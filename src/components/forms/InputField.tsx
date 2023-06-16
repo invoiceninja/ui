@@ -64,45 +64,33 @@ export function InputField(props: Props) {
       )}
 
       <div className="relative">
-        {props.type === 'date' ? (
-          <DatePicker
-            id={props.id}
-            required={props.required}
-            value={props.value}
-            onChange={props.onChange}
-            onValueChange={props.onValueChange}
-            disabled={props.disabled}
-            minDate={props.min}
-          />
-        ) : (
-          <DebounceInput
-            min={props.min}
-            maxLength={props.maxLength}
-            disabled={props.disabled}
-            element={props.element || 'input'}
-            inputRef={props.innerRef}
-            debounceTimeout={props.debounceTimeout ?? 300}
-            required={props.required}
-            id={props.id}
-            type={inputType}
-            className={classNames(
-              `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
-              {
-                'border border-gray-300': props.border !== false,
-              }
-            )}
-            placeholder={props.placeholder || ''}
-            onChange={(event) => {
-              props.onValueChange && props.onValueChange(event.target.value);
-              props.onChange && props.onChange(event);
-            }}
-            value={props.value}
-            list={props.list}
-            rows={props.textareaRows || 5}
-            step={props.step}
-            data-cy={props.cypressRef}
-          />
-        )}
+        <DebounceInput
+          min={props.min}
+          maxLength={props.maxLength}
+          disabled={props.disabled}
+          element={props.element || 'input'}
+          inputRef={props.innerRef}
+          debounceTimeout={props.debounceTimeout ?? 300}
+          required={props.required}
+          id={props.id}
+          type={inputType}
+          className={classNames(
+            `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            {
+              'border border-gray-300': props.border !== false,
+            }
+          )}
+          placeholder={props.placeholder || ''}
+          onChange={(event) => {
+            props.onValueChange && props.onValueChange(event.target.value);
+            props.onChange && props.onChange(event);
+          }}
+          value={props.value}
+          list={props.list}
+          rows={props.textareaRows || 5}
+          step={props.step}
+          data-cy={props.cypressRef}
+        />
 
         {isInitialTypePassword && (
           <span className="absolute top-1/4 right-3 cursor-pointer">
