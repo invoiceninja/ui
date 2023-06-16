@@ -13,7 +13,6 @@ import { atom } from 'jotai';
 interface Record {
   design_id: string;
   entity: string;
-  checked: boolean;
 }
 
-export const updatingRecords = atom<Record[] | undefined>(undefined);
+export const updatingRecordsAtom = atom<Record[]>([]);

@@ -24,7 +24,7 @@ import {
   parseTimeToDate,
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
-import { TimePicker } from '$app/components/forms/TimePicker';
+import { parseTime } from '../helpers';
 
 interface Props {
   task: Task;
@@ -198,8 +198,10 @@ export function TaskTable(props: Props) {
                   </Td>
 
                   <Td>
-                    <TimePicker
-                      value={start}
+                    <InputField
+                      type="time"
+                      step="1"
+                      value={parseTime(start)}
                       onValueChange={(value) =>
                         handleTimeChange(start, value, LogPosition.Start, index)
                       }
@@ -219,8 +221,10 @@ export function TaskTable(props: Props) {
                   )}
 
                   <Td>
-                    <TimePicker
-                      value={stop || 0}
+                    <InputField
+                      type="time"
+                      step="1"
+                      value={parseTime(stop) || 0}
                       onValueChange={(value) =>
                         handleTimeChange(stop, value, LogPosition.End, index)
                       }
