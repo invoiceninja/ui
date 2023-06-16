@@ -123,9 +123,7 @@ export function Registration() {
       >
         <Toggle
           checked={company?.client_can_register}
-          onValueChange={(value) =>
-            handleChange('client_can_register', value)
-          }
+          onValueChange={(value) => handleChange('client_can_register', value)}
         />
       </Element>
 

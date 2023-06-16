@@ -339,7 +339,7 @@ export function useActions() {
   const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = (task: Task) => {
-    setTask({ ...task, id: '', documents: [], number: '' });
+    setTask({ ...task, id: '', documents: [], number: '', invoice_id: '' });
 
     navigate('/tasks/create?action=clone');
   };

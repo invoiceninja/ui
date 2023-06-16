@@ -51,8 +51,11 @@ export function EnabledModules() {
     { label: t('tasks'), bitmask: ModuleBitmask.Tasks },
     { label: t('vendors'), bitmask: ModuleBitmask.Vendors },
     { label: t('expenses'), bitmask: ModuleBitmask.Expenses },
-    { label: t('purchase_orders'), bitmask: ModuleBitmask.PurchaseOrders},
-    { label: t('recurring_expenses'), bitmask: ModuleBitmask.RecurringExpenses },
+    { label: t('purchase_orders'), bitmask: ModuleBitmask.PurchaseOrders },
+    {
+      label: t('recurring_expenses'),
+      bitmask: ModuleBitmask.RecurringExpenses,
+    },
     { label: t('transactions'), bitmask: ModuleBitmask.Transactions },
 
     // { label: t('tickets'), bitmask: 128 },

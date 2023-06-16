@@ -14,7 +14,7 @@ import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 
 type Props = {
@@ -42,13 +42,17 @@ export function DropdownDateRangePicker(props: Props) {
   }, [props.startDate, props.endDate]);
 
   const handleCustomDateChange = (value: [string, string]) => {
-    dayjs.extend(customParseFormat)
+    dayjs.extend(customParseFormat);
     if (value[0] === '' || value[1] === '') {
       return;
     }
 
-    props.handleDateChange(dayjs(value[0]).format('YYYY-MM-DD') + ',' + dayjs(value[1]).format('YYYY-MM-DD'));
-  }
+    props.handleDateChange(
+      dayjs(value[0]).format('YYYY-MM-DD') +
+        ',' +
+        dayjs(value[1]).format('YYYY-MM-DD')
+    );
+  };
 
   return (
     <div className="flex justify-end items-center">

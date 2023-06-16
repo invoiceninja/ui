@@ -27,7 +27,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useFetchProjectQuery } from '$app/common/queries/projects';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export function useInvoiceTask() {
@@ -38,8 +37,6 @@ export function useInvoiceTask() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
-
-  const fetchProjectDetails = useFetchProjectQuery();
 
   const [, setInvoice] = useAtom(invoiceAtom);
 
@@ -98,7 +95,7 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop, , billable]) => {
+        logs.forEach(([start, stop, intervalDescription, billable]) => {
           if (
             billable ||
             !company?.settings.allow_billable_task_items ||
@@ -117,13 +114,37 @@ export function useInvoiceTask() {
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
 
-            parsed.push(
-              `${dayjs
-                .unix(start)
-                .format(`${dateFormat} ${timeFormat}`)} - ${dayjs
-                .unix(stop)
-                .format(timeFormat)} ${hoursDescription} <br />`
-            );
+            const description = [];
+
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('<div class="task-time-details">');
+            }
+
+            if (company.invoice_task_datelog) {
+              description.push(dayjs.unix(start).format(dateFormat));
+            }
+
+            if (company.invoice_task_timelog) {
+              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+            }
+
+            if (company.invoice_task_timelog) {
+              description.push(dayjs.unix(stop).format(timeFormat));
+            }
+
+            if (company.invoice_task_hours) {
+              description.push(hoursDescription);
+            }
+
+            if (company.invoice_task_item_description) {
+              description.push(intervalDescription);
+            }
+
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('</div>\n');
+            }
+
+            parsed.push(description.join(' '));
           }
         });
 
@@ -137,26 +158,14 @@ export function useInvoiceTask() {
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
 
-        let projectDescription = '';
-
-        if (company.invoice_task_project && task.project_id) {
-          const project = await fetchProjectDetails(task.project_id);
-
-          if (project) {
-            projectDescription = `## ${project.name}`;
-          }
-        }
+        const projectName =
+          company.invoice_task_project && task?.project?.name
+            ? '## ' + task.project?.name + '\n'
+            : '';
 
         if (parsed.length) {
-          item.notes = [
-            projectDescription,
-            task.description,
-            '<div class="task-time-details">',
-            ...parsed,
-            '</div>',
-          ]
-            .join('\n')
-            .trim();
+          item.notes =
+            projectName + '### ' + task?.description + ' ' + parsed.join(' ');
         }
 
         invoice.line_items = parsed.length ? [item] : [];

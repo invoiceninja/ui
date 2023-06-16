@@ -192,6 +192,18 @@ export function TaskSettings() {
         </Element>
 
         <Element
+          leftSide={t('invoice_task_item_description')}
+          leftSideHelp={t('invoice_task_item_description_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_item_description || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_item_description', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('lock_invoiced_tasks')}
           leftSideHelp={t('lock_invoiced_tasks_help')}
         >
