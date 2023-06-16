@@ -38,6 +38,7 @@ import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { useSave } from './hooks/useSave';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -72,7 +73,7 @@ export default function Edit() {
     }
   }, [data]);
 
-  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
+  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum | InvoiceSumInclusive>();
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();

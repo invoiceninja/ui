@@ -147,7 +147,9 @@ export function Details(props: Props) {
         <Toggle
           id="has_valid_vat_number"
           checked={props.client?.has_valid_vat_number}
-          onValueChange={(value) => handleCustomFieldChange('has_valid_vat_number', value)}
+          onValueChange={(value) =>
+            handleCustomFieldChange('has_valid_vat_number', value)
+          }
         />
       </Element>
 
@@ -155,7 +157,9 @@ export function Details(props: Props) {
         <Toggle
           id="is_tax_exempt"
           checked={props.client?.is_tax_exempt}
-          onValueChange={(value) => handleCustomFieldChange('is_tax_exempt', value)}
+          onValueChange={(value) =>
+            handleCustomFieldChange('is_tax_exempt', value)
+          }
         />
       </Element>
 

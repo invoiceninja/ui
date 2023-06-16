@@ -167,7 +167,9 @@ export function QuoteFooter(props: Props) {
                 <Toggle
                   label={t('inclusive_taxes')}
                   checked={quote?.uses_inclusive_taxes || false}
-                  onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>

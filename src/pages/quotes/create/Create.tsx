@@ -33,6 +33,7 @@ import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -47,6 +48,7 @@ export default function Create() {
       href: '/quotes/create',
     },
   ];
+  const company = useCurrentCompany();
 
   const [searchParams] = useSearchParams();
 
@@ -95,6 +97,8 @@ export default function Create() {
         if (searchParams.get('client')) {
           _quote.client_id = searchParams.get('client')!;
         }
+
+        _quote.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
 
         return (value = _quote);
       }

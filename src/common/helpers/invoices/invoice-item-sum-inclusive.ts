@@ -10,10 +10,13 @@
 import collect from 'collect.js';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 export class InvoiceItemSumInclusive {
   public taxCollection = collect();
-  protected currency = 'USD'; // Needs fixes, obviously.
 
   public lineItems: InvoiceItem[] = [];
   protected items = new Map();
@@ -23,7 +26,7 @@ export class InvoiceItemSumInclusive {
   protected grossSubTotal = 0;
   public totalTaxes = 0;
 
-  constructor(protected invoice: Invoice) {}
+  constructor(protected invoice: Invoice | Credit | Quote | PurchaseOrder | RecurringInvoice) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {

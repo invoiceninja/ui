@@ -133,6 +133,8 @@ export default function Create() {
           _invoice.client_id = searchParams.get('client')!;
         }
 
+        _invoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+
         value = _invoice;
       }
 

@@ -83,7 +83,9 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -176,7 +178,8 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
-      const invoiceSum = new InvoiceSum(credit, currency).build();
+      
+      const invoiceSum = credit.uses_inclusive_taxes ? new InvoiceSumInclusive(credit, currency).build() : new InvoiceSum(credit, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -292,19 +295,19 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
-    setCredit({ ...credit, number: '', documents: [] });
+    setCredit({ ...credit, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
-    setInvoice({ ...credit, number: '', documents: [], due_date: '' });
+    setInvoice({ ...credit, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (credit: Credit) => {
-    setQuote({ ...(credit as Quote), number: '', documents: [] });
+    setQuote({ ...(credit as Quote), number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/quotes/create?action=clone');
   };
@@ -314,6 +317,7 @@ export function useActions() {
       ...(credit as unknown as RecurringInvoice),
       number: '',
       documents: [],
+      frequency_id: '5',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -324,6 +328,7 @@ export function useActions() {
       ...(credit as unknown as PurchaseOrder),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/purchase_orders/create?action=clone');

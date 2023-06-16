@@ -20,13 +20,8 @@ interface Props {
 export function QuoteStatus(props: Props) {
   const [t] = useTranslation();
 
-  const {
-    status_id,
-    is_deleted,
-    archived_at,
-    invoice_id,
-    invitations,
-  } = props.entity;
+  const { status_id, is_deleted, archived_at, invoice_id, invitations } =
+    props.entity;
 
   const checkQuoteInvitationsViewedDate = () => {
     return invitations.some((invitation) => invitation.viewed_date);

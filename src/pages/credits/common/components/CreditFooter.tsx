@@ -168,7 +168,9 @@ export function CreditFooter(props: Props) {
                 <Toggle
                   label={t('inclusive_taxes')}
                   checked={credit?.uses_inclusive_taxes || false}
-                  onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>

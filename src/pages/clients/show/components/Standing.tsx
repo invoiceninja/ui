@@ -64,20 +64,19 @@ export function Standing(props: Props) {
                     )}
                   </span>
                 </div>
-                    
+
                 {client.payment_balance > 0 && (
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">{t('payments')}</p>
-                  <span>
-                    {formatMoney(
-                      client.payment_balance,
-                      client.country_id,
-                      client.settings.currency_id
-                    )}
-                  </span>
-                </div>
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{t('payments')}</p>
+                    <span>
+                      {formatMoney(
+                        client.payment_balance,
+                        client.country_id,
+                        client.settings.currency_id
+                      )}
+                    </span>
+                  </div>
                 )}
-                
               </div>
             }
             className="h-full"

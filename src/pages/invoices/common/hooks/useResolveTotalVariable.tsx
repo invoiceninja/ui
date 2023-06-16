@@ -19,11 +19,12 @@ import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface Props {
   resource?: ProductTableResource;
   relationType: RelationType;
-  invoiceSum?: InvoiceSum;
+  invoiceSum?: InvoiceSum | InvoiceSumInclusive;
   onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
 }
 

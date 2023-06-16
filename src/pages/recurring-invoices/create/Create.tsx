@@ -114,6 +114,8 @@ export default function Create() {
           _recurringInvoice.client_id = searchParams.get('client')!;
         }
 
+        _recurringInvoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+
         value = _recurringInvoice;
       }
 
