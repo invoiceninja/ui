@@ -52,8 +52,6 @@ export function CreditFooter(props: Props) {
     queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
   };
 
-  console.log(credit?.design_id);
-
   const tabs = [
     t('terms'),
     t('footer'),
