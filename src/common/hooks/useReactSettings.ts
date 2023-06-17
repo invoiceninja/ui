@@ -9,9 +9,10 @@
  */
 
 import { RootState } from '$app/common/stores/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { useCurrentUser } from './useCurrentUser';
-import { updateChanges } from '$app/common/stores/slices/user';
+import { useSelector } from 'react-redux';
+import { useInjectUserChanges } from './useInjectUserChanges';
+
+export type ChartsDefaultView = 'day' | 'week' | 'month';
 
 export interface ReactSettings {
   show_pdf_preview: boolean;
@@ -39,35 +40,9 @@ export type ReactTableColumns =
   | 'expense'
   | 'recurringExpense';
 
-type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
-  ? Prefix
-  : {
-      [K in keyof T & string]: T[K] extends object
-        ? K | `${Prefix}${K & string}.${AutoCompleteKey<T[K]>}`
-        : `${Prefix}${K & string}`;
-    }[keyof T & string];
-
-type ValueFor<
-  T,
-  Key extends AutoCompleteKey<T>
-> = Key extends `${infer First}.${infer Rest}`
-  ? First extends keyof T
-    ? Rest extends AutoCompleteKey<T[First]>
-      ? ValueFor<T[First], Rest>
-      : never
-    : never
-  : Key extends keyof T
-  ? T[Key]
-  : never;
-
-type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
-  key: K,
-  value: ValueFor<T, K>
-) => void;
-
 export function useReactSettings() {
-  const currentUser = useCurrentUser();
-  const dispatch = useDispatch();
+  const user = useInjectUserChanges();
+
 
   const reactSettings =
     useSelector(
@@ -75,7 +50,7 @@ export function useReactSettings() {
     ) || {};
 
   const previousReactTableColumns =
-    currentUser?.company_user?.settings?.react_table_columns;
+    user?.company_user?.settings?.react_table_columns;
 
   const settings: ReactSettings = {
     show_pdf_preview: true,
@@ -93,14 +68,6 @@ export function useReactSettings() {
     ...reactSettings,
   };
 
-  const update: UpdateFn<ReactSettings> = (property, value) => {
-    return dispatch(
-      updateChanges({
-        property: property,
-        value: value,
-      })
-    );
-  };
 
-  return { update, settings };
+  return settings;
 }
