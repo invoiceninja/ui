@@ -22,6 +22,11 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Badge } from '$app/components/Badge';
+import {
+  ChartsDefaultView,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -62,6 +67,9 @@ export enum TotalColors {
 export function Totals() {
   const [t] = useTranslation();
 
+  const settings = useReactSettings();
+  const { Preferences, update } = usePreferences();
+
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
@@ -74,7 +82,9 @@ export function Totals() {
   const [currency, setCurrency] = useState(1);
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
+  const [chartScale, setChartScale] = useState(
+    settings.preferences.dashboard_charts.default_view
+  );
 
   const [body, setBody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
@@ -128,6 +138,10 @@ export function Totals() {
     getTotals();
     getChartData();
   }, [body]);
+
+  useEffect(() => {
+    setChartScale(settings.preferences.dashboard_charts.default_view);
+  }, [settings.preferences.dashboard_charts.default_view]);
 
   return (
     <>
@@ -187,6 +201,23 @@ export function Totals() {
               endDate={body.end_date}
             />
           </div>
+
+          <Preferences>
+            <SelectField
+              label={t('dashboard_charts_default_view')}
+              value={settings.preferences.dashboard_charts.default_view}
+              onValueChange={(value) =>
+                update(
+                  'preferences.dashboard_charts.default_view',
+                  value as ChartsDefaultView
+                )
+              }
+            >
+              <option value="day">{t('day')}</option>
+              <option value="week">{t('week')}</option>
+              <option value="month">{t('month')}</option>
+            </SelectField>
+          </Preferences>
         </div>
       </div>
 
