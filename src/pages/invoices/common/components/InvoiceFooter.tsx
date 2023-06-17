@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { Card } from '$app/components/cards';
+import { Card, ClickableElement } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
@@ -26,7 +26,7 @@ import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
@@ -35,6 +35,10 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
+import { useState } from 'react';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 interface Props {
   invoice?: Invoice;
@@ -81,15 +85,36 @@ export function InvoiceFooter(props: Props) {
     t('documents'),
     t('settings'),
     t('custom_fields'),
+    t('history'),
   ];
 
   const onSuccess = () => {
     queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }));
   };
 
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const { data: history } = useQuery({
+    queryKey: [`/api/v1/invoices/${id}`, 'history'],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(
+          `/api/v1/invoices/${id}?include=activities.history&per_page=999999&t=${invoice?.updated_at}`
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
+      ),
+    enabled: Boolean(invoice) && tabIndex === 7,
+  });
+
+  const formatMoney = useFormatMoney();
+
+  console.log(history);
+
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup tabs={tabs} onTabChange={setTabIndex}>
         <div>
           <MarkdownEditor
             value={invoice?.public_notes || ''}
@@ -247,6 +272,22 @@ export function InvoiceFooter(props: Props) {
                 </Element>
               )
             )}
+        </div>
+
+        <div>
+          {history && history.activities?.length === 0 && (
+            <p>{t('nothing_to_see_here')}</p>
+          )}
+
+          {history &&
+            history.activities?.map((activity) => (
+              <ClickableElement
+                href={`/invoices/history/${activity.id}?per_page=999999&t=${activity.updated_at}`}
+                key={activity.id}
+              >
+                {/*  */}
+              </ClickableElement>
+            ))}
         </div>
       </TabGroup>
     </Card>
