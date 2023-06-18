@@ -311,7 +311,14 @@ export function useActions() {
       documents: [],
       number: '',
       due_date: '',
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/invoices/create?action=clone');
@@ -322,7 +329,14 @@ export function useActions() {
       ...(recurringInvoice as unknown as Quote),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/quotes/create?action=clone');
@@ -333,7 +347,14 @@ export function useActions() {
       ...(recurringInvoice as unknown as Credit),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/credits/create?action=clone');
@@ -344,7 +365,14 @@ export function useActions() {
       ...(recurringInvoice as unknown as PurchaseOrder),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/purchase_orders/create?action=clone');

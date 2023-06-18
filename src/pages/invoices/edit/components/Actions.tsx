@@ -101,7 +101,14 @@ export function useActions() {
       ...(invoice as unknown as RecurringInvoice),
       number: '',
       documents: [],
-      frequency_id: '5'
+      frequency_id: '5',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -112,7 +119,14 @@ export function useActions() {
       ...(invoice as unknown as PurchaseOrder),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
