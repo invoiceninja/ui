@@ -15,8 +15,11 @@ export default {
   [PaymentType.ALIPAY]: 'payment_type_Alipay',
   [PaymentType.AMERICAN_EXPRESS]: 'payment_type_American Express',
   [PaymentType.BANCONTACT]: 'bancontact',
+  [PaymentType.BACS]: 'payment_type_BACS',
   [PaymentType.BECS]: 'becs',
+  [PaymentType.BANK_TRANSFER]: 'payment_type_Bank Transfer',
   [PaymentType.CARTE_BLANCHE]: 'payment_type_Carte Blanche',
+  [PaymentType.CASH_APP]: 'payment_type_Cash App',
   [PaymentType.CHECK]: 'payment_type_Check',
   [PaymentType.CREDIT]: 'payment_type_Credit',
   [PaymentType.CREDIT_CARD_OTHER]: 'payment_type_Credit Card Other',
@@ -49,4 +52,5 @@ export default {
   [PaymentType.VISA]: 'payment_type_Visa Card',
   [PaymentType.KLARNA]: 'payment_type_Klarna',
   [PaymentType.INTERAC]: 'payment_type_Interac E-Transfer',
+  
 };
