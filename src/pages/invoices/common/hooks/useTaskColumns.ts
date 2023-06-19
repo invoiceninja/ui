@@ -48,17 +48,21 @@ export function useTaskColumns() {
       variables.splice(taxVariableIndex + 1, 0, ...taxes);
 
       variables = variables.filter((variable) => variable !== '$task.tax');
-
-      ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
-        if (company?.custom_fields[field]) {
-          variables = variables.filter(
-            (variable) => variable !== `$task.${field}`
-          );
-
-          variables.splice(variables.length - 1, 0, field);
-        }
-      });
     }
+
+    variables = variables.filter((variable) => variable !== '$task.line_total');
+
+    ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
+      if (company?.custom_fields[field]) {
+        variables = variables.filter(
+          (variable) => variable !== `$task.${field}`
+        );
+
+        variables.splice(variables.length - 1, 0, field);
+      }
+    });
+
+    variables.push('$task.line_total');
 
     setColumns(variables);
   }, [company]);
