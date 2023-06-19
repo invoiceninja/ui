@@ -381,7 +381,7 @@ export function useActions() {
       last_sent_date: '',
       project_id: '',
       subscription_id: '',
-      status_id: '',
+      status_id: '1',
       vendor_id: '',
     });
 
