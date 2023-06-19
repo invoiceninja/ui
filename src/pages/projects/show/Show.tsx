@@ -30,8 +30,15 @@ import { Inline } from '$app/components/Inline';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks';
 import { DataTable } from '$app/components/DataTable';
-import { useTaskColumns } from '$app/pages/tasks/common/hooks';
+import {
+  defaultColumns,
+  useAllTaskColumns,
+  useTaskColumns,
+  useTaskFilters,
+} from '$app/pages/tasks/common/hooks';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { permission } from '$app/common/guards/guards/permission';
 
 dayjs.extend(duration);
 
@@ -61,6 +68,9 @@ export default function Show() {
   const actions = useActions();
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
+
+  const filters = useTaskFilters();
+  const taskColumns = useAllTaskColumns();
 
   if (!project) {
     return (
@@ -117,7 +127,6 @@ export default function Show() {
 
           <p>
             {t('task_rate')}:
-
             {formatMoney(
               project.task_rate,
               project.client!.country_id,
@@ -144,11 +153,23 @@ export default function Show() {
       <div className="my-4">
         <DataTable
           resource="task"
-          endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           columns={columns}
-          withResourcefulActions
+          customActions={actions}
+          endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           bulkRoute="/api/v1/tasks/bulk"
-          linkToCreate={`/tasks/create?project=${project.id}`}
+          linkToCreate="/tasks/create"
+          customFilters={filters}
+          customFilterQueryKey="client_status"
+          customFilterPlaceholder="status"
+          withResourcefulActions
+          leftSideChevrons={
+            <DataTableColumnsPicker
+              columns={taskColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="task"
+            />
+          }
+          linkToCreateGuards={[permission('create_task')]}
         />
       </div>
     </Default>
