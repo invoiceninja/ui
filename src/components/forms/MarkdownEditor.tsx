@@ -72,7 +72,7 @@ export function MarkdownEditor(props: Props) {
             'mceCodeEditor',
           ],
           toolbar:
-            'undo redo | blocks | ' +
+            'undo redo | blocks | link ' +
             'bold italic forecolor | alignleft aligncenter ' +
             'alignright alignjustify | bullist numlist outdent indent | ' +
             'removeformat | code | help',
