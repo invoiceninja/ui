@@ -11,6 +11,9 @@
 export enum InvoiceItemType {
   Product = '1',
   Task = '2',
+  UnpaidFee = '3',
+  PaidFee = '4',
+  LateFee = '5',
 }
 
 export interface InvoiceItem {
