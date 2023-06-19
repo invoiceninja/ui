@@ -128,8 +128,13 @@ export default function Edit() {
             <ProductsTable
               type="product"
               resource={credit}
-              items={credit.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={credit.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
