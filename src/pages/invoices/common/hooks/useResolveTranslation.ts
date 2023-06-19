@@ -12,10 +12,13 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { resolveKey } from '$app/pages/invoices/common/helpers/resolve-key';
 import { useTranslation } from 'react-i18next';
 
-export function useResolveTranslation() {
+export function useResolveTranslation({ type }: { type?: 'product' | 'task' }) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
-  const customFields = ['product1', 'product2', 'product3', 'product4'];
+  const customFields =
+    type === 'product' || !type
+      ? ['product1', 'product2', 'product3', 'product4']
+      : ['task1', 'task2', 'task3', 'task4'];
 
   const aliases: Record<string, string> = {
     '$product.tax_rate1': t('tax_rate1'),
@@ -30,8 +33,8 @@ export function useResolveTranslation() {
 
     const { property } = resolveKey(key, delimiter);
 
-    if (customFields.includes(property)) {
-      const customField = company.custom_fields?.[property];
+    if (customFields.includes(key)) {
+      const customField = company.custom_fields?.[key];
 
       if (customField) {
         return customField.split('|')[0];
