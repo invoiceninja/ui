@@ -10,6 +10,7 @@
 
 export const enum PaymentType {
   BANK_TRANSFER = '1',
+  CASH = '2',
   CREDIT = '32',
   ACH = '4',
   VISA = '5',

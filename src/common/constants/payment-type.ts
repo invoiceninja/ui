@@ -19,6 +19,7 @@ export default {
   [PaymentType.BECS]: 'becs',
   [PaymentType.BANK_TRANSFER]: 'payment_type_Bank Transfer',
   [PaymentType.CARTE_BLANCHE]: 'payment_type_Carte Blanche',
+  [PaymentType.CASH]: 'payment_type_Cash',
   [PaymentType.CASH_APP]: 'payment_type_Cash App',
   [PaymentType.CHECK]: 'payment_type_Check',
   [PaymentType.CREDIT]: 'payment_type_Credit',
