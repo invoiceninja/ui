@@ -9,7 +9,8 @@
  */
 
 export const enum PaymentType {
-  CREDIT = '1',
+  BANK_TRANSFER = '1',
+  CREDIT = '32',
   ACH = '4',
   VISA = '5',
   MASTERCARD = '6',
@@ -48,4 +49,7 @@ export const enum PaymentType {
   FPX = '46',
   KLARNA = '47',
   INTERAC = '48',
+  BACS = '49',
+  STRIPE_BANK_TRANSFER = '50',
+  CASH_APP = '51',
 }
