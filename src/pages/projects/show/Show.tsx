@@ -31,6 +31,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks';
 import { DataTable } from '$app/components/DataTable';
 import { useTaskColumns } from '$app/pages/tasks/common/hooks';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 dayjs.extend(duration);
 
@@ -59,6 +60,7 @@ export default function Show() {
 
   const actions = useActions();
   const columns = useTaskColumns();
+  const formatMoney = useFormatMoney();
 
   if (!project) {
     return (
@@ -114,7 +116,13 @@ export default function Show() {
           </p>
 
           <p>
-            {t('task_rate')}: {project.task_rate}
+            {t('task_rate')}:
+
+            {formatMoney(
+              project.task_rate,
+              project.client!.country_id,
+              project.client!.settings.currency_id
+            )}
           </p>
         </InfoCard>
 
