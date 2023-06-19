@@ -66,7 +66,7 @@ export default function Edit() {
 
         request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
           .then(() => {
-            queryClient.invalidateQueries('/api/v1/designs');
+            queryClient.invalidateQueries(['/api/v1/designs']);
             queryClient.invalidateQueries(route('/api/v1/designs/:id', { id }));
 
             toast.success('updated_design');
