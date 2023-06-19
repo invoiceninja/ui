@@ -297,7 +297,10 @@ export function DebouncedCombobox(props: Props) {
 
   useEffect(() => {
     window.addEventListener('invalidate.combobox.queries', (event: any) => {
-      queryClient.invalidateQueries(event.detail.url);
+      const url = new URL(event.detail.url);
+
+      queryClient.invalidateQueries([event.detail.url]);
+      queryClient.invalidateQueries([url.pathname]);
 
       request('', 0);
     });
