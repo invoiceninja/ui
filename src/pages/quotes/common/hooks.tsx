@@ -293,13 +293,38 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
-    setQuote({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setQuote({ ...quote, number: '', 
+    documents: [], 
+    date: dayjs().format('YYYY-MM-DD'),
+    due_date: '',
+    total_taxes: 0,
+    exchange_rate: 1,
+    last_sent_date: '',
+    project_id: '',
+    subscription_id: '',
+    status_id: '',
+    vendor_id: '',
+    paid_to_date: 0,
+  });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (quote: Quote) => {
-    setCredit({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setCredit({ ...quote, 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+     });
 
     navigate('/credits/create?action=clone');
   };
@@ -341,7 +366,20 @@ export function useActions() {
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
+    setInvoice({ ...quote, 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0, 
+     });
     navigate('/invoices/create?action=clone');
   };
 

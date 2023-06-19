@@ -330,6 +330,7 @@ export function useActions() {
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -373,6 +374,7 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/purchase_orders/create?action=clone');
