@@ -33,7 +33,11 @@ interface Props {
   onClientCreated?: (client: Client) => unknown;
 }
 
-export function ClientCreate(props: Props) {
+export function ClientCreate({
+  isModalOpen,
+  setIsModalOpen,
+  onClientCreated,
+}: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -83,9 +87,9 @@ export function ClientCreate(props: Props) {
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
-        props.setIsModalOpen(false);
+        setIsModalOpen(false);
 
-        props.onClientCreated && props.onClientCreated(response.data.data);
+        onClientCreated && onClientCreated(response.data.data);
 
         queryClient.invalidateQueries('/api/v1/clients');
         queryClient.invalidateQueries(endpoint('/api/v1/clients'));
@@ -109,12 +113,27 @@ export function ClientCreate(props: Props) {
       });
   };
 
+  useEffect(() => {
+    if (!isModalOpen) {
+      setClient(undefined);
+      setContacts(() => [
+        {
+          first_name: '',
+          last_name: '',
+          email: '',
+          phone: '',
+          send_email: false,
+        },
+      ]);
+    }
+  }, [isModalOpen]);
+
   return (
     <Modal
       title={t('new_client')}
-      visible={props.isModalOpen}
+      visible={isModalOpen}
       onClose={(value) => {
-        props.setIsModalOpen(value);
+        setIsModalOpen(value);
         setErrors(undefined);
       }}
       size="large"
@@ -137,7 +156,7 @@ export function ClientCreate(props: Props) {
       </div>
 
       <div className="flex justify-end space-x-4">
-        <Button type="minimal" onClick={() => props.setIsModalOpen(false)}>
+        <Button type="minimal" onClick={() => setIsModalOpen(false)}>
           {t('cancel')}
         </Button>
 

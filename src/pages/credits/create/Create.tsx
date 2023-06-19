@@ -102,7 +102,8 @@ export default function Create() {
           _credit.client_id = searchParams.get('client')!;
         }
 
-        _credit.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+        _credit.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         value = _credit;
       }
@@ -162,8 +163,13 @@ export default function Create() {
             <ProductsTable
               type="product"
               resource={credit}
-              items={credit.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={credit.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"

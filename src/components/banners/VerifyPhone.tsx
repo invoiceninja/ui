@@ -204,6 +204,10 @@ export function VerifyPhone() {
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
 
   const account = useCurrentAccount();
+  
+  if (!account) {
+    return null;
+  }
 
   if (!isHosted()) {
     return null;

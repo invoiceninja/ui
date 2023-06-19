@@ -189,7 +189,12 @@ export default function Create() {
               type="product"
               resource={recurringInvoice}
               items={recurringInvoice.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+                (item) => [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
