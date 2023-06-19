@@ -123,7 +123,7 @@ export function Contacts(props: Props) {
 
           <Element leftSide={t('add_to_invoices')}>
             <Toggle
-              checked={contact.send_email}
+              checked={Boolean(contact.send_email)}
               onChange={(value) =>
                 handleChange(value, 'send_email', contact.id as string)
               }
