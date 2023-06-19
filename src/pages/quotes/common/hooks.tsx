@@ -293,13 +293,38 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
-    setQuote({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setQuote({ ...quote, number: '', 
+    documents: [], 
+    date: dayjs().format('YYYY-MM-DD'),
+    due_date: '',
+    total_taxes: 0,
+    exchange_rate: 1,
+    last_sent_date: '',
+    project_id: '',
+    subscription_id: '',
+    status_id: '',
+    vendor_id: '',
+    paid_to_date: 0,
+  });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (quote: Quote) => {
-    setCredit({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setCredit({ ...quote, 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+     });
 
     navigate('/credits/create?action=clone');
   };
@@ -309,7 +334,14 @@ export function useActions() {
       ...(quote as unknown as RecurringInvoice),
       number: '',
       documents: [],
-      frequency_id: '5'
+      frequency_id: '5',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -320,14 +352,34 @@ export function useActions() {
       ...(quote as unknown as PurchaseOrder),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
+    setInvoice({ ...quote, 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0, 
+     });
     navigate('/invoices/create?action=clone');
   };
 

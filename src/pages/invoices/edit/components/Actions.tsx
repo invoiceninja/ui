@@ -79,19 +79,58 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
+    setInvoice({ ...invoice, 
+      number: '', 
+      documents: [], 
+      due_date: '', 
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0, 
+    });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
-    setQuote({ ...(invoice as unknown as Quote), number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setQuote({ ...(invoice as unknown as Quote), 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (invoice: Invoice) => {
-    setCredit({ ...(invoice as unknown as Credit), number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setCredit({ ...(invoice as unknown as Credit), 
+      number: '', 
+      documents: [], 
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+     });
 
     navigate('/credits/create?action=clone');
   };
@@ -101,7 +140,15 @@ export function useActions() {
       ...(invoice as unknown as RecurringInvoice),
       number: '',
       documents: [],
-      frequency_id: '5'
+      frequency_id: '5',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -112,7 +159,15 @@ export function useActions() {
       ...(invoice as unknown as PurchaseOrder),
       number: '',
       documents: [],
-      date: dayjs().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/purchase_orders/create?action=clone');

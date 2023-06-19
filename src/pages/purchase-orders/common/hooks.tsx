@@ -390,7 +390,18 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
-    setPurchaseOrder({ ...purchaseOrder, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
+    setPurchaseOrder({ ...purchaseOrder, number: '', 
+    documents: [], 
+    date: dayjs().format('YYYY-MM-DD'),
+    total_taxes: 0,
+    exchange_rate: 1,
+    last_sent_date: '',
+    project_id: '',
+    subscription_id: '',
+    status_id: '1',
+    vendor_id: '',
+    paid_to_date: 0,
+  });
 
     navigate('/purchase_orders/create?action=clone');
   };
