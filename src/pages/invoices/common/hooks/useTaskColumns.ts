@@ -51,6 +51,10 @@ export function useTaskColumns() {
 
       ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
         if (company?.custom_fields[field]) {
+          variables = variables.filter(
+            (variable) => variable !== `$task.${field}`
+          );
+
           variables.splice(variables.length - 1, 0, field);
         }
       });

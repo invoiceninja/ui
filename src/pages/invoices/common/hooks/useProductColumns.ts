@@ -16,6 +16,8 @@ export function useProductColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
 
+  console.log(company?.settings.pdf_variables.product_columns);
+
   useEffect(() => {
     // We need to clone the product columns to local object,
     // because by default it's frozen.
@@ -57,6 +59,10 @@ export function useProductColumns() {
 
       ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
         if (company?.custom_fields[field]) {
+          variables = variables.filter(
+            (variable) => variable !== `$product.${field}`
+          );
+
           variables.splice(variables.length - 1, 0, field);
         }
       });
