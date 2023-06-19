@@ -157,7 +157,7 @@ export default function Show() {
           customActions={actions}
           endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           bulkRoute="/api/v1/tasks/bulk"
-          linkToCreate="/tasks/create"
+          linkToCreate={`/tasks/create?project=${id}`}
           customFilters={filters}
           customFilterQueryKey="client_status"
           customFilterPlaceholder="status"
