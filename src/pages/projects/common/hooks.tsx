@@ -247,7 +247,7 @@ export function useActions() {
 
   const isEditPage =
     location.pathname.endsWith('/edit') ||
-    location.pathname.endsWith(`/projects/${id}`);
+    !location.pathname.endsWith(`/projects/${id}`);
 
   const setProject = useSetAtom(projectAtom);
 
