@@ -13,6 +13,7 @@ export interface Parameters {
   show_payments_table: boolean;
   show_credits_table: boolean;
   show_aging_table: boolean;
+  only_clients_with_invoices: boolean;
   status: string;
   clients: string[];
   entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
