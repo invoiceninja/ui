@@ -92,6 +92,7 @@ export function EmailStatement(props: Props) {
           <option value="last_quarter">{t('last_quarter')}</option>
           <option value="this_year">{t('this_year')}</option>
           <option value="last_year">{t('last_year')}</option>
+          <option value="all_time">{t('all_time')}</option>
         </SelectField>
       </Element>
 
@@ -139,6 +140,18 @@ export function EmailStatement(props: Props) {
               value
             )
           }
+        />
+      </Element>
+
+      <Element leftSide={t('only_clients_with_invoices')}>
+        <Toggle
+            checked={schedule.parameters.only_clients_with_invoices}
+            onValueChange={(value) =>
+                handleChange(
+                    'parameters.only_clients_with_invoices' as keyof Schedule,
+                    value
+                )
+            }
         />
       </Element>
 

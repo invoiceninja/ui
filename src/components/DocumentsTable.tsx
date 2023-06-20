@@ -25,6 +25,8 @@ import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import { useQueryClient } from 'react-query';
 
 interface Props {
   documents: Document[];
@@ -42,6 +44,52 @@ export function DocumentsTable(props: Props) {
   const [documentId, setDocumentId] = useState<string>();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const queryClient = useQueryClient();
+
+  const downloadDocument = (doc: Document, inline: boolean) => {
+
+    toast.processing();
+
+    queryClient.fetchQuery(endpoint('/documents/:hash', { hash: doc.hash }), () =>
+      request(
+        'GET',
+        endpoint('/documents/:hash', { hash: doc.hash }),
+        { headers: defaultHeaders() },
+        { responseType: 'arraybuffer' }
+      )
+        .then((response) => {
+          const blob = new Blob([response.data], { type: response.headers['content-type'] });
+          const url = URL.createObjectURL(blob);
+
+          if (inline) {
+
+            window.open(url);
+            return;
+
+          }
+
+          const link = document.createElement('a');
+
+          link.download = doc.name;
+          link.href = url;
+          link.target = '_blank';
+
+          document.body.appendChild(link);
+
+          link.click();
+
+          document.body.removeChild(link);
+
+          toast.dismiss();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error();
+        })
+    );
+
+  }
 
   const destroy = (password: string) => {
     toast.processing();
@@ -98,30 +146,23 @@ export function DocumentsTable(props: Props) {
               <Td>{prettyBytes(document.size)}</Td>
               <Td>
                 <Dropdown label={t('more_actions')}>
-                  <DropdownElement icon={<Icon element={MdPageview} />}>
-                    <a
-                      target="_blank"
-                      className="block w-full"
-                      href={endpoint('/documents/:hash?inline=true', {
-                        hash: document.hash,
-                      })}
-                      rel="noreferrer"
-                    >
-                      {t('view')}
-                    </a>
+                  <DropdownElement
+                    onClick={() => {
+                      downloadDocument(document, true);
+                    }}
+                    icon={<Icon element={MdPageview} />}
+                  >
+                    {t('view')}
+
                   </DropdownElement>
 
-                  <DropdownElement icon={<Icon element={MdDownload} />}>
-                    <a
-                      target="_blank"
-                      className="block w-full"
-                      rel="noreferrer"
-                      href={endpoint('/documents/:hash', {
-                        hash: document.hash,
-                      })}
-                    >
-                      {t('download')}
-                    </a>
+                  <DropdownElement
+                    onClick={() => {
+                      downloadDocument(document, false);
+                    }}
+                    icon={<Icon element={MdDownload} />}
+                  >
+                    {t('download')}
                   </DropdownElement>
 
                   <DropdownElement

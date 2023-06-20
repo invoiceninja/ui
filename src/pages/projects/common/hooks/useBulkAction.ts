@@ -43,6 +43,7 @@ export function useBulkAction() {
         });
       })
       .finally(() => {
+        queryClient.invalidateQueries('/api/v1/projects');
         queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
 
         invalidateQueryValue &&

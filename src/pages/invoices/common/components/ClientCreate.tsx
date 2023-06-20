@@ -26,6 +26,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   isModalOpen: boolean;
@@ -58,10 +59,25 @@ export function ClientCreate({
   });
 
   useEffect(() => {
-    if (blankClient) {
-      setClient(blankClient);
+    if (blankClient && isModalOpen) {
+      setClient({ ...blankClient });
     }
-  }, [blankClient]);
+  }, [isModalOpen]);
+
+  const handleClose = (value: boolean) => {
+    setIsModalOpen(value);
+    setErrors(undefined);
+    setClient(undefined);
+    setContacts(() => [
+      {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        send_email: false,
+      },
+    ]);
+  };
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
@@ -87,7 +103,6 @@ export function ClientCreate({
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
-        setIsModalOpen(false);
 
         onClientCreated && onClientCreated(response.data.data);
 
@@ -101,6 +116,8 @@ export function ClientCreate({
             },
           })
         );
+
+        handleClose(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
@@ -113,55 +130,43 @@ export function ClientCreate({
       });
   };
 
-  useEffect(() => {
-    if (!isModalOpen) {
-      setClient(undefined);
-      setContacts(() => [
-        {
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-          send_email: false,
-        },
-      ]);
-    }
-  }, [isModalOpen]);
-
   return (
     <Modal
       title={t('new_client')}
       visible={isModalOpen}
-      onClose={(value) => {
-        setIsModalOpen(value);
-        setErrors(undefined);
-      }}
+      onClose={(value) => handleClose(value)}
       size="large"
       backgroundColor="gray"
     >
-      <div className="flex flex-col xl:flex-row xl:gap-4">
-        <div className="w-full xl:w-1/2">
-          <Details client={client} setClient={setClient} errors={errors} />
-          <Address client={client} setClient={setClient} />
-        </div>
+      {client ? (
+        <>
+          <div className="flex flex-col xl:flex-row xl:gap-4">
+            <div className="w-full xl:w-1/2">
+              <Details client={client} setClient={setClient} errors={errors} />
+              <Address client={client} setClient={setClient} />
+            </div>
 
-        <div className="w-full xl:w-1/2">
-          <Contacts
-            contacts={contacts}
-            setContacts={setContacts}
-            errors={errors}
-          />
-          <AdditionalInfo client={client} setClient={setClient} />
-        </div>
-      </div>
+            <div className="w-full xl:w-1/2">
+              <Contacts
+                contacts={contacts}
+                setContacts={setContacts}
+                errors={errors}
+              />
+              <AdditionalInfo client={client} setClient={setClient} />
+            </div>
+          </div>
 
-      <div className="flex justify-end space-x-4">
-        <Button type="minimal" onClick={() => setIsModalOpen(false)}>
-          {t('cancel')}
-        </Button>
+          <div className="flex justify-end space-x-4">
+            <Button type="secondary" onClick={() => handleClose(false)}>
+              {t('cancel')}
+            </Button>
 
-        <Button onClick={onSave}>{t('save')}</Button>
-      </div>
+            <Button onClick={onSave}>{t('save')}</Button>
+          </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
     </Modal>
   );
 }

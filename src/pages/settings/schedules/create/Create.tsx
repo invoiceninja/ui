@@ -83,6 +83,7 @@ export function Create() {
             show_aging_table: false,
             show_credits_table: false,
             show_payments_table: false,
+            only_clients_with_invoices: false,
             status: 'all',
             entity: 'invoice',
             entity_id: '',
