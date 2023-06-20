@@ -34,7 +34,7 @@ import { Button } from '$app/components/forms';
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
   const { id } = useParams();
-  const { data: client, isLoading } = useClientQuery({ id });
+  const { data: client, isLoading } = useClientQuery({ id, enabled: true });
 
   const [t] = useTranslation();
 
@@ -44,7 +44,7 @@ export default function Client() {
     useState<boolean>(false);
 
   useEffect(() => {
-    setDocumentTitle(client?.data?.data?.display_name || 'view_client');
+    setDocumentTitle(client?.display_name || 'view_client');
   }, [client]);
 
   const pages: Page[] = [
@@ -108,7 +108,7 @@ export default function Client() {
           {client && (
             <ResourceActions
               label={t('more_actions')}
-              resource={client.data.data}
+              resource={client}
               actions={actions}
             />
           )}
@@ -120,12 +120,12 @@ export default function Client() {
       {client && (
         <>
           <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
-            <Details client={client.data.data} />
-            <Address client={client.data.data} />
-            <Contacts client={client.data.data} />
-            <Standing client={client.data.data} />
-            {client.data.data.gateway_tokens.length > 0 && (
-              <Gateways client={client.data.data} />
+            <Details client={client} />
+            <Address client={client} />
+            <Contacts client={client} />
+            <Standing client={client} />
+            {client.gateway_tokens.length > 0 && (
+              <Gateways client={client} />
             )}
           </div>
 

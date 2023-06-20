@@ -57,7 +57,7 @@ export default function Statement() {
 
   const user = useCurrentUser();
 
-  const { data: clientResponse } = useClientQuery({ id });
+  const { data: clientResponse } = useClientQuery({ id, enabled: true });
 
   const scheduleStatement = useScheduleStatement();
 
@@ -201,7 +201,7 @@ export default function Statement() {
 
   useEffect(() => {
     if (clientResponse) {
-      setClient(clientResponse.data.data);
+      setClient(clientResponse);
     }
   }, [clientResponse]);
 
