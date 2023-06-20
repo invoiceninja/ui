@@ -8,17 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientQuery } from '$app/common/queries/clients';
-import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
@@ -30,7 +28,6 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useActions } from '../common/hooks/useActions';
@@ -39,6 +36,7 @@ import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -47,8 +45,6 @@ export default function Edit() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const company = useInjectCompanyChanges();
-  const dispatch = useDispatch();
 
   const { data, isLoading } = useClientQuery(
     { id },
@@ -94,26 +90,18 @@ export default function Edit() {
     },
   ];
 
+  const saveCompany = useHandleCompanySave();
+
   const onSave = () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .all([
-        request('PUT', endpoint('/api/v1/clients/:id', { id }), {
-          ...client,
-          documents: [],
-        }),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+    saveCompany();
 
+    request('PUT', endpoint('/api/v1/clients/:id', { id }), {
+      ...client,
+      documents: [],
+    })
+      .then(() => {
         toast.success(t('updated_client'), { id: toastId });
 
         queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
