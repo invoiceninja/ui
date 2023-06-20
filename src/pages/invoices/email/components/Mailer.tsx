@@ -124,7 +124,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             <SelectField
               defaultValue={templateId}
               onValueChange={(value) => handleTemplateChange(value)}
-              errorMessage={errors?.errors.template_id}
+              errorMessage={errors?.errors.template}
             >
               {Object.entries(props.list).map(
                 ([templateId, translation], index) => (
