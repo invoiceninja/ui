@@ -12,45 +12,65 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useState, useEffect } from 'react';
 import { clone } from 'lodash';
 
+const defaultLineItemColumns = [
+  { key: '$task.item', default: true },
+  { key: '$task.description', default: false },
+  { key: '$task.unit_cost', default: true },
+  { key: '$task.discount', default: false },
+  { key: '$task.quantity', default: true },
+  { key: '$task.line_total', default: true },
+];
+
 export function useTaskColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
 
   useEffect(() => {
-    // We need to clone the product columns to local object,
-    // because by default it's frozen.
-    let variables: string[] =
-      clone(company?.settings.pdf_variables.task_columns) || [];
+    const defaultVariables = defaultLineItemColumns.map((column) => column.key);
 
-    // Local object is needed because we want to spread tax columns in case they're enabled.
-    if (variables.includes('$task.tax')) {
-      const taxes: string[] = [];
-      const enabledTaxRates = company?.enabled_item_tax_rates || 0;
+    let variables: string[] = defaultLineItemColumns.map(
+      (column) => column.key
+    );
 
-      if (enabledTaxRates > 0) {
-        taxes.push('$task.tax_rate1');
-      }
+    const pdfVariables =
+      clone(company?.settings.pdf_variables.product_columns) || [];
 
-      if (enabledTaxRates > 1) {
-        taxes.push('$task.tax_rate2');
-      }
-
-      if (enabledTaxRates > 2) {
-        taxes.push('$task.tax_rate3');
-      }
-
-      // Let's remove original tax field because we don't need it anymore,
-      // but first we gonna keep the index, because that's where we are injecting other input fields.
-      const taxVariableIndex = variables.findIndex(
-        (variable) => variable === '$task.tax'
+    defaultVariables.forEach((variable) => {
+      const column = defaultLineItemColumns.find(
+        (column) => column.key === variable
       );
 
-      variables.splice(taxVariableIndex + 1, 0, ...taxes);
+      if (!pdfVariables.includes(variable) && !column?.default) {
+        variables = variables.filter(
+          (currentVariable) => currentVariable !== variable
+        );
+      }
+    });
 
-      variables = variables.filter((variable) => variable !== '$task.tax');
+    const taxes: string[] = [];
+    const enabledTaxRates = company?.enabled_item_tax_rates || 0;
+
+    if (enabledTaxRates > 0) {
+      taxes.push('$task.tax_rate1');
     }
 
-    variables = variables.filter((variable) => variable !== '$task.line_total');
+    if (enabledTaxRates > 1) {
+      taxes.push('$task.tax_rate2');
+    }
+
+    if (enabledTaxRates > 2) {
+      taxes.push('$task.tax_rate3');
+    }
+
+    variables = variables.filter((variable) => variable !== '$product.tax');
+
+    variables.splice(variables.length - 1, 0, ...taxes);
+
+    if (!company.enable_product_discount) {
+      variables = variables.filter(
+        (variable) => variable !== '$product.discount'
+      );
+    }
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
       if (company?.custom_fields[field]) {
@@ -61,8 +81,6 @@ export function useTaskColumns() {
         variables.splice(variables.length - 1, 0, field);
       }
     });
-
-    variables.push('$task.line_total');
 
     setColumns(variables);
   }, [company]);
