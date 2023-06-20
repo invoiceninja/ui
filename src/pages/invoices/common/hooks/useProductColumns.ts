@@ -61,11 +61,11 @@ export function useProductColumns() {
     );
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
-      if (company?.custom_fields[field]) {
-        variables = variables.filter(
-          (variable) => variable !== `$product.${field}`
-        );
+      variables = variables.filter(
+        (variable) => variable !== `$product.${field}`
+      );
 
+      if (company?.custom_fields[field]) {
         variables.splice(variables.length - 1, 0, field);
       }
     });
