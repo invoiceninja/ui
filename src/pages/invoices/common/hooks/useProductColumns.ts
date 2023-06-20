@@ -16,7 +16,7 @@ const defaultLineItemColumns = [
   { key: '$product.item', default: true },
   { key: '$product.description', default: false },
   { key: '$product.unit_cost', default: true },
-  { key: '$product.discount', default: false },
+  { key: '$product.discount', default: true },
   { key: '$product.quantity', default: true },
   { key: '$product.line_total', default: true },
 ];
@@ -28,7 +28,7 @@ export function useProductColumns() {
   useEffect(() => {
     const defaultVariables = defaultLineItemColumns.map((column) => column.key);
 
-    let variables: string[] = defaultLineItemColumns.map(
+    let updatedVariables: string[] = defaultLineItemColumns.map(
       (column) => column.key
     );
 
@@ -41,7 +41,7 @@ export function useProductColumns() {
       );
 
       if (!pdfVariables.includes(variable) && !column?.default) {
-        variables = variables.filter(
+        updatedVariables = updatedVariables.filter(
           (currentVariable) => currentVariable !== variable
         );
       }
@@ -62,27 +62,29 @@ export function useProductColumns() {
       taxes.push('$product.tax_rate3');
     }
 
-    variables = variables.filter((variable) => variable !== '$product.tax');
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$product.tax'
+    );
 
-    variables.splice(variables.length - 1, 0, ...taxes);
+    updatedVariables.splice(updatedVariables.length - 1, 0, ...taxes);
 
     if (!company.enable_product_discount) {
-      variables = variables.filter(
+      updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.discount'
       );
     }
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
       if (company?.custom_fields[field]) {
-        variables = variables.filter(
-          (variable) => variable !== `$product.${field}`
+        updatedVariables.splice(
+          updatedVariables.length - 1,
+          0,
+          `$product.${field}`
         );
-
-        variables.splice(variables.length - 1, 0, field);
       }
     });
 
-    setColumns(variables);
+    setColumns(updatedVariables);
   }, [company]);
 
   return columns;

@@ -16,7 +16,7 @@ const defaultLineItemColumns = [
   { key: '$task.item', default: true },
   { key: '$task.description', default: false },
   { key: '$task.unit_cost', default: true },
-  { key: '$task.discount', default: false },
+  { key: '$task.discount', default: true },
   { key: '$task.quantity', default: true },
   { key: '$task.line_total', default: true },
 ];
@@ -74,11 +74,7 @@ export function useTaskColumns() {
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
       if (company?.custom_fields[field]) {
-        variables = variables.filter(
-          (variable) => variable !== `$task.${field}`
-        );
-
-        variables.splice(variables.length - 1, 0, field);
+        variables.splice(variables.length - 1, 0, `$task.${field}`);
       }
     });
 

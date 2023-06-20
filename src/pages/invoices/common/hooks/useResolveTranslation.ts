@@ -33,8 +33,8 @@ export function useResolveTranslation({ type }: { type?: 'product' | 'task' }) {
 
     const { property } = resolveKey(key, delimiter);
 
-    if (customFields.includes(key)) {
-      const customField = company.custom_fields?.[key];
+    if (customFields.includes(property)) {
+      const customField = company.custom_fields?.[property];
 
       if (customField) {
         return customField.split('|')[0];
