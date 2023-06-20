@@ -179,7 +179,6 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           <Card className="scale-y-100" title={template.subject}>
             <iframe
               srcDoc={generateEmailPreview(template.body, template.wrapper)}
-              frameBorder="0"
               width="100%"
               height={800}
             />
@@ -187,7 +186,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         )}
       </div>
 
-      <div className="col-span-12 lg:col-span-7 bg-blue-300 h-max">
+      <div className="my-4 lg:my-0 col-span-12 lg:col-span-7 h-max">
         {props.resource && reactSettings?.show_pdf_preview && (
           <InvoiceViewer method="GET" link={pdfUrl(props.resource) as string} />
         )}

@@ -74,6 +74,10 @@ export default function Create() {
           _task.client_id = searchParams.get('client')!;
         }
 
+        if (searchParams.get('project')) {
+          _task.project_id = searchParams.get('project')!;
+        }
+
         value = _task;
       }
 
