@@ -28,12 +28,12 @@ export function useTaskColumns() {
   useEffect(() => {
     const defaultVariables = defaultLineItemColumns.map((column) => column.key);
 
-    let variables: string[] = defaultLineItemColumns.map(
+    let updatedVariables: string[] = defaultLineItemColumns.map(
       (column) => column.key
     );
 
-    const pdfVariables =
-      clone(company?.settings.pdf_variables.product_columns) || [];
+    let pdfVariables =
+      clone(company?.settings.pdf_variables.task_columns) || [];
 
     defaultVariables.forEach((variable) => {
       const column = defaultLineItemColumns.find(
@@ -41,7 +41,7 @@ export function useTaskColumns() {
       );
 
       if (!pdfVariables.includes(variable) && !column?.default) {
-        variables = variables.filter(
+        updatedVariables = updatedVariables.filter(
           (currentVariable) => currentVariable !== variable
         );
       }
@@ -62,23 +62,44 @@ export function useTaskColumns() {
       taxes.push('$task.tax_rate3');
     }
 
-    variables = variables.filter((variable) => variable !== '$product.tax');
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$task.tax'
+    );
 
-    variables.splice(variables.length - 1, 0, ...taxes);
+    pdfVariables = pdfVariables.filter((variable) => variable !== '$task.tax');
+
+    updatedVariables.splice(updatedVariables.length - 1, 0, ...taxes);
 
     if (!company.enable_product_discount) {
-      variables = variables.filter(
-        (variable) => variable !== '$product.discount'
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$task.discount'
       );
     }
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
+      pdfVariables = pdfVariables.filter(
+        (variable) => variable !== `$task.${field}`
+      );
+
       if (company?.custom_fields[field]) {
-        variables.splice(variables.length - 1, 0, `$task.${field}`);
+        updatedVariables.splice(
+          updatedVariables.length - 1,
+          0,
+          `$task.${field}`
+        );
       }
     });
 
-    setColumns(variables);
+    pdfVariables.forEach((pdfVariable) => {
+      const doesExistInDefaultVariables =
+        defaultVariables.includes(pdfVariable);
+
+      if (!doesExistInDefaultVariables) {
+        updatedVariables.splice(updatedVariables.length - 1, 0, pdfVariable);
+      }
+    });
+
+    setColumns(updatedVariables);
   }, [company]);
 
   return columns;

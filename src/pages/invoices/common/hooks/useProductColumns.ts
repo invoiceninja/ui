@@ -32,7 +32,7 @@ export function useProductColumns() {
       (column) => column.key
     );
 
-    const pdfVariables =
+    let pdfVariables =
       clone(company?.settings.pdf_variables.product_columns) || [];
 
     defaultVariables.forEach((variable) => {
@@ -66,6 +66,10 @@ export function useProductColumns() {
       (variable) => variable !== '$product.tax'
     );
 
+    pdfVariables = pdfVariables.filter(
+      (variable) => variable !== '$product.tax'
+    );
+
     updatedVariables.splice(updatedVariables.length - 1, 0, ...taxes);
 
     if (!company.enable_product_discount) {
@@ -75,12 +79,25 @@ export function useProductColumns() {
     }
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
+      pdfVariables = pdfVariables.filter(
+        (variable) => variable !== `$product.${field}`
+      );
+
       if (company?.custom_fields[field]) {
         updatedVariables.splice(
           updatedVariables.length - 1,
           0,
           `$product.${field}`
         );
+      }
+    });
+
+    pdfVariables.forEach((pdfVariable) => {
+      const doesExistInDefaultVariables =
+        defaultVariables.includes(pdfVariable);
+
+      if (!doesExistInDefaultVariables) {
+        updatedVariables.splice(updatedVariables.length - 1, 0, pdfVariable);
       }
     });
 
