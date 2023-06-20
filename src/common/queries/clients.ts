@@ -12,8 +12,10 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericQueryOptions } from './invoices';
+import { Client } from '../interfaces/client';
+import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
@@ -51,15 +53,17 @@ export function useClientsQuery(props: Props) {
   );
 }
 
-export function useClientQuery(
-  params: { id: string | undefined },
-  options: Record<string, any> = {}
-) {
-  return useQuery(
-    route('/api/v1/clients/:id', { id: params.id }),
-    () => request('GET', endpoint('/api/v1/clients/:id', { id: params.id })),
-    { ...options, staleTime: Infinity }
-  );
+export function useClientQuery({ id, enabled }: GenericQueryOptions) {
+  return useQuery({
+    queryKey: ['/api/v1/clients', id],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/clients/:id', { id })).then(
+        (response: GenericSingleResourceResponse<Client>) =>
+          response.data.data
+      ),
+    enabled,
+    staleTime: Infinity,
+  });
 }
 
 export function bulk(

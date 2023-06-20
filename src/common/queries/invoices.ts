@@ -18,6 +18,7 @@ import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface GenericQueryOptions {
+  id: string | number | undefined;
   enabled: boolean;
 }
 
