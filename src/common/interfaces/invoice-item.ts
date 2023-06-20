@@ -40,4 +40,5 @@ export interface InvoiceItem {
   type_id: InvoiceItemType;
   product_cost: number;
   date: string;
+  tax_id: string;
 }

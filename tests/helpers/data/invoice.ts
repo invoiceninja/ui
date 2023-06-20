@@ -78,6 +78,7 @@ const invoice: Invoice = {
       type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
+      tax_id: '1',
     },
     {
       quantity: 1,
@@ -102,6 +103,7 @@ const invoice: Invoice = {
       type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
+      tax_id: '1',
     },
     {
       quantity: 1,
@@ -126,6 +128,7 @@ const invoice: Invoice = {
       type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
+      tax_id: '1',
     },
   ],
   entity_type: 'invoice',
