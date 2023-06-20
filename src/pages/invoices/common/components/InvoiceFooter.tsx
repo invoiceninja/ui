@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card, ClickableElement } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { Element } from '$app/components/cards';
@@ -25,7 +25,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { endpoint } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { useQuery, useQueryClient } from 'react-query';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
@@ -39,11 +39,16 @@ import { useState } from 'react';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 interface Props {
   invoice?: Invoice;
   handleChange: ChangeHandler;
 }
+
+dayjs.extend(relativeTime);
 
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
@@ -109,8 +114,7 @@ export function InvoiceFooter(props: Props) {
   });
 
   const formatMoney = useFormatMoney();
-
-  console.log(history);
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -274,19 +278,30 @@ export function InvoiceFooter(props: Props) {
             )}
         </div>
 
-        <div>
+        <div className="space-y-6 h-56 overflow-y-auto">
           {history && history.activities?.length === 0 && (
             <p>{t('nothing_to_see_here')}</p>
           )}
 
           {history &&
             history.activities?.map((activity) => (
-              <ClickableElement
-                href={`/invoices/history/${activity.id}?per_page=999999&t=${activity.updated_at}`}
-                key={activity.id}
-              >
-                {/*  */}
-              </ClickableElement>
+              <div className="space-y-2 text-sm" key={activity.id}>
+                <div className="flex space-x-1">
+                  <span>$0,00</span>
+                  <span>&middot;</span>
+                  <Link to={`/clients/${activity.client_id}`}>
+                    {invoice?.client?.display_name}
+                  </Link>
+                </div>
+
+                <div className="flex space-x-1">
+                  <Link to={`/activities/${activity.id}`}>
+                    {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                  </Link>
+                  <span>&middot;</span>
+                  <span>{dayjs.unix(activity.created_at).fromNow()}</span>
+                </div>
+              </div>
             ))}
         </div>
       </TabGroup>
