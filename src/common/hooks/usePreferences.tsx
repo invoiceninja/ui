@@ -22,6 +22,9 @@ import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
 import { useQueryClient } from 'react-query';
 import { route } from '../helpers/route';
+import { ValidationBag } from '../interfaces/validation-bag';
+import { AxiosError } from 'axios';
+import { usePasswordConfirmation } from '$app/components/PasswordConfirmation';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -52,9 +55,11 @@ type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
 export function usePreferences() {
   const user = useInjectUserChanges();
   const queryClient = useQueryClient();
+  const { isPasswordRequired, touch } = usePasswordConfirmation();
 
   const [t] = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const dispatch = useDispatch();
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -79,7 +84,9 @@ export function usePreferences() {
       user,
       {
         headers: {
-          'X-Api-Password': passwordRef.current!.value,
+          'X-Api-Password': isPasswordRequired()
+            ? passwordRef.current!.value
+            : '',
         },
       }
     )
@@ -91,9 +98,14 @@ export function usePreferences() {
         );
 
         setIsVisible(false);
+        touch();
       })
-      .catch((error) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
+
+        if (error.response?.status === 412) {
+          setErrors(error.response.data);
+        }
 
         toast.error();
       });
@@ -111,11 +123,15 @@ export function usePreferences() {
             >
               {children}
 
-              <InputField
-                label={t('password')}
-                innerRef={passwordRef}
-                type="password"
-              />
+              {isPasswordRequired() && (
+                <InputField
+                  label={t('password')}
+                  innerRef={passwordRef}
+                  type="password"
+                  errorMessage={errors?.message}
+                />
+              )}
+
               <Button onClick={save}>{t('save')}</Button>
             </Modal>
 
@@ -129,7 +145,7 @@ export function usePreferences() {
           </>
         );
       },
-    [isVisible, passwordRef]
+    [isVisible, passwordRef, errors]
   );
 
   return { Preferences, update };
