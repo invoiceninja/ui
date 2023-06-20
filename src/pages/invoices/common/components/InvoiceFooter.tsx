@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { Card, ClickableElement } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
@@ -38,7 +38,6 @@ import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisable
 import { useState } from 'react';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -113,7 +112,6 @@ export function InvoiceFooter(props: Props) {
     enabled: Boolean(invoice) && tabIndex === 7,
   });
 
-  const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
