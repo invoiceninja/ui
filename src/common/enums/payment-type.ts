@@ -53,4 +53,5 @@ export const enum PaymentType {
   BACS = '49',
   STRIPE_BANK_TRANSFER = '50',
   CASH_APP = '51',
+  VENMO = '25',
 }
