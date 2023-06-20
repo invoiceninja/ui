@@ -26,6 +26,7 @@ export default [
     expense_id: '',
     product_cost: 0,
     date: '',
+    tax_id: '1',
   },
   {
     quantity: 1,
@@ -52,5 +53,7 @@ export default [
     expense_id: '',
     product_cost: 0,
     date: '',
+    tax_id: '1',
+
   },
 ];
