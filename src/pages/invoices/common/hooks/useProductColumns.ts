@@ -56,21 +56,15 @@ export function useProductColumns() {
       variables = variables.filter((variable) => variable !== '$product.tax');
     }
 
-    variables = variables.filter(
-      (variable) => variable !== '$product.line_total'
-    );
-
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
-      variables = variables.filter(
-        (variable) => variable !== `$product.${field}`
-      );
-
       if (company?.custom_fields[field]) {
+        variables = variables.filter(
+          (variable) => variable !== `$product.${field}`
+        );
+
         variables.splice(variables.length - 1, 0, field);
       }
     });
-
-    variables.push('$product.line_total');
 
     setColumns(variables);
   }, [company]);
