@@ -60,6 +60,7 @@ export function Contacts(props: Props) {
       first_name: '',
       last_name: '',
       email: '',
+      password: '',
       phone: '',
       send_email: false,
     });
@@ -111,6 +112,23 @@ export function Contacts(props: Props) {
             />
           </Element>
 
+          {company?.settings.enable_client_portal_password && (
+            <Element leftSide={t('password')}>
+              <InputField
+                id={`password_${index}`}
+                type="password"
+                value={contact.password}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  handleChange(
+                    event.target.value,
+                    'password',
+                    contact.id as string
+                  )
+                }
+              />
+            </Element>
+          )}
+
           <Element leftSide={t('phone')}>
             <InputField
               id={`phone_${index}`}
@@ -123,7 +141,7 @@ export function Contacts(props: Props) {
 
           <Element leftSide={t('add_to_invoices')}>
             <Toggle
-              checked={contact.send_email}
+              checked={Boolean(contact?.send_email)}
               onChange={(value) =>
                 handleChange(value, 'send_email', contact.id as string)
               }

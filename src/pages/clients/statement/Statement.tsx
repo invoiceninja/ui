@@ -43,6 +43,8 @@ export interface Statement {
   show_aging_table: boolean;
   show_payments_table: boolean;
   show_credits_table: boolean;
+
+  only_clients_with_invoices: boolean;
   start_date: string;
   status: StatementStatus;
   dateRangeId: string;
@@ -55,7 +57,7 @@ export default function Statement() {
 
   const user = useCurrentUser();
 
-  const { data: clientResponse } = useClientQuery({ id });
+  const { data: clientResponse } = useClientQuery({ id, enabled: true });
 
   const scheduleStatement = useScheduleStatement();
 
@@ -133,6 +135,7 @@ export default function Statement() {
     show_aging_table: true,
     show_payments_table: true,
     show_credits_table: true,
+    only_clients_with_invoices: false,
     status: 'all',
     dateRangeId: 'last7_days',
   });
@@ -198,7 +201,7 @@ export default function Statement() {
 
   useEffect(() => {
     if (clientResponse) {
-      setClient(clientResponse.data.data);
+      setClient(clientResponse);
     }
   }, [clientResponse]);
 

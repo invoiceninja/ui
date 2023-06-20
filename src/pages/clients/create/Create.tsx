@@ -28,6 +28,7 @@ import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -104,6 +105,8 @@ export default function Create() {
   return (
     <Default title={t('new_client')} breadcrumbs={pages} onSaveClick={onSave}>
       {isLoading && <Spinner />}
+
+      {errors && <ValidationAlert errors={errors} />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">

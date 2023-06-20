@@ -25,7 +25,7 @@ import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -50,10 +50,7 @@ export default function Edit() {
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
 
-  const { data, isLoading } = useClientQuery(
-    { id },
-    { refetchOnWindowFocus: false }
-  );
+  const { data, isLoading } = useClientQuery({ id, enabled: true });
 
   const queryClient = useQueryClient();
 
@@ -68,9 +65,14 @@ export default function Edit() {
   const onPasswordConformation = usePurgeClient(id);
 
   useEffect(() => {
-    if (data?.data?.data) {
-      setClient(data.data.data);
-      setContacts(data.data.data.contacts);
+    if (data) {
+      setClient(data);
+
+      const contacts = cloneDeep(data.contacts);
+
+      contacts.map((contact) => (contact.password = ''));
+
+      setContacts(contacts);
     }
   }, [data]);
 

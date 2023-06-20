@@ -21,6 +21,7 @@ const Projects = lazy(() => import('$app/pages/projects/index/Projects'));
 const Create = lazy(() => import('$app/pages/projects/create/Create'));
 const Project = lazy(() => import('$app/pages/projects/Project'));
 const Edit = lazy(() => import('$app/pages/projects/edit/Edit'));
+const Show = lazy(() => import('$app/pages/projects/show/Show'));
 const Documents = lazy(() => import('$app/pages/projects/documents/Documents'));
 
 export const projectRoutes = (
@@ -50,6 +51,22 @@ export const projectRoutes = (
             permission('create_project'),
           ]}
           component={<Create />}
+        />
+      }
+    />
+    <Route
+      path="/projects/:id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Projects),
+            or(
+              permission('view_project'),
+              permission('edit_project'),
+              assigned('/api/v1/projects/:id')
+            ),
+          ]}
+          component={<Show />}
         />
       }
     />
