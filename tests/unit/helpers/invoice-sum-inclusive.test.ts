@@ -187,6 +187,7 @@ describe('InvoiceSum test invoice calculation', () => {
       type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
+      tax_id: '1',
     };
 
     invoice.line_items = [];
@@ -231,6 +232,7 @@ describe('InvoiceSum test invoice calculation', () => {
       type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
+      tax_id: '1',
     };
 
     invoice.line_items = [];
