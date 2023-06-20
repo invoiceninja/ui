@@ -112,20 +112,22 @@ export function Contacts(props: Props) {
             />
           </Element>
 
-          <Element leftSide={t('password')}>
-            <InputField
-              id={`password_${index}`}
-              type="password"
-              value={contact.password}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(
-                  event.target.value,
-                  'password',
-                  contact.id as string
-                )
-              }
-            />
-          </Element>
+          {company?.settings.enable_client_portal_password && (
+            <Element leftSide={t('password')}>
+              <InputField
+                id={`password_${index}`}
+                type="password"
+                value={contact.password}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  handleChange(
+                    event.target.value,
+                    'password',
+                    contact.id as string
+                  )
+                }
+              />
+            </Element>
+          )}
 
           <Element leftSide={t('phone')}>
             <InputField
