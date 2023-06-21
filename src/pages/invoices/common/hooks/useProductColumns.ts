@@ -53,8 +53,10 @@ export function useProductColumns() {
         (column) => column.key === variable
       );
 
-      const columnIndex = defaultLineItemColumns.findIndex(
-        (column) => column.key === variable
+      const columnIndex = getColumnIndex(
+        variable,
+        pdfVariables,
+        updatedVariables
       );
 
       if (!updatedVariables.includes(variable) && column?.default) {
@@ -89,6 +91,10 @@ export function useProductColumns() {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.discount'
       );
+
+      pdfVariables = pdfVariables.filter(
+        (variable) => variable !== '$product.discount'
+      );
     } else {
       if (!updatedVariables.includes('$product.discount')) {
         const discountColumnIndex = defaultLineItemColumns.findIndex(
@@ -104,10 +110,6 @@ export function useProductColumns() {
         (variable) => variable !== `$product.${field}`
       );
 
-      pdfVariables = pdfVariables.filter(
-        (variable) => variable !== `$product.${field}`
-      );
-
       if (company?.custom_fields[field]) {
         const customFieldColumnIndex = getColumnIndex(
           `$product.${field}`,
@@ -116,6 +118,10 @@ export function useProductColumns() {
         );
 
         updatedVariables.splice(customFieldColumnIndex, 0, `$product.${field}`);
+      } else {
+        pdfVariables = pdfVariables.filter(
+          (variable) => variable !== `$product.${field}`
+        );
       }
     });
 

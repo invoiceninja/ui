@@ -53,8 +53,10 @@ export function useTaskColumns() {
         (column) => column.key === variable
       );
 
-      const columnIndex = defaultLineItemColumns.findIndex(
-        (column) => column.key === variable
+      const columnIndex = getColumnIndex(
+        variable,
+        pdfVariables,
+        updatedVariables
       );
 
       if (!updatedVariables.includes(variable) && column?.default) {
@@ -89,6 +91,10 @@ export function useTaskColumns() {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$task.discount'
       );
+
+      pdfVariables = pdfVariables.filter(
+        (variable) => variable !== '$task.discount'
+      );
     } else {
       if (!updatedVariables.includes('$task.discount')) {
         const discountColumnIndex = defaultLineItemColumns.findIndex(
@@ -104,10 +110,6 @@ export function useTaskColumns() {
         (variable) => variable !== `$task.${field}`
       );
 
-      pdfVariables = pdfVariables.filter(
-        (variable) => variable !== `$task.${field}`
-      );
-
       if (company?.custom_fields[field]) {
         const customFieldColumnIndex = getColumnIndex(
           `$task.${field}`,
@@ -116,6 +118,10 @@ export function useTaskColumns() {
         );
 
         updatedVariables.splice(customFieldColumnIndex, 0, `$task.${field}`);
+      } else {
+        pdfVariables = pdfVariables.filter(
+          (variable) => variable !== `$task.${field}`
+        );
       }
     });
 
