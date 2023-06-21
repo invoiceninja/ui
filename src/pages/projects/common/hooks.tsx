@@ -245,9 +245,7 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const isEditPage =
-    location.pathname.endsWith('/edit') ||
-    !location.pathname.endsWith(`/projects/${id}`);
+  const isEditPage = location.pathname.includes(id!);
 
   const setProject = useSetAtom(projectAtom);
 

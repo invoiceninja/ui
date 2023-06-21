@@ -129,8 +129,8 @@ export default function Show() {
             {t('task_rate')}:
             {formatMoney(
               project.task_rate,
-              project.client!.country_id,
-              project.client!.settings.currency_id
+              project.client?.country_id || '',
+              project.client?.settings.currency_id
             )}
           </p>
         </InfoCard>
