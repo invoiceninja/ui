@@ -18,7 +18,7 @@ import {
   useCompanyGatewaysQuery,
 } from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
@@ -35,12 +35,29 @@ import {
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
 
 const gatewaysStyles = [
-  { key: 'paypal_express', width: 110 },
-  { key: 'mollie', width: 110 },
-  { key: 'eway', width: 170 },
-  { key: 'forte', width: 190 },
-  { key: 'square', width: 130 },
-  { key: 'checkoutcom', width: 170 },
+  { name: 'paypal_express', width: 110 },
+  { name: 'mollie', width: 110 },
+  { name: 'eway', width: 170 },
+  { name: 'forte', width: 190 },
+  { name: 'square', width: 130 },
+  { name: 'checkoutcom', width: 170 },
+];
+
+const gatewaysDetails = [
+  { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
+  { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
+  { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
+  { name: 'paypal_express', key: '38f2c48af60c7dd69e04248cbb24c36e' },
+  { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
+  { name: 'mollie', key: '1bd651fb213ca0c9d66ae3c336dc77e8' },
+  { name: 'gocardless', key: 'b9886f9257f0c6ee7c302f1c74475f6c' },
+  { name: 'forte', key: 'kivcvjexxvdiyqtj3mju5d6yhpeht2xs' },
+  { name: 'razorpay', key: 'hxd6gwg3ekb9tb3v9lptgx1mqyg69zu9' },
+  { name: 'square', key: '65faab2ab6e3223dbe848b1686490baz' },
+  { name: 'paytrace', key: 'bbd736b3254b0aabed6ad7fda1298c88' },
+  { name: 'checkoutcom', key: '3758e7f7c6f4cecf0f4f348b9a00f456' },
+  { name: 'payfast', key: 'd6814fc83f45d2935e7777071e629ef9' },
+  { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
 ];
 
 export function Create() {
@@ -89,11 +106,15 @@ export function Create() {
 
   const [tabs, setTabs] = useState<string[]>(defaultTab);
 
-  const getGatewayWidth = (provider: string) => {
-    const providerName = provider.toLowerCase();
+  const getGatewayNameByKey = (key: string) => {
+    const gateway = gatewaysDetails.find((gateway) => gateway.key === key);
 
+    return gateway?.name || '';
+  };
+
+  const getGatewayWidth = (gatewayName: string) => {
     const gateway = gatewaysStyles.find(
-      (gateway) => gateway.key === providerName
+      (gateway) => gateway.name === gatewayName
     );
 
     return gateway ? gateway.width : undefined;
@@ -252,15 +273,17 @@ export function Create() {
           {filteredGateways.map(
             (gateway, index) =>
               availableGatewayLogos.includes(
-                gateway.provider.toLowerCase()
+                getGatewayNameByKey(gateway.key)
               ) && (
                 <Card key={index} className="w-52">
                   <div className="flex flex-col items-center justify-between space-y-5 h-52">
                     <div className="flex justify-center items-center border-b border-b-gray-200 w-full h-28">
                       <GatewayTypeIcon
-                        name={gateway.provider.toLowerCase()}
+                        name={getGatewayNameByKey(gateway.key)}
                         style={{
-                          width: getGatewayWidth(gateway.provider) || 150,
+                          width:
+                            getGatewayWidth(getGatewayNameByKey(gateway.key)) ||
+                            150,
                         }}
                       />
                     </div>
@@ -272,8 +295,8 @@ export function Create() {
                     )}
 
                     <Button
-                      onClick={(event: ChangeEvent<HTMLButtonElement>) => {
-                        event.preventDefault();
+                      behavior="button"
+                      onClick={() => {
                         setCreateBySetup(true);
                         handleChange(gateway.id);
                       }}
