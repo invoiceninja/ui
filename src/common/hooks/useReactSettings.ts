@@ -11,6 +11,7 @@
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { useInjectUserChanges } from './useInjectUserChanges';
+import { merge } from 'lodash';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -21,6 +22,11 @@ export interface ReactSettings {
   preferences: {
     dashboard_charts: {
       default_view: 'day' | 'week' | 'month';
+    };
+    datatables: {
+      clients: {
+        sort: string;
+      };
     };
   };
 }
@@ -43,7 +49,6 @@ export type ReactTableColumns =
 export function useReactSettings() {
   const user = useInjectUserChanges();
 
-
   const reactSettings =
     useSelector(
       (state: RootState) => state.user.changes?.company_user?.react_settings
@@ -64,10 +69,16 @@ export function useReactSettings() {
       dashboard_charts: {
         default_view: 'month',
       },
+      datatables: {
+        clients: {
+          sort: 'id|desc',
+        },
+      },
     },
-    ...reactSettings,
   };
 
-
-  return settings;
+  return merge<ReactSettings, ReactSettings>(
+    { ...settings },
+    { ...reactSettings }
+  );
 }
