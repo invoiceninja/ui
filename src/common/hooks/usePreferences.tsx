@@ -10,7 +10,7 @@
 
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
-import { ReactNode, useMemo, useRef, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
@@ -113,7 +113,22 @@ export function usePreferences() {
 
   const Preferences = useMemo(
     () =>
-      ({ children }: { children: ReactNode }) => {
+      ({
+        children,
+        contentless,
+      }: {
+        children?: ReactNode;
+        contentless?: boolean;
+      }) => {
+        useEffect(() => {
+          if (isVisible && contentless && !isPasswordRequired()) {
+            // We have no content and since password isn't required,
+            // let's just submit the form for the user.
+
+            save();
+          }
+        }, [isVisible]);
+
         return (
           <>
             <Modal
@@ -135,18 +150,20 @@ export function usePreferences() {
               <Button onClick={save}>{t('save')}</Button>
             </Modal>
 
-            <Button
-              type="minimal"
-              onClick={() => setIsVisible(true)}
-              noBackgroundColor
-            >
-              <FiSettings />
-            </Button>
+            {contentless === false && (
+              <Button
+                type="minimal"
+                onClick={() => setIsVisible(true)}
+                noBackgroundColor
+              >
+                <FiSettings />
+              </Button>
+            )}
           </>
         );
       },
     [isVisible, passwordRef, errors]
   );
 
-  return { Preferences, update };
+  return { Preferences, update, trigger: () => setIsVisible(true) };
 }
