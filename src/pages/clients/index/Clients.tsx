@@ -28,6 +28,8 @@ import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 export default function Clients() {
   useTitle('clients');
@@ -51,10 +53,11 @@ export default function Clients() {
   });
 
   const columns = useClientColumns();
-
   const clientColumns = useAllClientColumns();
-
   const handlePurgeClient = usePurgeClient(purgeClientId);
+
+  const settings = useReactSettings();
+  const { update, trigger, Preferences } = usePreferences();
 
   return (
     <Default
@@ -65,7 +68,7 @@ export default function Clients() {
     >
       <DataTable
         resource="client"
-        endpoint="/api/v1/clients?sort=id|desc"
+        endpoint={`/api/v1/clients?sort=${settings.preferences.datatables.clients.sort}`}
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
         linkToCreate="/clients/create"
@@ -89,6 +92,12 @@ export default function Clients() {
           />
         }
         linkToCreateGuards={[permission('create_client')]}
+        onSaveSorting={(sort) => {
+          if (sort) {
+            update('preferences.datatables.clients.sort', sort);
+            trigger();
+          }
+        }}
       />
 
       <MergeClientModal
@@ -102,6 +111,8 @@ export default function Clients() {
         onClose={setPasswordConfirmModalOpen}
         onSave={handlePurgeClient}
       />
+
+      <Preferences contentless />
     </Default>
   );
 }
