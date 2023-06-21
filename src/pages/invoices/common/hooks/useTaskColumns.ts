@@ -18,19 +18,32 @@ const defaultLineItemColumns = [
   { key: '$task.unit_cost', default: true },
   { key: '$task.discount', default: true },
   { key: '$task.quantity', default: true },
-  { key: '$task.line_total', default: true },
 ];
 
 export function useTaskColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
 
+  const getColumnIndex = (
+    columnKey: string,
+    pdfColumns: string[],
+    currentColumns: string[]
+  ) => {
+    const columnIndex = pdfColumns.findIndex(
+      (variable) => variable === columnKey
+    );
+
+    const adjustedColumnIndex =
+      columnIndex > -1 ? columnIndex : currentColumns.length;
+
+    return adjustedColumnIndex;
+  };
+
   useEffect(() => {
     const defaultVariables = defaultLineItemColumns.map((column) => column.key);
 
-    let updatedVariables: string[] = defaultLineItemColumns.map(
-      (column) => column.key
-    );
+    let updatedVariables: string[] =
+      clone(company?.settings.pdf_variables.task_columns) || [];
 
     let pdfVariables =
       clone(company?.settings.pdf_variables.task_columns) || [];
@@ -40,10 +53,12 @@ export function useTaskColumns() {
         (column) => column.key === variable
       );
 
-      if (!pdfVariables.includes(variable) && !column?.default) {
-        updatedVariables = updatedVariables.filter(
-          (currentVariable) => currentVariable !== variable
-        );
+      const columnIndex = defaultLineItemColumns.findIndex(
+        (column) => column.key === variable
+      );
+
+      if (!updatedVariables.includes(variable) && column?.default) {
+        updatedVariables.splice(columnIndex, 0, column.key);
       }
     });
 
@@ -62,42 +77,59 @@ export function useTaskColumns() {
       taxes.push('$task.tax_rate3');
     }
 
-    updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$task.tax'
+    const taxVariableIndex = getColumnIndex(
+      '$task.tax',
+      pdfVariables,
+      updatedVariables
     );
 
-    pdfVariables = pdfVariables.filter((variable) => variable !== '$task.tax');
-
-    updatedVariables.splice(updatedVariables.length - 1, 0, ...taxes);
+    updatedVariables.splice(taxVariableIndex, 0, ...taxes);
 
     if (!company.enable_product_discount) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$task.discount'
       );
+    } else {
+      if (!updatedVariables.includes('$task.discount')) {
+        const discountColumnIndex = defaultLineItemColumns.findIndex(
+          (column) => column.key === '$task.discount'
+        );
+
+        updatedVariables.splice(discountColumnIndex, 0, '$task.discount');
+      }
     }
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== `$task.${field}`
+      );
+
       pdfVariables = pdfVariables.filter(
         (variable) => variable !== `$task.${field}`
       );
 
       if (company?.custom_fields[field]) {
-        updatedVariables.splice(
-          updatedVariables.length - 1,
-          0,
-          `$task.${field}`
+        const customFieldColumnIndex = getColumnIndex(
+          `$task.${field}`,
+          pdfVariables,
+          updatedVariables
         );
+
+        updatedVariables.splice(customFieldColumnIndex, 0, `$task.${field}`);
       }
     });
 
-    pdfVariables.forEach((pdfVariable) => {
-      const doesExistInDefaultVariables =
-        defaultVariables.includes(pdfVariable);
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$task.line_total' && variable !== '$task.tax'
+    );
 
-      if (!doesExistInDefaultVariables) {
-        updatedVariables.splice(updatedVariables.length - 1, 0, pdfVariable);
-      }
-    });
+    const lineTotalColumnIndex = getColumnIndex(
+      '$task.line_total',
+      pdfVariables,
+      updatedVariables
+    );
+
+    updatedVariables.splice(lineTotalColumnIndex, 0, '$task.line_total');
 
     setColumns(updatedVariables);
   }, [company]);

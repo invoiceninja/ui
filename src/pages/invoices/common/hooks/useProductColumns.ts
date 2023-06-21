@@ -18,19 +18,32 @@ const defaultLineItemColumns = [
   { key: '$product.unit_cost', default: true },
   { key: '$product.discount', default: true },
   { key: '$product.quantity', default: true },
-  { key: '$product.line_total', default: true },
 ];
 
 export function useProductColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
 
+  const getColumnIndex = (
+    columnKey: string,
+    pdfColumns: string[],
+    currentColumns: string[]
+  ) => {
+    const columnIndex = pdfColumns.findIndex(
+      (variable) => variable === columnKey
+    );
+
+    const adjustedColumnIndex =
+      columnIndex > -1 ? columnIndex : currentColumns.length;
+
+    return adjustedColumnIndex;
+  };
+
   useEffect(() => {
     const defaultVariables = defaultLineItemColumns.map((column) => column.key);
 
-    let updatedVariables: string[] = defaultLineItemColumns.map(
-      (column) => column.key
-    );
+    let updatedVariables: string[] =
+      clone(company?.settings.pdf_variables.product_columns) || [];
 
     let pdfVariables =
       clone(company?.settings.pdf_variables.product_columns) || [];
@@ -40,10 +53,12 @@ export function useProductColumns() {
         (column) => column.key === variable
       );
 
-      if (!pdfVariables.includes(variable) && !column?.default) {
-        updatedVariables = updatedVariables.filter(
-          (currentVariable) => currentVariable !== variable
-        );
+      const columnIndex = defaultLineItemColumns.findIndex(
+        (column) => column.key === variable
+      );
+
+      if (!updatedVariables.includes(variable) && column?.default) {
+        updatedVariables.splice(columnIndex, 0, column.key);
       }
     });
 
@@ -62,44 +77,60 @@ export function useProductColumns() {
       taxes.push('$product.tax_rate3');
     }
 
-    updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$product.tax'
+    const taxVariableIndex = getColumnIndex(
+      '$product.tax',
+      pdfVariables,
+      updatedVariables
     );
 
-    pdfVariables = pdfVariables.filter(
-      (variable) => variable !== '$product.tax'
-    );
-
-    updatedVariables.splice(updatedVariables.length - 1, 0, ...taxes);
+    updatedVariables.splice(taxVariableIndex, 0, ...taxes);
 
     if (!company.enable_product_discount) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.discount'
       );
+    } else {
+      if (!updatedVariables.includes('$product.discount')) {
+        const discountColumnIndex = defaultLineItemColumns.findIndex(
+          (column) => column.key === '$product.discount'
+        );
+
+        updatedVariables.splice(discountColumnIndex, 0, '$product.discount');
+      }
     }
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== `$product.${field}`
+      );
+
       pdfVariables = pdfVariables.filter(
         (variable) => variable !== `$product.${field}`
       );
 
       if (company?.custom_fields[field]) {
-        updatedVariables.splice(
-          updatedVariables.length - 1,
-          0,
-          `$product.${field}`
+        const customFieldColumnIndex = getColumnIndex(
+          `$product.${field}`,
+          pdfVariables,
+          updatedVariables
         );
+
+        updatedVariables.splice(customFieldColumnIndex, 0, `$product.${field}`);
       }
     });
 
-    pdfVariables.forEach((pdfVariable) => {
-      const doesExistInDefaultVariables =
-        defaultVariables.includes(pdfVariable);
+    updatedVariables = updatedVariables.filter(
+      (variable) =>
+        variable !== '$product.line_total' && variable !== '$product.tax'
+    );
 
-      if (!doesExistInDefaultVariables) {
-        updatedVariables.splice(updatedVariables.length - 1, 0, pdfVariable);
-      }
-    });
+    const lineTotalColumnIndex = getColumnIndex(
+      '$product.line_total',
+      pdfVariables,
+      updatedVariables
+    );
+
+    updatedVariables.splice(lineTotalColumnIndex, 0, '$product.line_total');
 
     setColumns(updatedVariables);
   }, [company]);
