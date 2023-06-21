@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react';
 import { clone } from 'lodash';
 
 const defaultLineItemColumns = [
-  { key: '$task.item', default: true },
+  { key: '$task.service', default: true },
   { key: '$task.description', default: false },
   { key: '$task.unit_cost', default: true },
   { key: '$task.discount', default: true },
