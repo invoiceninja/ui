@@ -34,9 +34,12 @@ export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route(`/api/v1/company_gateways/:id?${params.queryParams || ''}`, {
-      id: params.id,
-    }),
+    [
+      route('/api/v1/company_gateways/:id', {
+        id: params.id,
+      }),
+      params.queryParams,
+    ],
     () =>
       request(
         'GET',
