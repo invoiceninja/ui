@@ -28,6 +28,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { Client } from '$app/common/interfaces/client';
 
 interface Props {
   task: Task;
@@ -41,6 +42,22 @@ export function TaskDetails(props: Props) {
 
   const { task, handleChange, errors } = props;
 
+  const handleChangeClient = (client: Client) => {
+  
+      handleChange('client_id', client.id);
+
+      if(!task?.id)
+        handleChange('rate', client?.settings?.default_task_rate ?? company?.settings?.default_task_rate );
+
+  }
+
+  const handleChangeProject = (project_id: string) => {
+
+    handleChange('project_id', project_id);
+    handleChange('client_id', '');
+
+  }
+
   const company = useCurrentCompany();
   const location = useLocation();
   const handleCustomFieldChange = useHandleCustomFieldChange();
@@ -48,19 +65,20 @@ export function TaskDetails(props: Props) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 xl:col-span-4 h-max">
+        {!task.project_id && (
         <Element leftSide={t('client')}>
           <ClientSelector
-            onChange={(client) => handleChange('client_id', client.id)}
+            onChange={(client) => handleChangeClient(client)}
             value={task.client_id}
             clearButton={Boolean(task.client_id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             errorMessage={errors?.errors.client_id}
           />
         </Element>
-
+        )}
         <Element leftSide={t('project')}>
           <ProjectSelector
-            onChange={(project) => handleChange('project_id', project.id)}
+            onChange={(project) => handleChangeProject(project.id)}
             value={task.project_id}
             clearButton={Boolean(task.project_id)}
             onClearButtonClick={() => handleChange('project_id', '')}

@@ -35,6 +35,7 @@ export const enum PaymentType {
   SEPA = '29',
   GOCARDLESS = '30',
   CRYPTO = '31',
+  ZELLE = '33',
   MOLLIE_BANK_TRANSFER = '34',
   KBC = '35',
   BANCONTACT = '36',
