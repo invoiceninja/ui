@@ -41,6 +41,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 interface Props {
   invoice?: Invoice;
@@ -113,6 +114,7 @@ export function InvoiceFooter(props: Props) {
   });
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const formatMoney = useFormatMoney();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -285,7 +287,15 @@ export function InvoiceFooter(props: Props) {
             history.activities?.map((activity) => (
               <div className="space-y-2 text-sm" key={activity.id}>
                 <div className="flex space-x-1">
-                  <span>$0,00</span>
+                  <span>
+                    {invoice?.client
+                      ? formatMoney(
+                          activity.history.amount,
+                          invoice?.client?.country_id,
+                          invoice?.client?.settings.currency_id
+                        )
+                      : null}
+                  </span>
                   <span>&middot;</span>
                   <Link to={`/clients/${activity.client_id}`}>
                     {invoice?.client?.display_name}
