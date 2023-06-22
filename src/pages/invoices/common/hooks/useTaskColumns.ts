@@ -87,6 +87,14 @@ export function useTaskColumns() {
 
     updatedVariables.splice(taxVariableIndex, 0, ...taxes);
 
+    pdfVariables.splice(taxVariableIndex, 0, ...taxes);
+
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$task.tax'
+    );
+
+    pdfVariables = pdfVariables.filter((variable) => variable !== '$task.tax');
+
     if (!company.enable_product_discount) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$task.discount'
@@ -106,27 +114,16 @@ export function useTaskColumns() {
     }
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
-      updatedVariables = updatedVariables.filter(
-        (variable) => variable !== `$task.${field}`
-      );
-
-      if (company?.custom_fields[field]) {
-        const customFieldColumnIndex = getColumnIndex(
-          `$task.${field}`,
-          pdfVariables,
-          updatedVariables
-        );
-
-        updatedVariables.splice(customFieldColumnIndex, 0, `$task.${field}`);
-      } else {
-        pdfVariables = pdfVariables.filter(
-          (variable) => variable !== `$task.${field}`
-        );
+      if (
+        company?.custom_fields[field] &&
+        !pdfVariables.includes(`$task.${field}`)
+      ) {
+        updatedVariables.splice(updatedVariables.length, 0, `$task.${field}`);
       }
     });
 
     updatedVariables = updatedVariables.filter(
-      (variable) => variable !== '$task.line_total' && variable !== '$task.tax'
+      (variable) => variable !== '$task.line_total'
     );
 
     const lineTotalColumnIndex = getColumnIndex(

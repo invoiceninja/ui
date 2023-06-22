@@ -87,6 +87,16 @@ export function useProductColumns() {
 
     updatedVariables.splice(taxVariableIndex, 0, ...taxes);
 
+    pdfVariables.splice(taxVariableIndex, 0, ...taxes);
+
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$product.tax'
+    );
+
+    pdfVariables = pdfVariables.filter(
+      (variable) => variable !== '$product.tax'
+    );
+
     if (!company.enable_product_discount) {
       updatedVariables = updatedVariables.filter(
         (variable) => variable !== '$product.discount'
@@ -106,28 +116,20 @@ export function useProductColumns() {
     }
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
-      updatedVariables = updatedVariables.filter(
-        (variable) => variable !== `$product.${field}`
-      );
-
-      if (company?.custom_fields[field]) {
-        const customFieldColumnIndex = getColumnIndex(
-          `$product.${field}`,
-          pdfVariables,
-          updatedVariables
-        );
-
-        updatedVariables.splice(customFieldColumnIndex, 0, `$product.${field}`);
-      } else {
-        pdfVariables = pdfVariables.filter(
-          (variable) => variable !== `$product.${field}`
+      if (
+        company?.custom_fields[field] &&
+        !pdfVariables.includes(`$product.${field}`)
+      ) {
+        updatedVariables.splice(
+          updatedVariables.length,
+          0,
+          `$product.${field}`
         );
       }
     });
 
     updatedVariables = updatedVariables.filter(
-      (variable) =>
-        variable !== '$product.line_total' && variable !== '$product.tax'
+      (variable) => variable !== '$product.line_total'
     );
 
     const lineTotalColumnIndex = getColumnIndex(
