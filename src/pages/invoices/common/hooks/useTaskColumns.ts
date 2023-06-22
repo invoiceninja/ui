@@ -17,7 +17,7 @@ const defaultLineItemColumns = [
   { key: '$task.description', default: false },
   { key: '$task.rate', default: true },
   { key: '$task.discount', default: true },
-  { key: '$task.quantity', default: true },
+  { key: '$task.hours', default: true },
 ];
 
 export function useTaskColumns() {
