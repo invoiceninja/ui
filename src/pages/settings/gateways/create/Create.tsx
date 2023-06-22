@@ -85,8 +85,10 @@ export function Create() {
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
-  const handleChange = (value: string) => {
+  const handleChange = (value: string, isManualChange?: boolean) => {
     setGateway(gateways.find((gateway) => gateway.id === value));
+
+    isManualChange && setTabIndex(1);
   };
 
   const defaultTab = [t('provider')];
@@ -206,11 +208,15 @@ export function Create() {
       onSaveClick={onSave}
       disableSaveButton={!gateway}
     >
-      <TabGroup tabs={tabs} onTabChange={(index) => setTabIndex(index)}>
+      <TabGroup
+        tabs={tabs}
+        defaultTabIndex={tabIndex}
+        onTabChange={(index) => setTabIndex(index)}
+      >
         <Card title={t('add_gateway')}>
           <Element leftSide={t('provider')}>
             <SelectField
-              onValueChange={(value) => handleChange(value)}
+              onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
               errorMessage={errors?.errors.gateway_key}
               withBlank
