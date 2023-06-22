@@ -40,6 +40,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
+import { Button } from '$app/components/forms';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -214,6 +215,13 @@ export default function Edit() {
 
       {reactSettings?.show_pdf_preview && (
         <div className="my-4">
+          <div className="my-2 space-x-1">
+            <span className="text-sm">Showing the activity.</span>
+            <Button type="minimal" behavior="button" noBackgroundColor>
+              Back to invoice view
+            </Button>
+          </div>
+
           {invoice && (
             <InvoicePreview
               for="invoice"

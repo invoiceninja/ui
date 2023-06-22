@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card } from '$app/components/cards';
-import { InputField, Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { Element } from '$app/components/cards';
@@ -303,9 +303,9 @@ export function InvoiceFooter(props: Props) {
                 </div>
 
                 <div className="flex space-x-1">
-                  <Link to={`/activities/${activity.id}`}>
+                  <Button type="minimal" behavior="button">
                     {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                  </Link>
+                  </Button>
                   <span>&middot;</span>
                   <span>{dayjs.unix(activity.created_at).fromNow()}</span>
                 </div>
