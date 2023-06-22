@@ -23,6 +23,10 @@ export function ActivateCompany() {
     return null;
   }
 
+  if (!company) {
+    return null;
+  }
+
   if (company && !company.is_disabled) {
     return null;
   }
