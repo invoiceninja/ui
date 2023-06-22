@@ -119,7 +119,7 @@ export function useInvoiceProject() {
           .join('\n')
           .trim();
 
-        invoice.line_items = [...invoice.line_items, item];
+        invoice.line_items.push(item);
       });
 
       setInvoice(invoice);
