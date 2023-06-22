@@ -15,7 +15,7 @@ import { clone } from 'lodash';
 const defaultLineItemColumns = [
   { key: '$task.service', default: true },
   { key: '$task.description', default: false },
-  { key: '$task.unit_cost', default: true },
+  { key: '$task.rate', default: true },
   { key: '$task.discount', default: true },
   { key: '$task.quantity', default: true },
 ];
