@@ -8,53 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
 import { route } from '$app/common/helpers/route';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { updateRecord } from '$app/common/stores/slices/company-users';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export function useHandleSave(
   setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
-  const company = useInjectCompanyChanges();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+  const saveCompany = useHandleCompanySave();
 
   return (invoice: Invoice) => {
     setErrors(undefined);
+
     toast.processing();
 
-    axios
-      .all([
-        request(
-          'PUT',
-          endpoint('/api/v1/invoices/:id', { id: invoice.id }),
-          invoice
-        ),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        toast.success('updated_invoice');
+    saveCompany();
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
-      })
+    request(
+      'PUT',
+      endpoint('/api/v1/invoices/:id', { id: invoice.id }),
+      invoice
+    )
+      .then(() => toast.success('updated_invoice'))
       .catch((error) => {
         console.error(error);
 

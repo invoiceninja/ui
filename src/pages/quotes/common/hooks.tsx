@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { QuoteStatus } from '$app/common/enums/quote-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
@@ -48,9 +48,6 @@ import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
-import { useDispatch } from 'react-redux';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { updateRecord } from '$app/common/stores/slices/company-users';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { Link } from '$app/components/forms';
@@ -88,6 +85,7 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -180,8 +178,9 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     );
 
     if (currency && quote) {
-      
-      const invoiceSum = quote.uses_inclusive_taxes ? new InvoiceSumInclusive(quote, currency).build() : new InvoiceSum(quote, currency).build();
+      const invoiceSum = quote.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(quote, currency).build()
+        : new InvoiceSum(quote, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -234,30 +233,18 @@ export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
-  const company = useInjectCompanyChanges();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+  const saveCompany = useHandleCompanySave();
 
   return (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
 
-    axios
-      .all([
-        request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        toast.success('updated_quote');
+    saveCompany();
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
+      .then(() => {
+        toast.success('updated_quote');
 
         queryClient.invalidateQueries(
           route('/api/v1/quotes/:id', { id: quote.id })
@@ -293,27 +280,10 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
-    setQuote({ ...quote, number: '', 
-    documents: [], 
-    date: dayjs().format('YYYY-MM-DD'),
-    due_date: '',
-    total_taxes: 0,
-    exchange_rate: 1,
-    last_sent_date: '',
-    project_id: '',
-    subscription_id: '',
-    status_id: '',
-    vendor_id: '',
-    paid_to_date: 0,
-  });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToCredit = (quote: Quote) => {
-    setCredit({ ...quote, 
-      number: '', 
-      documents: [], 
+    setQuote({
+      ...quote,
+      number: '',
+      documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
@@ -324,7 +294,27 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
-     });
+    });
+
+    navigate('/quotes/create?action=clone');
+  };
+
+  const cloneToCredit = (quote: Quote) => {
+    setCredit({
+      ...quote,
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/credits/create?action=clone');
   };
@@ -366,9 +356,10 @@ export function useActions() {
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, 
-      number: '', 
-      documents: [], 
+    setInvoice({
+      ...quote,
+      number: '',
+      documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
@@ -378,8 +369,8 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
-      paid_to_date: 0, 
-     });
+      paid_to_date: 0,
+    });
     navigate('/invoices/create?action=clone');
   };
 
