@@ -10,11 +10,18 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import toast from 'react-hot-toast';
+import { toast } from '$app/common/helpers/toast/toast';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-export function useHandleSend() {
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+
+export function useHandleSend({ setErrors }: Params) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
@@ -27,7 +34,8 @@ export function useHandleSend() {
     redirectUrl: string,
     ccEmail: string
   ) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
+    setErrors(undefined);
 
     request('POST', endpoint('/api/v1/emails'), {
       body,
@@ -38,14 +46,18 @@ export function useHandleSend() {
       cc_email: ccEmail,
     })
       .then(() => {
-        toast.success(t(`emailed_${entity}`), { id: toastId });
+        toast.success(t(`emailed_${entity}`) || '');
 
         navigate(redirectUrl);
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 }
