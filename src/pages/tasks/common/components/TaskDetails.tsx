@@ -47,7 +47,7 @@ export function TaskDetails(props: Props) {
       handleChange('client_id', client.id);
 
       if(!task?.id)
-        handleChange('rate', client?.settings?.default_task_rate ?? company?.settings?.default_task_rate );
+        handleChange('rate', client?.settings?.default_task_rate ?? 0 );
 
   }
 
