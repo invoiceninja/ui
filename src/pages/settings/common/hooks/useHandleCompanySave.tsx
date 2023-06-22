@@ -20,6 +20,7 @@ import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
+import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
@@ -32,7 +33,13 @@ export function useHandleCompanySave() {
     hasLanguageChangedAtom
   );
 
+  const shouldUpdate = useShouldUpdateCompany();
+
   return () => {
+    if (!shouldUpdate()) {
+      return;
+    }
+
     toast.processing();
 
     setErrors(undefined);
