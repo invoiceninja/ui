@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { CreditStatus } from '$app/common/enums/credit-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
@@ -17,7 +17,6 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
@@ -33,7 +32,6 @@ import {
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
@@ -50,7 +48,6 @@ import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -86,6 +83,7 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -178,8 +176,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
-      
-      const invoiceSum = credit.uses_inclusive_taxes ? new InvoiceSumInclusive(credit, currency).build() : new InvoiceSum(credit, currency).build();
+      const invoiceSum = credit.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(credit, currency).build()
+        : new InvoiceSum(credit, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -231,35 +230,22 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const company = useInjectCompanyChanges();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
+  const saveCompany = useHandleCompanySave();
+
   return (credit: Credit) => {
     toast.processing();
+
     setErrors(undefined);
 
-    axios
-      .all([
-        request(
-          'PUT',
-          endpoint('/api/v1/credits/:id', { id: credit.id }),
-          credit
-        ),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        toast.success('updated_credit');
+    saveCompany();
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
+      .then(() => {
+        toast.success('updated_credit');
 
         queryClient.invalidateQueries(
           route('/api/v1/credits/:id', { id: credit.id })
@@ -295,9 +281,10 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
-    setCredit({ ...credit, 
-      number: '', 
-      documents: [], 
+    setCredit({
+      ...credit,
+      number: '',
+      documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
@@ -308,16 +295,17 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
-     });
+    });
 
     navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
-    setInvoice({ ...credit, 
-      number: '', 
-      documents: [], 
-      due_date: '', 
+    setInvoice({
+      ...credit,
+      number: '',
+      documents: [],
+      due_date: '',
       date: dayjs().format('YYYY-MM-DD'),
       total_taxes: 0,
       exchange_rate: 1,
@@ -326,17 +314,18 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
-      paid_to_date: 0, 
+      paid_to_date: 0,
     });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (credit: Credit) => {
-    setQuote({ ...(credit as Quote), 
-      number: '', 
-      documents: [], 
-      date: dayjs().format('YYYY-MM-DD') ,
+    setQuote({
+      ...(credit as Quote),
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
       exchange_rate: 1,

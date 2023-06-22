@@ -16,6 +16,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { GenericQueryOptions } from './invoices';
 import { Client } from '../interfaces/client';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { route } from '../helpers/route';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
@@ -44,7 +45,7 @@ interface Props {
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    ['/api/v1/clients?filter_deleted_clients=true?per_page=500'],
+    ['/api/v1/clients', 'filter_deleted_clients=true', 'per_page=500'],
     () =>
       request('GET', endpoint('/api/v1/clients?per_page=500')).then(
         (response) => response.data.data
@@ -54,16 +55,17 @@ export function useClientsQuery(props: Props) {
 }
 
 export function useClientQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery({
-    queryKey: ['/api/v1/clients', id],
-    queryFn: () =>
+  return useQuery(
+    route('/api/v1/clients/:id', { id }),
+    () =>
       request('GET', endpoint('/api/v1/clients/:id', { id })).then(
-        (response: GenericSingleResourceResponse<Client>) =>
-          response.data.data
+        (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
-    enabled,
-    staleTime: Infinity,
-  });
+    {
+      enabled,
+      staleTime: Infinity,
+    }
+  );
 }
 
 export function bulk(

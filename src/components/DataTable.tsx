@@ -161,8 +161,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { data, isLoading, isError } = useQuery(
     [
+      apiEndpoint.pathname,
       props.endpoint,
-      apiEndpoint.href,
       perPage,
       currentPage,
       filter,
