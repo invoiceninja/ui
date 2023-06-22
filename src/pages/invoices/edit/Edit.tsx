@@ -223,14 +223,14 @@ export default function Edit() {
         <div className="my-4">
           {activityUrl ? (
             <div className="my-2 space-x-1">
-              <span className="text-sm">Showing the activity.</span>
+              <span className="text-sm">{t('showing_the_activity')}</span>
               <Button
                 type="minimal"
                 behavior="button"
                 noBackgroundColor
                 onClick={() => setActivityUrl(null)}
               >
-                Back to invoice view
+                {t('back_to_invoice_view')}
               </Button>
             </div>
           ) : null}
