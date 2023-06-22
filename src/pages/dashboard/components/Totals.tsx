@@ -27,6 +27,7 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -79,7 +80,9 @@ export function Totals() {
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [currency, setCurrency] = useState(1);
+  const [currency, setCurrency] = useState(
+    settings.preferences.dashboard_charts.currency
+  );
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState(
@@ -217,6 +220,14 @@ export function Totals() {
               <option value="week">{t('week')}</option>
               <option value="month">{t('month')}</option>
             </SelectField>
+
+            <CurrencySelector
+              label={t('currency')}
+              value={settings.preferences.dashboard_charts.currency.toString()}
+              onChange={(id) =>
+                update('preferences.dashboard_charts.currency', parseInt(id))
+              }
+            />
           </Preferences>
         </div>
       </div>
