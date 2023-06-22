@@ -54,12 +54,12 @@ export function TaskDetails(props: Props) {
               onChange={(client) => {
                 handleChange('client_id', client.id);
 
-                task.id
-                  ? handleChange(
-                      'rate',
-                      client?.settings?.default_task_rate ?? 0
-                    )
-                  : null;
+                if (!task.id) {
+                  handleChange(
+                    'rate',
+                    client?.settings?.default_task_rate ?? 0
+                  )
+                }
               }}
               value={task.client_id}
               clearButton={Boolean(task.client_id)}
