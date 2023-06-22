@@ -249,7 +249,7 @@ export function useActions() {
   const shouldShowEditAction =
     location.pathname.includes(id!) && !location.pathname.includes('/edit');
 
-  const isEditPage = location.pathname.includes(id!);
+  const isEditOrShowPage = location.pathname.includes(id!);
 
   const setProject = useSetAtom(projectAtom);
 
@@ -328,10 +328,10 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -342,7 +342,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -353,7 +353,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'delete')}
           icon={<Icon element={MdDelete} />}
