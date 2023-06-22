@@ -78,6 +78,8 @@ export default function Create() {
           _task.project_id = searchParams.get('project')!;
         }
 
+          _task.rate = company?.settings?.default_task_rate || 0;
+          
         value = _task;
       }
 

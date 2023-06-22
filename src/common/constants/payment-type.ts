@@ -54,5 +54,6 @@ export default {
   [PaymentType.UNIONPAY]: 'payment_type_UnionPay',
   [PaymentType.VENMO]: 'payment_type_Venmo',
   [PaymentType.VISA]: 'payment_type_Visa Card',
+  [PaymentType.ZELLE]: 'payment_type_Zelle',
   
 };
