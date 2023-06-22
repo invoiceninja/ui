@@ -150,15 +150,13 @@ export function usePreferences() {
               <Button onClick={save}>{t('save')}</Button>
             </Modal>
 
-            {contentless === false && (
-              <Button
-                type="minimal"
-                onClick={() => setIsVisible(true)}
-                noBackgroundColor
-              >
-                <FiSettings />
-              </Button>
-            )}
+            <Button
+              type="minimal"
+              onClick={() => setIsVisible(true)}
+              noBackgroundColor
+            >
+              <FiSettings />
+            </Button>
           </>
         );
       },
