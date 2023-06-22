@@ -31,7 +31,10 @@ import { v4 } from 'uuid';
 import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import {
+  InvoiceFooter,
+  activityUrlAtom,
+} from '../common/components/InvoiceFooter';
 import { InvoicePreview } from '../common/components/InvoicePreview';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
@@ -41,6 +44,7 @@ import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 import { Button } from '$app/components/forms';
+import { InvoiceViewer } from '../common/components/InvoiceViewer';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -103,6 +107,8 @@ export default function Edit() {
 
   const actions = useActions();
   const save = useHandleSave(setErrors);
+
+  const [activityUrl, setActivityUrl] = useAtom(activityUrlAtom);
 
   return (
     <Default
@@ -215,14 +221,25 @@ export default function Edit() {
 
       {reactSettings?.show_pdf_preview && (
         <div className="my-4">
-          <div className="my-2 space-x-1">
-            <span className="text-sm">Showing the activity.</span>
-            <Button type="minimal" behavior="button" noBackgroundColor>
-              Back to invoice view
-            </Button>
-          </div>
+          {activityUrl ? (
+            <div className="my-2 space-x-1">
+              <span className="text-sm">Showing the activity.</span>
+              <Button
+                type="minimal"
+                behavior="button"
+                noBackgroundColor
+                onClick={() => setActivityUrl(null)}
+              >
+                Back to invoice view
+              </Button>
+            </div>
+          ) : null}
 
-          {invoice && (
+          {activityUrl ? (
+            <InvoiceViewer link={activityUrl} method="GET" />
+          ) : null}
+
+          {invoice && !activityUrl ? (
             <InvoicePreview
               for="invoice"
               resource={invoice}
@@ -230,7 +247,7 @@ export default function Edit() {
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
             />
-          )}
+          ) : null}
         </div>
       )}
     </Default>

@@ -42,6 +42,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { atom, useAtom } from 'jotai';
 
 interface Props {
   invoice?: Invoice;
@@ -49,6 +50,8 @@ interface Props {
 }
 
 dayjs.extend(relativeTime);
+
+export const activityUrlAtom = atom<string | null>(null);
 
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
@@ -115,6 +118,8 @@ export function InvoiceFooter(props: Props) {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
+
+  const [, setActivityUrl] = useAtom(activityUrlAtom);
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -303,7 +308,17 @@ export function InvoiceFooter(props: Props) {
                 </div>
 
                 <div className="flex space-x-1">
-                  <Button type="minimal" behavior="button">
+                  <Button
+                    type="minimal"
+                    behavior="button"
+                    onClick={() =>
+                      setActivityUrl(
+                        endpoint(
+                          `/api/v1/activities/download_entity/${activity.id}`
+                        )
+                      )
+                    }
+                  >
                     {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
                   </Button>
                   <span>&middot;</span>
