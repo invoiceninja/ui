@@ -196,7 +196,7 @@ export function Create() {
 
   useEffect(() => {
     if (createBySetup) {
-      onSave();
+      onSave(1);
       setCreateBySetup(false);
     }
   }, [companyGateway]);
@@ -205,7 +205,7 @@ export function Create() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={onSave}
+      onSaveClick={() => onSave(1)}
       disableSaveButton={!gateway}
     >
       <TabGroup

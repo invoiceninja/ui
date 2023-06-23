@@ -30,7 +30,7 @@ export function useHandleCreate(
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return () => {
+  return (defaultTabIndex: number) => {
     toast.processing();
 
     setErrors(undefined);
@@ -47,8 +47,9 @@ export function useHandleCreate(
         toast.success('created_company_gateway');
 
         navigate(
-          route('/settings/gateways/:id/edit', {
+          route('/settings/gateways/:id/edit?defaultTab=:defaultTabIndex', {
             id: response.data.data.id,
+            defaultTabIndex,
           })
         );
       })
