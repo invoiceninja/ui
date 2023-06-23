@@ -11,7 +11,6 @@
 import { Card } from '$app/components/cards';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
@@ -23,17 +22,11 @@ export default function ProductFields() {
 
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
-  const disabledCustomFields = useShouldDisableCustomFields();
-
   return (
     <>
       <CustomFieldsPlanAlert />
 
-      <Card
-        title={t('custom_fields')}
-        disableSubmitButton={disabledCustomFields}
-        disableWithoutIcon={disabledCustomFields}
-      >
+      <Card title={t('custom_fields')}>
         {company &&
           ['product1', 'product2', 'product3', 'product4'].map((field) => (
             <Field
