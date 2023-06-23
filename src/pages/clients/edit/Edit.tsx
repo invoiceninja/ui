@@ -172,7 +172,12 @@ export default function Edit() {
               setErrors={setErrors}
               errors={errors}
             />
-            <AdditionalInfo client={client} setClient={setClient} />
+            <AdditionalInfo
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
           </div>
         </div>
       )}

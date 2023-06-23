@@ -27,15 +27,24 @@ import { TabGroup } from '$app/components/TabGroup';
 import { set } from 'lodash';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Field } from '$app/pages/settings/custom-fields/components';
-import { ChangeEvent, useEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function AdditionalInfo(props: Props) {
@@ -45,6 +54,8 @@ export function AdditionalInfo(props: Props) {
   const languages = useLanguages();
   const queryClient = useQueryClient();
 
+  const { setClient, errors, setErrors } = props;
+
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
@@ -52,7 +63,9 @@ export function AdditionalInfo(props: Props) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const client = { ...props.client };
 
-    props.setClient(set(client as Client, event.target.id, event.target.value));
+    setErrors(undefined);
+
+    setClient(set(client as Client, event.target.id, event.target.value));
   };
 
   const company = useInjectCompanyChanges();
@@ -104,6 +117,7 @@ export function AdditionalInfo(props: Props) {
                 id="settings.language_id"
                 defaultValue={props.client?.settings?.language_id || ''}
                 onChange={handleChange}
+                errorMessage={errors?.errors['settings.language_id']}
               >
                 <option value=""></option>
                 {languages.map((language, index) => (
@@ -121,6 +135,7 @@ export function AdditionalInfo(props: Props) {
                 id="settings.payment_terms"
                 defaultValue={props.client?.settings?.payment_terms || ''}
                 onChange={handleChange}
+                errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
                 {paymentTerms.data.data.map(
@@ -140,6 +155,7 @@ export function AdditionalInfo(props: Props) {
                 id="settings.valid_until"
                 defaultValue={props.client?.settings?.valid_until || ''}
                 onChange={handleChange}
+                errorMessage={errors?.errors['settings.valid_until']}
               >
                 <option value=""></option>
                 {paymentTerms.data.data.map(
@@ -158,6 +174,7 @@ export function AdditionalInfo(props: Props) {
               id="settings.default_task_rate"
               value={props.client?.settings?.default_task_rate || ''}
               onChange={handleChange}
+              errorMessage={errors?.errors['settings.default_task_rate']}
             />
           </Element>
 
@@ -207,6 +224,7 @@ export function AdditionalInfo(props: Props) {
                 id="size_id"
                 defaultValue={props.client?.size_id || ''}
                 onChange={handleChange}
+                errorMessage={errors?.errors.size_id}
               >
                 <option value=""></option>
 
@@ -227,6 +245,7 @@ export function AdditionalInfo(props: Props) {
                 id="industry_id"
                 defaultValue={props.client?.industry_id || ''}
                 onChange={handleChange}
+                errorMessage={errors?.errors.industry_id}
               >
                 <option value=""></option>
 
