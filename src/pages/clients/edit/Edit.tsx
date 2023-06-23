@@ -22,10 +22,8 @@ import { Default } from '$app/components/layouts/Default';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -37,6 +35,7 @@ import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -62,7 +61,7 @@ export default function Edit() {
 
   useEffect(() => {
     if (data) {
-      setClient(data);
+      setClient({ ...data });
 
       const contacts = cloneDeep(data.contacts);
 
@@ -95,7 +94,7 @@ export default function Edit() {
   const saveCompany = useHandleCompanySave();
 
   const onSave = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     saveCompany();
 
@@ -104,26 +103,27 @@ export default function Edit() {
       documents: [],
     })
       .then(() => {
-        toast.success(t('updated_client'), { id: toastId });
+        toast.success('updated_client');
 
         queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
 
         navigate(route('/clients/:id', { id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
         }
 
-        error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'), { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
-      })
-      .finally(() =>
-        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }))
-      );
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        }
+
+        if (error.response?.status !== 412 && error.response?.status !== 422) {
+          console.error(error);
+          toast.error();
+        }
+      });
   };
 
   const actions = useActions({
@@ -148,19 +148,28 @@ export default function Edit() {
     >
       {isLoading && <Spinner />}
 
-      {errors && <ValidationAlert errors={errors} />}
-
       {client && (
         <div className="flex flex-col xl:flex-row xl:gap-4">
           <div className="w-full xl:w-1/2">
-            <Details client={client} setClient={setClient} errors={errors} />
-            <Address client={client} setClient={setClient} />
+            <Details
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+            <Address
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
           </div>
 
           <div className="w-full xl:w-1/2">
             <Contacts
               contacts={contacts}
               setContacts={setContacts}
+              setErrors={setErrors}
               errors={errors}
             />
             <AdditionalInfo client={client} setClient={setClient} />

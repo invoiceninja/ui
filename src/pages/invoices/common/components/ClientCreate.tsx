@@ -142,14 +142,25 @@ export function ClientCreate({
         <>
           <div className="flex flex-col xl:flex-row xl:gap-4">
             <div className="w-full xl:w-1/2">
-              <Details client={client} setClient={setClient} errors={errors} />
-              <Address client={client} setClient={setClient} />
+              <Details
+                client={client}
+                setClient={setClient}
+                setErrors={setErrors}
+                errors={errors}
+              />
+              <Address
+                client={client}
+                setClient={setClient}
+                setErrors={setErrors}
+                errors={errors}
+              />
             </div>
 
             <div className="w-full xl:w-1/2">
               <Contacts
                 contacts={contacts}
                 setContacts={setContacts}
+                setErrors={setErrors}
                 errors={errors}
               />
               <AdditionalInfo client={client} setClient={setClient} />

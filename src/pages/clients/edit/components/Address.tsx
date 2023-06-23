@@ -14,10 +14,14 @@ import { TabGroup } from '$app/components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
 import { Client } from '$app/common/interfaces/client';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
   client: Client | undefined;
-  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  setClient: Dispatch<SetStateAction<Client | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function Address(props: Props) {
