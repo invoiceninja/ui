@@ -48,19 +48,32 @@ export function TaskDetails(props: Props) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 xl:col-span-4 h-max">
-        <Element leftSide={t('client')}>
-          <ClientSelector
-            onChange={(client) => handleChange('client_id', client.id)}
-            value={task.client_id}
-            clearButton={Boolean(task.client_id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            errorMessage={errors?.errors.client_id}
-          />
-        </Element>
+        {!task.project_id && (
+          <Element leftSide={t('client')}>
+            <ClientSelector
+              onChange={(client) => {
+                handleChange('client_id', client.id);
 
+                if (!task.id) {
+                  handleChange(
+                    'rate',
+                    client?.settings?.default_task_rate ?? 0
+                  )
+                }
+              }}
+              value={task.client_id}
+              clearButton={Boolean(task.client_id)}
+              onClearButtonClick={() => handleChange('client_id', '')}
+              errorMessage={errors?.errors.client_id}
+            />
+          </Element>
+        )}
         <Element leftSide={t('project')}>
           <ProjectSelector
-            onChange={(project) => handleChange('project_id', project.id)}
+            onChange={(project) => {
+              handleChange('project_id', project.id);
+              handleChange('client_id', '');
+            }}
             value={task.project_id}
             clearButton={Boolean(task.project_id)}
             onClearButtonClick={() => handleChange('project_id', '')}

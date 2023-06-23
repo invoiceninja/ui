@@ -11,6 +11,8 @@
 import { Company } from '$app/common/interfaces/company.interface';
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
+import { useCompanyChanges } from './useCompanyChanges';
+import { isEqual } from 'lodash';
 
 export function useCurrentCompany(): Company {
   const companyUserState = useSelector(
@@ -18,4 +20,17 @@ export function useCurrentCompany(): Company {
   );
 
   return companyUserState.api[companyUserState.currentIndex]?.company;
+}
+
+export function useShouldUpdateCompany() {
+  const company = useCurrentCompany();
+  const changes = useCompanyChanges();
+
+  return () => {
+    if (typeof changes === 'undefined') {
+      return false;
+    }
+
+    return !isEqual(company, changes);
+  };
 }

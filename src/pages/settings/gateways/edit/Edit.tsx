@@ -19,7 +19,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
@@ -29,6 +29,7 @@ import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
   const [t] = useTranslation();
+  const [searchParams] = useSearchParams();
 
   const { id } = useParams();
 
@@ -95,7 +96,10 @@ export function Edit() {
 
   return (
     <Settings title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        defaultTabIndex={Number(searchParams.get('tab')) ?? 0}
+      >
         <div>
           {companyGateway && (
             <Card title={t('edit_gateway')}>

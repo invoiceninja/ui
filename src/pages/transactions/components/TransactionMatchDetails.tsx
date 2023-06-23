@@ -87,7 +87,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -124,7 +124,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries('/api/v1/payments');
           queryClient.invalidateQueries(
@@ -163,7 +163,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
 
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -206,7 +206,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
 
           queryClient.invalidateQueries('/api/v1/expenses');
 
