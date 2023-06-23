@@ -19,6 +19,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { v4 } from 'uuid';
 
 interface Props {
   contacts: Partial<ClientContact>[];
@@ -37,9 +38,9 @@ export function Contacts(props: Props) {
     contactId: string
   ) => {
     const contactIndex = props.contacts.findIndex(
-      (contact) => contact.id === contactId
+      (contact) => contact.contact_key === contactId
     );
-
+    
     set(props.contacts[contactIndex], propertyId, value);
 
     props.setContacts(props.contacts);
@@ -57,6 +58,7 @@ export function Contacts(props: Props) {
     const contacts = [...props.contacts];
 
     contacts.push({
+      contact_key: v4().replaceAll('-', ''),
       first_name: '',
       last_name: '',
       email: '',
@@ -80,7 +82,7 @@ export function Contacts(props: Props) {
                 handleChange(
                   event.target.value,
                   'first_name',
-                  contact.id as string
+                  contact.contact_key as string
                 )
               }
               errorMessage={props.errors?.errors.name}
@@ -95,7 +97,7 @@ export function Contacts(props: Props) {
                 handleChange(
                   event.target.value,
                   'last_name',
-                  contact.id as string
+                  contact.contact_key as string
                 )
               }
               errorMessage={props.errors?.errors.name}
@@ -107,7 +109,7 @@ export function Contacts(props: Props) {
               id={`email_${index}`}
               value={contact.email}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'email', contact.id as string)
+                handleChange(event.target.value, 'email', contact.contact_key as string)
               }
             />
           </Element>
@@ -122,7 +124,7 @@ export function Contacts(props: Props) {
                   handleChange(
                     event.target.value,
                     'password',
-                    contact.id as string
+                    contact.contact_key as string
                   )
                 }
               />
@@ -134,7 +136,7 @@ export function Contacts(props: Props) {
               id={`phone_${index}`}
               value={contact.phone}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'phone', contact.id as string)
+                handleChange(event.target.value, 'phone', contact.contact_key as string)
               }
             />
           </Element>
@@ -143,7 +145,7 @@ export function Contacts(props: Props) {
             <Toggle
               checked={Boolean(contact?.send_email)}
               onChange={(value) =>
-                handleChange(value, 'send_email', contact.id as string)
+                handleChange(value, 'send_email', contact.contact_key as string)
               }
             />
           </Element>
@@ -154,7 +156,7 @@ export function Contacts(props: Props) {
               defaultValue={contact.custom_value1}
               value={company.custom_fields.contact1}
               onValueChange={(value) =>
-                handleChange(value, 'custom_value1', contact.id as string)
+                handleChange(value, 'custom_value1', contact.contact_key as string)
               }
             />
           )}
@@ -165,7 +167,7 @@ export function Contacts(props: Props) {
               defaultValue={contact.custom_value2}
               value={company.custom_fields.contact2}
               onValueChange={(value) =>
-                handleChange(value, 'custom_value2', contact.id as string)
+                handleChange(value, 'custom_value2', contact.contact_key as string)
               }
             />
           )}
@@ -176,7 +178,7 @@ export function Contacts(props: Props) {
               defaultValue={contact.custom_value3}
               value={company.custom_fields.contact3}
               onValueChange={(value) =>
-                handleChange(value, 'custom_value3', contact.id as string)
+                handleChange(value, 'custom_value3', contact.contact_key as string)
               }
             />
           )}
@@ -187,7 +189,7 @@ export function Contacts(props: Props) {
               defaultValue={contact.custom_value4}
               value={company.custom_fields.contact4}
               onValueChange={(value) =>
-                handleChange(value, 'custom_value4', contact.id as string)
+                handleChange(value, 'custom_value4', contact.contact_key as string)
               }
             />
           )}
