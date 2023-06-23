@@ -103,14 +103,6 @@ export function useTaskColumns() {
       pdfVariables = pdfVariables.filter(
         (variable) => variable !== '$task.discount'
       );
-    } else {
-      if (!updatedVariables.includes('$task.discount')) {
-        const discountColumnIndex = defaultLineItemColumns.findIndex(
-          (column) => column.key === '$task.discount'
-        );
-
-        updatedVariables.splice(discountColumnIndex, 0, '$task.discount');
-      }
     }
 
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {

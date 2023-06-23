@@ -105,14 +105,6 @@ export function useProductColumns() {
       pdfVariables = pdfVariables.filter(
         (variable) => variable !== '$product.discount'
       );
-    } else {
-      if (!updatedVariables.includes('$product.discount')) {
-        const discountColumnIndex = defaultLineItemColumns.findIndex(
-          (column) => column.key === '$product.discount'
-        );
-
-        updatedVariables.splice(discountColumnIndex, 0, '$product.discount');
-      }
     }
 
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
