@@ -27,10 +27,15 @@ export function useSave(
 
     toast.processing();
 
+    const updatedPayment = { ...payment };
+
+    delete updatedPayment.invoices;
+    delete updatedPayment.credits;
+
     request(
       'PUT',
       endpoint('/api/v1/payments/:id', { id: payment.id }),
-      payment
+      updatedPayment
     )
       .then(() => {
         toast.success('updated_payment');
