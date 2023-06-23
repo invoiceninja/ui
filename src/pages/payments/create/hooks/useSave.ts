@@ -18,6 +18,13 @@ import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 
+interface Paymentable {
+  _id: string;
+  amount: number;
+  credit_id: string;
+  invoice_id: string;
+}
+
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
@@ -51,6 +58,15 @@ export function useSave(
       })
       .finally(() => {
         queryClient.invalidateQueries(route('/api/v1/payments'));
+        
+          const paymentables = payment.invoices as Paymentable[] | undefined;
+
+          paymentables?.forEach((invoice) => {
+          
+            queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: invoice.invoice_id }));
+
+          });
+
       });
   };
 }
