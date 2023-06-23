@@ -15,16 +15,17 @@ import { useTranslation } from 'react-i18next';
 import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { ReactSettings } from './useReactSettings';
-import { useDispatch } from 'react-redux';
-import { updateChanges } from '../stores/slices/user';
+import { useDispatch, useStore } from 'react-redux';
+import { updateChanges, updateUser } from '../stores/slices/user';
 import { toast } from '../helpers/toast/toast';
 import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
-import { useQueryClient } from 'react-query';
-import { route } from '../helpers/route';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { usePasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { RootState } from '../stores/store';
+import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { CompanyUser } from '../interfaces/company-user';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -54,7 +55,6 @@ type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
 
 export function usePreferences() {
   const user = useInjectUserChanges();
-  const queryClient = useQueryClient();
   const { isPasswordRequired, touch } = usePasswordConfirmation();
 
   const [t] = useTranslation();
@@ -73,7 +73,9 @@ export function usePreferences() {
     );
   };
 
-  const save = () => {
+  const { getState } = useStore<RootState>();
+
+  const save = async () => {
     toast.processing();
 
     request(
@@ -81,7 +83,7 @@ export function usePreferences() {
       endpoint('/api/v1/users/:id?include=company_user', {
         id: user?.id,
       }),
-      user,
+      getState().user.changes,
       {
         headers: {
           'X-Api-Password': isPasswordRequired()
@@ -90,14 +92,13 @@ export function usePreferences() {
         },
       }
     )
-      .then(() => {
+      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_user');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/users/:id', { id: user?.id })
-        );
+        dispatch(updateUser(response.data.data));
 
         setIsVisible(false);
+
         touch();
       })
       .catch((error: AxiosError<ValidationBag>) => {
