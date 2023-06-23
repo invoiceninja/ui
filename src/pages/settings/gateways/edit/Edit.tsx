@@ -98,7 +98,7 @@ export function Edit() {
     <Settings title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
       <TabGroup
         tabs={tabs}
-        defaultTabIndex={Number(searchParams.get('defaultTab')) ?? 0}
+        defaultTabIndex={Number(searchParams.get('tab')) ?? 0}
       >
         <div>
           {companyGateway && (

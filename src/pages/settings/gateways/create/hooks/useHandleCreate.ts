@@ -47,7 +47,7 @@ export function useHandleCreate(
         toast.success('created_company_gateway');
 
         navigate(
-          route('/settings/gateways/:id/edit?defaultTab=:defaultTabIndex', {
+          route('/settings/gateways/:id/edit?tab=:defaultTabIndex', {
             id: response.data.data.id,
             defaultTabIndex,
           })
