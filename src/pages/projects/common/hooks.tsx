@@ -27,6 +27,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -245,9 +246,10 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const isEditPage =
-    location.pathname.endsWith('/edit') ||
-    !location.pathname.endsWith(`/projects/${id}`);
+  const shouldShowEditAction =
+    location.pathname.includes(id!) && !location.pathname.includes('/edit');
+
+  const isEditOrShowPage = location.pathname.includes(id!);
 
   const setProject = useSetAtom(projectAtom);
 
@@ -261,15 +263,21 @@ export function useActions() {
     toast.processing();
 
     queryClient.fetchQuery(
-      route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
-        projectId: project.id,
-      }),
+      route(
+        '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+        {
+          projectId: project.id,
+        }
+      ),
       () =>
         request(
           'GET',
-          endpoint('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
-            projectId: project.id,
-          })
+          endpoint(
+            '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+            {
+              projectId: project.id,
+            }
+          )
         )
           .then((response: GenericSingleResourceResponse<Task[]>) => {
             toast.dismiss();
@@ -292,6 +300,18 @@ export function useActions() {
   };
 
   const actions = [
+    (project: Project) =>
+      shouldShowEditAction && (
+        <DropdownElement
+          onClick={() =>
+            navigate(route('/projects/:id/edit', { id: project.id }))
+          }
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => shouldShowEditAction && <Divider withoutPadding />,
     (project: Project) => (
       <DropdownElement
         onClick={() => handleInvoiceProject(project)}
@@ -308,10 +328,10 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -322,7 +342,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -333,7 +353,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'delete')}
           icon={<Icon element={MdDelete} />}
