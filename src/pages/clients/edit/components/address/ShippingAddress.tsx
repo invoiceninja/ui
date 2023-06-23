@@ -95,12 +95,11 @@ export function ShippingAddress(props: Props) {
           onChange={handleChange}
         />
       </Element>
-
       {countries.length > 1 && (
         <Element leftSide={t('country')}>
           <SelectField
             id="shipping_country_id"
-            value={props.client?.shipping_country_id}
+            defaultValue={props.client?.shipping_country_id}
             onChange={handleChange}
           >
             <option value=""></option>
@@ -113,6 +112,8 @@ export function ShippingAddress(props: Props) {
           </SelectField>
         </Element>
       )}
+
+
     </>
   );
 }
