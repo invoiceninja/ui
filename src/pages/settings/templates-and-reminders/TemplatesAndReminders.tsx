@@ -111,7 +111,7 @@ export function TemplatesAndReminders() {
       subject: templateBody?.subject,
       entity: '',
       entity_id: '',
-      template: '',
+      template: `email_template_${templateId}`,
     }).then((response) => setPreview(response.data));
   }, [templateBody]);
 
