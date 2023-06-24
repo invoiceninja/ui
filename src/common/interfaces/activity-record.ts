@@ -55,5 +55,4 @@ export interface ActivityRecord {
   subscription: ActivityRecordBase
   payment_amount: ActivityRecordBase
   adjustment: ActivityRecordBase;
-  
 }
