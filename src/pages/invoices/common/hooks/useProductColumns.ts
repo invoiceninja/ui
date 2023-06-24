@@ -124,13 +124,7 @@ export function useProductColumns() {
       (variable) => variable !== '$product.line_total'
     );
 
-    const lineTotalColumnIndex = getColumnIndex(
-      '$product.line_total',
-      pdfVariables,
-      updatedVariables
-    );
-
-    updatedVariables.splice(lineTotalColumnIndex, 0, '$product.line_total');
+    updatedVariables.push('$product.line_total');
 
     setColumns(updatedVariables);
   }, [company]);

@@ -118,13 +118,7 @@ export function useTaskColumns() {
       (variable) => variable !== '$task.line_total'
     );
 
-    const lineTotalColumnIndex = getColumnIndex(
-      '$task.line_total',
-      pdfVariables,
-      updatedVariables
-    );
-
-    updatedVariables.splice(lineTotalColumnIndex, 0, '$task.line_total');
+    updatedVariables.push('$task.line_total');
 
     setColumns(updatedVariables);
   }, [company]);
