@@ -14,16 +14,9 @@ import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const { t } = useTranslation();
-
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
     const generate = (activity: ActivityRecord) => {
       console.log('activity', activity);
