@@ -9,10 +9,6 @@
  */
 
 
-interface WithHashId {
-  hashed_id: string;
-}
-
 interface ActivityRecordBase {
 label: string;
 hashed_id: string;
