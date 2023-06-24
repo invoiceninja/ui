@@ -52,19 +52,22 @@ export interface ActivityRecord {
   purchase_order_id: string;
   notes: string;
   ip: string;
-  client: Client & WithHashId;
-  task: Task;
-  contact: ClientContact;
-  user: User & WithHashId;
-  expense?: Expense & WithHashId;
-  invoice?: Invoice & WithHashId;
-  recurring_invoice?: RecurringInvoice & WithHashId;
-  recurring_expense?: RecurringExpense & WithHashId;
-  payment?: Payment & WithHashId;
-  credit?: Credit & WithHashId;
-  quote?: Quote & WithHashId;
-  vendor?: Vendor & WithHashId;
-  vendor_contact?: VendorContact & WithHashId;
-  purchase_order?: PurchaseOrder & WithHashId;
-  subscription?: Subscription & WithHashId;
+  client: [string, string]
+  task:  [string, string]
+  contact: [string, string] 
+  user: [string, string] 
+  expense: [string, string] 
+  invoice: [string, string] 
+  recurring_invoice: [string, string] 
+  recurring_expense: [string, string] 
+  payment: [string, string] 
+  credit: [string, string] 
+  quote: [string, string] 
+  vendor: [string, string]
+  vendor_contact: [string, string] 
+  purchase_order: [string, string] 
+  subscription: [string, string]
+  payment_amount: string
+  payment_adjustment: string;
+  
 }

@@ -30,158 +30,129 @@ export function useGenerateActivityElement() {
       return t('client');
     }
 
-    // First use primary contact, if possible.
-    const primary = activity.client.contacts.find(
-      (contact) => contact.is_primary
-    );
+    const generate = (activity: ActivityRecord) => {
+      let text = trans(`activity_${activity.activity_type_id}`, {});
 
-    if (primary) {
-      return `${primary.first_name} ${primary.last_name}`;
-    }
-
-    // If we don't have a primary, let's just use first contact.
-    const first = activity.client.contacts[0];
-
-    if (first) {
-      return `${first.first_name} ${first.last_name}`;
-    }
-
-    // As a fallback, use client name.
-    return activity.client.display_name;
-  };
-
-  const generate = (activity: ActivityRecord) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const replacements = {
-      client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.display_name}
-        </Link>
-      ),
-      contact: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {contact(activity)}
-        </Link>
-      ),
-      quote: (
-        <Link to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}>
-          {activity.quote?.number}
-        </Link>
-      ),
-      user: activity?.user
-        ? `${activity?.user?.first_name} ${activity?.user?.last_name}`
-        : 'System',
-      expense: (
-        <Link
-          to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
-        >
-          {activity?.expense?.number}
-        </Link>
-      ),
-      recurring_invoice: (
-        <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity.recurring_invoice?.hashed_id,
-          })}
-        >
-          {activity?.recurring_invoice?.number}
-        </Link>
-      ),
-      recurring_expense: (
-        <Link
-          to={route('/recurring_expenses/:id/edit', {
-            id: activity.recurring_expense?.hashed_id,
-          })}
-        >
-          {activity?.recurring_expense?.number}
-        </Link>
-      ),
-      purchase_order: (
-        <Link
-          to={route('/purchase_orders/:id/edit', {
-            id: activity.purchase_order?.hashed_id,
-          })}
-        >
-          {activity?.purchase_order?.number}
-        </Link>
-      ),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
-        >
-          {activity?.invoice?.number}
-        </Link>
-      ),
-      payment_amount:
-        activity.payment &&
-        formatMoney(
-          activity.payment.amount,
-          activity.client?.country_id || company?.settings.country_id,
-          activity.client?.settings.currency_id || company?.settings.currency_id
+      const replacements = {
+        client: (
+          <Link to={route('/clients/:id', { id: activity.client[1] })}>
+            {activity.client[0]}
+          </Link>
         ),
-      payment: (
-        <Link to={route('/payments/:id', { id: activity.payment?.hashed_id })}>
-          {activity?.payment?.number}
-        </Link>
-      ),
-      credit: (
-        <Link
-          to={route('/credits/:id/edit', { id: activity.credit?.hashed_id })}
-        >
-          {activity?.credit?.number}
-        </Link>
-      ),
-      task: (
-        <Link to={route('/tasks/:id/edit', { id: activity.credit?.hashed_id })}>
-          {activity?.task?.number}
-        </Link>
-      ),
-      vendor: (
-        <Link to={route('/vendors/:id', { id: activity.vendor?.hashed_id })}>
-          {activity?.vendor?.name}
-        </Link>
-      ),
-      subscription: (
-        <Link
-          to={route('/settings/subscriptions/:id/edit', {
-            id: activity.subscription?.hashed_id,
-          })}
-        >
-          {activity?.subscription?.name}
-        </Link>
-      ),
-      adjustment:
-        activity.payment &&
-        formatMoney(
-          activity.payment.refunded,
-          activity.client?.country_id || company?.settings.country_id,
-          activity.client?.settings.currency_id || company?.settings.currency_id
+        contact: (
+          <Link to={route('/clients/:id', { id: activity.client[1] })}>
+            {activity.client[0]}
+          </Link>
         ),
+        quote: (
+          <Link to={route('/quotes/:id/edit', { id: activity.quote[1] })}>
+            {activity.quote[0]}
+          </Link>
+        ),
+        user: activity?.user
+          ? activity.user[0]
+          : 'System',
+        expense: (
+          <Link
+            to={route('/expenses/:id/edit', { id: activity.expense[1] })}
+          >
+            {activity?.expense[0]}
+          </Link>
+        ),
+        recurring_invoice: (
+          <Link
+            to={route('/recurring_invoices/:id/edit', {
+              id: activity.recurring_invoice[1],
+            })}
+          >
+            {activity?.recurring_invoice[0]}
+          </Link>
+        ),
+        recurring_expense: (
+          <Link
+            to={route('/recurring_expenses/:id/edit', {
+              id: activity.recurring_expense[1],
+            })}
+          >
+            {activity?.recurring_expense[0]}
+          </Link>
+        ),
+        purchase_order: (
+          <Link
+            to={route('/purchase_orders/:id/edit', {
+              id: activity.purchase_order[1],
+            })}
+          >
+            {activity?.purchase_order[0]}
+          </Link>
+        ),
+        invoice: (
+          <Link
+            to={route('/invoices/:id/edit', { id: activity.invoice[1] })}
+          >
+            {activity?.invoice[0]}
+          </Link>
+        ),
+        payment_amount:
+          activity.payment[0],
+        payment: (
+          <Link to={route('/payments/:id', { id: activity.payment[1] })}>
+            {activity?.payment[0]}
+          </Link>
+        ),
+        credit: (
+          <Link
+            to={route('/credits/:id/edit', { id: activity.credit[1] })}
+          >
+            {activity?.credit[0]}
+          </Link>
+        ),
+        task: (
+          <Link to={route('/tasks/:id/edit', { id: activity.task[1] })}>
+            {activity?.task[0]}
+          </Link>
+        ),
+        vendor: (
+          <Link to={route('/vendors/:id', { id: activity.vendor[1] })}>
+            {activity?.vendor[0]}
+          </Link>
+        ),
+        subscription: (
+          <Link
+            to={route('/settings/subscriptions/:id/edit', {
+              id: activity.subscription[1],
+            })}
+          >
+            {activity?.subscription[0]}
+          </Link>
+        ),
+        adjustment:
+          activity.payment_adjustment,
+      };
+
+      for (const [variable, value] of Object.entries(replacements)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        text = reactStringReplace(text, `:${variable}`, () => value);
+      }
+
+      return text;
     };
 
-    for (const [variable, value] of Object.entries(replacements)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      text = reactStringReplace(text, `:${variable}`, () => value);
-    }
+    return (activity: ActivityRecord) => (
+      <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0 hover:bg-gray-50">
+        <div className="flex flex-col">
+          <span className="text-sm">{generate(activity)}</span>
 
-    return text;
-  };
+          <div className="flex space-x-3">
+            <span className="dark:text-white text-sm">
+              {date(activity.created_at, dateFormat)}
+            </span>
 
-  return (activity: ActivityRecord) => (
-    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0 hover:bg-gray-50">
-      <div className="flex flex-col">
-        <span className="text-sm">{generate(activity)}</span>
-
-        <div className="flex space-x-3">
-          <span className="dark:text-white text-sm">
-            {date(activity.created_at, dateFormat)}
-          </span>
-
-          <span className="text-gray-500 text-sm">{activity.ip}</span>
+            <span className="text-gray-500 text-sm">{activity.ip}</span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
