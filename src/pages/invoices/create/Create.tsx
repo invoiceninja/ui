@@ -258,7 +258,11 @@ export default function Create() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals
