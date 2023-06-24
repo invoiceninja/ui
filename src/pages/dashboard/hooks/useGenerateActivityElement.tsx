@@ -14,12 +14,16 @@ import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
+import { t } from 'i18next';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
     const generate = (activity: ActivityRecord) => {
-      console.log('activity', activity);
+      
+      if(activity.activity_type_id === 10)
+        console.log(activity);
+
       let text = trans(`activity_${activity.activity_type_id}`, {});
 
       const replacements = {
@@ -29,8 +33,8 @@ export function useGenerateActivityElement() {
           </Link>
         ),
         contact: (
-          <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-            {activity.client?.label}
+          <Link to={route(`/${activity?.contact?.contact_entity}/:id`, { id: activity.contact?.hashed_id })}>
+            {activity.contact?.label}
           </Link>
         ),
         quote: (
@@ -38,9 +42,9 @@ export function useGenerateActivityElement() {
             {activity.quote?.label}
           </Link>
         ),
-        user: activity?.user
-          ? activity.user?.label
-          : 'System',
+        user: 
+          activity.user?.label ?? 'system'
+        ,
         expense: (
           <Link
             to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
@@ -83,9 +87,9 @@ export function useGenerateActivityElement() {
           </Link>
         ),
         payment_amount:
-          activity.payment?.label,
+          activity?.payment_amount?.label,
         payment: (
-          <Link to={route('/payments/:id', { id: activity.payment?.hashed_id })}>
+          <Link to={route('/payments/:id/edit', { id: activity.payment?.hashed_id })}>
             {activity?.payment?.label}
           </Link>
         ),
@@ -102,7 +106,7 @@ export function useGenerateActivityElement() {
           </Link>
         ),
         vendor: (
-          <Link to={route('/vendors/:id', { id: activity.vendor?.hashed_id })}>
+          <Link to={route('/vendors/:id/edit', { id: activity.vendor?.hashed_id })}>
             {activity?.vendor?.label}
           </Link>
         ),
@@ -116,7 +120,7 @@ export function useGenerateActivityElement() {
           </Link>
         ),
         adjustment:
-          activity.payment_adjustment,
+          activity?.adjustment?.label,
       };
 
       for (const [variable, value] of Object.entries(replacements)) {
@@ -138,7 +142,7 @@ export function useGenerateActivityElement() {
               {date(activity.created_at, dateFormat)}
             </span>
 
-            <span className="text-gray-500 text-sm">{activity.ip}</span>
+            <span className="text-gray-500 text-sm">{activity.ip}</span><span className="text-gray-500 text-sm">{activity.notes}</span>
           </div>
         </div>
       </div>

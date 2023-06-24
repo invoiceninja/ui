@@ -12,10 +12,11 @@
 interface ActivityRecordBase {
 label: string;
 hashed_id: string;
+contact_entity: string;
 }
 export interface ActivityRecord {
   id: string;
-  activity_type_id: string;
+  activity_type_id: number;
   client_id: string;
   recurring_invoice_id: string;
   recurring_expense_id: string;
@@ -52,7 +53,7 @@ export interface ActivityRecord {
   vendor_contact: ActivityRecordBase 
   purchase_order: ActivityRecordBase 
   subscription: ActivityRecordBase
-  payment_amount: string
-  payment_adjustment: string;
+  payment_amount: ActivityRecordBase
+  adjustment: ActivityRecordBase;
   
 }
