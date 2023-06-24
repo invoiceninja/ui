@@ -20,9 +20,6 @@ export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
     const generate = (activity: ActivityRecord) => {
-      
-      if(activity.activity_type_id === 10)
-        console.log(activity);
 
       let text = trans(`activity_${activity.activity_type_id}`, {});
 
