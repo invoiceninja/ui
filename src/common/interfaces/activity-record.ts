@@ -28,6 +28,10 @@ interface WithHashId {
   hashed_id: string;
 }
 
+interface ActivityRecordBase {
+label: string;
+hashed_id: string;
+}
 export interface ActivityRecord {
   id: string;
   activity_type_id: string;
@@ -52,21 +56,21 @@ export interface ActivityRecord {
   purchase_order_id: string;
   notes: string;
   ip: string;
-  client: [string, string]
-  task:  [string, string]
-  contact: [string, string] 
-  user: [string, string] 
-  expense: [string, string] 
-  invoice: [string, string] 
-  recurring_invoice: [string, string] 
-  recurring_expense: [string, string] 
-  payment: [string, string] 
-  credit: [string, string] 
-  quote: [string, string] 
-  vendor: [string, string]
-  vendor_contact: [string, string] 
-  purchase_order: [string, string] 
-  subscription: [string, string]
+  client: ActivityRecordBase
+  task:  ActivityRecordBase
+  contact: ActivityRecordBase 
+  user: ActivityRecordBase 
+  expense: ActivityRecordBase 
+  invoice: ActivityRecordBase 
+  recurring_invoice: ActivityRecordBase 
+  recurring_expense: ActivityRecordBase 
+  payment: ActivityRecordBase 
+  credit: ActivityRecordBase 
+  quote: ActivityRecordBase 
+  vendor: ActivityRecordBase
+  vendor_contact: ActivityRecordBase 
+  purchase_order: ActivityRecordBase 
+  subscription: ActivityRecordBase
   payment_amount: string
   payment_adjustment: string;
   

@@ -25,105 +25,101 @@ export function useGenerateActivityElement() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const contact = (activity: ActivityRecord) => {
-    if (!activity.client) {
-      return t('client');
-    }
-
     const generate = (activity: ActivityRecord) => {
+      console.log('activity', activity);
       let text = trans(`activity_${activity.activity_type_id}`, {});
 
       const replacements = {
         client: (
-          <Link to={route('/clients/:id', { id: activity.client[1] })}>
-            {activity.client[0]}
+          <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+            {activity.client?.label}
           </Link>
         ),
         contact: (
-          <Link to={route('/clients/:id', { id: activity.client[1] })}>
-            {activity.client[0]}
+          <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+            {activity.client?.label}
           </Link>
         ),
         quote: (
-          <Link to={route('/quotes/:id/edit', { id: activity.quote[1] })}>
-            {activity.quote[0]}
+          <Link to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}>
+            {activity.quote?.label}
           </Link>
         ),
         user: activity?.user
-          ? activity.user[0]
+          ? activity.user?.label
           : 'System',
         expense: (
           <Link
-            to={route('/expenses/:id/edit', { id: activity.expense[1] })}
+            to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
           >
-            {activity?.expense[0]}
+            {activity?.expense?.label}
           </Link>
         ),
         recurring_invoice: (
           <Link
             to={route('/recurring_invoices/:id/edit', {
-              id: activity.recurring_invoice[1],
+              id: activity.recurring_invoice?.hashed_id,
             })}
           >
-            {activity?.recurring_invoice[0]}
+            {activity?.recurring_invoice?.label}
           </Link>
         ),
         recurring_expense: (
           <Link
             to={route('/recurring_expenses/:id/edit', {
-              id: activity.recurring_expense[1],
+              id: activity.recurring_expense?.hashed_id,
             })}
           >
-            {activity?.recurring_expense[0]}
+            {activity?.recurring_expense?.label}
           </Link>
         ),
         purchase_order: (
           <Link
             to={route('/purchase_orders/:id/edit', {
-              id: activity.purchase_order[1],
+              id: activity.purchase_order?.hashed_id,
             })}
           >
-            {activity?.purchase_order[0]}
+            {activity?.purchase_order?.label}
           </Link>
         ),
         invoice: (
           <Link
-            to={route('/invoices/:id/edit', { id: activity.invoice[1] })}
+            to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
           >
-            {activity?.invoice[0]}
+            {activity?.invoice?.label}
           </Link>
         ),
         payment_amount:
-          activity.payment[0],
+          activity.payment?.label,
         payment: (
-          <Link to={route('/payments/:id', { id: activity.payment[1] })}>
-            {activity?.payment[0]}
+          <Link to={route('/payments/:id', { id: activity.payment?.hashed_id })}>
+            {activity?.payment?.label}
           </Link>
         ),
         credit: (
           <Link
-            to={route('/credits/:id/edit', { id: activity.credit[1] })}
+            to={route('/credits/:id/edit', { id: activity.credit?.hashed_id })}
           >
-            {activity?.credit[0]}
+            {activity?.credit?.label}
           </Link>
         ),
         task: (
-          <Link to={route('/tasks/:id/edit', { id: activity.task[1] })}>
-            {activity?.task[0]}
+          <Link to={route('/tasks/:id/edit', { id: activity.task?.hashed_id })}>
+            {activity?.task?.label}
           </Link>
         ),
         vendor: (
-          <Link to={route('/vendors/:id', { id: activity.vendor[1] })}>
-            {activity?.vendor[0]}
+          <Link to={route('/vendors/:id', { id: activity.vendor?.hashed_id })}>
+            {activity?.vendor?.label}
           </Link>
         ),
         subscription: (
           <Link
             to={route('/settings/subscriptions/:id/edit', {
-              id: activity.subscription[1],
+              id: activity.subscription?.hashed_id,
             })}
           >
-            {activity?.subscription[0]}
+            {activity?.subscription?.label}
           </Link>
         ),
         adjustment:
@@ -155,4 +151,3 @@ export function useGenerateActivityElement() {
       </div>
     );
   }
-}
