@@ -43,7 +43,7 @@ export function useGenerateActivityElement() {
           </Link>
         ),
         user: 
-          activity.user?.label ?? 'system'
+          activity.user?.label ?? t('system')
         ,
         expense: (
           <Link
