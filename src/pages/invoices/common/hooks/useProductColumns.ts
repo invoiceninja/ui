@@ -12,14 +12,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useState, useEffect } from 'react';
 import { clone } from 'lodash';
 
-const defaultLineItemColumns = [
-  { key: '$product.item', default: true },
-  { key: '$product.description', default: false },
-  { key: '$product.unit_cost', default: true },
-  { key: '$product.discount', default: true },
-  { key: '$product.quantity', default: true },
-];
-
 export function useProductColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
@@ -40,29 +32,32 @@ export function useProductColumns() {
   };
 
   useEffect(() => {
-    const defaultVariables = defaultLineItemColumns.map((column) => column.key);
-
     let updatedVariables: string[] =
       clone(company?.settings.pdf_variables.product_columns) || [];
 
     let pdfVariables =
       clone(company?.settings.pdf_variables.product_columns) || [];
 
-    defaultVariables.forEach((variable) => {
-      const column = defaultLineItemColumns.find(
-        (column) => column.key === variable
-      );
+    const numberOfPdfVariables = pdfVariables.length;
 
-      const columnIndex = getColumnIndex(
-        variable,
-        pdfVariables,
-        updatedVariables
-      );
+    if (!updatedVariables.includes('$product.item')) {
+      updatedVariables.splice(0, 0, '$product.item');
+      pdfVariables.splice(0, 0, '$product.item');
+    }
 
-      if (!updatedVariables.includes(variable) && column?.default) {
-        updatedVariables.splice(columnIndex, 0, column.key);
-      }
-    });
+    if (!numberOfPdfVariables) {
+      updatedVariables.push('$product.description');
+    }
+
+    if (!updatedVariables.includes('$product.unit_cost')) {
+      updatedVariables.push('$product.unit_cost');
+      pdfVariables.push('$product.unit_cost');
+    }
+
+    if (!updatedVariables.includes('$product.quantity')) {
+      updatedVariables.push('$product.quantity');
+      pdfVariables.push('$product.quantity');
+    }
 
     const taxes: string[] = [];
     const enabledTaxRates = company?.enabled_item_tax_rates || 0;
@@ -107,6 +102,14 @@ export function useProductColumns() {
       );
     }
 
+    if (
+      company.enable_product_discount &&
+      !updatedVariables.includes('$product.discount')
+    ) {
+      updatedVariables.push('$product.discount');
+      pdfVariables.push('$product.discount');
+    }
+
     ['product1', 'product2', 'product3', 'product4'].forEach((field) => {
       if (
         company?.custom_fields[field] &&
@@ -116,6 +119,19 @@ export function useProductColumns() {
           updatedVariables.length,
           0,
           `$product.${field}`
+        );
+      }
+
+      if (
+        !company?.custom_fields[field] &&
+        pdfVariables.includes(`$product.${field}`)
+      ) {
+        updatedVariables = updatedVariables.filter(
+          (variable) => variable !== `$product.${field}`
+        );
+
+        pdfVariables = pdfVariables.filter(
+          (variable) => variable !== `$product.${field}`
         );
       }
     });

@@ -12,14 +12,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useState, useEffect } from 'react';
 import { clone } from 'lodash';
 
-const defaultLineItemColumns = [
-  { key: '$task.service', default: true },
-  { key: '$task.description', default: false },
-  { key: '$task.rate', default: true },
-  { key: '$task.discount', default: true },
-  { key: '$task.hours', default: true },
-];
-
 export function useTaskColumns() {
   const company = useCurrentCompany();
   const [columns, setColumns] = useState<string[]>([]);
@@ -40,29 +32,32 @@ export function useTaskColumns() {
   };
 
   useEffect(() => {
-    const defaultVariables = defaultLineItemColumns.map((column) => column.key);
-
     let updatedVariables: string[] =
       clone(company?.settings.pdf_variables.task_columns) || [];
 
     let pdfVariables =
       clone(company?.settings.pdf_variables.task_columns) || [];
 
-    defaultVariables.forEach((variable) => {
-      const column = defaultLineItemColumns.find(
-        (column) => column.key === variable
-      );
+    const numberOfPdfVariables = pdfVariables.length;
 
-      const columnIndex = getColumnIndex(
-        variable,
-        pdfVariables,
-        updatedVariables
-      );
+    if (!updatedVariables.includes('$task.service')) {
+      updatedVariables.splice(0, 0, '$task.service');
+      pdfVariables.splice(0, 0, '$task.service');
+    }
 
-      if (!updatedVariables.includes(variable) && column?.default) {
-        updatedVariables.splice(columnIndex, 0, column.key);
-      }
-    });
+    if (!numberOfPdfVariables) {
+      updatedVariables.push('$task.description');
+    }
+
+    if (!updatedVariables.includes('$task.rate')) {
+      updatedVariables.push('$task.rate');
+      pdfVariables.push('$task.rate');
+    }
+
+    if (!updatedVariables.includes('$task.hours')) {
+      updatedVariables.push('$task.hours');
+      pdfVariables.push('$task.hours');
+    }
 
     const taxes: string[] = [];
     const enabledTaxRates = company?.enabled_item_tax_rates || 0;
@@ -105,12 +100,33 @@ export function useTaskColumns() {
       );
     }
 
+    if (
+      company.enable_product_discount &&
+      !updatedVariables.includes('$task.discount')
+    ) {
+      updatedVariables.push('$task.discount');
+      pdfVariables.push('$task.discount');
+    }
+
     ['task1', 'task2', 'task3', 'task4'].forEach((field) => {
       if (
         company?.custom_fields[field] &&
         !pdfVariables.includes(`$task.${field}`)
       ) {
         updatedVariables.splice(updatedVariables.length, 0, `$task.${field}`);
+      }
+
+      if (
+        !company?.custom_fields[field] &&
+        pdfVariables.includes(`$task.${field}`)
+      ) {
+        updatedVariables = updatedVariables.filter(
+          (variable) => variable !== `$task.${field}`
+        );
+
+        pdfVariables = pdfVariables.filter(
+          (variable) => variable !== `$task.${field}`
+        );
       }
     });
 
