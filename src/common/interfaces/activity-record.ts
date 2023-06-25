@@ -8,29 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { User } from '@sentry/react';
-import { Client } from './client';
-import { ClientContact } from './client-contact';
-import { Expense } from './expense';
-import { Invoice } from './invoice';
-import { Credit } from './credit';
-import { Payment } from './payment';
-import { Quote } from './quote';
-import { RecurringInvoice } from './recurring-invoice';
-import { Task } from './task';
-import { Vendor } from './vendor';
-import { PurchaseOrder } from './purchase-order';
-import { VendorContact } from './vendor-contact';
-import { Subscription } from './subscription';
-import { RecurringExpense } from './recurring-expense';
 
-interface WithHashId {
-  hashed_id: string;
+interface ActivityRecordBase {
+label: string;
+hashed_id: string;
+contact_entity: string;
 }
-
 export interface ActivityRecord {
   id: string;
-  activity_type_id: string;
+  activity_type_id: number;
   client_id: string;
   recurring_invoice_id: string;
   recurring_expense_id: string;
@@ -52,19 +38,21 @@ export interface ActivityRecord {
   purchase_order_id: string;
   notes: string;
   ip: string;
-  client: Client & WithHashId;
-  task: Task;
-  contact: ClientContact;
-  user: User & WithHashId;
-  expense?: Expense & WithHashId;
-  invoice?: Invoice & WithHashId;
-  recurring_invoice?: RecurringInvoice & WithHashId;
-  recurring_expense?: RecurringExpense & WithHashId;
-  payment?: Payment & WithHashId;
-  credit?: Credit & WithHashId;
-  quote?: Quote & WithHashId;
-  vendor?: Vendor & WithHashId;
-  vendor_contact?: VendorContact & WithHashId;
-  purchase_order?: PurchaseOrder & WithHashId;
-  subscription?: Subscription & WithHashId;
+  client: ActivityRecordBase
+  task:  ActivityRecordBase
+  contact: ActivityRecordBase 
+  user: ActivityRecordBase 
+  expense: ActivityRecordBase 
+  invoice: ActivityRecordBase 
+  recurring_invoice: ActivityRecordBase 
+  recurring_expense: ActivityRecordBase 
+  payment: ActivityRecordBase 
+  credit: ActivityRecordBase 
+  quote: ActivityRecordBase 
+  vendor: ActivityRecordBase
+  vendor_contact: ActivityRecordBase 
+  purchase_order: ActivityRecordBase 
+  subscription: ActivityRecordBase
+  payment_amount: ActivityRecordBase
+  adjustment: ActivityRecordBase;
 }
