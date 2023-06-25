@@ -23,8 +23,8 @@ export function Activity() {
   const [t] = useTranslation();
 
   const { data, isLoading, isError } = useQuery(
-    '/api/v1/activities?react',
-    () => request('GET', endpoint('/api/v1/activities?react'))
+    '/api/v1/activities?reactv2',
+    () => request('GET', endpoint('/api/v1/activities?reactv2'))
   );
 
   const activityElement = useGenerateActivityElement();
