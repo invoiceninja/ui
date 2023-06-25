@@ -32,12 +32,13 @@ import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import collect from 'collect.js';
 
 export default function Apply() {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
-  const { data: payment } = usePaymentQuery({ id });
+  const { data: payment, isLoading } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
@@ -141,7 +142,11 @@ export default function Apply() {
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
           endpoint={`/api/v1/invoices?payable=${payment?.client_id}`}
+          initiallyVisible={isLoading}
+          clearInputAfterSelection
+          exclude={collect(formik.values.invoices).pluck('invoice_id').toArray()}
           label="number"
+          formatLabel={(invoice: Invoice) => `${t('invoice_number_short')}${invoice.number} - ${t('balance')} ${invoice.balance}`}
           onChange={(value: Record<Invoice>) =>
             handleInvoiceChange(
               value.resource?.id as string,
