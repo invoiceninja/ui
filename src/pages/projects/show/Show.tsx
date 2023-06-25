@@ -18,7 +18,7 @@ import { Project } from '$app/common/interfaces/project';
 import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
@@ -26,12 +26,12 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import duration from 'dayjs/plugin/duration';
 import dayjs from 'dayjs';
-import { Inline } from '$app/components/Inline';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../common/hooks';
+import { useActions as useProjectsActions } from '../common/hooks';
 import { DataTable } from '$app/components/DataTable';
 import {
   defaultColumns,
+  useActions as useTasksActions,
   useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
@@ -65,7 +65,8 @@ export default function Show() {
     staleTime: Infinity,
   });
 
-  const actions = useActions();
+  const projectActions = useProjectsActions();
+  const taskActions = useTasksActions();
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
 
@@ -95,15 +96,11 @@ export default function Show() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <Inline>
-          <Button to={`/projects/${id}/edit`}>{t('edit_project')}</Button>
-
-          <ResourceActions
-            resource={project}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        </Inline>
+        <ResourceActions
+          resource={project}
+          label={t('more_actions')}
+          actions={projectActions}
+        />
       }
     >
       <div className="grid grid-cols-3 gap-4">
@@ -129,8 +126,8 @@ export default function Show() {
             {t('task_rate')}:
             {formatMoney(
               project.task_rate,
-              project.client!.country_id,
-              project.client!.settings.currency_id
+              project.client?.country_id || '',
+              project.client?.settings.currency_id
             )}
           </p>
         </InfoCard>
@@ -154,7 +151,7 @@ export default function Show() {
         <DataTable
           resource="task"
           columns={columns}
-          customActions={actions}
+          customActions={taskActions}
           endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           bulkRoute="/api/v1/tasks/bulk"
           linkToCreate={`/tasks/create?project=${id}`}

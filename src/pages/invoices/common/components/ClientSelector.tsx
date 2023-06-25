@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 interface Props {
   readonly?: boolean;
@@ -130,9 +131,12 @@ export function ClientSelector(props: Props) {
               <p className="text-sm text-gray-700">{contact.email}</p>
 
               {resource.invitations.length >= 1 && (
+                <>
                 <Link to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`} external>
-                  {t('view_in_portal')}
+                  {t('view_in_portal')} 
                 </Link>
+                <CopyToClipboardIconOnly text={resource.invitations[0].link} />
+                </>
               )}
             </div>
           </div>

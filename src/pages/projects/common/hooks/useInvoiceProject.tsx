@@ -84,6 +84,8 @@ export function useInvoiceProject() {
 
       invoice.client_id = tasks.length ? tasks[0].client_id : '';
 
+      invoice.line_items = [];
+
       tasks.forEach((task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
@@ -117,7 +119,7 @@ export function useInvoiceProject() {
           .join('\n')
           .trim();
 
-        invoice.line_items = [item];
+        invoice.line_items.push(item);
       });
 
       setInvoice(invoice);
