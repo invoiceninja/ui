@@ -149,7 +149,7 @@ export default function Edit() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} />
+        <CreditFooter handleChange={handleChange} errors={errors} />
 
         {credit && (
           <InvoiceTotals
