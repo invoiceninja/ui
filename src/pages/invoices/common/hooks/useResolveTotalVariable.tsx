@@ -43,17 +43,6 @@ export function useResolveTotalVariable(props: Props) {
   const resolveTranslation = useResolveTranslation();
   const invoiceSum = props.invoiceSum;
 
-  // discount => invoice.discount,
-  // paid_to_date => invoice.paid_to_date,
-  // surcharge1-4 => invoice.surcharge1-4,
-  // outstanding => invoice.balance
-
-  // net_subtotal => ->getSubtotal(),
-  // subtotal => ->getSubtotal(),
-  // total_taxes => ->getTotalTaxes(),
-  // line_taxes => ->getLineTaxes(),
-  // total => ->getTotal(),
-
   const aliases: Record<string, string> = {
     total: 'amount',
     outstanding: 'balance',

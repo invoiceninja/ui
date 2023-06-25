@@ -10,7 +10,6 @@
 import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';

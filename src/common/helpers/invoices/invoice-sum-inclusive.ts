@@ -10,7 +10,6 @@
 import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Credit } from '$app/common/interfaces/credit';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
