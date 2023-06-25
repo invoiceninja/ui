@@ -116,7 +116,7 @@ export function useResolveTotalVariable(props: Props) {
     if (variable == '$balance_due' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.invoice.balance)}
+          {invoiceSum.invoice.status_id === '1' ? formatMoney(invoiceSum.invoice.amount) :formatMoney(invoiceSum.invoice.balance)}
         </Element>
       );
     }

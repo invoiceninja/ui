@@ -140,12 +140,12 @@ export default function Apply() {
 
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
-          endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.client_id}`}
+          endpoint={`/api/v1/invoices?payable=${payment?.client_id}`}
           label="number"
           onChange={(value: Record<Invoice>) =>
             handleInvoiceChange(
               value.resource?.id as string,
-              value.resource?.amount as number,
+              value.resource?.balance as number,
               value.resource?.number as string
             )
           }
@@ -157,7 +157,7 @@ export default function Apply() {
         )}
       </Element>
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string }, index) => (
+        (record: { _id: string; amount: number; number: string; balance: number }, index) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField

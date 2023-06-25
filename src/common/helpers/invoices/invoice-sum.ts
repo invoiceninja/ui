@@ -229,7 +229,7 @@ export class InvoiceSum {
   }
 
   protected setCalculatedAttributes() {
-    if (this.invoice.status_id !== InvoiceStatus.Draft) {
+    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
 
@@ -242,7 +242,7 @@ export class InvoiceSum {
           NumberFormatter.formatValue(this.total, this.currency.precision)
         );
       }
-    }
+    // }
 
     this.invoice.amount = parseFloat(
       NumberFormatter.formatValue(this.total, this.currency.precision)

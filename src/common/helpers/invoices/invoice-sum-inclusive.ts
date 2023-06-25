@@ -207,7 +207,7 @@ export class InvoiceSumInclusive {
   }
 
   protected setCalculatedAttributes() {
-    if (this.invoice.status_id !== InvoiceStatus.Draft) {
+    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
 
@@ -215,7 +215,7 @@ export class InvoiceSumInclusive {
       } else {
         this.invoice.balance = this.total; // Needs implementing formatting with number class.
       }
-    }
+    // }
 
     this.invoice.amount = this.total; // Needs implementing formatting with number class.
     this.invoice.total_taxes = this.totalTaxes;
