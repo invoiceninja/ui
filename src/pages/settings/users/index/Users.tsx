@@ -56,6 +56,7 @@ export function Users() {
           userId: currentUser?.id,
         })}
         linkToCreate="/settings/users/create"
+        bulkRoute="/api/v1/users/bulk"
       />
     </Settings>
   );
