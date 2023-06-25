@@ -59,6 +59,7 @@ export default function Edit() {
       {payment?.client && <ClientCard client={payment.client} />}
       {payment && <PaymentOverview payment={payment} />}
 
+      <Divider />
 
       <Element leftSide={t('payment_number')}>
         <InputField
