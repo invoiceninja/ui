@@ -29,6 +29,8 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useDispatch } from 'react-redux';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface VerificationProps {
   visible: boolean;
@@ -203,8 +205,10 @@ export function VerifyPhone() {
   const [t] = useTranslation();
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
 
+  const user = useCurrentUser();
   const account = useCurrentAccount();
-  
+  const company = useCurrentCompany();
+
   if (!account) {
     return null;
   }
@@ -213,7 +217,11 @@ export function VerifyPhone() {
     return null;
   }
 
-  if (account.account_sms_verified) {
+  if (
+    account.account_sms_verified ||
+    !user?.email_verified_at ||
+    company?.is_disabled
+  ) {
     return null;
   }
 
