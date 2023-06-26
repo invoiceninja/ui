@@ -20,8 +20,8 @@ import { SelectField } from './forms';
 type Props = {
   startDate: string;
   endDate: string;
-  handleDateChange: any;
-  handleDateRangeChange: any;
+  handleDateChange: (value: string) => unknown;
+  handleDateRangeChange: (value: string) => unknown;
 };
 
 export function DropdownDateRangePicker(props: Props) {
@@ -50,8 +50,8 @@ export function DropdownDateRangePicker(props: Props) {
 
     props.handleDateChange(
       dayjs(value[0]).format('YYYY-MM-DD') +
-      ',' +
-      dayjs(value[1]).format('YYYY-MM-DD')
+        ',' +
+        dayjs(value[1]).format('YYYY-MM-DD')
     );
   };
 
@@ -73,47 +73,16 @@ export function DropdownDateRangePicker(props: Props) {
           }
         }}
         style={{ width: '9.7rem' }}
-      >last365_days,,,,,this_year,last_year,all_time,custom
-        <option
-          value="last7_days"
-        >
-          {t('last_7_days')}
-        </option>
-        <option
-          value="last30_days"
-        >
-          {t('last_30_days')}
-        </option>
-        <option
-          value="this_month"
-        >
-          {t('this_month')}
-        </option>
-        <option
-          value="last_month"
-        >
-          {t('last_month')}
-        </option>
-        <option
-          value="this_quarter"
-        >
-          {t('current_quarter')}
-        </option>
-        <option
-          value="last_quarter"
-        >
-          {t('last_quarter')}
-        </option>
-        <option
-          value="this_year"
-        >
-          {t('this_year')}
-        </option>
-        <option
-          value="last_year"
-        >
-          {t('last_year')}
-        </option>
+      >
+        last365_days,,,,,this_year,last_year,all_time,custom
+        <option value="last7_days">{t('last_7_days')}</option>
+        <option value="last30_days">{t('last_30_days')}</option>
+        <option value="this_month">{t('this_month')}</option>
+        <option value="last_month">{t('last_month')}</option>
+        <option value="this_quarter">{t('current_quarter')}</option>
+        <option value="last_quarter">{t('last_quarter')}</option>
+        <option value="this_year">{t('this_year')}</option>
+        <option value="last_year">{t('last_year')}</option>
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
         <option value={'custom'}>{`${t('custom')}`}</option>
       </SelectField>
