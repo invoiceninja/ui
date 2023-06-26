@@ -53,6 +53,7 @@ export interface Payment {
 export interface Paymentable {
   id: string;
   invoice_id: string;
+  credit_id: string;
   amount: number;
   refunded: number;
   created_at: number;
