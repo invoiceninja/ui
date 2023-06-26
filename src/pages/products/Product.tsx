@@ -27,7 +27,6 @@ import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -83,7 +82,7 @@ export default function Product() {
       await saveCompany(true);
 
       request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
-        .then((response: GenericSingleResourceResponse<ProductInterface>) => {
+        .then((response) => {
           toast.success('updated_product');
 
           queryClient.invalidateQueries('/api/v1/products');
