@@ -55,8 +55,8 @@ export default function GeneralSettings() {
 
   const [updatingRecords] = useAtom(updatingRecordsAtom);
 
-  const handleSave = () => {
-    onSave();
+  const handleSave = async () => {
+    await onSave();
 
     const requests: AxiosPromise[] = [];
 

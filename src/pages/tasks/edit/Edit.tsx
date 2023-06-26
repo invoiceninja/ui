@@ -50,10 +50,10 @@ export default function Edit() {
 
   const saveCompany = useHandleCompanySave();
 
-  const handleSave = (task: Task) => {
+  const handleSave = async (task: Task) => {
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     if (isOverlapping(task)) {
       return toast.error('task_errors');
