@@ -76,7 +76,7 @@ export function Totals() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
 
-  const [body, setBody] = useState<{ start_date: string; end_date: string }>({
+  const [dates, setDates] = useState<{ start_date: string, end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth() - 1,
@@ -87,16 +87,32 @@ export function Totals() {
     end_date: new Date().toISOString().split('T')[0],
   });
 
+  const [body, setBody] = useState<{ start_date: string; end_date: string; date_range: string }>({
+    start_date: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() - 1,
+      new Date().getDate()
+    )
+      .toISOString()
+      .split('T')[0],
+    end_date: new Date().toISOString().split('T')[0],
+    date_range: 'last_month'
+  });
+
+  const handleDateRangeChange = (dateRange: string) => {
+    setBody({start_date: '', end_date: '', date_range: dateRange});
+  }
+
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
-
     if (new Date(startDate) > new Date(endDate)) {
       setBody({
         start_date: endDate,
         end_date: startDate,
+        date_range: 'custom'
       });
     } else {
-      setBody({ start_date: startDate, end_date: endDate });
+      setBody({ start_date: startDate, end_date: endDate, date_range: 'custom' });
     }
   };
 
@@ -104,23 +120,26 @@ export function Totals() {
     request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
       (response: AxiosResponse) => {
         setTotalsData(response.data);
-
         const currencies: Currency[] = [];
 
         Object.entries(response.data.currencies).map(([id, name]) => {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
-        setCurrency(parseInt(currencies[0].value));
+        setCurrency(currency ?? parseInt(currencies[0].value));
         setCurrencies(currencies);
         setIsLoadingTotals(false);
+        
       }
     );
   };
 
   const getChartData = () => {
     request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
-      (response: AxiosResponse) => setChartData(response.data)
+      (response: AxiosResponse) => {
+        setDates({start_date: response.data.start_date, end_date: response.data.end_date})
+        setChartData(response.data)
+      }
     );
   };
 
@@ -183,8 +202,9 @@ export function Totals() {
           <div className="flex flex-auto justify-center sm:col-start-3 ">
             <DropdownDateRangePicker
               handleDateChange={handleDateChange}
-              startDate={body.start_date}
-              endDate={body.end_date}
+              startDate={dates.start_date}
+              endDate={dates.end_date}
+              handleDateRangeChange={handleDateRangeChange}
             />
           </div>
         </div>
@@ -269,7 +289,7 @@ export function Totals() {
           >
             <Chart
               chartSensitivity={chartScale}
-              dates={{ start_date: body.start_date, end_date: body.end_date }}
+              dates={{ start_date: dates.start_date, end_date: dates.end_date }}
               data={chartData[currency]}
             />
           </Card>

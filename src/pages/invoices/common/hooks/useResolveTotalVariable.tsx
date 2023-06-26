@@ -20,6 +20,7 @@ import {
   RelationType,
 } from '../components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 interface Props {
   resource?: ProductTableResource;
@@ -42,17 +43,6 @@ export function useResolveTotalVariable(props: Props) {
 
   const resolveTranslation = useResolveTranslation();
   const invoiceSum = props.invoiceSum;
-
-  // discount => invoice.discount,
-  // paid_to_date => invoice.paid_to_date,
-  // surcharge1-4 => invoice.surcharge1-4,
-  // outstanding => invoice.balance
-
-  // net_subtotal => ->getSubtotal(),
-  // subtotal => ->getSubtotal(),
-  // total_taxes => ->getTotalTaxes(),
-  // line_taxes => ->getLineTaxes(),
-  // total => ->getTotal(),
 
   const aliases: Record<string, string> = {
     total: 'amount',
@@ -116,7 +106,7 @@ export function useResolveTotalVariable(props: Props) {
     if (variable == '$balance_due' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.invoice.balance)}
+          {invoiceSum.invoice.status_id === InvoiceStatus.Draft ? formatMoney(invoiceSum.invoice.amount) :formatMoney(invoiceSum.invoice.balance)}
         </Element>
       );
     }
