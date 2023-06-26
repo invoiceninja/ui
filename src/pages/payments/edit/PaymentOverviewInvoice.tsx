@@ -17,7 +17,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
-import { Credit } from '$app/common/interfaces/credit';
 
 interface Props {
   payment: Payment;
