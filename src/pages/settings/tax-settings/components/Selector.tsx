@@ -25,7 +25,7 @@ export function Selector() {
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
 
-  const { data } = useQuery('/api/v1/tax_rates?status=active', () =>
+  const { data } = useQuery('/api/v1/tax_rates', () =>
     request('GET', endpoint('/api/v1/tax_rates?status=active'))
   );
 
