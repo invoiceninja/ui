@@ -12,9 +12,16 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { resolveKey } from '$app/pages/invoices/common/helpers/resolve-key';
 import { useTranslation } from 'react-i18next';
 
-export function useResolveTranslation({ type }: { type?: 'product' | 'task' }) {
+interface Params {
+  type?: 'product' | 'task';
+}
+
+export function useResolveTranslation(params?: Params) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
+
+  const { type } = params || {};
+
   const customFields =
     type === 'product' || !type
       ? ['product1', 'product2', 'product3', 'product4']

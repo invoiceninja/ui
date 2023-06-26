@@ -40,7 +40,7 @@ export function useResolveTotalVariable(props: Props) {
   const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
 
-  const resolveTranslation = useResolveTranslation({});
+  const resolveTranslation = useResolveTranslation();
   const invoiceSum = props.invoiceSum;
 
   // discount => invoice.discount,
