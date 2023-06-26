@@ -26,7 +26,7 @@ export function Selector() {
   const dispatch = useDispatch();
 
   const { data } = useQuery('/api/v1/tax_rates', () =>
-    request('GET', endpoint('/api/v1/tax_rates'))
+    request('GET', endpoint('/api/v1/tax_rates?status=active'))
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
