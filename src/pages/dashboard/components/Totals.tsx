@@ -27,7 +27,6 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -89,7 +88,7 @@ export function Totals() {
     settings.preferences.dashboard_charts.default_view
   );
 
-  const [dates, setDates] = useState<{ start_date: string, end_date: string }>({
+  const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth() - 1,
@@ -100,7 +99,11 @@ export function Totals() {
     end_date: new Date().toISOString().split('T')[0],
   });
 
-  const [body, setBody] = useState<{ start_date: string; end_date: string; date_range: string }>({
+  const [body, setBody] = useState<{
+    start_date: string;
+    end_date: string;
+    date_range: string;
+  }>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth() - 1,
@@ -109,12 +112,12 @@ export function Totals() {
       .toISOString()
       .split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
-    date_range: 'last_month'
+    date_range: 'last_month',
   });
 
   const handleDateRangeChange = (dateRange: string) => {
-    setBody({start_date: '', end_date: '', date_range: dateRange});
-  }
+    setBody({ start_date: '', end_date: '', date_range: dateRange });
+  };
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
@@ -122,10 +125,14 @@ export function Totals() {
       setBody({
         start_date: endDate,
         end_date: startDate,
-        date_range: 'custom'
+        date_range: 'custom',
       });
     } else {
-      setBody({ start_date: startDate, end_date: endDate, date_range: 'custom' });
+      setBody({
+        start_date: startDate,
+        end_date: endDate,
+        date_range: 'custom',
+      });
     }
   };
 
@@ -142,7 +149,6 @@ export function Totals() {
         setCurrency(currency ?? parseInt(currencies[0].value));
         setCurrencies(currencies);
         setIsLoadingTotals(false);
-        
       }
     );
   };
@@ -150,8 +156,11 @@ export function Totals() {
   const getChartData = () => {
     request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
       (response: AxiosResponse) => {
-        setDates({start_date: response.data.start_date, end_date: response.data.end_date})
-        setChartData(response.data)
+        setDates({
+          start_date: response.data.start_date,
+          end_date: response.data.end_date,
+        });
+        setChartData(response.data);
       }
     );
   };
@@ -165,8 +174,14 @@ export function Totals() {
     setChartScale(settings.preferences.dashboard_charts.default_view);
   }, [settings.preferences.dashboard_charts.default_view]);
 
+  useEffect(() => {
+    setCurrency(settings.preferences.dashboard_charts.currency);
+  }, [currencies, settings.preferences.dashboard_charts.currency]);
+
   return (
     <>
+      {JSON.stringify(settings.preferences.dashboard_charts.currency)}
+
       {isLoadingTotals && (
         <div className="w-full flex justify-center">
           <Spinner />
@@ -178,7 +193,7 @@ export function Totals() {
         <div className="flex space-x-2">
           {currencies && (
             <SelectField
-              defaultValue={currencies[0]}
+              value={currency.toString()}
               onValueChange={(value) => setCurrency(parseInt(value))}
               style={{ width: '5rem' }}
             >
@@ -241,13 +256,19 @@ export function Totals() {
               <option value="month">{t('month')}</option>
             </SelectField>
 
-            <CurrencySelector
+            <SelectField
               label={t('currency')}
-              value={settings.preferences.dashboard_charts.currency.toString()}
-              onChange={(id) =>
-                update('preferences.dashboard_charts.currency', parseInt(id))
+              value={settings.preferences.dashboard_charts.currency}
+              onValueChange={(value) =>
+                update('preferences.dashboard_charts.currency', parseInt(value))
               }
-            />
+            >
+              {currencies.map((currency) => (
+                <option key={currency.value} value={currency.value}>
+                  {currency.label}
+                </option>
+              ))}
+            </SelectField>
           </Preferences>
         </div>
       </div>
