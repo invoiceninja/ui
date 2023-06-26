@@ -129,6 +129,7 @@ export default function Edit() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          textOnly
           readonly
         />
 
@@ -151,8 +152,13 @@ export default function Edit() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Product
+                  items={invoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
                   )}
                   columns={productColumns}
                   relationType="client_id"
@@ -197,7 +203,11 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals

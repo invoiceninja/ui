@@ -114,7 +114,8 @@ export default function Create() {
           _recurringInvoice.client_id = searchParams.get('client')!;
         }
 
-        _recurringInvoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+        _recurringInvoice.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         value = _recurringInvoice;
       }
@@ -188,8 +189,13 @@ export default function Create() {
             <ProductsTable
               type="product"
               resource={recurringInvoice}
-              items={recurringInvoice.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={recurringInvoice.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -204,7 +210,7 @@ export default function Create() {
           )}
         </div>
 
-        <InvoiceFooter handleChange={handleChange} />
+        <InvoiceFooter handleChange={handleChange} errors={errors} />
 
         {recurringInvoice && (
           <InvoiceTotals

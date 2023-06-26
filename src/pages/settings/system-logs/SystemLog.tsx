@@ -58,7 +58,7 @@ export function SystemLog() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data, isLoading } = useQuery(
-    '/api/v1/system_logs?per_page=200&sort=created_at|DESC',
+    ['/api/v1/system_logs', 'per_page=200', 'sort=created_at|DESC'],
     () =>
       request(
         'GET',

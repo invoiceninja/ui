@@ -24,11 +24,14 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export default function Create() {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery();
+
+  const queryClient = useQueryClient();
 
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -56,6 +59,8 @@ export default function Create() {
         request('POST', endpoint('/api/v1/designs'), design)
           .then((response: GenericSingleResourceResponse<Design>) => {
             toast.success('design_created');
+
+            queryClient.invalidateQueries(['/api/v1/designs']);
 
             navigate(
               route('/settings/invoice_design/custom_designs/:id/edit', {

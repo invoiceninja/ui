@@ -17,14 +17,15 @@ import { useUsersQuery } from '$app/common/queries/users';
 import { useTranslation } from 'react-i18next';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 interface Props {
   client: Client | undefined;
-  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  setClient: Dispatch<SetStateAction<Client | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   errors: ValidationBag | undefined;
 }
 
@@ -34,6 +35,8 @@ export function Details(props: Props) {
   const { data: groupSettings } = useGroupSettingsQuery();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    props.setErrors(undefined);
+
     props.setClient(
       (client) => client && set(client, event.target.id, event.target.value)
     );
@@ -64,6 +67,7 @@ export function Details(props: Props) {
           id="number"
           value={props.client?.number}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.number}
         />
       </Element>
 
@@ -73,6 +77,7 @@ export function Details(props: Props) {
             id="group_settings_id"
             defaultValue={props.client?.group_settings_id}
             onChange={handleChange}
+            errorMessage={props.errors?.errors.group_settings_id}
           >
             <option value=""></option>
             {groupSettings.data.data.map(
@@ -92,6 +97,7 @@ export function Details(props: Props) {
             id="assigned_user_id"
             onChange={handleChange}
             defaultValue={props.client?.assigned_user_id}
+            errorMessage={props.errors?.errors.assigned_user_id}
           >
             <option value=""></option>
             {users.data.data.map((user: User, index: number) => (
@@ -108,6 +114,7 @@ export function Details(props: Props) {
           id="id_number"
           value={props.client?.id_number}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.id_number}
         />
       </Element>
 
@@ -116,6 +123,7 @@ export function Details(props: Props) {
           id="vat_number"
           value={props.client?.vat_number}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.vat_number}
         />
       </Element>
 
@@ -124,6 +132,7 @@ export function Details(props: Props) {
           id="website"
           value={props.client?.website}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.website}
         />
       </Element>
 
@@ -132,6 +141,7 @@ export function Details(props: Props) {
           id="phone"
           value={props.client?.phone}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.phone}
         />
       </Element>
 
@@ -140,13 +150,14 @@ export function Details(props: Props) {
           id="routing_id"
           value={props.client?.routing_id}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.routing_id}
         />
       </Element>
 
       <Element leftSide={t('valid_vat_number')}>
         <Toggle
           id="has_valid_vat_number"
-          checked={props.client?.has_valid_vat_number}
+          checked={Boolean(props.client?.has_valid_vat_number)}
           onValueChange={(value) =>
             handleCustomFieldChange('has_valid_vat_number', value)
           }
@@ -156,7 +167,7 @@ export function Details(props: Props) {
       <Element leftSide={t('tax_exempt')}>
         <Toggle
           id="is_tax_exempt"
-          checked={props.client?.is_tax_exempt}
+          checked={Boolean(props.client?.is_tax_exempt)}
           onValueChange={(value) =>
             handleCustomFieldChange('is_tax_exempt', value)
           }

@@ -74,7 +74,7 @@ export default function Create() {
 
   const [payment, setPayment] = useState<PaymentOnCreation>();
   const [errors, setErrors] = useState<ValidationBag>();
-  const [sendEmail, setSendEmail] = useState(false);
+  const [sendEmail, setSendEmail] = useState(company?.settings?.client_manual_payment_notification);
   const [convertCurrency, setConvertCurrency] = useState(false);
 
   const { data: blankPayment } = useBlankPaymentQuery();
@@ -224,7 +224,7 @@ export default function Create() {
               id="amount"
               value={payment?.amount}
               onValueChange={(value) =>
-                handleChange('amount', parseFloat(value))
+                handleChange('amount', isNaN(parseFloat(value)) ? 0 : parseFloat(value) )
               }
               errorMessage={errors?.errors.amount}
             />

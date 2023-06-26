@@ -76,6 +76,8 @@ export function CreateTaskModal(props: Props) {
         .then(() => {
           toast.success('created_task');
 
+          queryClient.invalidateQueries('/api/v1/tasks');
+
           queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
           queryClient.invalidateQueries(

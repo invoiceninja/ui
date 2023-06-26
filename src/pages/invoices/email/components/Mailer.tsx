@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export type MailerResourceType =
   | 'invoice'
@@ -52,6 +53,8 @@ interface Props {
 
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [t] = useTranslation();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const [templateId, setTemplateId] = useState(props.defaultEmail);
   const [subject, setSubject] = useState('');
@@ -84,7 +87,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     resourceType: props.resourceType,
   });
 
-  const handleSend = useHandleSend();
+  const handleSend = useHandleSend({ setErrors });
 
   useImperativeHandle(
     ref,
@@ -121,6 +124,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             <SelectField
               defaultValue={templateId}
               onValueChange={(value) => handleTemplateChange(value)}
+              errorMessage={errors?.errors.template}
             >
               {Object.entries(props.list).map(
                 ([templateId, translation], index) => (
@@ -157,6 +161,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               label={t('cc_email')}
               value={ccEmail || template?.cc_email}
               onValueChange={(value) => setCcEmail(value)}
+              errorMessage={errors?.errors.cc_email}
             />
           )}
 
@@ -165,6 +170,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             value={subject || template?.raw_subject}
             onValueChange={(value) => setSubject(value)}
             disabled={freePlan() && isHosted()}
+            errorMessage={errors?.errors.subject}
           />
 
           {(proPlan() || enterprisePlan()) && (
@@ -179,7 +185,6 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           <Card className="scale-y-100" title={template.subject}>
             <iframe
               srcDoc={generateEmailPreview(template.body, template.wrapper)}
-              frameBorder="0"
               width="100%"
               height={800}
             />
@@ -187,7 +192,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         )}
       </div>
 
-      <div className="col-span-12 lg:col-span-7 bg-blue-300 h-max">
+      <div className="my-4 lg:my-0 col-span-12 lg:col-span-7 h-max">
         {props.resource && reactSettings?.show_pdf_preview && (
           <InvoiceViewer method="GET" link={pdfUrl(props.resource) as string} />
         )}

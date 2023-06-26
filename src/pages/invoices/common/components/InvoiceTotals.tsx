@@ -52,7 +52,6 @@ export function InvoiceTotals(props: Props) {
       {variables.map(
         (variable, index) =>
           (variable === '$subtotal' ||
-            variable === '$paid_to_date' ||
             variable === '$taxes') && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )
@@ -148,7 +147,6 @@ export function InvoiceTotals(props: Props) {
       {variables.map(
         (variable, index) =>
           variable !== '$subtotal' &&
-          variable !== '$paid_to_date' &&
           variable !== '$taxes' && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )

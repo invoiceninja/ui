@@ -18,6 +18,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 interface Props {
   readonly?: boolean;
@@ -27,6 +29,7 @@ interface Props {
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
   errorMessage?: string | string[];
   disableWithSpinner?: boolean;
+  textOnly?: boolean;
 }
 
 export function ClientSelector(props: Props) {
@@ -52,32 +55,53 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
+  const hasPermission = useHasPermission();
+
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex  flex-col justify-between space-y-2">
-        <Selector
-          inputLabel={t('client')}
-          onChange={(client) => props.onChange(client.id)}
-          value={resource?.client_id}
-          readonly={props.readonly || !resource}
-          clearButton={Boolean(resource?.client_id)}
-          onClearButtonClick={props.onClearButtonClick}
-          initiallyVisible={!resource?.client_id}
-          errorMessage={props.errorMessage}
-          disableWithSpinner={props.disableWithSpinner}
-        />
+        {hasPermission('view_client') ? (
+          props.textOnly ? (
+            <p className="text-gray-900 text-sm">
+              {resource?.client?.display_name}
+            </p>
+          ) : (
+            <Selector
+              inputLabel={t('client')}
+              onChange={(client) => props.onChange(client.id)}
+              value={resource?.client_id}
+              readonly={props.readonly || !resource}
+              clearButton={Boolean(resource?.client_id)}
+              onClearButtonClick={props.onClearButtonClick}
+              initiallyVisible={!resource?.client_id}
+              errorMessage={props.errorMessage}
+              disableWithSpinner={props.disableWithSpinner}
+            />
+          )
+        ) : (
+          <p className="text-gray-900 text-sm">
+            {resource?.client?.display_name}
+          </p>
+        )}
 
         {client && (
           <div className="space-x-2">
-            <Link to={route('/clients/:id/edit', { id: client.id })}>
-              {t('edit_client')}
-            </Link>
+            {hasPermission('edit_client') && (
+              <Link to={route('/clients/:id/edit', { id: client.id })}>
+                {t('edit_client')}
+              </Link>
+            )}
 
-            <span className="text-sm text-gray-800">/</span>
+            {hasPermission('view_client') ||
+              (hasPermission('edit_client') && (
+                <span className="text-sm text-gray-800">/</span>
+              ))}
 
-            <Link to={route('/clients/:id', { id: client.id })}>
-              {t('view_client')}
-            </Link>
+            {hasPermission('view_client') && (
+              <Link to={route('/clients/:id', { id: client.id })}>
+                {t('view_client')}
+              </Link>
+            )}
           </div>
         )}
       </div>
@@ -107,9 +131,12 @@ export function ClientSelector(props: Props) {
               <p className="text-sm text-gray-700">{contact.email}</p>
 
               {resource.invitations.length >= 1 && (
+                <>
                 <Link to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`} external>
-                  {t('view_in_portal')}
+                  {t('view_in_portal')} 
                 </Link>
+                <CopyToClipboardIconOnly text={resource.invitations[0].link} />
+                </>
               )}
             </div>
           </div>

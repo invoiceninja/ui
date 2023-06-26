@@ -52,7 +52,8 @@ export function useHandleProductChange(props: Props) {
     lineItem.custom_value2 = product?.custom_value2 || '';
     lineItem.custom_value3 = product?.custom_value3 || '';
     lineItem.custom_value4 = product?.custom_value4 || '';
-
+    lineItem.tax_id = product?.tax_id || '1';
+    
     return props.onChange(index, lineItem);
   };
 }

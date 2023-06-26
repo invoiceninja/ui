@@ -112,7 +112,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
-  setInvalidationQueryAtom(props.endpoint);
+  setInvalidationQueryAtom(apiEndpoint.pathname);
 
   const queryClient = useQueryClient();
 
@@ -160,7 +160,16 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
-    [props.endpoint, perPage, currentPage, filter, sort, status, customFilter],
+    [
+      apiEndpoint.pathname,
+      props.endpoint,
+      perPage,
+      currentPage,
+      filter,
+      sort,
+      status,
+      customFilter,
+    ],
     () => request('GET', apiEndpoint.href),
     {
       staleTime: props.staleTime || 5000,
@@ -201,6 +210,14 @@ export function DataTable<T extends object>(props: Props<T>) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
         mainCheckbox.current.checked = false;
+
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint(props.endpoint),
+            },
+          })
+        );
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -210,6 +227,8 @@ export function DataTable<T extends object>(props: Props<T>) {
       })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);
+        queryClient.invalidateQueries([apiEndpoint.pathname]);
+
         setSelected([]);
       });
   };

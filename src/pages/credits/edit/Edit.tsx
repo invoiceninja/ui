@@ -118,6 +118,7 @@ export default function Edit() {
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
           readonly
+          textOnly
         />
 
         <CreditDetails handleChange={handleChange} errors={errors} />
@@ -127,8 +128,13 @@ export default function Edit() {
             <ProductsTable
               type="product"
               resource={credit}
-              items={credit.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={credit.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -143,7 +149,7 @@ export default function Edit() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} />
+        <CreditFooter handleChange={handleChange} errors={errors} />
 
         {credit && (
           <InvoiceTotals

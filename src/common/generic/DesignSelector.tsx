@@ -66,7 +66,7 @@ export function DesignSelector(props: Props) {
             })
           );
 
-          queryClient.invalidateQueries('/api/v1/designs');
+          queryClient.invalidateQueries(['/api/v1/designs']);
 
           setDesign(null);
           setIsModalVisible(false);
@@ -109,7 +109,7 @@ export function DesignSelector(props: Props) {
         <DebouncedCombobox
           {...props}
           value="id"
-          endpoint="/api/v1/designs?per_page=500"
+          endpoint="/api/v1/designs?per_page=500&status=active"
           label="name"
           defaultValue={props.value}
           onChange={(design: Record<Design>) =>
@@ -138,7 +138,7 @@ export function DesignSelector(props: Props) {
         {...props}
         {...actionProps}
         value="id"
-        endpoint="/api/v1/designs"
+        endpoint="/api/v1/designs?status=active"
         label="name"
         defaultValue={props.value}
         disableWithQueryParameter={props.disableWithQueryParameter}

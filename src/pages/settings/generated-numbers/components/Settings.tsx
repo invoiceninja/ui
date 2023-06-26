@@ -33,13 +33,14 @@ export function Settings() {
         >
           <option value="1">1</option>
           <option value="2">01</option>
-          <option value="3">0001</option>
-          <option value="4">00001</option>
-          <option value="5">000001</option>
-          <option value="6">0000001</option>
-          <option value="7">00000001</option>
-          <option value="8">000000001</option>
-          <option value="9">0000000001</option>
+          <option value="3">001</option>
+          <option value="4">0001</option>
+          <option value="5">00001</option>
+          <option value="6">000001</option>
+          <option value="7">0000001</option>
+          <option value="8">00000001</option>
+          <option value="9">000000001</option>
+          <option value="10">0000000001</option>
         </SelectField>
       </Element>
 

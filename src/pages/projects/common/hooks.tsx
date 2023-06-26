@@ -27,11 +27,12 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -83,6 +84,7 @@ export function useAllProjectColumns() {
     'is_deleted',
     'number',
     'updated_at',
+    'current_hours',
   ] as const;
 
   return projectColumns;
@@ -111,9 +113,7 @@ export function useProjectColumns() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={route('/projects/:id/edit', { id: project.id })}>
-          {value}
-        </Link>
+        <Link to={route('/projects/:id', { id: project.id })}>{value}</Link>
       ),
     },
     {
@@ -157,12 +157,13 @@ export function useProjectColumns() {
       column: 'budgeted_hours',
       id: 'budgeted_hours',
       label: t('budgeted_hours'),
-      format: (value) =>
-        formatMoney(
-          value,
-          company?.settings.country_id,
-          company?.settings.currency_id
-        ),
+      format: (value) => value,
+    },
+    {
+      column: 'current_hours',
+      id: 'current_hours',
+      label: t('total_hours'),
+      format: (value) => value,
     },
     {
       column: 'entity_state',
@@ -239,6 +240,7 @@ export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const queryClient = useQueryClient();
 
@@ -246,7 +248,10 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const shouldShowEditAction =
+    location.pathname.includes(id!) && !location.pathname.includes('/edit');
+
+  const isEditOrShowPage = location.pathname.includes(id!);
 
   const setProject = useSetAtom(projectAtom);
 
@@ -260,15 +265,21 @@ export function useActions() {
     toast.processing();
 
     queryClient.fetchQuery(
-      route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
-        projectId: project.id,
-      }),
+      route(
+        '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+        {
+          projectId: project.id,
+        }
+      ),
       () =>
         request(
           'GET',
-          endpoint('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
-            projectId: project.id,
-          })
+          endpoint(
+            '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+            {
+              projectId: project.id,
+            }
+          )
         )
           .then((response: GenericSingleResourceResponse<Task[]>) => {
             toast.dismiss();
@@ -291,6 +302,18 @@ export function useActions() {
   };
 
   const actions = [
+    (project: Project) =>
+      shouldShowEditAction && (
+        <DropdownElement
+          onClick={() =>
+            navigate(route('/projects/:id/edit', { id: project.id }))
+          }
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => shouldShowEditAction && <Divider withoutPadding />,
     (project: Project) => (
       <DropdownElement
         onClick={() => handleInvoiceProject(project)}
@@ -307,10 +330,10 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -321,7 +344,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -332,7 +355,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditPage && (
+      isEditOrShowPage && (
         <DropdownElement
           onClick={() => bulk(project.id, 'delete')}
           icon={<Icon element={MdDelete} />}

@@ -133,7 +133,8 @@ export default function Create() {
           _invoice.client_id = searchParams.get('client')!;
         }
 
-        _invoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+        _invoice.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         value = _invoice;
       }
@@ -206,8 +207,13 @@ export default function Create() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Product
+                  items={invoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
                   )}
                   columns={productColumns}
                   relationType="client_id"
@@ -252,7 +258,11 @@ export default function Create() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals

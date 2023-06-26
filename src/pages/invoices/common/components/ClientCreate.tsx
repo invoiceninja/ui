@@ -26,6 +26,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   isModalOpen: boolean;
@@ -33,7 +34,11 @@ interface Props {
   onClientCreated?: (client: Client) => unknown;
 }
 
-export function ClientCreate(props: Props) {
+export function ClientCreate({
+  isModalOpen,
+  setIsModalOpen,
+  onClientCreated,
+}: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -54,10 +59,25 @@ export function ClientCreate(props: Props) {
   });
 
   useEffect(() => {
-    if (blankClient) {
-      setClient(blankClient);
+    if (blankClient && isModalOpen) {
+      setClient({ ...blankClient });
     }
-  }, [blankClient]);
+  }, [isModalOpen]);
+
+  const handleClose = (value: boolean) => {
+    setIsModalOpen(value);
+    setErrors(undefined);
+    setClient(undefined);
+    setContacts(() => [
+      {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        send_email: false,
+      },
+    ]);
+  };
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
@@ -83,9 +103,8 @@ export function ClientCreate(props: Props) {
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
-        props.setIsModalOpen(false);
 
-        props.onClientCreated && props.onClientCreated(response.data.data);
+        onClientCreated && onClientCreated(response.data.data);
 
         queryClient.invalidateQueries('/api/v1/clients');
         queryClient.invalidateQueries(endpoint('/api/v1/clients'));
@@ -97,6 +116,8 @@ export function ClientCreate(props: Props) {
             },
           })
         );
+
+        handleClose(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
@@ -112,37 +133,56 @@ export function ClientCreate(props: Props) {
   return (
     <Modal
       title={t('new_client')}
-      visible={props.isModalOpen}
-      onClose={(value) => {
-        props.setIsModalOpen(value);
-        setErrors(undefined);
-      }}
+      visible={isModalOpen}
+      onClose={(value) => handleClose(value)}
       size="large"
       backgroundColor="gray"
     >
-      <div className="flex flex-col xl:flex-row xl:gap-4">
-        <div className="w-full xl:w-1/2">
-          <Details client={client} setClient={setClient} errors={errors} />
-          <Address client={client} setClient={setClient} />
-        </div>
+      {client ? (
+        <>
+          <div className="flex flex-col xl:flex-row xl:gap-4">
+            <div className="w-full xl:w-1/2">
+              <Details
+                client={client}
+                setClient={setClient}
+                setErrors={setErrors}
+                errors={errors}
+              />
+              <Address
+                client={client}
+                setClient={setClient}
+                setErrors={setErrors}
+                errors={errors}
+              />
+            </div>
 
-        <div className="w-full xl:w-1/2">
-          <Contacts
-            contacts={contacts}
-            setContacts={setContacts}
-            errors={errors}
-          />
-          <AdditionalInfo client={client} setClient={setClient} />
-        </div>
-      </div>
+            <div className="w-full xl:w-1/2">
+              <Contacts
+                contacts={contacts}
+                setContacts={setContacts}
+                setErrors={setErrors}
+                errors={errors}
+              />
+              <AdditionalInfo
+                client={client}
+                setClient={setClient}
+                setErrors={setErrors}
+                errors={errors}
+              />
+            </div>
+          </div>
 
-      <div className="flex justify-end space-x-4">
-        <Button type="minimal" onClick={() => props.setIsModalOpen(false)}>
-          {t('cancel')}
-        </Button>
+          <div className="flex justify-end space-x-4">
+            <Button type="secondary" onClick={() => handleClose(false)}>
+              {t('cancel')}
+            </Button>
 
-        <Button onClick={onSave}>{t('save')}</Button>
-      </div>
+            <Button onClick={onSave}>{t('save')}</Button>
+          </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
     </Modal>
   );
 }

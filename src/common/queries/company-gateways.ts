@@ -18,7 +18,7 @@ export function useCompanyGatewaysQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    '/api/v1/company_gateways?sort=id|desc',
+    '/api/v1/company_gateways',
     () => request('GET', endpoint('/api/v1/company_gateways?sort=id|desc')),
     { staleTime: Infinity, enabled: isAdmin }
   );
@@ -34,9 +34,12 @@ export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route(`/api/v1/company_gateways/:id?${params.queryParams || ''}`, {
-      id: params.id,
-    }),
+    [
+      route('/api/v1/company_gateways/:id', {
+        id: params.id,
+      }),
+      params.queryParams,
+    ],
     () =>
       request(
         'GET',
