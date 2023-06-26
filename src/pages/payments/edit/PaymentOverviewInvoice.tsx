@@ -38,34 +38,69 @@ export function PaymentOverviewInvoice(props: Props) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
-    <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
-      <div className="flex items-center justify-center">
-        <span className="text-gray-800">
-          {`${t('invoice')} `}
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: props.paymentable.invoice_id,
-            })}
-          >
-            {setLabel(props.payment, props.paymentable)}
-          </Link>
-        </span>
-      </div>
-      <div className="flex items-center justify-center">
-        <span className="text-gray-400">
-          {formatMoney(
-            props?.paymentable?.amount || 0,
-            company.settings.country_id,
-            props.payment?.currency_id
-          )}
-        </span>
-        <span className="text-gray-400 mx-5">
-          {formatDate(
-            new Date(props.paymentable.created_at * 1000).toString(),
-            dateFormat
-          )}
-        </span>
-      </div>
-    </div>
+    <>
+      {props.paymentable.invoice_id && (
+        <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
+          <div className="flex items-center justify-center">
+            <span className="text-gray-800">
+              {`${t('invoice')} `}
+              <Link
+                to={route('/invoices/:id/edit', {
+                  id: props.paymentable.invoice_id,
+                })}
+              >
+                {setLabel(props.payment, props.paymentable)}
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">
+              {formatMoney(
+                props?.paymentable?.amount || 0,
+                company.settings.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+            <span className="text-gray-400 mx-5">
+              {formatDate(
+                new Date(props.paymentable.created_at * 1000).toString(),
+                dateFormat
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+      
+      {props.paymentable.credit_id && (
+        <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
+          <div className="flex items-center justify-center">
+            <span className="text-gray-800">
+              <Link
+                to={route('/credits/:id/edit', {
+                  id: props.paymentable.credit_id,
+                })}
+              >
+                {`${t('credit')} `}
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">
+              {formatMoney(
+                props?.paymentable?.amount || 0,
+                company.settings.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+            <span className="text-gray-400 mx-5">
+              {formatDate(
+                new Date(props.paymentable.created_at * 1000).toString(),
+                dateFormat
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

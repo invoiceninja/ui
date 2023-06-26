@@ -24,7 +24,7 @@ export default function Payments() {
     <DataTable
       resource="payment"
       endpoint={route(
-        '/api/v1/payments?include=client&client_id=:id&sort=id|desc',
+        '/api/v1/payments?include=client,invoices&client_id=:id&sort=id|desc',
         { id }
       )}
       columns={columns}

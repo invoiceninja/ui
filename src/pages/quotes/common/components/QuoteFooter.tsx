@@ -31,15 +31,17 @@ import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function QuoteFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
   const company = useCurrentCompany();
   const location = useLocation();
@@ -121,6 +123,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('user')}
                   value={quote?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -129,6 +132,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={quote?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 
@@ -140,6 +144,7 @@ export function QuoteFooter(props: Props) {
                   clearButton={Boolean(quote?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -150,6 +155,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('project')}
                   value={quote?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -160,6 +166,7 @@ export function QuoteFooter(props: Props) {
                   onValueChange={(value) =>
                     handleChange('exchange_rate', parseFloat(value))
                   }
+                  errorMessage={errors?.errors.exchange_rate}
                 />
               </div>
 

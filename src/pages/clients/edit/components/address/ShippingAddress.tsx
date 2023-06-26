@@ -13,20 +13,27 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { useCountries } from '$app/common/hooks/useCountries';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function ShippingAddress(props: Props) {
   const [t] = useTranslation();
   const countries = useCountries();
 
+  const { errors, setErrors, setClient } = props;
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    props.setClient(
+    setErrors(undefined);
+
+    setClient(
       (client) => client && set(client, event.target.id, event.target.value)
     );
   };
@@ -61,6 +68,7 @@ export function ShippingAddress(props: Props) {
           id="shipping_address1"
           value={props.client?.shipping_address1}
           onChange={handleChange}
+          errorMessage={errors?.errors.shipping_address1}
         />
       </Element>
 
@@ -77,6 +85,7 @@ export function ShippingAddress(props: Props) {
           id="shipping_city"
           value={props.client?.shipping_city}
           onChange={handleChange}
+          errorMessage={errors?.errors.shipping_city}
         />
       </Element>
 
@@ -85,6 +94,7 @@ export function ShippingAddress(props: Props) {
           id="shipping_state"
           value={props.client?.shipping_state}
           onChange={handleChange}
+          errorMessage={errors?.errors.shipping_state}
         />
       </Element>
 
@@ -93,6 +103,7 @@ export function ShippingAddress(props: Props) {
           id="shipping_postal_code"
           value={props.client?.shipping_postal_code}
           onChange={handleChange}
+          errorMessage={errors?.errors.shipping_postal_code}
         />
       </Element>
       {countries.length > 1 && (
@@ -101,6 +112,7 @@ export function ShippingAddress(props: Props) {
             id="shipping_country_id"
             defaultValue={props.client?.shipping_country_id}
             onChange={handleChange}
+            errorMessage={errors?.errors.shipping_country_id}
           >
             <option value=""></option>
 
@@ -112,8 +124,6 @@ export function ShippingAddress(props: Props) {
           </SelectField>
         </Element>
       )}
-
-
     </>
   );
 }

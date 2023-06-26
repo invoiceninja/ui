@@ -13,20 +13,27 @@ import { InputField, SelectField } from '$app/components/forms';
 import { useCountries } from '$app/common/hooks/useCountries';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   client: Client | undefined;
-  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  setClient: Dispatch<SetStateAction<Client | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function BillingAddress(props: Props) {
   const [t] = useTranslation();
   const countries = useCountries();
 
+  const { errors, setClient, setErrors } = props;
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    props.setClient(
+    setErrors(undefined);
+
+    setClient(
       (client) => client && set(client, event.target.id, event.target.value)
     );
   };
@@ -38,6 +45,7 @@ export function BillingAddress(props: Props) {
           id="address1"
           value={props.client?.address1}
           onChange={handleChange}
+          errorMessage={errors?.errors.address1}
         />
       </Element>
 
@@ -46,6 +54,7 @@ export function BillingAddress(props: Props) {
           id="address2"
           value={props.client?.address2}
           onChange={handleChange}
+          errorMessage={errors?.errors.address2}
         />
       </Element>
 
@@ -54,6 +63,7 @@ export function BillingAddress(props: Props) {
           id="city"
           value={props.client?.city}
           onChange={handleChange}
+          errorMessage={errors?.errors.city}
         />
       </Element>
 
@@ -62,6 +72,7 @@ export function BillingAddress(props: Props) {
           id="state"
           value={props.client?.state}
           onChange={handleChange}
+          errorMessage={errors?.errors.state}
         />
       </Element>
 
@@ -70,6 +81,7 @@ export function BillingAddress(props: Props) {
           id="postal_code"
           value={props.client?.postal_code}
           onChange={handleChange}
+          errorMessage={errors?.errors.postal_code}
         />
       </Element>
 
@@ -79,6 +91,7 @@ export function BillingAddress(props: Props) {
             id="country_id"
             defaultValue={props.client?.country_id}
             onChange={handleChange}
+            errorMessage={errors?.errors.country_id}
           >
             <option value=""></option>
 

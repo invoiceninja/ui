@@ -197,7 +197,7 @@ export default function Edit() {
           )}
         </div>
 
-        <InvoiceFooter handleChange={handleChange} />
+        <InvoiceFooter handleChange={handleChange} errors={errors} />
 
         {recurringInvoice && (
           <InvoiceTotals
