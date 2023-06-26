@@ -33,6 +33,7 @@ import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import collect from 'collect.js';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
 
 export default function Apply() {
   const queryClient = useQueryClient();
@@ -93,13 +94,16 @@ export default function Apply() {
     });
   }, [formik.values.invoices]);
 
+  useSaveBtn(
+    {
+      onClick: () => formik.submitForm(),
+      disableSaveButton: formik.isSubmitting,
+    },
+    [formik.values, formik.isSubmitting]
+  );
+
   return (
-    <Card
-      title={t('apply_payment')}
-      disableSubmitButton={formik.isSubmitting}
-      onFormSubmit={formik.handleSubmit}
-      withSaveButton
-    >
+    <Card title={t('apply_payment')}>
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.number} />
       </Element>

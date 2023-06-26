@@ -98,7 +98,8 @@ export default function Create() {
           _quote.client_id = searchParams.get('client')!;
         }
 
-        _quote.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+        _quote.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         return (value = _quote);
       }
@@ -174,7 +175,7 @@ export default function Create() {
           )}
         </div>
 
-        <QuoteFooter handleChange={handleChange} />
+        <QuoteFooter handleChange={handleChange} errors={errors} />
 
         {quote && (
           <InvoiceTotals

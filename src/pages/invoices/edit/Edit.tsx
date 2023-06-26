@@ -152,8 +152,8 @@ export default function Edit() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => [
+                  items={invoice.line_items.filter((item) =>
+                    [
                       InvoiceItemType.Product,
                       InvoiceItemType.UnpaidFee,
                       InvoiceItemType.PaidFee,
@@ -203,7 +203,11 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals

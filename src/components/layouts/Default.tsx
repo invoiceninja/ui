@@ -53,6 +53,7 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export interface SaveOption {
   label: string;
@@ -77,6 +78,8 @@ interface Props extends CommonProps {
 
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const company = useCurrentCompany();
 
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
@@ -352,7 +355,7 @@ export function Default(props: Props) {
           : '/settings/user_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
-      visible: true,
+      visible: Boolean(company),
     },
   ];
 

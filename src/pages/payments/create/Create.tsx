@@ -224,7 +224,7 @@ export default function Create() {
               id="amount"
               value={payment?.amount}
               onValueChange={(value) =>
-                handleChange('amount', parseFloat(value))
+                handleChange('amount', isNaN(parseFloat(value)) ? 0 : parseFloat(value) )
               }
               errorMessage={errors?.errors.amount}
             />
