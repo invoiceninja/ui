@@ -9,6 +9,8 @@
  */
 
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 export type TimeLogType = [number, number, string, boolean];
 export type TimeLogsType = TimeLogType[];
@@ -35,6 +37,8 @@ interface CalculateTimeOptions {
 
 export function calculateTime(log: string, options?: CalculateTimeOptions) {
   const times = parseTimeLog(log);
+  dayjs.extend(duration)
+  dayjs.extend(relativeTime)
 
   let seconds = 0;
 
@@ -57,8 +61,9 @@ export function calculateTime(log: string, options?: CalculateTimeOptions) {
   if (options?.inSeconds) {
     return seconds.toString();
   }
+  
+  return seconds > 86400 ? dayjs.duration(seconds, 'seconds').humanize() : dayjs.duration(seconds, 'seconds').format('HH:mm:ss');
 
-  return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
 
 export function calculateDifferenceBetweenLogs(log: string, logIndex: number) {

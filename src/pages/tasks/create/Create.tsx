@@ -78,7 +78,11 @@ export default function Create() {
           _task.project_id = searchParams.get('project')!;
         }
 
-          _task.rate = company?.settings?.default_task_rate || 0;
+        _task.rate = company?.settings?.default_task_rate || 0;
+
+        if (searchParams.get('rate')) {
+          _task.rate = parseFloat(searchParams.get('rate')!);
+        }
           
         value = _task;
       }

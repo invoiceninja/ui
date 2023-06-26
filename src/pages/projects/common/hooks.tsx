@@ -84,6 +84,7 @@ export function useAllProjectColumns() {
     'is_deleted',
     'number',
     'updated_at',
+    'current_hours',
   ] as const;
 
   return projectColumns;
@@ -156,12 +157,13 @@ export function useProjectColumns() {
       column: 'budgeted_hours',
       id: 'budgeted_hours',
       label: t('budgeted_hours'),
-      format: (value) =>
-        formatMoney(
-          value,
-          company?.settings.country_id,
-          company?.settings.currency_id
-        ),
+      format: (value) => value,
+    },
+    {
+      column: 'current_hours',
+      id: 'current_hours',
+      label: t('total_hours'),
+      format: (value) => value,
     },
     {
       column: 'entity_state',
