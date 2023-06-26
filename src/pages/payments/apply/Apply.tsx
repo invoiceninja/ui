@@ -32,13 +32,14 @@ import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 
 export default function Apply() {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
-  const { data: payment } = usePaymentQuery({ id });
+  const { data: payment, isLoading } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
@@ -144,12 +145,16 @@ export default function Apply() {
 
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
-          endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.client_id}`}
+          endpoint={`/api/v1/invoices?payable=${payment?.client_id}`}
+          initiallyVisible={isLoading}
+          clearInputAfterSelection
+          exclude={collect(formik.values.invoices).pluck('invoice_id').toArray()}
           label="number"
+          formatLabel={(invoice: Invoice) => `${t('invoice_number_short')}${invoice.number} - ${t('balance')} ${invoice.balance}`}
           onChange={(value: Record<Invoice>) =>
             handleInvoiceChange(
               value.resource?.id as string,
-              value.resource?.amount as number,
+              value.resource?.balance as number,
               value.resource?.number as string
             )
           }
@@ -161,7 +166,7 @@ export default function Apply() {
         )}
       </Element>
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string }, index) => (
+        (record: { _id: string; amount: number; number: string; balance: number }, index) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField

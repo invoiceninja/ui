@@ -10,7 +10,6 @@
 import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Credit } from '$app/common/interfaces/credit';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
@@ -207,7 +206,7 @@ export class InvoiceSumInclusive {
   }
 
   protected setCalculatedAttributes() {
-    if (this.invoice.status_id !== InvoiceStatus.Draft) {
+    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
 
@@ -215,7 +214,7 @@ export class InvoiceSumInclusive {
       } else {
         this.invoice.balance = this.total; // Needs implementing formatting with number class.
       }
-    }
+    // }
 
     this.invoice.amount = this.total; // Needs implementing formatting with number class.
     this.invoice.total_taxes = this.totalTaxes;
