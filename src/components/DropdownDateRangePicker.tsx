@@ -9,7 +9,7 @@
  */
 
 import dayjs from 'dayjs';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from 'antd';
@@ -26,11 +26,8 @@ type Props = {
 
 export function DropdownDateRangePicker(props: Props) {
   const [t] = useTranslation();
-  const [isOpenModal, setisOpenModal] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { RangePicker } = DatePicker;
-
-  // const now = new Date();
-  // const quarter = Math.floor(now.getMonth() / 3);
 
   const [customStartDate, setCustomStartDate] = useState<string>();
   const [customEndDate, setCustomEndDate] = useState<string>();
@@ -63,18 +60,18 @@ export function DropdownDateRangePicker(props: Props) {
         className={
           'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
         }
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          event.preventDefault();
-          if (event.target.value === 'custom') {
-            setisOpenModal(true);
+        onValueChange={(value) => {
+          if (value === 'custom') {
+            setIsModalVisible(true);
           } else {
-            setisOpenModal(false);
-            props.handleDateRangeChange(event.target.value);
+            setIsModalVisible(false);
+
+            props.handleDateRangeChange(value);
           }
         }}
         style={{ width: '9.7rem' }}
       >
-        last365_days,,,,,this_year,last_year,all_time,custom
+        {/* last365_days,,,,,this_year,last_year,all_time,custom */}
         <option value="last7_days">{t('last_7_days')}</option>
         <option value="last30_days">{t('last_30_days')}</option>
         <option value="this_month">{t('this_month')}</option>
@@ -86,13 +83,14 @@ export function DropdownDateRangePicker(props: Props) {
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
         <option value={'custom'}>{`${t('custom')}`}</option>
       </SelectField>
-      {isOpenModal && (
+      
+      {isModalVisible && (
         <div className="flex flex-row space-x-2">
           <RangePicker
             size="large"
             defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
             format={dateFormat}
-            onChange={(dates, dateString) => handleCustomDateChange(dateString)}
+            onChange={(_, dateString) => handleCustomDateChange(dateString)}
           />
         </div>
       )}
