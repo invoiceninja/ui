@@ -40,7 +40,7 @@ interface Action {
   onClick: () => unknown;
 }
 
-interface ComboboxStaticProps<T = any> {
+export interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
   entryOptions: EntryOptions<T>;
@@ -283,7 +283,7 @@ interface EntryOptions<T = any> {
   labelFn?: (resource: T) => string | JSX.Element;
 }
 
-interface ComboboxAsyncProps<T> {
+export interface ComboboxAsyncProps<T> {
   endpoint: URL;
   inputOptions: InputOptions;
   entryOptions: EntryOptions<T>;
