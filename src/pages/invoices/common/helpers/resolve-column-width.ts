@@ -22,5 +22,5 @@ export function resolveColumnWidth(column: string) {
     discount: '10%',
   };
 
-  return mappings[property] || '10%';
+  return mappings[property];
 }
