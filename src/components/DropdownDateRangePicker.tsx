@@ -21,6 +21,7 @@ type Props = {
   startDate: string;
   endDate: string;
   handleDateChange: any;
+  handleDateRangeChange: any;
 };
 
 export function DropdownDateRangePicker(props: Props) {
@@ -49,8 +50,8 @@ export function DropdownDateRangePicker(props: Props) {
 
     props.handleDateChange(
       dayjs(value[0]).format('YYYY-MM-DD') +
-        ',' +
-        dayjs(value[1]).format('YYYY-MM-DD')
+      ',' +
+      dayjs(value[1]).format('YYYY-MM-DD')
     );
   };
 
@@ -64,112 +65,57 @@ export function DropdownDateRangePicker(props: Props) {
         }
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           event.preventDefault();
-          if (event.target.value === 'Custom') {
+          if (event.target.value === 'custom') {
             setisOpenModal(true);
           } else {
             setisOpenModal(false);
-            props.handleDateChange(event.target.value);
+            props.handleDateRangeChange(event.target.value);
           }
         }}
         style={{ width: '9.7rem' }}
-      >
+      >last365_days,,,,,this_year,last_year,all_time,custom
         <option
-          value={[
-            new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
-              .toISOString()
-              .split('T')[0],
-            now.toISOString().split('T')[0],
-          ]}
+          value="last7_days"
         >
           {t('last_7_days')}
         </option>
         <option
-          value={[
-            new Date(new Date().setDate(now.getDate() - 30))
-              .toISOString()
-              .split('T')[0],
-            now.toISOString().split('T')[0],
-          ]}
+          value="last30_days"
         >
           {t('last_30_days')}
         </option>
         <option
-          value={[
-            new Date(now.getFullYear(), now.getMonth(), 2)
-              .toISOString()
-              .split('T')[0],
-            new Date(now.getFullYear(), now.getMonth() + 1, 1)
-              .toISOString()
-              .split('T')[0],
-          ]}
+          value="this_month"
         >
           {t('this_month')}
         </option>
         <option
-          value={[
-            new Date(
-              now.getFullYear() - (now.getMonth() > 0 ? 0 : 1),
-              (now.getMonth() - 1 + 12) % 12,
-              1
-            )
-              .toISOString()
-              .split('T')[0],
-            new Date(now.getFullYear(), now.getMonth(), 0)
-              .toISOString()
-              .split('T')[0],
-          ]}
+          value="last_month"
         >
           {t('last_month')}
         </option>
         <option
-          value={[
-            new Date(now.getFullYear(), quarter * 3, 1)
-              .toISOString()
-              .split('T')[0],
-            new Date(
-              new Date(now.getFullYear(), quarter * 3, 1).getFullYear(),
-              new Date(now.getFullYear(), quarter * 3, 1).getMonth() + 3,
-              0
-            )
-              .toISOString()
-              .split('T')[0],
-          ]}
+          value="this_quarter"
         >
           {t('current_quarter')}
         </option>
         <option
-          value={[
-            new Date(now.getFullYear(), quarter * 3 - 3, 1)
-              .toISOString()
-              .split('T')[0],
-            new Date(
-              new Date(now.getFullYear(), quarter * 3 - 3, 1).getFullYear(),
-              new Date(now.getFullYear(), quarter * 3 - 3, 1).getMonth() + 3,
-              0
-            )
-              .toISOString()
-              .split('T')[0],
-          ]}
+          value="last_quarter"
         >
           {t('last_quarter')}
         </option>
         <option
-          value={[
-            new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0],
-            new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0],
-          ]}
+          value="this_year"
         >
           {t('this_year')}
         </option>
         <option
-          value={[
-            new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0],
-            new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0],
-          ]}
+          value="last_year"
         >
           {t('last_year')}
         </option>
-        <option value={'Custom'}>{`${t('custom_range')}`}</option>
+        <option value={'last365_days'}>{`${t('last365_days')}`}</option>
+        <option value={'custom'}>{`${t('custom')}`}</option>
       </SelectField>
       {isOpenModal && (
         <div className="flex flex-row space-x-2">
