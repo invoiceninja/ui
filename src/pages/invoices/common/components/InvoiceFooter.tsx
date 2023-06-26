@@ -35,10 +35,12 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   invoice?: Invoice;
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceFooter(props: Props) {
@@ -49,7 +51,7 @@ export function InvoiceFooter(props: Props) {
   const company = useCurrentCompany();
   const location = useLocation();
 
-  const { invoice, handleChange } = props;
+  const { invoice, handleChange, errors } = props;
   const { id } = useParams();
 
   const handleCustomFieldChange = useHandleCustomFieldChange();
@@ -145,6 +147,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('project')}
                   value={invoice?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -154,6 +157,7 @@ export function InvoiceFooter(props: Props) {
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value) || 1)
                 }
+                errorMessage={errors?.errors.exchange_rate}
               />
 
               <Toggle
@@ -170,6 +174,7 @@ export function InvoiceFooter(props: Props) {
                   clearButton={Boolean(invoice?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -180,6 +185,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('user')}
                   value={invoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -190,6 +196,7 @@ export function InvoiceFooter(props: Props) {
                   clearButton={Boolean(invoice?.vendor_id)}
                   onClearButtonClick={() => handleChange('vendor_id', '')}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 

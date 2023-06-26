@@ -184,7 +184,7 @@ export default function Create() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} />
+        <CreditFooter handleChange={handleChange} errors={errors} />
 
         {credit && (
           <InvoiceTotals
