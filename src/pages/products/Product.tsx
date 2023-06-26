@@ -71,7 +71,7 @@ export default function Product() {
     },
   ];
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!isFormBusy) {
@@ -80,28 +80,28 @@ export default function Product() {
 
       toast.processing();
 
-      saveCompany(true).then(() => {
-        request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
-          .then((response: GenericSingleResourceResponse<ProductInterface>) => {
-            toast.success('updated_product');
+      await saveCompany(true);
 
-            queryClient.invalidateQueries('/api/v1/products');
+      request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
+        .then((response: GenericSingleResourceResponse<ProductInterface>) => {
+          toast.success('updated_product');
 
-            queryClient.invalidateQueries(
-              route('/api/v1/products/:id', { id: response.data.data.id })
-            );
-          })
-          .catch((error: AxiosError<ValidationBag>) => {
-            if (error.response?.status === 422) {
-              setErrors(error.response.data);
-              toast.dismiss();
-            } else {
-              console.error(error);
-              toast.error();
-            }
-          })
-          .finally(() => setIsFormBusy(false));
-      });
+          queryClient.invalidateQueries('/api/v1/products');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/products/:id', { id: response.data.data.id })
+          );
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          } else {
+            console.error(error);
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 
