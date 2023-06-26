@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -26,16 +26,13 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
-import { useDispatch } from 'react-redux';
-import { updateRecord } from '$app/common/stores/slices/company-users';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export default function Product() {
   const [t] = useTranslation();
 
-  const dispatch = useDispatch();
-
-  const companyChanges = useCompanyChanges();
+  const saveCompany = useHandleCompanySave();
 
   const { id } = useParams();
 
@@ -83,41 +80,28 @@ export default function Product() {
 
       toast.processing();
 
-      axios
-        .all([
-          request(
-            'PUT',
-            endpoint('/api/v1/products/:id', { id }),
-            productValue
-          ),
-          request(
-            'PUT',
-            endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
-            companyChanges
-          ),
-        ])
-        .then((response) => {
-          toast.success('updated_product');
+      saveCompany(true).then(() => {
+        request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
+          .then((response: GenericSingleResourceResponse<ProductInterface>) => {
+            toast.success('updated_product');
 
-          queryClient.invalidateQueries('/api/v1/products');
-          queryClient.invalidateQueries(
-            route('/api/v1/products/:id', { id: response[0].data.data.id })
-          );
+            queryClient.invalidateQueries('/api/v1/products');
 
-          dispatch(
-            updateRecord({ object: 'company', data: response[1].data.data })
-          );
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-            toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
-          }
-        })
-        .finally(() => setIsFormBusy(false));
+            queryClient.invalidateQueries(
+              route('/api/v1/products/:id', { id: response.data.data.id })
+            );
+          })
+          .catch((error: AxiosError<ValidationBag>) => {
+            if (error.response?.status === 422) {
+              setErrors(error.response.data);
+              toast.dismiss();
+            } else {
+              console.error(error);
+              toast.error();
+            }
+          })
+          .finally(() => setIsFormBusy(false));
+      });
     }
   };
 
