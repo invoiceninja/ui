@@ -81,6 +81,7 @@ export function ExpiredQuotes() {
           withoutActions
           withoutPagination
           withoutPadding
+          staleTime={Infinity}
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
