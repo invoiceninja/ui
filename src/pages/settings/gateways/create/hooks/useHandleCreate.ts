@@ -35,14 +35,12 @@ export function useHandleCreate(
 
     setErrors(undefined);
 
-    request(
-      'POST',
-      endpoint('/api/v1/company_gateways?sort=id|desc'),
-      companyGateway
-    )
+    request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
       .then((response: GenericSingleResourceResponse<CompanyGateway>) => {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
+
+        queryClient.invalidateQueries('/api/v1/company_gateways');
 
         toast.success('created_company_gateway');
 

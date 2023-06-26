@@ -128,8 +128,8 @@ export default function Edit() {
             <ProductsTable
               type="product"
               resource={quote}
-              items={quote.line_items.filter(
-                (item) => [
+              items={quote.line_items.filter((item) =>
+                [
                   InvoiceItemType.Product,
                   InvoiceItemType.UnpaidFee,
                   InvoiceItemType.PaidFee,
@@ -149,7 +149,7 @@ export default function Edit() {
           )}
         </div>
 
-        <QuoteFooter handleChange={handleChange} />
+        <QuoteFooter handleChange={handleChange} errors={errors} />
 
         {quote && (
           <InvoiceTotals

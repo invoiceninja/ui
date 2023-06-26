@@ -27,9 +27,11 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
 import Toggle from '$app/components/forms/Toggle';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceFooter(props: Props) {
@@ -37,7 +39,7 @@ export function InvoiceFooter(props: Props) {
 
   const { id } = useParams();
   const { t } = useTranslation();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -115,6 +117,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('project')}
                   value={recurringInvoice?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -124,6 +127,7 @@ export function InvoiceFooter(props: Props) {
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value))
                 }
+                errorMessage={errors?.errors.exchange_rate}
               />
 
               <div className="space-y-2">
@@ -134,6 +138,7 @@ export function InvoiceFooter(props: Props) {
                   clearButton={Boolean(recurringInvoice?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -144,6 +149,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('user')}
                   value={recurringInvoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -152,6 +158,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={recurringInvoice?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 

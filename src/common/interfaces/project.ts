@@ -35,4 +35,5 @@ export interface Project {
   documents: any[];
   client?: Client;
   tasks?: Task[];
+  current_hours: number;
 }

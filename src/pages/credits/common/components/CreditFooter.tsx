@@ -31,15 +31,17 @@ import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { route } from '$app/common/helpers/route';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function CreditFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
   const company = useCurrentCompany();
   const location = useLocation();
@@ -120,6 +122,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('user')}
                   value={credit?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -128,6 +131,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={credit?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 
@@ -139,6 +143,7 @@ export function CreditFooter(props: Props) {
                   clearButton={Boolean(credit?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -149,6 +154,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('project')}
                   value={credit?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -159,6 +165,7 @@ export function CreditFooter(props: Props) {
                   onValueChange={(value) =>
                     handleChange('exchange_rate', parseFloat(value))
                   }
+                  errorMessage={errors?.errors.exchange_rate}
                 />
               </div>
 
