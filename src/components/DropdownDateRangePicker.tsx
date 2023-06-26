@@ -29,7 +29,7 @@ export function DropdownDateRangePicker(props: Props) {
   const [isOpenModal, setisOpenModal] = useState(false);
   const { RangePicker } = DatePicker;
 
-  const now = new Date();
+  // const now = new Date();
   // const quarter = Math.floor(now.getMonth() / 3);
 
   const [customStartDate, setCustomStartDate] = useState<string>();
