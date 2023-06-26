@@ -126,7 +126,7 @@ export function Totals() {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
-        setCurrency(parseInt(currencies[0].value));
+        setCurrency(currency ?? parseInt(currencies[0].value));
         setCurrencies(currencies);
         setIsLoadingTotals(false);
         
