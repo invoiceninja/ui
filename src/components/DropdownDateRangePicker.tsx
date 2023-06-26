@@ -30,7 +30,7 @@ export function DropdownDateRangePicker(props: Props) {
   const { RangePicker } = DatePicker;
 
   const now = new Date();
-  const quarter = Math.floor(now.getMonth() / 3);
+  // const quarter = Math.floor(now.getMonth() / 3);
 
   const [customStartDate, setCustomStartDate] = useState<string>();
   const [customEndDate, setCustomEndDate] = useState<string>();
