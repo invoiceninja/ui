@@ -17,6 +17,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { Credit } from '$app/common/interfaces/credit';
 
 interface Props {
   payment: Payment;
@@ -38,6 +39,8 @@ export function PaymentOverviewInvoice(props: Props) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
+    <>
+    {props.paymentable.invoice_id && (
     <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
       <div className="flex items-center justify-center">
         <span className="text-gray-800">
@@ -67,5 +70,37 @@ export function PaymentOverviewInvoice(props: Props) {
         </span>
       </div>
     </div>
+    )}
+      {props.paymentable.credit_id && (
+        <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
+          <div className="flex items-center justify-center">
+            <span className="text-gray-800">
+              <Link
+                to={route('/credits/:id/edit', {
+                  id: props.paymentable.credit_id,
+                })}
+              >
+                {`${t('credit')} `}
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">
+              {formatMoney(
+                props?.paymentable?.amount || 0,
+                company.settings.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+            <span className="text-gray-400 mx-5">
+              {formatDate(
+                new Date(props.paymentable.created_at * 1000).toString(),
+                dateFormat
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
