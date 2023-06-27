@@ -32,7 +32,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
 
       <DebouncedCombobox
         inputLabel={props.inputLabel}
-        endpoint="/api/v1/projects"
+        endpoint="/api/v1/projects?status=active&per_page=100"
         label="name"
         onChange={(value: Record<Project>) =>
           value.resource && props.onChange(value.resource)

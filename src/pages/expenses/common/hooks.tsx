@@ -77,7 +77,7 @@ export function useActions() {
   };
 
   const actions: Action<Expense>[] = [
-    (expense) => (expense.should_be_invoiced === true) && (
+    (expense) => (expense.should_be_invoiced === true && expense.invoice_id.length === 0) && (
       <DropdownElement
         onClick={() => invoiceExpense(expense)}
         icon={<Icon element={MdTextSnippet} />}

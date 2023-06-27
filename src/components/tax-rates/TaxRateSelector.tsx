@@ -36,7 +36,7 @@ export function TaxRateSelector(props: Props) {
     <>
       <DebouncedCombobox
         inputLabel={props.inputLabel}
-        endpoint="/api/v1/tax_rates"
+        endpoint="/api/v1/tax_rates?status=active"
         label={t('tax')}
         formatLabel={(resource: TaxRate) =>
           `${resource.name} ${resource.rate}%`

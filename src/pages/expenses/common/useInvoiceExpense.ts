@@ -30,11 +30,11 @@ export function useInvoiceExpense() {
 
             if(expense.uses_inclusive_taxes){
                 
-                return Math.round((((amount / expense.amount) / 100) * 1000) / 10) / 100;
+                return Math.round((amount / expense.amount) * 100).toFixed(2);
                
             }
 
-            return Math.round(((amount / (expense.amount - amount)) * 100 ) /1) /1;
+            return Math.round(((amount / (expense.amount)) * 1000 ) /10) /1;
 
         }
 

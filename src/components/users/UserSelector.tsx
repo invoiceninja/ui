@@ -24,7 +24,7 @@ export function UserSelector(props: GenericSelectorProps<User>) {
   return (
     <DebouncedCombobox
       inputLabel={props.inputLabel}
-      endpoint="/api/v1/users"
+      endpoint="/api/v1/users?status=active"
       label="name"
       onChange={(value: Record<User>) =>
         value.resource && props.onChange(value.resource)
