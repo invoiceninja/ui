@@ -81,24 +81,12 @@ export default function Edit() {
   } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    const isAddingTask = searchParams.get('action') === 'add_task';
+    const isAddingTaskAction = searchParams.get('action') === 'add_task';
 
-    if (isAddingTask && invoice) {
-      const _invoice = cloneDeep(invoice);
+    const currentInvoice = isAddingTaskAction && invoice ? invoice : data;
 
-      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
-
-      setInvoice(_invoice);
-
-      if (_invoice?.client) {
-        setClient(_invoice.client);
-
-        clientResolver.cache(_invoice.client);
-      }
-    }
-
-    if (data && (!isAddingTask || !invoice)) {
-      const _invoice = cloneDeep(data);
+    if (currentInvoice) {
+      const _invoice = cloneDeep(currentInvoice);
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
