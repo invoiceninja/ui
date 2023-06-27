@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdAddCircleOutline,
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
@@ -343,7 +344,7 @@ export function useActions(params: Params) {
 
   const navigate = useNavigate();
 
-  const setTasksToAddOnInvoiceAtom = useSetAtom(tasksToAddOnInvoiceAtom);
+  const setTasksToAddOnInvoice = useSetAtom(tasksToAddOnInvoiceAtom);
 
   const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
 
@@ -401,7 +402,7 @@ export function useActions(params: Params) {
 
             setInvoices(response.data.data);
 
-            setTasksToAddOnInvoiceAtom([task]);
+            setTasksToAddOnInvoice([task]);
 
             setIsAddTasksOnInvoiceVisible(true);
           })
@@ -462,7 +463,7 @@ export function useActions(params: Params) {
       task.client_id && (
         <DropdownElement
           onClick={() => handleAddTasksOnInvoice(task)}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          icon={<Icon element={MdAddCircleOutline} />}
         >
           {trans('add_to_invoice', { invoice: '' })}
         </DropdownElement>
