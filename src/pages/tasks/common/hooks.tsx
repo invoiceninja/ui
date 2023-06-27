@@ -9,7 +9,7 @@
  */
 
 import { Link } from '$app/components/forms';
-import { date, endpoint, trans } from '$app/common/helpers';
+import { date, endpoint, getEntityState, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,14 +26,17 @@ import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdArchive,
   MdControlPointDuplicate,
+  MdDelete,
   MdEdit,
   MdNotStarted,
+  MdRestore,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -52,6 +55,8 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { taskToAddAtom } from './components/AddToInvoiceModal';
+import { EntityState } from '$app/common/enums/entity-state';
+import { useBulk } from '$app/common/queries/tasks';
 
 export const defaultColumns: string[] = [
   'status',
@@ -332,6 +337,8 @@ interface Params {
 }
 
 export function useActions(params?: Params) {
+  const { id } = useParams();
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -344,11 +351,16 @@ export function useActions(params?: Params) {
 
   const location = useLocation();
 
+  const isEditPage =
+    location.pathname.includes(id!) && !location.pathname.includes('projects');
+
   const company = useCurrentCompany();
 
   const start = useStart();
 
   const stop = useStop();
+
+  const bulk = useBulk();
 
   const invoiceTask = useInvoiceTask();
 
@@ -463,6 +475,39 @@ export function useActions(params?: Params) {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (task: Task) =>
+      isEditPage &&
+      getEntityState(task) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isEditPage &&
+      (getEntityState(task) === EntityState.Archived ||
+        getEntityState(task) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isEditPage &&
+      (getEntityState(task) === EntityState.Active ||
+        getEntityState(task) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

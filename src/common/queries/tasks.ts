@@ -12,11 +12,15 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Task } from '$app/common/interfaces/task';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
+import { toast } from '../helpers/toast/toast';
+import { AxiosError } from 'axios';
 
 interface TaskParams {
   id?: string;
@@ -65,4 +69,30 @@ export function useTasksQuery(params: TasksParams) {
       ).then((response) => response.data),
     { staleTime: Infinity }
   );
+}
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/tasks/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_task`);
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
+        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error();
+      });
+  };
 }
