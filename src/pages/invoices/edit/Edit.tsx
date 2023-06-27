@@ -81,9 +81,9 @@ export default function Edit() {
   } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    const isAddingTaskAction = searchParams.get('action') === 'add_task';
+    const isAddingTasksAction = searchParams.get('action') === 'add_task';
 
-    const currentInvoice = isAddingTaskAction && invoice ? invoice : data;
+    const currentInvoice = isAddingTasksAction && invoice ? invoice : data;
 
     if (currentInvoice) {
       const _invoice = cloneDeep(currentInvoice);

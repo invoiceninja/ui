@@ -399,7 +399,7 @@ export function useActions(params: Params) {
               return toast.error('no_invoices_found');
             }
 
-            setInvoices?.(response.data.data);
+            setInvoices(response.data.data);
 
             setTasksToAddOnInvoiceAtom([task]);
 

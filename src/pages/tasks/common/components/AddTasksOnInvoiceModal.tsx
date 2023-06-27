@@ -49,7 +49,7 @@ export function AddTasksOnInvoiceModal(props: Props) {
 
             <span>
               {formatMoney(
-                invoice.balance,
+                invoice.amount,
                 invoice.client?.country_id || '',
                 invoice.client?.settings.currency_id
               )}
