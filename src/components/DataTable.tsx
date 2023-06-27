@@ -56,7 +56,10 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
-export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
+export type CustomBulkAction<T> = (
+  selectedIds: string[],
+  selectedResources?: T[]
+) => ReactNode;
 
 interface StyleOptions {
   withoutBottomBorder?: boolean;
@@ -80,7 +83,7 @@ interface Props<T> extends CommonProps {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
-  customBulkActions?: CustomBulkAction[];
+  customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterQueryKey?: string;
   customFilterPlaceholder?: string;
@@ -95,6 +98,7 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
+  includeObjectSelection?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -128,6 +132,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
+  const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -233,6 +238,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       });
   };
 
+  useEffect(() => {
+    if (props.includeObjectSelection && data) {
+      const filteredSelectedResources = data.data.data.filter((resource: any) =>
+        selected.includes(resource.id)
+      );
+
+      setSelectedResources(filteredSelectedResources);
+    }
+  }, [selected]);
+
   return (
     <>
       {!props.withoutActions && (
@@ -268,8 +283,10 @@ export function DataTable<T extends object>(props: Props<T>) {
           <Dropdown label={t('more_actions')}>
             {props.customBulkActions &&
               props.customBulkActions.map(
-                (bulkAction: CustomBulkAction, index: number) => (
-                  <div key={index}>{bulkAction(selected)}</div>
+                (bulkAction: CustomBulkAction<T>, index: number) => (
+                  <div key={index}>
+                    {bulkAction(selected, selectedResources)}
+                  </div>
                 )
               )}
 

@@ -28,6 +28,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -46,7 +47,7 @@ export default function Invoices() {
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
-  const customBulkActions: CustomBulkAction[] = [
+  const customBulkActions: CustomBulkAction<Invoice>[] = [
     (selectedIds) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}

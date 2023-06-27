@@ -9,7 +9,7 @@
  */
 
 import { Link } from '$app/components/forms';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdAddCircleOutline,
   MdControlPointDuplicate,
   MdEdit,
   MdNotStarted,
@@ -47,6 +48,7 @@ import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { CustomBulkAction } from '$app/components/DataTable';
 
 export const defaultColumns: string[] = [
   'status',
@@ -402,3 +404,19 @@ export function useActions() {
 
   return actions;
 }
+
+export const useCustomBulkActions = () => {
+  const customBulkActions: CustomBulkAction<Task>[] = [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (selectedIds, selectedTasks) => (
+      <DropdownElement
+        onClick={async () => console.log('ok')}
+        icon={<Icon element={MdAddCircleOutline} />}
+      >
+        {trans('add_to_invoice', { invoice: '' })}
+      </DropdownElement>
+    ),
+  ];
+
+  return customBulkActions;
+};

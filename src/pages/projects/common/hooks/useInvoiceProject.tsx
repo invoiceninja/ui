@@ -28,6 +28,25 @@ import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
+export const calculateTaskHours = (timeLog: string) => {
+  const parsedTimeLogs = parseTimeLog(timeLog);
+
+  let hoursSum = 0;
+
+  if (parsedTimeLogs.length) {
+    parsedTimeLogs.forEach(([start, stop]) => {
+      const unixStart = dayjs.unix(start);
+      const unixStop = dayjs.unix(stop);
+
+      hoursSum += Number(
+        (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+      );
+    });
+  }
+
+  return hoursSum;
+};
+
 export function useInvoiceProject() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
@@ -37,25 +56,6 @@ export function useInvoiceProject() {
   const { data } = useBlankInvoiceQuery();
 
   const setInvoice = useSetAtom(invoiceAtom);
-
-  const calculateTaskHours = (timeLog: string) => {
-    const parsedTimeLogs = parseTimeLog(timeLog);
-
-    let hoursSum = 0;
-
-    if (parsedTimeLogs.length) {
-      parsedTimeLogs.forEach(([start, stop]) => {
-        const unixStart = dayjs.unix(start);
-        const unixStop = dayjs.unix(stop);
-
-        hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-        );
-      });
-    }
-
-    return hoursSum;
-  };
 
   return (tasks: Task[]) => {
     if (data) {

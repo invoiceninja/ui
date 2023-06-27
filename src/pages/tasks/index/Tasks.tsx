@@ -18,6 +18,7 @@ import {
   defaultColumns,
   useActions,
   useAllTaskColumns,
+  useCustomBulkActions,
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
@@ -40,6 +41,8 @@ export default function Tasks() {
 
   const taskColumns = useAllTaskColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
@@ -50,6 +53,7 @@ export default function Tasks() {
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         customFilters={filters}
+        customBulkActions={customBulkActions}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
@@ -69,6 +73,7 @@ export default function Tasks() {
           </Link>
         }
         linkToCreateGuards={[permission('create_task')]}
+        includeObjectSelection
       />
     </Default>
   );
