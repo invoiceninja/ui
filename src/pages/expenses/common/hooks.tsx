@@ -10,7 +10,7 @@
 
 import { Link } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
-import { date, getEntityState } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -27,7 +27,7 @@ import { StatusBadge } from '$app/components/StatusBadge';
 import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -40,12 +40,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useBulk } from '$app/common/queries/expenses';
 import { Divider } from '$app/components/cards/Divider';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useInvoiceExpense } from './useInvoiceExpense';
+import { Modal } from '$app/components/Modal';
+import { useQuery } from 'react-query';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { AxiosResponse } from 'axios';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -58,7 +66,7 @@ export function useActions() {
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
   const isEditPage = location.pathname.includes(id!);
-  const invoiceExpense = useInvoiceExpense();
+  const { create, calculatedTaxRate } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });
@@ -76,15 +84,126 @@ export function useActions() {
     navigate('/recurring_expenses/create?action=clone');
   };
 
-  const actions: Action<Expense>[] = [
-    (expense) => (expense.should_be_invoiced === true && expense.invoice_id.length === 0) && (
-      <DropdownElement
-        onClick={() => invoiceExpense(expense)}
-        icon={<Icon element={MdTextSnippet} />}
+  const [showAddToInvoiceModal, setShowAddToInvoiceModal] = useState(false);
+
+  const [, setInvoice] = useAtom(invoiceAtom);
+
+  const AddToInvoice = () => {
+    const { data } = useQuery({
+      queryFn: () =>
+        request(
+          'GET',
+          endpoint('/api/v1/expenses?has_invoices=true&include=invoice.client')
+        ).then(
+          (response: AxiosResponse<GenericManyResponse<Expense>>) =>
+            response.data
+        ),
+    });
+
+    const handle = (expense: Expense) => {
+      setInvoice(
+        () =>
+          expense.invoice && {
+            ...expense.invoice,
+            line_items: [
+              ...expense.invoice.line_items,
+              {
+                ...blankLineItem(),
+                type_id: InvoiceItemType.Product,
+                cost: expense.amount,
+                quantity: 1,
+                product_key: expense?.category?.name ?? '',
+                notes: expense.public_notes,
+                line_total: Number((expense.amount * 1).toPrecision(2)),
+                expense_id: expense.id,
+                tax_name1: expense.tax_name1,
+                tax_rate1: calculatedTaxRate(
+                  expense,
+                  expense.tax_amount1,
+                  expense.tax_rate1
+                ),
+                tax_name2: expense.tax_name2,
+                tax_rate2: calculatedTaxRate(
+                  expense,
+                  expense.tax_amount2,
+                  expense.tax_rate2
+                ),
+                tax_name3: expense.tax_name3,
+                tax_rate3: calculatedTaxRate(
+                  expense,
+                  expense.tax_amount3,
+                  expense.tax_rate3
+                ),
+              },
+            ],
+          }
+      );
+
+      navigate(
+        route(`/invoices/${expense?.invoice?.id}/edit?action=invoice_expense`)
+      );
+    };
+
+    const formatMoney = useFormatMoney();
+    const company = useCurrentCompany();
+
+    if (!data) {
+      return null;
+    }
+
+    return (
+      <Modal
+        title={t('add_to_invoice')}
+        onClose={setShowAddToInvoiceModal}
+        visible={showAddToInvoiceModal}
       >
-        {t('invoice_expense')}
-      </DropdownElement>
-    ),
+        {data.data.map((expense) => (
+          <button
+            key={expense.id}
+            onClick={() => handle(expense)}
+            className="inline-flex items-center justify-between"
+          >
+            <p>{expense.invoice?.number}</p>
+
+            <p>
+              {formatMoney(
+                expense.invoice!.amount,
+                expense.invoice?.client?.country_id ??
+                  company.settings.country_id,
+                expense.invoice!.client?.settings.currency_id
+              )}
+            </p>
+          </button>
+        ))}
+      </Modal>
+    );
+  };
+
+  const actions: Action<Expense>[] = [
+    (expense) =>
+      expense.should_be_invoiced === true &&
+      expense.invoice_id.length === 0 && (
+        <DropdownElement
+          onClick={() => create(expense)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_expense')}
+        </DropdownElement>
+      ),
+    (expense) =>
+      expense.should_be_invoiced === true &&
+      expense.invoice_id.length === 0 && (
+        <>
+          <AddToInvoice />
+
+          <DropdownElement
+            onClick={() => setShowAddToInvoiceModal(true)}
+            icon={<Icon element={MdTextSnippet} />}
+          >
+            {t('add_to_invoice')}
+          </DropdownElement>
+        </>
+      ),
     (expense) => (
       <DropdownElement
         onClick={() => cloneToExpense(expense)}
@@ -166,7 +285,7 @@ export function useAllExpenseColumns() {
     'entity_state',
     'archived_at',
     //   'assigned_to', @Todo: Need to resolve relationship
-      'category', 
+    'category',
     'created_at',
     //'created_by', @Todo: Need to resolve relationship
     firstCustom,
