@@ -30,7 +30,7 @@ export function AddTasksOnInvoiceModal(props: Props) {
 
   const formatMoney = useFormatMoney();
 
-  const addTasksToInvoice = useAddTasksOnInvoice({ setVisible });
+  const addTasksOnInvoice = useAddTasksOnInvoice({ setVisible });
 
   return (
     <Modal
@@ -43,7 +43,7 @@ export function AddTasksOnInvoiceModal(props: Props) {
           <div
             key={index}
             className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 px-3"
-            onClick={() => addTasksToInvoice(invoice)}
+            onClick={() => addTasksOnInvoice(invoice)}
           >
             <span>{invoice.number}</span>
 

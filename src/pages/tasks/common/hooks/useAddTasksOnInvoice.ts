@@ -38,13 +38,13 @@ export function useAddTasksOnInvoice(params: Params) {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { timeFormat } = useCompanyTimeFormat();
 
-  const newTasksForInvoice = useAtomValue(tasksToAddOnInvoiceAtom);
+  const tasks = useAtomValue(tasksToAddOnInvoiceAtom);
 
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
   return (invoice: Invoice) => {
-    if (newTasksForInvoice) {
-      newTasksForInvoice.forEach((task) => {
+    if (tasks) {
+      tasks.forEach((task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
@@ -84,7 +84,7 @@ export function useAddTasksOnInvoice(params: Params) {
         setVisible(false);
 
         navigate(
-          route('/invoices/:id/edit?action=add_task&table=tasks', {
+          route('/invoices/:id/edit?action=add_tasks&table=tasks', {
             id: invoice.id,
           })
         );

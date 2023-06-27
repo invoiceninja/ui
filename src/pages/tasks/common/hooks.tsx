@@ -423,6 +423,10 @@ export const useCustomBulkActions = (params: Params) => {
   const setTasksToAddOnInvoiceAtom = useSetAtom(tasksToAddOnInvoiceAtom);
 
   const handleAddTasksOnInvoice = (tasks: Task[]) => {
+    if (!tasks.length) {
+      return toast.error('no_invoices_found');
+    }
+
     const clientIdsOfSelectedTasks = tasks.map((task) => task.client_id);
 
     if (clientIdsOfSelectedTasks.length) {

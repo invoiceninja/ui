@@ -81,7 +81,7 @@ export default function Edit() {
   } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    const isAddingTasksAction = searchParams.get('action') === 'add_task';
+    const isAddingTasksAction = searchParams.get('action') === 'add_tasks';
 
     const currentInvoice = isAddingTasksAction && invoice ? invoice : data;
 
