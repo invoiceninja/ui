@@ -97,7 +97,7 @@ export function useActions() {
       queryFn: () => {
         const url = new URL(endpoint('/api/v1/expenses?include=invoice.client'));
 
-        if (expense.client) {
+        if (expense.client_id) {
           url.searchParams.set('has_invoices', `client,${expense.client_id}`);
         }
     
