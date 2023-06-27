@@ -41,7 +41,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
 import { useState } from 'react';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { AddToInvoiceModal } from '$app/pages/tasks/common/components/AddToInvoiceModal';
+import { AddTasksOnInvoiceModal } from '$app/pages/tasks/common/components/AddTasksOnInvoiceModal';
 
 dayjs.extend(duration);
 
@@ -76,7 +76,7 @@ export default function Show() {
   const projectActions = useProjectsActions();
   const taskActions = useTasksActions({
     setInvoices,
-    setIsAddToInvoiceVisible,
+    setIsAddTasksOnInvoiceVisible: setIsAddToInvoiceVisible,
   });
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
@@ -181,7 +181,7 @@ export default function Show() {
         />
       </div>
 
-      <AddToInvoiceModal
+      <AddTasksOnInvoiceModal
         visible={isAddToInvoiceVisible}
         setVisible={setIsAddToInvoiceVisible}
         invoices={invoices}

@@ -54,7 +54,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Invoice } from '$app/common/interfaces/invoice';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
-import { taskToAddAtom } from './components/AddToInvoiceModal';
+import { tasksToAddOnInvoiceAtom } from './components/AddTasksOnInvoiceModal';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/tasks';
 
@@ -333,19 +333,19 @@ export function useTaskFilters() {
 
 interface Params {
   setInvoices: Dispatch<SetStateAction<Invoice[]>>;
-  setIsAddToInvoiceVisible: Dispatch<SetStateAction<boolean>>;
+  setIsAddTasksOnInvoiceVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-export function useActions(params?: Params) {
+export function useActions(params: Params) {
   const { id } = useParams();
 
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
-  const setTaskToAddAtom = useSetAtom(taskToAddAtom);
+  const setTasksToAddOnInvoiceAtom = useSetAtom(tasksToAddOnInvoiceAtom);
 
-  const { setInvoices, setIsAddToInvoiceVisible } = params || {};
+  const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
 
   const queryClient = useQueryClient();
 
@@ -372,7 +372,7 @@ export function useActions(params?: Params) {
     navigate('/tasks/create?action=clone');
   };
 
-  const handleAddToInvoice = (task: Task) => {
+  const handleAddTasksOnInvoice = (task: Task) => {
     toast.processing();
 
     queryClient.fetchQuery(
@@ -401,9 +401,9 @@ export function useActions(params?: Params) {
 
             setInvoices?.(response.data.data);
 
-            setTaskToAddAtom(task);
+            setTasksToAddOnInvoiceAtom([task]);
 
-            setIsAddToInvoiceVisible?.(true);
+            setIsAddTasksOnInvoiceVisible(true);
           })
           .catch((error: AxiosError) => {
             toast.error();
@@ -461,7 +461,7 @@ export function useActions(params?: Params) {
     (task: Task) =>
       task.client_id && (
         <DropdownElement
-          onClick={() => handleAddToInvoice(task)}
+          onClick={() => handleAddTasksOnInvoice(task)}
           icon={<Icon element={MdControlPointDuplicate} />}
         >
           {trans('add_to_invoice', { invoice: '' })}
