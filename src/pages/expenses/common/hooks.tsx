@@ -34,6 +34,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdRestore,
+  MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { expenseAtom } from './atoms';
@@ -44,6 +45,7 @@ import { useBulk } from '$app/common/queries/expenses';
 import { Divider } from '$app/components/cards/Divider';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useInvoiceExpense } from './useInvoiceExpense';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -56,6 +58,7 @@ export function useActions() {
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
   const isEditPage = location.pathname.includes(id!);
+  const invoiceExpense = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });
@@ -74,6 +77,14 @@ export function useActions() {
   };
 
   const actions: Action<Expense>[] = [
+    (expense) => (expense.should_be_invoiced === true) && (
+      <DropdownElement
+        onClick={() => invoiceExpense(expense)}
+        icon={<Icon element={MdTextSnippet} />}
+      >
+        {t('invoice_expense')}
+      </DropdownElement>
+    ),
     (expense) => (
       <DropdownElement
         onClick={() => cloneToExpense(expense)}
@@ -155,7 +166,7 @@ export function useAllExpenseColumns() {
     'entity_state',
     'archived_at',
     //   'assigned_to', @Todo: Need to resolve relationship
-    //   'category', @Todo: Need to resolve relationship
+      'category', 
     'created_at',
     //'created_by', @Todo: Need to resolve relationship
     firstCustom,
@@ -204,6 +215,12 @@ export function useExpenseColumns() {
     });
 
   const columns: DataTableColumnsExtended<Expense, ExpenseColumns> = [
+    {
+      column: 'category',
+      id: 'category_id',
+      label: t('category'),
+      format: (value, expense) => expense?.category?.name,
+    },
     {
       column: 'status',
       id: 'id',

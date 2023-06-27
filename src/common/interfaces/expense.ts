@@ -9,6 +9,7 @@
  */
 
 import { Client } from './client';
+import { ExpenseCategory } from './expense-category';
 import { Vendor } from './vendor';
 
 export interface Expense {
@@ -61,4 +62,5 @@ export interface Expense {
   documents: any[];
   client?: Client;
   vendor?: Vendor;
+  category?: ExpenseCategory;
 }
