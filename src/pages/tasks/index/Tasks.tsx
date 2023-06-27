@@ -24,11 +24,19 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
+import { AddToInvoiceModal } from '../common/components/AddToInvoiceModal';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useState } from 'react';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
 
   const [t] = useTranslation();
+
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  const [isAddToInvoiceVisible, setIsAddToInvoiceVisible] =
+    useState<boolean>(false);
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
@@ -36,7 +44,7 @@ export default function Tasks() {
 
   const filters = useTaskFilters();
 
-  const actions = useActions();
+  const actions = useActions({ setInvoices, setIsAddToInvoiceVisible });
 
   const taskColumns = useAllTaskColumns();
 
@@ -69,6 +77,12 @@ export default function Tasks() {
           </Link>
         }
         linkToCreateGuards={[permission('create_task')]}
+      />
+
+      <AddToInvoiceModal
+        visible={isAddToInvoiceVisible}
+        setVisible={setIsAddToInvoiceVisible}
+        invoices={invoices}
       />
     </Default>
   );

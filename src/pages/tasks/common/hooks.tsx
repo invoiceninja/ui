@@ -9,7 +9,7 @@
  */
 
 import { Link } from '$app/components/forms';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -47,6 +47,11 @@ import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
+import { taskToAddAtom } from './components/AddToInvoiceModal';
 
 export const defaultColumns: string[] = [
   'status',
@@ -321,10 +326,21 @@ export function useTaskFilters() {
   return filters;
 }
 
-export function useActions() {
+interface Params {
+  setInvoices: Dispatch<SetStateAction<Invoice[]>>;
+  setIsAddToInvoiceVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const setTaskToAddAtom = useSetAtom(taskToAddAtom);
+
+  const { setInvoices, setIsAddToInvoiceVisible } = params || {};
+
+  const queryClient = useQueryClient();
 
   const location = useLocation();
 
@@ -342,6 +358,46 @@ export function useActions() {
     setTask({ ...task, id: '', documents: [], number: '', invoice_id: '' });
 
     navigate('/tasks/create?action=clone');
+  };
+
+  const handleAddToInvoice = (task: Task) => {
+    toast.processing();
+
+    queryClient.fetchQuery(
+      route(
+        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+        {
+          clientId: task.client_id,
+        }
+      ),
+      () =>
+        request(
+          'GET',
+          endpoint(
+            '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+            {
+              clientId: task.client_id,
+            }
+          )
+        )
+          .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+            toast.dismiss();
+
+            if (!response.data.data.length) {
+              return toast.error('no_invoices_found');
+            }
+
+            setInvoices?.(response.data.data);
+
+            setTaskToAddAtom(task);
+
+            setIsAddToInvoiceVisible?.(true);
+          })
+          .catch((error: AxiosError) => {
+            toast.error();
+            console.error(error);
+          })
+    );
   };
 
   const actions = [
@@ -388,6 +444,15 @@ export function useActions() {
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_task')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      task.client_id && (
+        <DropdownElement
+          onClick={() => handleAddToInvoice(task)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {trans('add_to_invoice', { invoice: '' })}
         </DropdownElement>
       ),
     (task: Task) => (
