@@ -88,12 +88,18 @@ export function useActions() {
 
   const [, setInvoice] = useAtom(invoiceAtom);
 
-  const AddToInvoice = () => {
+  interface AddToInvoiceProps {
+    expense: Expense;
+  }
+
+  const AddToInvoice = ({ expense }: AddToInvoiceProps) => {
     const { data } = useQuery({
       queryFn: () =>
         request(
           'GET',
-          endpoint('/api/v1/expenses?has_invoices=true&include=invoice.client')
+          endpoint(
+            `/api/v1/expenses?has_invoices=true&include=invoice.client&client_id=${expense.client_id}&project_id=${expense.project_id}`
+          )
         ).then(
           (response: AxiosResponse<GenericManyResponse<Expense>>) =>
             response.data
@@ -197,7 +203,7 @@ export function useActions() {
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 && (
         <>
-          <AddToInvoice />
+          <AddToInvoice expense={expense} />
 
           <DropdownElement
             onClick={() => setShowAddToInvoiceModal(true)}
