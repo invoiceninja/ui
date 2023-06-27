@@ -53,7 +53,7 @@ export default function Show() {
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  const [isAddToInvoiceVisible, setIsAddToInvoiceVisible] =
+  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
     useState<boolean>(false);
 
   const pages: Page[] = [
@@ -76,7 +76,7 @@ export default function Show() {
   const projectActions = useProjectsActions();
   const taskActions = useTasksActions({
     setInvoices,
-    setIsAddTasksOnInvoiceVisible: setIsAddToInvoiceVisible,
+    setIsAddTasksOnInvoiceVisible,
   });
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
@@ -182,8 +182,8 @@ export default function Show() {
       </div>
 
       <AddTasksOnInvoiceModal
-        visible={isAddToInvoiceVisible}
-        setVisible={setIsAddToInvoiceVisible}
+        visible={isAddTasksOnInvoiceVisible}
+        setVisible={setIsAddTasksOnInvoiceVisible}
         invoices={invoices}
       />
     </Default>

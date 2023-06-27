@@ -44,14 +44,14 @@ export default function Edit() {
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  const [isAddToInvoiceVisible, setIsAddToInvoiceVisible] =
+  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
     useState<boolean>(false);
 
   const queryClient = useQueryClient();
 
   const actions = useActions({
     setInvoices,
-    setIsAddTasksOnInvoiceVisible: setIsAddToInvoiceVisible,
+    setIsAddTasksOnInvoiceVisible,
   });
 
   useEffect(() => {
@@ -113,8 +113,8 @@ export default function Edit() {
       {task && <TaskTable task={task} handleChange={handleChange} />}
 
       <AddTasksOnInvoiceModal
-        visible={isAddToInvoiceVisible}
-        setVisible={setIsAddToInvoiceVisible}
+        visible={isAddTasksOnInvoiceVisible}
+        setVisible={setIsAddTasksOnInvoiceVisible}
         invoices={invoices}
       />
     </Default>
