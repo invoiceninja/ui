@@ -30,8 +30,8 @@ export function useInvoiceExpense() {
 
             if(expense.uses_inclusive_taxes){
                 
-                return Math.round((amount / expense.amount) * 100).toPrecision(2);
-               
+                return Math.round((((amount / expense.amount) * 100) * 1000) / 10) / 100
+
             }
 
             return Math.round(((amount / (expense.amount)) * 1000 ) /10) /1;
@@ -60,7 +60,7 @@ export function useInvoiceExpense() {
                 quantity: 1,
                 product_key: expense?.category?.name ?? '',
                 notes: expense.public_notes,
-                line_total: Number((expense.amount * 1).toFixed(2)),
+                line_total: Number((expense.amount * 1).toPrecision(2)),
                 expense_id: expense.id,
                 tax_name1: expense.tax_name1,
                 tax_rate1: calculatedTaxRate(expense, expense.tax_amount1, expense.tax_rate1),
