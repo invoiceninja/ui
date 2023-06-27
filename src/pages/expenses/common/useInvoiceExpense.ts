@@ -20,7 +20,6 @@ import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
 
 export function useInvoiceExpense() {
-    const [t] = useTranslation();
 
     const navigate = useNavigate();
     const { data } = useBlankInvoiceQuery();
