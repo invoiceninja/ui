@@ -49,6 +49,11 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { CustomBulkAction } from '$app/components/DataTable';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Dispatch, SetStateAction } from 'react';
+import { AxiosError } from 'axios';
+import { tasksToAddOnInvoiceAtom } from './components/AddTasksOnInvoiceModal';
 
 export const defaultColumns: string[] = [
   'status',
@@ -405,12 +410,76 @@ export function useActions() {
   return actions;
 }
 
-export const useCustomBulkActions = () => {
+interface Params {
+  setInvoices: Dispatch<SetStateAction<Invoice[]>>;
+  setIsAddTasksOnInvoiceVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+export const useCustomBulkActions = (params: Params) => {
+  const queryClient = useQueryClient();
+
+  const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
+
+  const setTasksToAddOnInvoiceAtom = useSetAtom(tasksToAddOnInvoiceAtom);
+
+  const handleAddTasksOnInvoice = (tasks: Task[]) => {
+    const clientIdsOfSelectedTasks = tasks.map((task) => task.client_id);
+
+    if (clientIdsOfSelectedTasks.length) {
+      const clientId = clientIdsOfSelectedTasks[0];
+
+      const isAnyClientDifferent = clientIdsOfSelectedTasks.some(
+        (id) => id !== clientId
+      );
+
+      if (isAnyClientDifferent) {
+        return toast.error('multiple_client_error');
+      }
+    }
+
+    toast.processing();
+
+    queryClient.fetchQuery(
+      route(
+        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+        {
+          clientId: tasks[0].client_id,
+        }
+      ),
+      () =>
+        request(
+          'GET',
+          endpoint(
+            '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+            {
+              clientId: tasks[0].client_id,
+            }
+          )
+        )
+          .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+            toast.dismiss();
+
+            if (!response.data.data.length) {
+              return toast.error('no_invoices_found');
+            }
+
+            setInvoices(response.data.data);
+
+            setTasksToAddOnInvoiceAtom(tasks);
+
+            setIsAddTasksOnInvoiceVisible(true);
+          })
+          .catch((error: AxiosError) => {
+            toast.error();
+            console.error(error);
+          })
+    );
+  };
+
   const customBulkActions: CustomBulkAction<Task>[] = [
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedTasks) => (
+    (_, selectedTasks) => (
       <DropdownElement
-        onClick={async () => console.log('ok')}
+        onClick={() => selectedTasks && handleAddTasksOnInvoice(selectedTasks)}
         icon={<Icon element={MdAddCircleOutline} />}
       >
         {trans('add_to_invoice', { invoice: '' })}

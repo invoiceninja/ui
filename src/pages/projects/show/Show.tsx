@@ -35,10 +35,14 @@ import {
   useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
+  useCustomBulkActions,
 } from '$app/pages/tasks/common/hooks';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import { AddTasksOnInvoiceModal } from '$app/pages/tasks/common/components/AddTasksOnInvoiceModal';
+import { useState } from 'react';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 dayjs.extend(duration);
 
@@ -47,6 +51,11 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
+    useState<boolean>(false);
 
   const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
@@ -72,6 +81,11 @@ export default function Show() {
 
   const filters = useTaskFilters();
   const taskColumns = useAllTaskColumns();
+
+  const customBulkActions = useCustomBulkActions({
+    setInvoices,
+    setIsAddTasksOnInvoiceVisible,
+  });
 
   if (!project) {
     return (
@@ -156,6 +170,7 @@ export default function Show() {
           bulkRoute="/api/v1/tasks/bulk"
           linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
           customFilters={filters}
+          customBulkActions={customBulkActions}
           customFilterQueryKey="client_status"
           customFilterPlaceholder="status"
           withResourcefulActions
@@ -167,8 +182,15 @@ export default function Show() {
             />
           }
           linkToCreateGuards={[permission('create_task')]}
+          includeObjectSelection
         />
       </div>
+
+      <AddTasksOnInvoiceModal
+        visible={isAddTasksOnInvoiceVisible}
+        setVisible={setIsAddTasksOnInvoiceVisible}
+        invoices={invoices}
+      />
     </Default>
   );
 }
