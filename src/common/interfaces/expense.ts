@@ -10,6 +10,7 @@
 
 import { Client } from './client';
 import { ExpenseCategory } from './expense-category';
+import { Invoice } from './invoice';
 import { Vendor } from './vendor';
 
 export interface Expense {
@@ -63,4 +64,5 @@ export interface Expense {
   client?: Client;
   vendor?: Vendor;
   category?: ExpenseCategory;
+  invoice?: Invoice;
 }
