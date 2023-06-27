@@ -98,6 +98,7 @@ export function useActions() {
           (response: AxiosResponse<GenericManyResponse<Expense>>) =>
             response.data
         ),
+      enabled: showAddToInvoiceModal,
     });
 
     const handle = (expense: Expense) => {
@@ -157,24 +158,26 @@ export function useActions() {
         onClose={setShowAddToInvoiceModal}
         visible={showAddToInvoiceModal}
       >
-        {data.data.map((expense) => (
-          <button
-            key={expense.id}
-            onClick={() => handle(expense)}
-            className="inline-flex items-center justify-between"
-          >
-            <p>{expense.invoice?.number}</p>
+        {data.data.map((expense) =>
+          expense.invoice ? (
+            <button
+              key={expense.id}
+              onClick={() => handle(expense)}
+              className="inline-flex items-center justify-between"
+            >
+              <p>{expense.invoice?.number}</p>
 
-            <p>
-              {formatMoney(
-                expense.invoice!.amount,
-                expense.invoice?.client?.country_id ??
-                  company.settings.country_id,
-                expense.invoice!.client?.settings.currency_id
-              )}
-            </p>
-          </button>
-        ))}
+              <p>
+                {formatMoney(
+                  expense.invoice.amount,
+                  expense.invoice.client?.country_id ??
+                    company.settings.country_id,
+                  expense.invoice.client?.settings.currency_id
+                )}
+              </p>
+            </button>
+          ) : null
+        )}
       </Modal>
     );
   };
