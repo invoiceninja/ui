@@ -10,13 +10,13 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Project } from '$app/common/interfaces/project';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
+
 import { CreateProjectModal } from '$app/pages/projects/common/components/CreateProjectModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export function ProjectSelector(props: GenericSelectorProps<Project>) {
   const [t] = useTranslation();
@@ -30,7 +30,26 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         onProjectCreated={(project) => props.onChange(project)}
       />
 
-      <DebouncedCombobox
+      <ComboboxAsync<Project>
+        inputOptions={{
+          label: props.inputLabel?.toString(),
+          value: props.value ?? null,
+        }}
+        endpoint={new URL(endpoint('/api/v1/projects'))}
+        entryOptions={{ id: 'id', label: 'name', value: 'id' }}
+        onChange={(entry) =>
+          entry.resource ? props.onChange(entry.resource) : null
+        }
+        readonly={props.readonly}
+        onDismiss={props.onClearButtonClick}
+        action={{
+          label: t('new_project'),
+          onClick: () => setIsModalOpen(true),
+          visible: true,
+        }}
+      />
+
+      {/* <DebouncedCombobox
         inputLabel={props.inputLabel}
         endpoint="/api/v1/projects"
         label="name"
@@ -45,7 +64,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         actionLabel={t('new_project')}
         onActionClick={() => setIsModalOpen(true)}
         errorMessage={props.errorMessage}
-      />
+      /> */}
     </>
   );
 }
