@@ -12,7 +12,6 @@ import { Expense } from '$app/common/interfaces/expense';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
