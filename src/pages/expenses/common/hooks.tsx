@@ -94,16 +94,22 @@ export function useActions() {
 
   const AddToInvoice = ({ expense }: AddToInvoiceProps) => {
     const { data } = useQuery({
-      queryFn: () =>
-        request(
-          'GET',
-          endpoint(
-            `/api/v1/expenses?has_invoices=true&include=invoice.client&client_id=${expense.client_id}&project_id=${expense.project_id}`
-          )
-        ).then(
+      queryFn: () => {
+        const url = new URL(endpoint('/api/v1/expenses?include=invoice.client'));
+
+        if (expense.client) {
+          url.searchParams.set('has_invoices', `client,${expense.client_id}`);
+        }
+    
+        if (expense.project_id) {
+          url.searchParams.set('has_invoices', `project,${expense.project_id}`);
+        }
+
+        return request('GET', url.href).then(
           (response: AxiosResponse<GenericManyResponse<Expense>>) =>
             response.data
-        ),
+        )
+      },
       enabled: showAddToInvoiceModal,
     });
 
