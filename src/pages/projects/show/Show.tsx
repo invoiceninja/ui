@@ -39,6 +39,9 @@ import {
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import { useState } from 'react';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { AddToInvoiceModal } from '$app/pages/tasks/common/components/AddToInvoiceModal';
 
 dayjs.extend(duration);
 
@@ -47,6 +50,11 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  const [isAddToInvoiceVisible, setIsAddToInvoiceVisible] =
+    useState<boolean>(false);
 
   const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
@@ -66,7 +74,10 @@ export default function Show() {
   });
 
   const projectActions = useProjectsActions();
-  const taskActions = useTasksActions();
+  const taskActions = useTasksActions({
+    setInvoices,
+    setIsAddToInvoiceVisible,
+  });
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
 
@@ -169,6 +180,12 @@ export default function Show() {
           linkToCreateGuards={[permission('create_task')]}
         />
       </div>
+
+      <AddToInvoiceModal
+        visible={isAddToInvoiceVisible}
+        setVisible={setIsAddToInvoiceVisible}
+        invoices={invoices}
+      />
     </Default>
   );
 }
