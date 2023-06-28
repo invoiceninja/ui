@@ -34,6 +34,24 @@ export function useFetchInvoicesForTasksAdding(params: Params) {
   const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
 
   return (tasks: Task[]) => {
+    if (!tasks.length) {
+      return toast.error('no_invoices_found');
+    }
+
+    const clientIdsOfSelectedTasks = tasks.map((task) => task.client_id);
+
+    if (clientIdsOfSelectedTasks.length) {
+      const clientId = clientIdsOfSelectedTasks[0];
+
+      const isAnyClientDifferent = clientIdsOfSelectedTasks.some(
+        (id) => id !== clientId
+      );
+
+      if (isAnyClientDifferent) {
+        return toast.error('multiple_client_error');
+      }
+    }
+
     toast.processing();
 
     queryClient.fetchQuery(
