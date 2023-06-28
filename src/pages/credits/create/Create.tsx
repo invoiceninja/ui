@@ -94,6 +94,22 @@ export default function Create() {
       ) {
         const _credit = cloneDeep(data);
 
+
+        if (company && company.enabled_tax_rates > 0) {
+          _credit.tax_name1 = company.settings.tax_name1;
+          _credit.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _credit.tax_name2 = company.settings.tax_name2;
+          _credit.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _credit.tax_name3 = company.settings.tax_name3;
+          _credit.tax_rate3 = company.settings.tax_rate3;
+        }
+
         if (typeof _credit.line_items === 'string') {
           _credit.line_items = [];
         }
