@@ -460,7 +460,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (task: Task) =>
-      task.client_id && (
+      task.client_id &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => handleAddTasksOnInvoice(task)}
           icon={<Icon element={MdAddCircleOutline} />}
