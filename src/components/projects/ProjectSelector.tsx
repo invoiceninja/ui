@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { Alert } from '../Alert';
 
 export function ProjectSelector(props: GenericSelectorProps<Project>) {
   const [t] = useTranslation();
@@ -49,22 +50,11 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         }}
       />
 
-      {/* <DebouncedCombobox
-        inputLabel={props.inputLabel}
-        endpoint="/api/v1/projects"
-        label="name"
-        onChange={(value: Record<Project>) =>
-          value.resource && props.onChange(value.resource)
-        }
-        defaultValue={props.value}
-        disabled={props.readonly}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        queryAdditional
-        actionLabel={t('new_project')}
-        onActionClick={() => setIsModalOpen(true)}
-        errorMessage={props.errorMessage}
-      /> */}
+      {props.errorMessage ? (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      ) : null}
     </>
   );
 }
