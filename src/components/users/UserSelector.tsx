@@ -11,7 +11,6 @@
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { User } from '$app/common/interfaces/user';
 
-
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ComboboxAsync } from '../forms/Combobox';
@@ -27,7 +26,7 @@ export function UserSelector(props: GenericSelectorProps<User>) {
         label: props.inputLabel?.toString(),
         value: props.value ?? null,
       }}
-      endpoint={new URL(endpoint('/api/v1/users'))}
+      endpoint={new URL(endpoint('/api/v1/users?status=active'))}
       entryOptions={{
         id: 'id',
         value: 'id',

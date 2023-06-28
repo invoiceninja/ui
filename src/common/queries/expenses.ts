@@ -50,7 +50,7 @@ export function useExpenseQuery(params: ExpenseParams) {
   return useQuery<Expense>(
     route('/api/v1/expenses/:id', { id: params.id }),
     () =>
-      request('GET', endpoint('/api/v1/expenses/:id', { id: params.id })).then(
+      request('GET', endpoint('/api/v1/expenses/:id?include=category', { id: params.id })).then(
         (response) => response.data.data
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
@@ -69,13 +69,14 @@ export function useExpensesQuery(params: ExpensesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions',
+          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&includes=:includes',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
             status: params.status ?? 'active',
             filter: params.filter ?? '',
             match_transactions: params.matchTransactions ?? false,
+            includes: 'category',
           }
         )
       ).then(

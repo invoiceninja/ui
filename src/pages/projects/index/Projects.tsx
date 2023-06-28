@@ -43,7 +43,7 @@ export default function Projects() {
     >
       <DataTable
         resource="project"
-        endpoint="/api/v1/projects?sort=id|desc"
+        endpoint="/api/v1/projects?status=active&sort=id|desc"
         bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}
