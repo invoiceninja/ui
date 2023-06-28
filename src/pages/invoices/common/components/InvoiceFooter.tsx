@@ -148,6 +148,7 @@ export function InvoiceFooter(props: Props) {
                   value={invoice?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
                   errorMessage={errors?.errors.project_id}
+                  onClearButtonClick={() => handleChange('project_id', '')}
                 />
               </div>
 
