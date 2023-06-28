@@ -10,13 +10,14 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Project } from '$app/common/interfaces/project';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
+
 import { CreateProjectModal } from '$app/pages/projects/common/components/CreateProjectModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
+import { Alert } from '../Alert';
 
 export function ProjectSelector(props: GenericSelectorProps<Project>) {
   const [t] = useTranslation();
@@ -30,22 +31,30 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         onProjectCreated={(project) => props.onChange(project)}
       />
 
-      <DebouncedCombobox
-        inputLabel={props.inputLabel}
-        endpoint="/api/v1/projects?status=active"
-        label="name"
-        onChange={(value: Record<Project>) =>
-          value.resource && props.onChange(value.resource)
+      <ComboboxAsync<Project>
+        inputOptions={{
+          label: props.inputLabel?.toString(),
+          value: props.value ?? null,
+        }}
+        endpoint={new URL(endpoint('/api/v1/projects?status=active'))}
+        entryOptions={{ id: 'id', label: 'name', value: 'id' }}
+        onChange={(entry) =>
+          entry.resource ? props.onChange(entry.resource) : null
         }
-        defaultValue={props.value}
-        disabled={props.readonly}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        queryAdditional
-        actionLabel={t('new_project')}
-        onActionClick={() => setIsModalOpen(true)}
-        errorMessage={props.errorMessage}
+        readonly={props.readonly}
+        onDismiss={props.onClearButtonClick}
+        action={{
+          label: t('new_project'),
+          onClick: () => setIsModalOpen(true),
+          visible: true,
+        }}
       />
+
+      {props.errorMessage ? (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      ) : null}
     </>
   );
 }
