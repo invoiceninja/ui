@@ -82,7 +82,11 @@ export default function Edit() {
 
   useEffect(() => {
     if (data) {
-      const _invoice = cloneDeep(data);
+      const _invoice =
+        searchParams.get('action') === 'invoice_expense'
+          ? cloneDeep(invoice!)
+          : cloneDeep(data);
+
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
