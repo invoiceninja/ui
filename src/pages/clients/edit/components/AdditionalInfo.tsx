@@ -22,7 +22,6 @@ import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
-import Toggle from '$app/components/forms/Toggle';
 import { TabGroup } from '$app/components/TabGroup';
 import { cloneDeep, set } from 'lodash';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -72,7 +71,7 @@ export function AdditionalInfo(props: Props) {
   const handleChangeSettings = (event: ChangeEvent<HTMLInputElement>) => {
         
     if (event.target.value.length === 0) {
-      let settingsProp = event.target.id.replace('settings.', '')
+      const settingsProp = event.target.id.replace('settings.', '')
 
       const _client = cloneDeep(props.client)
       
@@ -214,7 +213,7 @@ export function AdditionalInfo(props: Props) {
 
             <SelectField
               id="settings.send_reminders"
-              defaultValue={props.client?.settings?.hasOwnProperty('send_reminders') ? props.client?.settings?.send_reminders ? 'enabled' : 'disabled' : ''}
+              defaultValue={Object.prototype.hasOwnProperty.call(props.client?.settings, 'send_reminders') ? props.client?.settings?.send_reminders ? 'enabled' : 'disabled' : ''}
               className={
                 'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
               }
