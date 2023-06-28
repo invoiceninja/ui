@@ -24,7 +24,7 @@ import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import Toggle from '$app/components/forms/Toggle';
 import { TabGroup } from '$app/components/TabGroup';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import {
@@ -61,12 +61,42 @@ export function AdditionalInfo(props: Props) {
   const { id } = useParams();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+
     const client = { ...props.client };
 
     setErrors(undefined);
 
     setClient(set(client as Client, event.target.id, event.target.value));
   };
+
+  const handleChangeSettings = (event: ChangeEvent<HTMLInputElement>) => {
+        
+    if (event.target.value.length === 0) {
+      let settingsProp = event.target.id.replace('settings.', '')
+
+      const _client = cloneDeep(props.client)
+      
+      if(_client){
+        delete _client.settings[settingsProp]
+        props.setClient(_client)
+        return
+      }
+    
+    }
+
+    const client = { ...props.client };
+
+    setErrors(undefined);
+
+    let value: any = event.target.value;
+
+    if (event.target.id === 'settings.send_reminders'){
+      value = event.target.value === 'enabled' ? true : false
+    }
+
+    setClient(set(client as Client, event.target.id, value));
+
+  }
 
   const company = useInjectCompanyChanges();
   const handleCustomFieldChange = useHandleCustomFieldChange();
@@ -89,6 +119,8 @@ export function AdditionalInfo(props: Props) {
   const onSuccess = () => {
     queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
   };
+
+
 
   return (
     <Card className="mt-4" title={t('additional_info')}>
@@ -116,7 +148,7 @@ export function AdditionalInfo(props: Props) {
               <SelectField
                 id="settings.language_id"
                 defaultValue={props.client?.settings?.language_id || ''}
-                onChange={handleChange}
+                onChange={handleChangeSettings}
                 errorMessage={errors?.errors['settings.language_id']}
               >
                 <option value=""></option>
@@ -134,7 +166,7 @@ export function AdditionalInfo(props: Props) {
               <SelectField
                 id="settings.payment_terms"
                 defaultValue={props.client?.settings?.payment_terms || ''}
-                onChange={handleChange}
+                onChange={handleChangeSettings}
                 errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
@@ -154,7 +186,7 @@ export function AdditionalInfo(props: Props) {
               <SelectField
                 id="settings.valid_until"
                 defaultValue={props.client?.settings?.valid_until || ''}
-                onChange={handleChange}
+                onChange={handleChangeSettings}
                 errorMessage={errors?.errors['settings.valid_until']}
               >
                 <option value=""></option>
@@ -173,21 +205,27 @@ export function AdditionalInfo(props: Props) {
             <InputField
               id="settings.default_task_rate"
               value={props.client?.settings?.default_task_rate || ''}
-              onChange={handleChange}
+              onChange={handleChangeSettings}
               errorMessage={errors?.errors['settings.default_task_rate']}
             />
           </Element>
 
           <Element leftSide={t('send_reminders')}>
-            <Toggle
-              checked={Boolean(props.client?.settings?.send_reminders)}
-              onChange={(value) =>
-                props.setClient(
-                  (client) =>
-                    client && set(client, 'settings.send_reminders', value)
-                )
+
+            <SelectField
+              id="settings.send_reminders"
+              defaultValue={props.client?.settings?.hasOwnProperty('send_reminders') ? props.client?.settings?.send_reminders ? 'enabled' : 'disabled' : ''}
+              className={
+                'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
               }
-            />
+              onChange={(handleChangeSettings)}
+            >
+              <option value=""></option>
+              <option value="enabled">{`${t('enabled')}`}</option>
+              <option value="disabled">{`${t('disabled')}`}</option>
+            </SelectField>
+
+
           </Element>
         </div>
 
