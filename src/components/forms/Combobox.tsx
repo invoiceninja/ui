@@ -80,8 +80,8 @@ export function ComboboxStatic({
       : entries
           .filter(
             (entry) =>
-              entry.label.toLowerCase().includes(query.toLowerCase()) ||
-              entry.value.toString().toLowerCase().includes(query.toLowerCase())
+              entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
+              entry.value?.toString()?.toLowerCase()?.includes(query?.toLowerCase())
           )
           .filter((entry) =>
             exclude.length > 0 ? !exclude.includes(entry.value) : true
