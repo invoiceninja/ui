@@ -43,7 +43,7 @@ export function VendorSelector(props: VendorSelectorProps) {
         <DebouncedCombobox
           inputLabel={props.inputLabel}
           value="id"
-          endpoint="/api/v1/vendors"
+          endpoint="/api/v1/vendors?status=active"
           label="name"
           onChange={(value: Record<Vendor>) =>
             value.resource && props.onChange(value.resource)

@@ -46,6 +46,8 @@ export function useSave(params: Props) {
           route('/api/v1/expenses/:id', { id: expense.id })
         );
 
+        queryClient.invalidateQueries('/api/v1/expenses');
+
         navigate('/expenses');
       })
       .catch((error: AxiosError<ValidationBag>) => {

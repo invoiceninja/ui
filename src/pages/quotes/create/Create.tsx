@@ -90,6 +90,21 @@ export default function Create() {
       ) {
         const _quote = cloneDeep(data);
 
+        if (company && company.enabled_tax_rates > 0) {
+          _quote.tax_name1 = company.settings.tax_name1;
+          _quote.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _quote.tax_name2 = company.settings.tax_name2;
+          _quote.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _quote.tax_name3 = company.settings.tax_name3;
+          _quote.tax_rate3 = company.settings.tax_rate3;
+        }
+
         if (typeof _quote.line_items === 'string') {
           _quote.line_items = [];
         }
