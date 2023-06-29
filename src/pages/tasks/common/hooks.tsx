@@ -53,6 +53,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/tasks';
 import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
+import { CustomBulkAction } from '$app/components/DataTable';
 
 export const defaultColumns: string[] = [
   'status',
@@ -450,30 +451,10 @@ export function useActions() {
   return actions;
 }
 
-interface Params {
-  setInvoices: Dispatch<SetStateAction<Invoice[]>>;
-  setIsAddTasksOnInvoiceVisible: Dispatch<SetStateAction<boolean>>;
-}
-
-export const useCustomBulkActions = (params: Params) => {
-  const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
-
-  const fetchInvoicesForTasksAdding = useFetchInvoicesForTasksAdding({
-    setInvoices,
-    setIsAddTasksOnInvoiceVisible,
-  });
-
+export const useCustomBulkActions = () => {
   const customBulkActions: CustomBulkAction<Task>[] = [
-    (_, selectedTasks) => (
-      <DropdownElement
-        onClick={() =>
-          selectedTasks && fetchInvoicesForTasksAdding(selectedTasks)
-        }
-        icon={<Icon element={MdAddCircleOutline} />}
-      >
-        {trans('add_to_invoice', { invoice: '' })}
-      </DropdownElement>
-    ),
+    (_, selectedTasks) =>
+      selectedTasks && <AddTasksOnInvoiceAction tasks={selectedTasks} />,
   ];
 
   return customBulkActions;

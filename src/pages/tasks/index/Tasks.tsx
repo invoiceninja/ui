@@ -25,9 +25,6 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
-import { useState } from 'react';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { AddTasksOnInvoiceModal } from '../common/components/AddTasksOnInvoiceModal';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -35,11 +32,6 @@ export default function Tasks() {
   const [t] = useTranslation();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
-
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-
-  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
-    useState<boolean>(false);
 
   const columns = useTaskColumns();
 
@@ -49,10 +41,7 @@ export default function Tasks() {
 
   const taskColumns = useAllTaskColumns();
 
-  const customBulkActions = useCustomBulkActions({
-    setInvoices,
-    setIsAddTasksOnInvoiceVisible,
-  });
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -85,12 +74,6 @@ export default function Tasks() {
         }
         linkToCreateGuards={[permission('create_task')]}
         includeObjectSelection
-      />
-
-      <AddTasksOnInvoiceModal
-        visible={isAddTasksOnInvoiceVisible}
-        setVisible={setIsAddTasksOnInvoiceVisible}
-        invoices={invoices}
       />
     </Default>
   );
