@@ -22,7 +22,7 @@ interface Props {
 export function CompanyTaxDetails(props: Props) {
     const [t] = useTranslation();
 
-    const company = useCurrentCompany();
+    // const company = useCurrentCompany();
 
     return (
         <Modal
