@@ -103,7 +103,7 @@ export function AddTasksOnInvoiceAction(props: Props) {
       />
 
       <DropdownElement
-        onClick={() => handleOpenModal()}
+        onClick={handleOpenModal}
         icon={<Icon element={MdAddCircleOutline} />}
       >
         {trans('add_to_invoice', { invoice: '' })}
