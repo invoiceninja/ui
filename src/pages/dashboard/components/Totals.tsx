@@ -79,8 +79,8 @@ export function Totals() {
   const [dates, setDates] = useState<{ start_date: string, end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
-      new Date().getMonth() - 1,
-      new Date().getDate()
+      new Date().getMonth(),
+      1
     )
       .toISOString()
       .split('T')[0],
@@ -90,13 +90,13 @@ export function Totals() {
   const [body, setBody] = useState<{ start_date: string; end_date: string; date_range: string }>({
     start_date: new Date(
       new Date().getFullYear(),
-      new Date().getMonth() - 1,
-      new Date().getDate()
+      new Date().getMonth(),
+      1
     )
       .toISOString()
       .split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
-    date_range: 'last_month'
+    date_range: 'this_month'
   });
 
   const handleDateRangeChange = (dateRange: string) => {
@@ -126,7 +126,7 @@ export function Totals() {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
-        setCurrency(currency ?? parseInt(currencies[0].value));
+        setCurrency(parseInt(currencies[0].value) ?? 1);
         setCurrencies(currencies);
         setIsLoadingTotals(false);
         
@@ -234,7 +234,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.invoices.invoiced_amount || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString() ?? company.settings.currency_id
                       )}
                     </span>
                   </Badge>
@@ -247,7 +247,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.revenue.paid_to_date || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString() ?? company.settings.currency_id
                       )}
                     </span>
                   </Badge>
@@ -260,7 +260,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.outstanding.amount || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString() ?? company.settings.currency_id
                       )}
                     </span>
                   </Badge>

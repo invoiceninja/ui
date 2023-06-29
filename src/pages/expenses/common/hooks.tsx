@@ -54,6 +54,7 @@ import { AxiosResponse } from 'axios';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -95,31 +96,27 @@ export function useActions() {
   const AddToInvoice = ({ expense }: AddToInvoiceProps) => {
     const { data } = useQuery({
       queryFn: () => {
-        const url = new URL(endpoint('/api/v1/expenses?include=invoice.client'));
+        const url = new URL(endpoint('/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true'));
 
         if (expense.client_id) {
-          url.searchParams.set('has_invoices', `client,${expense.client_id}`);
-        }
-    
-        if (expense.project_id) {
-          url.searchParams.set('has_invoices', `project,${expense.project_id}`);
+          url.searchParams.set('client_id', expense.client_id);
         }
 
         return request('GET', url.href).then(
-          (response: AxiosResponse<GenericManyResponse<Expense>>) =>
+          (response: AxiosResponse<GenericManyResponse<Invoice>>) =>
             response.data
         )
       },
       enabled: showAddToInvoiceModal,
     });
 
-    const handle = (expense: Expense) => {
+    const handle = (invoice: Invoice) => {
       setInvoice(
         () =>
-          expense.invoice && {
-            ...expense.invoice,
+          invoice && {
+            ...invoice,
             line_items: [
-              ...expense.invoice.line_items,
+              ...invoice.line_items,
               {
                 ...blankLineItem(),
                 type_id: InvoiceItemType.Product,
@@ -153,7 +150,7 @@ export function useActions() {
       );
 
       navigate(
-        route(`/invoices/${expense?.invoice?.id}/edit?action=invoice_expense`)
+        route(`/invoices/${invoice?.id}/edit?action=invoice_expense`)
       );
     };
 
@@ -166,25 +163,25 @@ export function useActions() {
 
     return (
       <Modal
-        title={t('add_to_invoice')}
+        title={t('action_add_to_invoice')}
         onClose={setShowAddToInvoiceModal}
         visible={showAddToInvoiceModal}
       >
-        {data.data.map((expense) =>
-          expense.invoice ? (
+        {data.data.map((invoice) =>
+          invoice ? (
             <button
-              key={expense.id}
-              onClick={() => handle(expense)}
+              key={invoice.id}
+              onClick={() => handle(invoice)}
               className="inline-flex items-center justify-between"
             >
-              <p>{expense.invoice?.number}</p>
+              <p>{invoice?.number}</p>
 
               <p>
                 {formatMoney(
-                  expense.invoice.amount,
-                  expense.invoice.client?.country_id ??
+                  invoice.amount,
+                  invoice.client?.country_id ??
                     company.settings.country_id,
-                  expense.invoice.client?.settings.currency_id
+                  invoice.client?.settings.currency_id
                 )}
               </p>
             </button>
@@ -215,7 +212,7 @@ export function useActions() {
             onClick={() => setShowAddToInvoiceModal(true)}
             icon={<Icon element={MdTextSnippet} />}
           >
-            {t('add_to_invoice')}
+            {t('action_add_to_invoice')}
           </DropdownElement>
         </>
       ),
