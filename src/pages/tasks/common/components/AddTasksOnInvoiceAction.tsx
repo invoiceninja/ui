@@ -44,6 +44,12 @@ export function AddTasksOnInvoiceAction(props: Props) {
 
     const clientIdsOfSelectedTasks = tasks.map((task) => task.client_id);
 
+    const isAnyClientEmpty = clientIdsOfSelectedTasks.some((id) => !id);
+
+    if (isAnyClientEmpty) {
+      return toast.error('no_invoices_found');
+    }
+
     if (clientIdsOfSelectedTasks.length) {
       const clientId = clientIdsOfSelectedTasks[0];
 
