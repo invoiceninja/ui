@@ -17,7 +17,6 @@ import { useQuery } from 'react-query';
 
 interface InvoiceParams extends Params {
   clientStatus?: string;
-  taskStatus?: string;
   clientId?: string;
   withoutDeletedClients?: boolean;
   enabled?: boolean;
@@ -30,7 +29,7 @@ export function useInvoicesQuery(params: InvoiceParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page&status=:taskStatus',
+          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
@@ -38,7 +37,6 @@ export function useInvoicesQuery(params: InvoiceParams) {
             client_id: params.clientId ?? '',
             filter: params.filter ?? '',
             without_deleted_clients: params.withoutDeletedClients || true,
-            taskStatus: params.taskStatus ?? 'all',
           }
         )
       ).then(
