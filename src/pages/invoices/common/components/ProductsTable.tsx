@@ -66,7 +66,7 @@ export function ProductsTable(props: Props) {
 
   const isEditPage = location.pathname.includes(id!);
 
-  const resolveTranslation = useResolveTranslation();
+  const resolveTranslation = useResolveTranslation({ type: props.type });
 
   const resolveInputField = useResolveInputField({
     type: props.type,
