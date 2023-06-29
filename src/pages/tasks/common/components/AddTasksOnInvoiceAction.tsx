@@ -93,7 +93,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
     );
   };
 
-  return (tasks[0].client_id && !tasks[0].invoice_id) || isBulkAction ? (
+  return (tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
+    isBulkAction ? (
     <>
       <AddTasksOnInvoiceModal
         visible={isModalVisible}

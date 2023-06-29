@@ -454,7 +454,9 @@ export function useActions() {
 export const useCustomBulkActions = () => {
   const customBulkActions: CustomBulkAction<Task>[] = [
     (_, selectedTasks) =>
-      selectedTasks && <AddTasksOnInvoiceAction tasks={selectedTasks} />,
+      selectedTasks && (
+        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+      ),
   ];
 
   return customBulkActions;
