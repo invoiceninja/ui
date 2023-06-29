@@ -61,10 +61,6 @@ export function AddTasksOnInvoiceModal(props: Props) {
             )
           )
             .then((response: GenericSingleResourceResponse<Invoice[]>) => {
-              toast.dismiss();
-
-              console.log(response.data.data);
-
               if (!response.data.data.length) {
                 return toast.error('no_invoices_found');
               }
