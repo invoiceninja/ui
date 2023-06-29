@@ -44,6 +44,12 @@ export function AddTasksOnInvoiceAction(props: Props) {
 
     const clientIdsOfSelectedTasks = tasks.map((task) => task.client_id);
 
+    const isAnyClientEmpty = clientIdsOfSelectedTasks.some((id) => !id);
+
+    if (isAnyClientEmpty) {
+      return toast.error('no_invoices_found');
+    }
+
     if (clientIdsOfSelectedTasks.length) {
       const clientId = clientIdsOfSelectedTasks[0];
 
@@ -93,7 +99,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
     );
   };
 
-  return (tasks[0].client_id && !tasks[0].invoice_id) || isBulkAction ? (
+  return (tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
+    isBulkAction ? (
     <>
       <AddTasksOnInvoiceModal
         visible={isModalVisible}

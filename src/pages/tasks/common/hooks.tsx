@@ -53,6 +53,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/tasks';
 import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
+import { CustomBulkAction } from '$app/components/DataTable';
 
 export const defaultColumns: string[] = [
   'status',
@@ -449,3 +450,14 @@ export function useActions() {
 
   return actions;
 }
+
+export const useCustomBulkActions = () => {
+  const customBulkActions: CustomBulkAction<Task>[] = [
+    (_, selectedTasks) =>
+      selectedTasks && (
+        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+      ),
+  ];
+
+  return customBulkActions;
+};
