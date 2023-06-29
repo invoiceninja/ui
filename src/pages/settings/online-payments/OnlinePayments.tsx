@@ -163,7 +163,9 @@ export function OnlinePayments() {
 
         <Element leftSide={t('manual_payment_email')}>
           <Toggle
-            checked={company?.settings?.client_manual_payment_notification}
+            checked={Boolean(
+              company?.settings?.client_manual_payment_notification
+            )}
             onChange={(value: boolean) =>
               handleToggleChange(
                 'settings.client_manual_payment_notification',
@@ -175,7 +177,9 @@ export function OnlinePayments() {
 
         <Element leftSide={t('online_payment_email')}>
           <Toggle
-            checked={company?.settings?.client_online_payment_notification}
+            checked={Boolean(
+              company?.settings?.client_online_payment_notification
+            )}
             onChange={(value: boolean) =>
               handleToggleChange(
                 'settings.client_online_payment_notification',
@@ -190,7 +194,7 @@ export function OnlinePayments() {
           leftSideHelp={t('mark_paid_payment_email_help')}
         >
           <Toggle
-            checked={company?.settings?.mark_paid_payment_email || false}
+            checked={Boolean(company?.settings?.mark_paid_payment_email)}
             onChange={(value: boolean) =>
               handleToggleChange('settings.mark_paid_payment_email', value)
             }
