@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { Task } from '$app/common/interfaces/task';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
@@ -16,6 +16,12 @@ import { useState } from 'react';
 import { MdAddCircleOutline } from 'react-icons/md';
 import { AddTasksOnInvoiceModal } from './AddTasksOnInvoiceModal';
 import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { AxiosError } from 'axios';
+import { route } from '$app/common/helpers/route';
+import { useQueryClient } from 'react-query';
 
 interface Props {
   tasks: Task[];
@@ -25,7 +31,11 @@ interface Props {
 export function AddTasksOnInvoiceAction(props: Props) {
   const { tasks, isBulkAction } = props;
 
+  const queryClient = useQueryClient();
+
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   const handleOpenModal = () => {
     if (!tasks.length) {
@@ -46,7 +56,41 @@ export function AddTasksOnInvoiceAction(props: Props) {
       }
     }
 
-    setIsModalVisible(true);
+    toast.processing();
+
+    queryClient.fetchQuery(
+      route(
+        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+        {
+          clientId: tasks[0].client_id,
+        }
+      ),
+      () =>
+        request(
+          'GET',
+          endpoint(
+            '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+            {
+              clientId: tasks[0].client_id,
+            }
+          )
+        )
+          .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+            toast.dismiss();
+
+            if (!response.data.data.length) {
+              return toast.error('no_invoices_found');
+            }
+
+            setInvoices(response.data.data);
+
+            setIsModalVisible(true);
+          })
+          .catch((error: AxiosError) => {
+            toast.error();
+            console.error(error);
+          })
+    );
   };
 
   return (tasks[0].client_id && !tasks[0].invoice_id) || isBulkAction ? (
@@ -54,8 +98,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
       <AddTasksOnInvoiceModal
         visible={isModalVisible}
         setVisible={setIsModalVisible}
-        clientId={tasks[0].client_id}
         tasks={tasks}
+        invoices={invoices}
       />
 
       <DropdownElement
