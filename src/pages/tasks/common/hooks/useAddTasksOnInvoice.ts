@@ -10,9 +10,8 @@
 
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { tasksToAddOnInvoiceAtom } from '../components/AddTasksOnInvoiceModal';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { parseTimeLog } from '../helpers/calculate-time';
@@ -24,21 +23,19 @@ import {
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import { route } from '$app/common/helpers/route';
-import { Dispatch, SetStateAction } from 'react';
+import { Task } from '$app/common/interfaces/task';
 
 interface Params {
-  setVisible: Dispatch<SetStateAction<boolean>>;
+  tasks: Task[];
 }
 
 export function useAddTasksOnInvoice(params: Params) {
   const navigate = useNavigate();
 
-  const { setVisible } = params;
+  const { tasks } = params;
 
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { timeFormat } = useCompanyTimeFormat();
-
-  const tasks = useAtomValue(tasksToAddOnInvoiceAtom);
 
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
@@ -80,8 +77,6 @@ export function useAddTasksOnInvoice(params: Params) {
         invoice.line_items.push(item);
 
         setInvoiceAtom(invoice);
-
-        setVisible(false);
 
         navigate(
           route('/invoices/:id/edit?action=add_tasks&table=tasks', {
