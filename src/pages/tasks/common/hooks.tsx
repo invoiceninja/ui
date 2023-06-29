@@ -9,7 +9,7 @@
  */
 
 import { Link } from '$app/components/forms';
-import { date, endpoint, getEntityState, trans } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,7 +26,6 @@ import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
-  MdAddCircleOutline,
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
@@ -51,11 +50,9 @@ import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { Dispatch, SetStateAction } from 'react';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/tasks';
-import { useFetchInvoicesForTasksAdding } from './hooks/useFetchInvoicesForTasksAdding';
+import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
 
 export const defaultColumns: string[] = [
   'status',
@@ -330,19 +327,12 @@ export function useTaskFilters() {
   return filters;
 }
 
-interface Params {
-  setInvoices: Dispatch<SetStateAction<Invoice[]>>;
-  setIsAddTasksOnInvoiceVisible: Dispatch<SetStateAction<boolean>>;
-}
-
-export function useActions(params: Params) {
+export function useActions() {
   const { id } = useParams();
 
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
-  const { setInvoices, setIsAddTasksOnInvoiceVisible } = params;
 
   const location = useLocation();
 
@@ -360,11 +350,6 @@ export function useActions(params: Params) {
   const invoiceTask = useInvoiceTask();
 
   const setTask = useSetAtom(taskAtom);
-
-  const fetchInvoicesForTasksAdding = useFetchInvoicesForTasksAdding({
-    setInvoices,
-    setIsAddTasksOnInvoiceVisible,
-  });
 
   const cloneToTask = (task: Task) => {
     setTask({ ...task, id: '', documents: [], number: '', invoice_id: '' });
@@ -418,16 +403,7 @@ export function useActions(params: Params) {
           {t('invoice_task')}
         </DropdownElement>
       ),
-    (task: Task) =>
-      task.client_id &&
-      !task.invoice_id && (
-        <DropdownElement
-          onClick={() => fetchInvoicesForTasksAdding([task])}
-          icon={<Icon element={MdAddCircleOutline} />}
-        >
-          {trans('add_to_invoice', { invoice: '' })}
-        </DropdownElement>
-      ),
+    (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
     (task: Task) => (
       <DropdownElement
         onClick={() => cloneToTask(task)}

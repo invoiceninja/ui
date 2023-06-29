@@ -39,9 +39,6 @@ import {
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
-import { useState } from 'react';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { AddTasksOnInvoiceModal } from '$app/pages/tasks/common/components/AddTasksOnInvoiceModal';
 
 dayjs.extend(duration);
 
@@ -50,11 +47,6 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-
-  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
-    useState<boolean>(false);
 
   const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
@@ -74,10 +66,7 @@ export default function Show() {
   });
 
   const projectActions = useProjectsActions();
-  const taskActions = useTasksActions({
-    setInvoices,
-    setIsAddTasksOnInvoiceVisible,
-  });
+  const taskActions = useTasksActions();
   const columns = useTaskColumns();
   const formatMoney = useFormatMoney();
 
@@ -180,12 +169,6 @@ export default function Show() {
           linkToCreateGuards={[permission('create_task')]}
         />
       </div>
-
-      <AddTasksOnInvoiceModal
-        visible={isAddTasksOnInvoiceVisible}
-        setVisible={setIsAddTasksOnInvoiceVisible}
-        invoices={invoices}
-      />
     </Default>
   );
 }

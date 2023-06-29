@@ -28,8 +28,6 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { AddTasksOnInvoiceModal } from '../common/components/AddTasksOnInvoiceModal';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
@@ -42,17 +40,9 @@ export default function Edit() {
 
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-
-  const [isAddTasksOnInvoiceVisible, setIsAddTasksOnInvoiceVisible] =
-    useState<boolean>(false);
-
   const queryClient = useQueryClient();
 
-  const actions = useActions({
-    setInvoices,
-    setIsAddTasksOnInvoiceVisible,
-  });
+  const actions = useActions();
 
   useEffect(() => {
     if (data) {
@@ -111,12 +101,6 @@ export default function Edit() {
         <TaskDetails task={task} handleChange={handleChange} errors={errors} />
       )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
-
-      <AddTasksOnInvoiceModal
-        visible={isAddTasksOnInvoiceVisible}
-        setVisible={setIsAddTasksOnInvoiceVisible}
-        invoices={invoices}
-      />
     </Default>
   );
 }

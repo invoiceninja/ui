@@ -8,29 +8,76 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { Task } from '$app/common/interfaces/task';
 import { Modal } from '$app/components/Modal';
-import { atom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useAddTasksOnInvoice } from '../hooks/useAddTasksOnInvoice';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { toast } from '$app/common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { AxiosError } from 'axios';
+import { request } from '$app/common/helpers/request';
+import { useQueryClient } from 'react-query';
+import { route } from '$app/common/helpers/route';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
-  invoices: Invoice[];
+  tasks: Task[];
+  clientId: string;
 }
 
-export const tasksToAddOnInvoiceAtom = atom<Task[] | null>(null);
-
 export function AddTasksOnInvoiceModal(props: Props) {
-  const { visible, setVisible, invoices } = props;
+  const { visible, setVisible, tasks, clientId } = props;
+
+  const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
 
-  const addTasksOnInvoice = useAddTasksOnInvoice({ setVisible });
+  const addTasksOnInvoice = useAddTasksOnInvoice({ tasks });
+
+  const [invoices, setInvoices] = useState<Invoice[]>();
+
+  useEffect(() => {
+    if (visible) {
+      queryClient.fetchQuery(
+        route(
+          '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+          {
+            clientId,
+          }
+        ),
+        () =>
+          request(
+            'GET',
+            endpoint(
+              '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+              {
+                clientId,
+              }
+            )
+          )
+            .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+              toast.dismiss();
+
+              console.log(response.data.data);
+
+              if (!response.data.data.length) {
+                return toast.error('no_invoices_found');
+              }
+
+              setInvoices(response.data.data);
+            })
+            .catch((error: AxiosError) => {
+              toast.error();
+              console.error(error);
+            })
+      );
+    }
+  }, [clientId, visible]);
 
   return (
     <Modal
@@ -39,7 +86,7 @@ export function AddTasksOnInvoiceModal(props: Props) {
       onClose={() => setVisible(false)}
     >
       <div className="flex flex-col overflow-y-auto max-h-96">
-        {invoices.map((invoice, index) => (
+        {invoices?.map((invoice, index) => (
           <div
             key={index}
             className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 px-3"
@@ -56,6 +103,8 @@ export function AddTasksOnInvoiceModal(props: Props) {
             </span>
           </div>
         ))}
+
+        {!invoices && <Spinner />}
       </div>
     </Modal>
   );
