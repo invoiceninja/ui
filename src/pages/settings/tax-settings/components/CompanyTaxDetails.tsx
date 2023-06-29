@@ -13,7 +13,6 @@ import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 
 interface Props {
     isModalOpen: boolean;
