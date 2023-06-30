@@ -18,7 +18,6 @@ import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolve
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
@@ -43,6 +42,7 @@ import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 import { Alert } from '$app/components/Alert';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -206,19 +206,15 @@ export default function Create() {
       <Container>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
-            <DebouncedCombobox
-              endpoint="/api/v1/clients"
-              label="name"
-              onChange={(value: Record<Client>) => {
-                handleChange('client_id', value.resource?.id as string);
-
-                handleChange(
-                  'currency_id',
-                  value.resource?.settings.currency_id
-                );
+            <ClientSelector
+              onChange={(client) => {
+                handleChange('client_id', client?.id as string);
+                handleChange('currency_id', client?.settings.currency_id);
               }}
-              defaultValue={payment?.client_id}
               errorMessage={errors?.errors.client_id}
+              defaultValue={payment?.client_id}
+              value={payment?.client_id}
+              readonly={searchParams.has('invoice')}
             />
           </Element>
 
