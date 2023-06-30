@@ -25,12 +25,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Field } from '$app/pages/settings/custom-fields/components';
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
@@ -199,14 +194,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <SelectField
               id="settings.send_reminders"
               defaultValue={
-                Object.prototype.hasOwnProperty.call(
-                  client?.settings,
-                  'send_reminders'
-                )
-                  ? client?.settings?.send_reminders
-                    ? 'enabled'
-                    : 'disabled'
-                  : ''
+                client?.settings?.send_reminders === ''
+                  ? ''
+                  : client?.settings.send_reminders === true
+                  ? 'enabled'
+                  : 'disabled'
               }
               className={
                 'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
@@ -214,7 +206,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               onValueChange={(value) =>
                 handleSettingsChange(
                   'send_reminders',
-                  value === 'enabled' ? true : false
+                  value === '' ? '' : value === 'enabled' ? true : false
                 )
               }
               withBlank
