@@ -241,7 +241,7 @@ export function EmailSettings() {
               {t('default')}
             </option>
             {isHosted() && <option value="gmail">Gmail</option>}
-            {isHosted() && <option value="microsoft">Microsoft</option>}
+            {isHosted() && <option value="office365">Microsoft</option>}
             <option value="client_postmark">Postmark</option>
             <option value="client_mailgun">Mailgun</option>
           </SelectField>
