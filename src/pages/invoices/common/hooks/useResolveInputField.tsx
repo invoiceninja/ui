@@ -232,7 +232,7 @@ export function useResolveInputField(props: Props) {
             initialValue={resource?.line_items[index][property] as string}
             className="auto"
             onChange={(value: string) => {
-              onChange(property, parseFloat(value), index);
+              onChange(property, isNaN(parseFloat(value)) ? 0 : parseFloat(value), index);
             }}
           />
         )

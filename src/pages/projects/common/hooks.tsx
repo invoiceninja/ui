@@ -44,6 +44,8 @@ import { Task } from '$app/common/interfaces/task';
 import { AxiosError } from 'axios';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
+import { CustomBulkAction } from '$app/components/DataTable';
 
 export const defaultColumns: string[] = [
   'name',
@@ -367,3 +369,38 @@ export function useActions() {
 
   return actions;
 }
+
+export const useCustomBulkActions = () => {
+  const [t] = useTranslation();
+  const invoiceProject = useInvoiceProject();
+  const combineProjectsTasks = useCombineProjectsTasks();
+
+  const handleInvoiceProjects = (tasks: Task[] | null) => {
+    if (tasks && !tasks.length) {
+      return toast.error('no_assigned_tasks');
+    }
+
+    if (!tasks) {
+      return toast.error('multiple_client_error');
+    }
+
+    invoiceProject(tasks);
+  };
+
+  const customBulkActions: CustomBulkAction<Project>[] = [
+    (selectedIds, selectedProjects) => (
+      <DropdownElement
+        onClick={async () =>
+          handleInvoiceProjects(
+            await combineProjectsTasks(selectedIds, selectedProjects)
+          )
+        }
+        icon={<Icon element={MdTextSnippet} />}
+      >
+        {t('invoice_project')}
+      </DropdownElement>
+    ),
+  ];
+
+  return customBulkActions;
+};
