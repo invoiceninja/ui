@@ -195,7 +195,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             />
           </Element>
 
-          <Element leftSide={t('send_reminders')}>
+          {/* <Element leftSide={t('send_reminders')}>
             <SelectField
               id="settings.send_reminders"
               defaultValue={
@@ -222,7 +222,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
             </SelectField>
-          </Element>
+          </Element> */}
         </div>
 
         <div>
