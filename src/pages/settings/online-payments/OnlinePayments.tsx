@@ -93,11 +93,10 @@ export function OnlinePayments() {
 
         <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
           <SelectField
-            value={company?.settings?.auto_bill}
+            value={company?.settings?.auto_bill || 'off'}
             onChange={handleChange}
             id="settings.auto_bill"
           >
-            <option defaultChecked></option>
             <option value="always">
               {t('enabled')} ({t('auto_bill_help_always')})
             </option>
