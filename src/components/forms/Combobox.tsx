@@ -81,7 +81,10 @@ export function ComboboxStatic({
           .filter(
             (entry) =>
               entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
-              entry.value?.toString()?.toLowerCase()?.includes(query?.toLowerCase())
+              entry.value
+                ?.toString()
+                ?.toLowerCase()
+                ?.includes(query?.toLowerCase())
           )
           .filter((entry) =>
             exclude.length > 0 ? !exclude.includes(entry.value) : true
@@ -103,7 +106,7 @@ export function ComboboxStatic({
         return onEmptyValues(query);
       }
     },
-    1000,
+    600,
     [filteredValues]
   );
 
