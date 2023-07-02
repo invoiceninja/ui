@@ -40,10 +40,10 @@ export function useHandleCompanySave() {
       return;
     }
 
-    const adjustedToaster =
+    const adjustedExcludeToaster =
       typeof excludeToasters === 'boolean' && !excludeToasters;
 
-    !adjustedToaster && toast.processing();
+    !adjustedExcludeToaster && toast.processing();
 
     setErrors(undefined);
 
@@ -55,14 +55,14 @@ export function useHandleCompanySave() {
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-        !adjustedToaster && toast.dismiss();
+        !adjustedExcludeToaster && toast.dismiss();
 
         if (hasLanguageChanged) {
           queryClient.invalidateQueries('/api/v1/statics');
           setHasLanguageIdChanged(false);
         }
 
-        !adjustedToaster && toast.success('updated_settings');
+        !adjustedExcludeToaster && toast.success('updated_settings');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
