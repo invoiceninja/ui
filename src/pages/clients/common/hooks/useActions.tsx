@@ -24,10 +24,11 @@ import {
   MdCloudCircle,
   MdDelete,
   MdDeleteForever,
+  MdEdit,
   MdPictureAsPdf,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useBulk } from './useBulk';
 
 interface Params {
@@ -42,7 +43,24 @@ export function useActions(params: Params) {
   const bulk = useBulk();
   const location = useLocation();
 
+  const { id } = useParams();
+
+  const navigate = useNavigate();
+
+  const isOverviewPage =
+    location.pathname.includes(id!) && !location.pathname.includes('/edit');
+
   const actions: Action<Client>[] = [
+    () =>
+      isOverviewPage && (
+        <DropdownElement
+          onClick={() => navigate(route('/clients/:id/edit', { id }))}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => isOverviewPage && <Divider withoutPadding />,
     (client) =>
       !client.is_deleted && (
         <DropdownElement

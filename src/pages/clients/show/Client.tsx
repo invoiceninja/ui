@@ -29,7 +29,6 @@ import { Gateways } from './components/Gateways';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
-import { Button } from '$app/components/forms';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -100,19 +99,13 @@ export default function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <div className="flex space-x-3">
-          <Button to={route('/clients/:id/edit', { id })}>
-            {t('edit_client')}
-          </Button>
-
-          {client && (
-            <ResourceActions
-              label={t('more_actions')}
-              resource={client}
-              actions={actions}
-            />
-          )}
-        </div>
+        client && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={client}
+            actions={actions}
+          />
+        )
       }
     >
       {isLoading && <Spinner />}
@@ -124,9 +117,7 @@ export default function Client() {
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
-            {client.gateway_tokens.length > 0 && (
-              <Gateways client={client} />
-            )}
+            {client.gateway_tokens.length > 0 && <Gateways client={client} />}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />

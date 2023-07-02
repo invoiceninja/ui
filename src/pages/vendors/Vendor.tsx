@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCountries } from '$app/common/hooks/useCountries';
@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
-import { Inline } from '$app/components/Inline';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -72,19 +71,13 @@ export default function Vendor() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <Inline>
-          <Button to={route('/vendors/:id/edit', { id })}>
-            {t('edit_vendor')}
-          </Button>
-
-          {vendor && (
-            <ResourceActions
-              label={t('more_actions')}
-              resource={vendor}
-              actions={actions}
-            />
-          )}
-        </Inline>
+        vendor && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={vendor}
+            actions={actions}
+          />
+        )
       }
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">

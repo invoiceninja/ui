@@ -12,25 +12,42 @@ import { getEntityState } from '$app/common/helpers';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '$app/components/icons/Icon';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
+import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulkAction } from '$app/common/queries/vendor';
 import { Vendor } from '$app/common/interfaces/vendor';
+import { route } from '$app/common/helpers/route';
+import { Divider } from '$app/components/cards/Divider';
 
 export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
   const { id } = useParams();
 
+  const navigate = useNavigate();
+
   const bulk = useBulkAction();
 
-  const isEditPage = location.pathname.includes(id!);
+  const showBulkActions = location.pathname.includes(id!);
+
+  const shouldShowEditAction =
+    location.pathname.includes(id!) && !location.pathname.includes('/edit');
 
   const actions: Action<Vendor>[] = [
+    () =>
+      shouldShowEditAction && (
+        <DropdownElement
+          onClick={() => navigate(route('/vendors/:id/edit', { id }))}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => shouldShowEditAction && <Divider withoutPadding />,
     (vendor) =>
-      isEditPage &&
+      showBulkActions &&
       getEntityState(vendor) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(vendor.id, 'archive')}
@@ -40,7 +57,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      showBulkActions &&
       (getEntityState(vendor) === EntityState.Archived ||
         getEntityState(vendor) === EntityState.Deleted) && (
         <DropdownElement
@@ -51,7 +68,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      showBulkActions &&
       (getEntityState(vendor) === EntityState.Active ||
         getEntityState(vendor) === EntityState.Archived) && (
         <DropdownElement
