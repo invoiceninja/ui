@@ -295,6 +295,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/credits/create?action=clone');
@@ -315,6 +316,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/invoices/create?action=clone');
@@ -335,6 +337,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/quotes/create?action=clone');
@@ -354,6 +357,7 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
+      po_number: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -372,6 +376,7 @@ export function useActions() {
       subscription_id: '',
       status_id: '1',
       vendor_id: '',
+      po_number: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
