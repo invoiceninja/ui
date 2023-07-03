@@ -11,6 +11,7 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import {
+  useActions,
   useExpenseColumns,
   useExpenseFilters,
 } from '$app/pages/expenses/common/hooks';
@@ -25,6 +26,8 @@ export default function Expenses() {
 
   const filters = useExpenseFilters();
 
+  const actions = useActions();
+
   return (
     <DataTable
       resource="expense"
@@ -36,6 +39,7 @@ export default function Expenses() {
       )}
       columns={columns}
       customFilters={filters}
+      customActions={actions}
       customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions
