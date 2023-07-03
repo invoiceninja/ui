@@ -27,7 +27,6 @@ import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
 
-
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { FormEvent, useEffect, useState } from 'react';
@@ -203,6 +202,7 @@ export default function Create() {
       disableSaveButton={!payment}
     >
       <Container>
+        Client: {payment?.client_id}
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
@@ -339,7 +339,7 @@ export default function Create() {
               <Element key={index}>
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-2">
-                    <ComboboxAsync
+                    <ComboboxAsync<Credit>
                       inputOptions={{
                         value: credit.credit_id,
                         label: t('credit') ?? '',
