@@ -253,7 +253,8 @@ export function useActions() {
   const shouldShowEditAction =
     location.pathname.includes(id!) && !location.pathname.includes('/edit');
 
-  const isEditOrShowPage = location.pathname.includes(id!);
+  const isEditOrShowPage =
+    location.pathname.includes(id!) && location.pathname.includes('/edit');
 
   const setProject = useSetAtom(projectAtom);
 

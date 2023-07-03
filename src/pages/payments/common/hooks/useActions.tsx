@@ -34,7 +34,8 @@ export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
 
-  const isEditPage = location.pathname.includes(id!);
+  const isEditPage =
+    location.pathname.includes(id!) && location.pathname.includes('/edit');
 
   const bulk = useBulk();
 

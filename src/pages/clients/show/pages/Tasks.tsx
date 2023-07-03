@@ -10,7 +10,12 @@
 
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
-import { useTaskColumns, useTaskFilters } from '$app/pages/tasks/common/hooks';
+import {
+  useActions,
+  useCustomBulkActions,
+  useTaskColumns,
+  useTaskFilters,
+} from '$app/pages/tasks/common/hooks';
 import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;
@@ -21,6 +26,10 @@ export default function Tasks() {
   const columns = useTaskColumns();
 
   const filters = useTaskFilters();
+
+  const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <DataTable
@@ -33,6 +42,8 @@ export default function Tasks() {
       )}
       columns={columns}
       customFilters={filters}
+      customActions={actions}
+      customBulkActions={customBulkActions}
       customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions

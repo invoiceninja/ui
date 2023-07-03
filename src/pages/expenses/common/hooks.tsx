@@ -66,7 +66,8 @@ export function useActions() {
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
-  const isEditPage = location.pathname.includes(id!);
+  const isEditPage =
+    location.pathname.includes(id!) && location.pathname.includes('/edit');
   const { create, calculatedTaxRate } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
@@ -96,7 +97,11 @@ export function useActions() {
   const AddToInvoice = ({ expense }: AddToInvoiceProps) => {
     const { data } = useQuery({
       queryFn: () => {
-        const url = new URL(endpoint('/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true'));
+        const url = new URL(
+          endpoint(
+            '/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true'
+          )
+        );
 
         if (expense.client_id) {
           url.searchParams.set('client_id', expense.client_id);
@@ -105,7 +110,7 @@ export function useActions() {
         return request('GET', url.href).then(
           (response: AxiosResponse<GenericManyResponse<Invoice>>) =>
             response.data
-        )
+        );
       },
       enabled: showAddToInvoiceModal,
     });
@@ -149,9 +154,7 @@ export function useActions() {
           }
       );
 
-      navigate(
-        route(`/invoices/${invoice?.id}/edit?action=invoice_expense`)
-      );
+      navigate(route(`/invoices/${invoice?.id}/edit?action=invoice_expense`));
     };
 
     const formatMoney = useFormatMoney();
@@ -179,8 +182,7 @@ export function useActions() {
               <p>
                 {formatMoney(
                   invoice.amount,
-                  invoice.client?.country_id ??
-                    company.settings.country_id,
+                  invoice.client?.country_id ?? company.settings.country_id,
                   invoice.client?.settings.currency_id
                 )}
               </p>
