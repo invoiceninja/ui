@@ -294,7 +294,7 @@ interface ComboboxAsyncProps<T> {
   staleTime?: number;
   initiallyVisible?: boolean;
   querySpecificEntry?: string;
-  sortBy?: string;
+  sortBy?: string | null;
   exclude?: (string | number | boolean)[];
   action?: Action;
   nullable?: boolean;
@@ -322,7 +322,10 @@ export function ComboboxAsync<T = any>({
   const { data } = useQuery(
     [url.pathname, url.searchParams.toString()],
     () => {
-      url.searchParams.set('sort', sortBy);
+      if (sortBy) {
+        url.searchParams.set('sort', sortBy);
+      }
+
       url.searchParams.set('status', 'active');
 
       if (inputOptions.value) {
