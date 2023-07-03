@@ -340,6 +340,10 @@ export function useActions() {
   const isEditPage =
     location.pathname.includes(id!) && location.pathname.includes('/edit');
 
+  const showEditAction =
+    (location.pathname.includes(id!) && !location.pathname.includes('/edit')) ||
+    location.pathname.endsWith('/tasks');
+
   const company = useCurrentCompany();
 
   const start = useStart();
@@ -360,7 +364,7 @@ export function useActions() {
 
   const actions = [
     (task: Task) =>
-      isEditPage &&
+      showEditAction &&
       (!task.invoice_id || !company?.invoice_task_lock) && (
         <DropdownElement
           onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
@@ -370,7 +374,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      showEditAction &&
       (!task.invoice_id || !company?.invoice_task_lock) && (
         <Divider withoutPadding />
       ),

@@ -49,7 +49,6 @@ export default function Tasks() {
       withResourcefulActions
       bulkRoute="/api/v1/tasks/bulk"
       linkToCreate={route('/tasks/create?client=:id', { id })}
-      linkToEdit="/tasks/:id/edit"
       staleTime={dataTableStaleTime}
     />
   );

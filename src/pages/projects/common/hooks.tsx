@@ -254,7 +254,7 @@ export function useActions() {
     location.pathname.includes(id!) && !location.pathname.includes('/edit');
 
   const isEditOrShowPage =
-    location.pathname.includes(id!) && location.pathname.includes('/edit');
+    location.pathname.includes(id!) && !location.pathname.includes('/clients');
 
   const setProject = useSetAtom(projectAtom);
 
