@@ -47,7 +47,7 @@ export default function Expenses() {
     >
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor&sort=id|desc"
+        endpoint="/api/v1/expenses?include=client,vendor,category&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"

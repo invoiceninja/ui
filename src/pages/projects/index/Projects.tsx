@@ -16,6 +16,7 @@ import {
   defaultColumns,
   useActions,
   useAllProjectColumns,
+  useCustomBulkActions,
   useProjectColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -34,6 +35,8 @@ export default function Projects() {
 
   const projectColumns = useAllProjectColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default
       title={t('projects')}
@@ -43,10 +46,11 @@ export default function Projects() {
     >
       <DataTable
         resource="project"
-        endpoint="/api/v1/projects?sort=id|desc"
+        endpoint="/api/v1/projects?status=active&sort=id|desc"
         bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}
+        customBulkActions={customBulkActions}
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions
@@ -58,6 +62,7 @@ export default function Projects() {
           />
         }
         linkToCreateGuards={[permission('create_project')]}
+        includeObjectSelection
       />
     </Default>
   );

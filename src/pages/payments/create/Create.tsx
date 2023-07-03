@@ -18,7 +18,6 @@ import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolve
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
@@ -42,6 +41,8 @@ import { v4 } from 'uuid';
 import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
+import { Alert } from '$app/components/Alert';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -74,7 +75,9 @@ export default function Create() {
 
   const [payment, setPayment] = useState<PaymentOnCreation>();
   const [errors, setErrors] = useState<ValidationBag>();
-  const [sendEmail, setSendEmail] = useState(company?.settings?.client_manual_payment_notification);
+  const [sendEmail, setSendEmail] = useState(
+    company?.settings?.client_manual_payment_notification
+  );
   const [convertCurrency, setConvertCurrency] = useState(false);
 
   const { data: blankPayment } = useBlankPaymentQuery();
@@ -203,19 +206,15 @@ export default function Create() {
       <Container>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
-            <DebouncedCombobox
-              endpoint="/api/v1/clients"
-              label="name"
-              onChange={(value: Record<Client>) => {
-                handleChange('client_id', value.resource?.id as string);
-
-                handleChange(
-                  'currency_id',
-                  value.resource?.settings.currency_id
-                );
+            <ClientSelector
+              onChange={(client) => {
+                handleChange('client_id', client?.id as string);
+                handleChange('currency_id', client?.settings.currency_id);
               }}
-              defaultValue={payment?.client_id}
               errorMessage={errors?.errors.client_id}
+              defaultValue={payment?.client_id}
+              value={payment?.client_id}
+              readonly={searchParams.has('invoice')}
             />
           </Element>
 
@@ -224,7 +223,10 @@ export default function Create() {
               id="amount"
               value={payment?.amount}
               onValueChange={(value) =>
-                handleChange('amount', isNaN(parseFloat(value)) ? 0 : parseFloat(value) )
+                handleChange(
+                  'amount',
+                  isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                )
               }
               errorMessage={errors?.errors.amount}
             />
@@ -236,39 +238,53 @@ export default function Create() {
             payment.invoices.length > 0 &&
             payment.invoices.map((invoice, index) => (
               <Element key={index}>
-                <div className="flex items-center space-x-2">
-                  <DebouncedCombobox
-                    className="w-1/2"
-                    inputLabel={t('invoice')}
-                    endpoint={route('/api/v1/invoices?payable=:clientId', {
-                      clientId: payment.client_id,
-                    })}
-                    label="number"
-                    onChange={(value: Record<Invoice>) =>
-                      value.resource &&
-                      handleExistingInvoiceChange(value.resource, index)
-                    }
-                    defaultValue={invoice.invoice_id}
-                    queryAdditional
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <DebouncedCombobox
+                      className="w-1/2"
+                      inputLabel={t('invoice')}
+                      endpoint={route('/api/v1/invoices?payable=:clientId', {
+                        clientId: payment.client_id,
+                      })}
+                      label="number"
+                      onChange={(value: Record<Invoice>) =>
+                        value.resource &&
+                        handleExistingInvoiceChange(value.resource, index)
+                      }
+                      defaultValue={invoice.invoice_id}
+                      queryAdditional
+                    />
 
-                  <InputField
-                    label={t('amount_received')}
-                    onValueChange={(value) =>
-                      handleInvoiceInputChange(index, parseFloat(value))
-                    }
-                    className="w-full"
-                    value={invoice.amount}
-                  />
+                    <InputField
+                      label={t('amount_received')}
+                      onValueChange={(value) =>
+                        handleInvoiceInputChange(index, parseFloat(value))
+                      }
+                      className="w-full"
+                      value={invoice.amount}
+                    />
 
-                  <Button
-                    behavior="button"
-                    type="minimal"
-                    className="mt-6"
-                    onClick={() => handleDeletingInvoice(invoice._id)}
-                  >
-                    <X />
-                  </Button>
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      className="mt-6"
+                      onClick={() => handleDeletingInvoice(invoice._id)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+
+                  {errors?.errors[`invoices.${index}.amount`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`invoices.${index}.amount`]}
+                    </Alert>
+                  )}
+
+                  {errors?.errors[`invoices.${index}.invoice`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`invoices.${index}.invoice`]}
+                    </Alert>
+                  )}
                 </div>
               </Element>
             ))}
@@ -306,39 +322,53 @@ export default function Create() {
             payment.credits.length > 0 &&
             payment.credits.map((credit, index) => (
               <Element key={index}>
-                <div className="flex items-center space-x-2">
-                  <DebouncedCombobox
-                    className="w-1/2"
-                    inputLabel={t('credit')}
-                    endpoint={route('/api/v1/credits?client_id=:clientId', {
-                      clientId: payment.client_id,
-                    })}
-                    label="number"
-                    onChange={(value: Record<Credit>) =>
-                      value.resource &&
-                      handleExistingCreditChange(value.resource, index)
-                    }
-                    defaultValue={credit.credit_id}
-                    queryAdditional
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <DebouncedCombobox
+                      className="w-1/2"
+                      inputLabel={t('credit')}
+                      endpoint={route('/api/v1/credits?client_id=:clientId', {
+                        clientId: payment.client_id,
+                      })}
+                      label="number"
+                      onChange={(value: Record<Credit>) =>
+                        value.resource &&
+                        handleExistingCreditChange(value.resource, index)
+                      }
+                      defaultValue={credit.credit_id}
+                      queryAdditional
+                    />
 
-                  <InputField
-                    label={t('amount')}
-                    onValueChange={(value) =>
-                      handleCreditInputChange(index, parseFloat(value))
-                    }
-                    className="w-full"
-                    value={credit.amount}
-                  />
+                    <InputField
+                      label={t('amount')}
+                      onValueChange={(value) =>
+                        handleCreditInputChange(index, parseFloat(value))
+                      }
+                      className="w-full"
+                      value={credit.amount}
+                    />
 
-                  <Button
-                    behavior="button"
-                    type="minimal"
-                    className="mt-6"
-                    onClick={() => handleDeletingCredit(credit._id)}
-                  >
-                    <X />
-                  </Button>
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      className="mt-6"
+                      onClick={() => handleDeletingCredit(credit._id)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+
+                  {errors?.errors[`credits.${index}.amount`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`credits.${index}.amount`]}
+                    </Alert>
+                  )}
+
+                  {errors?.errors[`invoices.${index}.credit`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`invoices.${index}.credit`]}
+                    </Alert>
+                  )}
                 </div>
               </Element>
             ))}

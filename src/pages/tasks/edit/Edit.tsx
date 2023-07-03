@@ -24,19 +24,25 @@ import { useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
-import { Actions } from './components/Actions';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useTranslation } from 'react-i18next';
+import { useActions } from '../common/hooks';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
   const { id } = useParams();
   const { data } = useTaskQuery({ id });
 
+  const [t] = useTranslation();
+
   const [task, setTask] = useState<Task>();
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   useEffect(() => {
     if (data) {
@@ -80,8 +86,16 @@ export default function Edit() {
   return (
     <Default
       title={documentTitle}
-      navigationTopRight={task && <Actions task={task} />}
       onSaveClick={() => task && handleSave(task)}
+      navigationTopRight={
+        task && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={task}
+            actions={actions}
+          />
+        )
+      }
     >
       {task && (
         <TaskDetails task={task} handleChange={handleChange} errors={errors} />

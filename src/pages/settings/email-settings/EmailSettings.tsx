@@ -34,6 +34,10 @@ import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Image } from 'react-feather';
+import { route } from '$app/common/helpers/route';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
+import { User } from '@sentry/react';
+import { Record } from '$app/components/forms/DebouncedCombobox';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -237,11 +241,30 @@ export function EmailSettings() {
               {t('default')}
             </option>
             {isHosted() && <option value="gmail">Gmail</option>}
-            {isHosted() && <option value="microsoft">Microsoft</option>}
+            {isHosted() && <option value="office365">Microsoft</option>}
             <option value="client_postmark">Postmark</option>
             <option value="client_mailgun">Mailgun</option>
           </SelectField>
         </Element>
+
+        {(company?.settings.email_sending_method === 'office365' || company?.settings.email_sending_method === 'microsoft' || company?.settings.email_sending_method === 'gmail') && isHosted() && (
+          <Element leftSide={`Gmail / Microsoft ${t('user')}`}>
+            <DebouncedCombobox
+              clearButton={true}
+              onClearButtonClick={() => handleChange('settings.gmail_sending_user_id', "0")}
+              defaultValue={company?.settings.gmail_sending_user_id}
+              endpoint={route('/api/v1/users?sending_users=true')}
+              label="user"
+              onChange={(value: Record<User>) =>
+                value.resource && handleChange('settings.gmail_sending_user_id', value?.resource?.id)
+              }
+              formatLabel={(resource: User) =>
+                `${resource.first_name} ${resource.last_name}`
+              }
+              staleTime={1}
+            />
+          </Element>
+        )}
 
         {company?.settings.email_sending_method === 'client_postmark' && (
           <Element leftSide={t('secret')}>

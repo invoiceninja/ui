@@ -14,6 +14,7 @@ export enum InvoiceItemType {
   UnpaidFee = '3',
   PaidFee = '4',
   LateFee = '5',
+  Expense = '6',
 }
 
 export interface InvoiceItem {
@@ -41,4 +42,7 @@ export interface InvoiceItem {
   product_cost: number;
   date: string;
   tax_id: string;
+  task_id?: string;
+  expense_id?: string;
+
 }
