@@ -35,6 +35,7 @@ import {
   useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
+  useCustomBulkActions,
 } from '$app/pages/tasks/common/hooks';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -72,6 +73,8 @@ export default function Show() {
 
   const filters = useTaskFilters();
   const taskColumns = useAllTaskColumns();
+
+  const customBulkActions = useCustomBulkActions();
 
   if (!project) {
     return (
@@ -156,6 +159,7 @@ export default function Show() {
           bulkRoute="/api/v1/tasks/bulk"
           linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
           customFilters={filters}
+          customBulkActions={customBulkActions}
           customFilterQueryKey="client_status"
           customFilterPlaceholder="status"
           withResourcefulActions
@@ -167,6 +171,7 @@ export default function Show() {
             />
           }
           linkToCreateGuards={[permission('create_task')]}
+          includeObjectSelection
         />
       </div>
     </Default>

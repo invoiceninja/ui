@@ -81,8 +81,12 @@ export default function Edit() {
   } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    if (data) {
-      const _invoice = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentInvoice = isAnyAction && invoice ? invoice : data;
+
+    if (currentInvoice) {
+      const _invoice = cloneDeep(currentInvoice);
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 

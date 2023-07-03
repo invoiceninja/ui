@@ -78,6 +78,7 @@ export function MarkdownEditor(props: Props) {
             'removeformat | code | help',
           content_style:
             'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+          contextmenu: '',
         }}
         onEditorChange={handleChange}
       />

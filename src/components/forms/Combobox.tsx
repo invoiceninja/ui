@@ -80,8 +80,11 @@ export function ComboboxStatic({
       : entries
           .filter(
             (entry) =>
-              entry.label.toLowerCase().includes(query.toLowerCase()) ||
-              entry.value.toString().toLowerCase().includes(query.toLowerCase())
+              entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
+              entry.value
+                ?.toString()
+                ?.toLowerCase()
+                ?.includes(query?.toLowerCase())
           )
           .filter((entry) =>
             exclude.length > 0 ? !exclude.includes(entry.value) : true
@@ -103,7 +106,7 @@ export function ComboboxStatic({
         return onEmptyValues(query);
       }
     },
-    1000,
+    600,
     [filteredValues]
   );
 
@@ -162,7 +165,7 @@ export function ComboboxStatic({
         <div className="relative mt-1">
           <div className="relative w-full cursor-default overflow-hidden rounded border border-gray-300 bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm">
             <HeadlessCombobox.Input
-              className="w-full rounded border-0 bg-white py-2 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="w-full rounded border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) => entry?.label ?? ''}
               onFocus={() => setIsOpen(true)}
@@ -291,7 +294,7 @@ interface ComboboxAsyncProps<T> {
   staleTime?: number;
   initiallyVisible?: boolean;
   querySpecificEntry?: string;
-  sortBy?: string;
+  sortBy?: string | null;
   exclude?: (string | number | boolean)[];
   action?: Action;
   nullable?: boolean;
@@ -319,7 +322,10 @@ export function ComboboxAsync<T = any>({
   const { data } = useQuery(
     [url.pathname, url.searchParams.toString()],
     () => {
-      url.searchParams.set('sort', sortBy);
+      if (sortBy) {
+        url.searchParams.set('sort', sortBy);
+      }
+
       url.searchParams.set('status', 'active');
 
       if (inputOptions.value) {

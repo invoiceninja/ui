@@ -46,7 +46,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
         <DebouncedCombobox
           inputLabel={props.inputLabel}
           value="id"
-          endpoint="/api/v1/expense_categories"
+          endpoint="/api/v1/expense_categories?status=active"
           label="name"
           defaultValue={props.value}
           onChange={(category: Record<ExpenseCategory>) =>
