@@ -81,7 +81,10 @@ export function ComboboxStatic({
           .filter(
             (entry) =>
               entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
-              entry.value?.toString()?.toLowerCase()?.includes(query?.toLowerCase())
+              entry.value
+                ?.toString()
+                ?.toLowerCase()
+                ?.includes(query?.toLowerCase())
           )
           .filter((entry) =>
             exclude.length > 0 ? !exclude.includes(entry.value) : true
@@ -103,7 +106,7 @@ export function ComboboxStatic({
         return onEmptyValues(query);
       }
     },
-    1000,
+    600,
     [filteredValues]
   );
 
@@ -291,7 +294,7 @@ interface ComboboxAsyncProps<T> {
   staleTime?: number;
   initiallyVisible?: boolean;
   querySpecificEntry?: string;
-  sortBy?: string;
+  sortBy?: string | null;
   exclude?: (string | number | boolean)[];
   action?: Action;
   nullable?: boolean;
@@ -319,7 +322,10 @@ export function ComboboxAsync<T = any>({
   const { data } = useQuery(
     [url.pathname, url.searchParams.toString()],
     () => {
-      url.searchParams.set('sort', sortBy);
+      if (sortBy) {
+        url.searchParams.set('sort', sortBy);
+      }
+
       url.searchParams.set('status', 'active');
 
       if (inputOptions.value) {
