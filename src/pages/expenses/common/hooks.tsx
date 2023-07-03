@@ -36,7 +36,7 @@ import {
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -58,7 +58,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 
 export function useActions() {
   const [t] = useTranslation();
-  const { id } = useParams();
 
   const navigate = useNavigate();
   const bulk = useBulk();
@@ -66,8 +65,8 @@ export function useActions() {
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
-  const isEditPage =
-    location.pathname.includes(id!) && location.pathname.includes('/edit');
+  const isEditPage = location.pathname.endsWith('/edit');
+
   const { create, calculatedTaxRate } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {

@@ -337,11 +337,10 @@ export function useActions() {
 
   const location = useLocation();
 
-  const isEditPage =
-    location.pathname.includes(id!) && location.pathname.includes('/edit');
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const showEditAction =
-    (location.pathname.includes(id!) && !location.pathname.includes('/edit')) ||
+    (location.pathname.includes(id!) && !isEditPage) ||
     location.pathname.endsWith('/tasks');
 
   const company = useCurrentCompany();
