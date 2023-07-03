@@ -319,7 +319,7 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
-  const { data } = useQuery(
+  const { data, refetch } = useQuery(
     [url.pathname, url.searchParams.toString()],
     () => {
       if (sortBy) {
@@ -364,6 +364,10 @@ export function ComboboxAsync<T = any>({
   useEffect(() => {
     return () => setEntries([]);
   }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [endpoint.href]);
 
   const onEmptyValues = (query: string) => {
     setUrl((current) => {
