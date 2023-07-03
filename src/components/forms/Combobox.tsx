@@ -366,6 +366,7 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   useEffect(() => {
+    setUrl(() => new URL(endpoint.href));
     refetch();
   }, [endpoint.href]);
 
