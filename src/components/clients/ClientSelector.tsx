@@ -67,7 +67,13 @@ export function ClientSelector(props: ClientSelectorProps) {
           label: props.inputLabel?.toString(),
           value: props.value || null,
         }}
-        endpoint={new URL(endpoint('/api/v1/clients'))}
+        endpoint={
+          new URL(
+            endpoint('/api/v1/clients?with=:clientId', {
+              clientId: props.value,
+            })
+          )
+        }
         readonly={props.readonly}
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
