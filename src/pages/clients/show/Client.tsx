@@ -124,9 +124,7 @@ export default function Client() {
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
-            {client.gateway_tokens.length > 0 && (
-              <Gateways client={client} />
-            )}
+            {client.gateway_tokens.length > 0 && <Gateways client={client} />}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />
