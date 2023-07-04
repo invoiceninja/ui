@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const paymentMap = {
-    number: "payment.number",
-    user: "payment.user_id",
-    amount: "payment.amount",
-    refunded: "payment.refunded",
-    applied: "payment.applied",
-    transaction_reference: "payment.transaction_reference",
-    private_notes: "payment.private_notes",
-    custom_value: "payment.custom_value4",
-    client: "payment.client_id",
-    invoice_number: "payment.invoice_number",
-    date: "payment.date",
-    method: "payment.method",
-};
+export const paymentMap: Record<string, string>[] = [
+    { trans: 'number', value: "payment.number" },
+    { trans: 'user', value: "payment.user_id" },
+    { trans: 'amount', value: "payment.amount" },
+    { trans: 'refunded', value: "payment.refunded" },
+    { trans: 'applied', value: "payment.applied" },
+    { trans: 'transaction_reference', value: "payment.transaction_reference" },
+    { trans: 'private_notes', value: "payment.private_notes" },
+    { trans: 'custom_value', value: "payment.custom_value4" },
+    { trans: 'client', value: "payment.client_id" },
+    { trans: 'invoice_number', value: "payment.invoice_number" },
+    { trans: 'date', value: "payment.date" },
+    { trans: 'method', value: "payment.method" },
+];
