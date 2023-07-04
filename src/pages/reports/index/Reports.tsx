@@ -701,7 +701,7 @@ export default function Reports() {
         </Card>
       </div>
 
-      {showCustomColumns && (<TwoColumnsDnd />)}
+      {showCustomColumns && <TwoColumnsDnd />}
     </Default>
   );
 }
