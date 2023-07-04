@@ -22,6 +22,10 @@ client.interceptors.response.use(
       window.location.reload();
     }
 
+    if (error.response?.status === 404) {
+      window.location.href = '/#/not_found';
+    }
+
     return Promise.reject(error);
   }
 );
