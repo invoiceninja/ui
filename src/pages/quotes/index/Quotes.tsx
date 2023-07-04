@@ -10,7 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { CustomBulkAction, DataTable } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
@@ -23,14 +23,10 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { MdPrint } from 'react-icons/md';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { Quote } from '$app/common/interfaces/quote';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -43,22 +39,11 @@ export default function Quotes() {
 
   const actions = useActions();
 
-  const printPdf = usePrintPdf({ entity: 'quote' });
-
   const quoteColumns = useAllQuoteColumns();
 
   const filters = useQuoteFilters();
 
-  const customBulkActions: CustomBulkAction<Quote>[] = [
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
-    ),
-  ];
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>

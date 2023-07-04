@@ -12,6 +12,8 @@ import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useActions } from '$app/pages/invoices/edit/components/Actions';
+import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
 
 export const dataTableStaleTime = 50;
 
@@ -19,6 +21,10 @@ export default function Invoices() {
   const { id } = useParams();
 
   const columns = useInvoiceColumns();
+
+  const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <DataTable
@@ -28,9 +34,12 @@ export default function Invoices() {
         { id }
       )}
       columns={columns}
+      customActions={actions}
+      customBulkActions={customBulkActions}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
-      linkToCreate={route('/invoices/create?client=:id', { id: id })}
+      linkToCreate={route('/invoices/create?client=:id', { id })}
+      linkToEdit="/invoices/:id/edit"
       staleTime={dataTableStaleTime}
     />
   );

@@ -41,7 +41,7 @@ export function useHandleCompanySave() {
     }
 
     const adjustedExcludeToaster =
-      typeof excludeToasters === 'boolean' && !excludeToasters;
+      typeof excludeToasters === 'boolean' && excludeToasters;
 
     !adjustedExcludeToaster && toast.processing();
 

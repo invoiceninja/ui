@@ -21,17 +21,20 @@ import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const saveCompany = useHandleCompanySave();
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -64,10 +67,11 @@ export default function Create() {
     }
   }, [blankClient]);
 
-  const onSave = () => {
+  const onSave = async () => {
     set(client as Client, 'contacts', contacts);
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
+
     if (
       !(
         client?.name != '' ||
@@ -79,25 +83,27 @@ export default function Create() {
         message: t('invalid_name // needs translation'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
-      toast.error(t('error_title'), { id: toastId });
+      toast.error();
 
       return onSave;
     }
 
+    await saveCompany(true);
+
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
-        toast.success(t('created_client'), { id: toastId });
+        toast.success('created_client');
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 

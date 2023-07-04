@@ -67,7 +67,7 @@ export function EditSlider() {
     if (task?.time_log) {
       setTimeLog(parseTimeLog(task.time_log));
     }
-  }, [timeLogIndex]);
+  }, [timeLogIndex, task?.time_log]);
 
   const handleDateChange = (
     unix: number,
