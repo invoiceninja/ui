@@ -24,6 +24,7 @@ import {
   useCreditColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
+import { Credit } from '$app/common/interfaces/credit';
 
 export default function Credits() {
   useTitle('credits');
@@ -39,7 +40,7 @@ export default function Credits() {
 
   const creditColumns = useAllCreditColumns();
 
-  const customBulkActions: CustomBulkAction[] = [
+  const customBulkActions: CustomBulkAction<Credit>[] = [
     (selectedIds) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}

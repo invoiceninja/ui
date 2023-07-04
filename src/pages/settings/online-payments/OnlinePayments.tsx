@@ -26,9 +26,13 @@ import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useEffect, useState } from 'react';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
+
+  const dispatch = useDispatch();
 
   useTitle('online_payments');
 
@@ -48,6 +52,16 @@ export function OnlinePayments() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
+
+  const handleToggleChange = (id: string, value: boolean) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: id,
+        value,
+      })
+    );
+  };
 
   useEffect(() => {
     if (termsResponse) {
@@ -79,11 +93,10 @@ export function OnlinePayments() {
 
         <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
           <SelectField
-            value={company?.settings?.auto_bill}
+            value={company?.settings.auto_bill || 'off'}
             onChange={handleChange}
             id="settings.auto_bill"
           >
-            <option defaultChecked></option>
             <option value="always">
               {t('enabled')} ({t('auto_bill_help_always')})
             </option>
@@ -146,6 +159,46 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
+
+        <Element leftSide={t('manual_payment_email')}>
+          <Toggle
+            checked={Boolean(
+              company?.settings.client_manual_payment_notification
+            )}
+            onChange={(value: boolean) =>
+              handleToggleChange(
+                'settings.client_manual_payment_notification',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('online_payment_email')}>
+          <Toggle
+            checked={Boolean(
+              company?.settings.client_online_payment_notification
+            )}
+            onChange={(value: boolean) =>
+              handleToggleChange(
+                'settings.client_online_payment_notification',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('mark_paid_payment_email')}
+          leftSideHelp={t('mark_paid_payment_email_help')}
+        >
+          <Toggle
+            checked={Boolean(company?.settings.mark_paid_payment_email)}
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.mark_paid_payment_email', value)
+            }
+          />
+        </Element>
 
         <Element leftSide={t('enable_applying_payments')}>
           <Toggle

@@ -26,6 +26,7 @@ import {
   usePurchaseOrderFilters,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -46,7 +47,7 @@ export default function PurchaseOrders() {
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
-  const customBulkActions: CustomBulkAction[] = [
+  const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
     (selectedIds) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}

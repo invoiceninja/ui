@@ -16,7 +16,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
@@ -24,6 +24,7 @@ export function useHandleCreate(
   setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -35,7 +36,12 @@ export function useHandleCreate(
       .then((response: GenericSingleResourceResponse<Invoice>) => {
         toast.success('created_invoice');
 
-        navigate(route('/invoices/:id/edit', { id: response.data.data.id }));
+        navigate(
+          route('/invoices/:id/edit?table=:table', {
+            id: response.data.data.id,
+            table: searchParams.get('table') ?? 'products',
+          })
+        );
       })
       .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);

@@ -26,9 +26,12 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
+import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
 
 export default function Product() {
   const [t] = useTranslation();
+
+  const saveCompany = useHandleCompanySave();
 
   const { id } = useParams();
 
@@ -67,19 +70,26 @@ export default function Product() {
     },
   ];
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!isFormBusy) {
       setErrors(undefined);
-
       setIsFormBusy(true);
 
+      toast.processing();
+
+      await saveCompany(true);
+
       request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
-        .then(() => {
+        .then((response) => {
           toast.success('updated_product');
 
           queryClient.invalidateQueries('/api/v1/products');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/products/:id', { id: response.data.data.id })
+          );
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

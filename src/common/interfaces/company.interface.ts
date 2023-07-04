@@ -293,6 +293,7 @@ export interface Settings {
   e_invoice_type: string;
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
+  mark_paid_payment_email: boolean;
 }
 
 export interface TaxData {

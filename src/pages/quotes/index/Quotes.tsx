@@ -30,6 +30,7 @@ import { MdPrint } from 'react-icons/md';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { Quote } from '$app/common/interfaces/quote';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -48,7 +49,7 @@ export default function Quotes() {
 
   const filters = useQuoteFilters();
 
-  const customBulkActions: CustomBulkAction[] = [
+  const customBulkActions: CustomBulkAction<Quote>[] = [
     (selectedIds) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}
