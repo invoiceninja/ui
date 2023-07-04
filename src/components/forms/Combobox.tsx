@@ -40,7 +40,7 @@ interface Action {
   onClick: () => unknown;
 }
 
-interface ComboboxStaticProps<T = any> {
+export interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
   entryOptions: EntryOptions<T>;
@@ -74,21 +74,21 @@ export function ComboboxStatic({
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(initiallyVisible);
 
-  const filteredValues =
+  let filteredValues =
     query === ''
       ? entries
-      : entries
-          .filter(
-            (entry) =>
-              entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
-              entry.value
-                ?.toString()
-                ?.toLowerCase()
-                ?.includes(query?.toLowerCase())
-          )
-          .filter((entry) =>
-            exclude.length > 0 ? !exclude.includes(entry.value) : true
-          );
+      : entries.filter(
+          (entry) =>
+            entry.label?.toLowerCase()?.includes(query?.toLowerCase()) ||
+            entry.value
+              ?.toString()
+              ?.toLowerCase()
+              ?.includes(query?.toLowerCase())
+        );
+
+  filteredValues = filteredValues.filter((entry) =>
+    exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
 
   const comboboxRef = useRef<HTMLDivElement>(null);
 
@@ -286,7 +286,7 @@ interface EntryOptions<T = any> {
   labelFn?: (resource: T) => string | JSX.Element;
 }
 
-interface ComboboxAsyncProps<T> {
+export interface ComboboxAsyncProps<T> {
   endpoint: URL;
   inputOptions: InputOptions;
   entryOptions: EntryOptions<T>;
@@ -366,6 +366,7 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   useEffect(() => {
+    setUrl(() => new URL(endpoint.href));
     refetch();
   }, [endpoint.href]);
 

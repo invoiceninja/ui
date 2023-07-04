@@ -18,10 +18,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { Alert } from '$app/components/Alert';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
@@ -34,6 +30,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
 
 export default function Apply() {
   const queryClient = useQueryClient();
@@ -144,29 +141,62 @@ export default function Apply() {
       )}
 
       <Element leftSide={t('invoices')}>
-        <DebouncedCombobox
-          endpoint={`/api/v1/invoices?payable=${payment?.client_id}`}
-          initiallyVisible={isLoading}
-          clearInputAfterSelection
-          exclude={collect(formik.values.invoices).pluck('invoice_id').toArray()}
-          label="number"
-          formatLabel={(invoice: Invoice) => `${t('invoice_number_short')}${invoice.number} - ${t('balance')} ${invoice.balance}`}
-          onChange={(value: Record<Invoice>) =>
-            handleInvoiceChange(
-              value.resource?.id as string,
-              value.resource?.balance as number,
-              value.resource?.number as string
-            )
-          }
-        />
+        {payment?.client_id ? (
+          <ComboboxAsync<Invoice>
+            endpoint={
+              new URL(
+                endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+              )
+            }
+            inputOptions={{
+              value: 'id',
+            }}
+            entryOptions={{
+              id: 'id',
+              value: 'id',
+              label: 'name',
+              labelFn: (invoice) =>
+                `${t('invoice_number_short')}${invoice.number} - ${t(
+                  'balance'
+                )} ${formatMoney(
+                  invoice.balance,
+                  payment.client?.country_id ?? '1',
+                  payment.client?.settings.currency_id ?? '1'
+                )}`,
+            }}
+            onChange={({ resource }) =>
+              resource
+                ? handleInvoiceChange(
+                    resource.id,
+                    resource.balance,
+                    resource.number
+                  )
+                : null
+            }
+            initiallyVisible={isLoading}
+            exclude={collect(formik.values.invoices)
+              .pluck('invoice_id')
+              .toArray()}
+          />
+        ) : null}
+
         {errors?.errors.invoices && (
           <div className="py-2">
             <Alert type="danger">{errors.errors.invoices}</Alert>
           </div>
         )}
       </Element>
+
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string; balance: number }, index) => (
+        (
+          record: {
+            _id: string;
+            amount: number;
+            number: string;
+            balance: number;
+          },
+          index
+        ) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField
