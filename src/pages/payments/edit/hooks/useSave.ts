@@ -37,6 +37,8 @@ export function useSave(
     delete adjustedPaymentPayload.invoices;
     delete adjustedPaymentPayload.credits;
 
+    await saveCompany(true);
+
     request(
       'PUT',
       endpoint('/api/v1/payments/:id', { id: payment.id }),

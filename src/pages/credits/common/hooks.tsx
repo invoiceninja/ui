@@ -206,11 +206,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/credits'), credit)
       .then((response: GenericSingleResourceResponse<Credit>) => {
@@ -238,12 +242,12 @@ export function useSave(props: CreateProps) {
 
   const saveCompany = useHandleCompanySave();
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
 
     setErrors(undefined);
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
       .then(() => {
