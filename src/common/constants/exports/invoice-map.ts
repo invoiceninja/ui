@@ -7,8 +7,12 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+interface Record {
+    trans: string;
+    value: string;
+}
 
-export const invoiceMap: Record<string, string>[] = [
+export const invoiceMap: Record[] = [
     { trans: 'invoice_number', value: "invoice.number" },
     { trans: 'user', value: "invoice.user_id" },
     { trans: 'amount', value: "invoice.amount" },

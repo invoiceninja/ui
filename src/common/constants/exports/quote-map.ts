@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const quoteMap: Record<string, string>[] = [
+interface Record {
+    trans: string;
+    value: string;
+}
+
+export const quoteMap: Record[] = [
 { trans: 'quote_number', value: "quote.number" },
 { trans: 'user', value: "quote.user_id" },
 { trans: 'amount', value: "quote.amount" },

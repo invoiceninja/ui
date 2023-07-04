@@ -8,8 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+interface Record {
+    trans: string;
+    value: string;
+}
 
-export const clientMap: Record<string, string>[] = [
+export const clientMap: Record[] = [
     {trans: 'client_name', value: "client.name" },
     {trans: 'user', value: "client.user_id" },
     {trans: 'balance', value: "client.balance" },

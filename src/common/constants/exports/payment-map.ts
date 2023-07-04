@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const paymentMap: Record<string, string>[] = [
+interface Record {
+    trans: string;
+    value: string;
+}
+
+export const paymentMap: Record[] = [
     { trans: 'number', value: "payment.number" },
     { trans: 'user', value: "payment.user_id" },
     { trans: 'amount', value: "payment.amount" },
