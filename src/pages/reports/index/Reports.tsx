@@ -32,6 +32,8 @@ import {
   Draggable,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
+import { clientMap } from '$app/common/constants/exports/client-map';
+import { t } from 'i18next';
 
 type Identifier =
   | 'activity'
@@ -414,6 +416,7 @@ export default function Reports() {
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [showCustomColumns, setShowCustomColumns] =useState(false);
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
@@ -689,25 +692,30 @@ export default function Reports() {
               />
             </Element>
           )}
+          <Element leftSide={`${t('customize')} ${t('columns')}`}>
+            <Toggle
+              checked={showCustomColumns}
+              onValueChange={(value) => setShowCustomColumns(Boolean(value)) }
+            />
+          </Element>
         </Card>
       </div>
 
-      <TwoColumnsDnd />
+      {showCustomColumns && (<TwoColumnsDnd />)}
     </Default>
   );
 }
 
 export function TwoColumnsDnd() {
   const [data, setData] = useState([
-    ['foo', 'bar'],
-    ['david', 'benjamin'],
+    clientMap,
+    [],
   ]);
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
-
     // Create a copy of the data array
     const $data = cloneDeep(data);
 
@@ -729,22 +737,28 @@ export function TwoColumnsDnd() {
     setData(() => [...$data]);
   };
 
+  interface Record {
+    trans: string;
+    value: string;
+  }
+
   return (
     <div className="max-w-3xl">
       <Card className="my-6">
+        
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="flex items-center space-x-4 mx-4">
             <Droppable droppableId="0">
               {(provided) => (
                 <div
-                  className="w-1/2 border border-dashed"
+                  className="w-1/2 border border-dashed flex-column h-screen items-center"
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  {data[0].map((word, i) => (
+                  {data[0].map((record: Record, i: number) => (
                     <Draggable
-                      key={i}
-                      draggableId={`left-word-${word}`}
+                      key={record.value}
+                      draggableId={`left-word-${record.value}`}
                       index={i}
                     >
                       {(provided) => (
@@ -753,7 +767,7 @@ export function TwoColumnsDnd() {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <Element key={i}>{word}</Element>
+                          <Element key={i}>{t(`${record.trans}`)}</Element>
                         </div>
                       )}
                     </Draggable>
@@ -766,14 +780,14 @@ export function TwoColumnsDnd() {
             <Droppable droppableId="1">
               {(provided) => (
                 <div
-                  className="w-1/2 border border-dashed"
+                  className="w-1/2 border border-dashed flex-column h-screen items-center"
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  {data[1].map((word, i) => (
+                  {data[1].map((record: Record, i: number) => (
                     <Draggable
-                      key={i}
-                      draggableId={`right-word-${word}`}
+                      key={record.value}
+                      draggableId={`right-word-${record.value}`}
                       index={i}
                     >
                       {(provided) => (
@@ -782,7 +796,7 @@ export function TwoColumnsDnd() {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <Element key={i}>{word}</Element>
+                          <Element key={i}>{t(`${record.trans}`)}</Element>
                         </div>
                       )}
                     </Draggable>

@@ -25,7 +25,7 @@ export const clientMap: Record<string, string>[] = [
     {trans: 'state', value: "client.state" },
     {trans: 'postal_code', value: "client.postal_code" },
     {trans: 'country', value: "client.country_id" },
-    {trans: 'custom_value', value: "contact.custom_value4" },
+    {trans: 'custom_value4', value: "contact.custom_value4" },
     {trans: 'shipping_address1', value: "client.shipping_address1" },
     {trans: 'shipping_address2', value: "client.shipping_address2" },
     {trans: 'shipping_city', value: "client.shipping_city" },
