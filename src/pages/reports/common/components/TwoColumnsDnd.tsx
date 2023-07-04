@@ -51,6 +51,7 @@ export function TwoColumnsDnd() {
 
         // Then we can insert the word into new array at specific index
         $data[destinationIndex].splice(result.destination.index, 0, word);
+console.log($data);
 
         setData(() => [...$data]);
     };
@@ -64,12 +65,11 @@ export function TwoColumnsDnd() {
         <div className="max-w-5xl">
             <Card className="my-6">
                 <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="flex items-center w-full">
-
+                    <div className="flex w-full">
                         <Droppable droppableId="0">
                             {(provided) => (
                                 <div
-                                    className="w-1/2 border border-dashed flex-column h-screen items-center"
+                                    className="w-1/2 border border-dashed flex-column h-screen"
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
@@ -86,7 +86,7 @@ export function TwoColumnsDnd() {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <Element key={i}>{t(`${record.trans}`)}</Element>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -101,7 +101,7 @@ export function TwoColumnsDnd() {
                         <Droppable droppableId="1">
                             {(provided) => (
                                 <div
-                                    className="w-1/2 border border-dashed flex-column h-screen items-center"
+                                    className="w-1/2 border border-dashed flex-column h-screen"
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
@@ -117,8 +117,9 @@ export function TwoColumnsDnd() {
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
+                                                    className='content-start'
                                                 >
-                                                    <Element key={i}>{t(`${record.trans}`)}</Element>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('invoice')} ${t(`${record.trans}`)}`}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -150,7 +151,7 @@ export function TwoColumnsDnd() {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <Element key={i}>{t(`${record.trans}`)}</Element>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('payment')} ${t(`${record.trans}`)}`}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -169,6 +170,8 @@ export function TwoColumnsDnd() {
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
+                                    <h2>{`${t('report')} ${t('columns')}`}</h2>
+
                                     {data[3].map((record: Record, i: number) => (
                                         <Draggable
                                             key={record.value}
@@ -181,7 +184,7 @@ export function TwoColumnsDnd() {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <Element key={i}>{t(`${record.trans}`)}</Element>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
                                                 </div>
                                             )}
                                         </Draggable>

@@ -17,7 +17,7 @@ export const invoiceMap: Record[] = [
     { trans: 'user', value: "invoice.user_id" },
     { trans: 'amount', value: "invoice.amount" },
     { trans: 'balance', value: "invoice.balance" },
-    { trans: 'client', value: "client.name" },
+    { trans: 'client_name', value: "client.name" },
     { trans: 'discount', value: "item.discount" },
     { trans: 'po_number', value: "invoice.po_number" },
     { trans: 'date', value: "invoice.date" },
