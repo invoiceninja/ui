@@ -23,11 +23,14 @@ import {
   LineChart,
 } from 'recharts';
 import dayjs from 'dayjs';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 type Props = {
   data: ChartData;
   dates: any;
   chartSensitivity: 'day' | 'week' | 'month';
+  currency: string;
 };
 
 type LineChartData = {
@@ -39,7 +42,12 @@ type LineChartData = {
 
 export function Chart(props: Props) {
   const { t } = useTranslation();
+  const { currency } = props;
+
+  const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const formatMoney = useFormatMoney();
 
   const [chartData, setChartData] = useState<unknown[]>([]);
 
@@ -165,6 +173,14 @@ export function Chart(props: Props) {
     setChartData(data);
   }, [props]);
 
+  const formatTooltipValues = (number: string) => {
+    return formatMoney(
+      Number(number) || 0,
+      company.settings.country_id,
+      currency ?? company.settings.currency_id
+    ).toString();
+  };
+
   return (
     <ResponsiveContainer width="100%" height={330}>
       <LineChart height={200} data={chartData} margin={{ top: 17, left: 20 }}>
@@ -199,7 +215,7 @@ export function Chart(props: Props) {
         />
 
         <CartesianGrid strokeDasharray="0" vertical={false} />
-        <Tooltip />
+        <Tooltip formatter={formatTooltipValues} />
 
         <XAxis dataKey="date" />
         <YAxis interval={0} tickCount={6} />
