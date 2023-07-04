@@ -172,8 +172,6 @@ export function Totals() {
 
   return (
     <>
-      {JSON.stringify(settings.preferences.dashboard_charts.currency)}
-
       {isLoadingTotals && (
         <div className="w-full flex justify-center">
           <Spinner />
