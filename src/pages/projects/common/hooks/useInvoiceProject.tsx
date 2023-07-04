@@ -105,6 +105,7 @@ export function useInvoiceProject() {
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
+          task_id: task.id,
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
