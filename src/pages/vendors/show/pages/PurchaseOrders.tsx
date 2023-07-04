@@ -11,9 +11,11 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import {
+  useActions,
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
 } from '$app/pages/purchase-orders/common/hooks';
+import { useCustomBulkActions } from '$app/pages/purchase-orders/common/hooks/useCustomBulkActions';
 import { useParams } from 'react-router-dom';
 
 const dataTableStaleTime = 50;
@@ -24,6 +26,10 @@ export default function PurchaseOrders() {
   const columns = usePurchaseOrderColumns();
 
   const filters = usePurchaseOrderFilters();
+
+  const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <DataTable
@@ -36,6 +42,8 @@ export default function PurchaseOrders() {
       )}
       columns={columns}
       customFilters={filters}
+      customActions={actions}
+      customBulkActions={customBulkActions}
       customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions

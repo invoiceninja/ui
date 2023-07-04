@@ -26,15 +26,13 @@ import {
   MdSend,
   MdSettingsBackupRestore,
 } from 'react-icons/md';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 export function useActions() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
   const location = useLocation();
 
-  const isEditPage = location.pathname.includes(id!);
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const bulk = useBulk();
 

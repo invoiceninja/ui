@@ -26,12 +26,12 @@ export function useHandleSave(
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
-  return (invoice: Invoice) => {
+  return async (invoice: Invoice) => {
     setErrors(undefined);
 
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     request(
       'PUT',

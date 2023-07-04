@@ -12,7 +12,6 @@ import { Card, Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
 import paymentType from '$app/common/constants/payment-type';
-import { route } from '$app/common/helpers/route';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -27,10 +26,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { FormEvent, useEffect, useState } from 'react';
@@ -43,6 +39,8 @@ import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 import { Alert } from '$app/components/Alert';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -204,6 +202,7 @@ export default function Create() {
       disableSaveButton={!payment}
     >
       <Container>
+        Client: {payment?.client_id}
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
@@ -240,19 +239,28 @@ export default function Create() {
               <Element key={index}>
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-2">
-                    <DebouncedCombobox
-                      className="w-1/2"
-                      inputLabel={t('invoice')}
-                      endpoint={route('/api/v1/invoices?payable=:clientId', {
-                        clientId: payment.client_id,
-                      })}
-                      label="number"
-                      onChange={(value: Record<Invoice>) =>
-                        value.resource &&
-                        handleExistingInvoiceChange(value.resource, index)
+                    <ComboboxAsync<Invoice>
+                      inputOptions={{
+                        value: invoice.invoice_id,
+                        label: t('invoice') ?? '',
+                      }}
+                      endpoint={
+                        new URL(
+                          endpoint(
+                            `/api/v1/invoices?payable=${payment.client_id}`
+                          )
+                        )
                       }
-                      defaultValue={invoice.invoice_id}
-                      queryAdditional
+                      entryOptions={{
+                        label: 'number',
+                        id: 'id',
+                        value: 'id',
+                      }}
+                      onChange={(entry) =>
+                        entry.resource
+                          ? handleExistingInvoiceChange(entry.resource, index)
+                          : null
+                      }
                     />
 
                     <InputField
@@ -291,23 +299,30 @@ export default function Create() {
 
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
-              <DebouncedCombobox
-                endpoint={route('/api/v1/invoices?payable=:clientId', {
-                  clientId: payment.client_id,
-                })}
-                label="number"
-                clearInputAfterSelection
-                onChange={(value: Record<Invoice>) =>
-                  value.resource && handleInvoiceChange(value.resource)
+              <ComboboxAsync<Invoice>
+                endpoint={
+                  new URL(
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                  )
                 }
-                formatLabel={(resource: Invoice) =>
-                  `${t('invoice_number_short')} ${
-                    resource.number
-                  } (${formatMoney(
-                    resource.amount,
-                    resource?.client?.country_id ?? '1',
-                    resource?.client?.settings.currency_id
-                  )})`
+                inputOptions={{
+                  value: 'id',
+                }}
+                entryOptions={{
+                  id: 'id',
+                  value: 'id',
+                  label: 'name',
+                  labelFn: (invoice) =>
+                    `${t('invoice_number_short')}${invoice.number} - ${t(
+                      'balance'
+                    )} ${formatMoney(
+                      invoice.balance,
+                      payment.client?.country_id ?? '1',
+                      payment.client?.settings.currency_id ?? '1'
+                    )}`,
+                }}
+                onChange={({ resource }) =>
+                  resource ? handleInvoiceChange(resource) : null
                 }
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
@@ -324,19 +339,28 @@ export default function Create() {
               <Element key={index}>
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-2">
-                    <DebouncedCombobox
-                      className="w-1/2"
-                      inputLabel={t('credit')}
-                      endpoint={route('/api/v1/credits?client_id=:clientId', {
-                        clientId: payment.client_id,
-                      })}
-                      label="number"
-                      onChange={(value: Record<Credit>) =>
-                        value.resource &&
-                        handleExistingCreditChange(value.resource, index)
+                    <ComboboxAsync<Credit>
+                      inputOptions={{
+                        value: credit.credit_id,
+                        label: t('credit') ?? '',
+                      }}
+                      endpoint={
+                        new URL(
+                          endpoint(
+                            `/api/v1/credits?client_id=${payment.client_id}`
+                          )
+                        )
                       }
-                      defaultValue={credit.credit_id}
-                      queryAdditional
+                      entryOptions={{
+                        id: 'id',
+                        label: 'number',
+                        value: 'id`',
+                      }}
+                      onChange={(entry) =>
+                        entry.resource
+                          ? handleExistingCreditChange(entry.resource, index)
+                          : null
+                      }
                     />
 
                     <InputField
@@ -375,21 +399,28 @@ export default function Create() {
 
           {payment?.client_id && (
             <Element leftSide={t('credits')}>
-              <DebouncedCombobox
-                endpoint={route('/api/v1/credits?client_id=:clientId', {
-                  clientId: payment.client_id,
-                })}
-                label="number"
-                clearInputAfterSelection
-                onChange={(value: Record<Credit>) =>
-                  value.resource && handleCreditChange(value.resource)
+              <ComboboxAsync<Credit>
+                endpoint={
+                  new URL(
+                    endpoint(`/api/v1/credits?client_id=${payment.client_id}`)
+                  )
                 }
-                formatLabel={(resource: Credit) =>
-                  `${resource.number} (${formatMoney(
-                    resource.amount,
-                    resource?.client?.country_id ?? '1',
-                    resource?.client?.settings.currency_id
-                  )})`
+                inputOptions={{
+                  value: null,
+                }}
+                entryOptions={{
+                  id: 'id',
+                  label: 'number',
+                  value: 'id',
+                  labelFn: (resource) =>
+                    `${resource.number} (${formatMoney(
+                      resource.amount,
+                      resource?.client?.country_id ?? '1',
+                      resource?.client?.settings.currency_id
+                    )})`,
+                }}
+                onChange={(entry) =>
+                  entry.resource ? handleCreditChange(entry.resource) : null
                 }
                 exclude={collect(payment.credits).pluck('credit_id').toArray()}
               />

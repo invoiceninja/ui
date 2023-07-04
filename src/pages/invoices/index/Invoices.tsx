@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { CustomBulkAction, DataTable } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
@@ -21,14 +21,10 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { MdPrint } from 'react-icons/md';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -39,24 +35,13 @@ export default function Invoices() {
 
   const filters = useInvoiceFilters();
 
-  const printPdf = usePrintPdf({ entity: 'invoice' });
-
   const invoiceColumns = useAllInvoiceColumns();
 
   const columns = useInvoiceColumns();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
-  const customBulkActions: CustomBulkAction<Invoice>[] = [
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
-    ),
-  ];
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
