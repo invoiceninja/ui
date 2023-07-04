@@ -25,15 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
-import {
-  DragDropContext,
-  DropResult,
-  Droppable,
-  Draggable,
-} from '@hello-pangea/dnd';
-import { cloneDeep } from 'lodash';
-import { clientMap } from '$app/common/constants/exports/client-map';
-import { t } from 'i18next';
 import { TwoColumnsDnd } from '../common/components/TwoColumnsDnd';
 
 type Identifier =
