@@ -296,6 +296,14 @@ export function useSave() {
         toast.success('updated_task');
 
         queryClient.invalidateQueries(
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId: task.project_id,
+          })
+        );
+
+        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+
+        queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
       })
