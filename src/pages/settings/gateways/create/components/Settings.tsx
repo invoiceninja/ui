@@ -108,8 +108,8 @@ export function Settings(props: Props) {
             errorMessage={props.errors?.errors.token_billing}
           >
             <option value="always">{t('enabled')}</option>
-            <option value="optout">{t('enabled_by_default')}</option>
-            <option value="optin">{t('disabled_by_default')}</option>
+            <option value="optout">{t('auto_bill_help_optout')}</option>
+            <option value="optin">{t('auto_bill_help_optin')}</option>
             <option value="off">{t('off')}</option>
           </SelectField>
         </Element>
