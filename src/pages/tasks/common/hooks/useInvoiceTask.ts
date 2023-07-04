@@ -169,19 +169,23 @@ export function useInvoiceTask() {
             projectName + '### ' + task?.description + ' ' + parsed.join(' ');
         }
 
-        invoice.line_items = parsed.length ? [item] : [];
+        if (typeof invoice.line_items === 'string') {
+          invoice.line_items = [];
+        }
 
-        setInvoice(invoice);
-
-        navigate(
-          route(
-            '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
-            {
-              projectAssigned: Boolean(tasks[0].project_id),
-            }
-          )
-        );
+        invoice.line_items.push(item);
       });
+
+      setInvoice(invoice);
+
+      navigate(
+        route(
+          '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
+          {
+            projectAssigned: Boolean(tasks[0].project_id),
+          }
+        )
+      );
     }
   };
 }
