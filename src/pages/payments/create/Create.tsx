@@ -366,7 +366,7 @@ export default function Create() {
                     <InputField
                       label={t('amount')}
                       onValueChange={(value) =>
-                        handleCreditInputChange(index, parseFloat(value))
+                        handleCreditInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
                       }
                       className="w-full"
                       value={credit.amount}
