@@ -251,6 +251,7 @@ export function useActions() {
 
   const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
     entity: 'project',
+    editPageTabs: ['documents'],
   });
 
   const setProject = useSetAtom(projectAtom);

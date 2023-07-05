@@ -24,13 +24,13 @@ export function useActions() {
 
   const bulk = useBulkAction();
 
-  const { isEditPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'vendor',
   });
 
   const actions: Action<Vendor>[] = [
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       getEntityState(vendor) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(vendor.id, 'archive')}
@@ -40,7 +40,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       (getEntityState(vendor) === EntityState.Archived ||
         getEntityState(vendor) === EntityState.Deleted) && (
         <DropdownElement
@@ -51,7 +51,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       (getEntityState(vendor) === EntityState.Active ||
         getEntityState(vendor) === EntityState.Archived) && (
         <DropdownElement

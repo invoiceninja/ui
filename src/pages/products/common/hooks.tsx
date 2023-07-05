@@ -246,6 +246,7 @@ export function useActions() {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'product',
+    editPageTabs: ['documents', 'product_fields'],
   });
 
   const cloneToProduct = (product: Product) => {

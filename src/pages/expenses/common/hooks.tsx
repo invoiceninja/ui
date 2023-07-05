@@ -68,6 +68,7 @@ export function useActions() {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'expense',
+    editPageTabs: ['documents'],
   });
 
   const { create, calculatedTaxRate } = useInvoiceExpense();

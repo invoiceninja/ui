@@ -441,6 +441,7 @@ export function useActions() {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_expense',
+    editPageTabs: ['documents'],
   });
 
   const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {

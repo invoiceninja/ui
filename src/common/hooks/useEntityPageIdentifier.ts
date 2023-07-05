@@ -25,11 +25,11 @@ interface Params {
     | 'client'
     | 'vendor'
     | 'product';
-  editPageHasLinkedTabs?: boolean;
+  editPageTabs?: string[];
 }
 
 export function useEntityPageIdentifier(params: Params) {
-  const { entity, editPageHasLinkedTabs } = params;
+  const { entity, editPageTabs } = params;
 
   const location = useLocation();
   const urlParams = useParams();
@@ -39,13 +39,20 @@ export function useEntityPageIdentifier(params: Params) {
   const startsWithEntityName = location.pathname.startsWith(`/${entity}s`);
   const includesEntityId = entityId && location.pathname.includes(entityId);
   const endsWithEdit = location.pathname.endsWith('/edit');
+  const endsWithEditPageTab = editPageTabs?.some((tab) =>
+    location.pathname.endsWith(`/${tab}`)
+  );
 
   const isEditPage =
     startsWithEntityName &&
     includesEntityId &&
-    (editPageHasLinkedTabs || endsWithEdit);
+    (endsWithEditPageTab || endsWithEdit);
 
-  const isShowPage = startsWithEntityName && includesEntityId && !endsWithEdit;
+  const isShowPage =
+    startsWithEntityName &&
+    includesEntityId &&
+    !endsWithEdit &&
+    !endsWithEditPageTab;
 
   const isEditOrShowPage = isEditPage || isShowPage;
 
