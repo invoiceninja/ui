@@ -21,12 +21,20 @@ import { clientMap } from '$app/common/constants/exports/client-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
+import { quoteMap } from '$app/common/constants/exports/quote-map';
+import { creditMap } from '$app/common/constants/exports/credit-map';
 
-export function TwoColumnsDnd() {
+interface Props {
+    columns: string[];
+}
+
+export function TwoColumnsDnd(props: Props) {
     const [data, setData] = useState([
-        clientMap,
-        invoiceMap,
-        paymentMap,
+        props.columns.includes('client') ? clientMap : [],
+        props.columns.includes('invoice') ? invoiceMap : [],
+        props.columns.includes('credit') ? creditMap : [],
+        props.columns.includes('quote') ? quoteMap : [],
+        props.columns.includes('payment') ? paymentMap : [],
         [],
     ]);
 
@@ -51,9 +59,16 @@ export function TwoColumnsDnd() {
 
         // Then we can insert the word into new array at specific index
         $data[destinationIndex].splice(result.destination.index, 0, word);
-console.log($data);
 
         setData(() => [...$data]);
+    };
+
+    const translateLabel = (record: Record) => {
+        
+        const parts = record.value.split('.');
+
+        return `${t(`${parts[0]}`)} - ${t(`${record.trans}`)}` 
+
     };
 
     interface Record {
@@ -66,6 +81,7 @@ console.log($data);
             <Card className="my-6">
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className="flex w-full">
+                        {data[0].length > 0 && (
                         <Droppable droppableId="0">
                             {(provided) => (
                                 <div
@@ -86,7 +102,7 @@ console.log($data);
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -95,9 +111,9 @@ console.log($data);
                                 </div>
                             )}
                         </Droppable>
+                        )}
 
-
-
+                        {data[1].length > 0 && (
                         <Droppable droppableId="1">
                             {(provided) => (
                                 <div
@@ -119,7 +135,7 @@ console.log($data);
                                                     {...provided.dragHandleProps}
                                                     className='content-start'
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('invoice')} ${t(`${record.trans}`)}`}</span>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -128,8 +144,9 @@ console.log($data);
                                 </div>
                             )}
                         </Droppable>
+                        )}
 
-
+                        {data[2].length > 0 && (
                         <Droppable droppableId="2">
                             {(provided) => (
                                 <div
@@ -137,7 +154,7 @@ console.log($data);
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    <h2>{t('payment')}</h2>
+                                    <h2>{t('credit')}</h2>
 
                                     {data[2].map((record: Record, i: number) => (
                                         <Draggable
@@ -151,7 +168,7 @@ console.log($data);
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('payment')} ${t(`${record.trans}`)}`}</span>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -160,17 +177,18 @@ console.log($data);
                                 </div>
                             )}
                         </Droppable>
+                        )}
 
+                        {data[3].length > 0 && (
                         <Droppable droppableId="3">
                             {(provided) => (
                                 <>
-                                
                                 <div
                                     className="w-1/2 border border-dashed flex-column h-screen items-center"
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
-                                    <h2>{`${t('report')} ${t('columns')}`}</h2>
+                                    <h2>{t('quote')}</h2>
 
                                     {data[3].map((record: Record, i: number) => (
                                         <Draggable
@@ -194,7 +212,76 @@ console.log($data);
                                 </>
                             )}
                         </Droppable>
+                        )}
 
+
+                        {data[4].length > 0 && (
+                            <Droppable droppableId="4">
+                                {(provided) => (
+                                    <>
+                                        <div
+                                            className="w-1/2 border border-dashed flex-column h-screen items-center"
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                        >
+                                            <h2>{t('payment')}</h2>
+
+                                            {data[4].map((record: Record, i: number) => (
+                                                <Draggable
+                                                    key={record.value}
+                                                    draggableId={`right-word-${record.value}`}
+                                                    index={i}
+                                                >
+                                                    {(provided) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                        >
+                                                            <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    </>
+                                )}
+                            </Droppable>
+                        )}
+
+                        <Droppable droppableId="5">
+                            {(provided) => (
+                                <>
+                                    <div
+                                        className="w-1/2 border border-dashed flex-column h-screen items-center"
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <h2>{`${t('report')} ${t('columns')}`}</h2>
+
+                                        {data[5].map((record: Record, i: number) => (
+                                            <Draggable
+                                                key={record.value}
+                                                draggableId={`right-word-${record.value}`}
+                                                index={i}
+                                            >
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                    >
+                                                        <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                </>
+                            )}
+                        </Droppable>
                     </div>
                 </DragDropContext>
             </Card>
