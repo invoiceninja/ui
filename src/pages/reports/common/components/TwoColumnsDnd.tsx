@@ -88,7 +88,7 @@ export function TwoColumnsDnd(props: Props) {
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className="flex w-full">
                         {data[0].length > 0 && (
-                        <Droppable droppableId="0">
+                        <Droppable droppableId="0" isDropDisabled={true}>
                             {(provided) => (
                                 <div
                                     className="w-1/2 border border-dashed flex-column h-screen"
@@ -120,7 +120,7 @@ export function TwoColumnsDnd(props: Props) {
                         )}
 
                         {data[1].length > 0 && (
-                        <Droppable droppableId="1">
+                        <Droppable droppableId="1" isDropDisabled={true}>
                             {(provided) => (
                                 <div
                                     className="w-1/2 border border-dashed flex-column h-screen"
@@ -153,7 +153,7 @@ export function TwoColumnsDnd(props: Props) {
                         )}
 
                         {data[2].length > 0 && (
-                        <Droppable droppableId="2">
+                        <Droppable droppableId="2" isDropDisabled={true}>
                             {(provided) => (
                                 <div
                                     className="w-1/2 border border-dashed flex-column h-screen items-center"
@@ -186,7 +186,7 @@ export function TwoColumnsDnd(props: Props) {
                         )}
 
                         {data[3].length > 0 && (
-                        <Droppable droppableId="3">
+                        <Droppable droppableId="3" isDropDisabled={true}>
                             {(provided) => (
                                 <>
                                 <div
@@ -222,7 +222,7 @@ export function TwoColumnsDnd(props: Props) {
 
 
                         {data[4].length > 0 && (
-                            <Droppable droppableId="4">
+                            <Droppable droppableId="4" isDropDisabled={true}>
                                 {(provided) => (
                                     <>
                                         <div
