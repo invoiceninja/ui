@@ -440,11 +440,24 @@ export function useActions() {
 }
 
 export const useCustomBulkActions = () => {
+  const [t] = useTranslation();
+  const invoiceTask = useInvoiceTask();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
     (_, selectedTasks) =>
       selectedTasks && (
         <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
       ),
+
+    (_, selectedTasks) =>
+      selectedTasks ? (
+        <DropdownElement
+          onClick={() => invoiceTask(selectedTasks)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_task')}
+        </DropdownElement>
+      ) : null,
   ];
 
   return customBulkActions;

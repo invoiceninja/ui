@@ -202,7 +202,6 @@ export default function Create() {
       disableSaveButton={!payment}
     >
       <Container>
-        Client: {payment?.client_id}
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
@@ -266,7 +265,7 @@ export default function Create() {
                     <InputField
                       label={t('amount_received')}
                       onValueChange={(value) =>
-                        handleInvoiceInputChange(index, parseFloat(value))
+                        handleInvoiceInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
                       }
                       className="w-full"
                       value={invoice.amount}
@@ -366,7 +365,7 @@ export default function Create() {
                     <InputField
                       label={t('amount')}
                       onValueChange={(value) =>
-                        handleCreditInputChange(index, parseFloat(value))
+                        handleCreditInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
                       }
                       className="w-full"
                       value={credit.amount}
