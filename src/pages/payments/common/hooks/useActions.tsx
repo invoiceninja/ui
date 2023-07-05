@@ -31,7 +31,10 @@ import {
 export function useActions() {
   const [t] = useTranslation();
 
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'payment' });
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'payment',
+    editPageHasLinkedTabs: true,
+  });
 
   const bulk = useBulk();
 
