@@ -64,10 +64,6 @@ export function Edit() {
 
   const [tabs, setTabs] = useState<string[]>(defaultTab);
 
-  const [tabIndex, setTabIndex] = useState<number>(
-    Number(searchParams.get('tab')) ?? 0
-  );
-
   const gateways = useGateways();
 
   const onSave = useHandleUpdate(companyGateway, setErrors);
@@ -104,7 +100,6 @@ export function Edit() {
       <TabGroup
         tabs={tabs}
         defaultTabIndex={Number(searchParams.get('tab')) ?? 0}
-        onTabChange={(index) => setTabIndex(index)}
       >
         <div>
           {companyGateway && (
@@ -129,7 +124,6 @@ export function Edit() {
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
               errors={errors}
-              showStripeConnectMessage={tabIndex === 1}
             />
           )}
         </div>

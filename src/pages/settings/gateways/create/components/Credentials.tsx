@@ -18,8 +18,6 @@ import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { StripeConnect } from './gateways/StripeConnect';
 import { WePay } from './gateways/WePay';
-import { useEffect, useState } from 'react';
-import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   gateway: Gateway;
@@ -28,39 +26,20 @@ interface Props {
     React.SetStateAction<CompanyGateway | undefined>
   >;
   errors: ValidationBag | undefined;
-  showStripeConnectMessage?: boolean;
 }
 
 export function Credentials(props: Props) {
   const [t] = useTranslation();
-
-  const { companyGateway, showStripeConnectMessage } = props;
-
-  const [shownMessage, setShownMessage] = useState<boolean>(false);
 
   const resolveInputField = useResolveInputField(
     props.companyGateway,
     props.setCompanyGateway
   );
 
-  const companyGatewayConfig = JSON.parse(companyGateway.config);
-
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY];
-
-  useEffect(() => {
-    if (
-      companyGateway.gateway_key !== STRIPE_CONNECT &&
-      !companyGatewayConfig.account_id &&
-      !shownMessage &&
-      showStripeConnectMessage
-    ) {
-      setShownMessage(true);
-      toast.error('message');
-    }
-  }, [showStripeConnectMessage]);
 
   return (
     <Card title={t('credentials')}>
