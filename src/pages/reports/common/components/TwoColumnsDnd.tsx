@@ -9,7 +9,7 @@
  */
 
 import { Card, } from '$app/components/cards';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
     DragDropContext,
     DropResult,
@@ -23,9 +23,13 @@ import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
+import collect from 'collect.js';
 
 interface Props {
     columns: string[];
+    reportKeys: string[];
+    setReportKeys: Dispatch<SetStateAction<string[]>>;
+
 }
 
 export function TwoColumnsDnd(props: Props) {
@@ -61,6 +65,10 @@ export function TwoColumnsDnd(props: Props) {
         $data[destinationIndex].splice(result.destination.index, 0, word);
 
         setData(() => [...$data]);
+
+        // console.log(collect(data[5]).pluck('value').unique().toArray());
+
+        props.setReportKeys(collect(data[5]).pluck('value').toArray());
     };
 
     const translateLabel = (record: Record) => {
@@ -202,7 +210,7 @@ export function TwoColumnsDnd(props: Props) {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -238,7 +246,7 @@ export function TwoColumnsDnd(props: Props) {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                         >
-                                                            <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                            <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -272,7 +280,7 @@ export function TwoColumnsDnd(props: Props) {
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                     >
-                                                        <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{`${t('client')} ${t(`${record.trans}`)}`}</span>
+                                                        <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                     </div>
                                                 )}
                                             </Draggable>

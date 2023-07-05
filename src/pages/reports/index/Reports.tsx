@@ -103,6 +103,7 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] =useState(false);
+  const [reportKeys, setReportKeys] = useState<string[]>([]);
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
@@ -177,11 +178,13 @@ export default function Reports() {
 
     const { client_id } = report.payload;
 
-    const updatedPayload =
+    let updatedPayload =
       report.identifier === 'product_sales'
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
+    updatedPayload = {...updatedPayload, report_keys: reportKeys}
+    
     request('POST', endpoint(report.endpoint), updatedPayload, {
       responseType: report.payload.send_email ? 'json' : 'blob',
     })
@@ -391,7 +394,11 @@ export default function Reports() {
         </Card>
       </div>
 
-      {showCustomColumns && <TwoColumnsDnd columns={report.custom_columns}/>}
+      {showCustomColumns && <TwoColumnsDnd 
+                            columns={report.custom_columns}
+                            reportKeys={reportKeys}
+                            setReportKeys={setReportKeys}
+                            />}
     </Default>
   );
 }
