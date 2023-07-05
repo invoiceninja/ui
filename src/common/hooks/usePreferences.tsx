@@ -9,8 +9,8 @@
  */
 
 import { Modal } from '$app/components/Modal';
-import { Button, InputField } from '$app/components/forms';
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '$app/components/forms';
+import { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
@@ -22,7 +22,6 @@ import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { usePasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
@@ -55,14 +54,12 @@ type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
 
 export function usePreferences() {
   const user = useInjectUserChanges();
-  const { isPasswordRequired, touch } = usePasswordConfirmation();
 
   const [t] = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const dispatch = useDispatch();
-  const passwordRef = useRef<HTMLInputElement | null>(null);
 
   const update: UpdateFn<ReactSettings> = (property, value) => {
     return dispatch(
@@ -78,28 +75,15 @@ export function usePreferences() {
   const save = async () => {
     toast.processing();
 
-    request(
-      'PUT',
-      endpoint('/api/v1/users/:id?include=company_user', {
-        id: user?.id,
-      }),
-      getState().user.changes,
-      {
-        headers: {
-          'X-Api-Password': isPasswordRequired()
-            ? passwordRef.current!.value
-            : '',
-        },
-      }
-    )
+    request('PUT', endpoint(`/api/v1/company_users/${user?.id}/preferences`), {
+      react_settings: getState().user.changes.company_user.react_settings,
+    })
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_user');
 
         dispatch(updateUser(response.data.data));
 
         setIsVisible(false);
-
-        touch();
       })
       .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
@@ -114,22 +98,7 @@ export function usePreferences() {
 
   const Preferences = useMemo(
     () =>
-      ({
-        children,
-        contentless,
-      }: {
-        children?: ReactNode;
-        contentless?: boolean;
-      }) => {
-        useEffect(() => {
-          if (isVisible && contentless && !isPasswordRequired()) {
-            // We have no content and since password isn't required,
-            // let's just submit the form for the user.
-
-            save();
-          }
-        }, [isVisible]);
-
+      ({ children }: { children?: ReactNode; contentless?: boolean }) => {
         return (
           <>
             <Modal
@@ -138,15 +107,6 @@ export function usePreferences() {
               title={t('preferences')}
             >
               {children}
-
-              {isPasswordRequired() && (
-                <InputField
-                  label={t('password')}
-                  innerRef={passwordRef}
-                  type="password"
-                  errorMessage={errors?.message}
-                />
-              )}
 
               <Button onClick={save}>{t('save')}</Button>
             </Modal>
@@ -161,7 +121,7 @@ export function usePreferences() {
           </>
         );
       },
-    [isVisible, passwordRef, errors]
+    [isVisible, errors]
   );
 
   return { Preferences, update, trigger: () => setIsVisible(true) };
