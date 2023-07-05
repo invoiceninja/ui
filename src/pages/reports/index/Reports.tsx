@@ -76,7 +76,7 @@ interface Report {
   endpoint: string;
   payload: Payload;
   custom_columns: string[];
-  allow_custom_column: Boolean;
+  allow_custom_column: boolean;
 }
 
 interface Payload {

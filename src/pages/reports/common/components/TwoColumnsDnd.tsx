@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Card, } from '$app/components/cards';
 import { useState } from 'react';
 import {
     DragDropContext,
