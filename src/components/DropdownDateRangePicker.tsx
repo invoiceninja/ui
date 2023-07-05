@@ -18,6 +18,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 
 type Props = {
+  value?: string;
   startDate: string;
   endDate: string;
   handleDateChange: (value: string) => unknown;
@@ -56,7 +57,7 @@ export function DropdownDateRangePicker(props: Props) {
     <div className="flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
-        defaultValue="this_month"
+        value={props.value}
         className={
           'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
         }

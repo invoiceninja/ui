@@ -100,11 +100,9 @@ export function Totals() {
     end_date: string;
     date_range: string;
   }>({
-    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      .toISOString()
-      .split('T')[0],
-    end_date: new Date().toISOString().split('T')[0],
-    date_range: 'this_month',
+    start_date: '',
+    end_date: '',
+    date_range: settings.preferences.dashboard_charts.range,
   });
 
   const handleDateRangeChange = (dateRange: string) => {
@@ -170,6 +168,12 @@ export function Totals() {
     setCurrency(settings.preferences.dashboard_charts.currency);
   }, [currencies, settings.preferences.dashboard_charts.currency]);
 
+  useEffect(() => {
+    console.log(settings.preferences.dashboard_charts.range)
+
+    setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
+  }, [settings.preferences.dashboard_charts.range]);
+
   return (
     <>
       {isLoadingTotals && (
@@ -227,6 +231,7 @@ export function Totals() {
               startDate={dates.start_date}
               endDate={dates.end_date}
               handleDateRangeChange={handleDateRangeChange}
+              value={body.date_range}
             />
           </div>
 
@@ -276,7 +281,6 @@ export function Totals() {
               <option value="this_year">{t('this_year')}</option>
               <option value="last_year">{t('last_year')}</option>
               <option value={'last365_days'}>{`${t('last365_days')}`}</option>
-              <option value={'custom'}>{`${t('custom')}`}</option>
             </SelectField>
           </Preferences>
         </div>

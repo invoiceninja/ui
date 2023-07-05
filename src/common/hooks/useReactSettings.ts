@@ -71,7 +71,7 @@ export function useReactSettings() {
       dashboard_charts: {
         default_view: 'month',
         currency: 1,
-        range: 'last_7_days',
+        range: 'this_month',
       },
       datatables: {
         clients: {
