@@ -17,7 +17,6 @@ import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { Tab } from '$app/components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
@@ -30,6 +29,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { Button } from '$app/components/forms';
+import { useTabs } from './hooks/useTabs';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -57,38 +57,7 @@ export default function Client() {
 
   const handlePurgeClient = usePurgeClient(id);
 
-  const tabs: Tab[] = [
-    { name: t('invoices'), href: route('/clients/:id', { id }) },
-    { name: t('quotes'), href: route('/clients/:id/quotes', { id }) },
-    {
-      name: t('payments'),
-      href: route('/clients/:id/payments', { id }),
-    },
-    {
-      name: t('recurring_invoices'),
-      href: route('/clients/:id/recurring_invoices', { id }),
-    },
-    {
-      name: t('credits'),
-      href: route('/clients/:id/credits', { id }),
-    },
-    {
-      name: t('projects'),
-      href: route('/clients/:id/projects', { id }),
-    },
-    {
-      name: t('tasks'),
-      href: route('/clients/:id/tasks', { id }),
-    },
-    {
-      name: t('expenses'),
-      href: route('/clients/:id/expenses', { id }),
-    },
-    {
-      name: t('recurring_expenses'),
-      href: route('/clients/:id/recurring_expenses', { id }),
-    },
-  ];
+  const tabs = useTabs();
 
   const actions = useActions({
     setIsMergeModalOpen,

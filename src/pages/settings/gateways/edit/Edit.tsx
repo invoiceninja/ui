@@ -26,6 +26,7 @@ import { LimitsAndFees } from '../create/components/LimitsAndFees';
 import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
 import { useHandleUpdate } from './hooks/useHandleUpdate';
+import { ImportCustomers } from './components/stripe/ImportCustomers';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -102,9 +103,17 @@ export function Edit() {
       >
         <div>
           {companyGateway && (
-            <Card title={t('edit_gateway')}>
-              <Element leftSide={t('provider')}>{companyGateway.label}</Element>
-            </Card>
+            <div className="space-y-4">
+              <Card title={t('edit_gateway')}>
+                <Element leftSide={t('provider')}>
+                  {companyGateway.label}
+                </Element>
+              </Card>
+
+              {gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ? (
+                <ImportCustomers />
+              ) : null}
+            </div>
           )}
         </div>
 
