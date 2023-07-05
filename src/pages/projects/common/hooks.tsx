@@ -32,7 +32,7 @@ import {
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -46,6 +46,7 @@ import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
 import { CustomBulkAction } from '$app/components/DataTable';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'name',
@@ -240,9 +241,7 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
 
   const queryClient = useQueryClient();
 
@@ -250,11 +249,9 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const shouldShowEditAction =
-    location.pathname.includes(id!) && !location.pathname.includes('/edit');
-
-  const isEditOrShowPage =
-    location.pathname.includes(id!) && !location.pathname.includes('/clients');
+  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
+    entity: 'project',
+  });
 
   const setProject = useSetAtom(projectAtom);
 
@@ -306,7 +303,7 @@ export function useActions() {
 
   const actions = [
     (project: Project) =>
-      shouldShowEditAction && (
+      isShowPage && (
         <DropdownElement
           onClick={() =>
             navigate(route('/projects/:id/edit', { id: project.id }))
@@ -316,7 +313,7 @@ export function useActions() {
           {t('edit')}
         </DropdownElement>
       ),
-    () => shouldShowEditAction && <Divider withoutPadding />,
+    () => isShowPage && <Divider withoutPadding />,
     (project: Project) => (
       <DropdownElement
         onClick={() => handleInvoiceProject(project)}

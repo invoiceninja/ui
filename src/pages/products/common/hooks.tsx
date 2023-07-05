@@ -30,7 +30,7 @@ import {
   MdDelete,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
@@ -39,6 +39,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -236,17 +237,16 @@ export function useProductColumns() {
 }
 
 export function useActions() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
 
   const setProduct = useSetAtom(productAtom);
 
-  const isEditPage = location.pathname.includes(id!);
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'product',
+  });
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });

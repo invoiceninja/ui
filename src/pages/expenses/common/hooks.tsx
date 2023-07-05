@@ -55,6 +55,7 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -65,7 +66,9 @@ export function useActions() {
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'expense',
+  });
 
   const { create, calculatedTaxRate } = useInvoiceExpense();
 

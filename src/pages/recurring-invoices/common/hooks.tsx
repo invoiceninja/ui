@@ -38,7 +38,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { Quote } from '$app/common/interfaces/quote';
@@ -74,6 +74,7 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -179,8 +180,9 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
-
-      const invoiceSum = recurringInvoice.uses_inclusive_taxes ? new InvoiceSumInclusive(recurringInvoice, currency).build() : new InvoiceSum(recurringInvoice, currency).build();
+      const invoiceSum = recurringInvoice.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(recurringInvoice, currency).build()
+        : new InvoiceSum(recurringInvoice, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -283,7 +285,6 @@ export function useToggleStartStop() {
 }
 
 export function useActions() {
-  const location = useLocation();
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -294,7 +295,9 @@ export function useActions() {
 
   const bulk = useBulkAction();
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'recurring_invoice',
+  });
 
   const navigate = useNavigate();
   const toggleStartStop = useToggleStartStop();

@@ -40,6 +40,8 @@ import {
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import { Task } from '$app/common/interfaces/task';
+import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 
 dayjs.extend(duration);
 
@@ -75,6 +77,8 @@ export default function Show() {
   const taskColumns = useAllTaskColumns();
 
   const customBulkActions = useCustomBulkActions();
+
+  const showEditOption = useShowEditOption();
 
   if (!project) {
     return (
@@ -158,6 +162,8 @@ export default function Show() {
           endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           bulkRoute="/api/v1/tasks/bulk"
           linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
+          linkToEdit="/tasks/:id/edit"
+          showEdit={(task: Task) => showEditOption(task)}
           customFilters={filters}
           customBulkActions={customBulkActions}
           customFilterQueryKey="client_status"

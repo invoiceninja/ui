@@ -51,6 +51,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/recurring-expense';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'status',
@@ -438,7 +439,9 @@ export function useActions() {
 
   const bulk = useBulk();
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'recurring_expense',
+  });
 
   const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {
     setRecurringExpense({ ...recurringExpense, documents: [], number: '' });

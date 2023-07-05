@@ -38,7 +38,7 @@ import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -86,6 +86,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -274,7 +275,6 @@ export function useActions() {
 
   const { t } = useTranslation();
 
-  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const printPdf = usePrintPdf({ entity: 'quote' });
@@ -282,6 +282,8 @@ export function useActions() {
   const approve = useApprove();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
+
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -499,9 +501,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'archive')}
@@ -511,7 +513,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'restore')}
@@ -521,7 +523,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'delete')}

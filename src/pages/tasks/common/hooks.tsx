@@ -29,14 +29,13 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
-  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -54,6 +53,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/tasks';
 import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
 import { CustomBulkAction } from '$app/components/DataTable';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'status',
@@ -337,21 +337,13 @@ export function useTaskFilters() {
 }
 
 export function useActions() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
-  const location = useLocation();
-
-  const isEditPage = location.pathname.endsWith('/edit');
-
-  const showEditAction =
-    (location.pathname.includes(id!) && !isEditPage) ||
-    location.pathname.endsWith('/tasks');
-
-  const company = useCurrentCompany();
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'task',
+  });
 
   const start = useStart();
 
@@ -370,21 +362,6 @@ export function useActions() {
   };
 
   const actions = [
-    (task: Task) =>
-      showEditAction &&
-      (!task.invoice_id || !company?.invoice_task_lock) && (
-        <DropdownElement
-          onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    (task: Task) =>
-      showEditAction &&
-      (!task.invoice_id || !company?.invoice_task_lock) && (
-        <Divider withoutPadding />
-      ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
