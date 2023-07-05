@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { Dispatch, SetStateAction, useState } from 'react';
 import {
-    DragDropContext,
-    DropResult,
-    Droppable,
-    Draggable,
+  DragDropContext,
+  DropResult,
+  Droppable,
+  Draggable,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
 import { clientMap } from '$app/common/constants/exports/client-map';
@@ -24,273 +24,176 @@ import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import collect from 'collect.js';
+import { useTranslation } from 'react-i18next';
+
+interface Record {
+  trans: string;
+  value: string;
+}
+
+interface ColumnProps {
+  title: string;
+  droppableId: string;
+  isDropDisabled: boolean;
+  data: Record[];
+}
+
+export function Column({
+  title,
+  droppableId,
+  isDropDisabled,
+  data,
+}: ColumnProps) {
+  const [t] = useTranslation();
+
+  const translateLabel = (record: Record) => {
+    const parts = record.value.split('.');
+
+    return `${t(`${parts[0]}`)} - ${t(`${record.trans}`)}`;
+  };
+
+  return (
+    <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
+      {(provided) => (
+        <div
+          className="w-80 flex-column"
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
+          <h2 className="text-gray-500 font-medium">{title}</h2>
+          <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
+            {data.map((record: Record, i: number) => (
+              <Draggable
+                key={record.value}
+                draggableId={`left-word-${record.value}`}
+                index={i}
+              >
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    <span
+                      className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
+                      key={i}
+                    >
+                      {translateLabel(record)}
+                    </span>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+          </div>
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
+}
 
 interface Props {
-    columns: string[];
-    reportKeys: string[];
-    setReportKeys: Dispatch<SetStateAction<string[]>>;
-
+  columns: string[];
+  reportKeys: string[];
+  setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
 export function TwoColumnsDnd(props: Props) {
-    const [data, setData] = useState([
-        props.columns.includes('client') ? clientMap : [],
-        props.columns.includes('invoice') ? invoiceMap : [],
-        props.columns.includes('credit') ? creditMap : [],
-        props.columns.includes('quote') ? quoteMap : [],
-        props.columns.includes('payment') ? paymentMap : [],
-        [],
-    ]);
+  const [data, setData] = useState([
+    props.columns.includes('client') ? clientMap : [],
+    props.columns.includes('invoice') ? invoiceMap : [],
+    props.columns.includes('credit') ? creditMap : [],
+    props.columns.includes('quote') ? quoteMap : [],
+    props.columns.includes('payment') ? paymentMap : [],
+    [],
+  ]);
 
-    const onDragEnd = (result: DropResult) => {
-        if (!result.destination) {
-            return;
-        }
-        // Create a copy of the data array
-        const $data = cloneDeep(data);
-
-        // Find a source index
-        const sourceIndex = parseInt(result.source.droppableId);
-
-        // Find a string
-        const word = $data[sourceIndex][result.source.index];
-
-        // Cut a word from the original array
-        $data[sourceIndex].splice(result.source.index, 1);
-
-        // Find a destination index
-        const destinationIndex = parseInt(result.destination.droppableId);
-
-        // Then we can insert the word into new array at specific index
-        $data[destinationIndex].splice(result.destination.index, 0, word);
-
-        setData(() => [...$data]);
-        
-        props.setReportKeys(collect($data[5]).pluck('value').toArray());
-    };
-
-    const translateLabel = (record: Record) => {
-        
-        const parts = record.value.split('.');
-
-        return `${t(`${parts[0]}`)} - ${t(`${record.trans}`)}` 
-
-    };
-
-    interface Record {
-        trans: string;
-        value: string;
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
     }
+    // Create a copy of the data array
+    const $data = cloneDeep(data);
 
-    return (
-        <div className="max-w-5xl">
-            <Card className="my-6">
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="flex w-full">
-                        {data[0].length > 0 && (
-                        <Droppable droppableId="0" isDropDisabled={true}>
-                            {(provided) => (
-                                <div
-                                    className="w-1/2 border border-dashed flex-column h-screen"
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                >
-                                    <h2>{t('client')}</h2>
-                                    {data[0].map((record: Record, i: number) => (
-                                        <Draggable
-                                            key={record.value}
-                                            draggableId={`left-word-${record.value}`}
-                                            index={i}
-                                        >
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                        )}
+    // Find a source index
+    const sourceIndex = parseInt(result.source.droppableId);
 
-                        {data[1].length > 0 && (
-                        <Droppable droppableId="1" isDropDisabled={true}>
-                            {(provided) => (
-                                <div
-                                    className="w-1/2 border border-dashed flex-column h-screen"
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                >
-                                    <h2>{t('Invoice')}</h2>
-                                    {data[1].map((record: Record, i: number) => (
-                                        <Draggable
-                                            key={record.value}
-                                            draggableId={`left-word-${record.value}`}
-                                            index={i}
-                                        >
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    className='content-start'
-                                                >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                        )}
+    // Find a string
+    const word = $data[sourceIndex][result.source.index];
 
-                        {data[2].length > 0 && (
-                        <Droppable droppableId="2" isDropDisabled={true}>
-                            {(provided) => (
-                                <div
-                                    className="w-1/2 border border-dashed flex-column h-screen items-center"
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                >
-                                    <h2>{t('credit')}</h2>
+    // Cut a word from the original array
+    $data[sourceIndex].splice(result.source.index, 1);
 
-                                    {data[2].map((record: Record, i: number) => (
-                                        <Draggable
-                                            key={record.value}
-                                            draggableId={`left-word-${record.value}`}
-                                            index={i}
-                                        >
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                        )}
+    // Find a destination index
+    const destinationIndex = parseInt(result.destination.droppableId);
 
-                        {data[3].length > 0 && (
-                        <Droppable droppableId="3" isDropDisabled={true}>
-                            {(provided) => (
-                                <>
-                                <div
-                                    className="w-1/2 border border-dashed flex-column h-screen items-center"
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                >
-                                    <h2>{t('quote')}</h2>
+    // Then we can insert the word into new array at specific index
+    $data[destinationIndex].splice(result.destination.index, 0, word);
 
-                                    {data[3].map((record: Record, i: number) => (
-                                        <Draggable
-                                            key={record.value}
-                                            draggableId={`right-word-${record.value}`}
-                                            index={i}
-                                        >
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                                </>
-                            )}
-                        </Droppable>
-                        )}
+    setData(() => [...$data]);
 
+    props.setReportKeys(collect($data[5]).pluck('value').toArray());
+  };
 
-                        {data[4].length > 0 && (
-                            <Droppable droppableId="4" isDropDisabled={true}>
-                                {(provided) => (
-                                    <>
-                                        <div
-                                            className="w-1/2 border border-dashed flex-column h-screen items-center"
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
-                                        >
-                                            <h2>{t('payment')}</h2>
+  return (
+    <div className="min-w-min">
+      <Card className="my-6">
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="flex w-full py-2 px-6 space-x-4">
+            {data[0].length > 0 && (
+              <Column
+                title={t('client')}
+                data={data[0]}
+                droppableId="0"
+                isDropDisabled={true}
+              />
+            )}
 
-                                            {data[4].map((record: Record, i: number) => (
-                                                <Draggable
-                                                    key={record.value}
-                                                    draggableId={`right-word-${record.value}`}
-                                                    index={i}
-                                                >
-                                                    {(provided) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                        >
-                                                            <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    </>
-                                )}
-                            </Droppable>
-                        )}
+            {data[1].length > 0 && (
+              <Column
+                title={t('invoice')}
+                data={data[1]}
+                droppableId="1"
+                isDropDisabled={true}
+              />
+            )}
 
-                        <Droppable droppableId="5">
-                            {(provided) => (
-                                <>
-                                    <div
-                                        className="w-1/2 border border-dashed flex-column h-screen items-center"
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                    >
-                                        <h2>{`${t('report')} ${t('columns')}`}</h2>
+            {data[2].length > 0 && (
+              <Column
+                title={t('credit')}
+                data={data[2]}
+                droppableId="2"
+                isDropDisabled={true}
+              />
+            )}
 
-                                        {data[5].map((record: Record, i: number) => (
-                                            <Draggable
-                                                key={record.value}
-                                                draggableId={`right-word-${record.value}`}
-                                                index={i}
-                                            >
-                                                {(provided) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                    >
-                                                        <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                </>
-                            )}
-                        </Droppable>
-                    </div>
-                </DragDropContext>
-            </Card>
-        </div>
-    );
+            {data[3].length > 0 && (
+              <Column
+                title={t('quote')}
+                data={data[3]}
+                droppableId="3"
+                isDropDisabled={true}
+              />
+            )}
+
+            {data[4].length > 0 && (
+              <Column
+                title={t('payment')}
+                data={data[4]}
+                droppableId="4"
+                isDropDisabled={true}
+              />
+            )}
+
+            <Column
+              title={`${t('report')} ${t('columns')}`}
+              data={data[5]}
+              droppableId="5"
+              isDropDisabled={false}
+            />
+          </div>
+        </DragDropContext>
+      </Card>
+    </div>
+  );
 }
