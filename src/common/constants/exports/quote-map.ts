@@ -40,7 +40,7 @@ export const quoteMap: Record[] = [
 { trans: 'surcharge3', value: "quote.custom_surcharge3" },
 { trans: 'surcharge4', value: "quote.custom_surcharge4" },
 { trans: 'exchange_rate', value: "quote.exchange_rate" },
-{ trans: 'tax_amount', value: "quote.tax_amount" },    
+    { trans: 'tax_amount', value: "quote.total_taxes" },    
 { trans: 'quantity', value: "item.quantity" },
 { trans: 'discount', value: "item.discount" },
 { trans: 'cost', value: "item.cost" },

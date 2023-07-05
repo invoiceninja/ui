@@ -66,9 +66,9 @@ export function TwoColumnsDnd(props: Props) {
 
         setData(() => [...$data]);
 
-        // console.log(collect(data[5]).pluck('value').unique().toArray());
-
-        props.setReportKeys(collect(data[5]).pluck('value').toArray());
+        console.log($data[5]);
+        
+        props.setReportKeys(collect($data[5]).pluck('value').toArray());
     };
 
     const translateLabel = (record: Record) => {

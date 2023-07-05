@@ -39,7 +39,7 @@ export const invoiceMap: Record[] = [
     { trans: 'surcharge3', value: "invoice.custom_surcharge3" },
     { trans: 'surcharge4', value: "invoice.custom_surcharge4" },
     { trans: 'exchange_rate', value: "invoice.exchange_rate" },
-    { trans: 'tax_amount', value: "invoice.tax_amount" },    
+    { trans: 'tax_amount', value: "invoice.total_taxes" },    
     { trans: 'quantity', value: "item.quantity" },
     { trans: 'discount', value: "item.discount" },
     { trans: 'cost', value: "item.cost" },
