@@ -19,6 +19,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export function useHandleCreate(
   setErrors: (errors: ValidationBag | undefined) => unknown
@@ -26,11 +27,15 @@ export function useHandleCreate(
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (invoice: Invoice) => {
+  return async (invoice: Invoice) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/invoices'), invoice)
       .then((response: GenericSingleResourceResponse<Invoice>) => {

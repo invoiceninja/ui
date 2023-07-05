@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '../settings';
 
 export default function Dashboard() {
   useTitle('dashboard');
@@ -30,6 +32,8 @@ export default function Dashboard() {
   const user = useCurrentUser();
 
   const { isAdmin } = useAdmin();
+
+  const enabled = useEnabled();
 
   return (
     <Default
@@ -62,13 +66,17 @@ export default function Dashboard() {
           <PastDueInvoices />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
-          <ExpiredQuotes />
-        </div>
+        {enabled(ModuleBitmask.Quotes) && (
+          <div className="col-span-12 xl:col-span-6">
+            <ExpiredQuotes />
+          </div>
+        )}
 
-        <div className="col-span-12 xl:col-span-6">
-          <UpcomingQuotes />
-        </div>
+        {enabled(ModuleBitmask.Quotes) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingQuotes />
+          </div>
+        )}
       </div>
     </Default>
   );

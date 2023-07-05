@@ -10,7 +10,10 @@
 
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
-import { useRecurringExpenseColumns } from '$app/pages/recurring-expenses/common/hooks';
+import {
+  useActions,
+  useRecurringExpenseColumns,
+} from '$app/pages/recurring-expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
 const dataTableStaleTime = 50;
@@ -20,6 +23,8 @@ export default function RecurringExpenses() {
 
   const columns = useRecurringExpenseColumns();
 
+  const actions = useActions();
+
   return (
     <DataTable
       resource="recurring_expense"
@@ -28,6 +33,7 @@ export default function RecurringExpenses() {
         { id }
       )}
       columns={columns}
+      customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_expenses/bulk"
       linkToCreate={route('/recurring_expenses/create?vendor=:id', { id })}

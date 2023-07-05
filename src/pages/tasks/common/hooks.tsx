@@ -296,6 +296,14 @@ export function useSave() {
         toast.success('updated_task');
 
         queryClient.invalidateQueries(
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId: task.project_id,
+          })
+        );
+
+        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+
+        queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
       })
@@ -337,8 +345,11 @@ export function useActions() {
 
   const location = useLocation();
 
-  const isEditPage =
-    location.pathname.includes(id!) && !location.pathname.includes('projects');
+  const isEditPage = location.pathname.endsWith('/edit');
+
+  const showEditAction =
+    (location.pathname.includes(id!) && !isEditPage) ||
+    location.pathname.endsWith('/tasks');
 
   const company = useCurrentCompany();
 
@@ -360,7 +371,7 @@ export function useActions() {
 
   const actions = [
     (task: Task) =>
-      !location.pathname.endsWith('/edit') &&
+      showEditAction &&
       (!task.invoice_id || !company?.invoice_task_lock) && (
         <DropdownElement
           onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
@@ -370,7 +381,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      !location.pathname.endsWith('/edit') &&
+      showEditAction &&
       (!task.invoice_id || !company?.invoice_task_lock) && (
         <Divider withoutPadding />
       ),
@@ -452,11 +463,24 @@ export function useActions() {
 }
 
 export const useCustomBulkActions = () => {
+  const [t] = useTranslation();
+  const invoiceTask = useInvoiceTask();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
     (_, selectedTasks) =>
       selectedTasks && (
         <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
       ),
+
+    (_, selectedTasks) =>
+      selectedTasks ? (
+        <DropdownElement
+          onClick={() => invoiceTask(selectedTasks)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_task')}
+        </DropdownElement>
+      ) : null,
   ];
 
   return customBulkActions;

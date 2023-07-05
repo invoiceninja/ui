@@ -68,10 +68,10 @@ export function CreateVendorForm(props: Props) {
 
   const saveCompany = useHandleCompanySave();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/vendors'), vendor)
       .then((response) => {

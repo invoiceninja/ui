@@ -69,6 +69,7 @@ import {
   MdDelete,
   MdDownload,
   MdMarkEmailRead,
+  MdPaid,
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
@@ -84,6 +85,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useMarkPaid } from './hooks/useMarkPaid';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -204,11 +206,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/credits'), credit)
       .then((response: GenericSingleResourceResponse<Credit>) => {
@@ -236,12 +242,12 @@ export function useSave(props: CreateProps) {
 
   const saveCompany = useHandleCompanySave();
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
 
     setErrors(undefined);
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
       .then(() => {
@@ -277,6 +283,7 @@ export function useActions() {
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
+  const markPaid = useMarkPaid();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
@@ -453,6 +460,18 @@ export function useActions() {
             icon={<Icon element={MdMarkEmailRead} />}
           >
             {t('mark_sent')}
+          </DropdownElement>
+        </div>
+      ),
+    (credit) =>
+    (credit.status_id === CreditStatus.Draft || credit.status_id === CreditStatus.Sent || credit.status_id === CreditStatus.Partial) && 
+     credit.amount < 0 && (
+        <div>
+          <DropdownElement
+            onClick={() => markPaid(credit)}
+            icon={<Icon element={MdPaid} />}
+          >
+            {t('mark_paid')}
           </DropdownElement>
         </div>
       ),

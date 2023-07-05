@@ -57,10 +57,10 @@ export default function Edit() {
 
   const saveCompany = useHandleCompanySave();
 
-  const onSave = () => {
+  const onSave = async () => {
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/vendors/:id', { id }), vendor)
       .then(() => {
