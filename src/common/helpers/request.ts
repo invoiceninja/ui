@@ -23,7 +23,7 @@ client.interceptors.response.use(
     }
 
     if (error.response?.status === 404) {
-      window.location.href = '/#/not_found';
+      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
     }
 
     return Promise.reject(error);
