@@ -202,7 +202,6 @@ export default function Create() {
       disableSaveButton={!payment}
     >
       <Container>
-        Client: {payment?.client_id}
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
