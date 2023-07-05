@@ -22,6 +22,7 @@ export interface ReactSettings {
   preferences: {
     dashboard_charts: {
       default_view: 'day' | 'week' | 'month';
+      range: string;
       currency: number;
     };
     datatables: {
@@ -70,6 +71,7 @@ export function useReactSettings() {
       dashboard_charts: {
         default_view: 'month',
         currency: 1,
+        range: 'last_7_days',
       },
       datatables: {
         clients: {
