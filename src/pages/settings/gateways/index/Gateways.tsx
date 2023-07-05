@@ -32,32 +32,36 @@ export function Gateways() {
     {
       id: 'label',
       label: t('label'),
-      format: (field, gateway) => (
-        <div className="flex items-center space-x-2">
-          <Link
-            to={route('/settings/gateways/:id/edit?tab=:tab', {
-              id: gateway.id,
-              tab: STRIPE_CONNECT === gateway.gateway_key ? 1 : 0,
-            })}
-          >
-            {field}
-          </Link>
+      format: (field, gateway) => {
+        const gatewayConfig = JSON.parse(gateway.config);
 
-          {STRIPE_CONNECT === gateway.gateway_key && (
-            <Tooltip
-              size="regular"
-              message={t('stripe_connect_migration_title') as string}
-              width="auto"
-              placement="top"
+        return (
+          <div className="flex items-center space-x-2">
+            <Link
+              to={route('/settings/gateways/:id/edit?tab=:tab', {
+                id: gateway.id,
+                tab: STRIPE_CONNECT === gateway.gateway_key ? 1 : 0,
+              })}
             >
-              <div className="flex space-x-2">
-                <MdWarning color="red" size={22} />
-                <MdWarning color="red" size={22} />
-              </div>
-            </Tooltip>
-          )}
-        </div>
-      ),
+              {field}
+            </Link>
+
+            {STRIPE_CONNECT === gateway.gateway_key &&
+              !gatewayConfig.account_id && (
+                <Tooltip
+                  message={t('stripe_connect_migration_title') as string}
+                  width="auto"
+                  placement="top"
+                >
+                  <div className="flex space-x-2">
+                    <MdWarning color="red" size={22} />
+                    <MdWarning color="red" size={22} />
+                  </div>
+                </Tooltip>
+              )}
+          </div>
+        );
+      },
     },
     {
       id: 'test_mode',
