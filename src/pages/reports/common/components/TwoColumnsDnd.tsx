@@ -108,7 +108,7 @@ export function TwoColumnsDnd(props: Props) {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                    <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -141,7 +141,7 @@ export function TwoColumnsDnd(props: Props) {
                                                     {...provided.dragHandleProps}
                                                     className='content-start'
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                    <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -174,7 +174,7 @@ export function TwoColumnsDnd(props: Props) {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                    <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -208,7 +208,7 @@ export function TwoColumnsDnd(props: Props) {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                    <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -244,7 +244,7 @@ export function TwoColumnsDnd(props: Props) {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                         >
-                                                            <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                            <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -278,7 +278,7 @@ export function TwoColumnsDnd(props: Props) {
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                     >
-                                                        <span className="p-4 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
+                                                        <span className="p-2 mb-3 flex justify-between items-center bg-white shadow rounded-lg cursor-move ml-2 text-gray-700 font-semibold font-sans tracking-wide" key={i}>{translateLabel(record)}</span>
                                                     </div>
                                                 )}
                                             </Draggable>
