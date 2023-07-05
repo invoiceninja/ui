@@ -65,8 +65,6 @@ export function TwoColumnsDnd(props: Props) {
         $data[destinationIndex].splice(result.destination.index, 0, word);
 
         setData(() => [...$data]);
-
-        console.log($data[5]);
         
         props.setReportKeys(collect($data[5]).pluck('value').toArray());
     };
