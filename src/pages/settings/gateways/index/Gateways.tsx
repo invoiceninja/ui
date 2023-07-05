@@ -35,30 +35,32 @@ export function Gateways() {
       format: (field, gateway) => {
         const gatewayConfig = JSON.parse(gateway.config);
 
+        const showWarning =
+          STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
+
         return (
           <div className="flex items-center space-x-2">
             <Link
               to={route('/settings/gateways/:id/edit?tab=:tab', {
                 id: gateway.id,
-                tab: STRIPE_CONNECT === gateway.gateway_key ? 1 : 0,
+                tab: showWarning ? 1 : 0,
               })}
             >
               {field}
             </Link>
 
-            {STRIPE_CONNECT === gateway.gateway_key &&
-              !gatewayConfig.account_id && (
-                <Tooltip
-                  message={t('stripe_connect_migration_title') as string}
-                  width="auto"
-                  placement="top"
-                >
-                  <div className="flex space-x-2">
-                    <MdWarning color="red" size={22} />
-                    <MdWarning color="red" size={22} />
-                  </div>
-                </Tooltip>
-              )}
+            {showWarning && (
+              <Tooltip
+                message={t('stripe_connect_migration_title') as string}
+                width="auto"
+                placement="top"
+              >
+                <div className="flex space-x-2">
+                  <MdWarning color="red" size={22} />
+                  <MdWarning color="red" size={22} />
+                </div>
+              </Tooltip>
+            )}
           </div>
         );
       },
