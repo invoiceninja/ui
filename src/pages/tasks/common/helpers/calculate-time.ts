@@ -56,7 +56,7 @@ export function calculateHours(log: string) {
       .padStart(2, '0')}:${totalSecondsRemaining.toString().padStart(2, '0')}`;
   }
 
-  return totalHours;
+  return `${totalHours}h`;
 }
 
 interface CalculateTimeOptions {

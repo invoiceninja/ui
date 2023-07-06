@@ -137,7 +137,7 @@ export default function Kanban() {
           columns[index].cards.push({
             id: task.id,
             title: task.description,
-            description: calculateHours(task.time_log),
+            description: calculateHours(task.time_log).toString(),
             sortOrder: task.status_order,
             task,
           });
