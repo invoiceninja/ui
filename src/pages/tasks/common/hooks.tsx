@@ -43,7 +43,7 @@ import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
-import { calculateTime, parseTimeLog } from './helpers/calculate-time';
+import { calculateHours, parseTimeLog } from './helpers/calculate-time';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
@@ -179,7 +179,7 @@ export function useTaskColumns() {
       column: 'duration',
       id: 'time_log',
       label: t('duration'),
-      format: (value) => calculateTime(value.toString()),
+      format: (value) => calculateHours(value.toString()),
     },
     {
       column: 'entity_state',
