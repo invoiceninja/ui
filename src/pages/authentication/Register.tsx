@@ -98,7 +98,6 @@ export function Register() {
             <section>
               <InputField
                 type="email"
-                autoComplete="new-password"
                 label={t('email_address')}
                 id="email"
                 onChange={form.handleChange}
@@ -114,7 +113,6 @@ export function Register() {
             <section className="mt-4">
               <InputField
                 type="password"
-                autoComplete="new-password"
                 label={t('password')}
                 id="password"
                 onChange={form.handleChange}
@@ -130,7 +128,6 @@ export function Register() {
             <section className="mt-4">
               <InputField
                 type="password"
-                autoComplete="new-password"
                 label={t('password_confirmation')}
                 id="password_confirmation"
                 onChange={form.handleChange}
