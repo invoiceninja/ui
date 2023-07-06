@@ -25,6 +25,7 @@ import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
+import { itemMap } from '$app/common/constants/exports/item-map';
 
 interface Record {
   trans: string;
@@ -101,9 +102,9 @@ interface Props {
 export function TwoColumnsDnd(props: Props) {
   const [data, setData] = useState([
     props.columns.includes('client') ? clientMap : [],
-    props.columns.includes('invoice') ? invoiceMap : [],
-    props.columns.includes('credit') ? creditMap : [],
-    props.columns.includes('quote') ? quoteMap : [],
+    props.columns.includes('invoice') ? (props.columns.includes('item') ? invoiceMap.concat(itemMap) : invoiceMap) : [],
+    props.columns.includes('credit') ? (props.columns.includes('item') ? creditMap.concat(itemMap) : creditMap) : [],
+    props.columns.includes('quote') ? (props.columns.includes('item') ? quoteMap.concat(itemMap) : quoteMap) : [],
     props.columns.includes('payment') ? paymentMap : [],
     [],
   ]);
