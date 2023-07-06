@@ -19,6 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { atom, useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 export const dayJSLocaleAtom = atom<ILocale | null>(null);
 
@@ -26,6 +27,8 @@ export function App() {
   const { i18n } = useTranslation();
 
   const company = useCurrentCompany();
+
+  const navigate = useNavigate();
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
@@ -69,6 +72,12 @@ export function App() {
       }
     }
   }, [darkMode, resolvedLanguage]);
+
+  useEffect(() => {
+    window.addEventListener('navigate.invalid.page', () =>
+      navigate('/not_found')
+    );
+  }, []);
 
   return (
     <div className="App">

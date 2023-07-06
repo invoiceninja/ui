@@ -13,22 +13,32 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdPrint } from 'react-icons/md';
+import { MdDownload, MdPrint } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
+import { useDownloadPdfs } from './useDownloadPdfs';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const printPdf = usePrintPdf({ entity: 'invoice' });
+  const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     (selectedIds) => (
+      <>
       <DropdownElement
         onClick={() => printPdf(selectedIds)}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
+      <DropdownElement
+        onClick={() => downloadPdfs(selectedIds)}
+          icon={<Icon element={MdDownload} />}
+      >
+        {t('download_pdf')}
+      </DropdownElement>
+      </>
     ),
   ];
 
