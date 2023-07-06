@@ -44,21 +44,19 @@ export function calculateHours(log: string) {
     const durationInSeconds = finishTime - start;
 
     seconds += Math.max(durationInSeconds, 0);
-
-    const totalHours = Math.floor(seconds / 3600);
-    const totalMinutes = Math.floor((seconds % 3600) / 60);
-    const totalSecondsRemaining = seconds % 60;
-
-    if (totalHours < 24) {
-      return `${totalHours}:${totalMinutes
-        .toString()
-        .padStart(2, '0')}:${totalSecondsRemaining
-        .toString()
-        .padStart(2, '0')}`;
-    }
-
-    return totalHours;
   }
+
+  const totalHours = Math.floor(seconds / 3600);
+  const totalMinutes = Math.floor((seconds % 3600) / 60);
+  const totalSecondsRemaining = seconds % 60;
+
+  if (totalHours < 24) {
+    return `${totalHours}:${totalMinutes
+      .toString()
+      .padStart(2, '0')}:${totalSecondsRemaining.toString().padStart(2, '0')}`;
+  }
+
+  return totalHours;
 }
 
 interface CalculateTimeOptions {
