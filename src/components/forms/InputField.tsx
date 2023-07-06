@@ -34,6 +34,7 @@ interface Props extends CommonProps {
   textareaRows?: number;
   step?: string;
   maxLength?: number;
+  autoComplete?: string;
 }
 
 export function InputField(props: Props) {
@@ -66,6 +67,7 @@ export function InputField(props: Props) {
         <DebounceInput
           min={props.min}
           maxLength={props.maxLength}
+          autoComplete={props.autoComplete}
           disabled={props.disabled}
           element={props.element || 'input'}
           inputRef={props.innerRef}
