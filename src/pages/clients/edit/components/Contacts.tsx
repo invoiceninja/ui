@@ -80,7 +80,6 @@ export function Contacts(props: Props) {
           <Element leftSide={t('first_name')}>
             <InputField
               id={`first_name_${index}`}
-              autoComplete="new-password"
               value={contact.first_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
@@ -96,7 +95,6 @@ export function Contacts(props: Props) {
           <Element leftSide={t('last_name')}>
             <InputField
               id={`last_name_${index}`}
-              autoComplete="new-password"
               value={contact.last_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
@@ -112,7 +110,6 @@ export function Contacts(props: Props) {
           <Element leftSide={t('email')}>
             <InputField
               id={`email_${index}`}
-              autoComplete="new-password"
               value={contact.email}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
@@ -129,7 +126,6 @@ export function Contacts(props: Props) {
             <Element leftSide={t('password')}>
               <InputField
                 id={`password_${index}`}
-                autoComplete="new-password"
                 type="password"
                 value={contact.password}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -149,7 +145,6 @@ export function Contacts(props: Props) {
           <Element leftSide={t('phone')}>
             <InputField
               id={`phone_${index}`}
-              autoComplete="new-password"
               value={contact.phone}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(

@@ -79,6 +79,7 @@ export function Login() {
           <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField
               type="email"
+              autoComplete="on"
               label={t('email_address')}
               id="email"
               onChange={form.handleChange}
@@ -87,6 +88,7 @@ export function Login() {
 
             <InputField
               type="password"
+              autoComplete="on"
               label={t('password')}
               id="password"
               onChange={form.handleChange}
@@ -102,6 +104,7 @@ export function Login() {
 
             <InputField
               type="text"
+              autoComplete="on"
               id="one_time_password"
               onChange={form.handleChange}
               placeholder={t('plaid_optional')}
@@ -111,6 +114,7 @@ export function Login() {
             {isSelfHosted() && (
               <InputField
                 type="password"
+                autoComplete="on"
                 label={t('secret')}
                 placeholder={t('plaid_optional')}
                 value={secret}

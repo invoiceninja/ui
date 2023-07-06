@@ -67,7 +67,7 @@ export function InputField(props: Props) {
         <DebounceInput
           min={props.min}
           maxLength={props.maxLength}
-          autoComplete={props.autoComplete}
+          autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
           element={props.element || 'input'}
           inputRef={props.innerRef}
