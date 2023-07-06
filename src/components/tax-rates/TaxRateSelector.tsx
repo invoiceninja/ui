@@ -15,9 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { Alert } from '../Alert';
-import CommonProps from '$app/common/interfaces/common-props.interface';
 
-interface Props extends CommonProps {
+interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
@@ -26,7 +25,6 @@ interface Props extends CommonProps {
   onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
-  onInputFocus?: () => unknown;
 }
 
 export function TaxRateSelector(props: Props) {
@@ -55,7 +53,6 @@ export function TaxRateSelector(props: Props) {
           formatValue: (taxRate) => `${taxRate.name}${taxRate.rate}`,
         }}
         onDismiss={props.onClearButtonClick}
-        //onInputFocus={props.onInputFocus}
       />
 
       {props.errorMessage && (
