@@ -9,20 +9,21 @@
  */
 
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { TaxCreate } from '$app/pages/invoices/common/components/TaxCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
+import { Alert } from '../Alert';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
-interface Props {
+interface Props extends CommonProps {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
   inputLabel?: string;
-  onChange?: (value: Record<TaxRate>) => unknown;
+  errorMessage?: string | string[];
+  onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
   onInputFocus?: () => unknown;
@@ -34,25 +35,34 @@ export function TaxRateSelector(props: Props) {
 
   return (
     <>
-      <DebouncedCombobox
-        inputLabel={props.inputLabel}
-        endpoint="/api/v1/tax_rates?status=active"
-        label={t('tax')}
-        formatLabel={(resource: TaxRate) =>
-          `${resource.name} ${resource.rate}%`
-        }
-        onChange={(record: Record<TaxRate>) =>
-          props.onChange && props.onChange(record)
-        }
-        value="rate"
-        defaultValue={props.defaultValue}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        actionLabel={t('create_tax_rate')}
-        onActionClick={() => setIsModalOpen(true)}
-        className={props.className}
+      <ComboboxAsync<TaxRate>
+        inputOptions={{
+          value: props.defaultValue ?? null,
+          label: props.inputLabel,
+        }}
+        endpoint={new URL(endpoint('/api/v1/tax_rates?status=active'))}
+        onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
+        action={{
+          label: t('create_tax_rate'),
+          onClick: () => setIsModalOpen(true),
+          visible: true,
+        }}
+        entryOptions={{
+          id: 'id',
+          value: 'rate',
+          label: 'name',
+          formatLabel: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
+          formatValue: (taxRate) => `${taxRate.name}${taxRate.rate}`,
+        }}
+        onDismiss={props.onClearButtonClick}
         onInputFocus={props.onInputFocus}
       />
+
+      {props.errorMessage && (
+        <Alert type="danger" className="mt-2">
+          {props.errorMessage}
+        </Alert>
+      )}
 
       <TaxCreate
         isVisible={isModalOpen}
