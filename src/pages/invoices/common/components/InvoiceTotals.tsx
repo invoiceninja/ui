@@ -11,7 +11,7 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
@@ -44,7 +44,6 @@ export function InvoiceTotals(props: Props) {
   const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
 
-  const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
   const [t] = useTranslation();
 
   return (
@@ -69,17 +68,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate1', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name1', taxRate.name);
+              handleChange('tax_rate1', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(1)}
           />
         </Element>
       )}
@@ -97,17 +88,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate2', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name2', taxRate.name);
+              handleChange('tax_rate2', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(2)}
           />
         </Element>
       )}
@@ -125,17 +108,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate3', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name3', taxRate.name);
+              handleChange('tax_rate3', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(3)}
           />
         </Element>
       )}

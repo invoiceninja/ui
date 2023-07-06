@@ -52,7 +52,6 @@ export interface ComboboxStaticProps<T = any> {
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
-  onInputFocus?: () => unknown;
 }
 
 export type Nullable<T> = T | null;
@@ -69,7 +68,6 @@ export function ComboboxStatic({
   onChange,
   onDismiss,
   entryOptions,
-  onInputFocus,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -170,10 +168,7 @@ export function ComboboxStatic({
               className="w-full rounded border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) => entry?.label ?? ''}
-              onFocus={() => {
-                setIsOpen(true);
-                onInputFocus && onInputFocus();
-              }}
+              onFocus={() => setIsOpen(true)}
             />
 
             {!readonly && (
@@ -307,7 +302,6 @@ export interface ComboboxAsyncProps<T> {
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
-  onInputFocus?: () => unknown;
 }
 
 export function ComboboxAsync<T = any>({
@@ -323,7 +317,6 @@ export function ComboboxAsync<T = any>({
   nullable,
   onChange,
   onDismiss,
-  onInputFocus,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -402,7 +395,6 @@ export function ComboboxAsync<T = any>({
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}
-      onInputFocus={onInputFocus}
     />
   );
 }

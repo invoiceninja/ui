@@ -55,7 +55,7 @@ export function TaxRateSelector(props: Props) {
           formatValue: (taxRate) => `${taxRate.name}${taxRate.rate}`,
         }}
         onDismiss={props.onClearButtonClick}
-        onInputFocus={props.onInputFocus}
+        //onInputFocus={props.onInputFocus}
       />
 
       {props.errorMessage && (
