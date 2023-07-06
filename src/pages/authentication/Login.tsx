@@ -79,6 +79,7 @@ export function Login() {
           <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField
               type="email"
+              autoComplete="new-password"
               label={t('email_address')}
               id="email"
               onChange={form.handleChange}
@@ -87,6 +88,7 @@ export function Login() {
 
             <InputField
               type="password"
+              autoComplete="new-password"
               label={t('password')}
               id="password"
               onChange={form.handleChange}
