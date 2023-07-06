@@ -25,6 +25,7 @@ import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
+import { X } from 'react-feather';
 
 interface Record {
   trans: string;
@@ -36,6 +37,7 @@ interface ColumnProps {
   droppableId: string;
   isDropDisabled: boolean;
   data: Record[];
+  onRemove?: (record: Record) => unknown;
 }
 
 export function Column({
@@ -43,6 +45,7 @@ export function Column({
   droppableId,
   isDropDisabled,
   data,
+  onRemove,
 }: ColumnProps) {
   const [t] = useTranslation();
 
@@ -65,8 +68,8 @@ export function Column({
             {data.map((record: Record, i: number) => (
               <Draggable
                 key={record.value}
-                draggableId={`left-word-${record.value}`}
                 index={i}
+                draggableId={`left-word-${record.value}`}
               >
                 {(provided) => (
                   <div
@@ -79,6 +82,15 @@ export function Column({
                       key={i}
                     >
                       {translateLabel(record)}
+
+                      {droppableId === '5' && (
+                        <button
+                          type="button"
+                          onClick={() => (onRemove ? onRemove(record) : null)}
+                        >
+                          <X size={15} />
+                        </button>
+                      )}
                     </span>
                   </div>
                 )}
@@ -97,6 +109,8 @@ interface Props {
   reportKeys: string[];
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
+
+const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
 
 export function TwoColumnsDnd(props: Props) {
   const [data, setData] = useState([
@@ -133,6 +147,22 @@ export function TwoColumnsDnd(props: Props) {
     setData(() => [...$data]);
 
     props.setReportKeys(collect($data[5]).pluck('value').toArray());
+  };
+
+  const onRemove = (record: Record) => {
+    // Find where's the original
+    const type = record.value.split('.')[0];
+    const index = positions.indexOf(type);
+
+    // Remove it from the reports
+    const $data = cloneDeep(data);
+    
+    $data[5] = $data[5].filter((r) => r.value !== record.value);
+
+    // Add it back to the original
+    $data[index].push(record);
+
+    setData(() => [...$data]);
   };
 
   return (
@@ -190,6 +220,7 @@ export function TwoColumnsDnd(props: Props) {
               data={data[5]}
               droppableId="5"
               isDropDisabled={false}
+              onRemove={onRemove}
             />
           </div>
         </DragDropContext>
