@@ -28,7 +28,6 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { TwoColumnsDnd } from '../common/components/TwoColumnsDnd';
 import { useReports } from '../common/useReports';
 
-
 type Identifier =
   | 'activity'
   | 'client'
@@ -102,7 +101,7 @@ export default function Reports() {
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
-  const [showCustomColumns, setShowCustomColumns] =useState(false);
+  const [showCustomColumns, setShowCustomColumns] = useState(false);
   const [reportKeys, setReportKeys] = useState<string[]>([]);
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
@@ -111,7 +110,7 @@ export default function Reports() {
     const report = reports.find((report) => report.identifier === identifier);
 
     setShowCustomColumns(false);
-    
+
     if (report) {
       setReport(report);
     }
@@ -183,8 +182,8 @@ export default function Reports() {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    updatedPayload = {...updatedPayload, report_keys: reportKeys}
-    
+    updatedPayload = { ...updatedPayload, report_keys: reportKeys };
+
     request('POST', endpoint(report.endpoint), updatedPayload, {
       responseType: report.payload.send_email ? 'json' : 'blob',
     })
@@ -384,22 +383,23 @@ export default function Reports() {
             </Element>
           )}
           {report.allow_custom_column && (
-          <Element leftSide={`${t('customize')} ${t('columns')}`}>
-            <Toggle
-              checked={showCustomColumns}
-              onValueChange={(value) => setShowCustomColumns(Boolean(value)) }
-            />
-          </Element>
+            <Element leftSide={`${t('customize')} ${t('columns')}`}>
+              <Toggle
+                checked={showCustomColumns}
+                onValueChange={(value) => setShowCustomColumns(Boolean(value))}
+              />
+            </Element>
           )}
         </Card>
       </div>
 
-      {showCustomColumns && <TwoColumnsDnd 
-                            columns={report.custom_columns}
-                            reportKeys={reportKeys}
-                            setReportKeys={setReportKeys}
-                            />}
+      {showCustomColumns && (
+        <TwoColumnsDnd
+          columns={report.custom_columns}
+          reportKeys={reportKeys}
+          setReportKeys={setReportKeys}
+        />
+      )}
     </Default>
   );
 }
-
