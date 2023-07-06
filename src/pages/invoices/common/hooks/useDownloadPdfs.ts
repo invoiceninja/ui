@@ -32,10 +32,9 @@ export function useDownloadPdfs({ entity }: Props) {
             request(
                 'POST',
                 endpoint(`/api/v1/${entity}s/bulk`),
-                { action: 'bulk_download', ids: resourceIds },
-                { responseType: 'arraybuffer' }
+                { action: 'bulk_download', ids: resourceIds }
             )
-                .then((response) => {
+                .then(() => {
                     
                     toast.success(t('downloaded_entities') || '');
 
