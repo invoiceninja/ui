@@ -20,7 +20,6 @@ interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
-  inputLabel?: string;
   errorMessage?: string | string[];
   onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
@@ -36,7 +35,6 @@ export function TaxRateSelector(props: Props) {
       <ComboboxAsync<TaxRate>
         inputOptions={{
           value: props.defaultValue ?? null,
-          label: props.inputLabel,
         }}
         endpoint={new URL(endpoint('/api/v1/tax_rates?status=active'))}
         onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
