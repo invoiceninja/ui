@@ -633,7 +633,7 @@ export function useQuoteColumns() {
         <div className="flex items-center space-x-2">
           <QuoteStatusBadge entity={quote} />
 
-          {quote.status_id === QuoteStatus.Converted && (
+          {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
             <MdTextSnippet
               className="cursor-pointer"
               fontSize={19}
