@@ -82,6 +82,21 @@ export function useResolveInputField(props: Props) {
     isDeleteActionTriggeredAtom
   );
 
+  const getTaxRateDefaultValue = (
+    property: keyof InvoiceItem,
+    lineItem?: InvoiceItem
+  ) => {
+    if (lineItem) {
+      const taxName =
+        lineItem[property.replace('rate', 'name') as keyof InvoiceItem];
+      const taxRate = lineItem[property];
+
+      return `${taxName}${taxRate}`;
+    }
+
+    return '';
+  };
+
   const isAnyExceptLastLineItemEmpty = (items: InvoiceItem[]) => {
     const filteredItems = items.filter(
       (item, index) => index !== items.length - 1
@@ -232,7 +247,11 @@ export function useResolveInputField(props: Props) {
             initialValue={resource?.line_items[index][property] as string}
             className="auto"
             onChange={(value: string) => {
-              onChange(property, isNaN(parseFloat(value)) ? 0 : parseFloat(value), index);
+              onChange(
+                property,
+                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+                index
+              );
             }}
           />
         )
@@ -242,7 +261,7 @@ export function useResolveInputField(props: Props) {
     if (taxInputs.includes(property)) {
       return (
         <TaxRateSelector
-          key={`${property}${resource?.line_items[index][property]}`}
+          key={getTaxRateDefaultValue(property, resource?.line_items[index])}
           onChange={(value) =>
             value.resource &&
             handleTaxRateChange(property, index, value.resource)
@@ -250,10 +269,11 @@ export function useResolveInputField(props: Props) {
           onTaxCreated={(taxRate) =>
             handleTaxRateChange(property, index, taxRate)
           }
-          className="w-auto"
-          defaultValue={resource?.line_items[index][property]}
+          defaultValue={getTaxRateDefaultValue(
+            property,
+            resource?.line_items[index]
+          )}
           onClearButtonClick={() => handleTaxRateChange(property, index)}
-          clearButton={Boolean(resource?.line_items[index][property])}
         />
       );
     }

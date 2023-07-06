@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Record } from '$app/components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
@@ -21,6 +20,7 @@ import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Entry } from '$app/components/forms/Combobox';
 
 interface Props {
   resource: ProductTableResource;
@@ -51,8 +51,7 @@ export function InvoiceTotals(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map(
         (variable, index) =>
-          (variable === '$subtotal' ||
-            variable === '$taxes') && (
+          (variable === '$subtotal' || variable === '$taxes') && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )
       )}
@@ -60,9 +59,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate1}
-            clearButton={Boolean(resource?.tax_rate1)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={`${resource?.tax_name1}${resource?.tax_rate1}`}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
             }}
@@ -89,9 +87,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate2}
-            clearButton={Boolean(resource?.tax_rate2)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={`${resource?.tax_name2}${resource?.tax_rate2}`}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
@@ -118,9 +115,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate3}
-            clearButton={Boolean(resource?.tax_rate3)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={`${resource?.tax_name3}${resource?.tax_rate3}`}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}

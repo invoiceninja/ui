@@ -32,7 +32,7 @@ export function useHandleTaxRateChange(props: Props) {
 
     const lineItem = { ...resource.line_items[index] };
 
-    lineItem[property] = (taxRate?.rate as keyof typeof taxRate) || '';
+    lineItem[property] = (taxRate?.rate as keyof typeof taxRate) ?? 0;
 
     lineItem[property.replace('rate', 'name') as keyof InvoiceItem] =
       (taxRate?.name as keyof typeof taxRate) || '';
