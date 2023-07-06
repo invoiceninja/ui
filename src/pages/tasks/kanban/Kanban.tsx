@@ -16,7 +16,7 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsTable } from 'react-icons/bs';
-import { calculateTime } from '../common/helpers/calculate-time';
+import { calculateHours } from '../common/helpers/calculate-time';
 import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
@@ -137,7 +137,7 @@ export default function Kanban() {
           columns[index].cards.push({
             id: task.id,
             title: task.description,
-            description: calculateTime(task.time_log),
+            description: calculateHours(task.time_log).toString(),
             sortOrder: task.status_order,
             task,
           });
