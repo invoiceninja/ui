@@ -25,7 +25,7 @@ import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
-import { X } from 'react-feather';
+import { ChevronsRight, X } from 'react-feather';
 
 interface Record {
   trans: string;
@@ -178,6 +178,16 @@ export function TwoColumnsDnd(props: Props) {
     ]);
   };
 
+  const onAddAll = (index: number) => {
+    const $data = cloneDeep(data);
+
+    $data[5] = [...$data[5], ...$data[index]];
+
+    $data[index] = [];
+
+    setData(() => [...$data]);
+  };
+
   return (
     <div className="min-w-min">
       <Card className="my-6">
@@ -185,7 +195,15 @@ export function TwoColumnsDnd(props: Props) {
           <div className="flex w-full py-2 px-6 space-x-4">
             {data[0].length > 0 && (
               <Column
-                title={t('client').toString()}
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('client')}</p>
+
+                    <button type="button" onClick={() => onAddAll(0)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
                 data={data[0]}
                 droppableId="0"
                 isDropDisabled={true}
@@ -194,7 +212,15 @@ export function TwoColumnsDnd(props: Props) {
 
             {data[1].length > 0 && (
               <Column
-                title={t('invoice').toString()}
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('invoice')}</p>
+
+                    <button type="button" onClick={() => onAddAll(1)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
                 data={data[1]}
                 droppableId="1"
                 isDropDisabled={true}
@@ -203,7 +229,15 @@ export function TwoColumnsDnd(props: Props) {
 
             {data[2].length > 0 && (
               <Column
-                title={t('credit').toString()}
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('credit')}</p>
+
+                    <button type="button" onClick={() => onAddAll(2)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
                 data={data[2]}
                 droppableId="2"
                 isDropDisabled={true}
@@ -212,7 +246,15 @@ export function TwoColumnsDnd(props: Props) {
 
             {data[3].length > 0 && (
               <Column
-                title={t('quote').toString()}
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('quote')}</p>
+
+                    <button type="button" onClick={() => onAddAll(3)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
                 data={data[3]}
                 droppableId="3"
                 isDropDisabled={true}
@@ -221,7 +263,15 @@ export function TwoColumnsDnd(props: Props) {
 
             {data[4].length > 0 && (
               <Column
-                title={t('payment').toString()}
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('payment')}</p>
+
+                    <button type="button" onClick={() => onAddAll(4)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
                 data={data[4]}
                 droppableId="4"
                 isDropDisabled={true}
