@@ -26,6 +26,7 @@ import { creditMap } from '$app/common/constants/exports/credit-map';
 import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 import { ChevronsRight, X } from 'react-feather';
+import { itemMap } from '$app/common/constants/exports/item-map';
 
 interface Record {
   trans: string;
