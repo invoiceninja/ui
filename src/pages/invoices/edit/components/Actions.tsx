@@ -43,7 +43,7 @@ import {
   MdSchedule,
   MdSend,
 } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';
@@ -55,17 +55,19 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export function useActions() {
   const { t } = useTranslation();
 
-  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
+
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
   const archive = useHandleArchive();
   const restore = useHandleRestore();
@@ -79,10 +81,11 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, 
-      number: '', 
-      documents: [], 
-      due_date: '', 
+    setInvoice({
+      ...invoice,
+      number: '',
+      documents: [],
+      due_date: '',
       date: dayjs().format('YYYY-MM-DD'),
       total_taxes: 0,
       exchange_rate: 1,
@@ -91,16 +94,17 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
-      paid_to_date: 0, 
+      paid_to_date: 0,
     });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
-    setQuote({ ...(invoice as unknown as Quote), 
-      number: '', 
-      documents: [], 
+    setQuote({
+      ...(invoice as unknown as Quote),
+      number: '',
+      documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
@@ -117,9 +121,10 @@ export function useActions() {
   };
 
   const cloneToCredit = (invoice: Invoice) => {
-    setCredit({ ...(invoice as unknown as Credit), 
-      number: '', 
-      documents: [], 
+    setCredit({
+      ...(invoice as unknown as Credit),
+      number: '',
+      documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
       total_taxes: 0,
@@ -130,7 +135,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
-     });
+    });
 
     navigate('/credits/create?action=clone');
   };
@@ -314,9 +319,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       invoice.archived_at === 0 && (
         <DropdownElement
           onClick={() => archive(invoice)}
@@ -326,7 +331,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement
@@ -337,7 +342,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !invoice.is_deleted && (
         <DropdownElement
           onClick={() => destroy(invoice)}
