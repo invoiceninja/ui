@@ -22,6 +22,10 @@ client.interceptors.response.use(
       window.location.reload();
     }
 
+    if (error.response?.status === 404) {
+      window.dispatchEvent(new CustomEvent('navigate.invalid.page'));
+    }
+
     return Promise.reject(error);
   }
 );

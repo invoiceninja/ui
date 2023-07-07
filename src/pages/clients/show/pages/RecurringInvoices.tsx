@@ -12,12 +12,17 @@ import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
-import { useRecurringInvoiceColumns } from '$app/pages/recurring-invoices/common/hooks';
+import {
+  useActions,
+  useRecurringInvoiceColumns,
+} from '$app/pages/recurring-invoices/common/hooks';
 
 export default function RecurringInvoices() {
   const { id } = useParams();
 
   const columns = useRecurringInvoiceColumns();
+
+  const actions = useActions();
 
   return (
     <DataTable
@@ -29,11 +34,13 @@ export default function RecurringInvoices() {
         }
       )}
       columns={columns}
+      customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
       linkToCreate={route('/recurring_invoices/create?client=:id', {
-        id: id,
+        id,
       })}
+      linkToEdit="/recurring_invoices/:id/edit"
       staleTime={dataTableStaleTime}
     />
   );

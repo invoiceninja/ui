@@ -206,11 +206,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/quotes'), quote)
       .then((response: GenericSingleResourceResponse<Quote>) => {
@@ -236,11 +240,11 @@ export function useSave(props: CreateProps) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
       .then(() => {
@@ -629,7 +633,7 @@ export function useQuoteColumns() {
         <div className="flex items-center space-x-2">
           <QuoteStatusBadge entity={quote} />
 
-          {quote.status_id === QuoteStatus.Converted && (
+          {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
             <MdTextSnippet
               className="cursor-pointer"
               fontSize={19}
