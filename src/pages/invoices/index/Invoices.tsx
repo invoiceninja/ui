@@ -25,6 +25,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { InvoiceSlider } from '../common/components/InvoiceSlider';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -81,6 +82,8 @@ export default function Invoices() {
         }
         linkToCreateGuards={[permission('create_invoice')]}
       />
+
+      <InvoiceSlider />
     </Default>
   );
 }

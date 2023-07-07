@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -25,6 +25,11 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import {
+  invoiceSliderAtom,
+  invoiceSliderVisibilityAtom,
+} from '../components/InvoiceSlider';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -125,6 +130,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
+  const [, setInvoiceSliderVisibility] = useAtom(invoiceSliderVisibilityAtom);
+  const [, setInvoiceSlider] = useAtom(invoiceSliderAtom);
+
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
@@ -137,9 +145,16 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (_value, invoice) => (
-        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+        <Button
+          behavior="button"
+          onClick={() => {
+            setInvoiceSlider(invoice);
+            setInvoiceSliderVisibility(true);
+          }}
+          type="minimal"
+        >
           {invoice.number}
-        </Link>
+        </Button>
       ),
     },
     {
