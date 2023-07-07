@@ -25,17 +25,13 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Field } from '$app/pages/settings/custom-fields/components';
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { cloneDeep, set } from 'lodash';
 
 interface Props {
   client: Client | undefined;
@@ -66,13 +62,15 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     property: T,
     value: Client['settings'][typeof property]
   ) => {
-    setClient(
-      (client) =>
-        client && {
-          ...client,
-          settings: { ...client.settings, [property]: value },
-        }
-    );
+    const $client = cloneDeep(client)!;
+
+    if (property === 'send_reminders' && value === '') {
+      delete $client.settings.send_reminders;
+    } else {
+      set($client, `settings.${property}`, value);
+    }
+
+    setClient($client);
   };
 
   const company = useInjectCompanyChanges();
@@ -195,17 +193,14 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             />
           </Element>
 
-          {/* <Element leftSide={t('send_reminders')}>
+          <Element leftSide={t('send_reminders')}>
             <SelectField
               id="settings.send_reminders"
               defaultValue={
-                Object.prototype.hasOwnProperty.call(
-                  client?.settings,
-                  'send_reminders'
-                )
-                  ? client?.settings?.send_reminders
-                    ? 'enabled'
-                    : 'disabled'
+                client?.settings.send_reminders === true
+                  ? 'enabled'
+                  : client?.settings.send_reminders === false
+                  ? 'disabled'
                   : ''
               }
               className={
@@ -214,7 +209,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               onValueChange={(value) =>
                 handleSettingsChange(
                   'send_reminders',
-                  value === 'enabled' ? true : false
+                  value === 'enabled' ? true : value === '' ? '' : false
                 )
               }
               withBlank
@@ -222,7 +217,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
             </SelectField>
-          </Element> */}
+          </Element>
         </div>
 
         <div>
