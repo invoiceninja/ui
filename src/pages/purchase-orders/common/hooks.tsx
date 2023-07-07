@@ -215,11 +215,11 @@ export function usePurchaseOrderColumns() {
         column: 'amount',
         id: 'amount',
         label: t('amount'),
-        format: (amount) =>
+        format: (amount, po) =>
           formatMoney(
             amount,
-            company?.settings.country_id,
-            company?.settings.currency_id
+            po.vendor?.country_id ?? company?.settings.country_id,
+            po.vendor?.currency_id ?? company?.settings.currency_id
           ),
       },
       {
@@ -390,18 +390,20 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
-    setPurchaseOrder({ ...purchaseOrder, number: '', 
-    documents: [], 
-    date: dayjs().format('YYYY-MM-DD'),
-    total_taxes: 0,
-    exchange_rate: 1,
-    last_sent_date: '',
-    project_id: '',
-    subscription_id: '',
-    status_id: '1',
-    vendor_id: '',
-    paid_to_date: 0,
-  });
+    setPurchaseOrder({
+      ...purchaseOrder,
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/purchase_orders/create?action=clone');
   };
