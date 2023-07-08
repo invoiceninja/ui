@@ -265,7 +265,10 @@ export default function Create() {
                     <InputField
                       label={t('amount_received')}
                       onValueChange={(value) =>
-                        handleInvoiceInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
+                        handleInvoiceInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
                       }
                       className="w-full"
                       value={invoice.amount}
@@ -287,9 +290,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`invoices.${index}.invoice`] && (
+                  {errors?.errors[`invoices.${index}.invoice_id`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.invoice`]}
+                      {errors?.errors[`invoices.${index}.invoice_id`]}
                     </Alert>
                   )}
                 </div>
@@ -365,7 +368,10 @@ export default function Create() {
                     <InputField
                       label={t('amount')}
                       onValueChange={(value) =>
-                        handleCreditInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
+                        handleCreditInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
                       }
                       className="w-full"
                       value={credit.amount}
@@ -387,9 +393,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`invoices.${index}.credit`] && (
+                  {errors?.errors[`credits.${index}.credit_id`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.credit`]}
+                      {errors?.errors[`credits.${index}.credit_id`]}
                     </Alert>
                   )}
                 </div>
