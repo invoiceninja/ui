@@ -21,7 +21,6 @@ import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { atom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { Locale } from 'antd/lib/locale';
 
 export const dayJSLocaleAtom = atom<ILocale | null>(null);
 export const antdLocaleAtom = atom<any | null>(null);

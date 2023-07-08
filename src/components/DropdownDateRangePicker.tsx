@@ -18,7 +18,6 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 import { antdLocaleAtom } from '$app/App';
 import { useAtomValue } from 'jotai';
-import fr from 'antd/locale/fr_FR'
 
 type Props = {
   startDate: string;
