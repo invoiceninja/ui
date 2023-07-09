@@ -82,20 +82,6 @@ export function useResolveInputField(props: Props) {
     isDeleteActionTriggeredAtom
   );
 
-  const getTaxRateDefaultValue = (
-    property: keyof InvoiceItem,
-    lineItem?: InvoiceItem
-  ) => {
-    if (lineItem) {
-      const taxName =
-        lineItem[property.replace('rate', 'name') as keyof InvoiceItem];
-
-      return taxName;
-    }
-
-    return '';
-  };
-
   const isAnyExceptLastLineItemEmpty = (items: InvoiceItem[]) => {
     const filteredItems = items.filter(
       (item, index) => index !== items.length - 1
@@ -268,10 +254,11 @@ export function useResolveInputField(props: Props) {
           onTaxCreated={(taxRate) =>
             handleTaxRateChange(property, index, taxRate)
           }
-          defaultValue={getTaxRateDefaultValue(
-            property,
-            resource?.line_items[index]
-          )}
+          defaultValue={
+            resource?.line_items[index][
+              property.replace('rate', 'name') as keyof InvoiceItem
+            ]
+          }
           onClearButtonClick={() => handleTaxRateChange(property, index)}
         />
       );
