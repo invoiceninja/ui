@@ -272,6 +272,7 @@ export function Details(props: Props) {
           <CurrencySelector
             value={recurringExpense.currency_id}
             onChange={(currency) => handleChange('currency_id', currency)}
+            errorMessage={errors?.errors.currency_id}
           />
         </Element>
       )}
