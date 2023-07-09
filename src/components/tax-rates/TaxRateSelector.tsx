@@ -14,13 +14,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
-import { Alert } from '../Alert';
 
 interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
-  errorMessage?: string | string[];
   onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
@@ -45,19 +43,14 @@ export function TaxRateSelector(props: Props) {
         }}
         entryOptions={{
           id: 'id',
-          value: 'rate',
+          value: 'name',
           label: 'name',
-          formatLabel: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
-          formatValue: (taxRate) => `${taxRate.name}${taxRate.rate}`,
+          displayValueFn: (taxRate) =>
+            taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
+          labelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
         }}
         onDismiss={props.onClearButtonClick}
       />
-
-      {props.errorMessage && (
-        <Alert type="danger" className="mt-2">
-          {props.errorMessage}
-        </Alert>
-      )}
 
       <TaxCreate
         isVisible={isModalOpen}

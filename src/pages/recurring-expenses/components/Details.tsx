@@ -129,7 +129,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={`${recurringExpense.tax_name1}${recurringExpense.tax_rate1}`}
+              defaultValue={recurringExpense.tax_name1}
               onClearButtonClick={() => {
                 handleChange('tax_name1', '');
                 handleChange('tax_rate1', 0);
@@ -172,7 +172,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={`${recurringExpense.tax_name2}${recurringExpense.tax_rate2}`}
+              defaultValue={recurringExpense.tax_name2}
               onClearButtonClick={() => {
                 handleChange('tax_name2', '');
                 handleChange('tax_rate2', 0);
@@ -215,7 +215,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={`${recurringExpense.tax_name3}${recurringExpense.tax_rate3}`}
+              defaultValue={recurringExpense.tax_name3}
               onClearButtonClick={() => {
                 handleChange('tax_name3', '');
                 handleChange('tax_rate3', 0);

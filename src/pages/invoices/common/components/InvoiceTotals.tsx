@@ -58,7 +58,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={`${resource?.tax_name1}${resource?.tax_rate1}`}
+            defaultValue={resource?.tax_name1}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
@@ -78,7 +78,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={`${resource?.tax_name2}${resource?.tax_rate2}`}
+            defaultValue={resource?.tax_name2}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
@@ -98,7 +98,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={`${resource?.tax_name3}${resource?.tax_rate3}`}
+            defaultValue={resource?.tax_name3}
             onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);

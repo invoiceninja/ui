@@ -89,9 +89,8 @@ export function useResolveInputField(props: Props) {
     if (lineItem) {
       const taxName =
         lineItem[property.replace('rate', 'name') as keyof InvoiceItem];
-      const taxRate = lineItem[property];
 
-      return `${taxName}${taxRate}`;
+      return taxName;
     }
 
     return '';
@@ -261,7 +260,7 @@ export function useResolveInputField(props: Props) {
     if (taxInputs.includes(property)) {
       return (
         <TaxRateSelector
-          key={getTaxRateDefaultValue(property, resource?.line_items[index])}
+          key={`${property}${resource?.line_items[index][property]}`}
           onChange={(value) =>
             value.resource &&
             handleTaxRateChange(property, index, value.resource)

@@ -164,7 +164,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate1', value.resource?.rate);
               handleChange('tax_name1', value.resource?.name);
             }}
-            defaultValue={`${product.tax_name1}${product.tax_rate1}`}
+            defaultValue={product.tax_name1}
             onClearButtonClick={() => {
               handleChange('tax_rate1', 0);
               handleChange('tax_name1', '');
@@ -184,7 +184,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate2', value.resource?.rate);
               handleChange('tax_name2', value.resource?.name);
             }}
-            defaultValue={`${product.tax_name2}${product.tax_rate2}`}
+            defaultValue={product.tax_name2}
             onClearButtonClick={() => {
               handleChange('tax_rate2', 0);
               handleChange('tax_name2', '');
@@ -204,7 +204,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate3', value.resource?.rate);
               handleChange('tax_name3', value.resource?.name);
             }}
-            defaultValue={`${product.tax_name3}${product.tax_rate3}`}
+            defaultValue={product.tax_name3}
             onClearButtonClick={() => {
               handleChange('tax_rate3', 0);
               handleChange('tax_name3', '');
