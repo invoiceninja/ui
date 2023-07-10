@@ -16,7 +16,11 @@ import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { ReactSettings } from './useReactSettings';
 import { useDispatch, useStore } from 'react-redux';
-import { updateChanges, updateUser } from '../stores/slices/user';
+import {
+  injectInChanges,
+  updateChanges,
+  updateUser,
+} from '../stores/slices/user';
 import { toast } from '../helpers/toast/toast';
 import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
@@ -82,6 +86,7 @@ export function usePreferences() {
         toast.success('updated_user');
 
         dispatch(updateUser(response.data.data));
+        dispatch(injectInChanges());
 
         setIsVisible(false);
       })
@@ -124,5 +129,5 @@ export function usePreferences() {
     [isVisible, errors]
   );
 
-  return { Preferences, update, trigger: () => setIsVisible(true) };
+  return { Preferences, update };
 }

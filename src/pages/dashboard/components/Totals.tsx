@@ -79,14 +79,11 @@ export function Totals() {
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [currency, setCurrency] = useState(
-    settings.preferences.dashboard_charts.currency
-  );
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [chartScale, setChartScale] = useState(
-    settings.preferences.dashboard_charts.default_view
-  );
+
+  const chartScale = settings.preferences.dashboard_charts.default_view;
+  const currency = settings.preferences.dashboard_charts.currency;
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -136,7 +133,11 @@ export function Totals() {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
-        setCurrency(parseInt(currencies[0].value) ?? 1);
+        // update(
+        //   'preferences.dashboard_charts.currency',
+        //   parseInt(currencies[0].value) ?? 1
+        // );
+
         setCurrencies(currencies);
         setIsLoadingTotals(false);
       }
@@ -160,19 +161,13 @@ export function Totals() {
     getChartData();
   }, [body]);
 
-  useEffect(() => {
-    setChartScale(settings.preferences.dashboard_charts.default_view);
-  }, [settings.preferences.dashboard_charts.default_view]);
+  // useEffect(() => {
+  //   console.log(settings.preferences.dashboard_charts.range)
 
-  useEffect(() => {
-    setCurrency(settings.preferences.dashboard_charts.currency);
-  }, [currencies, settings.preferences.dashboard_charts.currency]);
+  //   setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
+  // }, [settings.preferences.dashboard_charts.range]);
 
-  useEffect(() => {
-    console.log(settings.preferences.dashboard_charts.range)
-
-    setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
-  }, [settings.preferences.dashboard_charts.range]);
+  console.log(currency);
 
   return (
     <>
@@ -188,7 +183,9 @@ export function Totals() {
           {currencies && (
             <SelectField
               value={currency.toString()}
-              onValueChange={(value) => setCurrency(parseInt(value))}
+              onValueChange={(value) =>
+                update('preferences.dashboard_charts.currency', parseInt(value))
+              }
               style={{ width: '5rem' }}
             >
               {currencies.map((currency, index) => (
@@ -203,7 +200,9 @@ export function Totals() {
             <Button
               key="day-btn"
               type={chartScale === 'day' ? 'primary' : 'secondary'}
-              onClick={() => setChartScale('day')}
+              onClick={() =>
+                update('preferences.dashboard_charts.default_view', 'day')
+              }
             >
               {t('day')}
             </Button>
@@ -211,7 +210,9 @@ export function Totals() {
             <Button
               key="week-btn"
               type={chartScale === 'week' ? 'primary' : 'secondary'}
-              onClick={() => setChartScale('week')}
+              onClick={() =>
+                update('preferences.dashboard_charts.default_view', 'week')
+              }
             >
               {t('week')}
             </Button>
@@ -219,7 +220,9 @@ export function Totals() {
             <Button
               key="month-btn"
               type={chartScale === 'month' ? 'primary' : 'secondary'}
-              onClick={() => setChartScale('month')}
+              onClick={() =>
+                update('preferences.dashboard_charts.default_view', 'month')
+              }
             >
               {t('month')}
             </Button>
