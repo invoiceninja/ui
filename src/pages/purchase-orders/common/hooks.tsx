@@ -216,11 +216,11 @@ export function usePurchaseOrderColumns() {
         column: 'amount',
         id: 'amount',
         label: t('amount'),
-        format: (amount) =>
+        format: (amount, po) =>
           formatMoney(
             amount,
-            company?.settings.country_id,
-            company?.settings.currency_id
+            po.vendor?.country_id ?? company?.settings.country_id,
+            po.vendor?.currency_id ?? company?.settings.currency_id
           ),
       },
       {
