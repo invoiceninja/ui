@@ -19,6 +19,8 @@ import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { LinkToVariables } from '../common/components/LinkToVariables';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -26,6 +28,8 @@ export function Invoices() {
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
 
@@ -58,6 +62,7 @@ export function Invoices() {
           id="settings.invoice_number_pattern"
           value={companyChanges?.settings?.invoice_number_pattern}
           onChange={handleChange}
+          errorMessage={errors?.errors['settings.invoice_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -65,6 +70,7 @@ export function Invoices() {
           id="settings.invoice_number_counter"
           value={companyChanges?.settings?.invoice_number_counter}
           onChange={handleChange}
+          errorMessage={errors?.errors['settings.invoice_number_counter']}
         />
       </Element>
 
