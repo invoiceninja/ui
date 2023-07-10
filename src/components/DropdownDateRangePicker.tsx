@@ -12,10 +12,12 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { DatePicker } from 'antd';
+import { ConfigProvider, DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
+import { antdLocaleAtom } from '$app/App';
+import { useAtomValue } from 'jotai';
 
 type Props = {
   startDate: string;
@@ -33,6 +35,7 @@ export function DropdownDateRangePicker(props: Props) {
   const [customEndDate, setCustomEndDate] = useState<string>();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const antdLocale = useAtomValue(antdLocaleAtom);
 
   useEffect(() => {
     setCustomStartDate(props.startDate);
@@ -86,12 +89,14 @@ export function DropdownDateRangePicker(props: Props) {
       
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
+          <ConfigProvider locale={antdLocale?.default}>
           <RangePicker
             size="large"
             defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
             format={dateFormat}
             onChange={(_, dateString) => handleCustomDateChange(dateString)}
           />
+          </ConfigProvider>
         </div>
       )}
     </div>
