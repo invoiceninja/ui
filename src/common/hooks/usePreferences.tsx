@@ -79,7 +79,7 @@ export function usePreferences() {
   const save = async () => {
     toast.processing();
 
-    request('PUT', endpoint(`/api/v1/company_users/${user?.id}/preferences`), {
+    request('PUT', endpoint(`/api/v1/company_users/${user?.id}/preferences?include=company_user`), {
       react_settings: getState().user.changes.company_user.react_settings,
     })
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
