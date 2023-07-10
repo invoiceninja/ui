@@ -38,7 +38,7 @@ export function App() {
   const resolveLanguage = useResolveLanguage();
 
   const resolveDayJSLocale = useResolveDayJSLocale();
-  
+
   const resolveAntdLocale = useResolveAntdLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
@@ -61,13 +61,8 @@ export function App() {
       });
 
       resolveAntdLocale(resolvedLanguage.locale).then((antdResolvedLocale) => {
-      
-        console.log(antdResolvedLocale)
-
         updateAntdLocale(antdResolvedLocale);
       });
-
-
 
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
         fetch(
