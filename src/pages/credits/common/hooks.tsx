@@ -48,7 +48,7 @@ import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -86,6 +86,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useMarkPaid } from './hooks/useMarkPaid';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -278,7 +279,10 @@ export function useActions() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'credit',
+  });
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const printPdf = usePrintPdf({ entity: 'credit' });
@@ -464,8 +468,10 @@ export function useActions() {
         </div>
       ),
     (credit) =>
-    (credit.status_id === CreditStatus.Draft || credit.status_id === CreditStatus.Sent || credit.status_id === CreditStatus.Partial) && 
-     credit.amount < 0 && (
+      (credit.status_id === CreditStatus.Draft ||
+        credit.status_id === CreditStatus.Sent ||
+        credit.status_id === CreditStatus.Partial) &&
+      credit.amount < 0 && (
         <div>
           <DropdownElement
             onClick={() => markPaid(credit)}
@@ -516,9 +522,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'archive')}
@@ -528,7 +534,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'restore')}
@@ -538,7 +544,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !credit?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'delete')}

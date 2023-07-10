@@ -31,7 +31,8 @@ export function UserSelector(props: GenericSelectorProps<User>) {
         id: 'id',
         value: 'id',
         label: 'name',
-        labelFn: (resource) => `${resource.first_name} ${resource.last_name}`,
+        dropdownLabelFn: (resource) =>
+          `${resource.first_name} ${resource.last_name}`,
       }}
       readonly={props.readonly}
       onDismiss={props.onClearButtonClick}

@@ -95,6 +95,7 @@ interface Props<T> extends CommonProps {
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
+  showEdit?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
@@ -455,20 +456,23 @@ export function DataTable<T extends object>(props: Props<T>) {
                 {props.withResourcefulActions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
-                      {props.linkToEdit && (
-                        <DropdownElement
-                          to={route(props.linkToEdit, {
-                            id: resource?.id,
-                          })}
-                          icon={<Icon element={MdEdit} />}
-                        >
-                          {t('edit')}
-                        </DropdownElement>
-                      )}
+                      {props.linkToEdit &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <DropdownElement
+                            to={route(props.linkToEdit, {
+                              id: resource?.id,
+                            })}
+                            icon={<Icon element={MdEdit} />}
+                          >
+                            {t('edit')}
+                          </DropdownElement>
+                        )}
 
-                      {props.linkToEdit && props.customActions && (
-                        <Divider withoutPadding />
-                      )}
+                      {props.linkToEdit &&
+                        props.customActions &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <Divider withoutPadding />
+                        )}
 
                       {props.customActions &&
                         props.customActions.map(

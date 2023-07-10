@@ -15,11 +15,13 @@ import { useRecurringExpenseQuery } from '$app/common/queries/recurring-expense'
 import { Page } from '$app/components/Breadcrumbs';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { useActions } from '../common/hooks';
 
 export default function Documents() {
   const [t] = useTranslation();
@@ -55,6 +57,8 @@ export default function Documents() {
 
   const queryClient = useQueryClient();
 
+  const actions = useActions();
+
   const invalidateCache = () => {
     queryClient.invalidateQueries(
       route('/api/v1/recurring_expenses/:id', { id })
@@ -62,7 +66,19 @@ export default function Documents() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      navigationTopRight={
+        recurringExpense && (
+          <ResourceActions
+            resource={recurringExpense}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
+    >
       <div className="space-y-4">
         <Tabs tabs={tabs} />
 
