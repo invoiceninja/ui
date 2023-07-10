@@ -166,7 +166,11 @@ export function TwoColumnsDnd(props: Props) {
 
   const onRemove = (record: Record) => {
     // Find where's the original
-    const type = record.value.split('.')[0];
+    const type =
+      record.value.split('.')[0] === 'item'
+        ? 'invoice' // Workaround for items as they're part of invoices.
+        : record.value.split('.')[0];
+
     const index = positions.indexOf(type);
 
     // Remove it from the reports
