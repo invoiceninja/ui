@@ -167,7 +167,10 @@ export function ComboboxStatic({
             <HeadlessCombobox.Input
               className="w-full rounded border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
-              displayValue={(entry: Nullable<Entry>) => entry?.label ?? ''}
+              displayValue={(entry: Nullable<Entry>) =>
+                entryOptions.inputLabelFn?.(entry?.resource) ??
+                (entry?.label || '')
+              }
               onFocus={() => setIsOpen(true)}
             />
 
@@ -234,8 +237,8 @@ export function ComboboxStatic({
                         )}
                       >
                         {entry.resource &&
-                        typeof entryOptions.labelFn !== 'undefined'
-                          ? entryOptions.labelFn(entry.resource)
+                        typeof entryOptions.dropdownLabelFn !== 'undefined'
+                          ? entryOptions.dropdownLabelFn(entry.resource)
                           : entry.label}
                       </span>
 
@@ -283,7 +286,8 @@ interface EntryOptions<T = any> {
   id: string;
   label: string;
   value: string;
-  labelFn?: (resource: T) => string | JSX.Element;
+  dropdownLabelFn?: (resource: T) => string | JSX.Element;
+  inputLabelFn?: (resource?: T) => string;
 }
 
 export interface ComboboxAsyncProps<T> {
