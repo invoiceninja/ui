@@ -45,9 +45,9 @@ export function TaxRateSelector(props: Props) {
           id: 'id',
           value: 'name',
           label: 'name',
-          displayValueFn: (taxRate) =>
+          inputLabelFn: (taxRate) =>
             taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
-          labelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
+          dropdownLabelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
         }}
         onDismiss={props.onClearButtonClick}
       />
