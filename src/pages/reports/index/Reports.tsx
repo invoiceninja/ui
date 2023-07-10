@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { TwoColumnsDnd } from '../common/components/TwoColumnsDnd';
+import { SortableColumns } from '../common/components/SortableColumns';
 import { useReports } from '../common/useReports';
 
 type Identifier =
@@ -394,7 +394,7 @@ export default function Reports() {
       </div>
 
       {showCustomColumns && (
-        <TwoColumnsDnd
+        <SortableColumns
           columns={report.custom_columns}
           reportKeys={reportKeys}
           setReportKeys={setReportKeys}

@@ -115,7 +115,7 @@ interface Props {
 
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
 
-export function TwoColumnsDnd(props: Props) {
+export function SortableColumns(props: Props) {
   const [data, setData] = useState([
     props.columns.includes('client') ? clientMap : [],
     props.columns.includes('invoice')
