@@ -102,9 +102,12 @@ export function Totals() {
     date_range: settings.preferences.dashboard_charts.range,
   });
 
-  const handleDateRangeChange = (dateRange: string) => {
-    setBody({ start_date: '', end_date: '', date_range: dateRange });
-  };
+  useEffect(() => {
+    setBody((current) => ({
+      ...current,
+      date_range: settings.preferences.dashboard_charts.range,
+    }));
+  }, [settings.preferences.dashboard_charts.range]);
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
@@ -166,8 +169,6 @@ export function Totals() {
 
   //   setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
   // }, [settings.preferences.dashboard_charts.range]);
-
-  console.log(currency);
 
   return (
     <>
@@ -233,12 +234,28 @@ export function Totals() {
               handleDateChange={handleDateChange}
               startDate={dates.start_date}
               endDate={dates.end_date}
-              handleDateRangeChange={handleDateRangeChange}
+              handleDateRangeChange={(value) =>
+                update('preferences.dashboard_charts.range', value)
+              }
               value={body.date_range}
             />
           </div>
 
           <Preferences>
+            <SelectField
+              label={t('currency')}
+              value={settings.preferences.dashboard_charts.currency}
+              onValueChange={(value) =>
+                update('preferences.dashboard_charts.currency', parseInt(value))
+              }
+            >
+              {currencies.map((currency) => (
+                <option key={currency.value} value={currency.value}>
+                  {currency.label}
+                </option>
+              ))}
+            </SelectField>
+
             <SelectField
               label={t('dashboard_charts_default_view')}
               value={settings.preferences.dashboard_charts.default_view}
@@ -252,20 +269,6 @@ export function Totals() {
               <option value="day">{t('day')}</option>
               <option value="week">{t('week')}</option>
               <option value="month">{t('month')}</option>
-            </SelectField>
-
-            <SelectField
-              label={t('currency')}
-              value={settings.preferences.dashboard_charts.currency}
-              onValueChange={(value) =>
-                update('preferences.dashboard_charts.currency', parseInt(value))
-              }
-            >
-              {currencies.map((currency) => (
-                <option key={currency.value} value={currency.value}>
-                  {currency.label}
-                </option>
-              ))}
             </SelectField>
 
             <SelectField
