@@ -118,9 +118,21 @@ const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
 export function TwoColumnsDnd(props: Props) {
   const [data, setData] = useState([
     props.columns.includes('client') ? clientMap : [],
-    props.columns.includes('invoice') ? (props.columns.includes('item') ? invoiceMap.concat(itemMap) : invoiceMap) : [],
-    props.columns.includes('credit') ? (props.columns.includes('item') ? creditMap.concat(itemMap) : creditMap) : [],
-    props.columns.includes('quote') ? (props.columns.includes('item') ? quoteMap.concat(itemMap) : quoteMap) : [],
+    props.columns.includes('invoice')
+      ? props.columns.includes('item')
+        ? invoiceMap.concat(itemMap)
+        : invoiceMap
+      : [],
+    props.columns.includes('credit')
+      ? props.columns.includes('item')
+        ? creditMap.concat(itemMap)
+        : creditMap
+      : [],
+    props.columns.includes('quote')
+      ? props.columns.includes('item')
+        ? quoteMap.concat(itemMap)
+        : quoteMap
+      : [],
     props.columns.includes('payment') ? paymentMap : [],
     [],
   ]);
@@ -171,9 +183,21 @@ export function TwoColumnsDnd(props: Props) {
   const onRemoveAll = () => {
     setData(() => [
       props.columns.includes('client') ? clientMap : [],
-      props.columns.includes('invoice') ? invoiceMap : [],
-      props.columns.includes('credit') ? creditMap : [],
-      props.columns.includes('quote') ? quoteMap : [],
+      props.columns.includes('invoice')
+        ? props.columns.includes('item')
+          ? invoiceMap.concat(itemMap)
+          : invoiceMap
+        : [],
+      props.columns.includes('credit')
+        ? props.columns.includes('item')
+          ? creditMap.concat(itemMap)
+          : creditMap
+        : [],
+      props.columns.includes('quote')
+        ? props.columns.includes('item')
+          ? quoteMap.concat(itemMap)
+          : quoteMap
+        : [],
       props.columns.includes('payment') ? paymentMap : [],
       [],
     ]);
