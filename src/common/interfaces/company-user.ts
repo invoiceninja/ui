@@ -8,15 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ReactSettings, ReactTableColumns } from '../hooks/useReactSettings';
 import { Account } from './account';
 import { Company } from './company.interface';
 import { User } from './user';
-
-export interface ReactSettings {
-  show_pdf_preview: boolean;
-  react_table_columns?: Record<ReactTableColumns, string[]>;
-  react_notification_link: boolean;
-}
 
 export interface CompanyUser {
   permissions: string;
@@ -36,21 +31,6 @@ export interface CompanyUser {
   account: Account;
   react_settings: ReactSettings;
 }
-
-export type ReactTableColumns =
-  | 'invoice'
-  | 'client'
-  | 'product'
-  | 'recurringInvoice'
-  | 'payment'
-  | 'quote'
-  | 'credit'
-  | 'project'
-  | 'task'
-  | 'vendor'
-  | 'purchaseOrder'
-  | 'expense'
-  | 'recurringExpense';
 
 export interface Settings {
   accent_color: string;
