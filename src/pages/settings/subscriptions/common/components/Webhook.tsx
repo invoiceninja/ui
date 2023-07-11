@@ -96,7 +96,7 @@ export function Webhook(props: SubscriptionProps) {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('headers')}>
+      <Element leftSide={t('add_header')}>
         <div className="flex flex-col">
           <div className="flex flex-1 justify-between items-center">
             <InputField

@@ -120,8 +120,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate1}
-              clearButton={Boolean(expense.tax_rate1)}
+              defaultValue={expense.tax_name1}
               onClearButtonClick={() => {
                 handleChange('tax_name1', '');
                 handleChange('tax_rate1', 0);
@@ -166,8 +165,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate2}
-              clearButton={Boolean(expense.tax_rate2)}
+              defaultValue={expense.tax_name2}
               onClearButtonClick={() => {
                 handleChange('tax_name2', '');
                 handleChange('tax_rate2', 0);
@@ -212,8 +210,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate3}
-              clearButton={Boolean(expense.tax_rate3)}
+              defaultValue={expense.tax_name3}
               onClearButtonClick={() => {
                 handleChange('tax_name3', '');
                 handleChange('tax_rate3', 0);

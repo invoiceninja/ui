@@ -314,7 +314,7 @@ export default function Create() {
                   id: 'id',
                   value: 'id',
                   label: 'name',
-                  labelFn: (invoice) =>
+                  dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
                     )} ${formatMoney(
@@ -417,7 +417,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
-                  labelFn: (resource) =>
+                  dropdownLabelFn: (resource) =>
                     `${resource.number} (${formatMoney(
                       resource.amount,
                       resource?.client?.country_id ?? '1',

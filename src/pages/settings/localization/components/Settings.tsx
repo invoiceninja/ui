@@ -172,8 +172,8 @@ export function Settings() {
 
         <Element leftSide={t('first_month_of_the_year')}>
           <SelectField
-            id="settings.first_month_of_year"
-            value={company?.settings?.first_month_of_year || ''}
+            id="first_month_of_year"
+            value={company?.first_month_of_year || ''}
             onChange={handleChange}
             errorMessage={errors?.errors['settings.first_month_of_year']}
           >
