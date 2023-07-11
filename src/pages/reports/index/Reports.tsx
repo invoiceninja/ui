@@ -382,6 +382,7 @@ export default function Reports() {
               />
             </Element>
           )}
+
           {report.allow_custom_column && (
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
@@ -396,7 +397,6 @@ export default function Reports() {
       {showCustomColumns && (
         <SortableColumns
           columns={report.custom_columns}
-          reportKeys={reportKeys}
           setReportKeys={setReportKeys}
         />
       )}
