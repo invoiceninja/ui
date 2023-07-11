@@ -112,31 +112,30 @@ export function Column({
 
 interface Props {
   columns: string[];
-  reportKeys: string[];
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
 
-export function SortableColumns(props: Props) {
+export function SortableColumns({ columns, setReportKeys }: Props) {
   const [data, setData] = useState([
-    props.columns.includes('client') ? clientMap : [],
-    props.columns.includes('invoice')
-      ? props.columns.includes('item')
+    columns.includes('client') ? clientMap : [],
+    columns.includes('invoice')
+      ? columns.includes('item')
         ? invoiceMap.concat(itemMap)
         : invoiceMap
       : [],
-    props.columns.includes('credit')
-      ? props.columns.includes('item')
+    columns.includes('credit')
+      ? columns.includes('item')
         ? creditMap.concat(itemMap)
         : creditMap
       : [],
-    props.columns.includes('quote')
-      ? props.columns.includes('item')
+    columns.includes('quote')
+      ? columns.includes('item')
         ? quoteMap.concat(itemMap)
         : quoteMap
       : [],
-    props.columns.includes('payment') ? paymentMap : [],
+    columns.includes('payment') ? paymentMap : [],
     [],
   ]);
 
@@ -164,7 +163,7 @@ export function SortableColumns(props: Props) {
 
     setData(() => [...$data]);
 
-    props.setReportKeys(collect($data[5]).pluck('value').toArray());
+    setReportKeys(collect($data[5]).pluck('value').toArray());
   };
 
   const onRemove = (record: Record) => {
@@ -189,23 +188,23 @@ export function SortableColumns(props: Props) {
 
   const onRemoveAll = () => {
     setData(() => [
-      props.columns.includes('client') ? clientMap : [],
-      props.columns.includes('invoice')
-        ? props.columns.includes('item')
+      columns.includes('client') ? clientMap : [],
+      columns.includes('invoice')
+        ? columns.includes('item')
           ? invoiceMap.concat(itemMap)
           : invoiceMap
         : [],
-      props.columns.includes('credit')
-        ? props.columns.includes('item')
+      columns.includes('credit')
+        ? columns.includes('item')
           ? creditMap.concat(itemMap)
           : creditMap
         : [],
-      props.columns.includes('quote')
-        ? props.columns.includes('item')
+      columns.includes('quote')
+        ? columns.includes('item')
           ? quoteMap.concat(itemMap)
           : quoteMap
         : [],
-      props.columns.includes('payment') ? paymentMap : [],
+      columns.includes('payment') ? paymentMap : [],
       [],
     ]);
   };
@@ -225,7 +224,7 @@ export function SortableColumns(props: Props) {
       <Card className="my-6">
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="flex w-full py-2 px-6 space-x-4">
-            {data[0].length > 0 && (
+            {columns.includes('client') && (
               <Column
                 title={() => (
                   <div className="flex justify-between items-center">
@@ -242,7 +241,7 @@ export function SortableColumns(props: Props) {
               />
             )}
 
-            {data[1].length > 0 && (
+            {columns.includes('invoice') && (
               <Column
                 title={() => (
                   <div className="flex justify-between items-center">
@@ -259,7 +258,7 @@ export function SortableColumns(props: Props) {
               />
             )}
 
-            {data[2].length > 0 && (
+            {columns.includes('credit') && (
               <Column
                 title={() => (
                   <div className="flex justify-between items-center">
@@ -276,7 +275,7 @@ export function SortableColumns(props: Props) {
               />
             )}
 
-            {data[3].length > 0 && (
+            {columns.includes('quote') && (
               <Column
                 title={() => (
                   <div className="flex justify-between items-center">
@@ -293,7 +292,7 @@ export function SortableColumns(props: Props) {
               />
             )}
 
-            {data[4].length > 0 && (
+            {columns.includes('payment') && (
               <Column
                 title={() => (
                   <div className="flex justify-between items-center">
