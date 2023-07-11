@@ -12,25 +12,25 @@ import { getEntityState } from '$app/common/helpers';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulkAction } from '$app/common/queries/vendor';
 import { Vendor } from '$app/common/interfaces/vendor';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export function useActions() {
   const [t] = useTranslation();
-  const location = useLocation();
-  const { id } = useParams();
 
   const bulk = useBulkAction();
 
-  const isEditPage = location.pathname.includes(id!);
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'vendor',
+  });
 
   const actions: Action<Vendor>[] = [
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       getEntityState(vendor) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(vendor.id, 'archive')}
@@ -40,7 +40,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       (getEntityState(vendor) === EntityState.Archived ||
         getEntityState(vendor) === EntityState.Deleted) && (
         <DropdownElement
@@ -51,7 +51,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditPage &&
+      isEditOrShowPage &&
       (getEntityState(vendor) === EntityState.Active ||
         getEntityState(vendor) === EntityState.Archived) && (
         <DropdownElement

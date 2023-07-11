@@ -155,7 +155,7 @@ export default function Apply() {
               id: 'id',
               value: 'id',
               label: 'name',
-              labelFn: (invoice) =>
+              dropdownLabelFn: (invoice) =>
                 `${t('invoice_number_short')}${invoice.number} - ${t(
                   'balance'
                 )} ${formatMoney(

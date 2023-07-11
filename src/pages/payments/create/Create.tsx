@@ -265,7 +265,10 @@ export default function Create() {
                     <InputField
                       label={t('amount_received')}
                       onValueChange={(value) =>
-                        handleInvoiceInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
+                        handleInvoiceInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
                       }
                       className="w-full"
                       value={invoice.amount}
@@ -311,7 +314,7 @@ export default function Create() {
                   id: 'id',
                   value: 'id',
                   label: 'name',
-                  labelFn: (invoice) =>
+                  dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
                     )} ${formatMoney(
@@ -365,7 +368,10 @@ export default function Create() {
                     <InputField
                       label={t('amount')}
                       onValueChange={(value) =>
-                        handleCreditInputChange(index, isNaN(parseFloat(value)) ? 0 : parseFloat(value))
+                        handleCreditInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
                       }
                       className="w-full"
                       value={credit.amount}
@@ -411,7 +417,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
-                  labelFn: (resource) =>
+                  dropdownLabelFn: (resource) =>
                     `${resource.number} (${formatMoney(
                       resource.amount,
                       resource?.client?.country_id ?? '1',

@@ -25,6 +25,8 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
+import { Task } from '$app/common/interfaces/task';
+import { useShowEditOption } from '../common/hooks/useShowEditOption';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -43,6 +45,8 @@ export default function Tasks() {
 
   const customBulkActions = useCustomBulkActions();
 
+  const showEditOption = useShowEditOption();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
@@ -52,6 +56,8 @@ export default function Tasks() {
         endpoint="/api/v1/tasks?include=status,client,project&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
+        linkToEdit="/tasks/:id/edit"
+        showEdit={(task: Task) => showEditOption(task)}
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterQueryKey="client_status"
