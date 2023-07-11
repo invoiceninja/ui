@@ -57,53 +57,56 @@ export function Column({
   };
 
   return (
-    <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
-      {(provided) => (
-        <div
-          className="w-80 flex-column"
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-        >
-          <h2 className="text-gray-500 font-medium">
-            {typeof title === 'string' ? <p>{title}</p> : title()}
-          </h2>
-          <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
-            {data.map((record: Record, i: number) => (
-              <Draggable
-                key={record.value}
-                index={i}
-                draggableId={`left-word-${record.value}`}
-              >
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    <span
-                      className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
-                      key={i}
-                    >
-                      {translateLabel(record)}
+    <div>
+      <h2 className="text-gray-500 font-medium">
+        {typeof title === 'string' ? <p>{title}</p> : title()}
+      </h2>
 
-                      {droppableId === '5' && (
-                        <button
-                          type="button"
-                          onClick={() => (onRemove ? onRemove(record) : null)}
-                        >
-                          <X size={15} />
-                        </button>
-                      )}
-                    </span>
-                  </div>
-                )}
-              </Draggable>
-            ))}
+      <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
+        {(provided) => (
+          <div
+            className="w-80 flex-column"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
+              {data.map((record: Record, i: number) => (
+                <Draggable
+                  key={record.value}
+                  index={i}
+                  draggableId={`left-word-${record.value}`}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <span
+                        className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
+                        key={i}
+                      >
+                        {translateLabel(record)}
+
+                        {droppableId === '5' && (
+                          <button
+                            type="button"
+                            onClick={() => (onRemove ? onRemove(record) : null)}
+                          >
+                            <X size={15} />
+                          </button>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+            </div>
+            {provided.placeholder}
           </div>
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
+        )}
+      </Droppable>
+    </div>
   );
 }
 
