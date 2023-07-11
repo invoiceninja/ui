@@ -20,6 +20,7 @@ interface Props {
   size?: 'small' | 'regular' | 'large';
   width?: number | string;
   placement?: 'top';
+  containsUnsafeHTMLTags?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -71,7 +72,11 @@ export function Tooltip(props: Props) {
               )}
               style={{ width: width || messageWidth }}
             >
-              {props.message}
+              {props.containsUnsafeHTMLTags ? (
+                <span dangerouslySetInnerHTML={{ __html: props.message }} />
+              ) : (
+                props.message
+              )}
             </span>
 
             <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
