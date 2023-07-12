@@ -358,8 +358,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -368,8 +373,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
