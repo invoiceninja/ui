@@ -22,6 +22,7 @@ client.interceptors.response.use(
   (error: AxiosError<ValidationBag>) => {
     if (error.response?.status === 403) {
       window.location.reload();
+      localStorage.clear();
     }
 
     if (error.response?.status === 404) {
