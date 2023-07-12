@@ -25,7 +25,8 @@ import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { InvoiceSlider } from '../common/components/InvoiceSlider';
+import { InvoiceSlider, invoiceSliderAtom, invoiceSliderVisibilityAtom } from '../common/components/InvoiceSlider';
+import { useAtom } from 'jotai';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -43,6 +44,9 @@ export default function Invoices() {
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
   const customBulkActions = useCustomBulkActions();
+
+  const [, setInvoiceSlider] = useAtom(invoiceSliderAtom);
+  const [, setInvoiceSliderVisibility] = useAtom(invoiceSliderVisibilityAtom);
 
   return (
     <Default
@@ -81,6 +85,10 @@ export default function Invoices() {
           />
         }
         linkToCreateGuards={[permission('create_invoice')]}
+        onTableRowClick={(invoice) => {
+          setInvoiceSlider(invoice);
+          setInvoiceSliderVisibility(true);
+        }}
       />
 
       <InvoiceSlider />
