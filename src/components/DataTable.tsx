@@ -9,7 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint, isProduction } from '$app/common/helpers';
+import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
@@ -49,6 +49,7 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -99,7 +100,6 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
-  includeObjectSelection?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -203,6 +203,14 @@ export function DataTable<T extends object>(props: Props<T>) {
     },
   ];
 
+  const showRestoreBulkAction = () => {
+    const isAnyResourceNotActive = selectedResources.some(
+      (resource) => getEntityState(resource) !== EntityState.Active
+    );
+
+    return isAnyResourceNotActive || !selectedResources.length;
+  };
+
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
@@ -240,7 +248,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   useEffect(() => {
-    if (props.includeObjectSelection && data) {
+    if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
         selected.includes(resource.id)
       );
@@ -301,18 +309,20 @@ export function DataTable<T extends object>(props: Props<T>) {
             </DropdownElement>
 
             <DropdownElement
-              onClick={() => bulk('restore')}
-              icon={<Icon element={MdRestore} />}
-            >
-              {t('restore')}
-            </DropdownElement>
-
-            <DropdownElement
               onClick={() => bulk('delete')}
               icon={<Icon element={MdDelete} />}
             >
               {t('delete')}
             </DropdownElement>
+
+            {showRestoreBulkAction() && (
+              <DropdownElement
+                onClick={() => bulk('restore')}
+                icon={<Icon element={MdRestore} />}
+              >
+                {t('restore')}
+              </DropdownElement>
+            )}
           </Dropdown>
         </Actions>
       )}
