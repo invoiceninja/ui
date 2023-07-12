@@ -29,7 +29,6 @@ import { AxiosError } from 'axios';
 import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
-import { get } from 'lodash';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
