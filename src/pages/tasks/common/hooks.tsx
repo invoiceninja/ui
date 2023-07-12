@@ -170,8 +170,13 @@ export function useTaskColumns() {
       id: 'description',
       label: t('description'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },

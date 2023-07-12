@@ -16,7 +16,7 @@ import { RecurringExpenseCardProps } from './Details';
 export function Notes(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
 
-  const { recurringExpense, handleChange } = props;
+  const { recurringExpense, handleChange, errors } = props;
 
   return (
     <Card title={t('notes')} isLoading={!recurringExpense} withContainer>
@@ -26,6 +26,7 @@ export function Notes(props: RecurringExpenseCardProps) {
           label={t('public_notes')}
           value={recurringExpense.public_notes}
           onValueChange={(value) => handleChange('public_notes', value)}
+          errorMessage={errors?.errors.public_notes}
         />
       )}
 
@@ -35,6 +36,7 @@ export function Notes(props: RecurringExpenseCardProps) {
           label={t('private_notes')}
           value={recurringExpense.private_notes}
           onValueChange={(value) => handleChange('private_notes', value)}
+          errorMessage={errors?.errors.private_notes}
         />
       )}
     </Card>

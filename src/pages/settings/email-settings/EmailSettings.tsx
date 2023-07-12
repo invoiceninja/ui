@@ -38,6 +38,8 @@ import { route } from '$app/common/helpers/route';
 import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import { User } from '@sentry/react';
 import { Record } from '$app/components/forms/DebouncedCombobox';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -51,6 +53,8 @@ export function EmailSettings() {
 
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -223,6 +227,9 @@ export function EmailSettings() {
                 onValueChange={(value) =>
                   handleChange('has_e_invoice_certificate_passphrase', value)
                 }
+                errorMessage={
+                  errors?.errors.has_e_invoice_certificate_passphrase
+                }
               />
             </Element>
           </>
@@ -236,6 +243,7 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
             }
+            errorMessage={errors?.errors['settings.email_sending_method']}
           >
             <option defaultChecked value="default">
               {t('default')}
@@ -247,24 +255,34 @@ export function EmailSettings() {
           </SelectField>
         </Element>
 
-        {(company?.settings.email_sending_method === 'office365' || company?.settings.email_sending_method === 'microsoft' || company?.settings.email_sending_method === 'gmail') && isHosted() && (
-          <Element leftSide={`Gmail / Microsoft ${t('user')}`}>
-            <DebouncedCombobox
-              clearButton={true}
-              onClearButtonClick={() => handleChange('settings.gmail_sending_user_id', "0")}
-              defaultValue={company?.settings.gmail_sending_user_id}
-              endpoint={route('/api/v1/users?sending_users=true')}
-              label="user"
-              onChange={(value: Record<User>) =>
-                value.resource && handleChange('settings.gmail_sending_user_id', value?.resource?.id)
-              }
-              formatLabel={(resource: User) =>
-                `${resource.first_name} ${resource.last_name}`
-              }
-              staleTime={1}
-            />
-          </Element>
-        )}
+        {(company?.settings.email_sending_method === 'office365' ||
+          company?.settings.email_sending_method === 'microsoft' ||
+          company?.settings.email_sending_method === 'gmail') &&
+          isHosted() && (
+            <Element leftSide={`Gmail / Microsoft ${t('user')}`}>
+              <DebouncedCombobox
+                clearButton={true}
+                onClearButtonClick={() =>
+                  handleChange('settings.gmail_sending_user_id', '0')
+                }
+                defaultValue={company?.settings.gmail_sending_user_id}
+                endpoint={route('/api/v1/users?sending_users=true')}
+                label="user"
+                onChange={(value: Record<User>) =>
+                  value.resource &&
+                  handleChange(
+                    'settings.gmail_sending_user_id',
+                    value?.resource?.id
+                  )
+                }
+                formatLabel={(resource: User) =>
+                  `${resource.first_name} ${resource.last_name}`
+                }
+                staleTime={1}
+                errorMessage={errors?.errors['settings.gmail_sending_user_id']}
+              />
+            </Element>
+          )}
 
         {company?.settings.email_sending_method === 'client_postmark' && (
           <Element leftSide={t('secret')}>
@@ -273,6 +291,7 @@ export function EmailSettings() {
               onValueChange={(value) =>
                 handleChange('settings.postmark_secret', value)
               }
+              errorMessage={errors?.errors['settings.postmark_secret']}
             />
           </Element>
         )}
@@ -285,6 +304,7 @@ export function EmailSettings() {
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_secret', value)
                 }
+                errorMessage={errors?.errors['settings.mailgun_secret']}
               />
             </Element>
 
@@ -294,6 +314,7 @@ export function EmailSettings() {
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_domain', value)
                 }
+                errorMessage={errors?.errors['settings.mailgun_domain']}
               />
             </Element>
 
@@ -303,6 +324,7 @@ export function EmailSettings() {
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_endpoint', value)
                 }
+                errorMessage={errors?.errors['settings.mailgun_endpoint']}
               >
                 <option value="api.mailgun.net" defaultChecked>
                   api.mailgun.net
@@ -319,6 +341,7 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.email_from_name', value)
             }
+            errorMessage={errors?.errors['settings.email_from_name']}
           />
         </Element>
 
@@ -328,6 +351,7 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.reply_to_name', value)
             }
+            errorMessage={errors?.errors['settings.reply_to_name']}
           />
         </Element>
 
@@ -337,6 +361,7 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.reply_to_email', value)
             }
+            errorMessage={errors?.errors['settings.reply_to_email']}
           />
         </Element>
 
@@ -347,6 +372,7 @@ export function EmailSettings() {
           <InputField
             value={company?.settings.bcc_email}
             onValueChange={(value) => handleChange('settings.bcc_email', value)}
+            errorMessage={errors?.errors['settings.bcc_email']}
           />
         </Element>
 
@@ -360,6 +386,7 @@ export function EmailSettings() {
               )
             }
             withBlank
+            errorMessage={errors?.errors['settings.entity_send_time']}
           >
             {[...Array(24).keys()].map((number, index) => (
               <option key={index} value={number + 1}>
@@ -380,6 +407,7 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.email_style', value)
             }
+            errorMessage={errors?.errors['settings.email_style']}
           >
             <option value="plain">{t('plain')}</option>
             <option value="light">{t('light')}</option>
@@ -400,6 +428,7 @@ export function EmailSettings() {
                       trans('body_variable_missing', { body: '$body' })
                     )
               }
+              errorMessage={errors?.errors['settings.email_style_custom']}
             />
           </Element>
         )}

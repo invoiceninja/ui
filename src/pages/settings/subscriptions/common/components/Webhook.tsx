@@ -71,7 +71,9 @@ export function Webhook(props: SubscriptionProps) {
               value
             )
           }
-          errorMessage={errors?.errors.post_purchase_url}
+          errorMessage={
+            errors?.errors['webhook_configuration.post_purchase_url']
+          }
         />
       </Element>
 
@@ -84,7 +86,9 @@ export function Webhook(props: SubscriptionProps) {
               value
             )
           }
-          errorMessage={errors?.errors.post_purchase_rest_method}
+          errorMessage={
+            errors?.errors['webhook_configuration.post_purchase_rest_method']
+          }
         >
           <option defaultChecked></option>
           <option value="post">{t('post')}</option>
