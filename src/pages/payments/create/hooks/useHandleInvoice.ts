@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import collect from 'collect.js';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { v4 } from 'uuid';
 import { PaymentOnCreation } from '../Create';
