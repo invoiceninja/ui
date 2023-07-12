@@ -53,7 +53,7 @@ export function useHandleInvoice(props: Props) {
 
       setPayment({
         ...cloned,
-        amount: collect(cloned.invoices).sum('amount') as number,
+        // amount: collect(cloned.invoices).sum('amount') as number,
       });
     },
     handleInvoiceInputChange: (index: number, amount: number) => {
@@ -63,7 +63,7 @@ export function useHandleInvoice(props: Props) {
 
       setPayment({
         ...cloned,
-        amount: collect(cloned.invoices).sum('amount') as number,
+        // amount: collect(cloned.invoices).sum('amount') as number,
       });
     },
     handleDeletingInvoice: (id: string) => {
