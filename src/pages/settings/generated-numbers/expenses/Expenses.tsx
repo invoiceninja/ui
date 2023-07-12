@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
@@ -20,8 +20,6 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Expenses() {
   const [t] = useTranslation();
@@ -30,8 +28,6 @@ export function Expenses() {
   const companyChanges = useCompanyChanges();
 
   const dispatch = useDispatch();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   useInjectCompanyChanges();
 
@@ -62,7 +58,6 @@ export function Expenses() {
           id="settings.expense_number_pattern"
           value={companyChanges?.settings?.expense_number_pattern}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.expense_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -70,7 +65,6 @@ export function Expenses() {
           id="settings.expense_number_counter"
           value={companyChanges?.settings?.expense_number_counter}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.expense_number_counter']}
         />
       </Element>
 

@@ -23,10 +23,9 @@ import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { hasLanguageChanged } from '../common/atoms';
 import { ChangeEvent } from 'react';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -34,8 +33,6 @@ export function Settings() {
 
   const dispatch = useDispatch();
   const company = useInjectCompanyChanges();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = useHandleCurrentCompanyChange();
 
@@ -63,7 +60,6 @@ export function Settings() {
             value={company?.settings?.currency_id || ''}
             id="settings.currency_id"
             onChange={handleChange}
-            errorMessage={errors?.errors['settings.currency_id']}
           >
             <option value=""></option>
             {statics?.currencies.map((currency) => (
@@ -112,7 +108,6 @@ export function Settings() {
               onChange={handleLanguageChange}
               id="settings.language_id"
               value={company?.settings?.language_id || '1'}
-              errorMessage={errors?.errors['settings.language_id']}
             >
               {statics?.languages.map((language: Language) => (
                 <option value={language.id} key={language.id}>
@@ -128,7 +123,6 @@ export function Settings() {
             onChange={handleChange}
             id="settings.timezone_id"
             value={company?.settings?.timezone_id || '1'}
-            errorMessage={errors?.errors['settings.timezone_id']}
           >
             {statics?.timezones.map((timezone: Timezone) => (
               <option value={timezone.id} key={timezone.id}>
@@ -143,7 +137,6 @@ export function Settings() {
             onChange={handleChange}
             id="settings.date_format_id"
             value={company?.settings?.date_format_id || '1'}
-            errorMessage={errors?.errors['settings.date_format_id']}
           >
             {statics?.date_formats.map((dateFormat: DateFormat) => (
               <option value={dateFormat.id} key={dateFormat.id}>
@@ -175,7 +168,6 @@ export function Settings() {
             id="first_month_of_year"
             value={company?.first_month_of_year || ''}
             onChange={handleChange}
-            errorMessage={errors?.errors['settings.first_month_of_year']}
           >
             <option value="">{/*  */}</option>
             <option value="1">{t('january')}</option>

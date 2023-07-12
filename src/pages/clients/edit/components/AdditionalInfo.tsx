@@ -108,7 +108,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   handleSettingsChange('currency_id', value)
                 }
                 withBlank
-                errorMessage={errors?.errors['settings.currency_id']}
               >
                 {currencies.map((currency, index) => (
                   <option key={index} value={currency.id}>
@@ -214,7 +213,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 )
               }
               withBlank
-              errorMessage={errors?.errors['settings.send_reminders']}
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>

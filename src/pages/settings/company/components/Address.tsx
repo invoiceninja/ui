@@ -16,8 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Address() {
   const [t] = useTranslation();
@@ -27,8 +25,6 @@ export function Address() {
   const companyChanges = useSelector(
     (state: RootState) => state.companyUsers.changes.company
   );
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
@@ -48,7 +44,6 @@ export function Address() {
               value={companyChanges?.settings?.address1}
               onChange={handleChange}
               id="settings.address1"
-              errorMessage={errors?.errors['settings.address1']}
             />
           </Element>
 
@@ -57,7 +52,6 @@ export function Address() {
               value={companyChanges?.settings?.address2}
               onChange={handleChange}
               id="settings.address2"
-              errorMessage={errors?.errors['settings.address2']}
             />
           </Element>
 
@@ -66,7 +60,6 @@ export function Address() {
               value={companyChanges?.settings?.city}
               onChange={handleChange}
               id="settings.city"
-              errorMessage={errors?.errors['settings.city']}
             />
           </Element>
 
@@ -75,7 +68,6 @@ export function Address() {
               value={companyChanges?.settings?.state}
               onChange={handleChange}
               id="settings.state"
-              errorMessage={errors?.errors['settings.state']}
             />
           </Element>
 
@@ -84,7 +76,6 @@ export function Address() {
               value={companyChanges?.settings?.postal_code}
               onChange={handleChange}
               id="settings.postal_code"
-              errorMessage={errors?.errors['settings.postal_code']}
             />
           </Element>
 
@@ -93,7 +84,6 @@ export function Address() {
               value={companyChanges?.settings?.country_id}
               onChange={handleChange}
               id="settings.country_id"
-              errorMessage={errors?.errors['settings.country_id']}
             >
               <option value=""></option>
               {statics?.countries.map((size: { id: string; name: string }) => (

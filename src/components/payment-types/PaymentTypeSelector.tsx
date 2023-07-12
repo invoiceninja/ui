@@ -16,12 +16,7 @@ export function PaymentTypeSelector(props: GenericSelectorProps) {
   const statics = useStaticsQuery();
 
   return (
-    <SelectField
-      value={props.value}
-      onValueChange={props.onChange}
-      withBlank
-      errorMessage={props.errorMessage}
-    >
+    <SelectField value={props.value} onValueChange={props.onChange} withBlank>
       {statics.data?.payment_types.map((type, index) => (
         <option key={index} value={type.id}>
           {type.name}

@@ -15,7 +15,6 @@ export interface GenericSelectorProps<T = string> {
   value: T;
   label?: string | null;
   onChange: (id: string) => unknown;
-  errorMessage?: string | string[];
 }
 
 export function CountrySelector(props: GenericSelectorProps) {
@@ -26,7 +25,6 @@ export function CountrySelector(props: GenericSelectorProps) {
       onValueChange={props.onChange}
       value={props.value}
       label={props.label}
-      errorMessage={props.errorMessage}
       withBlank
     >
       {countries.map((country, index) => (

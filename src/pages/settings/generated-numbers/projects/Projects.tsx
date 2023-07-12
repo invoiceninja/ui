@@ -20,8 +20,6 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Projects() {
   const [t] = useTranslation();
@@ -30,8 +28,6 @@ export function Projects() {
   const companyChanges = useCompanyChanges();
 
   const dispatch = useDispatch();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   useInjectCompanyChanges();
 
@@ -62,7 +58,6 @@ export function Projects() {
           id="settings.project_number_pattern"
           value={companyChanges?.settings?.project_number_pattern}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.project_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -70,7 +65,6 @@ export function Projects() {
           id="settings.project_number_counter"
           value={companyChanges?.settings?.project_number_counter}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.project_number_counter']}
         />
       </Element>
 
