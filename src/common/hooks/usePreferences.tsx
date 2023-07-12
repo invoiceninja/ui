@@ -57,6 +57,10 @@ type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
   value: ValueFor<T, K>
 ) => void;
 
+interface SaveOptions {
+  silent: boolean;
+}
+
 export function usePreferences() {
   const user = useInjectUserChanges();
 
@@ -77,8 +81,8 @@ export function usePreferences() {
 
   const { getState } = useStore<RootState>();
 
-  const save = async () => {
-    toast.processing();
+  const save = async ({ silent }: SaveOptions) => {
+    !silent && toast.processing();
 
     request(
       'PUT',
@@ -90,7 +94,7 @@ export function usePreferences() {
       }
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-        toast.success('updated_user');
+        !silent && toast.success('updated_user');
 
         dispatch(updateUser(response.data.data));
         dispatch(injectInChanges());
@@ -104,7 +108,7 @@ export function usePreferences() {
           setErrors(error.response.data);
         }
 
-        toast.error();
+        !silent && toast.error();
       });
   };
 
@@ -136,7 +140,9 @@ export function usePreferences() {
     [isVisible, errors]
   );
 
-  return { Preferences, update };
+  const settings = useReactSettings();
+
+  return { Preferences, update, preferences: settings.preferences, save };
 }
 
 export function usePreference<T extends AutoCompleteKey<ReactSettings>>(
