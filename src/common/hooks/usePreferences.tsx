@@ -14,7 +14,7 @@ import { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSettings } from 'react-icons/fi';
 import { useInjectUserChanges } from './useInjectUserChanges';
-import { ReactSettings } from './useReactSettings';
+import { ReactSettings, useReactSettings } from './useReactSettings';
 import { useDispatch, useStore } from 'react-redux';
 import {
   injectInChanges,
@@ -29,6 +29,7 @@ import { AxiosError } from 'axios';
 import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
+import { get } from 'lodash';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -79,9 +80,15 @@ export function usePreferences() {
   const save = async () => {
     toast.processing();
 
-    request('PUT', endpoint(`/api/v1/company_users/${user?.id}/preferences?include=company_user`), {
-      react_settings: getState().user.changes.company_user.react_settings,
-    })
+    request(
+      'PUT',
+      endpoint(
+        `/api/v1/company_users/${user?.id}/preferences?include=company_user`
+      ),
+      {
+        react_settings: getState().user.changes.company_user.react_settings,
+      }
+    )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_user');
 
@@ -130,4 +137,19 @@ export function usePreferences() {
   );
 
   return { Preferences, update };
+}
+
+export function usePreference<T extends AutoCompleteKey<ReactSettings>>(
+  property: T
+) {
+  const settings = useReactSettings();
+  const { update } = usePreferences();
+
+  const $update = (value: ValueFor<ReactSettings, T>) =>
+    update(property, value);
+
+  return [get(settings, property), $update] as [
+    ValueFor<ReactSettings, T>,
+    (value: ValueFor<ReactSettings, T>) => void
+  ];
 }
