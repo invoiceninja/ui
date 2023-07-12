@@ -20,16 +20,12 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Clients() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
 
@@ -62,7 +58,6 @@ export function Clients() {
           id="settings.client_number_pattern"
           value={companyChanges?.settings?.client_number_pattern}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.client_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -70,7 +65,6 @@ export function Clients() {
           id="settings.client_number_counter"
           value={companyChanges?.settings?.client_number_counter}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.client_number_counter']}
         />
       </Element>
 

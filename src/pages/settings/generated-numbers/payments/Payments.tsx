@@ -20,8 +20,6 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Payments() {
   const [t] = useTranslation();
@@ -29,8 +27,6 @@ export function Payments() {
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
 
@@ -63,7 +59,6 @@ export function Payments() {
           id="settings.payment_number_pattern"
           value={companyChanges?.settings?.payment_number_pattern}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.payment_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -71,7 +66,6 @@ export function Payments() {
           id="settings.payment_number_counter"
           value={companyChanges?.settings?.payment_number_counter}
           onChange={handleChange}
-          errorMessage={errors?.errors['settings.payment_number_counter']}
         />
       </Element>
 

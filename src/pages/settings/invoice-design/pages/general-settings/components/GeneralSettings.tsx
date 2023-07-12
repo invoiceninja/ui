@@ -13,7 +13,7 @@ import { Design } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { range } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,6 @@ import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -769,8 +768,6 @@ export function GeneralSettings() {
   const currentCompany = useCurrentCompany();
   const company = useCompanyChanges();
 
-  const errors = useAtomValue(companySettingsErrorsAtom);
-
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
@@ -830,7 +827,6 @@ export function GeneralSettings() {
             id="settings.invoice_design_id"
             value={company?.settings?.invoice_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('invoice_design_id', value)}
-            errorMessage={errors?.errors['settings.invoice_design_id']}
           >
             {designs &&
               designs.map((design: Design) => (
@@ -864,7 +860,6 @@ export function GeneralSettings() {
             id="settings.quote_design_id"
             value={company?.settings?.quote_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('quote_design_id', value)}
-            errorMessage={errors?.errors['settings.quote_design_id']}
           >
             {designs &&
               designs.map((design: Design) => (
@@ -898,7 +893,6 @@ export function GeneralSettings() {
             id="settings.credit_design_id"
             value={company?.settings?.credit_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('credit_design_id', value)}
-            errorMessage={errors?.errors['settings.credit_design_id']}
           >
             {designs &&
               designs.map((design: Design) => (
@@ -934,7 +928,6 @@ export function GeneralSettings() {
             onValueChange={(value) =>
               handleChange('purchase_order_design_id', value)
             }
-            errorMessage={errors?.errors['settings.purchase_order_design_id']}
           >
             {designs &&
               designs.map((design: Design) => (
@@ -950,11 +943,7 @@ export function GeneralSettings() {
               <Toggle
                 checked={isUpdateAllRecordsChecked('purchase_order')}
                 onValueChange={(value) =>
-                  handleUpdateAllRecordsChange(
-                    'purchase_order',
-                    'purchase_order_design_id',
-                    value
-                  )
+                  handleUpdateAllRecordsChange('purchase_order', 'purchase_order_design_id', value)
                 }
               />
             </div>
@@ -967,7 +956,6 @@ export function GeneralSettings() {
           id="settings.page_layout"
           value={company?.settings?.page_layout || 'portrait'}
           onValueChange={(value) => handleChange('page_layout', value)}
-          errorMessage={errors?.errors['settings.page_layout']}
         >
           <option value="portrait">{t('portrait')}</option>
           <option value="landscape">{t('landscape')}</option>
@@ -979,7 +967,6 @@ export function GeneralSettings() {
           id="settings.page_size"
           value={company?.settings?.page_size || 'A4'}
           onValueChange={(value) => handleChange('page_size', value)}
-          errorMessage={errors?.errors['settings.page_size']}
         >
           <option value="A5">A5</option>
           <option value="A4">A4</option>
@@ -999,7 +986,6 @@ export function GeneralSettings() {
           id="settings.font_size"
           value={company?.settings?.font_size || 16}
           onValueChange={(value) => handleChange('font_size', parseInt(value))}
-          errorMessage={errors?.errors['settings.font_size']}
         >
           {range(6, 41, 2).map((number) => (
             <option key={number} value={number}>
@@ -1019,7 +1005,6 @@ export function GeneralSettings() {
               onValueChange={(value) =>
                 handleChange('company_logo_size', `${value}${logoSizeType}`)
               }
-              errorMessage={errors?.errors['settings.company_logo_size']}
             />
           </div>
 
@@ -1042,7 +1027,6 @@ export function GeneralSettings() {
           id="settings.primary_font"
           value={company?.settings?.primary_font || 'roboto'}
           onValueChange={(value) => handleChange('primary_font', value)}
-          errorMessage={errors?.errors['settings.primary_font']}
         >
           {fonts.map((font) => (
             <option key={font.label} value={font.value}>
@@ -1057,7 +1041,6 @@ export function GeneralSettings() {
           id="settings.secondary_font"
           value={company?.settings?.secondary_font || 'roboto'}
           onValueChange={(value) => handleChange('secondary_font', value)}
-          errorMessage={errors?.errors['settings.secondary_font']}
         >
           {fonts.map((font) => (
             <option key={font.label} value={font.value}>
@@ -1134,7 +1117,6 @@ export function GeneralSettings() {
           onValueChange={(value) =>
             handleChange('page_numbering_alignment', value)
           }
-          errorMessage={errors?.errors['settings.page_numbering_alignment']}
         >
           <option value="C">{t('center')}</option>
           <option value="R">{t('right')}</option>

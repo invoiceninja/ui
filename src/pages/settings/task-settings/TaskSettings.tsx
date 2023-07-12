@@ -23,8 +23,6 @@ import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -36,8 +34,6 @@ export function TaskSettings() {
 
   useTitle('task_settings');
   useInjectCompanyChanges();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
@@ -78,7 +74,6 @@ export function TaskSettings() {
             id="settings.default_task_rate"
             onChange={handleChange}
             value={companyChanges?.settings?.default_task_rate || ''}
-            errorMessage={errors?.errors['settings.default_task_rate']}
           />
         </Element>
 
@@ -253,9 +248,6 @@ export function TaskSettings() {
                 : true
             }
             value={companyChanges?.settings?.show_all_tasks_client_portal.toString()}
-            errorMessage={
-              errors?.errors['settings.show_all_tasks_client_portal']
-            }
           >
             <option value="invoiced">{t('invoiced')}</option>
             <option value="uninvoiced">{t('uninvoiced')}</option>

@@ -81,7 +81,7 @@ export function EmailStatement(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.date_range' as keyof Schedule, value)
           }
-          errorMessage={errors?.errors['parameters.date_range']}
+          errorMessage={errors?.errors.date_range}
         >
           <option value="last7_days">{t('last7_days')}</option>
           <option value="last30_days">{t('last30_days')}</option>
@@ -102,7 +102,7 @@ export function EmailStatement(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.status' as keyof Schedule, value)
           }
-          errorMessage={errors?.errors['parameters.status']}
+          errorMessage={errors?.errors.status}
         >
           <option value="all">{t('all')}</option>
           <option value="paid">{t('paid')}</option>
@@ -145,13 +145,13 @@ export function EmailStatement(props: Props) {
 
       <Element leftSide={t('only_clients_with_invoices')}>
         <Toggle
-          checked={schedule.parameters.only_clients_with_invoices}
-          onValueChange={(value) =>
-            handleChange(
-              'parameters.only_clients_with_invoices' as keyof Schedule,
-              value
-            )
-          }
+            checked={schedule.parameters.only_clients_with_invoices}
+            onValueChange={(value) =>
+                handleChange(
+                    'parameters.only_clients_with_invoices' as keyof Schedule,
+                    value
+                )
+            }
         />
       </Element>
 

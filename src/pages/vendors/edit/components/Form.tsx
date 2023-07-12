@@ -233,7 +233,6 @@ export function Form(props: Props) {
             <CountrySelector
               value={vendor.country_id}
               onChange={(value) => handleChange('country_id', value)}
-              errorMessage={errors?.errors.country_id}
             />
           </Element>
         </Card>
@@ -249,9 +248,6 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('first_name', value, index)
                   }
-                  errorMessage={
-                    props.errors?.errors[`contacts.${index}.first_name`]
-                  }
                 />
               </Element>
 
@@ -260,9 +256,6 @@ export function Form(props: Props) {
                   value={contact.last_name}
                   onValueChange={(value) =>
                     handleContactChange('last_name', value, index)
-                  }
-                  errorMessage={
-                    props.errors?.errors[`contacts.${index}.last_name`]
                   }
                 />
               </Element>
@@ -273,7 +266,6 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('email', value, index)
                   }
-                  errorMessage={props.errors?.errors[`contacts.${index}.email`]}
                 />
               </Element>
 
@@ -283,7 +275,6 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('phone', value, index)
                   }
-                  errorMessage={props.errors?.errors[`contacts.${index}.phone`]}
                 />
               </Element>
 
@@ -334,7 +325,6 @@ export function Form(props: Props) {
                   onChange={(value) =>
                     handleChange('currency_id', parseInt(value))
                   }
-                  errorMessage={errors?.errors.currency_id}
                 />
               </Element>
 

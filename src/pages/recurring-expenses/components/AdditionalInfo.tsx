@@ -21,7 +21,7 @@ import { RecurringExpenseCardProps } from './Details';
 export function AdditionalInfo(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
 
-  const { recurringExpense, handleChange, errors } = props;
+  const { recurringExpense, handleChange } = props;
 
   const isMarkPaid = () => {
     return (
@@ -116,7 +116,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <PaymentTypeSelector
             value={recurringExpense.payment_type_id}
             onChange={(id) => handleChange('payment_type_id', id)}
-            errorMessage={errors?.errors.payment_type_id}
           />
         </Element>
       )}
@@ -127,7 +126,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
             type="date"
             value={recurringExpense.payment_date}
             onValueChange={(date) => handleChange('payment_date', date)}
-            errorMessage={errors?.errors.payment_date}
           />
         </Element>
       )}
@@ -139,7 +137,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
             onValueChange={(date) =>
               handleChange('transaction_reference', date)
             }
-            errorMessage={errors?.errors.transaction_reference}
           />
         </Element>
       )}
@@ -158,7 +155,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <CurrencySelector
             value={recurringExpense.invoice_currency_id}
             onChange={(id) => handleChange('invoice_currency_id', id)}
-            errorMessage={errors?.errors.invoice_currency_id}
           />
         </Element>
       )}
@@ -168,7 +164,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <InputField
             value={recurringExpense.exchange_rate}
             onValueChange={onExchangeRateChange}
-            errorMessage={errors?.errors.exchange_rate}
           />
         </Element>
       )}
@@ -178,7 +173,6 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <InputField
             value={recurringExpense.foreign_amount}
             onValueChange={onConvertedAmountChange}
-            errorMessage={errors?.errors.foreign_amount}
           />
         </Element>
       )}

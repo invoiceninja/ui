@@ -16,10 +16,8 @@ import { Element } from '$app/components/cards/Element';
 import { CustomField } from '$app/components/CustomField';
 import { InputField } from '$app/components/forms/InputField';
 import { SelectField } from '$app/components/forms/SelectField';
-import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Details() {
   const [t] = useTranslation();
@@ -27,8 +25,6 @@ export function Details() {
   const dispatch = useDispatch();
 
   const { data: statics } = useStaticsQuery();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const companyChanges = useSelector(
     (state: RootState) => state.companyUsers.changes.company
@@ -53,7 +49,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.name', value.toString())
               }
-              errorMessage={errors?.errors['settings.name']}
             />
           </Element>
 
@@ -63,7 +58,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.id_number', value.toString())
               }
-              errorMessage={errors?.errors['settings.id_number']}
             />
           </Element>
 
@@ -73,7 +67,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.vat_number', value.toString())
               }
-              errorMessage={errors?.errors['settings.vat_number']}
             />
           </Element>
 
@@ -83,7 +76,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.website', value.toString())
               }
-              errorMessage={errors?.errors['settings.website']}
             />
           </Element>
 
@@ -93,7 +85,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.email', value.toString())
               }
-              errorMessage={errors?.errors['settings.email']}
             />
           </Element>
 
@@ -103,7 +94,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('settings.phone', value.toString())
               }
-              errorMessage={errors?.errors['settings.phone']}
             />
           </Element>
 
@@ -115,7 +105,6 @@ export function Details() {
                   onValueChange={(value) =>
                     handleChange('settings.qr_iban', value.toString())
                   }
-                  errorMessage={errors?.errors['settings.qr_iban']}
                 />
               </Element>
               <Element leftSide={t('besr_id')}>
@@ -124,7 +113,6 @@ export function Details() {
                   onValueChange={(value) =>
                     handleChange('settings.besr_id', value.toString())
                   }
-                  errorMessage={errors?.errors['settings.besr_id']}
                 />
               </Element>
             </>
@@ -138,7 +126,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('size_id', value.toString())
               }
-              errorMessage={errors?.errors.size_id}
             >
               {statics?.sizes.map((size: { id: string; name: string }) => (
                 <option key={size.id} value={size.id}>
@@ -154,7 +141,6 @@ export function Details() {
               onValueChange={(value) =>
                 handleChange('industry_id', value.toString())
               }
-              errorMessage={errors?.errors.industry_id}
             >
               {statics?.industries.map(
                 (industry: { id: string; name: string }) => (

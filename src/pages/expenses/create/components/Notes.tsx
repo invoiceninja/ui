@@ -15,7 +15,7 @@ import { ExpenseCardProps } from './Details';
 
 export function Notes(props: ExpenseCardProps) {
   const [t] = useTranslation();
-  const { expense, handleChange, errors } = props;
+  const { expense, handleChange } = props;
 
   return (
     <Card title={t('notes')} isLoading={!expense} withContainer>
@@ -25,7 +25,6 @@ export function Notes(props: ExpenseCardProps) {
           label={t('public_notes')}
           element="textarea"
           onValueChange={(value) => handleChange('public_notes', value)}
-          errorMessage={errors?.errors.public_notes}
         />
       )}
 
@@ -35,7 +34,6 @@ export function Notes(props: ExpenseCardProps) {
           label={t('private_notes')}
           element="textarea"
           onValueChange={(value) => handleChange('private_notes', value)}
-          errorMessage={errors?.errors.private_notes}
         />
       )}
     </Card>

@@ -140,19 +140,11 @@ export default function Create() {
         </div>
 
         <div className="col-span-12 xl:col-span-4">
-          <Notes
-            expense={expense}
-            handleChange={handleChange}
-            errors={errors}
-          />
+          <Notes expense={expense} handleChange={handleChange} />
         </div>
 
         <div className="col-span-12 xl:col-span-4 space-y-4">
-          <AdditionalInfo
-            expense={expense}
-            handleChange={handleChange}
-            errors={errors}
-          />
+          <AdditionalInfo expense={expense} handleChange={handleChange} />
 
           <TaxSettings
             expense={expense}
