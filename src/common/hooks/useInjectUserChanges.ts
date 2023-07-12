@@ -9,15 +9,26 @@
  */
 
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { injectInChanges } from '../stores/slices/user';
 import { useCurrentUser } from './useCurrentUser';
+import { RootState } from '../stores/store';
+import { User } from '../interfaces/user';
+
+export function useUserChanges() {
+  return useSelector((state: RootState) => state.user.changes) as
+    | User
+    | undefined;
+}
 
 export function useInjectUserChanges() {
   const user = useCurrentUser();
   const dispatch = useDispatch();
+  const changes = useUserChanges();
 
   useEffect(() => {
     dispatch(injectInChanges());
   }, [user]);
+
+  return changes;
 }

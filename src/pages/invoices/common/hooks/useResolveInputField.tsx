@@ -232,7 +232,11 @@ export function useResolveInputField(props: Props) {
             initialValue={resource?.line_items[index][property] as string}
             className="auto"
             onChange={(value: string) => {
-              onChange(property, isNaN(parseFloat(value)) ? 0 : parseFloat(value), index);
+              onChange(
+                property,
+                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+                index
+              );
             }}
           />
         )
@@ -250,10 +254,12 @@ export function useResolveInputField(props: Props) {
           onTaxCreated={(taxRate) =>
             handleTaxRateChange(property, index, taxRate)
           }
-          className="w-auto"
-          defaultValue={resource?.line_items[index][property]}
+          defaultValue={
+            resource?.line_items[index][
+              property.replace('rate', 'name') as keyof InvoiceItem
+            ]
+          }
           onClearButtonClick={() => handleTaxRateChange(property, index)}
-          clearButton={Boolean(resource?.line_items[index][property])}
         />
       );
     }

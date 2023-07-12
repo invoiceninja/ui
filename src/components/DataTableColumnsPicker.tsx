@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import {
   CompanyUser,
-  ReactTableColumns,
 } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
@@ -34,7 +33,7 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ReactTableColumns, useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {

@@ -18,10 +18,12 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
+import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { atom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
 export const dayJSLocaleAtom = atom<ILocale | null>(null);
+export const antdLocaleAtom = atom<any | null>(null);
 
 export function App() {
   const { i18n } = useTranslation();
@@ -31,10 +33,13 @@ export function App() {
   const navigate = useNavigate();
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+  const updateAntdLocale = useSetAtom(antdLocaleAtom);
 
   const resolveLanguage = useResolveLanguage();
 
   const resolveDayJSLocale = useResolveDayJSLocale();
+
+  const resolveAntdLocale = useResolveAntdLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -53,6 +58,10 @@ export function App() {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
         updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
+      });
+
+      resolveAntdLocale(resolvedLanguage.locale).then((antdResolvedLocale) => {
+        updateAntdLocale(antdResolvedLocale);
       });
 
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {

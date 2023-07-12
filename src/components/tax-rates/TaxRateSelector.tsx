@@ -9,23 +9,19 @@
  */
 
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { TaxCreate } from '$app/pages/invoices/common/components/TaxCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
-  inputLabel?: string;
-  onChange?: (value: Record<TaxRate>) => unknown;
+  onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
-  onInputFocus?: () => unknown;
 }
 
 export function TaxRateSelector(props: Props) {
@@ -34,24 +30,26 @@ export function TaxRateSelector(props: Props) {
 
   return (
     <>
-      <DebouncedCombobox
-        inputLabel={props.inputLabel}
-        endpoint="/api/v1/tax_rates?status=active"
-        label={t('tax')}
-        formatLabel={(resource: TaxRate) =>
-          `${resource.name} ${resource.rate}%`
-        }
-        onChange={(record: Record<TaxRate>) =>
-          props.onChange && props.onChange(record)
-        }
-        value="rate"
-        defaultValue={props.defaultValue === 0 ? null : props.defaultValue}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        actionLabel={t('create_tax_rate')}
-        onActionClick={() => setIsModalOpen(true)}
-        className={props.className}
-        onInputFocus={props.onInputFocus}
+      <ComboboxAsync<TaxRate>
+        inputOptions={{
+          value: props.defaultValue ?? null,
+        }}
+        endpoint={new URL(endpoint('/api/v1/tax_rates?status=active'))}
+        onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
+        action={{
+          label: t('create_tax_rate'),
+          onClick: () => setIsModalOpen(true),
+          visible: true,
+        }}
+        entryOptions={{
+          id: 'id',
+          value: 'name',
+          label: 'name',
+          inputLabelFn: (taxRate) =>
+            taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
+          dropdownLabelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
+        }}
+        onDismiss={props.onClearButtonClick}
       />
 
       <TaxCreate
