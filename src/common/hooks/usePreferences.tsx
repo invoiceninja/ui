@@ -144,18 +144,3 @@ export function usePreferences() {
 
   return { Preferences, update, preferences: settings.preferences, save };
 }
-
-export function usePreference<T extends AutoCompleteKey<ReactSettings>>(
-  property: T
-) {
-  const settings = useReactSettings();
-  const { update } = usePreferences();
-
-  const $update = (value: ValueFor<ReactSettings, T>) =>
-    update(property, value);
-
-  return [get(settings, property), $update] as [
-    ValueFor<ReactSettings, T>,
-    (value: ValueFor<ReactSettings, T>) => void
-  ];
-}
