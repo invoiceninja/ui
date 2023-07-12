@@ -22,6 +22,12 @@ export function useInvoiceFilters() {
       backgroundColor: '#e4e4e4',
     },
     {
+      label: t('draft'),
+      value: 'draft',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
+    {
       label: t('paid'),
       value: 'paid',
       color: 'white',
