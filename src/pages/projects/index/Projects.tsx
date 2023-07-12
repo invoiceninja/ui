@@ -62,7 +62,6 @@ export default function Projects() {
           />
         }
         linkToCreateGuards={[permission('create_project')]}
-        includeObjectSelection
       />
     </Default>
   );

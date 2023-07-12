@@ -79,7 +79,6 @@ export default function Tasks() {
           </Link>
         }
         linkToCreateGuards={[permission('create_task')]}
-        includeObjectSelection
       />
     </Default>
   );
