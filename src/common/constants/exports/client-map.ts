@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Record {
+export interface Record {
     trans: string;
     value: string;
 }
