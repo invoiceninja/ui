@@ -20,8 +20,6 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function RecurringExpenses() {
   const [t] = useTranslation();
@@ -30,8 +28,6 @@ export function RecurringExpenses() {
   const companyChanges = useCompanyChanges();
 
   const dispatch = useDispatch();
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   useInjectCompanyChanges();
 
@@ -62,9 +58,6 @@ export function RecurringExpenses() {
           id="settings.recurring_expense_number_pattern"
           value={companyChanges?.settings?.recurring_expense_number_pattern}
           onChange={handleChange}
-          errorMessage={
-            errors?.errors['settings.recurring_expense_number_pattern']
-          }
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -72,9 +65,6 @@ export function RecurringExpenses() {
           id="settings.recurring_expense_number_counter"
           value={companyChanges?.settings?.recurring_expense_number_counter}
           onChange={handleChange}
-          errorMessage={
-            errors?.errors['settings.recurring_expense_number_counter']
-          }
         />
       </Element>
 

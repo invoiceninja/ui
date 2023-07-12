@@ -9,7 +9,7 @@
  */
 
 import { Design } from '$app/common/interfaces/design';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { useParams } from 'react-router-dom';
 import { atom, useAtom } from 'jotai';
@@ -26,8 +26,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Variables } from './components/Variables';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -46,8 +44,6 @@ export default function Edit() {
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
-
-  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data) {
@@ -75,14 +71,9 @@ export default function Edit() {
 
             toast.success('updated_design');
           })
-          .catch((error: AxiosError<ValidationBag>) => {
-            if (error.response?.status === 422) {
-              setErrors(error.response.data);
-              toast.dismiss();
-            } else {
-              console.error(error);
-              toast.error();
-            }
+          .catch((e) => {
+            console.error(e);
+            toast.error();
           });
       },
     },
@@ -93,7 +84,7 @@ export default function Edit() {
     <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-          <Settings errors={errors} />
+          <Settings />
           <Body />
           <Header />
           <Footer />

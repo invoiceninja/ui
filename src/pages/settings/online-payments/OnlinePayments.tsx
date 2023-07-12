@@ -28,8 +28,6 @@ import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useEffect, useState } from 'react';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -46,8 +44,6 @@ export function OnlinePayments() {
   const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>();
 
   const { data: termsResponse } = usePaymentTermsQuery({});
-
-  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const company = useInjectCompanyChanges();
 
@@ -100,7 +96,6 @@ export function OnlinePayments() {
             value={company?.settings.auto_bill || 'off'}
             onChange={handleChange}
             id="settings.auto_bill"
-            errorMessage={errors?.errors['settings.auto_bill']}
           >
             <option value="always">
               {t('enabled')} ({t('auto_bill_help_always')})
@@ -122,7 +117,6 @@ export function OnlinePayments() {
             id="settings.auto_bill_date"
             value={company?.settings.auto_bill_date || 'on_send_date'}
             onChange={handleChange}
-            errorMessage={errors?.errors['settings.auto_bill_date']}
           >
             <option value="on_send_date">{t('send_date')}</option>
             <option value="on_due_date">{t('due_date')}</option>
@@ -134,7 +128,6 @@ export function OnlinePayments() {
             value={company?.settings.use_credits_payment || 'off'}
             id="settings.use_credits_payment"
             onChange={handleChange}
-            errorMessage={errors?.errors['settings.use_credits_payment']}
           >
             <option value="always">{t('enabled')}</option>
             <option value="option">{t('show_option')}</option>
@@ -149,7 +142,6 @@ export function OnlinePayments() {
                 value={company?.settings?.payment_terms}
                 id="settings.payment_terms"
                 onChange={handleChange}
-                errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
                 {paymentTerms.map((type: PaymentTerm) => (
@@ -260,9 +252,6 @@ export function OnlinePayments() {
                   value
                 )
               }
-              errorMessage={
-                errors?.errors['settings.client_portal_under_payment_minimum']
-              }
             />
           </Element>
         )}
@@ -287,9 +276,6 @@ export function OnlinePayments() {
                   'settings.client_initiated_payments_minimum',
                   value
                 )
-              }
-              errorMessage={
-                errors?.errors['settings.client_initiated_payments_minimum']
               }
             />
           </Element>

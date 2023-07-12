@@ -290,9 +290,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`invoices.${index}.invoice_id`] && (
+                  {errors?.errors[`invoices.${index}.invoice`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.invoice_id`]}
+                      {errors?.errors[`invoices.${index}.invoice`]}
                     </Alert>
                   )}
                 </div>
@@ -393,9 +393,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`credits.${index}.credit_id`] && (
+                  {errors?.errors[`invoices.${index}.credit`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`credits.${index}.credit_id`]}
+                      {errors?.errors[`invoices.${index}.credit`]}
                     </Alert>
                   )}
                 </div>
