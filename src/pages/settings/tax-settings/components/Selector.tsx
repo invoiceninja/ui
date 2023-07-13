@@ -30,7 +30,7 @@ export function Selector() {
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const { data } = useQuery('/api/v1/tax_rates', () =>
-    request('GET', endpoint('/api/v1/tax_rates?status=active'))
+    request('GET', endpoint('/api/v1/tax_rates?status=active&per_page=100'))
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
