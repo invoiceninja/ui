@@ -141,7 +141,7 @@ const reports: Report[] = [
         label: 'expense',
         endpoint: '/api/v1/reports/expenses',
         allow_custom_column: true,
-        custom_columns: ['client', 'vendor'],
+        custom_columns: ['expense', 'client', 'vendor'],
         payload: {
             start_date: '',
             end_date: '',

@@ -13,10 +13,8 @@ interface Record {
 }
 
 export const expenseMap: Record[] = [
-    { trans: 'expense_number', value: "expense.number" },
     { trans: 'amount' , value: 'expense.amount' },
     { trans: 'category' , value: 'expense.category' },
-    { trans: 'client' , value: 'expense.client' },
     { trans: 'custom_value1' , value: 'expense.custom_value1' },
     { trans: 'custom_value2' , value: 'expense.custom_value2' },
     { trans: 'custom_value3' , value: 'expense.custom_value3' },
@@ -43,5 +41,7 @@ export const expenseMap: Record[] = [
     { trans: 'tax_rate3' , value: 'expense.tax_rate3' },
     { trans: 'transaction_reference' , value: 'expense.transaction_reference' },
     { trans: 'vendor' , value: 'expense.vendor_id' },
-    { trans: 'invoice' , value: 'expense.invoice_id' },
+    { trans: 'invoice', value: 'expense.invoice_id' },
+    { trans: 'user', value: 'expense.user' },
+    { trans: 'assigned_user', value: 'expense.assigned_user' },
 ];
