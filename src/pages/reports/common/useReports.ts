@@ -309,7 +309,7 @@ const reports: Report[] = [
         label: 'task',
         endpoint: '/api/v1/reports/tasks',
         allow_custom_column: true,
-        custom_columns: ['client','invoice', 'payment'],
+        custom_columns: ['task','client','invoice'],
         payload: {
             start_date: '',
             end_date: '',
