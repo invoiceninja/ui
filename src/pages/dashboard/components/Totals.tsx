@@ -169,15 +169,6 @@ export function Totals() {
     getChartData();
   }, [body]);
 
-  // useEffect(() => {
-  //   console.log(settings.preferences.dashboard_charts.range)
-
-  //   setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
-  // }, [settings.preferences.dashboard_charts.range]);
-
-  // console.log(chartData)
-  // console.log(currency)
-
   return (
     <>
       {isLoadingTotals && (
