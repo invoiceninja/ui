@@ -26,6 +26,9 @@ type Identifier =
     | 'product'
     | 'product_sales'
     | 'task'
+    | 'vendor'
+    | 'purchase_order'
+    | 'purchase_order_item'
     | 'profitloss'
     | 'client_balance_report'
     | 'client_sales_report'
@@ -138,7 +141,7 @@ const reports: Report[] = [
         label: 'expense',
         endpoint: '/api/v1/reports/expenses',
         allow_custom_column: false,
-        custom_columns: [],
+        custom_columns: ['client', 'vendor'],
         payload: {
             start_date: '',
             end_date: '',
@@ -170,6 +173,37 @@ const reports: Report[] = [
         endpoint: '/api/v1/reports/invoice_items',
         allow_custom_column: true,
         custom_columns: ['client', 'invoice', 'payment', 'item'],
+        payload: {
+            start_date: '',
+            end_date: '',
+            date_key: '',
+            date_range: 'all',
+            report_keys: [],
+            send_email: false,
+        },
+    },
+    {
+        identifier: 'purchase_order',
+        label: 'purchase_order',
+        endpoint: '/api/v1/reports/purchase_orders',
+        allow_custom_column: true,
+        custom_columns: ['vendor', 'purchase_order'],
+        payload: {
+            start_date: '',
+            end_date: '',
+            date_key: '',
+            date_range: 'all',
+            report_keys: [],
+            send_email: false,
+            status: '',
+        },
+    },
+    {
+        identifier: 'purchase_order_item',
+        label: 'purchase_order_item',
+        endpoint: '/api/v1/reports/purchase_order_items',
+        allow_custom_column: true,
+        custom_columns: ['vendor', 'purchase_order', 'item'],
         payload: {
             start_date: '',
             end_date: '',
@@ -214,7 +248,7 @@ const reports: Report[] = [
         label: 'recurring_invoice',
         endpoint: '/api/v1/reports/recurring_invoices',
         allow_custom_column: false,
-        custom_columns: [],
+        custom_columns: ['recurring_invoice', 'client', 'item'],
         payload: {
             start_date: '',
             end_date: '',
@@ -275,7 +309,22 @@ const reports: Report[] = [
         label: 'task',
         endpoint: '/api/v1/reports/tasks',
         allow_custom_column: false,
-        custom_columns: [],
+        custom_columns: ['client','invoice', 'payment'],
+        payload: {
+            start_date: '',
+            end_date: '',
+            date_key: '',
+            date_range: 'all',
+            report_keys: [],
+            send_email: false,
+        },
+    },
+    {
+        identifier: 'vendor',
+        label: 'vendor',
+        endpoint: '/api/v1/reports/vendors',
+        allow_custom_column: false,
+        custom_columns: ['vendor', 'client', 'expense'],
         payload: {
             start_date: '',
             end_date: '',
