@@ -61,7 +61,7 @@ export function InvoiceSlider() {
       }
       withoutActionContainer
     >
-      <TabGroup tabs={[t('overview'), t('contacts')]} width="full">
+      <TabGroup tabs={[t('overview'), t('history')]} width="full">
         <div className="space-y-4">
           <div>
             <Element leftSide={t('invoice_amount')}>
@@ -124,7 +124,7 @@ export function InvoiceSlider() {
           <div></div>
         </div>
 
-        <div>Contacts</div>
+        <div></div>
       </TabGroup>
     </Slider>
   );
