@@ -213,6 +213,7 @@ export default function Create() {
               defaultValue={payment?.client_id}
               value={payment?.client_id}
               readonly={searchParams.has('invoice')}
+              initiallyVisible={!payment?.client_id}
             />
           </Element>
 
