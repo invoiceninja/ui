@@ -225,10 +225,14 @@ export default function Create() {
                 searchParams.has('invoice') ||
                 searchParams.get('action') === 'enter'
               }
+              initiallyVisible={!payment?.client_id}
             />
           </Element>
 
-          <Element leftSide={t('amount_received')} leftSideHelp={t('amount_received_help')}>
+          <Element
+            leftSide={t('amount_received')}
+            leftSideHelp={t('amount_received_help')}
+          >
             <InputField
               id="amount"
               value={payment?.amount}
@@ -368,7 +372,7 @@ export default function Create() {
                       entryOptions={{
                         id: 'id',
                         label: 'number',
-                        value: 'id`',
+                        value: 'id',
                       }}
                       onChange={(entry) =>
                         entry.resource
