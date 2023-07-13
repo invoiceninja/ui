@@ -43,6 +43,7 @@ export function Settings(props: SubscriptionProps) {
         <SelectField
           value={subscription.auto_bill}
           onValueChange={(value) => handleChange('auto_bill', value)}
+          errorMessage={errors?.errors.auto_bill}
         >
           <option defaultChecked></option>
           <option value="always">{t('enabled')}</option>
@@ -120,7 +121,7 @@ export function Settings(props: SubscriptionProps) {
               value
             )
           }
-          errorMessage={errors?.errors.return_url}
+          errorMessage={errors?.errors['webhook_configuration.return_url']}
         />
       </Element>
 

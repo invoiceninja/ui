@@ -20,6 +20,8 @@ import { ChangeEvent } from 'react';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -27,6 +29,8 @@ export function RecurringInvoices() {
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
 
@@ -59,6 +63,9 @@ export function RecurringInvoices() {
           id="settings.recurring_invoice_number_pattern"
           value={companyChanges?.settings?.recurring_invoice_number_pattern}
           onChange={handleChange}
+          errorMessage={
+            errors?.errors['settings.recurring_invoice_number_pattern']
+          }
         />
       </Element>
       <Element leftSide={t('number_counter')}>
@@ -66,6 +73,9 @@ export function RecurringInvoices() {
           id="settings.recurring_invoice_number_counter"
           value={companyChanges?.settings?.recurring_invoice_number_counter}
           onChange={handleChange}
+          errorMessage={
+            errors?.errors['settings.recurring_invoice_number_counter']
+          }
         />
       </Element>
 

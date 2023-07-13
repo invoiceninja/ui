@@ -10,11 +10,10 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import paymentStatus from '$app/common/constants/payment-status';
 import { Payment } from '$app/common/interfaces/payment';
 import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
+import { PaymentStatus } from '../common/components/PaymentStatus';
 
 interface Props {
   payment: Payment;
@@ -49,7 +48,7 @@ export function PaymentOverview(props: Props) {
         </div>
 
         <div className="flex items-center justify-center">
-          <StatusBadge for={paymentStatus} code={props?.payment?.status_id} />
+          <PaymentStatus entity={props.payment} />
         </div>
 
         <div className="flex items-center justify-center">

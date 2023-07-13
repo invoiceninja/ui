@@ -23,11 +23,15 @@ import { PaymentTerm } from '../../../../common/interfaces/payment-term';
 import { request } from '$app/common/helpers/request';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Divider } from '$app/components/cards/Divider';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const { data: statics } = useStaticsQuery();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>
     request('GET', endpoint('/api/v1/payment_terms'))
@@ -57,6 +61,7 @@ export function Defaults() {
               id="settings.payment_type_id"
               blankOptionValue="0"
               withBlank
+              errorMessage={errors?.errors['settings.payment_type_id']}
             >
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
@@ -75,6 +80,7 @@ export function Defaults() {
                 id="settings.valid_until"
                 onChange={handleChange}
                 withBlank
+                errorMessage={errors?.errors['settings.valid_until']}
               >
                 {terms.data.data.map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days}>
@@ -92,6 +98,9 @@ export function Defaults() {
               id="settings.default_expense_payment_type_id"
               blankOptionValue="0"
               withBlank
+              errorMessage={
+                errors?.errors['settings.default_expense_payment_type_id']
+              }
             >
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (

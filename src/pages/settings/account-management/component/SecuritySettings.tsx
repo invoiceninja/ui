@@ -17,11 +17,15 @@ import { useDispatch } from 'react-redux';
 import { route } from '$app/common/helpers/route';
 import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '../../../../components/forms';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function SecuritySettings() {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const options = [
     {
@@ -79,6 +83,7 @@ export function SecuritySettings() {
           id="default_password_timeout"
           value={companyChanges?.default_password_timeout}
           onChange={handleChange}
+          errorMessage={errors?.errors.default_password_timeout}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -93,6 +98,7 @@ export function SecuritySettings() {
           id="session_timeout"
           value={companyChanges?.session_timeout}
           onChange={handleChange}
+          errorMessage={errors?.errors.session_timeout}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

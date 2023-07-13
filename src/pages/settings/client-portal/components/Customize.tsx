@@ -14,11 +14,15 @@ import { isSelfHosted } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Customize() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
     <Card title={t('customize')}>
@@ -29,6 +33,7 @@ export function Customize() {
           onValueChange={(value) =>
             handleChange('settings.portal_custom_head', value)
           }
+          errorMessage={errors?.errors['settings.portal_custom_head']}
         />
       </Element>
 
@@ -39,6 +44,7 @@ export function Customize() {
           onValueChange={(value) =>
             handleChange('settings.portal_custom_footer', value)
           }
+          errorMessage={errors?.errors['settings.portal_custom_footer']}
         />
       </Element>
 
@@ -51,6 +57,7 @@ export function Customize() {
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_css', value)
               }
+              errorMessage={errors?.errors['settings.portal_custom_css']}
             />
           </Element>
 
@@ -61,6 +68,7 @@ export function Customize() {
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_js', value)
               }
+              errorMessage={errors?.errors['settings.portal_custom_js']}
             />
           </Element>
         </>
