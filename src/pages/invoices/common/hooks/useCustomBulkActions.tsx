@@ -18,6 +18,8 @@ import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useBulk } from '$app/common/queries/invoices';
+import { BiPlusCircle } from 'react-icons/bi';
+import { useEnterPayment } from './useEnterPayment';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -25,7 +27,25 @@ export const useCustomBulkActions = () => {
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
 
+  const enterPayment = useEnterPayment();
+
   const bulk = useBulk();
+
+  const handleEnterPayment = (invoices: Invoice[]) => {
+    if (invoices.length) {
+      const clientId = invoices[0].client_id;
+
+      enterPayment(invoices, clientId);
+    }
+  };
+
+  const showEnterPaymentOptions = (invoices: Invoice[]) => {
+    const hasAnyInvoiceForPaymentEntering = invoices.some(
+      (invoice) => parseInt(invoice.status_id) < 4
+    );
+
+    return hasAnyInvoiceForPaymentEntering || !invoices.length;
+  };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     (selectedIds) => <SendEmailBulkAction invoiceIds={selectedIds} />,
@@ -53,6 +73,16 @@ export const useCustomBulkActions = () => {
         {t('mark_sent')}
       </DropdownElement>
     ),
+    (_, selectedInvoices) =>
+      selectedInvoices &&
+      showEnterPaymentOptions(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => handleEnterPayment(selectedInvoices)}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('enter_payment')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

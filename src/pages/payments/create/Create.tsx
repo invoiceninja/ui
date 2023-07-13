@@ -41,6 +41,8 @@ import { Alert } from '$app/components/Alert';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useAtom } from 'jotai';
+import { paymentAtom } from '../common/atoms';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -71,7 +73,7 @@ export default function Create() {
   const creditResolver = useCreditResolver();
   const formatMoney = useFormatMoney();
 
-  const [payment, setPayment] = useState<PaymentOnCreation>();
+  const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
@@ -81,74 +83,81 @@ export default function Create() {
   const { data: blankPayment } = useBlankPaymentQuery();
 
   useEffect(() => {
-    if (blankPayment?.data.data) {
-      setPayment({
-        ...blankPayment.data.data,
-        invoices: [],
-        credits: [],
-        client_id: '',
-      });
+    setPayment((current) => {
+      let value = current;
 
-      if (searchParams.has('client')) {
+      if (searchParams.get('action') !== 'enter') {
+        value = undefined;
+      }
+
+      if (typeof blankPayment !== 'undefined' && typeof value === 'undefined') {
+        value = {
+          ...blankPayment.data.data,
+          invoices: [],
+          credits: [],
+          client_id: '',
+        };
+      }
+
+      return value;
+    });
+
+    if (searchParams.has('client')) {
+      setPayment(
+        (current) =>
+          current && {
+            ...current,
+            client_id: searchParams.get('client') as string,
+          }
+      );
+    }
+
+    if (searchParams.has('client') && searchParams.has('invoice')) {
+      invoiceResolver
+        .find(searchParams.get('invoice') as string)
+        .then((invoice) =>
+          setPayment(
+            (current) =>
+              current && {
+                ...current,
+                invoices: [
+                  {
+                    _id: v4(),
+                    invoice_id: invoice.id,
+                    amount:
+                      invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    credit_id: '',
+                  },
+                ],
+              }
+          )
+        );
+    }
+
+    if (searchParams.has('client') && searchParams.has('credit')) {
+      creditResolver.find(searchParams.get('credit') as string).then((credit) =>
         setPayment(
           (current) =>
             current && {
               ...current,
-              client_id: searchParams.get('client') as string,
+              credits: [
+                {
+                  _id: v4(),
+                  credit_id: credit.id,
+                  amount: credit.balance > 0 ? credit.balance : credit.amount,
+                  invoice_id: '',
+                },
+              ],
             }
-        );
-      }
+        )
+      );
+    }
 
-      if (searchParams.has('client') && searchParams.has('invoice')) {
-        invoiceResolver
-          .find(searchParams.get('invoice') as string)
-          .then((invoice) =>
-            setPayment(
-              (current) =>
-                current && {
-                  ...current,
-                  invoices: [
-                    {
-                      _id: v4(),
-                      invoice_id: invoice.id,
-                      amount:
-                        invoice.balance > 0 ? invoice.balance : invoice.amount,
-                      credit_id: '',
-                    },
-                  ],
-                }
-            )
-          );
-      }
-
-      if (searchParams.has('client') && searchParams.has('credit')) {
-        creditResolver
-          .find(searchParams.get('credit') as string)
-          .then((credit) =>
-            setPayment(
-              (current) =>
-                current && {
-                  ...current,
-                  credits: [
-                    {
-                      _id: v4(),
-                      credit_id: credit.id,
-                      amount:
-                        credit.balance > 0 ? credit.balance : credit.amount,
-                      invoice_id: '',
-                    },
-                  ],
-                }
-            )
-          );
-      }
-
-      if (searchParams.has('type')) {
-        setPayment(
-          (current) =>
-            current && { ...current, type_id: searchParams.get('type') ?? '' }
-        );
-      }
+    if (searchParams.has('type')) {
+      setPayment(
+        (current) =>
+          current && { ...current, type_id: searchParams.get('type') ?? '' }
+      );
     }
   }, [blankPayment]);
 
@@ -212,7 +221,10 @@ export default function Create() {
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
-              readonly={searchParams.has('invoice')}
+              readonly={
+                searchParams.has('invoice') ||
+                searchParams.get('action') === 'enter'
+              }
             />
           </Element>
 
