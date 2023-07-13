@@ -40,7 +40,6 @@ export const expenseMap: Record[] = [
     { trans: 'tax_rate2' , value: 'expense.tax_rate2' },
     { trans: 'tax_rate3' , value: 'expense.tax_rate3' },
     { trans: 'transaction_reference' , value: 'expense.transaction_reference' },
-    { trans: 'vendor' , value: 'expense.vendor_id' },
     { trans: 'invoice', value: 'expense.invoice_id' },
     { trans: 'user', value: 'expense.user' },
     { trans: 'assigned_user', value: 'expense.assigned_user' },
