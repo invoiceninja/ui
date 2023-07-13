@@ -9,7 +9,7 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   DropResult,
@@ -27,6 +27,8 @@ import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 import { ChevronsRight, X } from 'react-feather';
 import { itemMap } from '$app/common/constants/exports/item-map';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { Identifier } from '../../index/Reports';
 
 interface Record {
   trans: string;
@@ -111,33 +113,40 @@ export function Column({
 }
 
 interface Props {
+  report: Identifier;
   columns: string[];
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
 
-export function SortableColumns({ columns, setReportKeys }: Props) {
-  const [data, setData] = useState([
-    columns.includes('client') ? clientMap : [],
-    columns.includes('invoice')
-      ? columns.includes('item')
-        ? invoiceMap.concat(itemMap)
-        : invoiceMap
-      : [],
-    columns.includes('credit')
-      ? columns.includes('item')
-        ? creditMap.concat(itemMap)
-        : creditMap
-      : [],
-    columns.includes('quote')
-      ? columns.includes('item')
-        ? quoteMap.concat(itemMap)
-        : quoteMap
-      : [],
-    columns.includes('payment') ? paymentMap : [],
-    [],
-  ]);
+export function SortableColumns({ report, columns, setReportKeys }: Props) {
+  const { preferences, update } = usePreferences();
+
+  const data =
+    report in preferences.reports.columns &&
+    preferences.reports.columns[report as Identifier].length !== 0
+      ? preferences.reports.columns[report]
+      : [
+          columns.includes('client') ? clientMap : [],
+          columns.includes('invoice')
+            ? columns.includes('item')
+              ? invoiceMap.concat(itemMap)
+              : invoiceMap
+            : [],
+          columns.includes('credit')
+            ? columns.includes('item')
+              ? creditMap.concat(itemMap)
+              : creditMap
+            : [],
+          columns.includes('quote')
+            ? columns.includes('item')
+              ? quoteMap.concat(itemMap)
+              : quoteMap
+            : [],
+          columns.includes('payment') ? paymentMap : [],
+          [],
+        ];
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -161,7 +170,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
     // Then we can insert the word into new array at specific index
     $data[destinationIndex].splice(result.destination.index, 0, word);
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
 
     setReportKeys(collect($data[5]).pluck('value').toArray());
   };
@@ -183,11 +192,11 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
     // Add it back to the original
     $data[index].push(record);
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
   };
 
   const onRemoveAll = () => {
-    setData(() => [
+    update(`preferences.reports.columns.${report}`, [
       columns.includes('client') ? clientMap : [],
       columns.includes('invoice')
         ? columns.includes('item')
@@ -216,7 +225,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
 
     $data[index] = [];
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
   };
 
   return (
