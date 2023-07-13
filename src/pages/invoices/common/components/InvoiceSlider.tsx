@@ -24,6 +24,8 @@ import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
 import { MdSend } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../../edit/components/Actions';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -35,6 +37,7 @@ export function InvoiceSlider() {
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+  const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -71,6 +74,15 @@ export function InvoiceSlider() {
             </Inline>
           </ClickableElement>
         </Inline>
+      }
+      topRight={
+        invoice ? (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={invoice}
+            actions={actions}
+          />
+        ) : null
       }
       withoutActionContainer
     >
