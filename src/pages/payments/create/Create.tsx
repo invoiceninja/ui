@@ -357,7 +357,7 @@ export default function Create() {
                       entryOptions={{
                         id: 'id',
                         label: 'number',
-                        value: 'id`',
+                        value: 'id',
                       }}
                       onChange={(entry) =>
                         entry.resource
