@@ -56,7 +56,7 @@ export default function Edit() {
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
-);
+  );
 
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -69,7 +69,7 @@ export default function Edit() {
   useEffect(() => {
     if (data) {
       setExpense(data);
-      setTaxInputType(data.calculate_tax_by_amount ? 'by_amount' : 'by_rate')
+      setTaxInputType(data.calculate_tax_by_amount ? 'by_amount' : 'by_rate');
     }
   }, [data]);
 
@@ -103,11 +103,19 @@ export default function Edit() {
           </div>
 
           <div className="col-span-12 xl:col-span-4">
-            <Notes expense={expense} handleChange={handleChange} />
+            <Notes
+              expense={expense}
+              handleChange={handleChange}
+              errors={errors}
+            />
           </div>
 
           <div className="col-span-12 xl:col-span-4 space-y-4">
-            <AdditionalInfo expense={expense} handleChange={handleChange} />
+            <AdditionalInfo
+              expense={expense}
+              handleChange={handleChange}
+              errors={errors}
+            />
 
             <TaxSettings
               expense={expense}

@@ -157,7 +157,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
-          amount: collect(payment?.invoices).sum('amount') as number,
+          // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
   }, [payment?.invoices]);
@@ -216,7 +216,7 @@ export default function Create() {
             />
           </Element>
 
-          <Element leftSide={t('amount_received')}>
+          <Element leftSide={t('amount_received')} leftSideHelp={t('amount_received_help')}>
             <InputField
               id="amount"
               value={payment?.amount}
@@ -290,9 +290,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`invoices.${index}.invoice`] && (
+                  {errors?.errors[`invoices.${index}.invoice_id`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.invoice`]}
+                      {errors?.errors[`invoices.${index}.invoice_id`]}
                     </Alert>
                   )}
                 </div>
@@ -393,9 +393,9 @@ export default function Create() {
                     </Alert>
                   )}
 
-                  {errors?.errors[`invoices.${index}.credit`] && (
+                  {errors?.errors[`credits.${index}.credit_id`] && (
                     <Alert className="mt-2" type="danger">
-                      {errors?.errors[`invoices.${index}.credit`]}
+                      {errors?.errors[`credits.${index}.credit_id`]}
                     </Alert>
                   )}
                 </div>

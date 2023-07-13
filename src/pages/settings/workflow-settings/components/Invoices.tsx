@@ -17,11 +17,15 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleToggleChange = (id: string, value: boolean | string) =>
     dispatch(
@@ -94,6 +98,7 @@ export function Invoices() {
             handleToggleChange('settings.lock_invoices', event.target.value)
           }
           value={companyChanges?.settings?.lock_invoices || 'off'}
+          errorMessage={errors?.errors['settings.lock_invoices']}
         >
           <option value="off">{t('off')}</option>
           <option value="when_sent">{t('when_sent')}</option>

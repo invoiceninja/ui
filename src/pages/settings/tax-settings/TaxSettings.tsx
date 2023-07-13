@@ -27,6 +27,8 @@ import { Divider } from '$app/components/cards/Divider';
 import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -38,6 +40,8 @@ export function TaxSettings() {
 
   useInjectCompanyChanges();
   useTitle('tax_settings');
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
@@ -80,6 +84,7 @@ export function TaxSettings() {
             id="enabled_tax_rates"
             onChange={handleChange}
             value={companyChanges?.enabled_tax_rates || 0}
+            errorMessage={errors?.errors.enabled_tax_rates}
           >
             <option value="0">{t('disabled')}</option>
             <option value="1">{t('one_tax_rate')}</option>
@@ -93,6 +98,7 @@ export function TaxSettings() {
             id="enabled_item_tax_rates"
             onChange={handleChange}
             value={companyChanges?.enabled_item_tax_rates || 0}
+            errorMessage={errors?.errors.enabled_item_tax_rates}
           >
             <option value="0">{t('disabled')}</option>
             <option value="1">{t('one_tax_rate')}</option>
@@ -106,6 +112,7 @@ export function TaxSettings() {
             id="enabled_expense_tax_rates"
             onChange={handleChange}
             value={companyChanges?.enabled_expense_tax_rates || 0}
+            errorMessage={errors?.errors.enabled_expense_tax_rates}
           >
             <option value="0">{t('disabled')}</option>
             <option value="1">{t('one_tax_rate')}</option>

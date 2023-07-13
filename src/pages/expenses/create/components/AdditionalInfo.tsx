@@ -25,7 +25,7 @@ import { ExpenseCardProps } from './Details';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
-  const { expense, handleChange } = props;
+  const { expense, handleChange, errors } = props;
 
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
@@ -186,6 +186,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <PaymentTypeSelector
             value={expense.payment_type_id}
             onChange={(id) => handleChange('payment_type_id', id)}
+            errorMessage={errors?.errors.payment_type_id}
           />
         </Element>
       )}
@@ -196,6 +197,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
             type="date"
             value={expense.payment_date}
             onValueChange={(date) => handleChange('payment_date', date)}
+            errorMessage={errors?.errors.payment_date}
           />
         </Element>
       )}
@@ -207,6 +209,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
             onValueChange={(date) =>
               handleChange('transaction_reference', date)
             }
+            errorMessage={errors?.errors.transaction_reference}
           />
         </Element>
       )}
@@ -229,6 +232,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
             <CurrencySelector
               value={expense.invoice_currency_id}
               onChange={(id) => handleChange('invoice_currency_id', id)}
+              errorMessage={errors?.errors.invoice_currency_id}
             />
           </Element>
 
@@ -238,6 +242,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
               onValueChange={(value) =>
                 handleChange('exchange_rate', parseFloat(value))
               }
+              errorMessage={errors?.errors.exchange_rate}
             />
           </Element>
 
@@ -251,6 +256,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
               onChange={(value: string) =>
                 onConvertedAmountChange(parseFloat(value))
               }
+              errorMessage={errors?.errors.foreign_amount}
             />
           </Element>
         </>

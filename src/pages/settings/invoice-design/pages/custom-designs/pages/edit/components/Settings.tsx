@@ -20,9 +20,16 @@ import { useAtom } from 'jotai';
 import { payloadAtom } from '../Edit';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
-export function Settings() {
+interface Props {
+  errors: ValidationBag | undefined;
+}
+
+export function Settings(props: Props) {
   const { t } = useTranslation();
+
+  const { errors } = props;
 
   const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
@@ -50,6 +57,7 @@ export function Settings() {
           <InputField
             value={payload.design?.name}
             onValueChange={(value) => handlePropertyChange('name', value)}
+            errorMessage={errors?.errors.name}
           />
         </Element>
 

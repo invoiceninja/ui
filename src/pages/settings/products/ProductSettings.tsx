@@ -22,6 +22,8 @@ import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function ProductSettings() {
   const [t] = useTranslation();
@@ -33,6 +35,8 @@ export function ProductSettings() {
 
   useInjectCompanyChanges();
   useTitle('product_settings');
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const dispatch = useDispatch();
 
@@ -99,6 +103,7 @@ export function ProductSettings() {
                 id="inventory_notification_threshold"
                 onChange={handleChange}
                 value={companyChanges?.inventory_notification_threshold || ''}
+                errorMessage={errors?.errors.inventory_notification_threshold}
               />
             </Element>
           </>
