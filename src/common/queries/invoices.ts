@@ -69,6 +69,14 @@ export function bulk(
   });
 }
 
+const successMessages = {
+  mark_sent: 'marked_sent_invoices',
+  email: 'emailed_invoices',
+  mark_paid: 'marked_invoices_as_paid',
+  download: 'exported_data',
+  cancel: 'cancelled_invoices',
+};
+
 interface Params {
   onSuccess?: () => void;
 }
@@ -98,19 +106,11 @@ export function useBulk(params?: Params) {
       ...(emailType && { email_type: emailType }),
     })
       .then(() => {
-        if (action === 'mark_sent') {
-          toast.success('marked_sent_invoices');
-        } else if (action === 'email') {
-          toast.success('emailed_invoices');
-        } else if (action === 'mark_paid') {
-          toast.success('marked_invoices_as_paid');
-        } else if (action === 'download') {
-          toast.success('exported_data');
-        } else if (action === 'cancel') {
-          toast.success('cancelled_invoices');
-        } else {
-          toast.success(`${action}d_invoice`);
-        }
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
+
+        toast.success(message);
 
         params?.onSuccess?.();
 
