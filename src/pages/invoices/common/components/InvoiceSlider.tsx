@@ -17,15 +17,15 @@ import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { openClientPortal } from '../helpers/open-client-portal';
+import {
+  generateClientPortalUrl,
+  openClientPortal,
+} from '../helpers/open-client-portal';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date } from '$app/common/helpers';
-import { Inline } from '$app/components/Inline';
-import { Icon } from '$app/components/icons/Icon';
-import { MdSend } from 'react-icons/md';
-import { BiPlusCircle } from 'react-icons/bi';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -50,31 +50,6 @@ export function InvoiceSlider() {
       }}
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
-      actionChildren={
-        <Inline className="w-full divide-x space-x-0">
-          {invoice && parseInt(invoice.status_id) < 4 ? (
-            <ClickableElement
-              className="text-center"
-              to={`/payments/create?invoice=${invoice.id}&client=${invoice.client_id}`}
-            >
-              <Inline>
-                <Icon element={BiPlusCircle} />
-                <p>{t('enter_payment')}</p>
-              </Inline>
-            </ClickableElement>
-          ) : null}
-
-          <ClickableElement
-            className="text-center"
-            to={`/invoices/${invoice?.id}/email`}
-          >
-            <Inline>
-              <Icon element={MdSend} />
-              <p>{t('send_email')}</p>
-            </Inline>
-          </ClickableElement>
-        </Inline>
-      }
       topRight={
         invoice ? (
           <ResourceActions
@@ -120,6 +95,20 @@ export function InvoiceSlider() {
             >
               {t('view_portal')}
             </ClickableElement>
+
+            {invoice ? (
+              <ClickableElement
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    generateClientPortalUrl(invoice) ?? ''
+                  );
+
+                  toast.success('copied_to_clipboard', { value: '' });
+                }}
+              >
+                {t('copy_link')}
+              </ClickableElement>
+            ) : null}
           </div>
 
           <Divider withoutPadding />
@@ -132,37 +121,7 @@ export function InvoiceSlider() {
 
           <Divider withoutPadding />
 
-          <div>
-            {invoice
-              ? invoice.line_items.map((item, i) => (
-                  <ClickableElement key={i} to={`/invoices/${invoice.id}/edit`}>
-                    <div className="flex flex-col text-gray-900">
-                      <div className="flex items-center justify-between">
-                        <p>{item.product_key}</p>
-                        <p>
-                          {invoice
-                            ? formatMoney(
-                                item.line_total,
-                                invoice.client?.country_id ||
-                                  company?.settings.country_id,
-                                invoice.client?.settings.currency_id ||
-                                  company?.settings.currency_id
-                              )
-                            : null}
-                        </p>
-                      </div>
-
-                      <div className="text-gray-500">
-                        {item.quantity}x &nbsp;
-                        {item.notes.length > 45
-                          ? item.notes.slice(0, 45).concat('...')
-                          : item.notes}
-                      </div>
-                    </div>
-                  </ClickableElement>
-                ))
-              : null}
-          </div>
+          <div></div>
         </div>
 
         <div>Contacts</div>
