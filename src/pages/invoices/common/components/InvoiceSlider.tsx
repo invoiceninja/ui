@@ -20,6 +20,10 @@ import { useTranslation } from 'react-i18next';
 import { openClientPortal } from '../helpers/open-client-portal';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date } from '$app/common/helpers';
+import { Inline } from '$app/components/Inline';
+import { Icon } from '$app/components/icons/Icon';
+import { MdSend } from 'react-icons/md';
+import { BiPlusCircle } from 'react-icons/bi';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -43,6 +47,32 @@ export function InvoiceSlider() {
       }}
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
+      actionChildren={
+        <Inline className="w-full divide-x space-x-0">
+          {invoice && parseInt(invoice.status_id) < 4 ? (
+            <ClickableElement
+              className="text-center"
+              to={`/payments/create?invoice=${invoice.id}&client=${invoice.client_id}`}
+            >
+              <Inline>
+                <Icon element={BiPlusCircle} />
+                <p>{t('enter_payment')}</p>
+              </Inline>
+            </ClickableElement>
+          ) : null}
+
+          <ClickableElement
+            className="text-center"
+            to={`/invoices/${invoice?.id}/email`}
+          >
+            <Inline>
+              <Icon element={MdSend} />
+              <p>{t('send_email')}</p>
+            </Inline>
+          </ClickableElement>
+        </Inline>
+      }
+      withoutActionContainer
     >
       <TabGroup tabs={[t('overview'), t('contacts')]} width="full">
         <div className="space-y-4">
