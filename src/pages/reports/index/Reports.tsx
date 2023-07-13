@@ -29,7 +29,7 @@ import { SortableColumns } from '../common/components/SortableColumns';
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 
-type Identifier =
+export type Identifier =
   | 'activity'
   | 'client'
   | 'contact'
@@ -402,6 +402,7 @@ export default function Reports() {
 
       {showCustomColumns && (
         <SortableColumns
+          report={report.identifier}
           columns={report.custom_columns}
           setReportKeys={setReportKeys}
         />
