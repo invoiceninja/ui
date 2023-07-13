@@ -140,7 +140,7 @@ const reports: Report[] = [
         identifier: 'expense',
         label: 'expense',
         endpoint: '/api/v1/reports/expenses',
-        allow_custom_column: false,
+        allow_custom_column: true,
         custom_columns: ['client', 'vendor'],
         payload: {
             start_date: '',
@@ -247,7 +247,7 @@ const reports: Report[] = [
         identifier: 'recurring_invoice',
         label: 'recurring_invoice',
         endpoint: '/api/v1/reports/recurring_invoices',
-        allow_custom_column: false,
+        allow_custom_column: true,
         custom_columns: ['recurring_invoice', 'client', 'item'],
         payload: {
             start_date: '',
@@ -308,7 +308,7 @@ const reports: Report[] = [
         identifier: 'task',
         label: 'task',
         endpoint: '/api/v1/reports/tasks',
-        allow_custom_column: false,
+        allow_custom_column: true,
         custom_columns: ['client','invoice', 'payment'],
         payload: {
             start_date: '',
@@ -323,8 +323,8 @@ const reports: Report[] = [
         identifier: 'vendor',
         label: 'vendor',
         endpoint: '/api/v1/reports/vendors',
-        allow_custom_column: false,
-        custom_columns: ['vendor', 'client', 'expense'],
+        allow_custom_column: true,
+        custom_columns: ['vendor'],
         payload: {
             start_date: '',
             end_date: '',

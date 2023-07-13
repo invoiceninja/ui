@@ -14,7 +14,7 @@ interface Record {
 }
 
 export const vendorMap: Record[] = [
-    { trans: 'name', value: "client.name" },
+    { trans: 'name', value: "vendor.name" },
     { trans: 'address1', value: 'vendor.address1' },
     { trans: 'address2', value: 'vendor.address2' },
     { trans: 'city', value: 'vendor.city' },
@@ -24,9 +24,8 @@ export const vendorMap: Record[] = [
     { trans: 'custom_value3', value: 'vendor.custom_value3' },
     { trans: 'custom_value4', value: 'vendor.custom_value4' },
     { trans: 'id_number', value: 'vendor.id_number' },
-    { trans: 'name', value: 'vendor.name' },
     { trans: 'number', value: 'vendor.number' },
-    { trans: 'client_phone', value: 'vendor.phone' },
+    { trans: 'phone', value: 'vendor.phone' },
     { trans: 'postal_code', value: 'vendor.postal_code' },
     { trans: 'private_notes', value: 'vendor.private_notes' },
     { trans: 'public_notes', value: 'vendor.public_notes' },

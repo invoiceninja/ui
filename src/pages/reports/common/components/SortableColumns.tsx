@@ -27,6 +27,11 @@ import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 import { ChevronsRight, X } from 'react-feather';
 import { itemMap } from '$app/common/constants/exports/item-map';
+import { vendorMap } from '$app/common/constants/exports/vendor-map';
+import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
+import { taskMap } from '$app/common/constants/exports/task-map';
+import { expenseMap } from '$app/common/constants/exports/expense-map';
+import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 
 interface Record {
   trans: string;
@@ -115,7 +120,7 @@ interface Props {
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
-const positions = ['client', 'invoice', 'credit', 'quote', 'payment'];
+const positions = ['client', 'invoice', 'credit', 'quote', 'payment', 'vendor', 'purchase_order', 'task', 'expense', 'recurring_invoice'];
 
 export function SortableColumns({ columns, setReportKeys }: Props) {
   const [data, setData] = useState([
@@ -136,6 +141,19 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
         : quoteMap
       : [],
     columns.includes('payment') ? paymentMap : [],
+    columns.includes('vendor') ? vendorMap : [],
+    columns.includes('purchase_order') 
+      ? columns.includes('item')
+        ? purchaseorderMap.concat(itemMap)
+        : purchaseorderMap
+      : [],
+    columns.includes('task') ? taskMap : [],
+    columns.includes('expense') ? expenseMap : [],
+    columns.includes('recurring_invoice') 
+      ? columns.includes('item')
+        ? recurringinvoiceMap.concat(itemMap)
+        : recurringinvoiceMap
+      : [],
     [],
   ]);
 
@@ -163,7 +181,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
 
     setData(() => [...$data]);
 
-    setReportKeys(collect($data[5]).pluck('value').toArray());
+    setReportKeys(collect($data[10]).pluck('value').toArray());
   };
 
   const onRemove = (record: Record) => {
@@ -178,7 +196,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
     // Remove it from the reports
     const $data = cloneDeep(data);
 
-    $data[5] = $data[5].filter((r) => r.value !== record.value);
+    $data[10] = $data[10].filter((r) => r.value !== record.value);
 
     // Add it back to the original
     $data[index].push(record);
@@ -212,7 +230,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
   const onAddAll = (index: number) => {
     const $data = cloneDeep(data);
 
-    $data[5] = [...$data[5], ...$data[index]];
+    $data[10] = [...$data[10], ...$data[index]];
 
     $data[index] = [];
 
@@ -309,6 +327,92 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
               />
             )}
 
+            {columns.includes('vendor') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('vendor')}</p>
+
+                    <button type="button" onClick={() => onAddAll(5)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[5]}
+                droppableId="5"
+                isDropDisabled={true}
+              />
+            )}
+
+            {columns.includes('purchase_order') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('purchase_order')}</p>
+
+                    <button type="button" onClick={() => onAddAll(6)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[6]}
+                droppableId="6"
+                isDropDisabled={true}
+              />
+            )}
+
+            {columns.includes('task') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('task')}</p>
+
+                    <button type="button" onClick={() => onAddAll(7)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[7]}
+                droppableId="7"
+                isDropDisabled={true}
+              />
+            )}
+            
+            {columns.includes('expense') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('expense')}</p>
+
+                    <button type="button" onClick={() => onAddAll(8)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[8]}
+                droppableId="8"
+                isDropDisabled={true}
+              />
+            )}
+            
+            {columns.includes('recurring_invoice') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('recurring_invoice')}</p>
+
+                    <button type="button" onClick={() => onAddAll(9)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[9]}
+                droppableId="9"
+                isDropDisabled={true}
+              />
+            )}
+            
+
             <Column
               title={() => (
                 <div className="flex items-center justify-between">
@@ -321,8 +425,8 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
                   </button>
                 </div>
               )}
-              data={data[5]}
-              droppableId="5"
+              data={data[10]}
+              droppableId="10"
               isDropDisabled={false}
               onRemove={onRemove}
             />
