@@ -27,6 +27,7 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import collect from 'collect.js';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -136,10 +137,14 @@ export function Totals() {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
-        // update(
-        //   'preferences.dashboard_charts.currency',
-        //   parseInt(currencies[0].value) ?? 1
-        // );
+        const $currencies = collect(currencies)
+          .pluck('value')
+          .map((value) => parseInt(value as string))
+          .toArray() as number[];
+
+        if (!$currencies.includes(currency)) {
+          update('preferences.dashboard_charts.currency', $currencies[0]);
+        }
 
         setCurrencies(currencies);
         setIsLoadingTotals(false);
@@ -169,6 +174,9 @@ export function Totals() {
 
   //   setBody((current) => ({...current, date_range: settings.preferences.dashboard_charts.range}))
   // }, [settings.preferences.dashboard_charts.range]);
+
+  // console.log(chartData)
+  // console.log(currency)
 
   return (
     <>
