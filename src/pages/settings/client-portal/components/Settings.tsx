@@ -64,6 +64,7 @@ export function Settings() {
               id="portal_mode"
               value={company?.portal_mode}
               onValueChange={(value) => handleChange('portal_mode', value)}
+              errorMessage={errors?.errors.portal_mode}
             >
               <option value="subdomain" key="subdomain">
                 {t('subdomain')}
@@ -93,6 +94,7 @@ export function Settings() {
               <InputField
                 value={company?.portal_domain}
                 onValueChange={(value) => handleChange('portal_domain', value)}
+                errorMessage={errors?.errors.portal_domain}
               />
             </Element>
           )}
@@ -104,6 +106,7 @@ export function Settings() {
           <InputField
             value={company?.portal_domain}
             onValueChange={(value) => handleChange('portal_domain', value)}
+            errorMessage={errors?.errors.portal_domain}
           />
         </Element>
       )}
@@ -193,6 +196,7 @@ export function Settings() {
             handleChange('settings.client_portal_terms', value)
           }
           value={company?.settings.client_portal_terms}
+          errorMessage={errors?.errors['settings.client_portal_terms']}
         />
       </Element>
 
@@ -203,6 +207,7 @@ export function Settings() {
             handleChange('settings.client_portal_privacy_policy', value)
           }
           value={company?.settings.client_portal_privacy_policy}
+          errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>
     </Card>
