@@ -20,6 +20,7 @@ import { toast } from '../helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
+import { ValidationBag } from '../interfaces/validation-bag';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -78,7 +79,15 @@ export function useBulk(params?: Params) {
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'email' | 'mark_sent',
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'email'
+      | 'mark_sent'
+      | 'mark_paid'
+      | 'download'
+      | 'cancel',
     emailType?: EmailType
   ) => {
     toast.processing();
@@ -93,6 +102,12 @@ export function useBulk(params?: Params) {
           toast.success('marked_sent_invoices');
         } else if (action === 'email') {
           toast.success('emailed_invoices');
+        } else if (action === 'mark_paid') {
+          toast.success('marked_invoices_as_paid');
+        } else if (action === 'download') {
+          toast.success('exported_data');
+        } else if (action === 'cancel') {
+          toast.success('cancelled_invoices');
         } else {
           toast.success(`${action}d_invoice`);
         }
@@ -102,7 +117,14 @@ export function useBulk(params?: Params) {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (
+          error.response?.status === 422 &&
+          error.response.data.errors.ids?.length
+        ) {
+          return toast.error(error.response.data.errors.ids[0]);
+        }
+
         console.error(error);
         toast.error();
       });
