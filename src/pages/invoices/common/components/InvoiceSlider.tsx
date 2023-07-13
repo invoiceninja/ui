@@ -151,16 +151,6 @@ export function InvoiceSlider() {
                 ))
               : null}
           </div>
-
-          <Divider withoutPadding />
-
-          <div className="flex justify-end px-5 sm:px-6">
-            <div className="flex flex-col">
-              <div>1</div>
-              <div>2</div>
-              <div>3</div>
-            </div>
-          </div>
         </div>
 
         <div>Contacts</div>
