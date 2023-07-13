@@ -18,7 +18,7 @@ import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
 import { BiMoney } from 'react-icons/bi';
 import { useBulk } from '$app/common/queries/invoices';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -28,20 +28,19 @@ export const useCustomBulkActions = () => {
 
   const bulk = useBulk();
 
-  const isInvoiceAutoBillable = (invoice: Invoice) => {
-    return (
-      invoice.balance > 0 &&
-      (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) &&
-      Boolean(invoice.client?.gateway_tokens.length)
-    );
-  };
-
   const showAutoBillAction = (invoices: Invoice[]) => {
     return (
       invoices.some((invoice) => isInvoiceAutoBillable(invoice)) ||
       !invoices.length
     );
+  };
+
+  const filterAutoBillableInvoiceIds = (invoices: Invoice[]) => {
+    const filteredInvoices = invoices.filter((invoice) =>
+      isInvoiceAutoBillable(invoice)
+    );
+
+    return filteredInvoices.map(({ id }) => id);
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
@@ -61,11 +60,13 @@ export const useCustomBulkActions = () => {
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, selectedInvoices) =>
+    (_, selectedInvoices) =>
       selectedInvoices &&
       showAutoBillAction(selectedInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'auto_bill')}
+          onClick={() =>
+            bulk(filterAutoBillableInvoiceIds(selectedInvoices), 'auto_bill')
+          }
           icon={<Icon element={BiMoney} />}
         >
           {t('auto_bill')}

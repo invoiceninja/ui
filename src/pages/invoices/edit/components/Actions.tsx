@@ -58,6 +58,15 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
 
+export const isInvoiceAutoBillable = (invoice: Invoice) => {
+  return (
+    invoice.balance > 0 &&
+    (invoice.status_id === InvoiceStatus.Sent ||
+      invoice.status_id === InvoiceStatus.Partial) &&
+    Boolean(invoice.client?.gateway_tokens.length)
+  );
+};
+
 export function useActions() {
   const { t } = useTranslation();
 
@@ -82,15 +91,6 @@ export function useActions() {
   const [, setCredit] = useAtom(creditAtom);
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
-
-  const showAutoBillAction = (invoice: Invoice) => {
-    return (
-      invoice.balance > 0 &&
-      (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) &&
-      Boolean(invoice.client?.gateway_tokens.length)
-    );
-  };
 
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({
@@ -262,7 +262,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      showAutoBillAction(invoice) && (
+      isInvoiceAutoBillable(invoice) && (
         <DropdownElement
           onClick={() => bulk([invoice.id], 'auto_bill')}
           icon={<Icon element={BiMoney} />}
