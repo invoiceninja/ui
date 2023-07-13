@@ -20,7 +20,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { GenericQueryOptions } from './invoices';
 
 interface PaymentParams {
   id: string | undefined;
@@ -72,17 +71,13 @@ export function usePaymentsQuery(params: PaymentsParams) {
   );
 }
 
-export function useBlankPaymentQuery(options?: GenericQueryOptions) {
+export function useBlankPaymentQuery() {
   const hasPermission = useHasPermission();
 
   return useQuery(
     route('/api/v1/payments/create'),
     () => request('GET', endpoint('/api/v1/payments/create')),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_payment'),
-    }
+    { staleTime: Infinity, enabled: hasPermission('create_payment') }
   );
 }
 
