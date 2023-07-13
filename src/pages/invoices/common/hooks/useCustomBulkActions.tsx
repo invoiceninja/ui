@@ -48,11 +48,10 @@ export const useCustomBulkActions = () => {
   };
 
   const showEnterPaymentOption = (invoices: Invoice[]) => {
-    const hasAnyInvoiceForPaymentEntering = invoices.some(
-      (invoice) => parseInt(invoice.status_id) < 4
+    return (
+      invoices.some((invoice) => parseInt(invoice.status_id) < 4) ||
+      !invoices.length
     );
-
-    return hasAnyInvoiceForPaymentEntering || !invoices.length;
   };
 
   const shouldDownloadDocuments = (invoices: Invoice[]) => {
@@ -63,6 +62,15 @@ export const useCustomBulkActions = () => {
     return (
       invoices.some(({ status_id }) => status_id === InvoiceStatus.Sent) ||
       !invoices.length
+    );
+  };
+
+  const showMarkSendOption = (invoices: Invoice[]) => {
+    return (
+      invoices.some(
+        ({ status_id, is_deleted }) =>
+          status_id === InvoiceStatus.Draft && !is_deleted
+      ) || !invoices.length
     );
   };
 
@@ -84,14 +92,16 @@ export const useCustomBulkActions = () => {
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => bulk(selectedIds, 'mark_sent')}
-        icon={<Icon element={MdMarkEmailRead} />}
-      >
-        {t('mark_sent')}
-      </DropdownElement>
-    ),
+    (selectedIds, selectedInvoices) =>
+      selectedInvoices &&
+      showMarkSendOption(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'mark_sent')}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
+          {t('mark_sent')}
+        </DropdownElement>
+      ),
     (_, selectedInvoices) =>
       selectedInvoices &&
       showEnterPaymentOption(selectedInvoices) && (
