@@ -32,7 +32,7 @@ export interface ReactSettings {
       };
     };
     reports: {
-      columns: ClientMapRecord[][];
+      columns: Record<string, ClientMapRecord[][]>;
     };
   };
 }
@@ -83,7 +83,7 @@ export function useReactSettings() {
         },
       },
       reports: {
-        columns: [],
+        columns: {},
       },
     },
   };
