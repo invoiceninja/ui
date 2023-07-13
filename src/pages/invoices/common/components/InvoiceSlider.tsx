@@ -123,15 +123,28 @@ export function InvoiceSlider() {
           <div>
             {invoice
               ? invoice.line_items.map((item, i) => (
-                  <ClickableElement key={i}>
+                  <ClickableElement key={i} to={`/invoices/${invoice.id}/edit`}>
                     <div className="flex flex-col text-gray-900">
                       <div className="flex items-center justify-between">
-                        <p>Product</p>
-                        <p>$0</p>
+                        <p>{item.product_key}</p>
+                        <p>
+                          {invoice
+                            ? formatMoney(
+                                item.line_total,
+                                invoice.client?.country_id ||
+                                  company?.settings.country_id,
+                                invoice.client?.settings.currency_id ||
+                                  company?.settings.currency_id
+                              )
+                            : null}
+                        </p>
                       </div>
 
                       <div className="text-gray-500">
-                        1x lorem ipsum &middot; Tax %
+                        {item.quantity}x &nbsp;
+                        {item.notes.length > 45
+                          ? item.notes.slice(0, 45).concat('...')
+                          : item.notes}
                       </div>
                     </div>
                   </ClickableElement>
