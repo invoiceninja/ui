@@ -27,7 +27,7 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCancel,
@@ -56,6 +56,7 @@ import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk } from '$app/common/queries/invoices';
 
 export function useActions() {
   const { t } = useTranslation();
@@ -66,6 +67,8 @@ export function useActions() {
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
+
+  const bulk = useBulk();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
@@ -79,6 +82,15 @@ export function useActions() {
   const [, setCredit] = useAtom(creditAtom);
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const showAutoBillAction = (invoice: Invoice) => {
+    return (
+      invoice.balance > 0 &&
+      (invoice.status_id === InvoiceStatus.Sent ||
+        invoice.status_id === InvoiceStatus.Partial) &&
+      Boolean(invoice.client?.gateway_tokens.length)
+    );
+  };
 
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({
@@ -247,6 +259,15 @@ export function useActions() {
           icon={<Icon element={MdPaid} />}
         >
           {t('mark_paid')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showAutoBillAction(invoice) && (
+        <DropdownElement
+          onClick={() => bulk([invoice.id], 'auto_bill')}
+          icon={<Icon element={BiMoney} />}
+        >
+          {t('auto_bill')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
