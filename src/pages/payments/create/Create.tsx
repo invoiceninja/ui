@@ -213,6 +213,7 @@ export default function Create() {
               defaultValue={payment?.client_id}
               value={payment?.client_id}
               readonly={searchParams.has('invoice')}
+              initiallyVisible={!payment?.client_id}
             />
           </Element>
 
@@ -356,7 +357,7 @@ export default function Create() {
                       entryOptions={{
                         id: 'id',
                         label: 'number',
-                        value: 'id`',
+                        value: 'id',
                       }}
                       onChange={(entry) =>
                         entry.resource
