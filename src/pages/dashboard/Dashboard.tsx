@@ -58,13 +58,17 @@ export default function Dashboard() {
           <RecentPayments />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
-          <UpcomingInvoices />
-        </div>
+        {enabled(ModuleBitmask.Invoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingInvoices />
+          </div>
+        )}
 
-        <div className="col-span-12 xl:col-span-6">
-          <PastDueInvoices />
-        </div>
+        {enabled(ModuleBitmask.Invoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <PastDueInvoices />
+          </div>
+        )}
 
         {enabled(ModuleBitmask.Quotes) && (
           <div className="col-span-12 xl:col-span-6">

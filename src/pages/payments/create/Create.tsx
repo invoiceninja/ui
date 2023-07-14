@@ -371,8 +371,16 @@ export default function Create() {
                       }
                       entryOptions={{
                         id: 'id',
-                        label: 'number',
                         value: 'id',
+                        label: 'number',
+                        dropdownLabelFn: (credit) =>
+                          `${t('credit')} #${credit.number} - ${t(
+                            'balance'
+                          )} ${formatMoney(
+                            credit.balance,
+                            payment.client?.country_id ?? '1',
+                            payment.client?.settings.currency_id ?? '1'
+                          )}`,
                       }}
                       onChange={(entry) =>
                         entry.resource
@@ -433,12 +441,14 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
-                  dropdownLabelFn: (resource) =>
-                    `${resource.number} (${formatMoney(
-                      resource.amount,
-                      resource?.client?.country_id ?? '1',
-                      resource?.client?.settings.currency_id
-                    )})`,
+                  dropdownLabelFn: (credit) =>
+                    `${t('credit')} #${credit.number} - ${t(
+                      'balance'
+                    )} ${formatMoney(
+                      credit.balance,
+                      payment.client?.country_id ?? '1',
+                      payment.client?.settings.currency_id ?? '1'
+                    )}`,
                 }}
                 onChange={(entry) =>
                   entry.resource ? handleCreditChange(entry.resource) : null

@@ -47,7 +47,7 @@ export default function PurchaseOrders() {
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="purchase_order"
-        endpoint="/api/v1/purchase_orders?include=vendor,expense&sort=id|desc"
+        endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"

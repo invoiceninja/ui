@@ -17,10 +17,10 @@ import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '../atoms/data-table';
 import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
 import { ValidationBag } from '../interfaces/validation-bag';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -75,6 +75,7 @@ const successMessages = {
   mark_paid: 'marked_invoices_as_paid',
   download: 'exported_data',
   cancel: 'cancelled_invoices',
+  auto_bill: 'auto_billed_invoices',
 };
 
 interface Params {
@@ -95,7 +96,8 @@ export function useBulk(params?: Params) {
       | 'mark_sent'
       | 'mark_paid'
       | 'download'
-      | 'cancel',
+      | 'cancel'
+      | 'auto_bill',
     emailType?: EmailType
   ) => {
     toast.processing();

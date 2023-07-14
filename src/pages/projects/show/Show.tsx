@@ -42,6 +42,8 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings';
 
 dayjs.extend(duration);
 
@@ -50,6 +52,8 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const enabled = useEnabled();
 
   const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
@@ -154,31 +158,33 @@ export default function Show() {
         </InfoCard>
       </div>
 
-      <div className="my-4">
-        <DataTable
-          resource="task"
-          columns={columns}
-          customActions={taskActions}
-          endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
-          bulkRoute="/api/v1/tasks/bulk"
-          linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
-          linkToEdit="/tasks/:id/edit"
-          showEdit={(task: Task) => showEditOption(task)}
-          customFilters={filters}
-          customBulkActions={customBulkActions}
-          customFilterQueryKey="client_status"
-          customFilterPlaceholder="status"
-          withResourcefulActions
-          leftSideChevrons={
-            <DataTableColumnsPicker
-              columns={taskColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-              table="task"
-            />
-          }
-          linkToCreateGuards={[permission('create_task')]}
-        />
-      </div>
+      {enabled(ModuleBitmask.Tasks) && (
+        <div className="my-4">
+          <DataTable
+            resource="task"
+            columns={columns}
+            customActions={taskActions}
+            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
+            bulkRoute="/api/v1/tasks/bulk"
+            linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
+            linkToEdit="/tasks/:id/edit"
+            showEdit={(task: Task) => showEditOption(task)}
+            customFilters={filters}
+            customBulkActions={customBulkActions}
+            customFilterQueryKey="client_status"
+            customFilterPlaceholder="status"
+            withResourcefulActions
+            leftSideChevrons={
+              <DataTableColumnsPicker
+                columns={taskColumns as unknown as string[]}
+                defaultColumns={defaultColumns}
+                table="task"
+              />
+            }
+            linkToCreateGuards={[permission('create_task')]}
+          />
+        </div>
+      )}
     </Default>
   );
 }
