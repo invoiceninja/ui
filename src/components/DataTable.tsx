@@ -289,7 +289,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
         >
-          <Dropdown label={t('more_actions')}>
+          <Dropdown label={t('more_actions')} disabled={!selected.length}>
             {props.customBulkActions &&
               props.customBulkActions.map(
                 (bulkAction: CustomBulkAction<T>, index: number) => (
