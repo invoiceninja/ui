@@ -80,6 +80,7 @@ export default function Invoices() {
           />
         }
         linkToCreateGuards={[permission('create_invoice')]}
+        includeObjectSelection
       />
     </Default>
   );
