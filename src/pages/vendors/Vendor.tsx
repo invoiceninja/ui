@@ -17,13 +17,14 @@ import { useVendorQuery } from '$app/common/queries/vendor';
 import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Default } from '$app/components/layouts/Default';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { Inline } from '$app/components/Inline';
+import { useTabs } from './show/hooks/useTabs';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -48,24 +49,7 @@ export default function Vendor() {
     { name: documentTitle || '', href: route('/vendors/:id', { id }) },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('purchase_orders'),
-      href: route('/vendors/:id', { id }),
-    },
-    {
-      name: t('expenses'),
-      href: route('/vendors/:id/expenses', { id }),
-    },
-    {
-      name: t('recurring_expenses'),
-      href: route('/vendors/:id/recurring_expenses', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/vendors/:id/documents', { id }),
-    },
-  ];
+  const tabs = useTabs();
 
   return (
     <Default

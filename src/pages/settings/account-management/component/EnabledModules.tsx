@@ -34,37 +34,37 @@ export enum ModuleBitmask {
   Transactions = 32768,
 }
 
+export const modules: Module[] = [
+  { label: 'invoices', bitmask: ModuleBitmask.Invoices },
+  {
+    label: 'recurring_invoices',
+    bitmask: ModuleBitmask.RecurringInvoices,
+  },
+  { label: 'quotes', bitmask: ModuleBitmask.Quotes },
+  { label: 'credits', bitmask: ModuleBitmask.Credits },
+  { label: 'projects', bitmask: ModuleBitmask.Projects },
+  { label: 'tasks', bitmask: ModuleBitmask.Tasks },
+  { label: 'vendors', bitmask: ModuleBitmask.Vendors },
+  { label: 'expenses', bitmask: ModuleBitmask.Expenses },
+  { label: 'purchase_orders', bitmask: ModuleBitmask.PurchaseOrders },
+  {
+    label: 'recurring_expenses',
+    bitmask: ModuleBitmask.RecurringExpenses,
+  },
+  { label: 'transactions', bitmask: ModuleBitmask.Transactions },
+
+  // { label: t('tickets'), bitmask: 128 },
+  // { label: t('proposals'), bitmask: 256 },
+  // { label: t('recurring_tasks'), bitmask: 1024 },
+  // { label: t('recurring_quotes'), bitmask: 2048 },
+  // { label: t('proformal_invoices'), bitmask: 8192 },
+  // { label: t('purchase_orders'), bitmask: 16384 },
+];
+
 export function EnabledModules() {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
-
-  const modules: Module[] = [
-    { label: t('invoices'), bitmask: ModuleBitmask.Invoices },
-    {
-      label: t('recurring_invoices'),
-      bitmask: ModuleBitmask.RecurringInvoices,
-    },
-    { label: t('quotes'), bitmask: ModuleBitmask.Quotes },
-    { label: t('credits'), bitmask: ModuleBitmask.Credits },
-    { label: t('projects'), bitmask: ModuleBitmask.Projects },
-    { label: t('tasks'), bitmask: ModuleBitmask.Tasks },
-    { label: t('vendors'), bitmask: ModuleBitmask.Vendors },
-    { label: t('expenses'), bitmask: ModuleBitmask.Expenses },
-    { label: t('purchase_orders'), bitmask: ModuleBitmask.PurchaseOrders },
-    {
-      label: t('recurring_expenses'),
-      bitmask: ModuleBitmask.RecurringExpenses,
-    },
-    { label: t('transactions'), bitmask: ModuleBitmask.Transactions },
-
-    // { label: t('tickets'), bitmask: 128 },
-    // { label: t('proposals'), bitmask: 256 },
-    // { label: t('recurring_tasks'), bitmask: 1024 },
-    // { label: t('recurring_quotes'), bitmask: 2048 },
-    // { label: t('proformal_invoices'), bitmask: 8192 },
-    // { label: t('purchase_orders'), bitmask: 16384 },
-  ];
 
   const handleToggleChange = (value: boolean, bitmask: number) =>
     dispatch(
@@ -78,7 +78,7 @@ export function EnabledModules() {
   return (
     <Card title={t('enabled_modules')}>
       {modules.map((module, index) => (
-        <Element key={index} leftSide={module.label}>
+        <Element key={index} leftSide={t(module.label)}>
           <Toggle
             checked={Boolean(companyChanges?.enabled_modules & module.bitmask)}
             key={module.label}

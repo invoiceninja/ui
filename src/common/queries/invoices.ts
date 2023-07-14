@@ -8,14 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '../helpers/toast/toast';
+import { ValidationBag } from '../interfaces/validation-bag';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -62,4 +66,42 @@ export function bulk(
     action,
     ids: Array.from(id),
   });
+}
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'auto_bill'
+  ) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/invoices/bulk'), {
+      action,
+      ids,
+    })
+      .then(() => {
+        if (action === 'auto_bill') {
+          toast.success('auto_billed_invoice');
+        } else {
+          toast.success(`${action}d_invoice`);
+        }
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (
+          error.response?.status === 422 &&
+          error.response.data.errors.ids?.length
+        ) {
+          return toast.error(error.response.data.errors.ids[0]);
+        }
+
+        console.error(error);
+        toast.error();
+      });
+  };
 }
