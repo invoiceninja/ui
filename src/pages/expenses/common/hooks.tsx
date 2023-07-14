@@ -411,11 +411,11 @@ export function useExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value) =>
+      format: (value, expense) =>
         formatMoney(
           value,
           company?.settings.country_id,
-          company?.settings.currency_id
+          expense.currency_id ? expense.currency_id : company?.settings.currency_id
         ),
     },
     {
