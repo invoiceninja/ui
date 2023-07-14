@@ -56,15 +56,10 @@ export function useSave(
         }
       })
       .finally(() => {
+        
         queryClient.invalidateQueries(route('/api/v1/payments'));
-
-        const paymentables = payment.invoices as Paymentable[] | undefined;
-
-        paymentables?.forEach((invoice) => {
-
-          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: invoice.invoice_id }));
-
-        });
+        queryClient.invalidateQueries(route('/api/v1/credits'));
+        queryClient.invalidateQueries(route('/api/v1/invoices'));
 
       });
   };
