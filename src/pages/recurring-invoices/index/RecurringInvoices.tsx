@@ -54,7 +54,7 @@ export default function RecurringInvoices() {
       <DataTable
         resource="recurring_invoice"
         columns={columns}
-        endpoint="/api/v1/recurring_invoices?include=client&sort=id|desc"
+        endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
