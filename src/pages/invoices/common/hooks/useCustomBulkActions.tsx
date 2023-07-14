@@ -24,11 +24,12 @@ import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useBulk } from '$app/common/queries/invoices';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import { useEnterPayment } from './useEnterPayment';
 import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
+import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -39,6 +40,13 @@ export const useCustomBulkActions = () => {
   const enterPayment = useEnterPayment();
 
   const bulk = useBulk();
+
+  const showAutoBillAction = (invoices: Invoice[]) => {
+    return (
+      !invoices.some((invoice) => !isInvoiceAutoBillable(invoice)) ||
+      !invoices.length
+    );
+  };
 
   const handleEnterPayment = (invoices: Invoice[]) => {
     if (invoices.length) {
@@ -110,6 +118,16 @@ export const useCustomBulkActions = () => {
         {t('download_pdf')}
       </DropdownElement>
     ),
+    (selectedIds, selectedInvoices) =>
+      selectedInvoices &&
+      showAutoBillAction(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'auto_bill')}
+          icon={<Icon element={BiMoney} />}
+        >
+          {t('auto_bill')}
+        </DropdownElement>
+      ),
     (selectedIds, selectedInvoices) =>
       selectedInvoices &&
       showMarkSendOption(selectedInvoices) && (
