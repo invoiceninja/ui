@@ -28,6 +28,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useEnterPayment } from './useEnterPayment';
 import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import collect from 'collect.js';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -41,6 +42,12 @@ export const useCustomBulkActions = () => {
 
   const handleEnterPayment = (invoices: Invoice[]) => {
     if (invoices.length) {
+      const clientIds = collect(invoices).pluck('client_id').unique().toArray();
+
+      if (clientIds.length > 1) {
+        return toast.error('multiple_client_error');
+      }
+
       const clientId = invoices[0].client_id;
 
       enterPayment(invoices, clientId);
@@ -49,8 +56,10 @@ export const useCustomBulkActions = () => {
 
   const showEnterPaymentOption = (invoices: Invoice[]) => {
     return (
-      invoices.some((invoice) => parseInt(invoice.status_id) < 4) ||
-      !invoices.length
+      !invoices.some(
+        (invoice) =>
+          parseInt(invoice.status_id) > parseInt(InvoiceStatus.Partial)
+      ) || !invoices.length
     );
   };
 
@@ -58,18 +67,27 @@ export const useCustomBulkActions = () => {
     return invoices.some(({ documents }) => documents.length);
   };
 
-  const showCancelInvoiceOption = (invoices: Invoice[]) => {
+  const showCancelOption = (invoices: Invoice[]) => {
     return (
-      invoices.some(({ status_id }) => status_id === InvoiceStatus.Sent) ||
+      !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent) ||
       !invoices.length
     );
   };
 
   const showMarkSendOption = (invoices: Invoice[]) => {
     return (
-      invoices.some(
+      !invoices.some(
         ({ status_id, is_deleted }) =>
-          status_id === InvoiceStatus.Draft && !is_deleted
+          status_id !== InvoiceStatus.Draft || is_deleted
+      ) || !invoices.length
+    );
+  };
+
+  const showMarkPaidOption = (invoices: Invoice[]) => {
+    return (
+      !invoices.some(
+        ({ status_id, is_deleted }) =>
+          parseInt(status_id) > parseInt(InvoiceStatus.Partial) || is_deleted
       ) || !invoices.length
     );
   };
@@ -112,14 +130,16 @@ export const useCustomBulkActions = () => {
           {t('enter_payment')}
         </DropdownElement>
       ),
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => bulk(selectedIds, 'mark_paid')}
-        icon={<Icon element={MdPaid} />}
-      >
-        {t('mark_paid')}
-      </DropdownElement>
-    ),
+    (selectedIds, selectedInvoices) =>
+      selectedInvoices &&
+      showMarkPaidOption(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'mark_paid')}
+          icon={<Icon element={MdPaid} />}
+        >
+          {t('mark_paid')}
+        </DropdownElement>
+      ),
     (selectedIds, selectedInvoices) => (
       <DropdownElement
         onClick={() =>
@@ -134,7 +154,7 @@ export const useCustomBulkActions = () => {
     ),
     (selectedIds, selectedInvoices) =>
       selectedInvoices &&
-      showCancelInvoiceOption(selectedInvoices) && (
+      showCancelOption(selectedInvoices) && (
         <DropdownElement
           onClick={() => bulk(selectedIds, 'cancel')}
           icon={<Icon element={MdCancel} />}
