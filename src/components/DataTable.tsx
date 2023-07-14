@@ -204,11 +204,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   ];
 
   const showRestoreBulkAction = () => {
-    const isAnyResourceNotActive = selectedResources.some(
-      (resource) => getEntityState(resource) !== EntityState.Active
+    return !selectedResources.some(
+      (resource) =>
+        getEntityState(resource) !== EntityState.Archived ||
+        getEntityState(resource) !== EntityState.Deleted
     );
-
-    return isAnyResourceNotActive || !selectedResources.length;
   };
 
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {

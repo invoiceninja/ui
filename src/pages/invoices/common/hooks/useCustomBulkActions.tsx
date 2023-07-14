@@ -42,10 +42,7 @@ export const useCustomBulkActions = () => {
   const bulk = useBulk();
 
   const showAutoBillAction = (invoices: Invoice[]) => {
-    return (
-      !invoices.some((invoice) => !isInvoiceAutoBillable(invoice)) ||
-      !invoices.length
-    );
+    return !invoices.some((invoice) => !isInvoiceAutoBillable(invoice));
   };
 
   const handleEnterPayment = (invoices: Invoice[]) => {
@@ -63,11 +60,8 @@ export const useCustomBulkActions = () => {
   };
 
   const showEnterPaymentOption = (invoices: Invoice[]) => {
-    return (
-      !invoices.some(
-        (invoice) =>
-          parseInt(invoice.status_id) > parseInt(InvoiceStatus.Partial)
-      ) || !invoices.length
+    return !invoices.some(
+      (invoice) => parseInt(invoice.status_id) > parseInt(InvoiceStatus.Partial)
     );
   };
 
@@ -76,27 +70,20 @@ export const useCustomBulkActions = () => {
   };
 
   const showCancelOption = (invoices: Invoice[]) => {
-    return (
-      !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent) ||
-      !invoices.length
-    );
+    return !invoices.some(({ status_id }) => status_id !== InvoiceStatus.Sent);
   };
 
   const showMarkSendOption = (invoices: Invoice[]) => {
-    return (
-      !invoices.some(
-        ({ status_id, is_deleted }) =>
-          status_id !== InvoiceStatus.Draft || is_deleted
-      ) || !invoices.length
+    return !invoices.some(
+      ({ status_id, is_deleted }) =>
+        status_id !== InvoiceStatus.Draft || is_deleted
     );
   };
 
   const showMarkPaidOption = (invoices: Invoice[]) => {
-    return (
-      !invoices.some(
-        ({ status_id, is_deleted }) =>
-          parseInt(status_id) > parseInt(InvoiceStatus.Partial) || is_deleted
-      ) || !invoices.length
+    return !invoices.some(
+      ({ status_id, is_deleted }) =>
+        parseInt(status_id) > parseInt(InvoiceStatus.Partial) || is_deleted
     );
   };
 
