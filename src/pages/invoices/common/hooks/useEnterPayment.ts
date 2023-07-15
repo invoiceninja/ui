@@ -22,34 +22,32 @@ export function useEnterPayment() {
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
-  return (invoices: Invoice[], clientId: string) => {
+  return (invoices: Invoice[]) => {
     if (blankPayment) {
       setPayment({
         ...blankPayment.data.data,
         invoices: [],
         credits: [],
-        client_id: clientId,
+        client_id: invoices[0].client_id,
       });
 
       invoices.forEach((invoice) => {
-        if (parseInt(invoice.status_id) < 4) {
-          setPayment(
-            (current) =>
-              current && {
-                ...current,
-                invoices: [
-                  ...current.invoices,
-                  {
-                    _id: v4(),
-                    invoice_id: invoice.id,
-                    amount:
-                      invoice.balance > 0 ? invoice.balance : invoice.amount,
-                    credit_id: '',
-                  },
-                ],
-              }
-          );
-        }
+        setPayment(
+          (current) =>
+            current && {
+              ...current,
+              invoices: [
+                ...current.invoices,
+                {
+                  _id: v4(),
+                  invoice_id: invoice.id,
+                  amount:
+                    invoice.balance > 0 ? invoice.balance : invoice.amount,
+                  credit_id: '',
+                },
+              ],
+            }
+        );
       });
 
       navigate('/payments/create?action=enter');

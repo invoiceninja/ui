@@ -53,9 +53,7 @@ export const useCustomBulkActions = () => {
         return toast.error('multiple_client_error');
       }
 
-      const clientId = invoices[0].client_id;
-
-      enterPayment(invoices, clientId);
+      enterPayment(invoices);
     }
   };
 
