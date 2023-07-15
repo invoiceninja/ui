@@ -18,6 +18,7 @@ import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
+import { Alert } from '../Alert';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -52,6 +53,7 @@ export interface ComboboxStaticProps<T = any> {
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
+  errorMessage?: string | string[];
 }
 
 export type Nullable<T> = T | null;
@@ -68,6 +70,7 @@ export function ComboboxStatic({
   onChange,
   onDismiss,
   entryOptions,
+  errorMessage,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -278,6 +281,12 @@ export function ComboboxStatic({
           </HeadlessCombobox.Options>
         )}
       </HeadlessCombobox>
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
     </div>
   );
 }
@@ -304,6 +313,8 @@ export interface ComboboxAsyncProps<T> {
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
+  disableWithQueryParameter?: boolean;
+  errorMessage?: string | string[];
 }
 
 export function ComboboxAsync<T = any>({
@@ -319,6 +330,8 @@ export function ComboboxAsync<T = any>({
   nullable,
   onChange,
   onDismiss,
+  disableWithQueryParameter,
+  errorMessage,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -332,7 +345,7 @@ export function ComboboxAsync<T = any>({
 
       url.searchParams.set('status', 'active');
 
-      if (inputOptions.value) {
+      if (inputOptions.value && !disableWithQueryParameter) {
         url.searchParams.set('with', inputOptions.value.toString());
       }
 
@@ -395,6 +408,7 @@ export function ComboboxAsync<T = any>({
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}
+      errorMessage={errorMessage}
     />
   );
 }
