@@ -141,7 +141,6 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('design')}
                   value={quote?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(quote?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
