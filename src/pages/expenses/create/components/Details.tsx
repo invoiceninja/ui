@@ -57,9 +57,8 @@ export function Details(props: Props) {
         <Element leftSide={t('vendor')}>
           <VendorSelector
             value={expense.vendor_id}
-            clearButton={Boolean(expense.vendor_id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
             onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+            onClearButtonClick={() => handleChange('vendor_id', '')}
             errorMessage={errors?.errors.vendor_id}
           />
         </Element>

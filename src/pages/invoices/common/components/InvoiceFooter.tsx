@@ -193,9 +193,8 @@ export function InvoiceFooter(props: Props) {
                 <VendorSelector
                   inputLabel={t('vendor')}
                   value={invoice?.vendor_id}
-                  clearButton={Boolean(invoice?.vendor_id)}
-                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>
