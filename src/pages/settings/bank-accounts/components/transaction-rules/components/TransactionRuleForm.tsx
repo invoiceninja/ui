@@ -104,7 +104,6 @@ export function TransactionRuleForm(props: Props) {
             onChange={(expenseCategory) =>
               handleChange('category_id', expenseCategory.id)
             }
-            clearButton={Boolean(transactionRule.category_id)}
             onClearButtonClick={() => handleChange('category_id', '')}
             errorMessage={errors?.errors.category_id}
           />
