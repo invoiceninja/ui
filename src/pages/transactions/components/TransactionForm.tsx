@@ -113,7 +113,6 @@ export function TransactionForm(props: Props) {
             props.handleChange('bank_integration_id', '')
           }
           errorMessage={props.errors?.errors.bank_integration_id}
-          clearButton={Boolean(props.transaction.bank_integration_id)}
         />
       </Element>
 
