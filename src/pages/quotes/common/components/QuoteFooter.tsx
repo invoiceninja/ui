@@ -132,6 +132,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={quote?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>

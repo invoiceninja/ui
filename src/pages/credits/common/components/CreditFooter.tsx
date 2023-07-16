@@ -131,6 +131,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={credit?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>
