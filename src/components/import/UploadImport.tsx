@@ -19,9 +19,9 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Button, SelectField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import Toggle from '$app/components/forms/Toggle';
 import { MdClose } from 'react-icons/md';
+import { BankAccountSelector } from '$app/pages/transactions/components/BankAccountSelector';
 
 interface Props {
   entity: string;
@@ -311,14 +311,12 @@ export function UploadImport(props: Props) {
                   <span>{t('bank_account')}</span>
                 </Td>
                 <Td colSpan={2}>
-                  <DebouncedCombobox
-                    endpoint="/api/v1/bank_integrations"
-                    label="bank_account_name"
-                    clearButton
-                    onChange={(transaction) =>
+                  <BankAccountSelector
+                    value={payload.bank_integration_id}
+                    onChange={(bankAccount) =>
                       setPayloadData((prevState) => ({
                         ...prevState,
-                        bank_integration_id: transaction?.resource?.id,
+                        bank_integration_id: bankAccount?.id,
                       }))
                     }
                     onClearButtonClick={() =>
