@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
-import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
@@ -28,6 +27,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 interface Props {
   task: Task;
@@ -83,20 +83,10 @@ export function TaskDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('user')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/users"
-            label={'first_name'}
-            clearButton={Boolean(task.assigned_user_id)}
-            formatLabel={(resource) =>
-              `${resource.first_name} ${resource.last_name}`
-            }
-            onChange={(user: Record<User>) =>
-              user.resource &&
-              handleChange('assigned_user_id', user.resource.id)
-            }
+          <UserSelector
+            value={task?.assigned_user_id}
+            onChange={(user) => handleChange('assigned_user_id', user.id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
-            queryAdditional
-            defaultValue={task.assigned_user_id}
             errorMessage={errors?.errors.assigned_user_id}
           />
         </Element>

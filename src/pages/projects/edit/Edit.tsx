@@ -14,10 +14,10 @@ import { Project } from '$app/common/interfaces/project';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useProjectQuery } from '$app/common/queries/projects';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -76,19 +76,12 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('user')}>
-        <DebouncedCombobox
-          defaultValue={project?.assigned_user_id}
-          endpoint="/api/v1/users"
-          label="first_name"
-          formatLabel={(resource) =>
-            `${resource.first_name} ${resource.last_name}`
-          }
-          onChange={(value) => handleChange('assigned_user_id', value.value)}
-          clearButton={Boolean(project?.assigned_user_id)}
+        <UserSelector
+          value={project?.assigned_user_id}
+          onChange={(user) => handleChange('assigned_user_id', user.id)}
           onClearButtonClick={() => handleChange('assigned_user_id', '')}
           errorMessage={errors?.errors.assigned_user_id}
-          queryAdditional
-          disabled
+          readonly
         />
       </Element>
 
