@@ -147,6 +147,7 @@ export default function Edit() {
             <Notes
               recurringExpense={recurringExpense}
               handleChange={handleChange}
+              errors={errors}
             />
           </div>
 
@@ -154,6 +155,7 @@ export default function Edit() {
             <AdditionalInfo
               recurringExpense={recurringExpense}
               handleChange={handleChange}
+              errors={errors}
             />
 
             <TaxSettings

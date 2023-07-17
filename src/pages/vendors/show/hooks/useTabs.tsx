@@ -22,35 +22,21 @@ export function useTabs() {
   const { id } = useParams();
 
   let tabs: Tab[] = [
-    { name: t('invoices'), href: route('/clients/:id', { id }) },
-    { name: t('quotes'), href: route('/clients/:id/quotes', { id }) },
     {
-      name: t('payments'),
-      href: route('/clients/:id/payments', { id }),
-    },
-    {
-      name: t('recurring_invoices'),
-      href: route('/clients/:id/recurring_invoices', { id }),
-    },
-    {
-      name: t('credits'),
-      href: route('/clients/:id/credits', { id }),
-    },
-    {
-      name: t('projects'),
-      href: route('/clients/:id/projects', { id }),
-    },
-    {
-      name: t('tasks'),
-      href: route('/clients/:id/tasks', { id }),
+      name: t('purchase_orders'),
+      href: route('/vendors/:id', { id }),
     },
     {
       name: t('expenses'),
-      href: route('/clients/:id/expenses', { id }),
+      href: route('/vendors/:id/expenses', { id }),
     },
     {
       name: t('recurring_expenses'),
-      href: route('/clients/:id/recurring_expenses', { id }),
+      href: route('/vendors/:id/recurring_expenses', { id }),
+    },
+    {
+      name: t('documents'),
+      href: route('/vendors/:id/documents', { id }),
     },
   ];
 

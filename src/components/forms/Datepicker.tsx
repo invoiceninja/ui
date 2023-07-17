@@ -32,8 +32,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Button } from './Button';
 import { SelectField } from './SelectField';
-import { useAtomValue } from 'jotai';
-import { dayJSLocaleAtom } from '$app/App';
+import { atom, useAtomValue } from 'jotai';
 
 interface Props extends CommonProps {
   required?: boolean;
@@ -96,6 +95,8 @@ const MONTHS: Month[] = [
     label: 'december',
   },
 ];
+
+export const dayJSLocaleAtom = atom<ILocale | null>(null);
 
 export function DatePicker(props: Props) {
   const [t] = useTranslation();
