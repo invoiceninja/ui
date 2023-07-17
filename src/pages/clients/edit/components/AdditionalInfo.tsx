@@ -65,7 +65,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     const $client = cloneDeep(client)!;
 
     if (property === 'send_reminders' && value === '') {
-      delete $client.settings.send_reminders;
+      delete $client.settings?.send_reminders;
     } else {
       set($client, `settings.${property}`, value);
     }
@@ -198,9 +198,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <SelectField
               id="settings.send_reminders"
               defaultValue={
-                client?.settings.send_reminders === true
+                client?.settings?.send_reminders === true
                   ? 'enabled'
-                  : client?.settings.send_reminders === false
+                  : client?.settings?.send_reminders === false
                   ? 'disabled'
                   : ''
               }

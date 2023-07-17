@@ -182,7 +182,6 @@ export default function Show() {
               />
             }
             linkToCreateGuards={[permission('create_task')]}
-            includeObjectSelection
           />
         </div>
       )}
