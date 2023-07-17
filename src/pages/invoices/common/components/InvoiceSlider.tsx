@@ -22,10 +22,16 @@ import {
   openClientPortal,
 } from '../helpers/open-client-portal';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useQuery } from 'react-query';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Payment } from '$app/common/interfaces/payment';
+import { AxiosResponse } from 'axios';
+import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -40,6 +46,19 @@ export function InvoiceSlider() {
   const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const { data: payments } = useQuery({
+    queryKey: ['/api/v1/invoices', invoice?.id, 'payments'],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(`/api/v1/payments?invoice_id=${invoice?.id}&include=client`)
+      ).then(
+        (response: AxiosResponse<GenericManyResponse<Payment>>) =>
+          response.data.data
+      ),
+    enabled: invoice !== null && isVisible,
+  });
 
   return (
     <Slider
@@ -121,7 +140,36 @@ export function InvoiceSlider() {
 
           <Divider withoutPadding />
 
-          <div></div>
+          <div>
+            {payments &&
+              payments.map((payment) => (
+                <ClickableElement key={payment.id}>
+                  <div className="flex flex-col space-y-2">
+                    <p className="font-semibold">
+                      {t('payment')} {payment.number}
+                    </p>
+
+                    <p className="inline-flex items-center space-x-1">
+                      <p>
+                        {formatMoney(
+                          payment.amount,
+                          payment.client?.country_id ||
+                            company.settings.country_id,
+                          payment.client?.settings.currency_id ||
+                            company.settings.currency_id
+                        )}
+                      </p>
+                      <p>&middot;</p>
+                      <p>{date(payment.date, dateFormat)}</p>
+                    </p>
+
+                    <div>
+                      <PaymentStatus entity={payment} />
+                    </div>
+                  </div>
+                </ClickableElement>
+              ))}
+          </div>
         </div>
 
         <div></div>
