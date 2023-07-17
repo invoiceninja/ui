@@ -38,6 +38,7 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -81,6 +82,8 @@ export function InvoiceSlider() {
     enabled: invoice !== null && isVisible,
   });
 
+  const activityElement = useGenerateActivityElement();
+
   return (
     <Slider
       visible={isVisible}
@@ -101,7 +104,10 @@ export function InvoiceSlider() {
       }
       withoutActionContainer
     >
-      <TabGroup tabs={[t('overview'), t('history')]} width="full">
+      <TabGroup
+        tabs={[t('overview'), t('history'), t('activity')]}
+        width="full"
+      >
         <div className="space-y-4">
           <div>
             <Element leftSide={t('invoice_amount')}>
@@ -253,6 +259,14 @@ export function InvoiceSlider() {
                 </div>
               </ClickableElement>
             ))}
+        </div>
+
+        <div>
+          {invoice?.activities?.map((activity) => (
+            <NonClickableElement key={activity.id}>
+              {/* {activityElement(activity)} */}
+            </NonClickableElement>
+          ))}
         </div>
       </TabGroup>
     </Slider>
