@@ -32,7 +32,6 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Payment } from '$app/common/interfaces/payment';
 import { AxiosResponse } from 'axios';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { InvoiceStatus } from './InvoiceStatus';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
