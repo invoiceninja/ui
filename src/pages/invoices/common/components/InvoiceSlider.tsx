@@ -144,7 +144,10 @@ export function InvoiceSlider() {
           <div>
             {payments &&
               payments.map((payment) => (
-                <ClickableElement key={payment.id}>
+                <ClickableElement
+                  key={payment.id}
+                  to={`/payments/${payment.id}`}
+                >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
                       {t('payment')} {payment.number}
