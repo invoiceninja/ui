@@ -33,9 +33,16 @@ import { Payment } from '$app/common/interfaces/payment';
 import { AxiosResponse } from 'axios';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoiceStatus } from './InvoiceStatus';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Link } from '$app/components/forms';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
+
+dayjs.extend(relativeTime);
 
 export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
@@ -57,6 +64,19 @@ export function InvoiceSlider() {
       ).then(
         (response: AxiosResponse<GenericManyResponse<Payment>>) =>
           response.data.data
+      ),
+    enabled: invoice !== null && isVisible,
+  });
+
+  const { data: activities } = useQuery({
+    queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(`/api/v1/invoices/${invoice?.id}?include=activities.history`)
+      ).then(
+        (response: GenericSingleResourceResponse<Invoice>) =>
+          response.data.data.activities
       ),
     enabled: invoice !== null && isVisible,
   });
@@ -192,7 +212,48 @@ export function InvoiceSlider() {
           ) : null}
         </div>
 
-        <div></div>
+        <div>
+          {activities && activities.length === 0 && (
+            <NonClickableElement>
+              {t('nothing_to_see_here')}
+            </NonClickableElement>
+          )}
+
+          {activities &&
+            activities.map((activity) => (
+              <ClickableElement
+                key={activity.id}
+                to={`/activities/${activity.id}`}
+              >
+                <div className="flex flex-col space-y-1">
+                  <div className="flex space-x-1">
+                    <span>
+                      {invoice?.client
+                        ? formatMoney(
+                            activity.history.amount,
+                            invoice?.client?.country_id ||
+                              company.settings.country_id,
+                            invoice?.client?.settings.currency_id ||
+                              company.settings.currency_id
+                          )
+                        : null}
+                    </span>
+                    <span>&middot;</span>
+                    <Link to={`/clients/${activity.client_id}`}>
+                      {invoice?.client?.display_name}
+                    </Link>
+                  </div>
+
+                  <div className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>{dayjs.unix(activity.created_at).fromNow()}</p>
+                  </div>
+                </div>
+              </ClickableElement>
+            ))}
+        </div>
       </TabGroup>
     </Slider>
   );
