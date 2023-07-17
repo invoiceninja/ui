@@ -16,7 +16,12 @@ import { useNavigate } from 'react-router-dom';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 
-export function UserSelector(props: GenericSelectorProps<User>) {
+interface UserSelectorProps extends GenericSelectorProps<User> {
+  endpoint?: string;
+  staleTime?: number;
+}
+
+export function UserSelector(props: UserSelectorProps) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
@@ -26,11 +31,15 @@ export function UserSelector(props: GenericSelectorProps<User>) {
         label: props.inputLabel?.toString(),
         value: props.value ?? null,
       }}
-      endpoint={new URL(endpoint('/api/v1/users?status=active'))}
+      endpoint={
+        new URL(endpoint(props.endpoint || '/api/v1/users?status=active'))
+      }
       entryOptions={{
         id: 'id',
         value: 'id',
         label: 'name',
+        inputLabelFn: (resource) =>
+          resource ? `${resource.first_name} ${resource.last_name}` : '',
         dropdownLabelFn: (resource) =>
           `${resource.first_name} ${resource.last_name}`,
       }}
@@ -44,6 +53,7 @@ export function UserSelector(props: GenericSelectorProps<User>) {
       onChange={(entry) =>
         entry.resource ? props.onChange(entry.resource) : null
       }
+      staleTime={props.staleTime || Infinity}
     />
   );
 }
