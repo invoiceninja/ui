@@ -40,6 +40,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { Inline } from '$app/components/Inline';
+import { Icon } from '$app/components/icons/Icon';
+import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -145,7 +147,10 @@ export function InvoiceSlider() {
               className="text-center"
               onClick={() => (invoice ? openClientPortal(invoice) : null)}
             >
-              {t('view_portal')}
+              <div className="inline-flex items-center space-x-1">
+                <Icon element={MdCloudCircle} />
+                <p>{t('view_portal')}</p>
+              </div>
             </ClickableElement>
 
             {invoice ? (
@@ -159,7 +164,10 @@ export function InvoiceSlider() {
                   toast.success('copied_to_clipboard', { value: '' });
                 }}
               >
-                {t('copy_link')}
+                <div className="inline-flex items-center space-x-1">
+                  <Icon element={MdOutlineContentCopy} />
+                  <p>{t('copy_link')}</p>
+                </div>
               </ClickableElement>
             ) : null}
           </Inline>
