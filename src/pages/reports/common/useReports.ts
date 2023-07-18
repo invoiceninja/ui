@@ -218,7 +218,7 @@ const reports: Report[] = [
         label: 'quote',
         endpoint: '/api/v1/reports/quotes',
         allow_custom_column: true,
-        custom_columns: ['client', 'quote', 'payment'],
+        custom_columns: ['client', 'quote'],
         payload: {
             start_date: '',
             end_date: '',
@@ -233,7 +233,7 @@ const reports: Report[] = [
         label: 'quote_item',
         endpoint: '/api/v1/reports/quote_items',
         allow_custom_column: true,
-        custom_columns: ['client', 'quote', 'payment', 'item'],
+        custom_columns: ['client', 'quote', 'item'],
         payload: {
             start_date: '',
             end_date: '',
