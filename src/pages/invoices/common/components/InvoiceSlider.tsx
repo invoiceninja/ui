@@ -131,6 +131,10 @@ export function InvoiceSlider() {
                   )
                 : null}
             </Element>
+
+            <Element leftSide={t('date')}>
+              {invoice ? date(invoice?.date, dateFormat) : null}
+            </Element>
           </div>
 
           <Divider withoutPadding />
@@ -155,14 +159,6 @@ export function InvoiceSlider() {
                 {t('copy_link')}
               </ClickableElement>
             ) : null}
-          </div>
-
-          <Divider withoutPadding />
-
-          <div>
-            <Element leftSide={t('date')}>
-              {invoice ? date(invoice?.date, dateFormat) : null}
-            </Element>
           </div>
 
           <Divider withoutPadding />
