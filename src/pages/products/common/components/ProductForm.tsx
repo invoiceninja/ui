@@ -64,6 +64,7 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('price')}>
         <InputField
+          type="number"
           value={product.price}
           onValueChange={(value) => handleChange('price', value)}
           errorMessage={errors?.errors.price}
@@ -83,6 +84,7 @@ export function ProductForm(props: Props) {
       {company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
           <InputField
+            type="number"
             value={product.quantity}
             onValueChange={(value) => handleChange('quantity', value)}
             errorMessage={errors?.errors.quantity}
@@ -92,6 +94,7 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('max_quantity')}>
         <InputField
+          type="number"
           value={product.max_quantity}
           onValueChange={(value) => handleChange('max_quantity', value)}
           errorMessage={errors?.errors.max_quantity}
@@ -128,6 +131,7 @@ export function ProductForm(props: Props) {
         <>
           <Element leftSide={t('stock_quantity')}>
             <InputField
+              type="number"
               value={product.in_stock_quantity}
               onValueChange={(value) =>
                 handleChange('in_stock_quantity', Number(value))
@@ -147,6 +151,7 @@ export function ProductForm(props: Props) {
 
           <Element leftSide={t('notification_threshold')}>
             <InputField
+              type="number"
               value={product.stock_notification_threshold}
               onValueChange={(value) =>
                 handleChange('stock_notification_threshold', value)
