@@ -41,7 +41,7 @@ import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
-import { calculateHours, parseTimeLog } from './helpers/calculate-time';
+import { calculateHours } from './helpers/calculate-time';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
