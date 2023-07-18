@@ -16,7 +16,6 @@ import { Inline } from '$app/components/Inline';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
 import { CustomField } from '$app/components/CustomField';
-import invoice from '$tests/helpers/data/invoice';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export interface PurchaseOrderCardProps {
