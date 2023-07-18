@@ -22,7 +22,6 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
-import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
@@ -108,18 +107,6 @@ export function useTaskColumns() {
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
-
-  const calculateDate = (task: Task) => {
-    const timeLog = parseTimeLog(task.time_log);
-
-    if (timeLog.length === 0) {
-      return '';
-    }
-
-    const [startTime] = timeLog[0];
-
-    return dayjs.unix(startTime).format(dateFormat);
-  };
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -237,9 +224,9 @@ export function useTaskColumns() {
     },
     {
       column: 'date',
-      id: 'id',
+      id: 'calculated_start_date',
       label: t('date'),
-      format: (value, task) => calculateDate(task),
+      format: (value, task) => date(task.date, dateFormat),
     },
     {
       column: 'documents',
