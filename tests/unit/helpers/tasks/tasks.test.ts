@@ -30,6 +30,8 @@ describe('Test Valid Task TimeLog', () => {
             archived_at: 1,
             created_at: 2,
             updated_at: 3,
+            date: "2020-01-01",
+            calculated_start_date: "2020-01-01",
         }  
 
         task.time_log = "[[0,1]]";
