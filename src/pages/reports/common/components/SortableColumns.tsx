@@ -223,6 +223,19 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
           : quoteMap
         : [],
       columns.includes('payment') ? paymentMap : [],
+      columns.includes('vendor') ? vendorMap : [],
+      columns.includes('purchase_order')
+        ? columns.includes('item')
+          ? purchaseorderMap.concat(itemMap)
+          : purchaseorderMap
+        : [],
+      columns.includes('task') ? taskMap : [],
+      columns.includes('expense') ? expenseMap : [],
+      columns.includes('recurring_invoice')
+        ? columns.includes('item')
+          ? recurringinvoiceMap.concat(itemMap)
+          : recurringinvoiceMap
+        : [],
       [],
     ]);
   };
