@@ -183,7 +183,7 @@ export function Chart(props: Props) {
 
   return (
     <ResponsiveContainer width="100%" height={330}>
-      <LineChart height={200} data={chartData} margin={{ top: 17, left: 20 }}>
+      <LineChart height={200} data={chartData} margin={{ top: 17, left: 36 }}>
         <Line
           id="invoices"
           type="monotone"
@@ -217,8 +217,15 @@ export function Chart(props: Props) {
         <CartesianGrid strokeDasharray="0" vertical={false} />
         <Tooltip formatter={formatTooltipValues} />
 
-        <XAxis dataKey="date" />
-        <YAxis interval={0} tickCount={6} />
+        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} />
+        <YAxis
+          interval={0}
+          tickCount={6}
+          tickFormatter={(value) =>
+            formatTooltipValues(value).replace(/ /g, '\u00A0')
+          }
+          tick={{ fontSize: 14 }}
+        />
       </LineChart>
     </ResponsiveContainer>
   );
