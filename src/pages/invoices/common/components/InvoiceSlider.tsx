@@ -39,6 +39,7 @@ import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { Inline } from '$app/components/Inline';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -108,7 +109,7 @@ export function InvoiceSlider() {
         tabs={[t('overview'), t('history'), t('activity')]}
         width="full"
       >
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div>
             <Element leftSide={t('invoice_amount')}>
               {invoice
@@ -139,8 +140,9 @@ export function InvoiceSlider() {
 
           <Divider withoutPadding />
 
-          <div>
+          <Inline className="w-full">
             <ClickableElement
+              className="text-center"
               onClick={() => (invoice ? openClientPortal(invoice) : null)}
             >
               {t('view_portal')}
@@ -148,6 +150,7 @@ export function InvoiceSlider() {
 
             {invoice ? (
               <ClickableElement
+                className="text-center"
                 onClick={() => {
                   navigator.clipboard.writeText(
                     generateClientPortalUrl(invoice) ?? ''
@@ -159,7 +162,7 @@ export function InvoiceSlider() {
                 {t('copy_link')}
               </ClickableElement>
             ) : null}
-          </div>
+          </Inline>
 
           <Divider withoutPadding />
 
