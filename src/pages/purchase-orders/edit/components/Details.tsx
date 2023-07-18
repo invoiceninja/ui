@@ -15,6 +15,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Inline } from '$app/components/Inline';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -29,6 +31,7 @@ export function Details(props: PurchaseOrderCardProps) {
   const [t] = useTranslation();
 
   const { purchaseOrder, handleChange, errors } = props;
+  const company = useCurrentCompany();
 
   return (
     <>
@@ -74,6 +77,28 @@ export function Details(props: PurchaseOrderCardProps) {
             />
           </Element>
         )}
+        {purchaseOrder && company?.custom_fields?.invoice1 && (
+          <CustomField
+            field="invoice1"
+            defaultValue={purchaseOrder?.custom_value1 || ''}
+            value={company.custom_fields.invoice1}
+            onValueChange={(value) =>
+              handleChange('custom_value1', value.toString())
+            }
+          />
+        )}
+
+        {purchaseOrder && company?.custom_fields?.invoice2 && (
+          <CustomField
+            field="invoice2"
+            defaultValue={purchaseOrder?.custom_value2 || ''}
+            value={company.custom_fields.invoice2}
+            onValueChange={(value) =>
+              handleChange('custom_value2', value.toString())
+            }
+          />
+        )}
+
       </Card>
 
       <Card className="col-span-12 xl:col-span-4 h-max">
@@ -111,6 +136,28 @@ export function Details(props: PurchaseOrderCardProps) {
             </div>
           </Inline>
         </Element>
+
+        {purchaseOrder && company?.custom_fields?.invoice3 && (
+          <CustomField
+            field="invoice3"
+            defaultValue={purchaseOrder?.custom_value3 || ''}
+            value={company.custom_fields.invoice3}
+            onValueChange={(value) =>
+              handleChange('custom_value3', value.toString())
+            }
+          />
+        )}
+
+        {purchaseOrder && company?.custom_fields?.invoice4 && (
+          <CustomField
+            field="invoice4"
+            defaultValue={purchaseOrder?.custom_value4 || ''}
+            value={company.custom_fields.invoice4}
+            onValueChange={(value) =>
+              handleChange('custom_value4', value.toString())
+            }
+          />
+        )}
       </Card>
     </>
   );
