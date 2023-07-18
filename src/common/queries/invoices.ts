@@ -17,6 +17,7 @@ import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
+import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
@@ -68,26 +69,52 @@ export function bulk(
   });
 }
 
-export function useBulk() {
+const successMessages = {
+  mark_sent: 'marked_sent_invoices',
+  email: 'emailed_invoices',
+  mark_paid: 'marked_invoices_as_paid',
+  download: 'exported_data',
+  cancel: 'cancelled_invoices',
+  auto_bill: 'auto_billed_invoices',
+};
+
+interface Params {
+  onSuccess?: () => void;
+}
+
+export function useBulk(params?: Params) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'auto_bill'
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'email'
+      | 'mark_sent'
+      | 'mark_paid'
+      | 'download'
+      | 'cancel'
+      | 'auto_bill',
+    emailType?: EmailType
   ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/invoices/bulk'), {
       action,
       ids,
+      ...(emailType && { email_type: emailType }),
     })
       .then(() => {
-        if (action === 'auto_bill') {
-          toast.success('auto_billed_invoice');
-        } else {
-          toast.success(`${action}d_invoice`);
-        }
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
+
+        toast.success(message);
+
+        params?.onSuccess?.();
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);

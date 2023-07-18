@@ -16,7 +16,7 @@ export function PurchaseOrderDetails() {
   const [t] = useTranslation();
 
   const defaultVariables = [
-    { value: '$purchase_order.number', label: t('credit_number') },
+    { value: '$purchase_order.number', label: t('number') },
     { value: '$purchase_order.po_number', label: t('po_number') },
     { value: '$purchase_order.date', label: t('date') },
     { value: '$purchase_order.due_date', label: t('due_date') },
