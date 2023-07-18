@@ -19,6 +19,7 @@ import {
   MdMarkEmailRead,
   MdPaid,
   MdPrint,
+  MdRefresh,
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -82,6 +83,16 @@ export const useCustomBulkActions = () => {
     return !invoices.some(
       ({ status_id, is_deleted }) =>
         parseInt(status_id) > parseInt(InvoiceStatus.Partial) || is_deleted
+    );
+  };
+
+  const showReverseOption = (invoices: Invoice[]) => {
+    return !invoices.some(
+      ({ status_id, is_deleted, archived_at }) =>
+        (status_id !== InvoiceStatus.Paid &&
+          status_id !== InvoiceStatus.Partial) ||
+        is_deleted ||
+        archived_at
     );
   };
 
@@ -155,6 +166,16 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    (selectedIds, selectedInvoices) =>
+      selectedInvoices &&
+      showReverseOption(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'reverse')}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
+        </DropdownElement>
+      ),
     (selectedIds, selectedInvoices) =>
       selectedInvoices &&
       showCancelOption(selectedInvoices) && (
