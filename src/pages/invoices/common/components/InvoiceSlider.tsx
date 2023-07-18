@@ -38,7 +38,6 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
@@ -84,8 +83,6 @@ export function InvoiceSlider() {
       ),
     enabled: invoice !== null && isVisible,
   });
-
-  const activityElement = useGenerateActivityElement();
 
   return (
     <Slider
@@ -174,7 +171,7 @@ export function InvoiceSlider() {
 
           <Divider withoutPadding />
 
-          <div>
+          <div className="divide-y">
             {payments &&
               payments.map((payment) => (
                 <ClickableElement
