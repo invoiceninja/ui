@@ -22,7 +22,7 @@ import {
   openClientPortal,
 } from '../helpers/open-client-portal';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -41,11 +41,47 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
 import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
+import { route } from '$app/common/helpers/route';
+import reactStringReplace from 'react-string-replace';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
+
+export function useGenerateActivityElement() {
+  const [t] = useTranslation();
+
+  return (activity: InvoiceActivity) => {
+    let text = trans(`activity_${activity.activity_type_id}`, {});
+
+    const replacements = {
+      client: (
+        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+          {activity.client?.label}
+        </Link>
+      ),
+
+      user: activity.user?.label ?? t('system'),
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
+    };
+
+    for (const [variable, value] of Object.entries(replacements)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      text = reactStringReplace(text, `:${variable}`, () => value);
+    }
+
+    return text;
+  };
+}
 
 export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
@@ -83,6 +119,21 @@ export function InvoiceSlider() {
       ),
     enabled: invoice !== null && isVisible,
   });
+
+  const { data: activities2 } = useQuery({
+    queryKey: ['/api/v1/activities/entity', invoice?.id],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'invoice',
+        entity_id: invoice?.id,
+      }).then(
+        (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
+          response.data.data
+      ),
+    enabled: invoice !== null && isVisible,
+  });
+
+  const activityElement = useGenerateActivityElement();
 
   return (
     <Slider
@@ -235,7 +286,7 @@ export function InvoiceSlider() {
                 key={activity.id}
                 to={`/activities/${activity.id}`}
               >
-                <div className="flex flex-col space-y-1">
+                <div className="flex flex-col">
                   <div className="flex space-x-1">
                     <span>
                       {invoice?.client
@@ -266,9 +317,14 @@ export function InvoiceSlider() {
         </div>
 
         <div>
-          {invoice?.activities?.map((activity) => (
-            <NonClickableElement key={activity.id}>
-              {/* {activityElement(activity)} */}
+          {activities2?.map((activity) => (
+            <NonClickableElement key={activity.id} className="flex flex-col">
+              <p>{activityElement(activity)}</p>
+              <p className="inline-flex items-center space-x-1">
+                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>&middot;</p>
+                <p>{activity.ip}</p>
+              </p>
             </NonClickableElement>
           ))}
         </div>
