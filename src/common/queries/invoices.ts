@@ -76,7 +76,6 @@ const successMessages = {
   download: 'exported_data',
   cancel: 'cancelled_invoices',
   auto_bill: 'auto_billed_invoices',
-  reverse: 'reversed_invoices',
 };
 
 interface Params {
@@ -98,8 +97,7 @@ export function useBulk(params?: Params) {
       | 'mark_paid'
       | 'download'
       | 'cancel'
-      | 'auto_bill'
-      | 'reverse',
+      | 'auto_bill',
     emailType?: EmailType
   ) => {
     toast.processing();
