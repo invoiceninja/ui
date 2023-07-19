@@ -29,7 +29,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
-import { atom, useSetAtom } from 'jotai';
+import { atom } from 'jotai';
 
 export const companyEditModalOpenedAtom = atom<boolean>(false);
 
@@ -58,8 +58,6 @@ export function CompanySwitcher() {
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
     useState<boolean>(false);
 
-  const setIsCompanyEditModalOpened = useSetAtom(companyEditModalOpenedAtom);
-
   const switchCompany = (index: number) => {
     dispatch(
       authenticate({
@@ -70,8 +68,6 @@ export function CompanySwitcher() {
     );
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
-
-    setIsCompanyEditModalOpened(false);
 
     sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'false');
 

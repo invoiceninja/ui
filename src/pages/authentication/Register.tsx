@@ -91,8 +91,8 @@ export function Register() {
               setErrors(error.response.data.errors);
             }
 
-            setIsFormBusy(false);
             setMessage(error.response?.data.message as string);
+            setIsFormBusy(false);
           }
         );
     },
