@@ -64,6 +64,7 @@ export function useAddTasksOnInvoice(params: Params) {
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
           task_id: task.id,
+          tax_id: '',
         };
 
         item.notes = [
