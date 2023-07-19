@@ -31,12 +31,20 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
+import { useSetAtom } from 'jotai';
+import { creditAtom } from '$app/pages/credits/common/atoms';
+import { Credit } from '$app/common/interfaces/credit';
+import { useNavigate } from 'react-router-dom';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
+  const navigate = useNavigate();
+
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
+
+  const setCredit = useSetAtom(creditAtom);
 
   const enterPayment = useEnterPayment();
 
@@ -56,6 +64,14 @@ export const useCustomBulkActions = () => {
 
       enterPayment(invoices);
     }
+  };
+
+  const handleReverseInvoices = (invoices: Invoice[]) => {
+    setCredit({
+      ...(invoices[0] as unknown as Credit),
+    });
+
+    navigate('/credits/create?action=reverse');
   };
 
   const showEnterPaymentOption = (invoices: Invoice[]) => {
@@ -166,11 +182,11 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    (selectedIds, selectedInvoices) =>
+    (_, selectedInvoices) =>
       selectedInvoices &&
       showReverseOption(selectedInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'reverse')}
+          onClick={() => handleReverseInvoices(selectedInvoices)}
           icon={<Icon element={MdRefresh} />}
         >
           {t('reverse')}
