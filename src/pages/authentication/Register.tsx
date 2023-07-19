@@ -65,7 +65,11 @@ export function Register() {
         return;
       }
 
-      request('POST', endpoint('/api/v1/signup?include=token,user'), values)
+      request(
+        'POST',
+        endpoint('/api/v1/signup?include=token,user,company'),
+        values
+      )
         .then((response: AxiosResponse) => {
           dispatch(
             register({
