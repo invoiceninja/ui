@@ -18,16 +18,13 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 
 interface Props {
   task: Task;
@@ -128,16 +125,14 @@ export function TaskDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('status')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/task_statuses"
-            label="name"
-            onChange={(value: Record<TaskStatus>) =>
-              value.resource && handleChange('status_id', value.resource.id)
+          <TaskStatusSelector
+            value={task.status_id}
+            onChange={(taskStatus: TaskStatus) =>
+              taskStatus && handleChange('status_id', taskStatus.id)
             }
-            defaultValue={task.status_id}
-            queryAdditional
+            onClearButtonClick={() => handleChange('status_id', '')}
+            readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
-            disabled={props.taskModal}
           />
         </Element>
 

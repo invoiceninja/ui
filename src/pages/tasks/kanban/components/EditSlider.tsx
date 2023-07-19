@@ -14,10 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { Modal } from '$app/components/Modal';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
@@ -43,6 +39,7 @@ import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 
 export function EditSlider() {
   const [t] = useTranslation();
@@ -236,15 +233,13 @@ export function EditSlider() {
               onValueChange={(rate) => handleChange('rate', rate)}
             />
 
-            <DebouncedCombobox
+            <TaskStatusSelector
               inputLabel={t('status')}
-              endpoint="/api/v1/task_statuses"
-              label="name"
-              onChange={(value: Record<TaskStatus>) =>
-                value.resource && handleChange('status_id', value.resource.id)
+              value={task?.status_id}
+              onChange={(taskStatus: TaskStatus) =>
+                taskStatus && handleChange('status_id', taskStatus.id)
               }
-              defaultValue={task?.status_id}
-              queryAdditional
+              onClearButtonClick={() => handleChange('status_id', '')}
             />
 
             <InputField
