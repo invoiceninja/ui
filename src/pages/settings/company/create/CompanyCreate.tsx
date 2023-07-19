@@ -22,6 +22,8 @@ import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { useSetAtom } from 'jotai';
+import { companyEditModalOpenedAtom } from '$app/components/CompanySwitcher';
 
 interface Props {
   isModalOpen: boolean;
@@ -36,6 +38,8 @@ export function CompanyCreate(props: Props) {
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const setIsCompanyEditModalOpened = useSetAtom(companyEditModalOpenedAtom);
 
   const switchCompany = (
     index: number,
@@ -52,7 +56,7 @@ export function CompanyCreate(props: Props) {
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
-    localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
+    setIsCompanyEditModalOpened(false);
 
     queryClient.invalidateQueries();
 

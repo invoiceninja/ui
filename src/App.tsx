@@ -19,13 +19,19 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import { companyEditModalOpenedAtom } from './components/CompanySwitcher';
 
 export function App() {
+  const [t] = useTranslation();
   const { i18n } = useTranslation();
+
+  const { isOwner } = useAdmin();
 
   const company = useCurrentCompany();
 
@@ -41,6 +47,10 @@ export function App() {
   const resolveAntdLocale = useResolveAntdLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
+
+  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] = useAtom(
+    companyEditModalOpenedAtom
+  );
 
   const resolvedLanguage = company
     ? resolveLanguage(company.settings.language_id)
@@ -87,11 +97,30 @@ export function App() {
     );
   }, []);
 
-  return (
-    <div className="App">
-      <Toaster position="top-center" />
+  useEffect(() => {
+    const companyName = company?.settings?.name;
 
-      {routes}
-    </div>
+    if (
+      company &&
+      (companyName.includes(t('untitled')) || !companyName) &&
+      !isCompanyEditModalOpened
+    ) {
+      setIsCompanyEditModalOpened(true);
+    }
+  }, [company]);
+
+  return (
+    <>
+      <div className="App">
+        <Toaster position="top-center" />
+
+        {routes}
+      </div>
+
+      <CompanyEdit
+        isModalOpen={isCompanyEditModalOpened && isOwner}
+        setIsModalOpen={setIsCompanyEditModalOpened}
+      />
+    </>
   );
 }
