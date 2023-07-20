@@ -72,6 +72,7 @@ export default function RecurringExpense() {
   useEffect(() => {
     if (data) {
       setRecurringExpense(data);
+      setTaxInputType(data.calculate_tax_by_amount ? 'by_amount' : 'by_rate');
     }
   }, [data]);
 
