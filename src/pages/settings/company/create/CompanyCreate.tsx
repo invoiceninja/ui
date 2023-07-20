@@ -88,7 +88,10 @@ export function CompanyCreate(props: Props) {
             .catch((error: AxiosError) => {
               console.error(error);
               toast.error();
-            });
+            })
+            .finally(() =>
+              localStorage.setItem('COMPANY-EDIT-OPENED', 'false')
+            );
         })
         .catch((error: AxiosError) => {
           console.error(error);
