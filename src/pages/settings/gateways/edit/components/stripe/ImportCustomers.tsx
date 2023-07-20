@@ -13,10 +13,11 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { Card, ClickableElement } from '$app/components/cards';
+import { Card, ClickableElement, Element } from '$app/components/cards';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 
 export function ImportCustomers() {
   const [t] = useTranslation();
@@ -49,7 +50,7 @@ export function ImportCustomers() {
     <>
       <Card title={t('import_customers')}>
         <ClickableElement onClick={() => setIsPasswordConfirmModalOpen(true)}>
-          {t('click_to_start_import')}
+          {t('click_to_continue')}
         </ClickableElement>
       </Card>
 
@@ -58,6 +59,7 @@ export function ImportCustomers() {
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
       />
+
     </>
   );
 }
