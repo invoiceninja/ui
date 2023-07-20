@@ -8,165 +8,73 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useRecurringExpenseQuery } from '$app/common/queries/recurring-expense';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
-import {
-  useActions,
-  useHandleChange,
-} from '$app/pages/recurring-expenses/common/hooks';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useHandleChange } from '$app/pages/recurring-expenses/common/hooks';
+import { Dispatch, SetStateAction } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { TaxSettings } from '../components/Taxes';
 
+export interface Context {
+  errors: ValidationBag | undefined;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  recurringExpense: RecurringExpense;
+  setRecurringExpense: Dispatch<SetStateAction<RecurringExpense | undefined>>;
+  taxInputType: 'by_rate' | 'by_amount';
+  setTaxInputType: Dispatch<SetStateAction<'by_rate' | 'by_amount'>>;
+}
+
 export default function Edit() {
-  const [t] = useTranslation();
+  const context: Context = useOutletContext();
 
-  const { documentTitle } = useTitle('recurring_expense');
-
-  const actions = useActions();
-
-  const { id } = useParams();
-
-  const { data } = useRecurringExpenseQuery({ id });
-
-  const navigate = useNavigate();
-
-  const queryClient = useQueryClient();
-
-  const pages: Page[] = [
-    { name: t('recurring_expenses'), href: '/recurring_expenses' },
-    {
-      name: t('edit_recurring_expense'),
-      href: route('/recurring_expenses/:id', { id }),
-    },
-  ];
-
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/recurring_expenses/:id/edit', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/recurring_expenses/:id/documents', { id }),
-    },
-  ];
-
-  const [recurringExpense, setRecurringExpense] = useState<RecurringExpense>();
-
-  const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
-    'by_rate'
-  );
-
-  const [errors, setErrors] = useState<ValidationBag>();
+  const {
+    setErrors,
+    setRecurringExpense,
+    recurringExpense,
+    errors,
+    taxInputType,
+    setTaxInputType,
+  } = context;
 
   const handleChange = useHandleChange({ setRecurringExpense, setErrors });
 
-  useEffect(() => {
-    if (data) {
-      setRecurringExpense(data);
-    }
-  }, [data]);
-
-  const handleSave = () => {
-    toast.processing();
-
-    setErrors(undefined);
-
-    request(
-      'PUT',
-      endpoint('/api/v1/recurring_expenses/:id', { id: recurringExpense!.id }),
-      recurringExpense
-    )
-      .then(() => {
-        toast.success('updated_recurring_expense');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', { id: recurringExpense!.id })
-        );
-
-        navigate('/recurring_expenses');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
-        } else {
-          toast.error();
-          console.error(error);
-        }
-      });
-  };
-
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={() => recurringExpense && handleSave()}
-      navigationTopRight={
-        recurringExpense && (
-          <ResourceActions
-            resource={recurringExpense}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-    >
-      <div className="space-y-4">
-        <Tabs tabs={tabs} />
-
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 xl:col-span-4">
-            <Details
-              recurringExpense={recurringExpense}
-              handleChange={handleChange}
-              taxInputType={taxInputType}
-              pageType="edit"
-              errors={errors}
-            />
-          </div>
-
-          <div className="col-span-12 xl:col-span-4">
-            <Notes
-              recurringExpense={recurringExpense}
-              handleChange={handleChange}
-              errors={errors}
-            />
-          </div>
-
-          <div className="col-span-12 xl:col-span-4 space-y-4">
-            <AdditionalInfo
-              recurringExpense={recurringExpense}
-              handleChange={handleChange}
-              errors={errors}
-            />
-
-            <TaxSettings
-              recurringExpense={recurringExpense}
-              handleChange={handleChange}
-              taxInputType={taxInputType}
-              setTaxInputType={setTaxInputType}
-            />
-          </div>
-        </div>
+    <div className="grid grid-cols-12 gap-4">
+      <div className="col-span-12 xl:col-span-4">
+        <Details
+          recurringExpense={recurringExpense}
+          handleChange={handleChange}
+          taxInputType={taxInputType}
+          pageType="edit"
+          errors={errors}
+        />
       </div>
-    </Default>
+
+      <div className="col-span-12 xl:col-span-4">
+        <Notes
+          recurringExpense={recurringExpense}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      </div>
+
+      <div className="col-span-12 xl:col-span-4 space-y-4">
+        <AdditionalInfo
+          recurringExpense={recurringExpense}
+          handleChange={handleChange}
+          errors={errors}
+        />
+
+        <TaxSettings
+          recurringExpense={recurringExpense}
+          handleChange={handleChange}
+          taxInputType={taxInputType}
+          setTaxInputType={setTaxInputType}
+        />
+      </div>
+    </div>
   );
 }
