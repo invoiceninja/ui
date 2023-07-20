@@ -19,10 +19,13 @@ import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
+import { date } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -63,7 +66,8 @@ export function RecentPayments() {
     {
       id: 'date',
       label: t('date'),
-      format: (value) => value && dayjs(value).format('MMM DD'),
+      format: (value) => date(value, dateFormat),
+
     },
     {
       id: 'amount',
