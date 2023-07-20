@@ -10,7 +10,7 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -23,9 +23,14 @@ import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useAdmin } from './common/hooks/permissions/useHasPermission';
 
 export function App() {
+  const [t] = useTranslation();
   const { i18n } = useTranslation();
+
+  const { isOwner } = useAdmin();
 
   const company = useCurrentCompany();
 
@@ -41,6 +46,9 @@ export function App() {
   const resolveAntdLocale = useResolveAntdLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
+
+  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
+    useState(false);
 
   const resolvedLanguage = company
     ? resolveLanguage(company.settings.language_id)
@@ -87,11 +95,31 @@ export function App() {
     );
   }, []);
 
-  return (
-    <div className="App">
-      <Toaster position="top-center" />
+  useEffect(() => {
+    const companyName = company?.settings?.name;
 
-      {routes}
-    </div>
+    if (
+      company &&
+      (!companyName || companyName === t('untitled_company')) &&
+      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
+    ) {
+      localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
+      setIsCompanyEditModalOpened(true);
+    }
+  }, [company]);
+
+  return (
+    <>
+      <div className="App">
+        <Toaster position="top-center" />
+
+        {routes}
+      </div>
+
+      <CompanyEdit
+        isModalOpen={isCompanyEditModalOpened && isOwner}
+        setIsModalOpen={setIsCompanyEditModalOpened}
+      />
+    </>
   );
 }

@@ -26,6 +26,10 @@ import { Link } from '../../components/forms/Link';
 import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  changeCurrentIndex,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
 
 export function Register() {
   const [t] = useTranslation();
@@ -65,7 +69,13 @@ export function Register() {
         return;
       }
 
-      request('POST', endpoint('/api/v1/signup?include=token,user'), values)
+      request(
+        'POST',
+        endpoint(
+          '/api/v1/signup?include=token,user.company_user,company,account'
+        ),
+        values
+      )
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -73,6 +83,9 @@ export function Register() {
               user: response.data.data[0].user,
             })
           );
+
+          dispatch(updateCompanyUsers(response.data.data));
+          dispatch(changeCurrentIndex(0));
         })
         .catch(
           (error: AxiosError<GenericValidationBag<RegisterValidation>>) => {
