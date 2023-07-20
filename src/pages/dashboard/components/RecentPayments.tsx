@@ -17,7 +17,6 @@ import { Payment } from '$app/common/interfaces/payment';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
-import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
