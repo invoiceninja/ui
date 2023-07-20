@@ -13,7 +13,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { Card, ClickableElement, Element } from '$app/components/cards';
+import { Card, ClickableElement } from '$app/components/cards';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
