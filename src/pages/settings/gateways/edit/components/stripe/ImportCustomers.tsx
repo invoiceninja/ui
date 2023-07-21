@@ -18,6 +18,7 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+
 export function ImportCustomers() {
   const [t] = useTranslation();
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
@@ -49,7 +50,7 @@ export function ImportCustomers() {
     <>
       <Card title={t('import_customers')}>
         <ClickableElement onClick={() => setIsPasswordConfirmModalOpen(true)}>
-          {t('click_to_start_import')}
+          {t('click_to_continue')}
         </ClickableElement>
       </Card>
 
@@ -58,6 +59,7 @@ export function ImportCustomers() {
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
       />
+
     </>
   );
 }

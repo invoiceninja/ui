@@ -27,6 +27,8 @@ import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
 import { useHandleUpdate } from './hooks/useHandleUpdate';
 import { ImportCustomers } from './components/stripe/ImportCustomers';
+import { WebhookConfiguration } from './components/WebhookConfiguration';
+import collect from 'collect.js';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -111,8 +113,14 @@ export function Edit() {
               </Card>
 
               {gateway?.key === 'd14dd26a37cecc30fdd65700bfb55b23' ? (
-                <ImportCustomers />
+                <ImportCustomers/>
               ) : null}
+
+              {gateway && collect(Object.values(gateway.options)).pluck('webhooks').flatten().unique().whereNotNull().count() > 1 && (
+              <WebhookConfiguration
+                companyGateway={companyGateway}
+                gateway={gateway}/>
+              )}
             </div>
           )}
         </div>
