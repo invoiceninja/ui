@@ -218,6 +218,10 @@ export default function Create() {
                 handleChange('client_id', client?.id as string);
                 handleChange('currency_id', client?.settings.currency_id);
               }}
+              onClearButtonClick={() => {
+                handleChange('client_id', '');
+                handleChange('currency_id', '');
+              }}
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
