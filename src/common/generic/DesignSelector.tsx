@@ -109,7 +109,7 @@ export function DesignSelector(props: Props) {
             )
           }
           inputOptions={{
-            label: t('design') || '',
+            label: props.inputLabel?.toString(),
             value: design?.id || null,
           }}
           entryOptions={{
