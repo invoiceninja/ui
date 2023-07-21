@@ -37,7 +37,7 @@ export function UserSelector(props: UserSelectorProps) {
       entryOptions={{
         id: 'id',
         value: 'id',
-        label: 'name',
+        label: 'first_name',
         inputLabelFn: (resource) =>
           resource ? `${resource.first_name} ${resource.last_name}` : '',
         dropdownLabelFn: (resource) =>

@@ -186,15 +186,19 @@ export function EmailRecord(props: Props) {
               dropdownLabelFn: (purchaseOrder) =>
                 `${purchaseOrder.number} (${formatMoney(
                   purchaseOrder.amount,
-                  purchaseOrder?.vendor?.country_id ?? '1',
-                  purchaseOrder?.vendor?.currency_id ?? '1'
+                  purchaseOrder?.vendor?.country_id ||
+                    company?.settings.country_id,
+                  purchaseOrder?.vendor?.currency_id ||
+                    company?.settings.currency_id
                 )})`,
               inputLabelFn: (purchaseOrder) =>
                 purchaseOrder
                   ? `${purchaseOrder.number} (${formatMoney(
                       purchaseOrder.amount,
-                      purchaseOrder?.vendor?.country_id ?? '1',
-                      purchaseOrder?.vendor?.currency_id ?? '1'
+                      purchaseOrder?.vendor?.country_id ||
+                        company?.settings.country_id,
+                      purchaseOrder?.vendor?.currency_id ||
+                        company?.settings.currency_id
                     )})`
                   : '',
             }}
