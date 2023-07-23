@@ -34,6 +34,9 @@ import {
 import { useHandleTaxRateChange } from './useHandleTaxRateChange';
 import { Product } from '$app/common/interfaces/product';
 import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import collect from 'collect.js';
+import { taxCategories } from '$app/pages/products/common/components/ProductForm';
 
 const numberInputs = [
   'discount',
@@ -185,6 +188,76 @@ export function useResolveInputField(props: Props) {
     // } // Disabled, causing infinite loop of line items
   }, [resource?.line_items, isDeleteActionTriggered]);
 
+  const [t] = useTranslation();
+
+  const showTaxRateSelector = (
+    property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
+    index: number
+  ) => {
+    // Do this only if `calculate_taxes` is enabled
+    if (company.calculate_taxes) {
+      const lineItem = resource?.line_items[index];
+
+      // If the value is set to override taxes (7), show the regular element
+      if (lineItem.tax_id === '7') {
+        return (
+          <TaxRateSelector
+            key={`${property}${resource?.line_items[index][property]}`}
+            onChange={(value) =>
+              value.resource &&
+              handleTaxRateChange(property, index, value.resource)
+            }
+            onTaxCreated={(taxRate) =>
+              handleTaxRateChange(property, index, taxRate)
+            }
+            defaultValue={
+              resource?.line_items[index][
+                property.replace('rate', 'name') as keyof InvoiceItem
+              ]
+            }
+            onClearButtonClick={() => handleTaxRateChange(property, index)}
+          />
+        );
+      }
+
+      const categories = collect(taxCategories)
+        .pluck('value')
+        .filter((i) => i !== '7')
+        .toArray();
+
+      if (categories.includes(lineItem.tax_id) && property === 'tax_rate1') {
+        return (
+          <p>
+            {t(
+              taxCategories.find((i) => i.value === lineItem.tax_id)?.label ??
+                ''
+            )}
+          </p>
+        );
+      }
+
+      return null;
+    }
+
+    return (
+      <TaxRateSelector
+        key={`${property}${resource?.line_items[index][property]}`}
+        onChange={(value) =>
+          value.resource && handleTaxRateChange(property, index, value.resource)
+        }
+        onTaxCreated={(taxRate) =>
+          handleTaxRateChange(property, index, taxRate)
+        }
+        defaultValue={
+          resource?.line_items[index][
+            property.replace('rate', 'name') as keyof InvoiceItem
+          ]
+        }
+        onClearButtonClick={() => handleTaxRateChange(property, index)}
+      />
+    );
+  };
+
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
@@ -244,24 +317,7 @@ export function useResolveInputField(props: Props) {
     }
 
     if (taxInputs.includes(property)) {
-      return (
-        <TaxRateSelector
-          key={`${property}${resource?.line_items[index][property]}`}
-          onChange={(value) =>
-            value.resource &&
-            handleTaxRateChange(property, index, value.resource)
-          }
-          onTaxCreated={(taxRate) =>
-            handleTaxRateChange(property, index, taxRate)
-          }
-          defaultValue={
-            resource?.line_items[index][
-              property.replace('rate', 'name') as keyof InvoiceItem
-            ]
-          }
-          onClearButtonClick={() => handleTaxRateChange(property, index)}
-        />
-      );
+      return showTaxRateSelector(property as 'tax_rate1', index);
     }
 
     if (['line_total'].includes(property)) {
