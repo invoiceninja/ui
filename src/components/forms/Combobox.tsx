@@ -54,6 +54,7 @@ export interface ComboboxStaticProps<T = any> {
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
   errorMessage?: string | string[];
+  clearInputAfterSelection?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -71,6 +72,7 @@ export function ComboboxStatic({
   onDismiss,
   entryOptions,
   errorMessage,
+  clearInputAfterSelection,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -116,6 +118,11 @@ export function ComboboxStatic({
   useEffect(() => {
     if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
+    }
+
+    if (clearInputAfterSelection) {
+      setSelectedValue(null);
+      setQuery('');
     }
   }, [selectedValue]);
 
@@ -322,6 +329,7 @@ export interface ComboboxAsyncProps<T> {
   onDismiss?: () => unknown;
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
+  clearInputAfterSelection?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -339,6 +347,7 @@ export function ComboboxAsync<T = any>({
   onDismiss,
   disableWithQueryParameter,
   errorMessage,
+  clearInputAfterSelection,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -416,6 +425,7 @@ export function ComboboxAsync<T = any>({
       nullable={nullable}
       entryOptions={entryOptions}
       errorMessage={errorMessage}
+      clearInputAfterSelection={clearInputAfterSelection}
     />
   );
 }
