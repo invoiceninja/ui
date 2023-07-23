@@ -50,6 +50,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useSearchParams } from 'react-router-dom';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -108,6 +109,7 @@ export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+  const [searchParams] = useSearchParams();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -123,7 +125,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { styleOptions } = props;
 
-  const [filter, setFilter] = useState<string>('');
+  const filter = searchParams.get('filter') ?? '';
+
   const [customFilter, setCustomFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
@@ -261,7 +264,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     <>
       {!props.withoutActions && (
         <Actions
-          onFilterChange={setFilter}
+          // onFilterChang/e={setFilter}
           optionsMultiSelect={true}
           options={options}
           defaultOption={options[0]}
