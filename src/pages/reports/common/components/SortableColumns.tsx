@@ -34,7 +34,6 @@ import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../../index/Reports';
-import { report } from 'process';
 
 interface Record {
   trans: string;
@@ -127,7 +126,7 @@ interface Props {
 
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment', 'vendor', 'purchase_order', 'task', 'expense', 'recurring_invoice'];
 
-export function SortableColumns({ columns, setReportKeys }: Props) {
+export function SortableColumns({ columns, setReportKeys, report }: Props) {
   const [data] = useState([
     columns.includes('client') ? clientMap : [],
     columns.includes('invoice')
