@@ -16,7 +16,7 @@ import {
   Droppable,
   Draggable,
 } from '@hello-pangea/dnd';
-import { cloneDeep, update } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { clientMap } from '$app/common/constants/exports/client-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
@@ -34,6 +34,7 @@ import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../../index/Reports';
+import { report } from 'process';
 
 interface Record {
   trans: string;
@@ -127,7 +128,7 @@ interface Props {
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment', 'vendor', 'purchase_order', 'task', 'expense', 'recurring_invoice'];
 
 export function SortableColumns({ columns, setReportKeys }: Props) {
-  const [data, setData] = useState([
+  const [data] = useState([
     columns.includes('client') ? clientMap : [],
     columns.includes('invoice')
       ? columns.includes('item')
