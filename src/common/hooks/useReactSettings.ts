@@ -12,6 +12,7 @@ import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { merge } from 'lodash';
+import { Record as ClientMapRecord } from '../constants/exports/client-map';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -29,6 +30,9 @@ export interface ReactSettings {
       clients: {
         sort: string;
       };
+    };
+    reports: {
+      columns: Record<string, ClientMapRecord[][]>;
     };
   };
 }
@@ -77,6 +81,9 @@ export function useReactSettings() {
         clients: {
           sort: 'id|desc',
         },
+      },
+      reports: {
+        columns: {},
       },
     },
   };

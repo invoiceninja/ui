@@ -64,11 +64,17 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   ) => {
     const $client = cloneDeep(client)!;
 
-    if (property === 'send_reminders' && value === '') {
-      delete $client.settings.send_reminders;
+    if (property !== 'currency_id' && value === '') {
+      delete $client.settings?.[property];
     } else {
       set($client, `settings.${property}`, value);
     }
+
+    // if (property === 'send_reminders' && value === '') {
+    //   delete $client.settings?.send_reminders;
+    // } else {
+    //   set($client, `settings.${property}`, value);
+    // }
 
     setClient($client);
   };
@@ -108,6 +114,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   handleSettingsChange('currency_id', value)
                 }
                 withBlank
+                errorMessage={errors?.errors['settings.currency_id']}
               >
                 {currencies.map((currency, index) => (
                   <option key={index} value={currency.id}>
@@ -197,9 +204,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <SelectField
               id="settings.send_reminders"
               defaultValue={
-                client?.settings.send_reminders === true
+                client?.settings?.send_reminders === true
                   ? 'enabled'
-                  : client?.settings.send_reminders === false
+                  : client?.settings?.send_reminders === false
                   ? 'disabled'
                   : ''
               }
@@ -213,6 +220,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 )
               }
               withBlank
+              errorMessage={errors?.errors['settings.send_reminders']}
             >
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>

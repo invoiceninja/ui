@@ -27,8 +27,9 @@ import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { SortableColumns } from '../common/components/SortableColumns';
 import { useReports } from '../common/useReports';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
-type Identifier =
+export type Identifier =
   | 'activity'
   | 'client'
   | 'contact'
@@ -172,6 +173,8 @@ export default function Reports() {
     }));
   };
 
+  const { save } = usePreferences();
+
   const handleExport = () => {
     toast.processing();
 
@@ -229,7 +232,10 @@ export default function Reports() {
 
         toast.error();
       })
-      .finally(() => setIsPendingExport(false));
+      .finally(() => {
+        setIsPendingExport(false);
+        save({ silent: true });
+      });
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -399,6 +405,7 @@ export default function Reports() {
 
       {showCustomColumns && (
         <SortableColumns
+          report={report.identifier}
           columns={report.custom_columns}
           setReportKeys={setReportKeys}
         />

@@ -22,6 +22,7 @@ export interface Credit {
   status_id: string;
   design_id: string;
   recurring_id: string;
+  invoice_id: string;
   created_at: number;
   updated_at: number;
   archived_at: number;

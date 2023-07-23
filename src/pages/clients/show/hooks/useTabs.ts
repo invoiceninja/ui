@@ -11,7 +11,7 @@
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { route } from '$app/common/helpers/route';
 import { Tab } from '$app/components/Tabs';
-import { ModuleBitmask } from '$app/pages/settings';
+import { modules } from '$app/pages/settings';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -54,9 +54,11 @@ export function useTabs() {
     },
   ];
 
-  if (!enabled(ModuleBitmask.Quotes)) {
-    tabs = tabs.filter((tab) => tab.name !== t('quotes'));
-  }
+  modules.forEach((module) => {
+    if (!enabled(module.bitmask)) {
+      tabs = tabs.filter((tab) => tab.name !== t(module.label));
+    }
+  });
 
   return tabs;
 }

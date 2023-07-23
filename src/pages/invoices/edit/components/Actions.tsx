@@ -27,7 +27,7 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCancel,
@@ -39,6 +39,7 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
+  MdRefresh,
   MdRestore,
   MdSchedule,
   MdSend,
@@ -56,6 +57,17 @@ import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk } from '$app/common/queries/invoices';
+import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+
+export const isInvoiceAutoBillable = (invoice: Invoice) => {
+  return (
+    invoice.balance > 0 &&
+    (invoice.status_id === InvoiceStatus.Sent ||
+      invoice.status_id === InvoiceStatus.Partial) &&
+    Boolean(invoice.client?.gateway_tokens.length)
+  );
+};
 
 export function useActions() {
   const { t } = useTranslation();
@@ -66,6 +78,10 @@ export function useActions() {
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
+
+  const reverseInvoice = useReverseInvoice();
+
+  const bulk = useBulk();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
@@ -250,6 +266,15 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
+      isInvoiceAutoBillable(invoice) && (
+        <DropdownElement
+          onClick={() => bulk([invoice.id], 'auto_bill')}
+          icon={<Icon element={BiMoney} />}
+        >
+          {t('auto_bill')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
       parseInt(invoice.status_id) < 4 && (
         <DropdownElement
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
@@ -276,6 +301,18 @@ export function useActions() {
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Paid ||
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !invoice.is_deleted &&
+      !invoice.archived_at && (
+        <DropdownElement
+          onClick={() => reverseInvoice(invoice)}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,

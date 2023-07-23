@@ -9,7 +9,7 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   DropResult,
@@ -32,6 +32,8 @@ import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-m
 import { taskMap } from '$app/common/constants/exports/task-map';
 import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { Identifier } from '../../index/Reports';
 
 interface Record {
   trans: string;
@@ -116,6 +118,7 @@ export function Column({
 }
 
 interface Props {
+  report: Identifier;
   columns: string[];
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
@@ -179,7 +182,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
     // Then we can insert the word into new array at specific index
     $data[destinationIndex].splice(result.destination.index, 0, word);
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
 
     setReportKeys(collect($data[10]).pluck('value').toArray());
   };
@@ -201,11 +204,11 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
     // Add it back to the original
     $data[index].push(record);
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
   };
 
   const onRemoveAll = () => {
-    setData(() => [
+    update(`preferences.reports.columns.${report}`, [
       columns.includes('client') ? clientMap : [],
       columns.includes('invoice')
         ? columns.includes('item')
@@ -247,7 +250,7 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
 
     $data[index] = [];
 
-    setData(() => [...$data]);
+    update(`preferences.reports.columns.${report}`, [...$data]);
   };
 
   return (

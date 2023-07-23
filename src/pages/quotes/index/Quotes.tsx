@@ -50,7 +50,7 @@ export default function Quotes() {
       <DataTable
         resource="quote"
         columns={columns}
-        endpoint="/api/v1/quotes?include=client&sort=id|desc"
+        endpoint="/api/v1/quotes?include=client&without_deleted_clients=true&sort=id|desc"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"

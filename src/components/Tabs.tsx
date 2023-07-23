@@ -10,8 +10,14 @@
 
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { MouseEvent, useRef } from 'react';
-import { Link, Params, useLocation, useParams } from 'react-router-dom';
+import { MouseEvent, useEffect, useRef } from 'react';
+import {
+  Link,
+  Params,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 interface Props {
   className?: string;
@@ -25,6 +31,8 @@ export function Tabs(props: Props) {
   const accentColor = useAccentColor();
   const location = useLocation();
   const params = useParams();
+
+  const navigate = useNavigate();
 
   const isActive = (tab: Tab) => {
     return (
@@ -50,6 +58,18 @@ export function Tabs(props: Props) {
       left: clickedTab!.offsetLeft - scrollWidth - scrollBy,
     });
   };
+
+  useEffect(() => {
+    if (props.tabs.length) {
+      const doesDefaultUrlExist = props.tabs.some(
+        ({ href }) => href === location.pathname
+      );
+
+      if (!doesDefaultUrlExist) {
+        navigate(props.tabs[0].href);
+      }
+    }
+  }, []);
 
   return (
     <div className={props.className}>

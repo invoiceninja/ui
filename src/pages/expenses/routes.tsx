@@ -20,6 +20,7 @@ import { lazy } from 'react';
 const Expenses = lazy(() => import('$app/pages/expenses/index/Expenses'));
 const Import = lazy(() => import('$app/pages/expenses/import/Import'));
 const Create = lazy(() => import('$app/pages/expenses/create/Create'));
+const Expense = lazy(() => import('$app/pages/expenses/Expense'));
 const Edit = lazy(() => import('$app/pages/expenses/edit/Edit'));
 const Documents = lazy(() => import('$app/pages/expenses/documents/Documents'));
 
@@ -65,39 +66,24 @@ export const expenseRoutes = (
         />
       }
     />
-    <Route path=":id">
-      <Route
-        path="edit"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.Expenses),
-              or(
-                permission('view_expense'),
-                permission('edit_expense'),
-                assigned('/api/v1/expenses/:id')
-              ),
-            ]}
-            component={<Edit />}
-          />
-        }
-      />
-      <Route
-        path="documents"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.Expenses),
-              or(
-                permission('view_expense'),
-                permission('edit_expense'),
-                assigned('/api/v1/expenses/:id')
-              ),
-            ]}
-            component={<Documents />}
-          />
-        }
-      />
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Expenses),
+            or(
+              permission('view_expense'),
+              permission('edit_expense'),
+              assigned('/api/v1/expenses/:id')
+            ),
+          ]}
+          component={<Expense />}
+        />
+      }
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
     </Route>
   </Route>
 );

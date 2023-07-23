@@ -16,8 +16,7 @@ import { ConfigProvider, DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
-import { antdLocaleAtom } from '$app/App';
-import { useAtomValue } from 'jotai';
+import { atom, useAtomValue } from 'jotai';
 
 type Props = {
   value?: string;
@@ -26,6 +25,8 @@ type Props = {
   handleDateChange: (value: string) => unknown;
   handleDateRangeChange: (value: string) => unknown;
 };
+
+export const antdLocaleAtom = atom<any | null>(null);
 
 export function DropdownDateRangePicker(props: Props) {
   const [t] = useTranslation();
