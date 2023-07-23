@@ -9,14 +9,14 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
   DragDropContext,
   DropResult,
   Droppable,
   Draggable,
 } from '@hello-pangea/dnd';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, update } from 'lodash';
 import { clientMap } from '$app/common/constants/exports/client-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
@@ -56,6 +56,7 @@ export function Column({
   onRemove,
 }: ColumnProps) {
   const [t] = useTranslation();
+
 
   const translateLabel = (record: Record) => {
     const parts = record.value.split('.');
@@ -159,6 +160,8 @@ export function SortableColumns({ columns, setReportKeys }: Props) {
       : [],
     [],
   ]);
+
+  const { update } = usePreferences();
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
