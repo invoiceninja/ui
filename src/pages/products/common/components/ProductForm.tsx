@@ -29,6 +29,18 @@ interface Props {
   ) => void;
 }
 
+export const taxCategories = [
+  { value: '1', label: 'physical_goods' },
+  { value: '2', label: 'services' },
+  { value: '3', label: 'digital_products' },
+  { value: '4', label: 'shipping' },
+  { value: '5', label: 'tax_exempt' },
+  { value: '6', label: 'reduced_tax' },
+  { value: '7', label: 'override_tax' },
+  { value: '8', label: 'zero_rated' },
+  { value: '9', label: 'reverse_tax' },
+];
+
 export function ProductForm(props: Props) {
   const [t] = useTranslation();
 
@@ -107,15 +119,11 @@ export function ProductForm(props: Props) {
           onValueChange={(value) => handleChange('tax_id', value)}
           errorMessage={errors?.errors.tax_id}
         >
-          <option value="1">{t('physical_goods')}</option>
-          <option value="2">{t('services')}</option>
-          <option value="3">{t('digital_products')}</option>
-          <option value="4">{t('shipping')}</option>
-          <option value="5">{t('tax_exempt')}</option>
-          <option value="6">{t('reduced_tax')}</option>
-          <option value="7">{t('override_tax')}</option>
-          <option value="8">{t('zero_rated')}</option>
-          <option value="9">{t('reverse_tax')}</option>
+          {taxCategories.map((category) => (
+            <option key={category.value} value={category.value}>
+              {t(category.label)}
+            </option>
+          ))}
         </SelectField>
       </Element>
 
