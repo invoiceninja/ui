@@ -29,10 +29,13 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useQueryClient } from 'react-query';
 
 export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const saveCompany = useHandleCompanySave();
 
@@ -93,6 +96,16 @@ export default function Create() {
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success('created_client');
+
+        queryClient.invalidateQueries('/api/v1/clients');
+
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint('/api/v1/clients'),
+            },
+          })
+        );
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
