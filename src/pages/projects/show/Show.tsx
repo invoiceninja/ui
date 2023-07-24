@@ -171,7 +171,6 @@ export default function Show() {
             showEdit={(task: Task) => showEditOption(task)}
             customFilters={filters}
             customBulkActions={customBulkActions}
-            customFilterQueryKey="client_status"
             customFilterPlaceholder="status"
             withResourcefulActions
             leftSideChevrons={

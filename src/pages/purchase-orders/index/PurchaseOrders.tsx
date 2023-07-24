@@ -55,7 +55,6 @@ export default function PurchaseOrders() {
         customActions={actions}
         customBulkActions={customBulkActions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={

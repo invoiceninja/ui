@@ -48,7 +48,6 @@ export default function Tasks() {
       customFilters={filters}
       customActions={actions}
       customBulkActions={customBulkActions}
-      customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/tasks/bulk"

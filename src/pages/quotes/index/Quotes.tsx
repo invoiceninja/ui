@@ -57,7 +57,6 @@ export default function Quotes() {
         customActions={actions}
         customBulkActions={customBulkActions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={

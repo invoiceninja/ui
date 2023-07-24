@@ -56,7 +56,6 @@ export default function Payments() {
         withResourcefulActions
         customActions={actions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={
