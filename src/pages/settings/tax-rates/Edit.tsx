@@ -29,8 +29,11 @@ import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useActions } from '$app/pages/settings/tax-rates/common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Edit() {
+  const { setDocumentTitle } = useTitle('edit_tax_rate');
+
   const [t] = useTranslation();
   const { id } = useParams();
 
@@ -50,9 +53,7 @@ export function Edit() {
   const actions = useActions();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${
-      data?.data.data.name
-    }`;
+    setDocumentTitle(data?.data.data.name);
   }, [data]);
 
   const invalidatePaymentTermCache = () => {

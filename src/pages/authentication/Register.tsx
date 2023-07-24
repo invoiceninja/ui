@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -30,13 +30,12 @@ import {
   changeCurrentIndex,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Register() {
-  const [t] = useTranslation();
+  useTitle('register');
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('register')}`;
-  });
+  const [t] = useTranslation();
 
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
     undefined

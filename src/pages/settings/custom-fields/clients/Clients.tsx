@@ -9,13 +9,14 @@
  */
 
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../../../components/cards';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Clients() {
+  useTitle('custom_fields');
   const [t] = useTranslation();
 
   const pages = [
@@ -23,10 +24,6 @@ export function Clients() {
     { name: t('custom_fields'), href: '/settings/custom_fields' },
     { name: t('clients'), href: '/settings/custom_fields/clients' },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
-  });
 
   return (
     <Settings
