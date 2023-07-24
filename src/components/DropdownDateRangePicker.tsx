@@ -89,12 +89,12 @@ export function DropdownDateRangePicker(props: Props) {
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
           <ConfigProvider locale={antdLocale?.default}>
-          <RangePicker
-            size="large"
-            defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
-            format={dateFormat}
-            onChange={(_, dateString) => handleCustomDateChange(dateString)}
-          />
+            <RangePicker
+              size="large"
+              defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
+              format={dateFormat}
+              onChange={(_, dateString) => handleCustomDateChange(dateString)}
+            />
           </ConfigProvider>
         </div>
       )}

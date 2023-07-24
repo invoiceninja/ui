@@ -66,7 +66,6 @@ export function RecentPayments() {
       id: 'date',
       label: t('date'),
       format: (value) => date(value, dateFormat),
-
     },
     {
       id: 'amount',

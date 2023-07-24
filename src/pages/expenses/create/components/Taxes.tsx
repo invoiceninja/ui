@@ -28,11 +28,12 @@ export function TaxSettings(props: Props) {
   const company = useCurrentCompany();
 
   const taxTypeChange = (value: string) => {
-  
-    setTaxInputType(value as 'by_rate' | 'by_amount')
-    handleChange('calculate_tax_by_amount', value === 'by_amount' ? true : false)
-
-  }
+    setTaxInputType(value as 'by_rate' | 'by_amount');
+    handleChange(
+      'calculate_tax_by_amount',
+      value === 'by_amount' ? true : false
+    );
+  };
 
   return (
     <Card title={t('taxes')} isLoading={!expense}>

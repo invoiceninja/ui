@@ -132,10 +132,15 @@ export function ClientSelector(props: Props) {
 
               {resource.invitations.length >= 1 && (
                 <>
-                <Link to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`} external>
-                  {t('view_in_portal')} 
-                </Link>
-                <CopyToClipboardIconOnly text={resource.invitations[0].link} />
+                  <Link
+                    to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
+                    external
+                  >
+                    {t('view_in_portal')}
+                  </Link>
+                  <CopyToClipboardIconOnly
+                    text={resource.invitations[0].link}
+                  />
                 </>
               )}
             </div>
