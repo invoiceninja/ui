@@ -9,13 +9,14 @@
  */
 
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../../../components/cards';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Expenses() {
+  useTitle('custom_fields');
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('expenses')}`;
@@ -25,10 +26,6 @@ export function Expenses() {
     { name: t('custom_fields'), href: '/settings/custom_fields' },
     { name: t('expenses'), href: '/settings/custom_fields/expenses' },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
-  });
 
   return (
     <Settings

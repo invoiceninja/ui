@@ -131,6 +131,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={credit?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>
@@ -140,7 +141,6 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('design')}
                   value={credit?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(credit?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}

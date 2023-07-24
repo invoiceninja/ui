@@ -17,4 +17,6 @@ export const recurringInvoiceAtom = atom<RecurringInvoice | undefined>(
   undefined
 );
 
-export const invoiceSumAtom = atom<InvoiceSum | InvoiceSumInclusive | undefined>(undefined);
+export const invoiceSumAtom = atom<
+  InvoiceSum | InvoiceSumInclusive | undefined
+>(undefined);

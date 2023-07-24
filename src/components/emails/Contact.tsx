@@ -29,7 +29,9 @@ export function Contact(props: Props) {
   const vendorResolver = useVendorResolver();
 
   const [relation, setRelation] = useState<Vendor | Client>();
-  const [relationKey, setRelationKey] = useState<'vendor_contact_id' | 'client_contact_id'>('client_contact_id');
+  const [relationKey, setRelationKey] = useState<
+    'vendor_contact_id' | 'client_contact_id'
+  >('client_contact_id');
 
   useEffect(() => {
     if (
@@ -57,16 +59,18 @@ export function Contact(props: Props) {
     <>
       {relation && (
         <div>
-          {relation.contacts.filter((contact) => 
-          
-            props.resource.invitations.find((invitation) => invitation[relationKey] === contact.id)
-          
-          ).map((contact, index) => (
-            <p key={index}>
-              {contact.first_name} {contact.last_name} &#183;
-              <span className="font-semibold"> {contact.email}</span>
-            </p>
-          ))}
+          {relation.contacts
+            .filter((contact) =>
+              props.resource.invitations.find(
+                (invitation) => invitation[relationKey] === contact.id
+              )
+            )
+            .map((contact, index) => (
+              <p key={index}>
+                {contact.first_name} {contact.last_name} &#183;
+                <span className="font-semibold"> {contact.email}</span>
+              </p>
+            ))}
         </div>
       )}
     </>

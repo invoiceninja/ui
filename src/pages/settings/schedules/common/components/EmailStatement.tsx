@@ -48,10 +48,19 @@ export function EmailStatement(props: Props) {
 
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
 
+  const handleChangeParameters = (clients: Client[]) => {
+    const currentParameters = { ...schedule.parameters };
+    currentParameters.clients = clients.map(({ id }) => id);
+
+    handleChange('parameters', currentParameters);
+  };
+
   const handleRemoveClient = (clientIndex: number) => {
     const updatedClientsList = selectedClients.filter(
       (client, index) => index !== clientIndex
     );
+
+    handleChangeParameters(updatedClientsList);
 
     setSelectedClients(updatedClientsList);
   };
@@ -65,13 +74,6 @@ export function EmailStatement(props: Props) {
       setSelectedClients(clients);
     }
   }, [clientsResponse]);
-
-  useEffect(() => {
-    const currentParameters = { ...schedule.parameters };
-    currentParameters.clients = selectedClients?.map(({ id }) => id);
-
-    handleChange('parameters', currentParameters);
-  }, [selectedClients]);
 
   return (
     <>
@@ -157,9 +159,14 @@ export function EmailStatement(props: Props) {
 
       <Element leftSide={t('client')}>
         <ClientSelector
-          onChange={(client) =>
-            setSelectedClients((prevState) => [...prevState, client])
-          }
+          onChange={(client) => {
+            setSelectedClients((prevState) => {
+              const currentClients = [...prevState, client];
+              handleChangeParameters(currentClients);
+
+              return currentClients;
+            });
+          }}
           withoutAction
           clearInputAfterSelection
           exclude={schedule.parameters.clients}

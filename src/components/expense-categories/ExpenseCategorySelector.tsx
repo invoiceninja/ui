@@ -10,13 +10,11 @@
 
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export interface ExpenseCategorySelectorProps
   extends GenericSelectorProps<ExpenseCategory> {
@@ -43,22 +41,30 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
       />
 
       {!props.setSelectedIds && (
-        <DebouncedCombobox
-          inputLabel={props.inputLabel}
-          value="id"
-          endpoint="/api/v1/expense_categories?status=active"
-          label="name"
-          defaultValue={props.value}
-          onChange={(category: Record<ExpenseCategory>) =>
+        <ComboboxAsync<ExpenseCategory>
+          endpoint={
+            new URL(endpoint('/api/v1/expense_categories?status=active'))
+          }
+          onChange={(category: Entry<ExpenseCategory>) =>
             category.resource && props.onChange(category.resource)
           }
-          disabled={props.readonly}
-          clearButton={props.clearButton}
-          onClearButtonClick={props.onClearButtonClick}
-          queryAdditional
+          inputOptions={{
+            label: props.inputLabel?.toString(),
+            value: props.value || null,
+          }}
+          entryOptions={{
+            id: 'id',
+            label: 'name',
+            value: 'id',
+          }}
+          action={{
+            label: t('new_expense_category'),
+            onClick: () => setIsModalOpen(true),
+            visible: true,
+          }}
+          readonly={props.readonly}
+          onDismiss={props.onClearButtonClick}
           initiallyVisible={props.initiallyVisible}
-          actionLabel={t('new_expense_category')}
-          onActionClick={() => setIsModalOpen(true)}
           sortBy="name|asc"
           staleTime={props.staleTime}
           errorMessage={props.errorMessage}

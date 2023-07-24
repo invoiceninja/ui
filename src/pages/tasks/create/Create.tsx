@@ -83,7 +83,7 @@ export default function Create() {
         if (searchParams.get('rate')) {
           _task.rate = parseFloat(searchParams.get('rate')!);
         }
-          
+
         value = _task;
       }
 

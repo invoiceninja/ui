@@ -11,9 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import {
-  CompanyUser,
-} from '$app/common/interfaces/company-user';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
@@ -33,7 +31,10 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { ReactTableColumns, useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  ReactTableColumns,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {

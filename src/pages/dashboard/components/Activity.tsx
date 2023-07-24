@@ -26,7 +26,6 @@ export function Activity() {
     '/api/v1/activities?reactv2',
     () => request('GET', endpoint('/api/v1/activities?reactv2')),
     { staleTime: 60 }
-    
   );
 
   const activityElement = useGenerateActivityElement();

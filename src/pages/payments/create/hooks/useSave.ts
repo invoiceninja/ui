@@ -50,11 +50,9 @@ export function useSave(
         }
       })
       .finally(() => {
-
         queryClient.invalidateQueries(route('/api/v1/payments'));
         queryClient.invalidateQueries(route('/api/v1/credits'));
         queryClient.invalidateQueries(route('/api/v1/invoices'));
-
       });
   };
 }

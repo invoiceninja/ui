@@ -26,6 +26,8 @@ import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
+
+
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
   id: keyof TResource;
@@ -136,10 +138,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (_value, invoice) => (
-        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-          {invoice.number}
-        </Link>
+      format: (value, invoice) => (
+        <Link to={`/invoices/${invoice.id}/edit`}>{value}</Link>
       ),
     },
     {

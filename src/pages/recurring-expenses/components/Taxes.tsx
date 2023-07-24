@@ -28,6 +28,11 @@ export function TaxSettings(props: Props) {
   const { recurringExpense, handleChange, taxInputType, setTaxInputType } =
     props;
 
+  const taxTypeChange = (value: string) => {
+    setTaxInputType(value as 'by_rate' | 'by_amount');
+    handleChange('calculate_tax_by_amount', value === 'by_amount');
+  };
+
   return (
     <Card title={t('taxes')} isLoading={!recurringExpense}>
       {!company?.enabled_expense_tax_rates && (
@@ -45,9 +50,7 @@ export function TaxSettings(props: Props) {
               { id: 'by_amount', title: t('by_amount'), value: 'by_amount' },
             ]}
             defaultSelected={taxInputType}
-            onValueChange={(value) =>
-              setTaxInputType(value as 'by_rate' | 'by_amount')
-            }
+            onValueChange={(value) => taxTypeChange(value)}
           />
         </Element>
       )}

@@ -63,7 +63,7 @@ export const gatewaysDetails = [
 export function Create() {
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('online_payments');
+  const { documentTitle } = useTitle('add_gateway');
 
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
 

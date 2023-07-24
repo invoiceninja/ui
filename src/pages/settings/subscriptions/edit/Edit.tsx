@@ -29,8 +29,11 @@ import { Settings as SubscriptionSettings } from '../common/components/Settings'
 import { Webhook } from '../common/components/Webhook';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Edit() {
+  const { documentTitle } = useTitle('edit_payment_link');
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -133,7 +136,7 @@ export function Edit() {
 
   return (
     <Settings
-      title={t('edit_subscription')}
+      title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}

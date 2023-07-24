@@ -15,34 +15,31 @@ import { t } from 'i18next';
 import { useQueryClient } from 'react-query';
 
 interface Props {
-    entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
+  entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
 }
 
 export function useDownloadPdfs({ entity }: Props) {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return (resourceIds: string[]) => {
-        if (!resourceIds.length) {
-            return;
-        }
+  return (resourceIds: string[]) => {
+    if (!resourceIds.length) {
+      return;
+    }
 
-        toast.processing();
+    toast.processing();
 
-        queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
-            request(
-                'POST',
-                endpoint(`/api/v1/${entity}s/bulk`),
-                { action: 'bulk_download', ids: resourceIds }
-            )
-                .then(() => {
-                    
-                    toast.success(t('downloaded_entities') || '');
-
-                })
-                .catch((error) => {
-                    console.error(error);
-                    toast.error();
-                })
-        );
-    };
+    queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
+      request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
+        action: 'bulk_download',
+        ids: resourceIds,
+      })
+        .then(() => {
+          toast.success(t('downloaded_entities') || '');
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error();
+        })
+    );
+  };
 }

@@ -49,7 +49,7 @@ export function ImportCustomers() {
     <>
       <Card title={t('import_customers')}>
         <ClickableElement onClick={() => setIsPasswordConfirmModalOpen(true)}>
-          {t('click_to_start_import')}
+          {t('click_to_continue')}
         </ClickableElement>
       </Card>
 

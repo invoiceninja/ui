@@ -98,7 +98,6 @@ export function Details(props: PurchaseOrderCardProps) {
             }
           />
         )}
-
       </Card>
 
       <Card className="col-span-12 xl:col-span-4 h-max">
