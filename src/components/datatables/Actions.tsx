@@ -19,6 +19,7 @@ export interface SelectOption {
   label: string;
   backgroundColor: string;
   color: string;
+  queryKey?: string;
 }
 
 interface Props extends CommonProps {
@@ -31,7 +32,6 @@ interface Props extends CommonProps {
   onStatusChange?: Dispatch<SetStateAction<string[]>>;
   onCustomFilterChange?: Dispatch<SetStateAction<string[]>>;
   customFilters?: SelectOption[];
-  customFilterQueryKey?: string;
   customFilterPlaceholder?: string;
   beforeFilter?: ReactNode;
 }
