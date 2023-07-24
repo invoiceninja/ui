@@ -35,6 +35,8 @@ import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-inv
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../../index/Reports';
 
+const reportColumn = 10;
+
 interface Record {
   trans: string;
   value: string;
@@ -95,7 +97,7 @@ export function Column({
                       >
                         {translateLabel(record)}
 
-                        {droppableId === '5' && (
+                        {droppableId === reportColumn.toString() && (
                           <button
                             type="button"
                             onClick={() => (onRemove ? onRemove(record) : null)}
@@ -135,48 +137,47 @@ const positions = [
   'expense',
   'recurring_invoice',
 ];
-const reportColumn = 10;
 
 export function SortableColumns({ report, columns, setReportKeys }: Props) {
   const { preferences, update } = usePreferences();
 
   const data =
     report in preferences.reports.columns &&
-      preferences.reports.columns[report as Identifier].length !== 0
+    preferences.reports.columns[report as Identifier].length !== 0
       ? preferences.reports.columns[report]
       : [
-        columns.includes('client') ? clientMap : [],
-        columns.includes('invoice')
-          ? columns.includes('item')
-            ? invoiceMap.concat(itemMap)
-            : invoiceMap
-          : [],
-        columns.includes('credit')
-          ? columns.includes('item')
-            ? creditMap.concat(itemMap)
-            : creditMap
-          : [],
-        columns.includes('quote')
-          ? columns.includes('item')
-            ? quoteMap.concat(itemMap)
-            : quoteMap
-          : [],
-        columns.includes('payment') ? paymentMap : [],
-        columns.includes('vendor') ? vendorMap : [],
-        columns.includes('purchase_order')
-          ? columns.includes('item')
-            ? purchaseorderMap.concat(itemMap)
-            : purchaseorderMap
-          : [],
-        columns.includes('task') ? taskMap : [],
-        columns.includes('expense') ? expenseMap : [],
-        columns.includes('recurring_invoice')
-          ? columns.includes('item')
-            ? recurringinvoiceMap.concat(itemMap)
-            : recurringinvoiceMap
-          : [],
-        [],
-      ];
+          columns.includes('client') ? clientMap : [],
+          columns.includes('invoice')
+            ? columns.includes('item')
+              ? invoiceMap.concat(itemMap)
+              : invoiceMap
+            : [],
+          columns.includes('credit')
+            ? columns.includes('item')
+              ? creditMap.concat(itemMap)
+              : creditMap
+            : [],
+          columns.includes('quote')
+            ? columns.includes('item')
+              ? quoteMap.concat(itemMap)
+              : quoteMap
+            : [],
+          columns.includes('payment') ? paymentMap : [],
+          columns.includes('vendor') ? vendorMap : [],
+          columns.includes('purchase_order')
+            ? columns.includes('item')
+              ? purchaseorderMap.concat(itemMap)
+              : purchaseorderMap
+            : [],
+          columns.includes('task') ? taskMap : [],
+          columns.includes('expense') ? expenseMap : [],
+          columns.includes('recurring_invoice')
+            ? columns.includes('item')
+              ? recurringinvoiceMap.concat(itemMap)
+              : recurringinvoiceMap
+            : [],
+          [],
+        ];
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
