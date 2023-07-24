@@ -110,6 +110,16 @@ export function ComboboxStatic({
     [filteredValues]
   );
 
+  const handleChangeValue = (value: Entry | null) => {
+    if (value) {
+      if (selectedValue && value.value === selectedValue.value) {
+        onDismiss && onDismiss();
+      } else {
+        setSelectedValue(() => ({ ...value, eventType: 'internal' }));
+      }
+    }
+  };
+
   useEffect(() => {
     if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
@@ -150,9 +160,7 @@ export function ComboboxStatic({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={(value) =>
-          setSelectedValue(() => value && { ...value, eventType: 'internal' })
-        }
+        onChange={(value) => handleChangeValue(value)}
         disabled={readonly}
         ref={comboboxRef}
       >
