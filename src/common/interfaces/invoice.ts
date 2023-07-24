@@ -10,6 +10,7 @@
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Invitation } from './purchase-order';
+import { TaxInfo } from './tax-info';
 
 export interface Invoice {
   id: string;
@@ -114,4 +115,5 @@ export interface History {
   amount: number;
   created_at: number;
   updated_at: number;
+  tax_info?: TaxInfo;
 }

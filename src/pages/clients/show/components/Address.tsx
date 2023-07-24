@@ -34,7 +34,7 @@ export function Address(props: Props) {
               <>
                 <p>
                   {client.address1.length > 0 && client.address1}
-                  {client.address1.length > 0 && <br />}  
+                  {client.address1.length > 0 && <br />}
                   {client.address2}
                 </p>
 

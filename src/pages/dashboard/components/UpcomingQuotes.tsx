@@ -28,13 +28,11 @@ export function UpcomingQuotes() {
     {
       id: 'number',
       label: t('number'),
-      format: (value, quote) => {
-        return (
-          <Link to={route('/invoices/:id/edit', { id: quote.id })}>
-            {quote.number}
-          </Link>
-        );
-      },
+      format: (value, quote) => (
+        <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+          {quote.number}
+        </Link>
+      ),
     },
     {
       id: 'client_id',

@@ -17,6 +17,9 @@ import { ModuleBitmask } from '$app/pages/settings/account-management/component'
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 
+const RecurringExpense = lazy(
+  () => import('$app/pages/recurring-expenses/RecurringExpense')
+);
 const RecurringExpenses = lazy(
   () => import('$app/pages/recurring-expenses/index/RecurringExpenses')
 );
@@ -58,39 +61,24 @@ export const recurringExpenseRoutes = (
         />
       }
     />
-    <Route path=":id">
-      <Route
-        path="edit"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.RecurringExpenses),
-              or(
-                permission('view_recurring_expense'),
-                permission('edit_recurring_expense'),
-                assigned('/api/v1/recurring_expenses/:id')
-              ),
-            ]}
-            component={<Edit />}
-          />
-        }
-      />
-      <Route
-        path="documents"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.RecurringExpenses),
-              or(
-                permission('view_recurring_expense'),
-                permission('edit_recurring_expense'),
-                assigned('/api/v1/recurring_expenses/:id')
-              ),
-            ]}
-            component={<Documents />}
-          />
-        }
-      />
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.RecurringExpenses),
+            or(
+              permission('view_recurring_expense'),
+              permission('edit_recurring_expense'),
+              assigned('/api/v1/recurring_expenses/:id')
+            ),
+          ]}
+          component={<RecurringExpense />}
+        />
+      }
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
     </Route>
   </Route>
 );

@@ -27,15 +27,16 @@ import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Settings } from '$app/components/layouts/Settings';
 import { useState } from 'react';
-import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdEdit } from 'react-icons/md';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function PaymentTerms() {
+  const { documentTitle } = useTitle('payment_terms');
   const [t] = useTranslation();
 
   const pages = [
@@ -43,10 +44,6 @@ export function PaymentTerms() {
     { name: t('company_details'), href: '/settings/company_details' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
-  });
 
   const queryClient = useQueryClient();
 
@@ -78,7 +75,7 @@ export function PaymentTerms() {
   };
 
   return (
-    <Settings title={t('payment_terms')}>
+    <Settings title={documentTitle}>
       <Breadcrumbs pages={pages} />
 
       <div className="flex justify-end">

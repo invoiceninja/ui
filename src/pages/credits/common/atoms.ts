@@ -14,4 +14,6 @@ import { Credit } from '$app/common/interfaces/credit';
 import { atom } from 'jotai';
 
 export const creditAtom = atom<Credit | undefined>(undefined);
-export const invoiceSumAtom = atom<InvoiceSum | InvoiceSumInclusive | undefined>(undefined);
+export const invoiceSumAtom = atom<
+  InvoiceSum | InvoiceSumInclusive | undefined
+>(undefined);

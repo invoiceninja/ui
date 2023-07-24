@@ -73,7 +73,9 @@ export default function Edit() {
     }
   }, [data]);
 
-  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum | InvoiceSumInclusive>();
+  const [invoiceSum, setInvoiceSum] = useState<
+    InvoiceSum | InvoiceSumInclusive
+  >();
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();

@@ -157,6 +157,7 @@ export function useInvoiceTask() {
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
           task_id: task.id,
+          tax_id: '',
         };
 
         const projectName =

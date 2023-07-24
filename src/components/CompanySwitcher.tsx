@@ -23,14 +23,12 @@ import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { useCompanyName } from '$app/common/hooks/useLogo';
 import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
-import { CompanyEdit } from '$app/pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -55,9 +53,6 @@ export function CompanySwitcher() {
     useState<boolean>(false);
 
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
-    useState<boolean>(false);
-
-  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
@@ -90,32 +85,12 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
-  useEffect(() => {
-    if (
-      currentCompany &&
-      currentCompany?.settings?.name.includes(t('untitled')) &&
-      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
-    ) {
-      localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
-      setIsCompanyEditModalOpened(true);
-    }
-  }, []);
-
-  const { isOwner } = useAdmin();
-
   return (
     <>
       <CompanyCreate
         isModalOpen={isCompanyCreateModalOpened}
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
-
-      {isOwner && (
-        <CompanyEdit
-          isModalOpen={isCompanyEditModalOpened}
-          setIsModalOpen={setIsCompanyEditModalOpened}
-        />
-      )}
 
       <Menu as="div" className="relative inline-block text-left w-full">
         <Menu.Button className="flex items-center justify-between w-full rounded font-medium pl-2">

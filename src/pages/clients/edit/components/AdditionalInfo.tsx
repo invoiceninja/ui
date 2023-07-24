@@ -64,11 +64,17 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   ) => {
     const $client = cloneDeep(client)!;
 
-    if (property === 'send_reminders' && value === '') {
-      delete $client.settings?.send_reminders;
+    if (property !== 'currency_id' && value === '') {
+      delete $client.settings?.[property];
     } else {
       set($client, `settings.${property}`, value);
     }
+
+    // if (property === 'send_reminders' && value === '') {
+    //   delete $client.settings?.send_reminders;
+    // } else {
+    //   set($client, `settings.${property}`, value);
+    // }
 
     setClient($client);
   };

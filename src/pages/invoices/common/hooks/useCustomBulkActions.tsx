@@ -19,6 +19,7 @@ import {
   MdMarkEmailRead,
   MdPaid,
   MdPrint,
+  MdRefresh,
 } from 'react-icons/md';
 import { usePrintPdf } from './usePrintPdf';
 import { useDownloadPdfs } from './useDownloadPdfs';
@@ -30,6 +31,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
+import { useReverseInvoice } from './useReverseInvoice';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -40,6 +42,8 @@ export const useCustomBulkActions = () => {
   const enterPayment = useEnterPayment();
 
   const bulk = useBulk();
+
+  const reverseInvoice = useReverseInvoice();
 
   const showAutoBillAction = (invoices: Invoice[]) => {
     return !invoices.some((invoice) => !isInvoiceAutoBillable(invoice));
@@ -82,6 +86,16 @@ export const useCustomBulkActions = () => {
     return !invoices.some(
       ({ status_id, is_deleted }) =>
         parseInt(status_id) > parseInt(InvoiceStatus.Partial) || is_deleted
+    );
+  };
+
+  const showReverseOption = (invoices: Invoice[]) => {
+    return !invoices.some(
+      ({ status_id, is_deleted, archived_at }) =>
+        (status_id !== InvoiceStatus.Paid &&
+          status_id !== InvoiceStatus.Partial) ||
+        is_deleted ||
+        archived_at
     );
   };
 
@@ -155,6 +169,16 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    (_, selectedInvoices) =>
+      selectedInvoices &&
+      showReverseOption(selectedInvoices) && (
+        <DropdownElement
+          onClick={() => reverseInvoice(selectedInvoices[0])}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
+        </DropdownElement>
+      ),
     (selectedIds, selectedInvoices) =>
       selectedInvoices &&
       showCancelOption(selectedInvoices) && (

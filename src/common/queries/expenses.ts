@@ -50,9 +50,10 @@ export function useExpenseQuery(params: ExpenseParams) {
   return useQuery<Expense>(
     route('/api/v1/expenses/:id', { id: params.id }),
     () =>
-      request('GET', endpoint('/api/v1/expenses/:id?include=category', { id: params.id })).then(
-        (response) => response.data.data
-      ),
+      request(
+        'GET',
+        endpoint('/api/v1/expenses/:id?include=category', { id: params.id })
+      ).then((response) => response.data.data),
     { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

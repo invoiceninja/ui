@@ -109,6 +109,7 @@ export function useInvoiceProject() {
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          tax_id: '',
         };
 
         item.notes = [

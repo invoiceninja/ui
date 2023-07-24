@@ -39,6 +39,7 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
+  MdRefresh,
   MdRestore,
   MdSchedule,
   MdSend,
@@ -57,6 +58,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
+import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -78,6 +80,8 @@ export function useActions() {
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
+
+  const reverseInvoice = useReverseInvoice();
 
   const bulk = useBulk();
 
@@ -299,6 +303,18 @@ export function useActions() {
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Paid ||
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !invoice.is_deleted &&
+      !invoice.archived_at && (
+        <DropdownElement
+          onClick={() => reverseInvoice(invoice)}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,

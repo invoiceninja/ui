@@ -52,8 +52,6 @@ export function CompanyCreate(props: Props) {
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
-    localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
-
     queryClient.invalidateQueries();
 
     window.location.href = route('/');
@@ -90,7 +88,10 @@ export function CompanyCreate(props: Props) {
             .catch((error: AxiosError) => {
               console.error(error);
               toast.error();
-            });
+            })
+            .finally(() =>
+              localStorage.setItem('COMPANY-EDIT-OPENED', 'false')
+            );
         })
         .catch((error: AxiosError) => {
           console.error(error);

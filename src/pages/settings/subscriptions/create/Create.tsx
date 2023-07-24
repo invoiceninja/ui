@@ -32,8 +32,11 @@ import { Frequency } from '$app/common/enums/frequency';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Create() {
+  const { documentTitle } = useTitle('new_payment_link');
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -120,7 +123,7 @@ export function Create() {
 
   return (
     <Settings
-      title={t('new_payment_link')}
+      title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}

@@ -27,18 +27,18 @@ export function useCustomBulkActions() {
   const customBulkActions: CustomBulkAction<Quote>[] = [
     (selectedIds) => (
       <>
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
         <DropdownElement
-        onClick={() => downloadPdfs(selectedIds)}
+          onClick={() => printPdf(selectedIds)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
+        </DropdownElement>
+        <DropdownElement
+          onClick={() => downloadPdfs(selectedIds)}
           icon={<Icon element={MdDownload} />}
-      >
-        {t('download_pdf')}
-      </DropdownElement>
+        >
+          {t('download_pdf')}
+        </DropdownElement>
       </>
     ),
   ];
