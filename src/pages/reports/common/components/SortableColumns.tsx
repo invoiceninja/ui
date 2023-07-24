@@ -125,6 +125,7 @@ interface Props {
 }
 
 const positions = ['client', 'invoice', 'credit', 'quote', 'payment', 'vendor', 'purchase_order', 'task', 'expense', 'recurring_invoice'];
+const reportColumn = 10;
 
 export function SortableColumns({ columns, setReportKeys, report }: Props) {
   const [data] = useState([
@@ -187,7 +188,7 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
 
     update(`preferences.reports.columns.${report}`, [...$data]);
 
-    setReportKeys(collect($data[10]).pluck('value').toArray());
+    setReportKeys(collect($data[reportColumn]).pluck('value').toArray());
   };
 
   const onRemove = (record: Record) => {
@@ -202,7 +203,7 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
     // Remove it from the reports
     const $data = cloneDeep(data);
 
-    $data[10] = $data[10].filter((r) => r.value !== record.value);
+    $data[reportColumn] = $data[reportColumn].filter((r) => r.value !== record.value);
 
     // Add it back to the original
     $data[index].push(record);
@@ -249,7 +250,7 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
   const onAddAll = (index: number) => {
     const $data = cloneDeep(data);
 
-    $data[10] = [...$data[10], ...$data[index]];
+    $data[reportColumn] = [...$data[reportColumn], ...$data[index]];
 
     $data[index] = [];
 
@@ -444,8 +445,8 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
                   </button>
                 </div>
               )}
-              data={data[10]}
-              droppableId="10"
+              data={data[reportColumn]}
+              droppableId={reportColumn.toString()}
               isDropDisabled={false}
               onRemove={onRemove}
             />
