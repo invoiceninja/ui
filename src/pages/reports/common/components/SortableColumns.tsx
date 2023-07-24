@@ -9,7 +9,7 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   DropResult,
@@ -137,42 +137,46 @@ const positions = [
 ];
 const reportColumn = 10;
 
-export function SortableColumns({ columns, setReportKeys, report }: Props) {
-  const [data] = useState([
-    columns.includes('client') ? clientMap : [],
-    columns.includes('invoice')
-      ? columns.includes('item')
-        ? invoiceMap.concat(itemMap)
-        : invoiceMap
-      : [],
-    columns.includes('credit')
-      ? columns.includes('item')
-        ? creditMap.concat(itemMap)
-        : creditMap
-      : [],
-    columns.includes('quote')
-      ? columns.includes('item')
-        ? quoteMap.concat(itemMap)
-        : quoteMap
-      : [],
-    columns.includes('payment') ? paymentMap : [],
-    columns.includes('vendor') ? vendorMap : [],
-    columns.includes('purchase_order')
-      ? columns.includes('item')
-        ? purchaseorderMap.concat(itemMap)
-        : purchaseorderMap
-      : [],
-    columns.includes('task') ? taskMap : [],
-    columns.includes('expense') ? expenseMap : [],
-    columns.includes('recurring_invoice')
-      ? columns.includes('item')
-        ? recurringinvoiceMap.concat(itemMap)
-        : recurringinvoiceMap
-      : [],
-    [],
-  ]);
+export function SortableColumns({ report, columns, setReportKeys }: Props) {
+  const { preferences, update } = usePreferences();
 
-  const { update } = usePreferences();
+  const data =
+    report in preferences.reports.columns &&
+      preferences.reports.columns[report as Identifier].length !== 0
+      ? preferences.reports.columns[report]
+      : [
+        columns.includes('client') ? clientMap : [],
+        columns.includes('invoice')
+          ? columns.includes('item')
+            ? invoiceMap.concat(itemMap)
+            : invoiceMap
+          : [],
+        columns.includes('credit')
+          ? columns.includes('item')
+            ? creditMap.concat(itemMap)
+            : creditMap
+          : [],
+        columns.includes('quote')
+          ? columns.includes('item')
+            ? quoteMap.concat(itemMap)
+            : quoteMap
+          : [],
+        columns.includes('payment') ? paymentMap : [],
+        columns.includes('vendor') ? vendorMap : [],
+        columns.includes('purchase_order')
+          ? columns.includes('item')
+            ? purchaseorderMap.concat(itemMap)
+            : purchaseorderMap
+          : [],
+        columns.includes('task') ? taskMap : [],
+        columns.includes('expense') ? expenseMap : [],
+        columns.includes('recurring_invoice')
+          ? columns.includes('item')
+            ? recurringinvoiceMap.concat(itemMap)
+            : recurringinvoiceMap
+          : [],
+        [],
+      ];
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
