@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -18,6 +18,8 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
+import { Alert } from '$app/components/Alert';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -28,18 +30,6 @@ interface Props {
     value: Product[keyof Product]
   ) => void;
 }
-
-export const taxCategories = [
-  { value: '1', label: 'physical_goods' },
-  { value: '2', label: 'services' },
-  { value: '3', label: 'digital_products' },
-  { value: '4', label: 'shipping' },
-  { value: '5', label: 'tax_exempt' },
-  { value: '6', label: 'reduced_tax' },
-  { value: '7', label: 'override_tax' },
-  { value: '8', label: 'zero_rated' },
-  { value: '9', label: 'reverse_tax' },
-];
 
 export function ProductForm(props: Props) {
   const [t] = useTranslation();
@@ -114,17 +104,16 @@ export function ProductForm(props: Props) {
       </Element>
 
       <Element leftSide={t('tax_category')}>
-        <SelectField
+        <TaxCategorySelector
           value={product.tax_id}
-          onValueChange={(value) => handleChange('tax_id', value)}
-          errorMessage={errors?.errors.tax_id}
-        >
-          {taxCategories.map((category) => (
-            <option key={category.value} value={category.value}>
-              {t(category.label)}
-            </option>
-          ))}
-        </SelectField>
+          onChange={(taxCategory) => handleChange('tax_id', taxCategory.value)}
+        />
+
+        {errors?.errors.tax_id ? (
+          <Alert className="mt-2" type="danger">
+            {errors.errors.tax_id}
+          </Alert>
+        ) : null}
       </Element>
 
       <Element leftSide={t('image_url')}>
