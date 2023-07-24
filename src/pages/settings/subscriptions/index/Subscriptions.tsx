@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useSubscriptionColumns } from '../common/hooks/useSubscriptionColumns';
 
 export function Subscriptions() {
-  const { documentTitle } = useTitle('subscriptions');
+  const { documentTitle } = useTitle('payment_links');
 
   const [t] = useTranslation();
 

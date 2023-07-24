@@ -26,7 +26,14 @@ export class InvoiceItemSumInclusive {
   protected grossSubTotal = 0;
   public totalTaxes = 0;
 
-  constructor(protected invoice: Invoice | Credit | Quote | PurchaseOrder | RecurringInvoice) {}
+  constructor(
+    protected invoice:
+      | Invoice
+      | Credit
+      | Quote
+      | PurchaseOrder
+      | RecurringInvoice
+  ) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {

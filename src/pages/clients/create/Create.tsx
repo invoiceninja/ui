@@ -30,8 +30,11 @@ import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useQueryClient } from 'react-query';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export default function Create() {
+  const { documentTitle } = useTitle('new_client');
+
   const [t] = useTranslation();
   const navigate = useNavigate();
 
@@ -113,7 +116,7 @@ export default function Create() {
   };
 
   return (
-    <Default title={t('new_client')} breadcrumbs={pages} onSaveClick={onSave}>
+    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
       {isLoading && <Spinner />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">

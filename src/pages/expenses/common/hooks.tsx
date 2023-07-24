@@ -415,7 +415,9 @@ export function useExpenseColumns() {
         formatMoney(
           value,
           company?.settings.country_id,
-          expense.currency_id ? expense.currency_id : company?.settings.currency_id
+          expense.currency_id
+            ? expense.currency_id
+            : company?.settings.currency_id
         ),
     },
     {

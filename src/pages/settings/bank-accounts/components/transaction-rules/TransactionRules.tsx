@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useTransactionRuleColumns } from './hooks/useTransactionRuleColumns';
 
 export function TransactionRules() {
-  useTitle('bank_accounts');
+  const { documentTitle } = useTitle('transaction_rules');
 
   const [t] = useTranslation();
 
@@ -32,7 +32,7 @@ export function TransactionRules() {
 
   return (
     <Settings
-      title={t('transaction_rules')}
+      title={documentTitle}
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#bank_transaction_rules"
     >

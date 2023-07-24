@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -26,13 +26,16 @@ import { Link } from '../../components/forms/Link';
 import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  changeCurrentIndex,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Register() {
-  const [t] = useTranslation();
+  useTitle('register');
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('register')}`;
-  });
+  const [t] = useTranslation();
 
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
     undefined
@@ -65,7 +68,13 @@ export function Register() {
         return;
       }
 
-      request('POST', endpoint('/api/v1/signup?include=token,user'), values)
+      request(
+        'POST',
+        endpoint(
+          '/api/v1/signup?include=token,user.company_user,company,account'
+        ),
+        values
+      )
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -73,6 +82,9 @@ export function Register() {
               user: response.data.data[0].user,
             })
           );
+
+          dispatch(updateCompanyUsers(response.data.data));
+          dispatch(changeCurrentIndex(0));
         })
         .catch(
           (error: AxiosError<GenericValidationBag<RegisterValidation>>) => {

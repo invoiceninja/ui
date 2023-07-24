@@ -150,11 +150,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={recurringExpense.tax_name1}
                 onValueChange={(value) => handleChange('tax_name1', value)}
                 errorMessage={errors?.errors.tax_name1}
               />
               <InputField
                 label={t('tax_amount')}
+                value={recurringExpense.tax_amount1}
                 onValueChange={(value) =>
                   handleChange('tax_amount1', parseFloat(value))
                 }
@@ -193,11 +195,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={recurringExpense.tax_name2}
                 onValueChange={(value) => handleChange('tax_name2', value)}
                 errorMessage={errors?.errors.tax_name2}
               />
               <InputField
                 label={t('tax_amount')}
+                value={recurringExpense.tax_amount2}
                 onValueChange={(value) =>
                   handleChange('tax_amount2', parseFloat(value))
                 }
@@ -236,11 +240,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={recurringExpense.tax_name3}
                 onValueChange={(value) => handleChange('tax_name3', value)}
                 errorMessage={errors?.errors.tax_name3}
               />
               <InputField
                 label={t('tax_amount')}
+                value={recurringExpense.tax_amount3}
                 onValueChange={(value) =>
                   handleChange('tax_amount3', parseFloat(value))
                 }

@@ -17,27 +17,27 @@ import { useAtomValue } from 'jotai';
 import { useQueryClient } from 'react-query';
 
 export function useMarkPaid() {
-    const queryClient = useQueryClient();
-    const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-    return (credit: Credit) => {
-        toast.processing();
+  return (credit: Credit) => {
+    toast.processing();
 
-        request(
-            'PUT',
-            endpoint('/api/v1/credits/:id?mark_paid=true', { id: credit.id }),
-            credit
-        )
-            .then(() => {
-                invalidateQueryValue &&
-                    queryClient.invalidateQueries([invalidateQueryValue]);
+    request(
+      'PUT',
+      endpoint('/api/v1/credits/:id?mark_paid=true', { id: credit.id }),
+      credit
+    )
+      .then(() => {
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
-                toast.success('updated_credit');
-            })
-            .catch((error) => {
-                console.error(error);
+        toast.success('updated_credit');
+      })
+      .catch((error) => {
+        console.error(error);
 
-                toast.error();
-            });
-    };
+        toast.error();
+      });
+  };
 }

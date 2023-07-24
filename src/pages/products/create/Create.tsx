@@ -28,8 +28,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
 import { useQueryClient } from 'react-query';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export default function Create() {
+  const { documentTitle } = useTitle('new_product');
+
   const [t] = useTranslation();
   const queryClient = useQueryClient();
 
@@ -104,7 +107,7 @@ export default function Create() {
 
   return (
     <Default
-      title={t('new_product')}
+      title={documentTitle}
       breadcrumbs={pages}
       disableSaveButton={!data || isFormBusy}
       onSaveClick={handleSave}
