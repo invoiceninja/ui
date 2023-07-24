@@ -23,7 +23,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankProjectQuery } from '$app/common/queries/projects';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Container } from '$app/components/Container';
-import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import { Default } from '$app/components/layouts/Default';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -32,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -152,20 +152,11 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('user')}>
-            <DebouncedCombobox
-              defaultValue={project?.assigned_user_id}
-              endpoint="/api/v1/users"
-              label="first_name"
-              formatLabel={(resource) =>
-                `${resource.first_name} ${resource.last_name}`
-              }
-              onChange={(value) =>
-                handleChange('assigned_user_id', value.value)
-              }
-              clearButton={Boolean(project?.assigned_user_id)}
+            <UserSelector
+              value={project?.assigned_user_id}
+              onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}
-              queryAdditional
             />
           </Element>
 

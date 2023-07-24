@@ -135,7 +135,6 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('design')}
                   value={recurringInvoice?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(recurringInvoice?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
@@ -158,6 +157,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={recurringInvoice?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>

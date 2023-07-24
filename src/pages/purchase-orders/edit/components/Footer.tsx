@@ -125,7 +125,6 @@ export function Footer(props: PurchaseOrderCardProps) {
                 inputLabel={t('design')}
                 value={purchaseOrder?.design_id}
                 onChange={(design) => handleChange('design_id', design.id)}
-                clearButton={Boolean(purchaseOrder?.design_id)}
                 onClearButtonClick={() => handleChange('design_id', '')}
                 disableWithQueryParameter
                 errorMessage={errors?.errors.design_id}

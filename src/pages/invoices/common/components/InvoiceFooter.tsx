@@ -172,7 +172,6 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('design')}
                   value={invoice?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(invoice?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
@@ -194,9 +193,8 @@ export function InvoiceFooter(props: Props) {
                 <VendorSelector
                   inputLabel={t('vendor')}
                   value={invoice?.vendor_id}
-                  clearButton={Boolean(invoice?.vendor_id)}
-                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>

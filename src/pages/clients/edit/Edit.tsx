@@ -105,6 +105,8 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_client');
 
+        queryClient.invalidateQueries('/api/v1/clients');
+
         queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
 
         navigate(route('/clients/:id', { id }));

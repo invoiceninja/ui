@@ -16,10 +16,7 @@ import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-pr
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankDesignQuery } from '$app/common/queries/designs';
 import { Button, InputField } from '$app/components/forms';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { Modal } from '$app/components/Modal';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -32,8 +29,6 @@ interface Props extends GenericSelectorProps<Design> {
 }
 
 export function DesignSelector(props: Props) {
-  const defaultProps: Props = { actionVisibility: true, ...props };
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -84,12 +79,6 @@ export function DesignSelector(props: Props) {
     }
   };
 
-  const actionProps: { onActionClick?: () => void } = {};
-
-  if (defaultProps.actionVisibility !== false) {
-    actionProps.onActionClick = () => setIsModalVisible(true);
-  }
-
   return (
     <>
       <Modal
@@ -106,22 +95,36 @@ export function DesignSelector(props: Props) {
           errorMessage={errors?.errors.name}
         />
 
-        <DebouncedCombobox
-          {...props}
-          value="id"
-          endpoint="/api/v1/designs?per_page=500&status=active"
-          label="name"
-          defaultValue={props.value}
-          onChange={(design: Record<Design>) =>
-            setDesign((current) => {
-              if (current && design.resource?.design) {
-                return { ...current, design: design.resource.design };
-              }
-
-              return current;
-            })
+        <ComboboxAsync<Design>
+          endpoint={
+            new URL(endpoint('/api/v1/designs?per_page=500&status=active'))
           }
-          inputLabel={t('design')}
+          onChange={(design: Entry<Design>) =>
+            setDesign(
+              (current) =>
+                design.resource && {
+                  ...design.resource,
+                  name: current?.name || '',
+                }
+            )
+          }
+          inputOptions={{
+            label: props.inputLabel?.toString(),
+            value: design?.id || null,
+          }}
+          entryOptions={{
+            id: 'id',
+            label: 'name',
+            value: 'id',
+          }}
+          action={{
+            label: t('new_design'),
+            onClick: () => setIsModalVisible(true),
+            visible:
+              typeof props.actionVisibility === 'undefined' ||
+              props.actionVisibility,
+          }}
+          onDismiss={() => setDesign(null)}
           disableWithQueryParameter={props.disableWithQueryParameter}
           errorMessage={
             errors?.errors['design.header'] ||
@@ -134,18 +137,30 @@ export function DesignSelector(props: Props) {
         <Button onClick={handleCreate}>{t('save')}</Button>
       </Modal>
 
-      <DebouncedCombobox
-        {...props}
-        {...actionProps}
-        value="id"
-        endpoint="/api/v1/designs?status=active"
-        label="name"
-        defaultValue={props.value}
-        disableWithQueryParameter={props.disableWithQueryParameter}
-        onChange={(design: Record<Design>) => {
-          design.resource && props.onChange(design.resource);
+      <ComboboxAsync<Design>
+        endpoint={new URL(endpoint('/api/v1/designs?status=active'))}
+        onChange={(design: Entry<Design>) =>
+          design.resource && props.onChange(design.resource)
+        }
+        inputOptions={{
+          label: props.inputLabel?.toString(),
+          value: props.value || null,
         }}
-        actionLabel={t('new_design')}
+        entryOptions={{
+          id: 'id',
+          label: 'name',
+          value: 'id',
+        }}
+        action={{
+          label: t('new_design'),
+          onClick: () => setIsModalVisible(true),
+          visible:
+            typeof props.actionVisibility === 'undefined' ||
+            props.actionVisibility,
+        }}
+        onDismiss={props.onClearButtonClick}
+        disableWithQueryParameter={props.disableWithQueryParameter}
+        errorMessage={props.errorMessage}
       />
     </>
   );
