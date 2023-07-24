@@ -13,6 +13,11 @@ import { useTranslation } from 'react-i18next';
 import { Task } from '$app/common/interfaces/task';
 import { StatusBadge } from '$app/components/StatusBadge';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 interface Props {
   entity: Task;
@@ -21,7 +26,10 @@ interface Props {
 export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
-  const { invoice_id, archived_at, is_deleted, time_log } = props.entity;
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { invoice_id, archived_at, is_deleted, time_log, status } =
+    props.entity;
 
   const isRunning = () => {
     const timeLogs = parseTimeLog(time_log);
@@ -42,5 +50,22 @@ export function TaskStatus(props: Props) {
 
   if (isRunning()) return <Badge variant="light-blue">{t('running')}</Badge>;
 
-  return <StatusBadge for={{}} code={props.entity.status?.name || 'logged'} />;
+  if (status) {
+    const { red, green, blue } = hexToRGB(status.color);
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    return (
+      <StatusBadge
+        for={{}}
+        code={status.name}
+        style={{
+          color: adjustColorDarkness(status.color, darknessAmount),
+          backgroundColor: status.color,
+        }}
+      />
+    );
+  }
+
+  return <StatusBadge for={{}} code="logged" />;
 }
