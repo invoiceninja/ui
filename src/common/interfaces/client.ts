@@ -9,6 +9,7 @@
  */
 
 import { ClientContact } from './client-contact';
+import { TaxInfo } from './tax-info';
 import { Timestamps } from './timestamps';
 
 interface Meta {
@@ -79,4 +80,5 @@ export interface Client extends Timestamps {
   has_valid_vat_number: boolean;
   is_tax_exempt: boolean;
   routing_id: string;
+  tax_info?: TaxInfo;
 }

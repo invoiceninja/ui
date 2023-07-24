@@ -10,6 +10,7 @@
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Invitation } from './purchase-order';
+import { TaxInfo } from './tax-info';
 
 export interface Invoice {
   id: string;
@@ -76,4 +77,5 @@ export interface Invoice {
   invitations: Invitation[];
   documents: any[];
   client?: Client;
+  tax_info?: TaxInfo;
 }
