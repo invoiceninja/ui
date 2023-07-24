@@ -99,14 +99,6 @@ export default function Create() {
 
         queryClient.invalidateQueries('/api/v1/clients');
 
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/clients'),
-            },
-          })
-        );
-
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {

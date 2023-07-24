@@ -107,14 +107,6 @@ export default function Edit() {
 
         queryClient.invalidateQueries('/api/v1/clients');
 
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/clients'),
-            },
-          })
-        );
-
         queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
 
         navigate(route('/clients/:id', { id }));

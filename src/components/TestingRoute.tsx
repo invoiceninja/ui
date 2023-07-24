@@ -11,7 +11,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
 export function TestingRoute() {
-  const isTestEnv = import.meta.env.VITE_IS_TEST === 'true';
-
-  return isTestEnv ? <Outlet /> : <Navigate to="/logout" />;
+  return import.meta.env.VITE_IS_TEST === 'true' ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/logout" />
+  );
 }
