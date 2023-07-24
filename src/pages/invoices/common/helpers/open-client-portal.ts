@@ -14,12 +14,22 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
-export function openClientPortal(
+export function generateClientPortalUrl(
   resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder
 ) {
   if (resource.invitations.length > 0) {
-    window
-      .open(`${resource.invitations[0].link}?silent=true`, '_blank')
-      ?.focus();
+    return `${resource.invitations[0].link}?silent=true`;
+  }
+
+  return null;
+}
+
+export function openClientPortal(
+  resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder
+) {
+  const url = generateClientPortalUrl(resource);
+
+  if (url) {
+    window.open(url, '_blank')?.focus();
   }
 }
