@@ -19,24 +19,21 @@ import {
   Tr,
 } from '$app/components/tables';
 import { Settings } from '$app/components/layouts/Settings';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function GroupSettings() {
+  const { documentTitle } = useTitle('group_settings');
+
   const [t] = useTranslation();
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('group_settings'), href: '/settings/group_settings' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'group_settings'
-    )}`;
-  });
 
   return (
     <Settings
-      title={t('group_settings')}
+      title={documentTitle}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#group_settings"
     >
