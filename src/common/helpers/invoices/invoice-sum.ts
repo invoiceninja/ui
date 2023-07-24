@@ -229,18 +229,18 @@ export class InvoiceSum {
 
   protected setCalculatedAttributes() {
     // if (this.invoice.status_id !== InvoiceStatus.Draft) {
-      if (this.invoice.amount !== this.invoice.balance) {
-        const paidToDate = this.invoice.amount - this.invoice.balance;
+    if (this.invoice.amount !== this.invoice.balance) {
+      const paidToDate = this.invoice.amount - this.invoice.balance;
 
-        this.invoice.balance =
-          parseFloat(
-            NumberFormatter.formatValue(this.total, this.currency.precision)
-          ) - paidToDate;
-      } else {
-        this.invoice.balance = parseFloat(
+      this.invoice.balance =
+        parseFloat(
           NumberFormatter.formatValue(this.total, this.currency.precision)
-        );
-      }
+        ) - paidToDate;
+    } else {
+      this.invoice.balance = parseFloat(
+        NumberFormatter.formatValue(this.total, this.currency.precision)
+      );
+    }
     // }
 
     this.invoice.amount = parseFloat(

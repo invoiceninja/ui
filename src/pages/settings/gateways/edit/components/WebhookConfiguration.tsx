@@ -18,28 +18,38 @@ import { Gateway } from '$app/common/interfaces/statics';
 import collect from 'collect.js';
 
 interface Props {
-    companyGateway: CompanyGateway;
-    gateway: Gateway;
+  companyGateway: CompanyGateway;
+  gateway: Gateway;
 }
 
 export function WebhookConfiguration(props: Props) {
-    const [t] = useTranslation();
-    const company = useCurrentCompany();
+  const [t] = useTranslation();
+  const company = useCurrentCompany();
 
-    return (
+  return (
+    <Card title={t('webhooks')}>
+      <Element leftSide={t('webhook_url')}>
+        <CopyToClipboard
+          text={`${apiEndpoint()}/payment_webhook/${company.company_key}/${
+            props.companyGateway.id
+          }`}
+        />
+      </Element>
 
-        <Card title={t('webhooks')}>
-            <Element leftSide={t('webhook_url')}>
-                <CopyToClipboard text={`${apiEndpoint()}/payment_webhook/${company.company_key}/${props.companyGateway.id}`} />
-            </Element>
-            
-            <Element leftSide={t('supported_events')}>
-                <ul className="list-disc">
-                    {collect(Object.values(props.gateway.options)).pluck('webhooks').flatten().unique().whereNotNull().all().sort().map((element: string, index: number) => {
-                        return <li key={index}>{element}</li>
-                    })}
-                </ul>
-            </Element>
-        </Card>
-    )
+      <Element leftSide={t('supported_events')}>
+        <ul className="list-disc">
+          {collect(Object.values(props.gateway.options))
+            .pluck('webhooks')
+            .flatten()
+            .unique()
+            .whereNotNull()
+            .all()
+            .sort()
+            .map((element: string, index: number) => {
+              return <li key={index}>{element}</li>;
+            })}
+        </ul>
+      </Element>
+    </Card>
+  );
 }

@@ -57,7 +57,6 @@ export function Column({
 }: ColumnProps) {
   const [t] = useTranslation();
 
-
   const translateLabel = (record: Record) => {
     const parts = record.value.split('.');
 
@@ -124,7 +123,18 @@ interface Props {
   setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
-const positions = ['client', 'invoice', 'credit', 'quote', 'payment', 'vendor', 'purchase_order', 'task', 'expense', 'recurring_invoice'];
+const positions = [
+  'client',
+  'invoice',
+  'credit',
+  'quote',
+  'payment',
+  'vendor',
+  'purchase_order',
+  'task',
+  'expense',
+  'recurring_invoice',
+];
 const reportColumn = 10;
 
 export function SortableColumns({ columns, setReportKeys, report }: Props) {
@@ -147,14 +157,14 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
       : [],
     columns.includes('payment') ? paymentMap : [],
     columns.includes('vendor') ? vendorMap : [],
-    columns.includes('purchase_order') 
+    columns.includes('purchase_order')
       ? columns.includes('item')
         ? purchaseorderMap.concat(itemMap)
         : purchaseorderMap
       : [],
     columns.includes('task') ? taskMap : [],
     columns.includes('expense') ? expenseMap : [],
-    columns.includes('recurring_invoice') 
+    columns.includes('recurring_invoice')
       ? columns.includes('item')
         ? recurringinvoiceMap.concat(itemMap)
         : recurringinvoiceMap
@@ -203,7 +213,9 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
     // Remove it from the reports
     const $data = cloneDeep(data);
 
-    $data[reportColumn] = $data[reportColumn].filter((r) => r.value !== record.value);
+    $data[reportColumn] = $data[reportColumn].filter(
+      (r) => r.value !== record.value
+    );
 
     // Add it back to the original
     $data[index].push(record);
@@ -397,7 +409,7 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
                 isDropDisabled={true}
               />
             )}
-            
+
             {columns.includes('expense') && (
               <Column
                 title={() => (
@@ -414,7 +426,7 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
                 isDropDisabled={true}
               />
             )}
-            
+
             {columns.includes('recurring_invoice') && (
               <Column
                 title={() => (
@@ -431,7 +443,6 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
                 isDropDisabled={true}
               />
             )}
-            
 
             <Column
               title={() => (

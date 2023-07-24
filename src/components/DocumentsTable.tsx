@@ -48,48 +48,48 @@ export function DocumentsTable(props: Props) {
   const queryClient = useQueryClient();
 
   const downloadDocument = (doc: Document, inline: boolean) => {
-
     toast.processing();
 
-    queryClient.fetchQuery(endpoint('/documents/:hash', { hash: doc.hash }), () =>
-      request(
-        'GET',
-        endpoint('/documents/:hash', { hash: doc.hash }),
-        { headers: defaultHeaders() },
-        { responseType: 'arraybuffer' }
-      )
-        .then((response) => {
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          const url = URL.createObjectURL(blob);
+    queryClient.fetchQuery(
+      endpoint('/documents/:hash', { hash: doc.hash }),
+      () =>
+        request(
+          'GET',
+          endpoint('/documents/:hash', { hash: doc.hash }),
+          { headers: defaultHeaders() },
+          { responseType: 'arraybuffer' }
+        )
+          .then((response) => {
+            const blob = new Blob([response.data], {
+              type: response.headers['content-type'],
+            });
+            const url = URL.createObjectURL(blob);
 
-          if (inline) {
+            if (inline) {
+              window.open(url);
+              return;
+            }
 
-            window.open(url);
-            return;
+            const link = document.createElement('a');
 
-          }
+            link.download = doc.name;
+            link.href = url;
+            link.target = '_blank';
 
-          const link = document.createElement('a');
+            document.body.appendChild(link);
 
-          link.download = doc.name;
-          link.href = url;
-          link.target = '_blank';
+            link.click();
 
-          document.body.appendChild(link);
+            document.body.removeChild(link);
 
-          link.click();
-
-          document.body.removeChild(link);
-
-          toast.dismiss();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        })
+            toast.dismiss();
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error();
+          })
     );
-
-  }
+  };
 
   const destroy = (password: string) => {
     toast.processing();
@@ -153,7 +153,6 @@ export function DocumentsTable(props: Props) {
                     icon={<Icon element={MdPageview} />}
                   >
                     {t('view')}
-
                   </DropdownElement>
 
                   <DropdownElement

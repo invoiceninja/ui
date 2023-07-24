@@ -18,7 +18,6 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-
 export function ImportCustomers() {
   const [t] = useTranslation();
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
@@ -59,7 +58,6 @@ export function ImportCustomers() {
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
       />
-
     </>
   );
 }
