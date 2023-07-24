@@ -199,7 +199,7 @@ export function useResolveInputField(props: Props) {
       const lineItem = resource?.line_items[index];
 
       // If the value is set to override taxes (7), show the regular element
-      if (lineItem.tax_id === '7') {
+      if (lineItem.tax_id === '7' || lineItem.tax_id === "") {
         return (
           <TaxRateSelector
             key={`${property}${resource?.line_items[index][property]}`}
