@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
 import { ClickableElement, Element } from '$app/components/cards';
@@ -89,7 +88,6 @@ export function InvoiceSlider() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -165,9 +163,8 @@ export function InvoiceSlider() {
               {invoice
                 ? formatMoney(
                     invoice?.amount,
-                    invoice.client?.country_id || company?.settings.country_id,
-                    invoice.client?.settings.currency_id ||
-                      company?.settings.currency_id
+                    invoice.client?.country_id,
+                    invoice.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -176,9 +173,8 @@ export function InvoiceSlider() {
               {invoice
                 ? formatMoney(
                     invoice.balance,
-                    invoice.client?.country_id || company?.settings.country_id,
-                    invoice.client?.settings.currency_id ||
-                      company?.settings.currency_id
+                    invoice.client?.country_id,
+                    invoice.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -238,10 +234,8 @@ export function InvoiceSlider() {
                       <p>
                         {formatMoney(
                           payment.amount,
-                          payment.client?.country_id ||
-                            company.settings.country_id,
-                          payment.client?.settings.currency_id ||
-                            company.settings.currency_id
+                          payment.client?.country_id,
+                          payment.client?.settings.currency_id
                         )}
                       </p>
                       <p>&middot;</p>
@@ -292,10 +286,8 @@ export function InvoiceSlider() {
                       {invoice?.client
                         ? formatMoney(
                             activity.history.amount,
-                            invoice?.client?.country_id ||
-                              company.settings.country_id,
-                            invoice?.client?.settings.currency_id ||
-                              company.settings.currency_id
+                            invoice?.client?.country_id,
+                            invoice?.client?.settings.currency_id
                           )
                         : null}
                     </span>

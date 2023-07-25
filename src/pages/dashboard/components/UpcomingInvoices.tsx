@@ -14,14 +14,12 @@ import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms/Link';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 
 export function UpcomingInvoices() {
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -56,8 +54,8 @@ export function UpcomingInvoices() {
         <Badge variant="blue">
           {formatMoney(
             value,
-            invoice.client?.country_id || company.settings.country_id,
-            invoice.client?.settings.currency_id || company.settings.currency_id
+            invoice.client?.country_id,
+            invoice.client?.settings.currency_id
           )}
         </Badge>
       ),

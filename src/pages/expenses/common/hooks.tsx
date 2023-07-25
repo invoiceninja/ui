@@ -161,7 +161,6 @@ export function useActions() {
     };
 
     const formatMoney = useFormatMoney();
-    const company = useCurrentCompany();
 
     if (!data) {
       return null;
@@ -185,7 +184,7 @@ export function useActions() {
               <p>
                 {formatMoney(
                   invoice.amount,
-                  invoice.client?.country_id ?? company.settings.country_id,
+                  invoice.client?.country_id,
                   invoice.client?.settings.currency_id
                 )}
               </p>
@@ -412,13 +411,7 @@ export function useExpenseColumns() {
       id: 'amount',
       label: t('amount'),
       format: (value, expense) =>
-        formatMoney(
-          value,
-          company?.settings.country_id,
-          expense.currency_id
-            ? expense.currency_id
-            : company?.settings.currency_id
-        ),
+        formatMoney(value, company?.settings.country_id, expense.currency_id),
     },
     {
       column: 'public_notes',
@@ -494,12 +487,8 @@ export function useExpenseColumns() {
       column: 'net_amount',
       id: 'amount',
       label: t('net_amount'),
-      format: (value) =>
-        formatMoney(
-          value,
-          company?.settings.country_id,
-          company?.settings.currency_id
-        ),
+      format: (value, expense) =>
+        formatMoney(value, company?.settings.country_id, expense.currency_id),
     },
     {
       column: 'payment_date',

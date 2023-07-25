@@ -315,7 +315,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.invoices.invoiced_amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString()
                       )}
                     </span>
                   </Badge>
@@ -328,7 +328,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.revenue.paid_to_date || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString()
                       )}
                     </span>
                   </Badge>
@@ -341,7 +341,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.outstanding.amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString()
                       )}
                     </span>
                   </Badge>
