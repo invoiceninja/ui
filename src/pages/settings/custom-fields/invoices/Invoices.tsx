@@ -17,6 +17,10 @@ import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
+import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
 
 export function Invoices() {
   const { documentTitle } = useTitle('custom_fields');
@@ -31,19 +35,32 @@ export function Invoices() {
     { name: t('invoices'), href: '/settings/custom_fields/invoices' },
   ];
 
+  const company = useCurrentCompany();
+  const handleChange = useHandleCustomFieldChange();
+  const handleSurchargesChange = useHandleCustomSurchargeFieldChange();
+  const save = useHandleCompanySave();
+
   return (
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#custom_fields"
+      onSaveClick={save}
     >
       <CustomFieldsPlanAlert />
 
       <Card title={`${t('custom_fields')}: ${t('invoices')}`}>
         {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('invoice_field')} />
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('invoice_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
         ))}
       </Card>
+
       <Card>
         {['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
           (field, index) => (
@@ -53,6 +70,10 @@ export function Invoices() {
                 <InputField
                   id={field}
                   placeholder={t('surcharge_field')}
+                  value={company.custom_fields[field]}
+                  onValueChange={(value) =>
+                    handleSurchargesChange(field, value)
+                  }
                   disabled={disabledCustomFields}
                 />
               }
