@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -18,6 +18,8 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
+import { Alert } from '$app/components/Alert';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -102,21 +104,16 @@ export function ProductForm(props: Props) {
       </Element>
 
       <Element leftSide={t('tax_category')}>
-        <SelectField
+        <TaxCategorySelector
           value={product.tax_id}
-          onValueChange={(value) => handleChange('tax_id', value)}
-          errorMessage={errors?.errors.tax_id}
-        >
-          <option value="1">{t('physical_goods')}</option>
-          <option value="2">{t('services')}</option>
-          <option value="3">{t('digital_products')}</option>
-          <option value="4">{t('shipping')}</option>
-          <option value="5">{t('tax_exempt')}</option>
-          <option value="6">{t('reduced_tax')}</option>
-          <option value="7">{t('override_tax')}</option>
-          <option value="8">{t('zero_rated')}</option>
-          <option value="9">{t('reverse_tax')}</option>
-        </SelectField>
+          onChange={(taxCategory) => handleChange('tax_id', taxCategory.value)}
+        />
+
+        {errors?.errors.tax_id ? (
+          <Alert className="mt-2" type="danger">
+            {errors.errors.tax_id}
+          </Alert>
+        ) : null}
       </Element>
 
       <Element leftSide={t('image_url')}>
