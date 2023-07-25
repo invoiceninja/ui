@@ -99,10 +99,10 @@ export function InvoiceSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/payments?invoice_id=${invoice?.id}&include=client`)
+        endpoint(`/api/v1/invoices/${invoice?.id}?include=client,payments`)
       ).then(
-        (response: AxiosResponse<GenericManyResponse<Payment>>) =>
-          response.data.data
+        (response: AxiosResponse<GenericManyResponse<Invoice>>) =>
+          response.data.data.payments
       ),
     enabled: invoice !== null && isVisible,
   });
