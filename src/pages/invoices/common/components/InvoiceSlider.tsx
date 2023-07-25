@@ -29,7 +29,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { Payment } from '$app/common/interfaces/payment';
 import { AxiosResponse } from 'axios';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoiceStatus } from './InvoiceStatus';
