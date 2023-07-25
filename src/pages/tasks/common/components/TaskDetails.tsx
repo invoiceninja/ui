@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Task } from '$app/common/interfaces/task';
@@ -168,21 +168,15 @@ export function TaskDetails(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['task1', 'task2', 'task3', 'task4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('task_field')}
-                    onChange={(value: any) =>
-                      handleCustomFieldChange(field, value)
-                    }
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link
+                to="/settings/custom_fields/tasks"
+                className="capitalize"
+              >
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>
