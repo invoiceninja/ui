@@ -339,8 +339,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       invoice.balance,
-                      payment.client?.country_id ?? '1',
-                      payment.client?.settings.currency_id ?? '1'
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}`,
                 }}
                 onChange={({ resource }) =>
@@ -382,8 +382,8 @@ export default function Create() {
                             'balance'
                           )} ${formatMoney(
                             credit.balance,
-                            payment.client?.country_id ?? '1',
-                            payment.client?.settings.currency_id ?? '1'
+                            payment.client?.country_id,
+                            payment.client?.settings.currency_id
                           )}`,
                       }}
                       onChange={(entry) =>
@@ -450,8 +450,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       credit.balance,
-                      payment.client?.country_id ?? '1',
-                      payment.client?.settings.currency_id ?? '1'
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}`,
                 }}
                 onChange={(entry) =>

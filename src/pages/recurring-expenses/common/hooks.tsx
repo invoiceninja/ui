@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
@@ -123,8 +122,6 @@ export function useRecurringExpenseColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const company = useCurrentCompany();
-
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -201,11 +198,11 @@ export function useRecurringExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value) =>
+      format: (value, recurringExpense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          recurringExpense.client?.country_id,
+          recurringExpense.client?.settings.currency_id
         ),
     },
     {
@@ -283,11 +280,11 @@ export function useRecurringExpenseColumns() {
       column: 'net_amount',
       id: 'amount',
       label: t('net_amount'),
-      format: (value) =>
+      format: (value, recurringExpense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          recurringExpense.client?.country_id,
+          recurringExpense.client?.settings.currency_id
         ),
     },
     {

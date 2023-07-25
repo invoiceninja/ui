@@ -586,7 +586,6 @@ export function useRecurringInvoiceColumns() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
 
@@ -638,9 +637,8 @@ export function useRecurringInvoiceColumns() {
       format: (value, recurringInvoice) =>
         formatMoney(
           value,
-          recurringInvoice.client?.country_id || company.settings.country_id,
-          recurringInvoice.client?.settings.currency_id ||
-            company.settings.currency_id
+          recurringInvoice.client?.country_id,
+          recurringInvoice.client?.settings.currency_id
         ),
     },
     {
@@ -719,10 +717,8 @@ export function useRecurringInvoiceColumns() {
         recurringInvoice.is_amount_discount
           ? formatMoney(
               value,
-              recurringInvoice.client?.country_id ||
-                company?.settings.country_id,
-              recurringInvoice.client?.settings.currency_id ||
-                company?.settings.currency_id
+              recurringInvoice.client?.country_id,
+              recurringInvoice.client?.settings.currency_id
             )
           : `${recurringInvoice.discount}%`,
     },

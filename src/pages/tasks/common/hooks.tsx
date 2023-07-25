@@ -192,8 +192,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           task.rate || company.settings.default_task_rate,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -259,8 +259,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           value,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {

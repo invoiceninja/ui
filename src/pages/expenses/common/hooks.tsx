@@ -411,7 +411,11 @@ export function useExpenseColumns() {
       id: 'amount',
       label: t('amount'),
       format: (value, expense) =>
-        formatMoney(value, company?.settings.country_id, expense.currency_id),
+        formatMoney(
+          value,
+          expense.client?.country_id,
+          expense.currency_id || expense.client?.settings.currency_id
+        ),
     },
     {
       column: 'public_notes',

@@ -31,8 +31,8 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('amount')}: ${formatMoney(
               props?.payment?.amount || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              company.settings.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>
@@ -41,8 +41,8 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('applied')}: ${formatMoney(
               props?.payment?.applied || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              company.settings.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>
@@ -55,8 +55,8 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('refunded')}: ${formatMoney(
               props?.payment?.refunded || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              company.settings.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>

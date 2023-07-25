@@ -61,6 +61,7 @@ export function useExpenseQuery(params: ExpenseParams) {
 interface ExpensesParams extends Params {
   enabled?: boolean;
   matchTransactions?: boolean;
+  include?: string;
 }
 
 export function useExpensesQuery(params: ExpensesParams) {
@@ -70,7 +71,7 @@ export function useExpensesQuery(params: ExpensesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&includes=:includes',
+          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&includes=:includes&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
@@ -78,6 +79,7 @@ export function useExpensesQuery(params: ExpensesParams) {
             filter: params.filter ?? '',
             match_transactions: params.matchTransactions ?? false,
             includes: 'category',
+            include: params.include || '',
           }
         )
       ).then(

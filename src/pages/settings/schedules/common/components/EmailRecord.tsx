@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -35,15 +34,13 @@ export function EmailRecord(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
-  const company = useCurrentCompany();
-
   const { schedule, handleChange, errors } = props;
 
   const formatEntityLabel = (entity: Invoice | Quote) => {
     return `${entity.number} (${formatMoney(
       entity.amount,
-      entity?.client?.country_id || company?.settings.country_id,
-      entity?.client?.settings.currency_id || company?.settings.currency_id
+      entity?.client?.country_id,
+      entity?.client?.settings.currency_id
     )})`;
   };
 
@@ -186,19 +183,15 @@ export function EmailRecord(props: Props) {
               dropdownLabelFn: (purchaseOrder) =>
                 `${purchaseOrder.number} (${formatMoney(
                   purchaseOrder.amount,
-                  purchaseOrder?.vendor?.country_id ||
-                    company?.settings.country_id,
-                  purchaseOrder?.vendor?.currency_id ||
-                    company?.settings.currency_id
+                  purchaseOrder?.vendor?.country_id,
+                  purchaseOrder?.vendor?.currency_id
                 )})`,
               inputLabelFn: (purchaseOrder) =>
                 purchaseOrder
                   ? `${purchaseOrder.number} (${formatMoney(
                       purchaseOrder.amount,
-                      purchaseOrder?.vendor?.country_id ||
-                        company?.settings.country_id,
-                      purchaseOrder?.vendor?.currency_id ||
-                        company?.settings.currency_id
+                      purchaseOrder?.vendor?.country_id,
+                      purchaseOrder?.vendor?.currency_id
                     )})`
                   : '',
             }}

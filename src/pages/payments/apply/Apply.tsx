@@ -31,7 +31,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Apply() {
   const queryClient = useQueryClient();
@@ -101,8 +100,6 @@ export default function Apply() {
     [formik.values, formik.isSubmitting]
   );
 
-  const company = useCurrentCompany();
-
   return (
     <Card title={t('apply_payment')}>
       <Element leftSide={t('number')}>{payment?.number}</Element>
@@ -112,27 +109,24 @@ export default function Apply() {
           <Element leftSide={t('amount')}>
             {formatMoney(
               payment?.amount - payment?.refunded,
-              payment.client?.country_id || company.settings.country_id,
-              payment.client?.settings.currency_id ||
-                company.settings.currency_id
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
             )}
           </Element>
 
           <Element leftSide={t('applied')}>
             {formatMoney(
               payment?.applied,
-              payment.client?.country_id || company.settings.country_id,
-              payment.client?.settings.currency_id ||
-                company.settings.currency_id
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
             )}
           </Element>
 
           <Element leftSide={t('unapplied')}>
             {formatMoney(
               payment?.amount - payment?.refunded - payment?.applied,
-              payment.client?.country_id || company.settings.country_id,
-              payment.client?.settings.currency_id ||
-                company.settings.currency_id
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
             )}
           </Element>
         </>
@@ -158,8 +152,8 @@ export default function Apply() {
                   'balance'
                 )} ${formatMoney(
                   invoice.balance,
-                  payment.client?.country_id ?? '1',
-                  payment.client?.settings.currency_id ?? '1'
+                  payment.client?.country_id,
+                  payment.client?.settings.currency_id
                 )}`,
             }}
             onChange={({ resource }) =>
