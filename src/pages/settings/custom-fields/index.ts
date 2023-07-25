@@ -20,3 +20,4 @@ export { Vendors as VendorsCustomFields } from './vendors/Vendors';
 export { Expenses as ExpensesCustomFields } from './expenses/Expenses';
 export { Users as UsersCustomFields } from './users/Users';
 export { Quotes as QuotesCustomFields } from './quotes/Quotes';
+export { Credits as CreditCustomFields } from './credits/Credits';

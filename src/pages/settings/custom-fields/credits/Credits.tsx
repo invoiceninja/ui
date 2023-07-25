@@ -15,7 +15,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Card } from '$app/components/cards';
 import { Field } from '../components';
 
-export function Quotes() {
+export function Credits() {
   const { documentTitle } = useTitle('custom_fields');
 
   const [t] = useTranslation();
@@ -23,7 +23,7 @@ export function Quotes() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('quotes'), href: '/settings/custom_fields/quotes' },
+    { name: t('credits'), href: '/settings/custom_fields/credits' },
   ];
 
   return (
@@ -34,9 +34,9 @@ export function Quotes() {
     >
       <CustomFieldsPlanAlert />
 
-      <Card title={`${t('custom_fields')}: ${t('quotes')}`}>
-        {['quote1', 'quote2', 'quote3', 'quote4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('quote_field')} />
+      <Card title={`${t('custom_fields')}: ${t('credits')}`}>
+        {['credit1', 'credit2', 'credit3', 'credit4'].map((field) => (
+          <Field key={field} field={field} placeholder={t('credit_field')} />
         ))}
       </Card>
     </Settings>

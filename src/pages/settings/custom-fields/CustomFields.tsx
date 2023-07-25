@@ -30,6 +30,7 @@ export function CustomFields() {
     { label: t('invoices'), link: '/settings/custom_fields/invoices' },
     { label: t('payments'), link: '/settings/custom_fields/payments' },
     { label: t('quotes'), link: '/settings/custom_fields/quotes' },
+    { label: t('credits'), link: '/settings/custom_fields/credits' },
     { label: t('projects'), link: '/settings/custom_fields/projects' },
     { label: t('tasks'), link: '/settings/custom_fields/tasks' },
     { label: t('vendors'), link: '/settings/custom_fields/vendors' },
