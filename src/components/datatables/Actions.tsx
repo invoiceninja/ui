@@ -92,6 +92,11 @@ export function Actions(props: Props) {
       },
       color: '#999999',
     }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+    }),
   };
 
   return (
