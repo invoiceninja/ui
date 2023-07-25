@@ -105,6 +105,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('custom_fields'),
+      href: '/settings/custom_fields',
+      current: location.pathname.endsWith('/settings/custom_fields'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
       current: location.pathname.startsWith('/settings/generated_numbers'),
