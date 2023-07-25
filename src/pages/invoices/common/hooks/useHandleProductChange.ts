@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { ProductTableResource } from '../components/ProductsTable';
@@ -19,20 +20,27 @@ interface Props {
 }
 
 export function useHandleProductChange(props: Props) {
+  const company = useCurrentCompany();
+
   const resource = props.resource;
 
   return (index: number, product_key: string, product: Product | null) => {
+    console.log(company.fill_products)
+
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
     lineItem.quantity = product?.quantity || 0;
-    lineItem.cost = product?.price || 0;
+
+    if (company.fill_products) {
+      lineItem.cost = product?.price || 0;
+    }
 
     if (!product) {
       lineItem.notes = '';
     }
 
-    if (props.type == 'product' && product?.notes) {
+    if (props.type == 'product' && product?.notes && company.fill_products) {
       lineItem.notes = product?.notes;
     }
 
