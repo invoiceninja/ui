@@ -22,12 +22,14 @@ export function CustomFields() {
     { name: t('settings'), href: '/settings' },
     { name: t('custom_fields'), href: '/settings/custom_fields' },
   ];
+  
   const modules = [
     { label: t('company'), link: '/settings/custom_fields/company' },
     { label: t('clients'), link: '/settings/custom_fields/clients' },
     { label: t('products'), link: '/settings/custom_fields/products' },
     { label: t('invoices'), link: '/settings/custom_fields/invoices' },
     { label: t('payments'), link: '/settings/custom_fields/payments' },
+    { label: t('quotes'), link: '/settings/custom_fields/quotes' },
     { label: t('projects'), link: '/settings/custom_fields/projects' },
     { label: t('tasks'), link: '/settings/custom_fields/tasks' },
     { label: t('vendors'), link: '/settings/custom_fields/vendors' },

@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 export * from './CustomFields';
 export { Company as CompanyCustomFields } from './company/Company';
 export { Clients as ClientsCustomFields } from './clients/Clients';
@@ -18,3 +19,4 @@ export { Tasks as TasksCustomFields } from './tasks/Tasks';
 export { Vendors as VendorsCustomFields } from './vendors/Vendors';
 export { Expenses as ExpensesCustomFields } from './expenses/Expenses';
 export { Users as UsersCustomFields } from './users/Users';
+export { Quotes as QuotesCustomFields } from './quotes/Quotes';
