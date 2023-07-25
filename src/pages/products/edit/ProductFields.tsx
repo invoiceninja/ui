@@ -14,6 +14,7 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
+import { Link } from '$app/components/forms';
 
 export default function ProductFields() {
   const [t] = useTranslation();
@@ -23,21 +24,15 @@ export default function ProductFields() {
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
-    <>
-      <CustomFieldsPlanAlert />
-
-      <Card title={t('custom_fields')}>
-        {company &&
-          ['product1', 'product2', 'product3', 'product4'].map((field) => (
-            <Field
-              key={field}
-              initialValue={company.custom_fields[field]}
-              field={field}
-              placeholder={t('product_field')}
-              onChange={(value) => handleCustomFieldChange(field, value)}
-            />
-          ))}
-      </Card>
-    </>
+    <Card title={t('custom_fields')} withContainer>
+      <div>
+        <span className="text-sm">
+          {t('custom_fields_location_changed')} &nbsp;
+        </span>
+        <Link to="/settings/custom_fields/products" className="capitalize">
+          {t('click_here')}
+        </Link>
+      </div>
+    </Card>
   );
 }
