@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
@@ -32,6 +32,7 @@ import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
+import { Inline } from '$app/components/Inline';
 
 interface Props {
   client: Client | undefined;
@@ -287,33 +288,21 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert className="px-6" />
-
-          {company &&
-            ['client1', 'client2', 'client3', 'client4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('client_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/clients" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
 
         <div>
-          <CustomFieldsPlanAlert className="px-6" />
-
-          {company &&
-            ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('contact_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/clients" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
 
         {id ? (
