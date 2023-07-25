@@ -43,6 +43,7 @@ import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
+import { Payment } from '$app/common/interfaces/payment';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -223,7 +224,7 @@ export function InvoiceSlider() {
 
           <div className="divide-y">
             {payments &&
-              payments.map((payment) => (
+              payments.map((payment: Payment) => (
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}`}
