@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';
 import { Element } from '$app/components/cards';
@@ -211,48 +211,12 @@ export function InvoiceFooter(props: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert />
-
-          {company &&
-            ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('invoice_field')}
-                onChange={(value: any) => handleCustomFieldChange(field, value)}
-                noExternalPadding
-              />
-            ))}
-
-          <Divider />
-
-          {company &&
-            ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
-              (field, index) => (
-                <Element
-                  noExternalPadding
-                  key={index}
-                  leftSide={
-                    <InputField
-                      id={field}
-                      value={company.custom_fields[field]}
-                      placeholder={t('surcharge_field')}
-                      onValueChange={(value) =>
-                        handleCustomSurchargeFieldChange(field, value)
-                      }
-                      disabled={disabledCustomFields}
-                    />
-                  }
-                >
-                  <Toggle
-                    label={t('charge_taxes')}
-                    checked={surchargeValue(index)}
-                    onChange={() => setSurchargeTaxValue(index)}
-                  />
-                </Element>
-              )
-            )}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/invoices" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
       </TabGroup>
     </Card>
