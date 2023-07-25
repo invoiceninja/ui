@@ -21,6 +21,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
+import { useSetSurchageTaxValue } from '$app/pages/invoices/common/hooks/useSetSurchargeTaxValue';
 
 export function Invoices() {
   const { documentTitle } = useTitle('custom_fields');
@@ -37,8 +38,24 @@ export function Invoices() {
 
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const handleSurchargesChange = useHandleCustomSurchargeFieldChange();
+  const handleCustomSurchargeFieldChange =
+    useHandleCustomSurchargeFieldChange();
   const save = useHandleCompanySave();
+
+  const surchargeValue = (index: number) => {
+    switch (index) {
+      case 0:
+        return company?.custom_surcharge_taxes1;
+      case 1:
+        return company?.custom_surcharge_taxes2;
+      case 2:
+        return company?.custom_surcharge_taxes3;
+      case 3:
+        return company?.custom_surcharge_taxes4;
+    }
+  };
+
+  const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   return (
     <Settings
@@ -62,26 +79,32 @@ export function Invoices() {
       </Card>
 
       <Card>
-        {['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
-          (field, index) => (
-            <Element
-              key={index}
-              leftSide={
-                <InputField
-                  id={field}
-                  placeholder={t('surcharge_field')}
-                  value={company.custom_fields[field]}
-                  onValueChange={(value) =>
-                    handleSurchargesChange(field, value)
-                  }
-                  disabled={disabledCustomFields}
+        {company &&
+          ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
+            (field, index) => (
+              <Element
+                noExternalPadding
+                key={index}
+                leftSide={
+                  <InputField
+                    id={field}
+                    value={company.custom_fields[field]}
+                    placeholder={t('surcharge_field')}
+                    onValueChange={(value) =>
+                      handleCustomSurchargeFieldChange(field, value)
+                    }
+                    disabled={disabledCustomFields}
+                  />
+                }
+              >
+                <Toggle
+                  label={t('charge_taxes')}
+                  checked={surchargeValue(index)}
+                  onChange={() => setSurchargeTaxValue(index)}
                 />
-              }
-            >
-              <Toggle label={t('charge_taxes')} />
-            </Element>
-          )
-        )}
+              </Element>
+            )
+          )}
       </Card>
     </Settings>
   );

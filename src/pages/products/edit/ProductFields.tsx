@@ -9,19 +9,11 @@
  */
 
 import { Card } from '$app/components/cards';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from '$app/components/forms';
 
 export default function ProductFields() {
   const [t] = useTranslation();
-
-  const company = useInjectCompanyChanges();
-
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <Card title={t('custom_fields')} withContainer>

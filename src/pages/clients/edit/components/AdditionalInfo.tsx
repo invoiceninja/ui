@@ -13,18 +13,14 @@ import { InputField, Link, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -32,7 +28,6 @@ import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
-import { Inline } from '$app/components/Inline';
 
 interface Props {
   client: Client | undefined;
@@ -79,9 +74,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
     setClient($client);
   };
-
-  const company = useInjectCompanyChanges();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const [tabs, setTabs] = useState([
     t('settings'),

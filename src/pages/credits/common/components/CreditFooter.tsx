@@ -10,11 +10,8 @@
 
 import { Card } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
@@ -30,7 +27,6 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { route } from '$app/common/helpers/route';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
@@ -43,10 +39,8 @@ export function CreditFooter(props: Props) {
   const { id } = useParams();
   const { handleChange, errors } = props;
 
-  const company = useCurrentCompany();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const [credit] = useAtom(creditAtom);
 

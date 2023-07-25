@@ -10,17 +10,10 @@
 
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
-import { Element } from '$app/components/cards';
-import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
-import { Divider } from '$app/components/cards/Divider';
-import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
@@ -33,8 +26,6 @@ import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
@@ -47,33 +38,10 @@ export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
 
   const queryClient = useQueryClient();
-
-  const company = useCurrentCompany();
   const location = useLocation();
 
   const { invoice, handleChange, errors } = props;
   const { id } = useParams();
-
-  const handleCustomFieldChange = useHandleCustomFieldChange();
-  const handleCustomSurchargeFieldChange =
-    useHandleCustomSurchargeFieldChange();
-
-  const disabledCustomFields = useShouldDisableCustomFields();
-
-  const surchargeValue = (index: number) => {
-    switch (index) {
-      case 0:
-        return company?.custom_surcharge_taxes1;
-      case 1:
-        return company?.custom_surcharge_taxes2;
-      case 2:
-        return company?.custom_surcharge_taxes3;
-      case 3:
-        return company?.custom_surcharge_taxes4;
-    }
-  };
-
-  const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   const tabs = [
     t('public_notes'),

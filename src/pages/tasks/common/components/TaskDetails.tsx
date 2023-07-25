@@ -11,16 +11,13 @@
 import { Card, Element } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
@@ -40,7 +37,6 @@ export function TaskDetails(props: Props) {
 
   const company = useCurrentCompany();
   const location = useLocation();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <div className="grid grid-cols-12 gap-4">
