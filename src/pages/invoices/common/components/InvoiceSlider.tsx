@@ -29,7 +29,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { Payment } from '$app/common/interfaces/payment';
 import { AxiosResponse } from 'axios';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoiceStatus } from './InvoiceStatus';
@@ -44,6 +43,7 @@ import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
+import { Payment } from '$app/common/interfaces/payment';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -99,10 +99,10 @@ export function InvoiceSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/payments?invoice_id=${invoice?.id}&include=client`)
+        endpoint(`/api/v1/invoices/${invoice?.id}?include=payments`)
       ).then(
-        (response: AxiosResponse<GenericManyResponse<Payment>>) =>
-          response.data.data
+        (response: GenericSingleResourceResponse<Invoice>) =>
+          response.data.data.payments
       ),
     enabled: invoice !== null && isVisible,
   });
@@ -224,7 +224,7 @@ export function InvoiceSlider() {
 
           <div className="divide-y">
             {payments &&
-              payments.map((payment) => (
+              payments.map((payment: Payment) => (
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}`}

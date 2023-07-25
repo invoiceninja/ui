@@ -9,6 +9,7 @@
  */
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
+import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { TaxInfo } from './tax-info';
 
@@ -78,6 +79,7 @@ export interface Invoice {
   documents: any[];
   client?: Client;
   activities?: Activity[];
+  payments?: Payment[];
 }
 
 export interface Activity {
