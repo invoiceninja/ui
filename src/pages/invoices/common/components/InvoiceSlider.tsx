@@ -99,9 +99,9 @@ export function InvoiceSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/invoices/${invoice?.id}?include=client,payments`)
+        endpoint(`/api/v1/invoices/${invoice?.id}?include=payments`)
       ).then(
-        (response: AxiosResponse<GenericManyResponse<Invoice>>) =>
+        (response: GenericSingleResourceResponse<Invoice>) =>
           response.data.data.payments
       ),
     enabled: invoice !== null && isVisible,
