@@ -202,7 +202,8 @@ export function useRecurringExpenseColumns() {
         formatMoney(
           value,
           recurringExpense.client?.country_id,
-          recurringExpense.client?.settings.currency_id
+          recurringExpense.currency_id ||
+            recurringExpense.client?.settings.currency_id
         ),
     },
     {
@@ -284,7 +285,8 @@ export function useRecurringExpenseColumns() {
         formatMoney(
           value,
           recurringExpense.client?.country_id,
-          recurringExpense.client?.settings.currency_id
+          recurringExpense.currency_id ||
+            recurringExpense.client?.settings.currency_id
         ),
     },
     {

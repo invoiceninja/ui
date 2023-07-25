@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { Payment } from '$app/common/interfaces/payment';
 import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
@@ -22,7 +21,6 @@ interface Props {
 export function PaymentOverview(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   return (
     <div>
@@ -31,7 +29,7 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('amount')}: ${formatMoney(
               props?.payment?.amount || 0,
-              company.settings.country_id,
+              props.payment.client?.country_id,
               props.payment?.currency_id
             )}`}
           </span>
@@ -41,7 +39,7 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('applied')}: ${formatMoney(
               props?.payment?.applied || 0,
-              company.settings.country_id,
+              props.payment.client?.country_id,
               props.payment?.currency_id
             )}`}
           </span>
@@ -55,7 +53,7 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('refunded')}: ${formatMoney(
               props?.payment?.refunded || 0,
-              company.settings.country_id,
+              props.payment.client?.country_id,
               props.payment?.currency_id
             )}`}
           </span>
