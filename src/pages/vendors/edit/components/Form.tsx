@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -352,19 +352,15 @@ export function Form(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('contact_field')}
-                    onChange={(value) => handleCustomFieldChange(field, value)}
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link
+                to="/settings/custom_fields/vendors"
+                className="capitalize"
+              >
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>
