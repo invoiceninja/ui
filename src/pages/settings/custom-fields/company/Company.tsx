@@ -10,10 +10,13 @@
 
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../../components/cards';
-import { Settings } from '../../../../components/layouts/Settings';
-import { Field } from '../components';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Settings } from '$app/components/layouts/Settings';
+import { Card } from '$app/components/cards';
+import { Field } from '../components/Field';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 
 export function Company() {
   useTitle('custom_fields');
@@ -28,17 +31,28 @@ export function Company() {
     { name: t('company'), href: '/settings/custom_fields/company' },
   ];
 
+  const company = useCurrentCompany();
+  const handleChange = useHandleCustomFieldChange();
+  const save = useHandleCompanySave();
+
   return (
     <Settings
       title={t('custom_fields')}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#custom_fields"
+      onSaveClick={save}
     >
       <CustomFieldsPlanAlert />
 
       <Card title={title}>
         {['company1', 'company2', 'company3', 'company4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('company_field')} />
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('company_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
         ))}
       </Card>
     </Settings>
