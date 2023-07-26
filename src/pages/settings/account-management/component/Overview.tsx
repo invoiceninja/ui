@@ -94,12 +94,8 @@ export function Overview() {
         <>
           <Divider />
           <Element leftSide={t('set_default_company')}>
-            <Button
-              type="minimal"
-              behavior="button"
-              onClick={handleSetDefaultCompany}
-            >
-              {company.settings.name}
+            <Button behavior="button" onClick={handleSetDefaultCompany}>
+              {company?.settings.name}
             </Button>
           </Element>
         </>
