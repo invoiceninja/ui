@@ -20,7 +20,6 @@ import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
 import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
