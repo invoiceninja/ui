@@ -40,7 +40,6 @@ export default function Expenses() {
       columns={columns}
       customFilters={filters}
       customActions={actions}
-      customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/expenses/bulk"

@@ -53,6 +53,12 @@ import { useBulk } from '$app/common/queries/tasks';
 import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 export const defaultColumns: string[] = [
   'status',
@@ -310,6 +316,12 @@ export function useSave() {
 export function useTaskFilters() {
   const [t] = useTranslation();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: taskStatuses } = useTaskStatusesQuery({
+    status: 'active',
+  });
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -324,6 +336,20 @@ export function useTaskFilters() {
       backgroundColor: '#22C55E',
     },
   ];
+
+  taskStatuses?.data.forEach((taskStatus) => {
+    const { red, green, blue } = hexToRGB(taskStatus.color);
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      label: taskStatus.name,
+      value: taskStatus.id,
+      color: adjustColorDarkness(taskStatus.color, darknessAmount),
+      backgroundColor: taskStatus.color,
+      queryKey: 'task_status',
+    });
+  });
 
   return filters;
 }
