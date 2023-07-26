@@ -87,7 +87,7 @@ export function useAllProjectColumns() {
     'is_deleted',
     'number',
     'updated_at',
-    'current_hours',
+    'total_hours',
   ] as const;
 
   return projectColumns;
@@ -173,7 +173,7 @@ export function useProjectColumns() {
       format: (value) => value,
     },
     {
-      column: 'current_hours',
+      column: 'total_hours',
       id: 'current_hours',
       label: t('total_hours'),
       format: (value) => value,
