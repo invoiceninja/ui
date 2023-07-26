@@ -63,6 +63,26 @@ export function UploadImport(props: Props) {
     setPayloadData(payload);
   };
 
+  const getSelection = (mapping: string, index: number) => {
+        
+    const search = mapData?.mappings[props.entity].available.filter((column: string) => {
+    
+      const split_map = column.split('.');
+      let label_property = split_map[1];
+
+      if (split_map[1] == 'user_id') label_property = 'user';
+
+      if (split_map[1] == 'shipping_country_id')
+        label_property = 'shipping_country';
+
+      return t(label_property).toLowerCase().includes(mapping.toLowerCase()) ? column : false
+      
+    });
+
+    return search?.length ? search[0] : false;
+
+  };
+
   const decorateMapping = (mapping: any) => {
     const split_map = mapping.split('.');
 
@@ -135,9 +155,10 @@ export function UploadImport(props: Props) {
 
       request('POST', endpoint('/api/v1/preimport'), formData)
         .then((response) => {
-          setMapData(response.data);
+          setMapData(response.data);          
           props.onSuccess;
           toast.dismiss();
+
         })
         .catch((error) => {
           console.error(error);
@@ -292,11 +313,11 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank>
+                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={getSelection(mapping, index)}>
                       {mapData.mappings[props.entity].available.map(
-                        (mapping: any, index: number) => (
-                          <option value={mapping} key={index}>
-                            {decorateMapping(mapping)}
+                        (select_name: any, index: number) => (
+                          <option value={select_name} key={index}>
+                            {decorateMapping(select_name)}
                           </option>
                         )
                       )}
