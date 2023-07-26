@@ -59,6 +59,7 @@ export interface Company {
   oauth_password_required: boolean;
   first_month_of_year: string;
   company_key: string;
+  fill_products: boolean;
 }
 
 export interface CompanyInput {

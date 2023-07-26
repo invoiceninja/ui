@@ -44,7 +44,6 @@ export default function PurchaseOrders() {
       customFilters={filters}
       customActions={actions}
       customBulkActions={customBulkActions}
-      customFilterQueryKey="client_status"
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/purchase_orders/bulk"

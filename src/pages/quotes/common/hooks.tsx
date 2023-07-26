@@ -604,7 +604,6 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
@@ -673,8 +672,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company.settings.country_id,
-          quote.client?.settings.currency_id || company.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -773,8 +772,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -822,8 +821,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -874,8 +873,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {

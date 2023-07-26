@@ -67,9 +67,8 @@ export function ViewSlider() {
             <Element leftSide={t('rate')}>
               {formatMoney(
                 currentTask.rate || company.settings.default_task_rate,
-                currentTask.client?.country_id || company?.settings.country_id,
-                currentTask.client?.settings.currency_id ||
-                  company?.settings.currency_id
+                currentTask.client?.country_id,
+                currentTask.client?.settings.currency_id
               )}
             </Element>
 

@@ -144,7 +144,7 @@ export function Edit() {
               />
 
               <InputField
-                type="text"
+                type="number"
                 id="rate"
                 label={t('rate')}
                 onChange={formik.handleChange}

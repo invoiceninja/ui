@@ -45,6 +45,7 @@ export function usePaymentQuery(params: PaymentParams) {
 interface PaymentsParams extends Params {
   enabled?: boolean;
   matchTransactions?: boolean;
+  include?: string;
 }
 
 export function usePaymentsQuery(params: PaymentsParams) {
@@ -54,13 +55,14 @@ export function usePaymentsQuery(params: PaymentsParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/payments?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions',
+          '/api/v1/payments?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
             status: params.status ?? 'active',
             filter: params.filter ?? '',
             match_transactions: params.matchTransactions ?? false,
+            include: params.include || '',
           }
         )
       ).then(

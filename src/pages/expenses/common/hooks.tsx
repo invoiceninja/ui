@@ -13,7 +13,6 @@ import paymentType from '$app/common/constants/payment-type';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
@@ -161,7 +160,6 @@ export function useActions() {
     };
 
     const formatMoney = useFormatMoney();
-    const company = useCurrentCompany();
 
     if (!data) {
       return null;
@@ -185,7 +183,7 @@ export function useActions() {
               <p>
                 {formatMoney(
                   invoice.amount,
-                  invoice.client?.country_id ?? company.settings.country_id,
+                  invoice.client?.country_id,
                   invoice.client?.settings.currency_id
                 )}
               </p>
@@ -338,7 +336,6 @@ export function useExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   const reactSettings = useReactSettings();
 
@@ -414,10 +411,8 @@ export function useExpenseColumns() {
       format: (value, expense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          expense.currency_id
-            ? expense.currency_id
-            : company?.settings.currency_id
+          expense.client?.country_id,
+          expense.currency_id || expense.client?.settings.currency_id
         ),
     },
     {
@@ -494,11 +489,11 @@ export function useExpenseColumns() {
       column: 'net_amount',
       id: 'amount',
       label: t('net_amount'),
-      format: (value) =>
+      format: (value, expense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          expense.client?.country_id,
+          expense.currency_id || expense.client?.settings.currency_id
         ),
     },
     {

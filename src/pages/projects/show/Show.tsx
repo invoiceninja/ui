@@ -137,7 +137,7 @@ export default function Show() {
             {t('task_rate')}:
             {formatMoney(
               project.task_rate,
-              project.client?.country_id || '',
+              project.client?.country_id,
               project.client?.settings.currency_id
             )}
           </p>
@@ -171,7 +171,6 @@ export default function Show() {
             showEdit={(task: Task) => showEditOption(task)}
             customFilters={filters}
             customBulkActions={customBulkActions}
-            customFilterQueryKey="client_status"
             customFilterPlaceholder="status"
             withResourcefulActions
             leftSideChevrons={
