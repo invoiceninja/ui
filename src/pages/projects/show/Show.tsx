@@ -153,7 +153,7 @@ export default function Show() {
           </p>
 
           <p>
-            {t('duration')}: {duration()}
+            {t('total_hours')}: {project.current_hours}
           </p>
         </InfoCard>
       </div>
