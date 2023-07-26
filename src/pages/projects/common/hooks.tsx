@@ -13,7 +13,6 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Project } from '$app/common/interfaces/project';
 import { Divider } from '$app/components/cards/Divider';
@@ -97,7 +96,6 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -123,11 +121,11 @@ export function useProjectColumns() {
       column: 'task_rate',
       id: 'task_rate',
       label: t('task_rate'),
-      format: (value) =>
+      format: (value, task) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {

@@ -43,7 +43,7 @@ export function Create() {
 
   const { data } = useBlankSubscriptionQuery();
 
-  const { data: productsData } = useProductsQuery();
+  const { data: productsData } = useProductsQuery({ include: 'company' });
 
   const queryClient = useQueryClient();
 

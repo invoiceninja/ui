@@ -13,7 +13,6 @@ import paymentType from '$app/common/constants/payment-type';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Payment } from '$app/common/interfaces/payment';
@@ -81,7 +80,6 @@ export function usePaymentColumns() {
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCurrency = useResolveCurrency();
 
@@ -142,8 +140,8 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
-          payment.client?.country_id || company.settings.country_id,
-          payment.client?.settings.currency_id || company.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {
@@ -184,8 +182,8 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           calculateConvertedAmount(payment),
-          payment.client?.country_id || company?.settings.country_id,
-          payment.client?.settings.currency_id || company?.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {
@@ -253,8 +251,8 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
-          payment.client?.country_id || company?.settings.country_id,
-          payment.client?.settings.currency_id || company?.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {

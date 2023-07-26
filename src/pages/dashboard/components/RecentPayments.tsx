@@ -14,7 +14,6 @@ import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms/Link';
 import { Payment } from '$app/common/interfaces/payment';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import { Badge } from '$app/components/Badge';
@@ -23,7 +22,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const columns: DataTableColumns<Payment> = [
@@ -74,8 +72,8 @@ export function RecentPayments() {
         <Badge variant="green">
           {formatMoney(
             value,
-            payment.client?.country_id || company.settings.country_id,
-            payment.client?.settings.currency_id || company.settings.currency_id
+            payment.client?.country_id,
+            payment.client?.settings.currency_id
           )}
         </Badge>
       ),

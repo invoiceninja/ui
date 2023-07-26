@@ -629,7 +629,6 @@ export function useCreditColumns() {
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
 
@@ -672,8 +671,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -686,13 +685,12 @@ export function useCreditColumns() {
       column: 'remaining',
       id: 'balance',
       label: t('remaining'),
-      format: (_, credit) => {
-        return formatMoney(
+      format: (_, credit) =>
+        formatMoney(
           credit.balance,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        );
-      },
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
+        ),
     },
     {
       column: 'archived_at',
@@ -778,8 +776,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -827,8 +825,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -879,8 +877,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
