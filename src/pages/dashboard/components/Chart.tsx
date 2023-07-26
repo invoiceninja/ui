@@ -38,6 +38,7 @@ type LineChartData = {
   invoices: number;
   outstanding: number;
   payments: number;
+  expenses: number;
 }[];
 
 export function Chart(props: Props) {
@@ -105,6 +106,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -122,6 +124,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -139,6 +142,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -167,6 +171,15 @@ export function Chart(props: Props) {
 
       if (recordIndex >= 0) {
         data[recordIndex].payments += parseFloat(payment.total);
+      }
+    });
+
+    props.data?.expenses.forEach((expense) => {
+      const date = formatDate(expense.date, dateFormat);
+      const recordIndex = getRecordIndex(data, date);
+
+      if (recordIndex >= 0) {
+        data[recordIndex].expenses += parseFloat(expense.total);
       }
     });
 
@@ -210,6 +223,16 @@ export function Chart(props: Props) {
           name={t('outstanding') || ''}
           dataKey="outstanding"
           stroke={TotalColors.Red}
+          dot={false}
+          strokeWidth={2}
+        />
+
+        <Line
+          id="expenses"
+          type="monotone"
+          name={t('expenses') || ''}
+          dataKey="expenses"
+          stroke={TotalColors.Gray}
           dot={false}
           strokeWidth={2}
         />
