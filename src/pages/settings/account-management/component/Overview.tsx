@@ -19,7 +19,7 @@ import { endpoint } from '$app/common/helpers';
 import { Button } from '$app/components/forms';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { Divider } from 'antd';
 
 export function Overview() {
@@ -38,13 +38,10 @@ export function Overview() {
       })
     );
 
-  const handleSetDefaultCompany = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSetDefaultCompany = () => {
     toast.processing();
 
-    request('POST', endpoint(`/api/v1/companies/${company.id}/default`), {
-    })
+    request('POST', endpoint(`/api/v1/companies/${company.id}/default`), {})
       .then((response) => {
         toast.success(response.data.message);
         setDefaultCompany(false);
@@ -56,7 +53,6 @@ export function Overview() {
   };
 
   return (
-    
     <Card title={t('overview')}>
       <Element
         leftSide={t('activate_company')}
@@ -93,16 +89,21 @@ export function Overview() {
           }
         />
       </Element>
-    
+
       {account.default_company_id !== company.id && defaultCompany && (
-      <>
-      <Divider />
-      <Element leftSide={t('set_default_company')}>
-        <Button onClick={handleSetDefaultCompany}>{company.settings.name}</Button>
-      </Element>
-      </>
+        <>
+          <Divider />
+          <Element leftSide={t('set_default_company')}>
+            <Button
+              type="minimal"
+              behavior="button"
+              onClick={handleSetDefaultCompany}
+            >
+              {company.settings.name}
+            </Button>
+          </Element>
+        </>
       )}
     </Card>
-    
   );
 }
