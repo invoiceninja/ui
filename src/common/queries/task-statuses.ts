@@ -34,16 +34,18 @@ export function useBlankTaskStatusQuery() {
 }
 
 interface Params {
-  endpoint?: string;
+  status?: string;
 }
 
 export function useTaskStatusesQuery(params?: Params) {
   return useQuery<GenericManyResponse<TaskStatus>>(
-    route(params?.endpoint || '/api/v1/task_statuses'),
+    ['/api/v1/task_statuses', params],
     () =>
       request(
         'GET',
-        endpoint(params?.endpoint || '/api/v1/task_statuses')
+        endpoint('/api/v1/task_statuses?status=:status', {
+          status: params?.status || 'all',
+        })
       ).then((response) => response.data)
   );
 }

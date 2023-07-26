@@ -319,7 +319,7 @@ export function useTaskFilters() {
   const adjustColorDarkness = useAdjustColorDarkness();
 
   const { data: taskStatuses } = useTaskStatusesQuery({
-    endpoint: '/api/v1/task_statuses?status=active',
+    status: 'active',
   });
 
   const filters: SelectOption[] = [
