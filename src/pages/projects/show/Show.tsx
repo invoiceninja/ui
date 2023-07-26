@@ -92,16 +92,6 @@ export default function Show() {
     );
   }
 
-  const duration = () => {
-    let duration = 0;
-
-    project.tasks?.map((task) => {
-      duration += parseInt(calculateTime(task.time_log, { inSeconds: true }));
-    });
-
-    return dayjs.duration(duration, 'seconds').format('HH:mm:ss');
-  };
-
   return (
     <Default
       title={documentTitle}
