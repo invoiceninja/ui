@@ -63,7 +63,7 @@ export function UploadImport(props: Props) {
     setPayloadData(payload);
   };
 
-  const getSelection = (mapping: string, index: number) => {
+  const getSelection = (mapping: string) => {
         
     const search = mapData?.mappings[props.entity].available.filter((column: string) => {
     
@@ -313,7 +313,7 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={getSelection(mapping, index)}>
+                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={getSelection(mapping)}>
                       {mapData.mappings[props.entity].available.map(
                         (select_name: any, index: number) => (
                           <option value={select_name} key={index}>
