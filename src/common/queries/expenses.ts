@@ -71,7 +71,7 @@ export function useExpensesQuery(params: ExpensesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&includes=:includes&include=:include',
+          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
