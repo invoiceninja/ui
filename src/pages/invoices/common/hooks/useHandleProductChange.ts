@@ -25,8 +25,6 @@ export function useHandleProductChange(props: Props) {
   const resource = props.resource;
 
   return (index: number, product_key: string, product: Product | null) => {
-    console.log(company.fill_products)
-
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
