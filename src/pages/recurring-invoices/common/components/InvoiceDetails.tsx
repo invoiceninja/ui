@@ -56,11 +56,7 @@ export function InvoiceDetails(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('next_send_date', value)}
-            value={
-              recurringInvoice?.next_send_date
-                ? dayjs(recurringInvoice?.next_send_date).format('YYYY-MM-DD')
-                : dayjs().format('YYYY-MM-DD')
-            }
+            value={recurringInvoice?.next_send_date}
             min={dayjs().format('YYYY-MM-DD')}
             errorMessage={props.errors?.errors.next_send_date}
           />
