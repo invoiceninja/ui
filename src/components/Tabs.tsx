@@ -22,6 +22,7 @@ import {
 interface Props {
   className?: string;
   tabs: Tab[];
+  disableBackupNavigation?: boolean;
 }
 
 export type Tab = { name: string; href: string; matcher?: Matcher[] };
@@ -60,7 +61,7 @@ export function Tabs(props: Props) {
   };
 
   useEffect(() => {
-    if (props.tabs.length) {
+    if (props.tabs.length && !props.disableBackupNavigation) {
       const doesDefaultUrlExist = props.tabs.some(
         ({ href }) => href === location.pathname
       );
