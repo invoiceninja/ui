@@ -101,7 +101,7 @@ export function usePreferences() {
         setIsVisible(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
+        silent && toast.dismiss();
 
         if (error.response?.status === 412) {
           setErrors(error.response.data);

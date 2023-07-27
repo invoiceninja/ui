@@ -19,7 +19,6 @@ import {
   Thead,
   Tr,
 } from '$app/components/tables';
-import { AxiosError } from 'axios';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { bulk, usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { Breadcrumbs } from '$app/components/Breadcrumbs';
@@ -27,13 +26,13 @@ import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Settings } from '$app/components/layouts/Settings';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdEdit } from 'react-icons/md';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function PaymentTerms() {
   const { documentTitle } = useTitle('payment_terms');
@@ -58,19 +57,10 @@ export function PaymentTerms() {
   });
 
   const archive = (id: string) => {
-    toast.loading(t('processing'));
+    toast.processing();
 
     bulk([id], 'archive')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('archived_payment_term'));
-      })
-      .catch((error: AxiosError) => {
-        toast.dismiss();
-        toast.success(t('error_title'));
-
-        console.error(error);
-      })
+      .then(() => toast.success('archived_payment_term'))
       .finally(() => queryClient.invalidateQueries('/api/v1/payment_terms'));
   };
 

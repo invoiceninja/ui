@@ -59,28 +59,19 @@ function Confirmation({
 
     request('POST', endpoint('/api/v1/verify/confirm'), {
       code,
-    })
-      .then(() => {
-        toast.success('verified_phone_number');
+    }).then(() => {
+      toast.success('verified_phone_number');
 
-        queryClient.invalidateQueries('/api/v1/users');
-        queryClient.invalidateQueries('/api/v1/company_users');
+      queryClient.invalidateQueries('/api/v1/users');
+      queryClient.invalidateQueries('/api/v1/company_users');
 
-        request('POST', endpoint('/api/v1/refresh'))
-          .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-            dispatch(updateCompanyUsers(response.data.data));
-            onComplete();
-          })
-          .catch((error: AxiosError) => {
-            console.error(error);
-            toast.error();
-          });
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        error.response?.status === 400
-          ? toast.error(error.response.data.message)
-          : toast.dismiss();
-      });
+      request('POST', endpoint('/api/v1/refresh')).then(
+        (response: GenericSingleResourceResponse<CompanyUser>) => {
+          dispatch(updateCompanyUsers(response.data.data));
+          onComplete();
+        }
+      );
+    });
   };
 
   useEffect(() => {
@@ -141,10 +132,6 @@ function Verification({ visible, onClose }: VerificationProps) {
         setIsConfirmationVisible(true);
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 400) {
-          return toast.error(error.response.data.message);
-        }
-
         if (error.response?.status === 422) {
           toast.dismiss();
 

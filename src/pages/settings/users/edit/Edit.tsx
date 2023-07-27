@@ -92,9 +92,6 @@ export function Edit() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
@@ -119,9 +116,6 @@ export function Edit() {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

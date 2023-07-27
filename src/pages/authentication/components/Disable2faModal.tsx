@@ -58,9 +58,6 @@ export function Disable2faModal(props: Props) {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       })
       .finally(() => setIsSendCodeBusy(false));
@@ -81,10 +78,6 @@ export function Disable2faModal(props: Props) {
         setCode('');
         setEmail('');
         setIsCodeVerificationModalOpen(false);
-      })
-      .catch((error: AxiosError) => {
-        toast.dismiss();
-        console.error(error);
       })
       .finally(() => setIsVerifyCodeBusy(false));
   };

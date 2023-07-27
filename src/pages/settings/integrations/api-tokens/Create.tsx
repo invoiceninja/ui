@@ -79,15 +79,11 @@ export function Create() {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-            return;
           }
 
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
             setLastPasswordEntryTime(0);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

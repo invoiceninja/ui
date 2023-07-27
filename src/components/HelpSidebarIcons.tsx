@@ -9,7 +9,6 @@
  */
 
 import Tippy from '@tippyjs/react';
-import { AxiosError } from 'axios';
 import { endpoint, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
@@ -33,12 +32,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   docsLink?: string;
@@ -67,17 +66,10 @@ export function HelpSidebarIcons(props: Props) {
       send_logs: false,
     },
     onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
 
       request('POST', endpoint('/api/v1/support/messages/send'), values)
-        .then(() =>
-          toast.success(t('your_message_has_been_received'), { id: toastId })
-        )
-        .catch((error: AxiosError) => {
-          console.error(error);
-
-          toast.error(t('error_title'), { id: toastId });
-        })
+        .then(() => toast.success('your_message_has_been_received'))
         .finally(() => {
           formik.setSubmitting(false);
           setIsContactVisible(false);

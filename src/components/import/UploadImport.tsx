@@ -115,16 +115,13 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    request('POST', endpoint(endPointUrl, params), requestData)
-      .then((response) => {
+    request('POST', endpoint(endPointUrl, params), requestData).then(
+      (response) => {
         toast.success(response?.data?.message ?? 'error_title');
         props.onFileImported?.();
         props.onSuccess;
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+      }
+    );
   };
 
   const formik = useFormik({
@@ -133,16 +130,13 @@ export function UploadImport(props: Props) {
     onSubmit: () => {
       toast.processing();
 
-      request('POST', endpoint('/api/v1/preimport'), formData)
-        .then((response) => {
+      request('POST', endpoint('/api/v1/preimport'), formData).then(
+        (response) => {
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        });
+        }
+      );
     },
   });
 

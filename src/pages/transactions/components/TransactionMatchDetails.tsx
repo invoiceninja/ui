@@ -12,7 +12,6 @@ import { FormEvent, useEffect, useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from '$app/common/enums/transactions';
 import { route } from '$app/common/helpers/route';
@@ -97,10 +96,6 @@ export function TransactionMatchDetails(props: Props) {
 
           toast.success('converted_transaction');
         })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
-        })
         .finally(() => setIsFormBusy(false));
     }
   };
@@ -134,10 +129,6 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('linked_transaction');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -178,10 +169,6 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('converted_transaction');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -224,10 +211,7 @@ export function TransactionMatchDetails(props: Props) {
 
           toast.success('linked_transaction');
         })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
-        })
+
         .finally(() => setIsFormBusy(false));
     }
   };

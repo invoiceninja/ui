@@ -21,12 +21,12 @@ import {
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import collect from 'collect.js';
-import toast from 'react-hot-toast';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export const calculateTaskHours = (timeLog: string) => {
   const parsedTimeLogs = parseTimeLog(timeLog);

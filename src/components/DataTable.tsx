@@ -263,10 +263,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         );
       })
       .catch((error: AxiosError) => {
-        console.error(error);
         console.error(error.response?.data);
-
-        toast.error();
       })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);

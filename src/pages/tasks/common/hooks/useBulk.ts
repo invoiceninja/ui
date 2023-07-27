@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,12 +25,6 @@ export function useBulkAction() {
       ids: [id],
     })
       .then(() => toast.success(`${action}d_task`))
-      .catch((error: AxiosError) => {
-        console.error(error);
-        console.error(error.response?.data);
-
-        toast.error();
-      })
       .finally(() => {
         queryClient.invalidateQueries('/api/v1/tasks');
 

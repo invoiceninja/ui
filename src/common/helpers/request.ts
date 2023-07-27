@@ -38,9 +38,13 @@ client.interceptors.response.use(
       error.response.status < 500
     ) {
       toast.error(error?.response?.data.message || 'error_title');
-
-      return new Promise(() => {});
     }
+
+    if (error.response?.status && error.response.status === 500) {
+      toast.error('error_title');
+    }
+
+    console.error(error);
 
     return Promise.reject(error);
   }

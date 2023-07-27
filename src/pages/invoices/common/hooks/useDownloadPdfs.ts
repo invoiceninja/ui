@@ -32,14 +32,9 @@ export function useDownloadPdfs({ entity }: Props) {
       request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
         action: 'bulk_download',
         ids: resourceIds,
+      }).then(() => {
+        toast.success(t('downloaded_entities') || '');
       })
-        .then(() => {
-          toast.success(t('downloaded_entities') || '');
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        })
     );
   };
 }

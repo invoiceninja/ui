@@ -10,7 +10,6 @@
 
 import { Card, CardContainer, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -23,11 +22,11 @@ import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function Edit() {
   useTitle('payment_terms');
@@ -58,23 +57,14 @@ export function Edit() {
       num_days: data?.data.data.num_days || 0,
     },
     onSubmit: (values: Partial<PaymentTerm>) => {
-      toast.loading(t('processing'));
+      toast.processing();
 
       request(
         'PUT',
         endpoint('/api/v1/payment_terms/:id', { id: data?.data.data.id }),
         values
       )
-        .then(() => {
-          toast.dismiss();
-          toast.success(t('updated_payment_term'));
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-
-          toast.dismiss();
-          toast.error(t('error_title'));
-        })
+        .then(() => toast.success('updated_payment_term'))
         .finally(() => {
           formik.setSubmitting(false);
           invalidatePaymentTermCache();

@@ -40,11 +40,10 @@ export function useHandleSave(
     )
       .then(() => toast.success('updated_invoice'))
       .catch((error) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => {
         setIsDeleteActionTriggered(undefined);

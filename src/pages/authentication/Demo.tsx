@@ -31,9 +31,7 @@ export function Demo() {
       password,
     })
       .then((response) => login(response))
-      .catch((error) => {
-        console.error(error);
-
+      .catch(() => {
         navigate('/login');
       });
   }, []);

@@ -112,9 +112,6 @@ export function Create() {
           }
 
           setErrors(errorMessages);
-        } else {
-          toast.error();
-          console.log(error);
         }
       });
   };

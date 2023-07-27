@@ -44,18 +44,13 @@ export function Upload(props: Props) {
 
       request('POST', props.endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      })
-        .then(() => {
-          toast.success('uploaded_document');
+      }).then(() => {
+        toast.success('uploaded_document');
 
-          setFormData(new FormData());
+        setFormData(new FormData());
 
-          props.onSuccess?.();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        });
+        props.onSuccess?.();
+      });
     },
   });
 

@@ -289,8 +289,8 @@ export function useSave() {
   const queryClient = useQueryClient();
 
   return (task: Task) => {
-    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
-      .then(() => {
+    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
+      () => {
         toast.success('updated_task');
 
         queryClient.invalidateQueries(
@@ -304,12 +304,8 @@ export function useSave() {
         queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      }
+    );
   };
 }
 

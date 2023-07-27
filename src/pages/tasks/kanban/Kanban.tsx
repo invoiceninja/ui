@@ -171,11 +171,6 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      })
       .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
   };
 

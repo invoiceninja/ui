@@ -42,9 +42,7 @@ export function useResolveTemplate(
         subject,
         template: templateId,
         cc_email: ccEmail,
-      })
-        .then((response) => setTemplate(response.data))
-        .catch((error) => console.error(error))
+      }).then((response) => setTemplate(response.data))
     );
   }, [body, entity, entityId, subject, templateId, ccEmail]);
 

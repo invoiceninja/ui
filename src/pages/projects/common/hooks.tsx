@@ -40,7 +40,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Task } from '$app/common/interfaces/task';
-import { AxiosError } from 'axios';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
@@ -289,24 +288,19 @@ export function useActions() {
               projectId: project.id,
             }
           )
-        )
-          .then((response: GenericSingleResourceResponse<Task[]>) => {
-            toast.dismiss();
+        ).then((response: GenericSingleResourceResponse<Task[]>) => {
+          toast.dismiss();
 
-            const unInvoicedTasks = response.data.data.filter(
-              (task) => !task.invoice_id
-            );
+          const unInvoicedTasks = response.data.data.filter(
+            (task) => !task.invoice_id
+          );
 
-            if (!response.data.data.length) {
-              return toast.error('no_assigned_tasks');
-            }
+          if (!response.data.data.length) {
+            return toast.error('no_assigned_tasks');
+          }
 
-            invoiceProject(unInvoicedTasks);
-          })
-          .catch((error: AxiosError) => {
-            toast.error();
-            console.error(error);
-          })
+          invoiceProject(unInvoicedTasks);
+        })
     );
   };
 
