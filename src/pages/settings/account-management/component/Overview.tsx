@@ -90,7 +90,7 @@ export function Overview() {
         />
       </Element>
 
-      {account.default_company_id !== company.id && defaultCompany && (
+      {account.default_company_id !== company?.id && defaultCompany && (
         <>
           <Divider />
           <Element leftSide={t('set_default_company')}>
@@ -99,7 +99,7 @@ export function Overview() {
               behavior="button"
               onClick={handleSetDefaultCompany}
             >
-              {company.settings.name}
+              {company?.settings.name}
             </Button>
           </Element>
         </>
