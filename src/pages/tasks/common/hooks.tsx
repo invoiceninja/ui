@@ -177,7 +177,7 @@ export function useTaskColumns() {
       column: 'duration',
       id: 'time_log',
       label: t('duration'),
-      format: (value) => calculateHours(value.toString()),
+      format: (value) => calculateHours(value.toString(), true),
     },
     {
       column: 'entity_state',
