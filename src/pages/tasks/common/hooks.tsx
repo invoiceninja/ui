@@ -338,14 +338,14 @@ export function useTaskFilters() {
   ];
 
   taskStatuses?.data.forEach((taskStatus) => {
-    const { red, green, blue } = hexToRGB(taskStatus.color);
+    const { red, green, blue, hex } = hexToRGB(taskStatus.color);
 
     const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
     filters.push({
       label: taskStatus.name,
       value: taskStatus.id,
-      color: adjustColorDarkness(taskStatus.color, darknessAmount),
+      color: adjustColorDarkness(hex, darknessAmount),
       backgroundColor: taskStatus.color,
       queryKey: 'task_status',
     });
