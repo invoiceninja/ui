@@ -40,11 +40,6 @@ export function Disable2faModal(props: Props) {
   const [isCodeVerificationModalOpen, setIsCodeVerificationModalOpen] =
     useState<boolean>(false);
 
-  const handleClose = () => {
-    setVisible(false);
-    setEmail('');
-  };
-
   const handleSendCode = () => {
     toast.processing();
 
@@ -56,7 +51,7 @@ export function Disable2faModal(props: Props) {
       .then((response) => {
         toast.success(response.data.message);
 
-        handleClose();
+        setVisible(false);
         setIsCodeVerificationModalOpen(true);
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -84,6 +79,7 @@ export function Disable2faModal(props: Props) {
         toast.success(response.data.message);
 
         setCode('');
+        setEmail('');
         setIsCodeVerificationModalOpen(false);
       })
       .catch((error: AxiosError) => {
@@ -95,7 +91,14 @@ export function Disable2faModal(props: Props) {
 
   return (
     <>
-      <Modal title={t('disable_2fa')} visible={visible} onClose={handleClose}>
+      <Modal
+        title={t('disable_2fa')}
+        visible={visible}
+        onClose={() => {
+          setVisible(false);
+          setEmail('');
+        }}
+      >
         <div className="flex flex-col space-y-6">
           <InputField
             label={t('email')}
@@ -124,6 +127,7 @@ export function Disable2faModal(props: Props) {
         onClose={() => {
           setIsCodeVerificationModalOpen(false);
           setCode('');
+          setEmail('');
         }}
       >
         <div className="flex flex-col space-y-7 items-center">
@@ -142,7 +146,7 @@ export function Disable2faModal(props: Props) {
             <Button
               onClick={handleConfirmCode}
               disableWithoutIcon
-              disabled={isSendCodeBusy || isVerifyCodeBusy}
+              disabled={isSendCodeBusy || isVerifyCodeBusy || code.length !== 6}
             >
               {t('verify')}
             </Button>
