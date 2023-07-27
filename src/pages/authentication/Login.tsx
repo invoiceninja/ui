@@ -122,7 +122,7 @@ export function Login() {
               <div className="flex flex-col lg:flex-row items-center justify-between">
                 <InputLabel>{t('secret')}</InputLabel>
                 <div
-                  className="text-center text-sm hover:underline cursor-pointer"
+                  className="text-sm hover:underline cursor-pointer"
                   onClick={() => setIsDisable2faModalOpen(true)}
                   style={{ color: accentColor }}
                 >
