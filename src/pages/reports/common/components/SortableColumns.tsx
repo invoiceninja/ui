@@ -9,7 +9,6 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   DropResult,
@@ -23,7 +22,6 @@ import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
-import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 import { ChevronsRight, X } from 'react-feather';
 import { itemMap } from '$app/common/constants/exports/item-map';
@@ -35,7 +33,7 @@ import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-inv
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../../index/Reports';
 
-const reportColumn = 10;
+export const reportColumn = 10;
 
 interface Record {
   trans: string;
@@ -122,7 +120,6 @@ export function Column({
 interface Props {
   report: Identifier;
   columns: string[];
-  setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
 const positions = [
@@ -138,7 +135,7 @@ const positions = [
   'recurring_invoice',
 ];
 
-export function SortableColumns({ report, columns, setReportKeys }: Props) {
+export function SortableColumns({ report, columns }: Props) {
   const { preferences, update } = usePreferences();
 
   const data =
@@ -202,8 +199,6 @@ export function SortableColumns({ report, columns, setReportKeys }: Props) {
     $data[destinationIndex].splice(result.destination.index, 0, word);
 
     update(`preferences.reports.columns.${report}`, [...$data]);
-
-    setReportKeys(collect($data[reportColumn]).pluck('value').toArray());
   };
 
   const onRemove = (record: Record) => {

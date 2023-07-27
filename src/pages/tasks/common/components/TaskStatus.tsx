@@ -51,7 +51,7 @@ export function TaskStatus(props: Props) {
   if (isRunning()) return <Badge variant="light-blue">{t('running')}</Badge>;
 
   if (status) {
-    const { red, green, blue } = hexToRGB(status.color);
+    const { red, green, blue, hex } = hexToRGB(status.color);
 
     const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
@@ -60,7 +60,7 @@ export function TaskStatus(props: Props) {
         for={{}}
         code={status.name}
         style={{
-          color: adjustColorDarkness(status.color, darknessAmount),
+          color: adjustColorDarkness(hex, darknessAmount),
           backgroundColor: status.color,
         }}
       />

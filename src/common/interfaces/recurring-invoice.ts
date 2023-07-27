@@ -32,6 +32,7 @@ export interface RecurringInvoice {
   date: string;
   last_sent_date: string;
   next_send_date: string;
+  next_send_datetime: string;
   due_date: string;
   terms: string;
   public_notes: string;
