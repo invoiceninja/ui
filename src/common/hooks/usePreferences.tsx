@@ -106,8 +106,6 @@ export function usePreferences() {
         if (error.response?.status === 412) {
           setErrors(error.response.data);
         }
-
-        !silent && toast.error();
       });
   };
 

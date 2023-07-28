@@ -134,11 +134,8 @@ function Verification({ visible, onClose }: VerificationProps) {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           toast.dismiss();
-
-          return setErrors(error.response.data);
+          setErrors(error.response.data);
         }
-
-        return toast.dismiss();
       });
   };
 
