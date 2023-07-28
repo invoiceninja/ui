@@ -24,7 +24,7 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
 
@@ -70,6 +70,8 @@ export default function Product() {
     },
   ];
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -81,7 +83,11 @@ export default function Product() {
 
       await saveCompany(true);
 
-      request('PUT', endpoint('/api/v1/products/:id', { id }), productValue)
+      const url = searchParams.has('update_in_stock_quantity')
+        ? endpoint('/api/v1/products/:id?update_in_stock_quantity=true', { id })
+        : endpoint('/api/v1/products/:id', { id });
+
+      request('PUT', url, productValue)
         .then((response) => {
           toast.success('updated_product');
 
@@ -90,6 +96,9 @@ export default function Product() {
           queryClient.invalidateQueries(
             route('/api/v1/products/:id', { id: response.data.data.id })
           );
+
+          searchParams.delete('update_in_stock_quantity');
+          setSearchParams(searchParams);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
