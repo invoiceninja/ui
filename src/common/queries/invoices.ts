@@ -116,8 +116,16 @@ export function useBulk(params?: Params) {
 
         params?.onSuccess?.();
 
+        ids.forEach((id) => {
+          queryClient.invalidateQueries(
+            route('/api/v1/invoices/:id', { id })
+          ); 
+        });
+        
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
+
+        
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (
