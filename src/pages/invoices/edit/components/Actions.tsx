@@ -297,7 +297,8 @@ export function useActions() {
       </DropdownElement>
     ),
     (invoice: Invoice) =>
-      invoice.status_id === InvoiceStatus.Sent && (
+      invoice.status_id === InvoiceStatus.Sent ||
+      invoice.status_id === InvoiceStatus.Partial && (
         <DropdownElement
           onClick={() => cancel(invoice)}
           icon={<Icon element={MdCancel} />}
