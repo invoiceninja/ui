@@ -76,8 +76,7 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
       </Route>
-      <Route path="custom_fields">
-        <Route path="" element={<Settings.CustomFields />} />
+      <Route path="custom_fields" element={<Settings.CustomFields />}>
         <Route path="company" element={<Settings.CompanyCustomFields />} />
         <Route path="clients" element={<Settings.ClientsCustomFields />} />
         <Route path="products" element={<Settings.ProductsCustomFields />} />
