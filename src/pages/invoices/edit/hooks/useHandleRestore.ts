@@ -21,9 +21,7 @@ export function useHandleRestore() {
     toast.processing();
 
     bulk([invoice.id], 'restore')
-      .then(() => {
-        toast.success('restored_invoice');
-      })
+      .then(() => toast.success('restored_invoice'))
       .finally(() =>
         queryClient.invalidateQueries(
           route('/api/v1/invoices/:id', { id: invoice.id })

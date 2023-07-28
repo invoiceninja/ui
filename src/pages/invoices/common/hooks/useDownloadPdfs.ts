@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { t } from 'i18next';
 import { useQueryClient } from 'react-query';
 
 interface Props {
@@ -32,9 +31,7 @@ export function useDownloadPdfs({ entity }: Props) {
       request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
         action: 'bulk_download',
         ids: resourceIds,
-      }).then(() => {
-        toast.success(t('downloaded_entities') || '');
-      })
+      }).then(() => toast.success('downloaded_entities'))
     );
   };
 }

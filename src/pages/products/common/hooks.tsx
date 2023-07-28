@@ -265,7 +265,7 @@ export function useActions() {
     toast.processing();
 
     bulk([id], action).then(() => {
-      toast.success(t(`${action}d_product`) || '');
+      toast.success(`${action}d_product`);
 
       queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
       queryClient.invalidateQueries('/api/v1/products');

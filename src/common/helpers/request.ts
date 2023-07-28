@@ -37,7 +37,7 @@ client.interceptors.response.use(
       error.response.status > 399 &&
       error.response.status < 500
     ) {
-      toast.error(error?.response?.data.message || 'error_title');
+      toast.error(error.response?.data.message || 'error_title');
     }
 
     if (error.response?.status && error.response.status === 500) {
