@@ -8,15 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Settings } from '$app/components/layouts/Settings';
 import { Card } from '$app/components/cards';
 import { Field } from '../components/Field';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 
 export function Company() {
   useTitle('custom_fields');

@@ -9,17 +9,13 @@
  */
 
 import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
 import { useSetSurchageTaxValue } from '$app/pages/invoices/common/hooks/useSetSurchargeTaxValue';
 import { Divider } from '$app/components/cards/Divider';
