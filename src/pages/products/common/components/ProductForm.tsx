@@ -20,6 +20,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
 import { Alert } from '$app/components/Alert';
+import { useSearchParams } from 'react-router-dom';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -33,6 +34,7 @@ interface Props {
 
 export function ProductForm(props: Props) {
   const [t] = useTranslation();
+  const [, setSearchParams] = useSearchParams();
 
   const company = useCurrentCompany();
 
@@ -130,9 +132,16 @@ export function ProductForm(props: Props) {
             <InputField
               type="number"
               value={product.in_stock_quantity}
-              onValueChange={(value) =>
-                handleChange('in_stock_quantity', Number(value))
-              }
+              onValueChange={(value) => {
+                handleChange('in_stock_quantity', Number(value));
+
+                if (type === 'edit') {
+                  setSearchParams((params) => ({
+                    ...params,
+                    update_in_stock_quantity: 'true',
+                  }));
+                }
+              }}
               errorMessage={errors?.errors.in_stock_quantity}
             />
           </Element>
