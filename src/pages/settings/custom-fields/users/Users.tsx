@@ -24,26 +24,10 @@ export function Users() {
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('users')}`;
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('users'), href: '/settings/custom_fields/users' },
-  ];
-
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const save = useHandleCompanySave();
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
-
       <Card title={title}>
         {['user1', 'user2', 'user3', 'user4'].map((field) => (
           <Field
@@ -55,6 +39,5 @@ export function Users() {
           />
         ))}
       </Card>
-    </Settings>
   );
 }

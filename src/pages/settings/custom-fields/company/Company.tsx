@@ -24,37 +24,20 @@ export function Company() {
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('company')}`;
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('company'), href: '/settings/custom_fields/company' },
-  ];
-
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const save = useHandleCompanySave();
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
-
-      <Card title={title}>
-        {['company1', 'company2', 'company3', 'company4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('company_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
-    </Settings>
+    <Card title={title}>
+      {['company1', 'company2', 'company3', 'company4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('company_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

@@ -25,36 +25,20 @@ export function Products() {
 
   const title = `${t('custom_fields')}: ${t('products')}`;
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('products'), href: '/settings/custom_fields/products' },
-  ];
-
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const save = useHandleCompanySave();
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
-
-      <Card title={title}>
-        {['product1', 'product2', 'product3', 'product4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('product_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
-    </Settings>
+    <Card title={title}>
+      {['product1', 'product2', 'product3', 'product4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('product_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

@@ -16,7 +16,6 @@ import { Card } from '$app/components/cards';
 import { Field } from '../components/Field';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 
 export function Projects() {
   useTitle('custom_fields');
@@ -24,26 +23,10 @@ export function Projects() {
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('projects')}`;
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('projects'), href: '/settings/custom_fields/projects' },
-  ];
-
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const save = useHandleCompanySave();
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
-
       <Card title={title}>
         {['project1', 'project2', 'project3', 'project4'].map((field) => (
           <Field
@@ -55,6 +38,5 @@ export function Projects() {
           />
         ))}
       </Card>
-    </Settings>
   );
 }

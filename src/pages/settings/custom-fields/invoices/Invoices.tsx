@@ -22,25 +22,17 @@ import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFie
 import { useHandleCompanySave } from '../../common/hooks/useHandleCompanySave';
 import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
 import { useSetSurchageTaxValue } from '$app/pages/invoices/common/hooks/useSetSurchargeTaxValue';
+import { Divider } from '$app/components/cards/Divider';
 
 export function Invoices() {
-  const { documentTitle } = useTitle('custom_fields');
-
   const [t] = useTranslation();
 
   const disabledCustomFields = useShouldDisableCustomFields();
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('invoices'), href: '/settings/custom_fields/invoices' },
-  ];
 
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
   const handleCustomSurchargeFieldChange =
     useHandleCustomSurchargeFieldChange();
-  const save = useHandleCompanySave();
 
   const surchargeValue = (index: number) => {
     switch (index) {
@@ -58,54 +50,44 @@ export function Invoices() {
   const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   return (
-    <Settings
-      title={documentTitle}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
+    <Card title={`${t('custom_fields')}: ${t('invoices')}`}>
+      {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('invoice_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
 
-      <Card title={`${t('custom_fields')}: ${t('invoices')}`}>
-        {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('invoice_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+      <Divider />
 
-      <Card>
-        {company &&
-          ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
-            (field, index) => (
-              <Element
-                noExternalPadding
-                key={index}
-                leftSide={
-                  <InputField
-                    id={field}
-                    value={company.custom_fields[field]}
-                    placeholder={t('surcharge_field')}
-                    onValueChange={(value) =>
-                      handleCustomSurchargeFieldChange(field, value)
-                    }
-                    disabled={disabledCustomFields}
-                  />
-                }
-              >
-                <Toggle
-                  label={t('charge_taxes')}
-                  checked={surchargeValue(index)}
-                  onChange={() => setSurchargeTaxValue(index)}
+      {company &&
+        ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
+          (field, index) => (
+            <Element
+              key={index}
+              leftSide={
+                <InputField
+                  id={field}
+                  value={company.custom_fields[field]}
+                  placeholder={t('surcharge_field')}
+                  onValueChange={(value) =>
+                    handleCustomSurchargeFieldChange(field, value)
+                  }
+                  disabled={disabledCustomFields}
                 />
-              </Element>
-            )
-          )}
-      </Card>
-    </Settings>
+              }
+            >
+              <Toggle
+                label={t('charge_taxes')}
+                checked={surchargeValue(index)}
+                onChange={() => setSurchargeTaxValue(index)}
+              />
+            </Element>
+          )
+        )}
+    </Card>
   );
 }

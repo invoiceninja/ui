@@ -25,25 +25,10 @@ export function Quotes() {
 
   const title = `${t('custom_fields')}: ${t('quotes')}`;
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('quotes'), href: '/settings/custom_fields/quotes' },
-  ];
-
   const company = useCurrentCompany();
   const handleChange = useHandleCustomFieldChange();
-  const save = useHandleCompanySave();
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
-    >
-      <CustomFieldsPlanAlert />
-
       <Card title={title}>
         {['quote0', 'quote2', 'quote3', 'quote4'].map((field) => (
           <Field
@@ -55,6 +40,5 @@ export function Quotes() {
           />
         ))}
       </Card>
-    </Settings>
   );
 }
