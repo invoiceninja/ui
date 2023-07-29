@@ -289,7 +289,7 @@ export function HelpSidebarIcons(props: Props) {
         >
           <Tippy
             duration={0}
-            content={isMiniSidebar ? t('show_menue') : t('hide_menu')}
+            content={isMiniSidebar ? t('show_menu') : t('hide_menu')}
             className="text-white rounded text-xs mb-2"
           >
             {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}

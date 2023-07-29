@@ -83,9 +83,13 @@ export default function Refund() {
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(
-            route('/api/v1/payments/refund?email_receipt=:email', {
-              email: String(email),
-            })
+            route('/api/v1/payments/refund?email_receipt=:email', { email: String(email) })
+          );
+          queryClient.invalidateQueries(
+            route('/api/v1/payments/:id', { id })
+          );
+          queryClient.invalidateQueries(
+            route('/api/v1/payments')
           );
         });
     },
