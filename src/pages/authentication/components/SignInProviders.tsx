@@ -84,6 +84,8 @@ export function SignInProviders() {
   };
 
   const authHandler = (err: any, data: any, msal: any) => {
+    console.log(err, data, msal);
+
     dispatch(setMsal(msal));
 
     request(
