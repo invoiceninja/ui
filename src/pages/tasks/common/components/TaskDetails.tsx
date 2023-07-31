@@ -167,10 +167,7 @@ export function TaskDetails(props: Props) {
               <span className="text-sm">
                 {t('custom_fields_location_changed')} &nbsp;
               </span>
-              <Link
-                to="/settings/custom_fields/tasks"
-                className="capitalize"
-              >
+              <Link to="/settings/custom_fields/tasks" className="capitalize">
                 {t('click_here')}
               </Link>
             </div>

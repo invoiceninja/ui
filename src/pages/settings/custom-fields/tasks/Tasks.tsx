@@ -29,16 +29,16 @@ export function Tasks() {
   }
 
   return (
-      <Card title={title}>
-        {['task1', 'task2', 'task3', 'task4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('task_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+    <Card title={title}>
+      {['task1', 'task2', 'task3', 'task4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('task_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

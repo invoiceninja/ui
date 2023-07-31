@@ -30,16 +30,16 @@ export function Quotes() {
   }
 
   return (
-      <Card title={title}>
-        {['quote0', 'quote2', 'quote3', 'quote4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('quote_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+    <Card title={title}>
+      {['quote0', 'quote2', 'quote3', 'quote4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('quote_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

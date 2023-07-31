@@ -25,7 +25,11 @@ import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { InvoiceSlider, invoiceSliderAtom, invoiceSliderVisibilityAtom } from '../common/components/InvoiceSlider';
+import {
+  InvoiceSlider,
+  invoiceSliderAtom,
+  invoiceSliderVisibilityAtom,
+} from '../common/components/InvoiceSlider';
 import { useAtom } from 'jotai';
 
 export default function Invoices() {

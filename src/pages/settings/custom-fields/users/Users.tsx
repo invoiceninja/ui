@@ -29,16 +29,16 @@ export function Users() {
   }
 
   return (
-      <Card title={title}>
-        {['user1', 'user2', 'user3', 'user4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('user_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+    <Card title={title}>
+      {['user1', 'user2', 'user3', 'user4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('user_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

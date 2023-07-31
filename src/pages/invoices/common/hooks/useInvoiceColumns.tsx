@@ -26,8 +26,6 @@ import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
-
-
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
   id: keyof TResource;

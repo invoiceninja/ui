@@ -69,8 +69,6 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
   );
 };
 
-
-
 export function useActions() {
   const { t } = useTranslation();
 

@@ -29,16 +29,16 @@ export function Payments() {
   }
 
   return (
-      <Card title={title}>
-        {['payment1', 'payment2', 'payment3', 'payment4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('payment_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+    <Card title={title}>
+      {['payment1', 'payment2', 'payment3', 'payment4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('payment_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

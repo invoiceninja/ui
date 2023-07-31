@@ -29,16 +29,16 @@ export function Projects() {
   }
 
   return (
-      <Card title={title}>
-        {['project1', 'project2', 'project3', 'project4'].map((field) => (
-          <Field
-            key={field}
-            field={field}
-            placeholder={t('project_field')}
-            onChange={(value) => handleChange(field, value)}
-            initialValue={company.custom_fields[field]}
-          />
-        ))}
-      </Card>
+    <Card title={title}>
+      {['project1', 'project2', 'project3', 'project4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('project_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }
