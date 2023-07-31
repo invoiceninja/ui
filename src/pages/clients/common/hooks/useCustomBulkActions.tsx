@@ -23,16 +23,7 @@ export const useCustomBulkActions = () => {
   const documentsBulk = useDocumentsBulk();
 
   const getClientsDocumentsIds = (clients: Client[]) => {
-    let documentsIds: string[] = [];
-
-    clients.forEach((client) => {
-      documentsIds = [
-        ...documentsIds,
-        ...client.documents.map((document) => document.id),
-      ];
-    });
-
-    return documentsIds;
+    return clients.flatMap((client) => client.documents.map(({ id }) => id));
   };
 
   const shouldDownloadDocuments = (clients: Client[]) => {
