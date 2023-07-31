@@ -19,7 +19,6 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
-import { AxiosError } from 'axios';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -100,18 +99,13 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/expenses/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_expense`);
+    }).then(() => {
+      toast.success(`${action}d_expense`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+    });
   };
 }

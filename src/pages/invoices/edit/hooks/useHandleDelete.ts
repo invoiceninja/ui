@@ -8,29 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { toast } from '$app/common/helpers/toast/toast';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { bulk } from '$app/common/queries/invoices';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export function useHandleDelete() {
-  const [t] = useTranslation();
   const navigate = useNavigate();
 
   return (invoice: Invoice) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
-    bulk([invoice.id], 'delete')
-      .then(() => {
-        toast.success(t('deleted_invoice'), { id: toastId });
+    bulk([invoice.id], 'delete').then(() => {
+      toast.success('deleted_invoice');
 
-        navigate('/invoices');
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-      });
+      navigate('/invoices');
+    });
   };
 }

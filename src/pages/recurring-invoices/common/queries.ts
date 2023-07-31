@@ -16,7 +16,6 @@ import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { AxiosError } from 'axios';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -60,18 +59,12 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_recurring_invoice`);
+    }).then(() => {
+      toast.success(`${action}d_recurring_invoice`);
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_invoices/:id', { id })
-        );
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.error();
-      });
+      queryClient.invalidateQueries(
+        route('/api/v1/recurring_invoices/:id', { id })
+      );
+    });
   };
 }

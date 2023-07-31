@@ -23,10 +23,10 @@ import { Address } from '$app/pages/clients/edit/components/Address';
 import { Contacts } from '$app/pages/clients/edit/components/Contacts';
 import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   isModalOpen: boolean;
@@ -81,7 +81,7 @@ export function ClientCreate({
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
 
     if (
@@ -95,14 +95,14 @@ export function ClientCreate({
         message: t('invalid_data //needs translation'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
-      toast.error(t('error_title'), { id: toastId });
+      toast.error();
 
       return onSave;
     }
 
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
-        toast.success(t('created_client'), { id: toastId });
+        toast.success('created_client');
 
         onClientCreated && onClientCreated(response.data.data);
 
@@ -120,13 +120,10 @@ export function ClientCreate({
         handleClose(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           setErrors(error.response.data);
+          toast.dismiss();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 

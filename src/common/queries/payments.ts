@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
@@ -93,20 +92,15 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/payments/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        const translationKeyword = action === 'email' ? 'emaile' : action;
+    }).then(() => {
+      const translationKeyword = action === 'email' ? 'emaile' : action;
 
-        toast.success(`${translationKeyword}d_payment`);
+      toast.success(`${translationKeyword}d_payment`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+    });
   };
 }

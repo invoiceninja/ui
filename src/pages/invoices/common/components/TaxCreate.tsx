@@ -17,8 +17,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   isVisible: boolean;
@@ -40,7 +40,7 @@ export function TaxCreate(props: Props) {
 
       request('POST', endpoint('/api/v1/tax_rates'), values)
         .then((response) => {
-          toast.success(t('created_tax_rate'));
+          toast.success('created_tax_rate');
           props.onClose(false);
 
           window.dispatchEvent(
@@ -54,11 +54,10 @@ export function TaxCreate(props: Props) {
           props.onTaxCreated && props.onTaxCreated(response.data.data);
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          console.error(error);
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
         })
         .finally(() => formik.setSubmitting(false));
     },

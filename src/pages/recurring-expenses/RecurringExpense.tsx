@@ -101,9 +101,6 @@ export default function RecurringExpense() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          toast.error();
-          console.error(error);
         }
       });
   };

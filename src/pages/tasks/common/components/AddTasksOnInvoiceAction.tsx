@@ -19,7 +19,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { AxiosError } from 'axios';
 import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
 
@@ -80,22 +79,17 @@ export function AddTasksOnInvoiceAction(props: Props) {
               clientId: tasks[0].client_id,
             }
           )
-        )
-          .then((response: GenericSingleResourceResponse<Invoice[]>) => {
-            toast.dismiss();
+        ).then((response: GenericSingleResourceResponse<Invoice[]>) => {
+          toast.dismiss();
 
-            if (!response.data.data.length) {
-              return toast.error('no_invoices_found');
-            }
+          if (!response.data.data.length) {
+            return toast.error('no_invoices_found');
+          }
 
-            setInvoices(response.data.data);
+          setInvoices(response.data.data);
 
-            setIsModalVisible(true);
-          })
-          .catch((error: AxiosError) => {
-            toast.error();
-            console.error(error);
-          })
+          setIsModalVisible(true);
+        })
     );
   };
 

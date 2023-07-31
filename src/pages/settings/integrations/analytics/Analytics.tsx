@@ -87,9 +87,6 @@ export function Analytics() {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));
