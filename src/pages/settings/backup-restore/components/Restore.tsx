@@ -29,9 +29,9 @@ export function Restore() {
             onFileImported={() => setIsDataImported(true)}
           />
         ) : (
-          <Card title={t('restore_started')}>
+          <Card title={t('restore')}>
             <span className="text-gray-600 pl-6">
-              {t('importing_process_started')}
+              {t('import_started')}
             </span>
           </Card>
         )}
