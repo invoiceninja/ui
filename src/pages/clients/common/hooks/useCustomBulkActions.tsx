@@ -22,7 +22,7 @@ export const useCustomBulkActions = () => {
 
   const documentsBulk = useDocumentsBulk();
 
-  const getClientsDocumentsIds = (clients: Client[]) => {
+  const getDocumentsIds = (clients: Client[]) => {
     return clients.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
@@ -31,11 +31,15 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Client>[] = [
-    (_, selectedClients) => (
+    (_, selectedClients, onActionCall) => (
       <DropdownElement
         onClick={() =>
           selectedClients && shouldDownloadDocuments(selectedClients)
-            ? documentsBulk(getClientsDocumentsIds(selectedClients), 'download')
+            ? documentsBulk(
+                getDocumentsIds(selectedClients),
+                'download',
+                onActionCall
+              )
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

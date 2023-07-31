@@ -22,7 +22,7 @@ export const useCustomBulkActions = () => {
 
   const documentsBulk = useDocumentsBulk();
 
-  const getProductsDocumentsIds = (products: Product[]) => {
+  const getDocumentsIds = (products: Product[]) => {
     return products.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
@@ -31,13 +31,14 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Product>[] = [
-    (_, selectedProducts) => (
+    (_, selectedProducts, onActionCall) => (
       <DropdownElement
         onClick={() =>
           selectedProducts && shouldDownloadDocuments(selectedProducts)
             ? documentsBulk(
-                getProductsDocumentsIds(selectedProducts),
-                'download'
+                getDocumentsIds(selectedProducts),
+                'download',
+                onActionCall
               )
             : toast.error('no_documents_to_download')
         }
