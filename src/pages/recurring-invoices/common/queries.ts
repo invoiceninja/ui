@@ -16,6 +16,8 @@ import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -50,21 +52,40 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
   );
 }
 
+type Action = 'archive' | 'restore' | 'delete' | 'start' | 'stop';
+
+const successMessages = {
+  start: 'started_recurring_invoice',
+  stop: 'stopped_recurring_invoice',
+};
+
 export function useBulkAction() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (ids: string[], action: Action, onActionCall?: () => void) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
-      ids: [id],
-    }).then(() => {
-      toast.success(`${action}d_recurring_invoice`);
+      ids,
+    })
+      .then(() => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
 
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_invoices/:id', { id })
-      );
-    });
+        toast.success(message);
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
+        ids.forEach((id) =>
+          queryClient.invalidateQueries(
+            route('/api/v1/recurring_invoices/:id', { id })
+          )
+        );
+      })
+      .finally(() => onActionCall?.());
   };
 }
