@@ -9,33 +9,36 @@
  */
 
 import { toast } from '$app/common/helpers/toast/toast';
-import { Client } from '$app/common/interfaces/client';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Product } from '$app/common/interfaces/product';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const documentsBulk = useDocumentsBulk();
 
-  const getClientsDocumentsIds = (clients: Client[]) => {
-    return clients.flatMap(({ documents }) => documents.map(({ id }) => id));
+  const getProductsDocumentsIds = (products: Product[]) => {
+    return products.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
-  const shouldDownloadDocuments = (clients: Client[]) => {
-    return clients.some(({ documents }) => documents.length);
+  const shouldDownloadDocuments = (products: Product[]) => {
+    return products.some(({ documents }) => documents.length);
   };
 
-  const customBulkActions: CustomBulkAction<Client>[] = [
-    (_, selectedClients) => (
+  const customBulkActions: CustomBulkAction<Product>[] = [
+    (_, selectedProducts) => (
       <DropdownElement
         onClick={() =>
-          selectedClients && shouldDownloadDocuments(selectedClients)
-            ? documentsBulk(getClientsDocumentsIds(selectedClients), 'download')
+          selectedProducts && shouldDownloadDocuments(selectedProducts)
+            ? documentsBulk(
+                getProductsDocumentsIds(selectedProducts),
+                'download'
+              )
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
