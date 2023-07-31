@@ -456,7 +456,7 @@ export function useActions() {
       isEditPage &&
       getEntityState(recurringInvoice) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'archive')}
+          onClick={() => bulk([recurringInvoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -467,7 +467,7 @@ export function useActions() {
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'restore')}
+          onClick={() => bulk([recurringInvoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -478,7 +478,7 @@ export function useActions() {
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'delete')}
+          onClick={() => bulk([recurringInvoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
