@@ -87,8 +87,8 @@ export const settingsRoutes = (
         <Route path="vendors" element={<Settings.VendorsCustomFields />} />
         <Route path="expenses" element={<Settings.ExpensesCustomFields />} />
         <Route path="users" element={<Settings.UsersCustomFields />} />
-        <Route path="quotes" element={<Settings.QuotesCustomFields />} />
-        <Route path="credits" element={<Settings.CreditCustomFields />} />
+        {/* <Route path="quotes" element={<Settings.QuotesCustomFields />} /> */}
+        {/* <Route path="credits" element={<Settings.CreditCustomFields />} /> */}
       </Route>
       <Route path="generated_numbers" element={<Settings.GeneratedNumbers />}>
         <Route path="" element={<Settings.GeneratedNumbersSettings />} />
