@@ -41,15 +41,14 @@ export function Overview() {
   const handleSetDefaultCompany = () => {
     toast.processing();
 
-    request('POST', endpoint(`/api/v1/companies/${company.id}/default`), {})
-      .then((response) => {
-        toast.success(response.data.message);
-        setDefaultCompany(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+    request(
+      'POST',
+      endpoint(`/api/v1/companies/${company.id}/default`),
+      {}
+    ).then((response) => {
+      toast.success(response.data.message);
+      setDefaultCompany(false);
+    });
   };
 
   return (

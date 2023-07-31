@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
@@ -261,12 +260,6 @@ export function DataTable<T extends object>(props: Props<T>) {
             },
           })
         );
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        console.error(error.response?.data);
-
-        toast.error();
       })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);

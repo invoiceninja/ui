@@ -33,29 +33,24 @@ export function usePrintPdf({ entity }: Props) {
         endpoint(`/api/v1/${entity}s/bulk`),
         { action: 'bulk_print', ids: resourceIds },
         { responseType: 'arraybuffer' }
-      )
-        .then((response) => {
-          const blob = new Blob([response.data], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
+      ).then((response) => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
 
-          const iframeElement = document.createElement('iframe');
+        const iframeElement = document.createElement('iframe');
 
-          iframeElement.style.display = 'none';
-          iframeElement.src = url;
+        iframeElement.style.display = 'none';
+        iframeElement.src = url;
 
-          document.body.appendChild(iframeElement);
+        document.body.appendChild(iframeElement);
 
-          if (iframeElement && iframeElement.contentWindow) {
-            iframeElement.contentWindow.focus();
-            iframeElement.contentWindow.print();
-          }
+        if (iframeElement && iframeElement.contentWindow) {
+          iframeElement.contentWindow.focus();
+          iframeElement.contentWindow.print();
+        }
 
-          toast.dismiss();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        })
+        toast.dismiss();
+      })
     );
   };
 }

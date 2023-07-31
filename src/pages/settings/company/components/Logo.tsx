@@ -9,20 +9,20 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -34,7 +34,7 @@ export function Logo() {
     enableReinitialize: true,
     initialValues: formData,
     onSubmit: () => {
-      toast.loading(t('processing'));
+      toast.processing();
 
       request(
         'POST',
@@ -47,14 +47,7 @@ export function Logo() {
             updateRecord({ object: 'company', data: response.data.data })
           );
 
-          toast.dismiss();
-          toast.success(t('uploaded_logo'));
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-
-          toast.dismiss();
-          toast.error(t('error_title'));
+          toast.success('uploaded_logo');
         })
         .finally(() => setFormData(new FormData()));
     },

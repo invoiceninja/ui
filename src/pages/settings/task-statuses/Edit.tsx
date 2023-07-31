@@ -90,12 +90,10 @@ export function Edit() {
           setIsTitleApplied(false);
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-          console.error(error);
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error();
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
         })
         .finally(() => setIsFormBusy(false));
     }

@@ -20,7 +20,6 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
-import { AxiosError } from 'axios';
 
 interface TaskParams {
   id?: string;
@@ -81,18 +80,13 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/tasks/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_task`);
+    }).then(() => {
+      toast.success(`${action}d_task`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
+    });
   };
 }

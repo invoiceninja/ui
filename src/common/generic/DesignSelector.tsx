@@ -69,12 +69,8 @@ export function DesignSelector(props: Props) {
         .catch((e: AxiosError<ValidationBag>) => {
           if (e.response?.status === 422) {
             setErrors(e.response.data);
-
-            return toast.dismiss();
+            toast.dismiss();
           }
-
-          toast.error();
-          console.error(e);
         });
     }
   };

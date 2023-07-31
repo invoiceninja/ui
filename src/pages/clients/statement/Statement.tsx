@@ -24,7 +24,6 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { AxiosError } from 'axios';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -189,14 +188,9 @@ export default function Statement() {
       'POST',
       endpoint('/api/v1/client_statement?send_email=true'),
       statement
-    )
-      .then((response) => {
-        toast.success(response.data.message);
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+    ).then((response) => {
+      toast.success(response.data.message);
+    });
   };
 
   useEffect(() => {
@@ -210,21 +204,16 @@ export default function Statement() {
 
     request('POST', endpoint('/api/v1/client_statement'), statement, {
       responseType: 'arraybuffer',
-    })
-      .then((response) => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    }).then((response) => {
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
 
-        if (iframeRef.current) {
-          iframeRef.current.src = url;
-        }
+      if (iframeRef.current) {
+        iframeRef.current.src = url;
+      }
 
-        toast.dismiss();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+      toast.dismiss();
+    });
   }, [statement]);
 
   return (

@@ -46,31 +46,25 @@ export function useStop() {
       'PUT',
       endpoint('/api/v1/tasks/:id?stop=true', { id: task.id }),
       task
-    )
-      .then(() => {
-        toast.success('stopped_task');
+    ).then(() => {
+      toast.success('stopped_task');
 
-        queryClient.invalidateQueries('/api/v1/tasks');
+      queryClient.invalidateQueries('/api/v1/tasks');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/tasks/:id', { id: task.id })
+      );
 
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+      queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+          projectId: task.project_id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

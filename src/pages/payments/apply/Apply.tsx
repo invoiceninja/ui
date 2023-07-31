@@ -21,7 +21,6 @@ import { Alert } from '$app/components/Alert';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
@@ -31,6 +30,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export default function Apply() {
   const queryClient = useQueryClient();
@@ -47,19 +47,18 @@ export default function Apply() {
       invoices: [],
     },
     onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
       setErrors(undefined);
 
       request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
         .then((data) => {
-          toast.success(t('updated_payment'), { id: toastId });
+          toast.success('updated_payment');
           navigate(route('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
           if (error.response?.status === 422) {
             setErrors(error.response.data);
+            toast.dismiss();
           }
         })
         .finally(() => {

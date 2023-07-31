@@ -10,27 +10,18 @@
 
 import { Invoice } from '$app/common/interfaces/invoice';
 import { bulk } from '$app/common/queries/invoices';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useHandleRestore() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return (invoice: Invoice) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     bulk([invoice.id], 'restore')
-      .then(() => {
-        toast.success(t('restored_invoice'), { id: toastId });
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-      })
+      .then(() => toast.success('restored_invoice'))
       .finally(() =>
         queryClient.invalidateQueries(
           route('/api/v1/invoices/:id', { id: invoice.id })

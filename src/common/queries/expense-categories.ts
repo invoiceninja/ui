@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
@@ -72,21 +71,15 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/expense_categories/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_expense_category`);
+    }).then(() => {
+      toast.success(`${action}d_expense_category`);
 
-        queryClient.invalidateQueries('/api/v1/expense_categories');
+      queryClient.invalidateQueries('/api/v1/expense_categories');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/expense_categories/:id', { id })
-        );
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.error();
-      });
+      queryClient.invalidateQueries(
+        route('/api/v1/expense_categories/:id', { id })
+      );
+    });
   };
 }
 

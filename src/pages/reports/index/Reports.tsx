@@ -110,7 +110,7 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
-  
+
   const { save, preferences } = usePreferences();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
@@ -229,8 +229,6 @@ export default function Reports() {
         toast.success();
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           if (report.payload.send_email) {
             setErrors(error.response.data as ValidationBag);
@@ -242,8 +240,6 @@ export default function Reports() {
             blob.text().then((text) => setErrors(JSON.parse(text)));
           }
         }
-
-        toast.error();
       })
       .finally(() => {
         setIsPendingExport(false);

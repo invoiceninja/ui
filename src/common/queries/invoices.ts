@@ -132,11 +132,8 @@ export function useBulk(params?: Params) {
           error.response?.status === 422 &&
           error.response.data.errors.ids?.length
         ) {
-          return toast.error(error.response.data.errors.ids[0]);
+          toast.error(error.response.data.errors.ids[0]);
         }
-
-        console.error(error);
-        toast.error();
       });
   };
 }

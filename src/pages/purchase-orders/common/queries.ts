@@ -16,7 +16,6 @@ import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
@@ -57,25 +56,20 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/purchase_orders/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        action === 'expense'
-          ? toast.success('converted_to_expense')
-          : toast.success(`${action}d_purchase_order`);
+    }).then(() => {
+      action === 'expense'
+        ? toast.success('converted_to_expense')
+        : toast.success(`${action}d_purchase_order`);
 
-        queryClient.invalidateQueries('/api/v1/purchase_orders');
+      queryClient.invalidateQueries('/api/v1/purchase_orders');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/purchase_orders/:id', { id })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }
 
@@ -92,20 +86,15 @@ export function useMarkSent() {
         id: purchaseOrder.id,
       }),
       purchaseOrder
-    )
-      .then(() => {
-        toast.success('marked_purchase_order_as_sent');
+    ).then(() => {
+      toast.success('marked_purchase_order_as_sent');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

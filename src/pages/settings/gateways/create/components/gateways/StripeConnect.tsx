@@ -21,18 +21,16 @@ export function StripeConnect() {
   const handleSetup = () => {
     request('POST', endpoint('/api/v1/one_time_token'), {
       context: 'stripe_connect',
-    })
-      .then((response) =>
-        window
-          .open(
-            route('https://invoicing.co/stripe/signup/:token', {
-              token: response.data.hash,
-            }),
-            '_blank'
-          )
-          ?.focus()
-      )
-      .catch((error) => console.error(error));
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/stripe/signup/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
   };
 
   return (

@@ -26,12 +26,10 @@ export function VerifyEmail() {
     toast.processing();
 
     if (user) {
-      request('POST', endpoint('/api/v1/user/:id/reconfirm', { id: user.id }))
-        .then((response) => toast.success(response.data.message))
-        .catch((error) => {
-          toast.error();
-          console.error(error);
-        });
+      request(
+        'POST',
+        endpoint('/api/v1/user/:id/reconfirm', { id: user.id })
+      ).then((response) => toast.success(response.data.message));
     }
   };
 

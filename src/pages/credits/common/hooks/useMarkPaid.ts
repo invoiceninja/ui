@@ -27,17 +27,11 @@ export function useMarkPaid() {
       'PUT',
       endpoint('/api/v1/credits/:id?mark_paid=true', { id: credit.id }),
       credit
-    )
-      .then(() => {
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+    ).then(() => {
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        toast.success('updated_credit');
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      toast.success('updated_credit');
+    });
   };
 }

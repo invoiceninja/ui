@@ -15,7 +15,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Project } from '$app/common/interfaces/project';
 import { Task } from '$app/common/interfaces/task';
-import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 
 export function useCombineProjectsTasks() {
@@ -64,20 +63,15 @@ export function useCombineProjectsTasks() {
                 projectId,
               }
             )
-          )
-            .then((response: GenericSingleResourceResponse<Task[]>) => {
-              const unInvoicedTasks = response.data.data.filter(
-                (task) => !task.invoice_id
-              );
+          ).then((response: GenericSingleResourceResponse<Task[]>) => {
+            const unInvoicedTasks = response.data.data.filter(
+              (task) => !task.invoice_id
+            );
 
-              if (tasks !== null) {
-                tasks = [...tasks, ...unInvoicedTasks];
-              }
-            })
-            .catch((error: AxiosError) => {
-              toast.error();
-              console.error(error);
-            })
+            if (tasks !== null) {
+              tasks = [...tasks, ...unInvoicedTasks];
+            }
+          })
       );
     });
 
