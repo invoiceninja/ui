@@ -31,12 +31,14 @@ export function useDocumentsQuery(params: Params) {
 }
 
 export const useDocumentsBulk = () => {
-  return (ids: string[], action: 'download') => {
+  return (ids: string[], action: 'download', onActionCall?: () => void) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/documents?per_page=100'), {
       action,
       ids,
-    }).then(() => toast.success('exported_data'));
+    })
+      .then(() => toast.success('exported_data'))
+      .finally(() => onActionCall?.());
   };
 };
