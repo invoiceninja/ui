@@ -13,7 +13,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Card } from '$app/components/cards';
 import { Field } from '../components/Field';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Users() {
   useTitle('custom_fields');
@@ -21,8 +21,12 @@ export function Users() {
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('users')}`;
-  const company = useCurrentCompany();
+  const company = useCompanyChanges();
   const handleChange = useHandleCustomFieldChange();
+
+  if (!company) {
+    return null;
+  }
 
   return (
       <Card title={title}>
