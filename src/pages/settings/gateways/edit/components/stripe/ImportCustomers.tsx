@@ -38,9 +38,6 @@ export function ImportCustomers() {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

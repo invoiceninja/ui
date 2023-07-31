@@ -75,8 +75,8 @@ export function MergeClientModal(props: Props) {
             route('/api/v1/clients/:id', { id: response.data.data.id })
           );
 
-          request('POST', endpoint('/api/v1/refresh'))
-            .then((response: AxiosResponse) => {
+          request('POST', endpoint('/api/v1/refresh')).then(
+            (response: AxiosResponse) => {
               toast.success('merged_clients');
 
               dispatch(updateCompanyUsers(response.data.data));
@@ -88,19 +88,13 @@ export function MergeClientModal(props: Props) {
               if (props.editPage) {
                 navigate('/clients');
               }
-            })
-            .catch((error: AxiosError) => {
-              console.error(error);
-              toast.error();
-            });
+            }
+          );
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
             setLastPasswordEntryTime(0);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

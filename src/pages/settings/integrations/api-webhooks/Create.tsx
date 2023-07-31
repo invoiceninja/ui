@@ -147,9 +147,6 @@ export function Create() {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-          } else {
-            toast.error();
-            console.error(error);
           }
         })
         .finally(() => setIsFormBusy(false));

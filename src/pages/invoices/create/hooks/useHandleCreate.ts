@@ -49,11 +49,10 @@ export function useHandleCreate(
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };

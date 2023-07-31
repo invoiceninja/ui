@@ -84,8 +84,6 @@ export function CreateExpenseCategoryModal(props: Props) {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
-          } else {
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

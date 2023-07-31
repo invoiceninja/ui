@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -27,23 +26,17 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/bank_transactions/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_transaction`);
+    }).then(() => {
+      toast.success(`${action}d_transaction`);
 
-        queryClient.invalidateQueries('/api/v1/bank_transactions');
+      queryClient.invalidateQueries('/api/v1/bank_transactions');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/bank_transactions/:id', { id })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.error();
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

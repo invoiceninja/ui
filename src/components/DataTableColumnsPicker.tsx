@@ -87,20 +87,18 @@ export function DataTableColumnsPicker(props: Props) {
 
     toast.processing();
 
-    request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), user)
-      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-        set(user, 'company_user', response.data.data);
-        setIsModalVisible(false);
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: user.id }),
+      user
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(user, 'company_user', response.data.data);
+      setIsModalVisible(false);
 
-        dispatch(updateUser(user));
+      dispatch(updateUser(user));
 
-        toast.success('saved_settings');
-      })
-      .catch((error) => {
-        toast.error();
-
-        console.error(error);
-      });
+      toast.success('saved_settings');
+    });
   };
 
   const handleDelete = (columnKey: string) => {

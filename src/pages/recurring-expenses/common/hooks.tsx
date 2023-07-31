@@ -412,26 +412,24 @@ export function useToggleStartStop() {
         ? '/api/v1/recurring_expenses/:id?start=true'
         : '/api/v1/recurring_expenses/:id?stop=true';
 
-    request('PUT', endpoint(url, { id: recurringExpense.id }), recurringExpense)
-      .then(() => {
-        queryClient.invalidateQueries('/api/v1/recurring_expenses');
+    request(
+      'PUT',
+      endpoint(url, { id: recurringExpense.id }),
+      recurringExpense
+    ).then(() => {
+      queryClient.invalidateQueries('/api/v1/recurring_expenses');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', {
-            id: recurringExpense.id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/recurring_expenses/:id', {
+          id: recurringExpense.id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        toast.success(action === 'start' ? 'start' : 'stop');
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      toast.success(action === 'start' ? 'start' : 'stop');
+    });
   };
 }
 
