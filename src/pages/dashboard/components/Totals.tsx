@@ -262,7 +262,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('dashboard_charts_default_view')}
+              label={t('range')}
               value={settings.preferences.dashboard_charts.default_view}
               onValueChange={(value) =>
                 update(
@@ -277,7 +277,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('range')}
+              label={t('date_range')}
               value={settings.preferences.dashboard_charts.range}
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.range', value)

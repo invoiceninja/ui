@@ -41,6 +41,7 @@ import {
 } from '$app/components/tax-rates/TaxCategorySelector';
 import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 const numberInputs = [
   'discount',
@@ -172,6 +173,7 @@ export function useResolveInputField(props: Props) {
   };
 
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings(); 
   const resource = props.resource;
 
   const formatMoney = useFormatMoney({
@@ -315,7 +317,7 @@ export function useResolveInputField(props: Props) {
         inputCurrencySeparators && (
           <DecimalNumberInput
             precision={
-              property === 'quantity' ? 6 : inputCurrencySeparators.precision
+              property === 'quantity' ? 6 : (reactSettings?.number_precision && reactSettings?.number_precision > 0) ? reactSettings.number_precision : (inputCurrencySeparators?.precision || 2)
             }
             id={property}
             currency={inputCurrencySeparators}
