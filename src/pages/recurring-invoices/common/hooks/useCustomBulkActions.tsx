@@ -36,6 +36,12 @@ export const useCustomBulkActions = () => {
     return recurringInvoices.some(({ documents }) => documents.length);
   };
 
+  const shouldShowDownloadDocuments = (
+    recurringInvoices: RecurringInvoice[]
+  ) => {
+    return recurringInvoices.some(({ is_deleted }) => !is_deleted);
+  };
+
   const shouldShowStartAction = (recurringInvoices: RecurringInvoice[]) => {
     return recurringInvoices.every(
       ({ status_id }) =>
@@ -71,23 +77,24 @@ export const useCustomBulkActions = () => {
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedRecurringInvoices, onActionCall) => (
-      <DropdownElement
-        onClick={() =>
-          selectedRecurringInvoices &&
-          shouldDownloadDocuments(selectedRecurringInvoices)
-            ? documentsBulk(
-                getDocumentsIds(selectedRecurringInvoices),
-                'download',
-                onActionCall
-              )
-            : toast.error('no_documents_to_download')
-        }
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('documents')}
-      </DropdownElement>
-    ),
+    (_, selectedRecurringInvoices, onActionCall) =>
+      selectedRecurringInvoices &&
+      shouldShowDownloadDocuments(selectedRecurringInvoices) && (
+        <DropdownElement
+          onClick={() =>
+            shouldDownloadDocuments(selectedRecurringInvoices)
+              ? documentsBulk(
+                  getDocumentsIds(selectedRecurringInvoices),
+                  'download',
+                  onActionCall
+                )
+              : toast.error('no_documents_to_download')
+          }
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('documents')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

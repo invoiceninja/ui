@@ -30,23 +30,29 @@ export const useCustomBulkActions = () => {
     return clients.some(({ documents }) => documents.length);
   };
 
+  const shouldShowDownloadDocuments = (clients: Client[]) => {
+    return clients.every(({ is_deleted }) => !is_deleted);
+  };
+
   const customBulkActions: CustomBulkAction<Client>[] = [
-    (_, selectedClients, onActionCall) => (
-      <DropdownElement
-        onClick={() =>
-          selectedClients && shouldDownloadDocuments(selectedClients)
-            ? documentsBulk(
-                getDocumentsIds(selectedClients),
-                'download',
-                onActionCall
-              )
-            : toast.error('no_documents_to_download')
-        }
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('documents')}
-      </DropdownElement>
-    ),
+    (_, selectedClients, onActionCall) =>
+      selectedClients &&
+      shouldShowDownloadDocuments(selectedClients) && (
+        <DropdownElement
+          onClick={() =>
+            shouldDownloadDocuments(selectedClients)
+              ? documentsBulk(
+                  getDocumentsIds(selectedClients),
+                  'download',
+                  onActionCall
+                )
+              : toast.error('no_documents_to_download')
+          }
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('documents')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

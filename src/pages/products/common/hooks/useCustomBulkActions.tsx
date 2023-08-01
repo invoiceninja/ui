@@ -37,6 +37,10 @@ export const useCustomBulkActions = () => {
     return products.some(({ documents }) => documents.length);
   };
 
+  const shouldShowDownloadDocuments = (products: Product[]) => {
+    return products.every(({ is_deleted }) => !is_deleted);
+  };
+
   const customBulkActions: CustomBulkAction<Product>[] = [
     (_, selectedProducts) => (
       <DropdownElement
@@ -56,22 +60,24 @@ export const useCustomBulkActions = () => {
         {t('new_purchase_order')}
       </DropdownElement>
     ),
-    (_, selectedProducts, onActionCall) => (
-      <DropdownElement
-        onClick={() =>
-          selectedProducts && shouldDownloadDocuments(selectedProducts)
-            ? documentsBulk(
-                getDocumentsIds(selectedProducts),
-                'download',
-                onActionCall
-              )
-            : toast.error('no_documents_to_download')
-        }
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('documents')}
-      </DropdownElement>
-    ),
+    (_, selectedProducts, onActionCall) =>
+      selectedProducts &&
+      shouldShowDownloadDocuments(selectedProducts) && (
+        <DropdownElement
+          onClick={() =>
+            shouldDownloadDocuments(selectedProducts)
+              ? documentsBulk(
+                  getDocumentsIds(selectedProducts),
+                  'download',
+                  onActionCall
+                )
+              : toast.error('no_documents_to_download')
+          }
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('documents')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;
