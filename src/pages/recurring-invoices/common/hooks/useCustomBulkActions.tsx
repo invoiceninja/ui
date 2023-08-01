@@ -18,6 +18,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { useBulkAction } from '../queries';
+import { UpdatePricesAction } from '../components/UpdatePricesAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -39,6 +40,10 @@ export const useCustomBulkActions = () => {
   const shouldShowDownloadDocuments = (
     recurringInvoices: RecurringInvoice[]
   ) => {
+    return recurringInvoices.some(({ is_deleted }) => !is_deleted);
+  };
+
+  const shouldShowUpdatePrices = (recurringInvoices: RecurringInvoice[]) => {
     return recurringInvoices.some(({ is_deleted }) => !is_deleted);
   };
 
@@ -76,6 +81,14 @@ export const useCustomBulkActions = () => {
         >
           {t('stop')}
         </DropdownElement>
+      ),
+    (_, selectedRecurringInvoices, onActionCall) =>
+      selectedRecurringInvoices &&
+      shouldShowUpdatePrices(selectedRecurringInvoices) && (
+        <UpdatePricesAction
+          recurringInvoices={selectedRecurringInvoices}
+          onActionCall={onActionCall}
+        />
       ),
     (_, selectedRecurringInvoices, onActionCall) =>
       selectedRecurringInvoices &&

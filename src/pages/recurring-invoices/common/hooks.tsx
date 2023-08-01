@@ -75,6 +75,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { UpdatePricesAction } from './components/UpdatePricesAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -409,6 +410,10 @@ export function useActions() {
         >
           {t('stop')}
         </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <UpdatePricesAction recurringInvoices={[recurringInvoice]} />
       ),
     () => <Divider withoutPadding />,
     (recurringInvoice) => (

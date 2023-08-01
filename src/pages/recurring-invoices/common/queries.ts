@@ -52,16 +52,29 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
   );
 }
 
-type Action = 'archive' | 'restore' | 'delete' | 'start' | 'stop';
+type Action =
+  | 'archive'
+  | 'restore'
+  | 'delete'
+  | 'start'
+  | 'stop'
+  | 'update_prices';
 
 const successMessages = {
   start: 'started_recurring_invoice',
   stop: 'stopped_recurring_invoice',
+  update_prices: 'updated_prices',
 };
 
-export function useBulkAction() {
+interface Params {
+  onSuccess?: () => void;
+}
+
+export function useBulkAction(params?: Params) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  const { onSuccess } = params || {};
 
   return (ids: string[], action: Action, onActionCall?: () => void) => {
     toast.processing();
@@ -76,6 +89,8 @@ export function useBulkAction() {
           `${action}d_invoice`;
 
         toast.success(message);
+
+        onSuccess?.();
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
