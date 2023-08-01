@@ -11,11 +11,12 @@
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { UpdatePricesModal } from './UpdatePricesModal';
 import { useState } from 'react';
 import { useBulkAction } from '../queries';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { MdSync } from 'react-icons/md';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
 
 interface Props {
   recurringInvoices: RecurringInvoice[];
@@ -52,11 +53,18 @@ export const UpdatePricesAction = (props: Props) => {
         {t('update_prices')}
       </DropdownElement>
 
-      <UpdatePricesModal
+      <Modal
+        title={t('update_prices')}
         visible={isModalOpen}
-        setVisible={setIsModalOpen}
-        handleSave={handleSave}
-      />
+        onClose={() => setIsModalOpen(false)}
+        backgroundColor="white"
+      >
+        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+
+        <Button className="self-end" onClick={handleSave}>
+          {t('yes')}
+        </Button>
+      </Modal>
     </>
   );
 };
