@@ -18,6 +18,9 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Dispatch, SetStateAction } from 'react';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -58,30 +61,41 @@ type Action =
   | 'delete'
   | 'start'
   | 'stop'
-  | 'update_prices';
+  | 'update_prices'
+  | 'increase_prices';
 
 const successMessages = {
   start: 'started_recurring_invoice',
   stop: 'stopped_recurring_invoice',
   update_prices: 'updated_prices',
+  increase_prices: 'updated_prices',
 };
 
 interface Params {
   onSuccess?: () => void;
+  setErrors?: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
 export function useBulkAction(params?: Params) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  const { onSuccess } = params || {};
+  const { onSuccess, setErrors } = params || {};
 
-  return (ids: string[], action: Action, onActionCall?: () => void) => {
+  return (
+    ids: string[],
+    action: Action,
+    onActionCall?: () => void,
+    increasePercentage?: number
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
       ids,
+      ...(typeof increasePercentage === 'number' && {
+        percentage_increase: increasePercentage,
+      }),
     })
       .then(() => {
         const message =
@@ -92,6 +106,8 @@ export function useBulkAction(params?: Params) {
 
         onSuccess?.();
 
+        onActionCall?.();
+
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
@@ -101,6 +117,11 @@ export function useBulkAction(params?: Params) {
           )
         );
       })
-      .finally(() => onActionCall?.());
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors?.(error.response.data);
+          toast.dismiss();
+        }
+      });
   };
 }

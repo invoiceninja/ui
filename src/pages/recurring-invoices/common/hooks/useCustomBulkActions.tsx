@@ -19,6 +19,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { useBulkAction } from '../queries';
 import { UpdatePricesAction } from '../components/UpdatePricesAction';
+import { IncreasePricesAction } from '../components/IncreasePricesAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -44,6 +45,10 @@ export const useCustomBulkActions = () => {
   };
 
   const shouldShowUpdatePrices = (recurringInvoices: RecurringInvoice[]) => {
+    return recurringInvoices.some(({ is_deleted }) => !is_deleted);
+  };
+
+  const shouldShowIncreasePrices = (recurringInvoices: RecurringInvoice[]) => {
     return recurringInvoices.some(({ is_deleted }) => !is_deleted);
   };
 
@@ -86,6 +91,14 @@ export const useCustomBulkActions = () => {
       selectedRecurringInvoices &&
       shouldShowUpdatePrices(selectedRecurringInvoices) && (
         <UpdatePricesAction
+          recurringInvoices={selectedRecurringInvoices}
+          onActionCall={onActionCall}
+        />
+      ),
+    (_, selectedRecurringInvoices, onActionCall) =>
+      selectedRecurringInvoices &&
+      shouldShowIncreasePrices(selectedRecurringInvoices) && (
+        <IncreasePricesAction
           recurringInvoices={selectedRecurringInvoices}
           onActionCall={onActionCall}
         />

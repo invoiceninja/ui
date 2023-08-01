@@ -76,6 +76,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { UpdatePricesAction } from './components/UpdatePricesAction';
+import { IncreasePricesAction } from './components/IncreasePricesAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -414,6 +415,10 @@ export function useActions() {
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
         <UpdatePricesAction recurringInvoices={[recurringInvoice]} />
+      ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <IncreasePricesAction recurringInvoices={[recurringInvoice]} />
       ),
     () => <Divider withoutPadding />,
     (recurringInvoice) => (
