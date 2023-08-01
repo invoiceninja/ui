@@ -39,6 +39,9 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { BiPlusCircle } from 'react-icons/bi';
+import { useInvoiceProducts } from './hooks/useInvoiceProducts';
+import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -247,6 +250,10 @@ export function useActions() {
 
   const setProduct = useSetAtom(productAtom);
 
+  const invoiceProducts = useInvoiceProducts();
+
+  const purchaseOrderProducts = usePurchaseOrderProducts();
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'product',
     editPageTabs: ['documents', 'product_fields'],
@@ -273,6 +280,22 @@ export function useActions() {
   };
 
   const actions = [
+    (product: Product) => (
+      <DropdownElement
+        onClick={() => invoiceProducts([product])}
+        icon={<Icon element={BiPlusCircle} />}
+      >
+        {t('new_invoice')}
+      </DropdownElement>
+    ),
+    (product: Product) => (
+      <DropdownElement
+        onClick={() => purchaseOrderProducts([product])}
+        icon={<Icon element={BiPlusCircle} />}
+      >
+        {t('new_purchase_order')}
+      </DropdownElement>
+    ),
     (product: Product) => (
       <DropdownElement
         onClick={() => cloneToProduct(product)}
