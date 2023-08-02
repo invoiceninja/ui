@@ -280,30 +280,33 @@ export function useActions() {
   };
 
   const actions = [
-    (product: Product) => (
-      <DropdownElement
-        onClick={() => invoiceProducts([product])}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_invoice')}
-      </DropdownElement>
-    ),
-    (product: Product) => (
-      <DropdownElement
-        onClick={() => purchaseOrderProducts([product])}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_purchase_order')}
-      </DropdownElement>
-    ),
-    (product: Product) => (
-      <DropdownElement
-        onClick={() => cloneToProduct(product)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    (product: Product) =>
+      !product.is_deleted && (
+        <DropdownElement
+          onClick={() => invoiceProducts([product])}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_invoice')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      !product.is_deleted && (
+        <DropdownElement
+          onClick={() => purchaseOrderProducts([product])}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_purchase_order')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      !product.is_deleted && (
+        <DropdownElement
+          onClick={() => cloneToProduct(product)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (product: Product) =>
       getEntityState(product) === EntityState.Active &&

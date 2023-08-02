@@ -41,25 +41,35 @@ export const useCustomBulkActions = () => {
     return products.every(({ is_deleted }) => !is_deleted);
   };
 
+  const shouldShowNewInvoice = (products: Product[]) => {
+    return products.every(({ is_deleted }) => !is_deleted);
+  };
+
+  const shouldShowPurchaseOrder = (products: Product[]) => {
+    return products.every(({ is_deleted }) => !is_deleted);
+  };
+
   const customBulkActions: CustomBulkAction<Product>[] = [
-    (_, selectedProducts) => (
-      <DropdownElement
-        onClick={() => selectedProducts && invoiceProducts(selectedProducts)}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_invoice')}
-      </DropdownElement>
-    ),
-    (_, selectedProducts) => (
-      <DropdownElement
-        onClick={() =>
-          selectedProducts && purchaseOrderProducts(selectedProducts)
-        }
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_purchase_order')}
-      </DropdownElement>
-    ),
+    (_, selectedProducts) =>
+      selectedProducts &&
+      shouldShowNewInvoice(selectedProducts) && (
+        <DropdownElement
+          onClick={() => invoiceProducts(selectedProducts)}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_invoice')}
+        </DropdownElement>
+      ),
+    (_, selectedProducts) =>
+      selectedProducts &&
+      shouldShowPurchaseOrder(selectedProducts) && (
+        <DropdownElement
+          onClick={() => purchaseOrderProducts(selectedProducts)}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_purchase_order')}
+        </DropdownElement>
+      ),
     (_, selectedProducts, onActionCall) =>
       selectedProducts &&
       shouldShowDownloadDocuments(selectedProducts) && (
