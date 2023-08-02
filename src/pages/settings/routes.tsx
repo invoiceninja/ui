@@ -76,8 +76,7 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
       </Route>
-      <Route path="custom_fields">
-        <Route path="" element={<Settings.CustomFields />} />
+      <Route path="custom_fields" element={<Settings.CustomFields />}>
         <Route path="company" element={<Settings.CompanyCustomFields />} />
         <Route path="clients" element={<Settings.ClientsCustomFields />} />
         <Route path="products" element={<Settings.ProductsCustomFields />} />
@@ -88,6 +87,8 @@ export const settingsRoutes = (
         <Route path="vendors" element={<Settings.VendorsCustomFields />} />
         <Route path="expenses" element={<Settings.ExpensesCustomFields />} />
         <Route path="users" element={<Settings.UsersCustomFields />} />
+        {/* <Route path="quotes" element={<Settings.QuotesCustomFields />} /> */}
+        {/* <Route path="credits" element={<Settings.CreditCustomFields />} /> */}
       </Route>
       <Route path="generated_numbers" element={<Settings.GeneratedNumbers />}>
         <Route path="" element={<Settings.GeneratedNumbersSettings />} />

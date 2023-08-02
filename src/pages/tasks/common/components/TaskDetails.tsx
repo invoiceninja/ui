@@ -9,18 +9,15 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
@@ -40,7 +37,6 @@ export function TaskDetails(props: Props) {
 
   const company = useCurrentCompany();
   const location = useLocation();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -168,21 +164,12 @@ export function TaskDetails(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['task1', 'task2', 'task3', 'task4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('task_field')}
-                    onChange={(value: any) =>
-                      handleCustomFieldChange(field, value)
-                    }
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link to="/settings/custom_fields/tasks" className="capitalize">
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>

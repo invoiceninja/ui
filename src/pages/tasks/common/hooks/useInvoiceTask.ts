@@ -82,8 +82,9 @@ export function useInvoiceTask() {
         invoice.tax_name3 = company.settings?.tax_name3;
         invoice.tax_rate3 = company.settings?.tax_rate3;
       }
-      
-      invoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false
+
+      invoice.uses_inclusive_taxes =
+        company?.settings?.inclusive_taxes ?? false;
 
       const clients = collect(tasks).pluck('client_id').unique().toArray();
 
