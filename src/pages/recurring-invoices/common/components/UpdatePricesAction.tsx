@@ -57,7 +57,6 @@ export const UpdatePricesAction = (props: Props) => {
         title={t('update_prices')}
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        backgroundColor="white"
       >
         <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
 

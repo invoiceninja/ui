@@ -68,7 +68,6 @@ export const IncreasePricesAction = (props: Props) => {
         title={t('increase_prices')}
         visible={isModalOpen}
         onClose={handleOnUpdatedPrices}
-        backgroundColor="white"
       >
         <InputField
           label={t('percent')}
