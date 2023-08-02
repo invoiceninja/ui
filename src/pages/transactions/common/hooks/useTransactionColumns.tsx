@@ -28,9 +28,9 @@ export function useTransactionColumns() {
 
   const formatMoney = useFormatMoney();
 
-  const { data: invoices } = useInvoicesQuery({});
+  const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
 
-  const { data: expenses } = useExpensesQuery({});
+  const { data: expenses } = useExpensesQuery({ perPage: 1000 });
 
   const getInvoiceNumber = (invoiceId: string) => {
     return invoices?.find((invoice) => invoice.id === invoiceId)?.number || '';
