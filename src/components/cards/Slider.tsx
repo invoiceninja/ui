@@ -62,7 +62,7 @@ export function Slider(props: Props) {
 
                       <Inline>
                         {props.topRight}
-                        
+
                         <MdClose
                           fontSize={24}
                           className="cursor-pointer"

@@ -15,12 +15,12 @@ import { Field } from '../components/Field';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-export function Company() {
+export function Credits() {
   useTitle('custom_fields');
 
   const [t] = useTranslation();
 
-  const title = `${t('custom_fields')}: ${t('company')}`;
+  const title = `${t('custom_fields')}: ${t('credits')}`;
   const company = useCompanyChanges();
   const handleChange = useHandleCustomFieldChange();
 
@@ -30,11 +30,11 @@ export function Company() {
 
   return (
     <Card title={title}>
-      {['company1', 'company2', 'company3', 'company4'].map((field) => (
+      {['credit1', 'credit2', 'credit3', 'credit4'].map((field) => (
         <Field
           key={field}
           field={field}
-          placeholder={t('company_field')}
+          placeholder={t('credit_field')}
           onChange={(value) => handleChange(field, value)}
           initialValue={company.custom_fields[field]}
         />

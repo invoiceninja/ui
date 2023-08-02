@@ -9,20 +9,17 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { Divider } from '$app/components/cards/Divider';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import Toggle from '$app/components/forms/Toggle';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { set } from 'lodash';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
@@ -39,7 +36,6 @@ export function Form(props: Props) {
   const { vendor, setVendor, errors } = props;
 
   const company = useCurrentCompany();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -352,19 +348,12 @@ export function Form(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('contact_field')}
-                    onChange={(value) => handleCustomFieldChange(field, value)}
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link to="/settings/custom_fields/vendors" className="capitalize">
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>
