@@ -279,7 +279,7 @@ export default function Create() {
 
       {reactSettings?.show_pdf_preview && (
         <div className="my-4">
-          {invoice && (
+          {invoice && invoice.client_id && (
             <InvoicePreview
               for="create"
               resource={invoice}
