@@ -22,6 +22,7 @@ import { useResolveCurrencySeparator } from '$app/pages/transactions/common/hook
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
@@ -30,6 +31,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
   const resolveCurrencySeparator = useResolveCurrencySeparator();
+  const reactSettings = useReactSettings();
 
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>({
@@ -249,7 +251,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Element leftSide={t('converted_amount')}>
             <DecimalNumberInput
               border
-              precision={currencySeparators?.precision || 2}
+              precision={(reactSettings?.number_precision && reactSettings?.number_precision > 0) ? reactSettings.number_precision : (currencySeparators?.precision || 2)}
               currency={currencySeparators}
               className="auto"
               initialValue={(expense.foreign_amount || 0).toString()}

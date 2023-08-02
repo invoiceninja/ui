@@ -20,6 +20,7 @@ export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
   react_notification_link: boolean;
+  number_precision?: number;
   preferences: {
     dashboard_charts: {
       default_view: 'day' | 'week' | 'month';
