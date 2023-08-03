@@ -60,15 +60,17 @@ const container = document.getElementById('root') as HTMLElement;
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 createRoot(container).render(
-  <QueryClientProvider client={queryClient}>
-    <Provider store={store}>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <Router>
-          <ScrollToTop>
-            <App />
-          </ScrollToTop>
-        </Router>
-      </GoogleOAuthProvider>
-    </Provider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <Router>
+            <ScrollToTop>
+              <App />
+            </ScrollToTop>
+          </Router>
+        </GoogleOAuthProvider>
+      </Provider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );

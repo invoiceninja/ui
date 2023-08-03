@@ -10,7 +10,7 @@
 
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
@@ -30,20 +30,16 @@ export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
 
-  const [signalController, setSignalController] = useState(
-    new AbortController()
-  );
-
   useEffect(() => {
     if (props.withToast) {
       toast.processing();
     }
 
-    setSignalController({ ...new AbortController() });
+    const controller = new AbortController();
 
     request(props.method, props.link, props.resource, {
       responseType: 'arraybuffer',
-      signal: signalController.signal,
+      signal: controller.signal,
     }).then((response) => {
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -62,17 +58,12 @@ export function InvoiceViewer(props: Props) {
 
       toast.dismiss();
     });
-  }, [props.link, props.resource]);
-
-  useEffect(() => {
-    console.log('ok');
 
     return () => {
-      console.log('ok');
-      signalController.abort();
+      controller.abort();
       toast.dismiss();
     };
-  }, []);
+  }, [props.link, props.resource]);
 
   if (android) {
     return (
