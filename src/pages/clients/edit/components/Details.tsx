@@ -22,6 +22,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
+import { EntityStatus } from '$app/components/EntityStatus';
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
@@ -53,6 +54,12 @@ export function Details(props: Props) {
 
   return (
     <Card title={t('company_details')}>
+      {props.client && (
+        <Element leftSide={t('status')}>
+          <EntityStatus entity={props.client} />
+        </Element>
+      )}
+
       <Element leftSide={t('name')}>
         <InputField
           id="name"
