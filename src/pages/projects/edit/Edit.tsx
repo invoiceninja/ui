@@ -18,6 +18,7 @@ import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -50,6 +51,12 @@ export default function Edit() {
 
   return (
     <Card title={t('edit_project')}>
+      {project && (
+        <Element leftSide={t('status')}>
+          <EntityStatus entity={project} />
+        </Element>
+      )}
+
       <Element leftSide={t('project_name')} required>
         <InputField
           value={project?.name}
