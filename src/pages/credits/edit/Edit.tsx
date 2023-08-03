@@ -35,6 +35,8 @@ import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
+import { Card } from '$app/components/cards';
+import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -111,15 +113,24 @@ export default function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={credit}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          readonly
-          textOnly
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          {credit && (
+            <div className="flex space-x-20">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <CreditStatusBadge entity={credit} />
+            </div>
+          )}
+
+          <ClientSelector
+            resource={credit}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            readonly
+            textOnly
+          />
+        </Card>
 
         <CreditDetails handleChange={handleChange} errors={errors} />
 
