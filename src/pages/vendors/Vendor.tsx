@@ -25,6 +25,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { Inline } from '$app/components/Inline';
 import { useTabs } from './show/hooks/useTabs';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -73,6 +74,13 @@ export default function Vendor() {
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
+          {vendor && (
+            <div className="flex space-x-20 my-3">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <EntityStatus entity={vendor} />
+            </div>
+          )}
+
           <p>
             {t('id_number')}: {vendor?.id_number}
           </p>
