@@ -28,6 +28,7 @@ interface Props {
   setClient: Dispatch<SetStateAction<Client | undefined>>;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function Details(props: Props) {
@@ -54,7 +55,7 @@ export function Details(props: Props) {
 
   return (
     <Card title={t('company_details')}>
-      {props.client && (
+      {props.client && props.page === 'edit' && (
         <Element leftSide={t('status')}>
           <EntityStatus entity={props.client} />
         </Element>
