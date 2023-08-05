@@ -360,7 +360,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -375,7 +375,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
