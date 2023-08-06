@@ -82,7 +82,7 @@ export function Actions(props: Props) {
       ids: [id],
     })
       .then(() => {
-        toast.success(t(`${action}d_user`), { id: toastId });
+        toast.success(t(`${action}d_user`));
         queryClient.invalidateQueries(route('/api/v1/users'));
       })
       .catch((error) => {
