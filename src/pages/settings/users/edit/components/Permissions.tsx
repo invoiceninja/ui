@@ -188,6 +188,24 @@ export function Permissions(props: Props) {
           </div>
         </Element>
       ))}
+
+      <Element leftSide={t('view_dashboard')}>
+        <Toggle
+          checked={isPermissionChecked('view_dashboard')}
+          onValueChange={(value) =>
+            handlePermissionChange('view_dashboard', value)
+          }
+        />
+      </Element>
+
+      <Element leftSide={t('view_reports')}>
+        <Toggle
+          checked={isPermissionChecked('view_reports')}
+          onValueChange={(value) =>
+            handlePermissionChange('view_reports', value)
+          }
+        />
+      </Element>
     </Card>
   );
 }
