@@ -75,6 +75,7 @@ export function ListBox(props: Props) {
 
   const isExpensesDataKey = props.dataKey === 'expenses';
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [clientId, setClientId] = useState<string>();
 
   const { data: clientsResponse } = useClientsQuery({
@@ -124,8 +125,11 @@ export function ListBox(props: Props) {
     return Boolean(props.selectedIds?.find((id) => id === itemId)?.length);
   };
 
+  // This section of code is currently commented out due to the absence of client_id filtering during invoice selection.
+  // Uncomment the code when the decision is made to reinstate this functionality.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const selectItem = (itemId: string, clientId?: string) => {
-    setClientId(clientId);
+    //setClientId(clientId);
 
     const filteredItemIdsList = props.selectedIds?.find((id) => itemId === id);
 
@@ -166,7 +170,7 @@ export function ListBox(props: Props) {
   };
 
   useEffect(() => {
-    setClients(clientsResponse);
+    !clients && setClients(clientsResponse);
 
     if (isInvoicesDataKey) {
       setResourceItems(getFormattedResourceList(invoicesResponse));
@@ -181,6 +185,7 @@ export function ListBox(props: Props) {
     }
   }, [
     props.dataKey,
+    clients,
     invoicesResponse,
     vendorsResponse,
     expenseCategoriesResponse,
@@ -189,11 +194,15 @@ export function ListBox(props: Props) {
     expensesResponse,
   ]);
 
+  // This section of code is currently commented out due to the absence of client_id filtering during invoice selection.
+  // Uncomment the code when the decision is made to reinstate this functionality.
+  /*
   useEffect(() => {
     if (isInvoicesDataKey && !props.selectedIds?.length) {
       setClientId('');
     }
   }, [props.selectedIds]);
+  */
 
   return (
     <div className="flex flex-col flex-1 w-full">
