@@ -95,6 +95,7 @@ export function Actions(props: Props) {
 
         toast.success(message);
         queryClient.invalidateQueries(route('/api/v1/users'));
+        queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
       })
       .catch((error) => {
         if (error.response?.status === 412) {
