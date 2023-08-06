@@ -75,6 +75,13 @@ export function Actions(props: Props) {
       return remove();
     }
 
+    const successMessages = {
+      archive: 'archive',
+      restore: 'restore',
+      delete: 'delete',
+      remove: 'remove',
+    };
+
     toast.processing();
 
     request('POST', endpoint('/api/v1/users/bulk'), {
@@ -82,7 +89,11 @@ export function Actions(props: Props) {
       ids: [id],
     })
       .then(() => {
-        toast.success(t(`${action}d_user`));
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_user`;
+
+        toast.success(message);
         queryClient.invalidateQueries(route('/api/v1/users'));
       })
       .catch((error) => {
