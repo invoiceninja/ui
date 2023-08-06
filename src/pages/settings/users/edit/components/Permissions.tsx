@@ -106,6 +106,27 @@ export function Permissions(props: Props) {
         />
       </Element>
 
+      <Element leftSide={t('view_dashboard')}>
+        <Toggle
+          checked={isPermissionChecked('view_dashboard')}
+          onValueChange={(value) =>
+            handlePermissionChange('view_dashboard', value)
+          }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('reports')}
+        leftSideHelp={t('view_report_permission')}
+      >
+        <Toggle
+          checked={isPermissionChecked('view_reports')}
+          onValueChange={(value) =>
+            handlePermissionChange('view_reports', value)
+          }
+        />
+      </Element>
+
       <Element>
         <div className="grid grid-cols-3 md:grid-cols-6">
           <div className="col-1">{t('create')}</div>
@@ -188,24 +209,6 @@ export function Permissions(props: Props) {
           </div>
         </Element>
       ))}
-
-      <Element leftSide={t('view_dashboard')}>
-        <Toggle
-          checked={isPermissionChecked('view_dashboard')}
-          onValueChange={(value) =>
-            handlePermissionChange('view_dashboard', value)
-          }
-        />
-      </Element>
-
-      <Element leftSide={t('view_reports')}>
-        <Toggle
-          checked={isPermissionChecked('view_reports')}
-          onValueChange={(value) =>
-            handlePermissionChange('view_reports', value)
-          }
-        />
-      </Element>
     </Card>
   );
 }
