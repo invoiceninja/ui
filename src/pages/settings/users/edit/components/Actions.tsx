@@ -76,10 +76,10 @@ export function Actions(props: Props) {
     }
 
     const successMessages = {
-      archive: 'archive',
-      restore: 'restore',
-      delete: 'delete',
-      remove: 'remove',
+      archive: 'archived_user',
+      restore: 'restored_user',
+      delete: 'deleted_user',
+      remove: 'removed_user',
     };
 
     toast.processing();
