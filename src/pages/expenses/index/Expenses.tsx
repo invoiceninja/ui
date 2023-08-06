@@ -54,7 +54,6 @@ export default function Expenses() {
         linkToEdit="/expenses/:id/edit"
         customActions={actions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={<ImportButton route="/expenses/import" />}

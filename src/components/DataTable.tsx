@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
@@ -50,6 +49,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
+import collect from 'collect.js';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -86,7 +86,6 @@ interface Props<T> extends CommonProps {
   customActions?: any;
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
-  customFilterQueryKey?: string;
   customFilterPlaceholder?: string;
   withoutActions?: boolean;
   withoutPagination?: boolean;
@@ -121,7 +120,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const { styleOptions } = props;
+  const { styleOptions, customFilters } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -137,6 +136,38 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
+  const handleChangingCustomFilters = () => {
+    if (customFilters) {
+      const queryKeys: string[] = collect(props.customFilters)
+        .pluck('queryKey')
+        .unique()
+        .toArray();
+
+      queryKeys.forEach((queryKey) => {
+        const currentQueryKey = queryKey || 'client_status';
+        const selectedFiltersByKey: string[] = [];
+
+        customFilters.forEach((filter, index) => {
+          const customFilterQueryKey = filter.queryKey || null;
+
+          if (
+            customFilterQueryKey === queryKey &&
+            customFilter.includes(filter.value)
+          ) {
+            selectedFiltersByKey.push(filter.value);
+          }
+
+          if (index === customFilters.length - 1) {
+            apiEndpoint.searchParams.set(
+              currentQueryKey,
+              selectedFiltersByKey.join(',')
+            );
+          }
+        });
+      });
+    }
+  };
+
   useEffect(() => {
     const perPageParameter = apiEndpoint.searchParams.get('perPage');
 
@@ -149,12 +180,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
-    if (props.customFilterQueryKey) {
-      apiEndpoint.searchParams.set(
-        props.customFilterQueryKey,
-        customFilter.join(',')
-      );
-    }
+
+    handleChangingCustomFilters();
+
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
@@ -233,12 +261,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           })
         );
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        console.error(error.response?.data);
-
-        toast.error();
-      })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);
         queryClient.invalidateQueries([apiEndpoint.pathname]);
@@ -267,7 +289,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           defaultOption={options[0]}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
-          customFilterQueryKey={props.customFilterQueryKey}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={

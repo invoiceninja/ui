@@ -106,12 +106,11 @@ export function UserDetails() {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else if (error.response?.status == 422) {
+        }
+
+        if (error.response?.status == 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

@@ -43,7 +43,7 @@ export function Create() {
 
   const { data } = useBlankSubscriptionQuery();
 
-  const { data: productsData } = useProductsQuery();
+  const { data: productsData } = useProductsQuery({ include: 'company' });
 
   const queryClient = useQueryClient();
 
@@ -114,9 +114,6 @@ export function Create() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

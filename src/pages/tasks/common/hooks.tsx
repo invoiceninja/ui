@@ -53,6 +53,12 @@ import { useBulk } from '$app/common/queries/tasks';
 import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 export const defaultColumns: string[] = [
   'status',
@@ -171,7 +177,7 @@ export function useTaskColumns() {
       column: 'duration',
       id: 'time_log',
       label: t('duration'),
-      format: (value) => calculateHours(value.toString()),
+      format: (value) => calculateHours(value.toString(), true),
     },
     {
       column: 'entity_state',
@@ -192,8 +198,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           task.rate || company.settings.default_task_rate,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -259,8 +265,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           value,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -283,8 +289,8 @@ export function useSave() {
   const queryClient = useQueryClient();
 
   return (task: Task) => {
-    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
-      .then(() => {
+    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
+      () => {
         toast.success('updated_task');
 
         queryClient.invalidateQueries(
@@ -298,17 +304,19 @@ export function useSave() {
         queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      }
+    );
   };
 }
 
 export function useTaskFilters() {
   const [t] = useTranslation();
+
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: taskStatuses } = useTaskStatusesQuery({
+    status: 'active',
+  });
 
   const filters: SelectOption[] = [
     {
@@ -324,6 +332,20 @@ export function useTaskFilters() {
       backgroundColor: '#22C55E',
     },
   ];
+
+  taskStatuses?.data.forEach((taskStatus) => {
+    const { red, green, blue, hex } = hexToRGB(taskStatus.color);
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      label: taskStatus.name,
+      value: taskStatus.id,
+      color: adjustColorDarkness(hex, darknessAmount),
+      backgroundColor: taskStatus.color,
+      queryKey: 'task_status',
+    });
+  });
 
   return filters;
 }

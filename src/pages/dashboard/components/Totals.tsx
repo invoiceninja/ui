@@ -57,12 +57,18 @@ export interface ChartData {
     date: string;
     currency: string;
   }[];
+  expenses: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
 }
 
 export enum TotalColors {
   Green = '#54B434',
   Blue = '#2596BE',
   Red = '#BE4D25',
+  Gray = '#242930',
 }
 
 export function Totals() {
@@ -256,7 +262,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('dashboard_charts_default_view')}
+              label={t('range')}
               value={settings.preferences.dashboard_charts.default_view}
               onValueChange={(value) =>
                 update(
@@ -271,7 +277,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('range')}
+              label={t('date_range')}
               value={settings.preferences.dashboard_charts.range}
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.range', value)
@@ -315,7 +321,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.invoices.invoiced_amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString()
                       )}
                     </span>
                   </Badge>
@@ -327,6 +333,19 @@ export function Totals() {
                     <span className="mx-2 text-base">
                       {formatMoney(
                         totalsData[currency]?.revenue.paid_to_date || 0,
+                        company.settings.country_id,
+                        currency.toString()
+                      )}
+                    </span>
+                  </Badge>
+                </div>
+                
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
+                  <span className="text-gray-600">{t('expenses')}</span>
+                  <Badge style={{ backgroundColor: TotalColors.Gray }}>
+                    <span className="mx-2 text-base">
+                      {formatMoney(
+                        totalsData[currency]?.expenses.amount || 0,
                         company.settings.country_id,
                         currency.toString() ?? company.settings.currency_id
                       )}
@@ -341,7 +360,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.outstanding.amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString()
                       )}
                     </span>
                   </Badge>

@@ -20,6 +20,7 @@ export function resolveColumnWidth(column: string) {
     quantity: '10%',
     line_total: '5%',
     discount: '10%',
+    tax_rate1: '12%',
   };
 
   return mappings[property] || '';

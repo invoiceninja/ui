@@ -22,15 +22,7 @@ export function SwitchToFlutter() {
 
     request('PUT', endpoint('/api/v1/accounts/:id', { id: account.id }), {
       set_react_as_default_ap: false,
-    })
-      .then(() => (window.location.href = window.location.origin))
-      .catch((error) => {
-        console.error(error);
-
-        error.response?.status === 400
-          ? toast.error(error.response.data.message)
-          : toast.error('error_title');
-      });
+    }).then(() => (window.location.href = window.location.origin));
   };
 
   return (

@@ -32,33 +32,32 @@ export function useDownloadPdf(props: Props) {
       toast.processing();
 
       queryClient.fetchQuery(downloadableUrl, () =>
-        request('GET', downloadableUrl, {}, { responseType: 'arraybuffer' })
-          .then((response) => {
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
+        request(
+          'GET',
+          downloadableUrl,
+          {},
+          { responseType: 'arraybuffer' }
+        ).then((response) => {
+          const blob = new Blob([response.data], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
 
-            const [, filename] =
-              response.headers['content-disposition'].split('filename=');
+          const [, filename] =
+            response.headers['content-disposition'].split('filename=');
 
-            const link = document.createElement('a');
+          const link = document.createElement('a');
 
-            link.download = filename;
-            link.href = url;
-            link.target = '_blank';
+          link.download = filename;
+          link.href = url;
+          link.target = '_blank';
 
-            document.body.appendChild(link);
+          document.body.appendChild(link);
 
-            link.click();
+          link.click();
 
-            document.body.removeChild(link);
+          document.body.removeChild(link);
 
-            toast.dismiss();
-          })
-          .catch((error) => {
-            console.error(error);
-
-            toast.error();
-          })
+          toast.dismiss();
+        })
       );
     }
   };

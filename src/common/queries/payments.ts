@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
@@ -45,6 +44,7 @@ export function usePaymentQuery(params: PaymentParams) {
 interface PaymentsParams extends Params {
   enabled?: boolean;
   matchTransactions?: boolean;
+  include?: string;
 }
 
 export function usePaymentsQuery(params: PaymentsParams) {
@@ -54,13 +54,14 @@ export function usePaymentsQuery(params: PaymentsParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/payments?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions',
+          '/api/v1/payments?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
             status: params.status ?? 'active',
             filter: params.filter ?? '',
             match_transactions: params.matchTransactions ?? false,
+            include: params.include || '',
           }
         )
       ).then(
@@ -91,20 +92,15 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/payments/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        const translationKeyword = action === 'email' ? 'emaile' : action;
+    }).then(() => {
+      const translationKeyword = action === 'email' ? 'emaile' : action;
 
-        toast.success(`${translationKeyword}d_payment`);
+      toast.success(`${translationKeyword}d_payment`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+    });
   };
 }

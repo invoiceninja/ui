@@ -116,19 +116,24 @@ export function useBulk(params?: Params) {
 
         params?.onSuccess?.();
 
+        ids.forEach((id) => {
+          queryClient.invalidateQueries(
+            route('/api/v1/invoices/:id', { id })
+          ); 
+        });
+        
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
+
+        
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (
           error.response?.status === 422 &&
           error.response.data.errors.ids?.length
         ) {
-          return toast.error(error.response.data.errors.ids[0]);
+          toast.error(error.response.data.errors.ids[0]);
         }
-
-        console.error(error);
-        toast.error();
       });
   };
 }

@@ -21,8 +21,6 @@ import { route } from '$app/common/helpers/route';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useNavigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Icon } from '$app/components/icons/Icon';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -55,13 +53,13 @@ export function BankAccounts() {
   };
 
   const handleRefresh = () => {
-    request('POST', endpoint('/api/v1/bank_integrations/refresh_accounts'), {})
-      .then((response) => {
-        toast.success(response.data.message);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        toast.error(error.response?.data.message);
-      });
+    request(
+      'POST',
+      endpoint('/api/v1/bank_integrations/refresh_accounts'),
+      {}
+    ).then((response) => {
+      toast.success(response.data.message);
+    });
   };
 
   return (

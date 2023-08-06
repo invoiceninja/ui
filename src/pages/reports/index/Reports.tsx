@@ -25,9 +25,13 @@ import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { SortableColumns } from '../common/components/SortableColumns';
+import {
+  SortableColumns,
+  reportColumn,
+} from '../common/components/SortableColumns';
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import collect from 'collect.js';
 
 export type Identifier =
   | 'activity'
@@ -106,7 +110,8 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
-  const [reportKeys, setReportKeys] = useState<string[]>([]);
+
+  const { save, preferences } = usePreferences();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
@@ -173,8 +178,6 @@ export default function Reports() {
     }));
   };
 
-  const { save } = usePreferences();
-
   const handleExport = () => {
     toast.processing();
 
@@ -187,6 +190,16 @@ export default function Reports() {
       report.identifier === 'product_sales'
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
+
+    let reportKeys: string[] = [];
+
+    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+      reportKeys = collect(
+        preferences.reports.columns[report.identifier][reportColumn]
+      )
+        .pluck('value')
+        .toArray() as string[];
+    }
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
@@ -216,8 +229,6 @@ export default function Reports() {
         toast.success();
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           if (report.payload.send_email) {
             setErrors(error.response.data as ValidationBag);
@@ -229,8 +240,6 @@ export default function Reports() {
             blob.text().then((text) => setErrors(JSON.parse(text)));
           }
         }
-
-        toast.error();
       })
       .finally(() => {
         setIsPendingExport(false);
@@ -407,7 +416,6 @@ export default function Reports() {
         <SortableColumns
           report={report.identifier}
           columns={report.custom_columns}
-          setReportKeys={setReportKeys}
         />
       )}
     </Default>

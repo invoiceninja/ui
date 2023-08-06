@@ -29,23 +29,17 @@ export function useMarkPaid() {
       'PUT',
       endpoint('/api/v1/invoices/:id?paid=true', { id: invoice.id }),
       invoice
-    )
-      .then(() => {
-        toast.success('invoice_paid');
+    ).then(() => {
+      toast.success('invoice_paid');
 
-        queryClient.invalidateQueries('/api/v1/invoices');
+      queryClient.invalidateQueries('/api/v1/invoices');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/invoices/:id', { id: invoice.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/invoices/:id', { id: invoice.id })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error) => {
-        toast.error();
-
-        console.error(error);
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

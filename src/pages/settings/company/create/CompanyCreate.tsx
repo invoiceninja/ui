@@ -9,7 +9,7 @@
  */
 
 import { Button } from '$app/components/forms';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -85,17 +85,9 @@ export function CompanyCreate(props: Props) {
                 companyUser.token.token
               );
             })
-            .catch((error: AxiosError) => {
-              console.error(error);
-              toast.error();
-            })
             .finally(() =>
               localStorage.setItem('COMPANY-EDIT-OPENED', 'false')
             );
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }

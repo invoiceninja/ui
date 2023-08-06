@@ -11,13 +11,13 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { User } from '$app/common/interfaces/user';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -48,33 +48,25 @@ export function Actions(props: Props) {
   const queryClient = useQueryClient();
 
   const invite = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
-    request('POST', endpoint('/api/v1/users/:id/invite', { id }))
-      .then(() =>
-        toast.success(t('email_sent_to_confirm_email'), { id: toastId })
-      )
-      .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-      });
+    request('POST', endpoint('/api/v1/users/:id/invite', { id })).then(() =>
+      toast.success('email_sent_to_confirm_email')
+    );
   };
 
   const remove = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request('DELETE', endpoint('/api/v1/users/:id/detach_from_company', { id }))
       .then(() => {
-        toast.success(t('removed_user'), { id: toastId });
+        toast.success('removed_user');
         navigate('/settings/users');
       })
       .catch((error) => {
-        console.error(error);
-
-        error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'), { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        }
       });
   };
 
@@ -83,7 +75,7 @@ export function Actions(props: Props) {
       return remove();
     }
 
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request('POST', endpoint('/api/v1/users/bulk'), {
       action,
@@ -94,11 +86,9 @@ export function Actions(props: Props) {
         queryClient.invalidateQueries(route('/api/v1/users'));
       })
       .catch((error) => {
-        console.error(error);
-
-        error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'), { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        }
       });
   };
 

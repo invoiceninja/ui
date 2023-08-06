@@ -58,36 +58,31 @@ export function DocumentsTable(props: Props) {
           endpoint('/documents/:hash', { hash: doc.hash }),
           { headers: defaultHeaders() },
           { responseType: 'arraybuffer' }
-        )
-          .then((response) => {
-            const blob = new Blob([response.data], {
-              type: response.headers['content-type'],
-            });
-            const url = URL.createObjectURL(blob);
+        ).then((response) => {
+          const blob = new Blob([response.data], {
+            type: response.headers['content-type'],
+          });
+          const url = URL.createObjectURL(blob);
 
-            if (inline) {
-              window.open(url);
-              return;
-            }
+          if (inline) {
+            window.open(url);
+            return;
+          }
 
-            const link = document.createElement('a');
+          const link = document.createElement('a');
 
-            link.download = doc.name;
-            link.href = url;
-            link.target = '_blank';
+          link.download = doc.name;
+          link.href = url;
+          link.target = '_blank';
 
-            document.body.appendChild(link);
+          document.body.appendChild(link);
 
-            link.click();
+          link.click();
 
-            document.body.removeChild(link);
+          document.body.removeChild(link);
 
-            toast.dismiss();
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error();
-          })
+          toast.dismiss();
+        })
     );
   };
 
@@ -108,9 +103,6 @@ export function DocumentsTable(props: Props) {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

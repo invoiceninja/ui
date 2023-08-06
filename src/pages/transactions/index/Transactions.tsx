@@ -85,7 +85,6 @@ export default function Transactions() {
           linkToEdit="/transactions/:id/edit"
           onTableRowClick={getSelectedTransaction}
           customFilters={filters}
-          customFilterQueryKey="client_status"
           customFilterPlaceholder="status"
           rightSide={
             <Guard

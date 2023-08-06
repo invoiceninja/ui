@@ -235,11 +235,10 @@ export function useSave(props: RecurringInvoiceSaveProps) {
         toast.success('updated_recurring_invoice');
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -257,30 +256,28 @@ export function useToggleStartStop() {
         ? '/api/v1/recurring_invoices/:id?start=true'
         : '/api/v1/recurring_invoices/:id?stop=true';
 
-    request('PUT', endpoint(url, { id: recurringInvoice.id }), recurringInvoice)
-      .then(() => {
-        queryClient.invalidateQueries('/api/v1/recurring_invoices');
+    request(
+      'PUT',
+      endpoint(url, { id: recurringInvoice.id }),
+      recurringInvoice
+    ).then(() => {
+      queryClient.invalidateQueries('/api/v1/recurring_invoices');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_invoices/:id', {
-            id: recurringInvoice.id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/recurring_invoices/:id', {
+          id: recurringInvoice.id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        toast.success(
-          action === 'start'
-            ? 'started_recurring_invoice'
-            : 'stopped_recurring_invoice'
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      toast.success(
+        action === 'start'
+          ? 'started_recurring_invoice'
+          : 'stopped_recurring_invoice'
+      );
+    });
   };
 }
 
@@ -519,11 +516,10 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -586,7 +582,6 @@ export function useRecurringInvoiceColumns() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
 
@@ -638,9 +633,8 @@ export function useRecurringInvoiceColumns() {
       format: (value, recurringInvoice) =>
         formatMoney(
           value,
-          recurringInvoice.client?.country_id || company.settings.country_id,
-          recurringInvoice.client?.settings.currency_id ||
-            company.settings.currency_id
+          recurringInvoice.client?.country_id,
+          recurringInvoice.client?.settings.currency_id
         ),
     },
     {
@@ -719,10 +713,8 @@ export function useRecurringInvoiceColumns() {
         recurringInvoice.is_amount_discount
           ? formatMoney(
               value,
-              recurringInvoice.client?.country_id ||
-                company?.settings.country_id,
-              recurringInvoice.client?.settings.currency_id ||
-                company?.settings.currency_id
+              recurringInvoice.client?.country_id,
+              recurringInvoice.client?.settings.currency_id
             )
           : `${recurringInvoice.discount}%`,
     },

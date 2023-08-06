@@ -21,25 +21,22 @@ import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
 import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { useDropzone } from 'react-dropzone';
 import { updateRecord } from '$app/common/stores/slices/company-users';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Image } from 'react-feather';
-import { route } from '$app/common/helpers/route';
-import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
-import { User } from '@sentry/react';
-import { Record } from '$app/components/forms/DebouncedCombobox';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -69,7 +66,7 @@ export function EmailSettings() {
     enableReinitialize: true,
     initialValues: formData,
     onSubmit: () => {
-      toast.loading(t('processing'));
+      toast.processing();
 
       request(
         'POST',
@@ -82,22 +79,16 @@ export function EmailSettings() {
             updateRecord({ object: 'company', data: response.data.data })
           );
 
-          toast.dismiss();
-          toast.success(t('uploaded_document'));
+          toast.success('uploaded_document');
         })
-        .catch((error: AxiosError) => {
-          console.error(error);
 
-          toast.dismiss();
-          toast.error(t('error_title'));
-        })
         .finally(() => setFormData(new FormData()));
     },
   });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) {
-      toast.error(t('invalid_file'));
+      toast.error('invalid_file');
       return;
     }
 
@@ -260,26 +251,17 @@ export function EmailSettings() {
           company?.settings.email_sending_method === 'gmail') &&
           isHosted() && (
             <Element leftSide={`Gmail / Microsoft ${t('user')}`}>
-              <DebouncedCombobox
-                clearButton={true}
+              <UserSelector
+                endpoint="/api/v1/users?sending_users=true"
+                value={company?.settings?.gmail_sending_user_id}
+                onChange={(user) =>
+                  handleChange('settings.gmail_sending_user_id', user.id)
+                }
                 onClearButtonClick={() =>
                   handleChange('settings.gmail_sending_user_id', '0')
                 }
-                defaultValue={company?.settings.gmail_sending_user_id}
-                endpoint={route('/api/v1/users?sending_users=true')}
-                label="user"
-                onChange={(value: Record<User>) =>
-                  value.resource &&
-                  handleChange(
-                    'settings.gmail_sending_user_id',
-                    value?.resource?.id
-                  )
-                }
-                formatLabel={(resource: User) =>
-                  `${resource.first_name} ${resource.last_name}`
-                }
-                staleTime={1}
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
+                staleTime={1}
               />
             </Element>
           )}

@@ -19,7 +19,6 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
-import { AxiosError } from 'axios';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -61,6 +60,7 @@ export function useExpenseQuery(params: ExpenseParams) {
 interface ExpensesParams extends Params {
   enabled?: boolean;
   matchTransactions?: boolean;
+  include?: string;
 }
 
 export function useExpensesQuery(params: ExpensesParams) {
@@ -70,7 +70,7 @@ export function useExpensesQuery(params: ExpensesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&includes=:includes',
+          '/api/v1/expenses?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
@@ -78,6 +78,7 @@ export function useExpensesQuery(params: ExpensesParams) {
             filter: params.filter ?? '',
             match_transactions: params.matchTransactions ?? false,
             includes: 'category',
+            include: params.include || '',
           }
         )
       ).then(
@@ -98,18 +99,13 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/expenses/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_expense`);
+    }).then(() => {
+      toast.success(`${action}d_expense`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+    });
   };
 }

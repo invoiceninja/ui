@@ -15,13 +15,11 @@ import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { useTranslation } from 'react-i18next';
 import { MultipleProductSelector } from './MultipleProductSelector';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export interface SubscriptionProps {
   subscription: Subscription;
@@ -52,16 +50,20 @@ export function Overview(props: OverviewSubscriptionProps) {
       </Element>
 
       <Element leftSide={t('group')}>
-        <DebouncedCombobox
-          endpoint={'/api/v1/group_settings'}
-          label="name"
-          defaultValue={subscription.group_id}
-          onChange={(value: Record<GroupSettings>) =>
+        <ComboboxAsync<GroupSettings>
+          endpoint={new URL(endpoint('/api/v1/group_settings?status=active'))}
+          onChange={(value: Entry<GroupSettings>) =>
             value.resource && handleChange('group_id', value.resource.id)
           }
-          onClearButtonClick={() => handleChange('group_id', '')}
-          queryAdditional
-          clearButton
+          inputOptions={{
+            value: subscription.group_id,
+          }}
+          entryOptions={{
+            id: 'id',
+            label: 'name',
+            value: 'id',
+          }}
+          onDismiss={() => handleChange('group_id', '')}
           errorMessage={errors?.errors.group_id}
         />
       </Element>

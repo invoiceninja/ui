@@ -49,15 +49,10 @@ export function Connect() {
       'POST',
       endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
       {}
-    )
-      .then((response) => {
-        toast.success(response.data.message);
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error();
-        console.error(error);
-      });
+    ).then((response) => {
+      toast.success(response.data.message);
+      window.location.reload();
+    });
   };
 
   const handleDisconnectOauth = (event: FormEvent<HTMLButtonElement>) => {
@@ -68,15 +63,10 @@ export function Connect() {
     request(
       'POST',
       endpoint('/api/v1/users/:id/disconnect_oauth', { id: user!.id })
-    )
-      .then((response) => {
-        toast.success(response.data.message);
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error();
-        console.error(error);
-      });
+    ).then((response) => {
+      toast.success(response.data.message);
+      window.location.reload();
+    });
   };
 
   const authHandler = (err: any, data: any, msal: any) => {
@@ -88,14 +78,9 @@ export function Connect() {
         '/api/v1/connected_account?include=company_user&provider=microsoft'
       ),
       data
-    )
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+    ).then(() => {
+      window.location.reload();
+    });
   };
 
   const handleGoogle = (token: string) => {
@@ -107,14 +92,9 @@ export function Connect() {
           token,
         }
       )
-    )
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+    ).then(() => {
+      window.location.reload();
+    });
   };
 
   const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;

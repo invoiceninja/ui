@@ -224,11 +224,10 @@ export function useCreate(props: CreateProps) {
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -256,11 +255,10 @@ export function useSave(props: CreateProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -604,7 +602,6 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
@@ -673,8 +670,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company.settings.country_id,
-          quote.client?.settings.currency_id || company.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -773,8 +770,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -822,8 +819,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -848,7 +845,7 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -863,7 +860,7 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -874,8 +871,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {

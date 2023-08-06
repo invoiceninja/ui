@@ -231,9 +231,6 @@ export function useCreate(props: CreateProps) {
           if (error.response.data.errors.invoice_id) {
             toast.error(error.response.data.errors.invoice_id[0]);
           }
-        } else {
-          console.error(error);
-          toast.error();
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -265,11 +262,10 @@ export function useSave(props: CreateProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -629,7 +625,6 @@ export function useCreditColumns() {
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
 
@@ -672,8 +667,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -686,13 +681,12 @@ export function useCreditColumns() {
       column: 'remaining',
       id: 'balance',
       label: t('remaining'),
-      format: (_, credit) => {
-        return formatMoney(
+      format: (_, credit) =>
+        formatMoney(
           credit.balance,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        );
-      },
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
+        ),
     },
     {
       column: 'archived_at',
@@ -778,8 +772,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -827,8 +821,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -853,7 +847,7 @@ export function useCreditColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -868,7 +862,7 @@ export function useCreditColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -879,8 +873,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {

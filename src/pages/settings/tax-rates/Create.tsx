@@ -83,9 +83,6 @@ export function Create() {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));
@@ -132,7 +129,7 @@ export function Create() {
 
             <InputField
               required
-              type="text"
+              type="number"
               label={t('rate')}
               value={taxRate?.rate}
               onValueChange={(value) => handleChange('rate', Number(value))}

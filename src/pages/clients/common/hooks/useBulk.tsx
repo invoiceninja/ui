@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -27,18 +26,13 @@ export function useBulk() {
     request('POST', endpoint('/api/v1/clients/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_client`);
+    }).then(() => {
+      toast.success(`${action}d_client`);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+    });
   };
 }

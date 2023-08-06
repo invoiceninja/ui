@@ -18,6 +18,7 @@ import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
+import { Alert } from '../Alert';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -52,6 +53,8 @@ export interface ComboboxStaticProps<T = any> {
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
+  errorMessage?: string | string[];
+  clearInputAfterSelection?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -68,6 +71,8 @@ export function ComboboxStatic({
   onChange,
   onDismiss,
   entryOptions,
+  errorMessage,
+  clearInputAfterSelection,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -124,6 +129,11 @@ export function ComboboxStatic({
     if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
     }
+
+    if (clearInputAfterSelection) {
+      setSelectedValue(null);
+      setQuery('');
+    }
   }, [selectedValue]);
 
   useEffect(() => {
@@ -173,6 +183,7 @@ export function ComboboxStatic({
         <div className="relative mt-1">
           <div className="relative w-full cursor-default overflow-hidden rounded border border-gray-300 bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm">
             <HeadlessCombobox.Input
+              data-testid="combobox-input-field"
               className="w-full rounded border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
@@ -196,11 +207,16 @@ export function ComboboxStatic({
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
               >
                 {onDismiss && selectedValue ? (
-                  <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <X
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                    data-testid="combobox-clear-icon"
+                  />
                 ) : (
                   <ChevronDown
                     className="h-5 w-5 text-gray-400"
                     aria-hidden="true"
+                    data-testid="combobox-chevrondown-icon"
                   />
                 )}
               </HeadlessCombobox.Button>
@@ -215,6 +231,7 @@ export function ComboboxStatic({
           >
             {action && action.visible && (
               <button
+                data-testid="combobox-action-button"
                 type="button"
                 onClick={action.onClick}
                 className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-gray-100"
@@ -286,6 +303,12 @@ export function ComboboxStatic({
           </HeadlessCombobox.Options>
         )}
       </HeadlessCombobox>
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
     </div>
   );
 }
@@ -312,6 +335,9 @@ export interface ComboboxAsyncProps<T> {
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
+  disableWithQueryParameter?: boolean;
+  errorMessage?: string | string[];
+  clearInputAfterSelection?: boolean;
 }
 
 export function ComboboxAsync<T = any>({
@@ -327,6 +353,9 @@ export function ComboboxAsync<T = any>({
   nullable,
   onChange,
   onDismiss,
+  disableWithQueryParameter,
+  errorMessage,
+  clearInputAfterSelection,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -340,7 +369,7 @@ export function ComboboxAsync<T = any>({
 
       url.searchParams.set('status', 'active');
 
-      if (inputOptions.value) {
+      if (inputOptions.value && !disableWithQueryParameter) {
         url.searchParams.set('with', inputOptions.value.toString());
       }
 
@@ -403,6 +432,8 @@ export function ComboboxAsync<T = any>({
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}
+      errorMessage={errorMessage}
+      clearInputAfterSelection={clearInputAfterSelection}
     />
   );
 }

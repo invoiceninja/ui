@@ -30,13 +30,13 @@ export function parseTimeLog(log: string) {
   return parsed;
 }
 
-export function calculateHours(log: string) {
+export function calculateHours(log: string, includeRunning = false) {
   const times = parseTimeLog(log);
 
   let seconds = 0;
 
   for (const [start, finish] of times) {
-    if (start > finish) {
+    if (start > finish && !includeRunning) {
       continue;
     }
 

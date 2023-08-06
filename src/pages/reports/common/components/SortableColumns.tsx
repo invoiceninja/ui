@@ -9,7 +9,6 @@
  */
 
 import { Card } from '$app/components/cards';
-import { Dispatch, SetStateAction, useState } from 'react';
 import {
   DragDropContext,
   DropResult,
@@ -23,7 +22,6 @@ import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
-import collect from 'collect.js';
 import { useTranslation } from 'react-i18next';
 import { ChevronsRight, X } from 'react-feather';
 import { itemMap } from '$app/common/constants/exports/item-map';
@@ -34,6 +32,8 @@ import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../../index/Reports';
+
+export const reportColumn = 10;
 
 interface Record {
   trans: string;
@@ -95,7 +95,7 @@ export function Column({
                       >
                         {translateLabel(record)}
 
-                        {droppableId === '5' && (
+                        {droppableId === reportColumn.toString() && (
                           <button
                             type="button"
                             onClick={() => (onRemove ? onRemove(record) : null)}
@@ -120,7 +120,6 @@ export function Column({
 interface Props {
   report: Identifier;
   columns: string[];
-  setReportKeys: Dispatch<SetStateAction<string[]>>;
 }
 
 const positions = [
@@ -135,44 +134,47 @@ const positions = [
   'expense',
   'recurring_invoice',
 ];
-const reportColumn = 10;
 
-export function SortableColumns({ columns, setReportKeys, report }: Props) {
-  const [data] = useState([
-    columns.includes('client') ? clientMap : [],
-    columns.includes('invoice')
-      ? columns.includes('item')
-        ? invoiceMap.concat(itemMap)
-        : invoiceMap
-      : [],
-    columns.includes('credit')
-      ? columns.includes('item')
-        ? creditMap.concat(itemMap)
-        : creditMap
-      : [],
-    columns.includes('quote')
-      ? columns.includes('item')
-        ? quoteMap.concat(itemMap)
-        : quoteMap
-      : [],
-    columns.includes('payment') ? paymentMap : [],
-    columns.includes('vendor') ? vendorMap : [],
-    columns.includes('purchase_order')
-      ? columns.includes('item')
-        ? purchaseorderMap.concat(itemMap)
-        : purchaseorderMap
-      : [],
-    columns.includes('task') ? taskMap : [],
-    columns.includes('expense') ? expenseMap : [],
-    columns.includes('recurring_invoice')
-      ? columns.includes('item')
-        ? recurringinvoiceMap.concat(itemMap)
-        : recurringinvoiceMap
-      : [],
-    [],
-  ]);
+export function SortableColumns({ report, columns }: Props) {
+  const { preferences, update } = usePreferences();
 
-  const { update } = usePreferences();
+  const data =
+    report in preferences.reports.columns &&
+    preferences.reports.columns[report as Identifier].length !== 0
+      ? preferences.reports.columns[report]
+      : [
+          columns.includes('client') ? clientMap : [],
+          columns.includes('invoice')
+            ? columns.includes('item')
+              ? invoiceMap.concat(itemMap)
+              : invoiceMap
+            : [],
+          columns.includes('credit')
+            ? columns.includes('item')
+              ? creditMap.concat(itemMap)
+              : creditMap
+            : [],
+          columns.includes('quote')
+            ? columns.includes('item')
+              ? quoteMap.concat(itemMap)
+              : quoteMap
+            : [],
+          columns.includes('payment') ? paymentMap : [],
+          columns.includes('vendor') ? vendorMap : [],
+          columns.includes('purchase_order')
+            ? columns.includes('item')
+              ? purchaseorderMap.concat(itemMap)
+              : purchaseorderMap
+            : [],
+          columns.includes('task') ? taskMap : [],
+          columns.includes('expense') ? expenseMap : [],
+          columns.includes('recurring_invoice')
+            ? columns.includes('item')
+              ? recurringinvoiceMap.concat(itemMap)
+              : recurringinvoiceMap
+            : [],
+          [],
+        ];
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -197,8 +199,6 @@ export function SortableColumns({ columns, setReportKeys, report }: Props) {
     $data[destinationIndex].splice(result.destination.index, 0, word);
 
     update(`preferences.reports.columns.${report}`, [...$data]);
-
-    setReportKeys(collect($data[reportColumn]).pluck('value').toArray());
   };
 
   const onRemove = (record: Record) => {

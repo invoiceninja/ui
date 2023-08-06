@@ -83,7 +83,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           onClick: () => setIsModalOpen(true),
         }}
         key="client_selector"
-        // clearInputAfterFirstSelection
+        clearInputAfterSelection={props.clearInputAfterSelection}
       />
 
       {props.errorMessage && (

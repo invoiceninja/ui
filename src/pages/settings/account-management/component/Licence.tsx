@@ -9,17 +9,15 @@
  */
 
 import { Button, InputField } from '$app/components/forms';
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { ClickableElement } from '../../../../components/cards';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function License() {
   const [t] = useTranslation();
@@ -32,7 +30,7 @@ export function License() {
       license: '',
     },
     onSubmit: (values) => {
-      toast.loading(t('processing'));
+      toast.processing();
 
       request(
         'POST',
@@ -41,17 +39,9 @@ export function License() {
         })
       )
         .then(() => {
-          toast.dismiss();
-          toast.success(t('bought_white_label'));
+          toast.success('bought_white_label');
 
           setIsModalVisible(false);
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-
-          error.response?.status === 400
-            ? toast.error(error.response.data.message)
-            : toast.error(t('error_title'));
         })
         .finally(() => formik.setSubmitting(false));
     },

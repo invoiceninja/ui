@@ -17,8 +17,6 @@ import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { generatePath } from 'react-router-dom';
-import { AxiosError } from 'axios';
-import { toast } from '$app/common/helpers/toast/toast';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
@@ -65,10 +63,6 @@ export function useFetchProjectQuery() {
       )
       .then((response: GenericSingleResourceResponse<Project>) => {
         project = response.data.data;
-      })
-      .catch((error: AxiosError) => {
-        toast.error();
-        console.error(error);
       });
 
     return project;

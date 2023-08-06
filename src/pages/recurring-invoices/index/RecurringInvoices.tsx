@@ -60,7 +60,6 @@ export default function RecurringInvoices() {
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={

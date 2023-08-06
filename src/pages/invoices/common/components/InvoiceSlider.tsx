@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
 import { ClickableElement, Element } from '$app/components/cards';
@@ -29,7 +28,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { Payment } from '$app/common/interfaces/payment';
 import { AxiosResponse } from 'axios';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoiceStatus } from './InvoiceStatus';
@@ -44,6 +42,7 @@ import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
+import { Payment } from '$app/common/interfaces/payment';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -89,7 +88,6 @@ export function InvoiceSlider() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -99,10 +97,10 @@ export function InvoiceSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/payments?invoice_id=${invoice?.id}&include=client`)
+        endpoint(`/api/v1/invoices/${invoice?.id}?include=payments`)
       ).then(
-        (response: AxiosResponse<GenericManyResponse<Payment>>) =>
-          response.data.data
+        (response: GenericSingleResourceResponse<Invoice>) =>
+          response.data.data.payments
       ),
     enabled: invoice !== null && isVisible,
   });
@@ -165,9 +163,8 @@ export function InvoiceSlider() {
               {invoice
                 ? formatMoney(
                     invoice?.amount,
-                    invoice.client?.country_id || company?.settings.country_id,
-                    invoice.client?.settings.currency_id ||
-                      company?.settings.currency_id
+                    invoice.client?.country_id,
+                    invoice.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -176,9 +173,8 @@ export function InvoiceSlider() {
               {invoice
                 ? formatMoney(
                     invoice.balance,
-                    invoice.client?.country_id || company?.settings.country_id,
-                    invoice.client?.settings.currency_id ||
-                      company?.settings.currency_id
+                    invoice.client?.country_id,
+                    invoice.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -224,10 +220,10 @@ export function InvoiceSlider() {
 
           <div className="divide-y">
             {payments &&
-              payments.map((payment) => (
+              payments.map((payment: Payment) => (
                 <ClickableElement
                   key={payment.id}
-                  to={`/payments/${payment.id}`}
+                  to={`/payments/${payment.id}/edit`}
                 >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
@@ -238,10 +234,8 @@ export function InvoiceSlider() {
                       <p>
                         {formatMoney(
                           payment.amount,
-                          payment.client?.country_id ||
-                            company.settings.country_id,
-                          payment.client?.settings.currency_id ||
-                            company.settings.currency_id
+                          payment.client?.country_id,
+                          payment.client?.settings.currency_id
                         )}
                       </p>
                       <p>&middot;</p>
@@ -292,10 +286,8 @@ export function InvoiceSlider() {
                       {invoice?.client
                         ? formatMoney(
                             activity.history.amount,
-                            invoice?.client?.country_id ||
-                              company.settings.country_id,
-                            invoice?.client?.settings.currency_id ||
-                              company.settings.currency_id
+                            invoice?.client?.country_id,
+                            invoice?.client?.settings.currency_id
                           )
                         : null}
                     </span>

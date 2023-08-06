@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../../components/cards';
-import { Settings } from '../../../../components/layouts/Settings';
-import { Field } from '../components';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Field } from '../components/Field';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Company() {
   useTitle('custom_fields');
@@ -21,26 +21,24 @@ export function Company() {
   const [t] = useTranslation();
 
   const title = `${t('custom_fields')}: ${t('company')}`;
+  const company = useCompanyChanges();
+  const handleChange = useHandleCustomFieldChange();
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('company'), href: '/settings/custom_fields/company' },
-  ];
+  if (!company) {
+    return null;
+  }
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-    >
-      <CustomFieldsPlanAlert />
-
-      <Card title={title}>
-        {['company1', 'company2', 'company3', 'company4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('company_field')} />
-        ))}
-      </Card>
-    </Settings>
+    <Card title={title}>
+      {['company1', 'company2', 'company3', 'company4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('company_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

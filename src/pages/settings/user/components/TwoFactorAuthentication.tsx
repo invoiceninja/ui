@@ -10,12 +10,10 @@
 
 import { Card, Element } from '$app/components/cards';
 import { Button, InputField, Link } from '$app/components/forms';
-import { AxiosError } from 'axios';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { updateUser } from '$app/common/stores/slices/user';
 import { Modal } from '$app/components/Modal';
 import { merge } from 'lodash';
@@ -45,8 +43,8 @@ export function TwoFactorAuthentication() {
   const requestQrCode = () => {
     toast.processing();
 
-    request('GET', endpoint('/api/v1/settings/enable_two_factor'))
-      .then((response) => {
+    request('GET', endpoint('/api/v1/settings/enable_two_factor')).then(
+      (response) => {
         toast.dismiss();
 
         setQrCode(response.data.data.qrCode);
@@ -54,15 +52,8 @@ export function TwoFactorAuthentication() {
         setQrCodeSecret(response.data.data.secret);
 
         setIsEnableModalOpen(true);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.dismiss();
-          console.error(error);
-        }
-      });
+      }
+    );
   };
 
   const enableTwoFactor = () => {
@@ -79,49 +70,31 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(false);
       })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 400) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.dismiss();
-          toast.error();
-        }
-      })
       .finally(() => setIsSubmitDisabled(false));
   };
 
   const disableTwoFactor = () => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/settings/disable_two_factor'))
-      .then(() => {
+    request('POST', endpoint('/api/v1/settings/disable_two_factor')).then(
+      () => {
         toast.success('disabled_two_factor');
 
         dispatch(updateUser(merge({}, user, { google_2fa_secret: false })));
 
         setIsDisableModalOpen(false);
-      })
-      .catch((error) => {
-        toast.error();
-        console.error(error);
-      });
+      }
+    );
   };
 
   const resetSmsCode = () => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/sms_reset'), { email: user!.email })
-      .then(() => {
+    request('POST', endpoint('/api/v1/sms_reset'), { email: user!.email }).then(
+      () => {
         toast.success('check_phone_code');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 400) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.dismiss();
-          console.error(error);
-        }
-      });
+      }
+    );
   };
 
   const verifyPhoneNumber = (code: string) => {
@@ -130,26 +103,17 @@ export function TwoFactorAuthentication() {
     request('POST', endpoint('/api/v1/sms_reset/confirm?validate_only=true'), {
       code,
       email: user!.email,
-    })
-      .then(() => {
-        toast.success('verified_phone_number');
+    }).then(() => {
+      toast.success('verified_phone_number');
 
-        dispatch(updateUser(merge({}, user, { verified_phone_number: true })));
+      dispatch(updateUser(merge({}, user, { verified_phone_number: true })));
 
-        setIsSmsModalOpen(false);
+      setIsSmsModalOpen(false);
 
-        requestQrCode();
+      requestQrCode();
 
-        setIsEnableModalOpen(true);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 400) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.dismiss();
-          console.error(error);
-        }
-      });
+      setIsEnableModalOpen(true);
+    });
   };
 
   const checkPhoneNumberVerification = () => {

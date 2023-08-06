@@ -12,7 +12,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms/Link';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +20,6 @@ import { Badge } from '$app/components/Badge';
 
 export function ExpiredQuotes() {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
   const columns: DataTableColumns<Quote> = [
@@ -55,8 +53,8 @@ export function ExpiredQuotes() {
         <Badge variant="light-blue">
           {formatMoney(
             value,
-            quote.client?.country_id || company.settings.country_id,
-            quote.client?.settings.currency_id || company.settings.currency_id
+            quote.client?.country_id,
+            quote.client?.settings.currency_id
           )}
         </Badge>
       ),

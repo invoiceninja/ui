@@ -40,26 +40,24 @@ export function InvoiceViewer(props: Props) {
     request(props.method, props.link, props.resource, {
       responseType: 'arraybuffer',
       signal: controller.signal,
-    })
-      .then((response) => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    }).then((response) => {
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
 
-        if (android && linkRef.current) {
-          linkRef.current.href = url;
+      if (android && linkRef.current) {
+        linkRef.current.href = url;
 
-          props.onLink && props.onLink(url);
-        }
+        props.onLink && props.onLink(url);
+      }
 
-        if (!android && iframeRef.current) {
-          iframeRef.current.src = url;
+      if (!android && iframeRef.current) {
+        iframeRef.current.src = url;
 
-          props.onLink && props.onLink(url);
-        }
+        props.onLink && props.onLink(url);
+      }
 
-        toast.dismiss();
-      })
-      .catch((error) => console.error(error));
+      toast.dismiss();
+    });
 
     return () => {
       controller.abort();

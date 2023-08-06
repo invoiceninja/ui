@@ -218,6 +218,10 @@ export default function Create() {
                 handleChange('client_id', client?.id as string);
                 handleChange('currency_id', client?.settings.currency_id);
               }}
+              onClearButtonClick={() => {
+                handleChange('client_id', '');
+                handleChange('currency_id', '');
+              }}
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
@@ -335,8 +339,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       invoice.balance,
-                      payment.client?.country_id ?? '1',
-                      payment.client?.settings.currency_id ?? '1'
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}`,
                 }}
                 onChange={({ resource }) =>
@@ -378,8 +382,8 @@ export default function Create() {
                             'balance'
                           )} ${formatMoney(
                             credit.balance,
-                            payment.client?.country_id ?? '1',
-                            payment.client?.settings.currency_id ?? '1'
+                            payment.client?.country_id,
+                            payment.client?.settings.currency_id
                           )}`,
                       }}
                       onChange={(entry) =>
@@ -446,8 +450,8 @@ export default function Create() {
                       'balance'
                     )} ${formatMoney(
                       credit.balance,
-                      payment.client?.country_id ?? '1',
-                      payment.client?.settings.currency_id ?? '1'
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
                     )}`,
                 }}
                 onChange={(entry) =>

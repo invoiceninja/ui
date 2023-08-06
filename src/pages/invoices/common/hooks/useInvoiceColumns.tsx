@@ -12,7 +12,6 @@ import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Credit } from '$app/common/interfaces/credit';
@@ -25,8 +24,6 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-
-
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -117,7 +114,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
 
   const reactSettings = useReactSettings();
@@ -149,8 +145,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -170,8 +166,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -277,8 +273,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -338,8 +334,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -364,7 +360,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -379,7 +375,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -414,8 +410,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {

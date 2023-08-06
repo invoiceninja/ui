@@ -29,6 +29,7 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 
 export default function Create() {
@@ -36,6 +37,8 @@ export default function Create() {
 
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const saveCompany = useHandleCompanySave();
 
@@ -97,15 +100,14 @@ export default function Create() {
       .then((response) => {
         toast.success('created_client');
 
+        queryClient.invalidateQueries('/api/v1/clients');
+
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
