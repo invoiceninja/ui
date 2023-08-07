@@ -95,13 +95,13 @@ export function Chart(props: Props) {
 
     const largestTick = chartData.reduce((maxTick, data) => {
       return properties.reduce((currentMax, property) => {
-        const currentValueLength = formatMoney(
+        const currentTickLength = formatMoney(
           Number(data[property as keyof typeof data]) ?? 0,
           company?.settings.country_id,
           currency
         ).toString().length;
 
-        return Math.max(currentMax, currentValueLength);
+        return Math.max(currentMax, currentTickLength);
       }, maxTick);
     }, 0);
 
