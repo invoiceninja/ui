@@ -232,10 +232,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   ];
 
   const showRestoreBulkAction = () => {
-    return !selectedResources.some(
-      (resource) =>
-        getEntityState(resource) !== EntityState.Archived ||
-        getEntityState(resource) !== EntityState.Deleted
+    return selectedResources.every(
+      (resource) => getEntityState(resource) !== EntityState.Active
     );
   };
 
