@@ -105,7 +105,7 @@ export function Chart(props: Props) {
       }, maxTick);
     }, 0);
 
-    return largestTick;
+    return largestTick ? largestTick * 8.5 : undefined;
   }, [chartData]);
 
   useEffect(() => {
@@ -266,7 +266,7 @@ export function Chart(props: Props) {
             formatTooltipValues(value).replace(/ /g, '\u00A0')
           }
           tick={{ fontSize: 14 }}
-          width={yAxisWidth ? yAxisWidth * 8.5 : undefined}
+          width={yAxisWidth}
         />
       </LineChart>
     </ResponsiveContainer>
