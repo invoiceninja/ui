@@ -28,6 +28,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDownload,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
@@ -59,6 +60,7 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import { useDocumentsBulk } from '$app/common/queries/documents';
 
 export const defaultColumns: string[] = [
   'status',
@@ -420,7 +422,7 @@ export function useActions() {
       isEditPage &&
       getEntityState(task) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(task.id, 'archive')}
+          onClick={() => bulk([task.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -431,7 +433,7 @@ export function useActions() {
       (getEntityState(task) === EntityState.Archived ||
         getEntityState(task) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(task.id, 'restore')}
+          onClick={() => bulk([task.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -442,7 +444,7 @@ export function useActions() {
       (getEntityState(task) === EntityState.Active ||
         getEntityState(task) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(task.id, 'delete')}
+          onClick={() => bulk([task.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
@@ -457,14 +459,70 @@ export const useCustomBulkActions = () => {
   const [t] = useTranslation();
   const invoiceTask = useInvoiceTask();
 
+  const bulk = useBulk();
+
+  const documentsBulk = useDocumentsBulk();
+
+  const shouldDownloadDocuments = (tasks: Task[]) => {
+    return tasks.some(({ documents }) => documents.length);
+  };
+
+  const getDocumentsIds = (tasks: Task[]) => {
+    return tasks.flatMap(({ documents }) => documents.map(({ id }) => id));
+  };
+
+  const showStartAction = (selectedTasks: Task[]) => {
+    return selectedTasks.every(
+      (task) => !isTaskRunning(task) && !task.invoice_id
+    );
+  };
+
+  const showStopAction = (selectedTasks: Task[]) => {
+    return selectedTasks.every(
+      (task) => isTaskRunning(task) && !task.invoice_id
+    );
+  };
+
+  const showInvoiceTaskAction = (selectedTasks: Task[]) => {
+    return selectedTasks.every(
+      (task) => !isTaskRunning(task) && !task.invoice_id
+    );
+  };
+
+  const showAddToInvoiceAction = (selectedTasks: Task[]) => {
+    return selectedTasks.every(
+      (task) => !isTaskRunning(task) && !task.invoice_id && task.client_id
+    );
+  };
+
   const customBulkActions: CustomBulkAction<Task>[] = [
+    (selectedIds, selectedTasks, onActionCall) =>
+      selectedTasks &&
+      showStartAction(selectedTasks) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'start', onActionCall)}
+          icon={<Icon element={MdNotStarted} />}
+        >
+          {t('start')}
+        </DropdownElement>
+      ),
+    (selectedIds, selectedTasks, onActionCall) =>
+      selectedTasks &&
+      showStopAction(selectedTasks) && (
+        <DropdownElement
+          onClick={() => bulk(selectedIds, 'stop', onActionCall)}
+          icon={<Icon element={MdStopCircle} />}
+        >
+          {t('stop')}
+        </DropdownElement>
+      ),
     (_, selectedTasks) =>
-      selectedTasks && (
+      selectedTasks &&
+      showAddToInvoiceAction(selectedTasks) && (
         <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
       ),
-
     (_, selectedTasks) =>
-      selectedTasks ? (
+      selectedTasks && showInvoiceTaskAction(selectedTasks) ? (
         <DropdownElement
           onClick={() => invoiceTask(selectedTasks)}
           icon={<Icon element={MdTextSnippet} />}
@@ -472,6 +530,22 @@ export const useCustomBulkActions = () => {
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
+    (_, selectedTasks, onActionCall) => (
+      <DropdownElement
+        onClick={() =>
+          selectedTasks && shouldDownloadDocuments(selectedTasks)
+            ? documentsBulk(
+                getDocumentsIds(selectedTasks),
+                'download',
+                onActionCall
+              )
+            : toast.error('no_documents_to_download')
+        }
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('documents')}
+      </DropdownElement>
+    ),
   ];
 
   return customBulkActions;
