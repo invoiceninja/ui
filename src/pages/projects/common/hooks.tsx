@@ -26,6 +26,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDownload,
   MdEdit,
   MdRestore,
   MdTextSnippet,
@@ -45,6 +46,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useDocumentsBulk } from '$app/common/queries/documents';
 
 export const defaultColumns: string[] = [
   'name',
@@ -376,6 +378,8 @@ export const useCustomBulkActions = () => {
   const invoiceProject = useInvoiceProject();
   const combineProjectsTasks = useCombineProjectsTasks();
 
+  const documentsBulk = useDocumentsBulk();
+
   const handleInvoiceProjects = (tasks: Task[] | null) => {
     if (tasks && !tasks.length) {
       return toast.error('no_assigned_tasks');
@@ -386,6 +390,14 @@ export const useCustomBulkActions = () => {
     }
 
     invoiceProject(tasks);
+  };
+
+  const shouldDownloadDocuments = (projects: Project[]) => {
+    return projects.some(({ documents }) => documents.length);
+  };
+
+  const getDocumentsIds = (projects: Project[]) => {
+    return projects.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
   const customBulkActions: CustomBulkAction<Project>[] = [
@@ -399,6 +411,22 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdTextSnippet} />}
       >
         {t('invoice_project')}
+      </DropdownElement>
+    ),
+    (_, selectedProjects, onActionCall) => (
+      <DropdownElement
+        onClick={() =>
+          selectedProjects && shouldDownloadDocuments(selectedProjects)
+            ? documentsBulk(
+                getDocumentsIds(selectedProjects),
+                'download',
+                onActionCall
+              )
+            : toast.error('no_documents_to_download')
+        }
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('documents')}
       </DropdownElement>
     ),
   ];
