@@ -60,6 +60,10 @@ export function CompanyTaxDetails(props: Props) {
         );
     };
 
+    const hasInvalidAddress = () => {
+        return company.settings?.postal_code === "" || company.settings?.city === "" ||  company.settings?.state === ""
+    };
+
     return (
         <Modal
             title="Company Tax Configuration"
@@ -72,7 +76,10 @@ export function CompanyTaxDetails(props: Props) {
 
             <Divider />
 
-            {company.origin_tax_data?.geoPostalCode === undefined || company.origin_tax_data?.geoPostalCode === "" && (
+            {company.origin_tax_data?.geoPostalCode === undefined || 
+            company.origin_tax_data?.geoPostalCode === "" ||
+            hasInvalidAddress()
+            && (
                 <div className='flex flex-col items-center '>
                     <p className="text-center">Minimum required fields are Zip, City, State. For highest accuracy, also include a valid street address.</p>
                     <Link 
@@ -83,7 +90,7 @@ export function CompanyTaxDetails(props: Props) {
                     
                 </div>
             )}
-            {company.origin_tax_data?.geoPostalCode && (
+            {company.origin_tax_data && !hasInvalidAddress() && (
                 <div className="flex flex-col">
                     <EntityTaxData
                         entity={company.origin_tax_data}
