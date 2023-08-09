@@ -10,7 +10,7 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Button } from '$app/components/forms';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,10 @@ export function CompanyTaxDetails(props: Props) {
             onClose={() => props.setIsModalOpen(false)}
             backgroundColor="white"
         >
-        {company.origin_tax_data && (
+        {company.origin_tax_data?.geoPostalCode === undefined && (
+            <div></div>
+        )}
+        {company.origin_tax_data?.geoPostalCode && (
         <div className="">
             <Element 
                 leftSide={t('postal_code')}
