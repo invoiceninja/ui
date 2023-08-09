@@ -8,12 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Transaction } from '$app/common/interfaces/transactions';
-import { useQuery } from 'react-query';
+import { useAtomValue } from 'jotai';
+import { useQuery, useQueryClient } from 'react-query';
 
 interface TransactionParams {
   id: string | undefined;
@@ -45,4 +48,45 @@ export function useBlankTransactionQuery() {
       ),
     { staleTime: Infinity }
   );
+}
+
+const successMessages = {
+  convert_matched: 'converted_transactions',
+};
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'convert_matched',
+    onActionCall?: () => void
+  ) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/bank_transactions/bulk'), {
+      action,
+      ids,
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_invoice`;
+
+      toast.success(message);
+
+      onActionCall?.();
+
+      queryClient.invalidateQueries('/api/v1/bank_transactions');
+
+      ids.forEach((id) => {
+        queryClient.invalidateQueries(
+          route('/api/v1/bank_transactions/:id', { id })
+        );
+      });
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
+  };
 }

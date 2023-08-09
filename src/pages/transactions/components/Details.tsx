@@ -29,12 +29,12 @@ import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTransactionQuery } from '../common/queries';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
 import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
 import { Expense } from '$app/common/interfaces/expense';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date as formatDate } from '$app/common/helpers';
+import { useTransactionQuery } from '$app/common/queries/transactions';
 
 interface Props {
   transactionId: string;
