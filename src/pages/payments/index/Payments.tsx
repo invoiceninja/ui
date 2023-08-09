@@ -49,14 +49,13 @@ export default function Payments() {
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&sort=id|desc"
+        endpoint="/api/v1/payments?include=client,invoices&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
         customActions={actions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={

@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -34,7 +33,6 @@ export function setLabel(payment: Payment, paymentable: Paymentable): string {
 export function PaymentOverviewInvoice(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
@@ -57,7 +55,7 @@ export function PaymentOverviewInvoice(props: Props) {
             <span className="text-gray-400">
               {formatMoney(
                 props?.paymentable?.amount || 0,
-                company.settings.country_id,
+                props.payment.client?.country_id,
                 props.payment?.currency_id
               )}
             </span>
@@ -70,7 +68,7 @@ export function PaymentOverviewInvoice(props: Props) {
           </div>
         </div>
       )}
-      
+
       {props.paymentable.credit_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
@@ -88,7 +86,7 @@ export function PaymentOverviewInvoice(props: Props) {
             <span className="text-gray-400">
               {formatMoney(
                 props?.paymentable?.amount || 0,
-                company.settings.country_id,
+                props.payment.client?.country_id,
                 props.payment?.currency_id
               )}
             </span>

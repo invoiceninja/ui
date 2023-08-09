@@ -83,6 +83,9 @@ export function useInvoiceTask() {
         invoice.tax_rate3 = company.settings?.tax_rate3;
       }
 
+      invoice.uses_inclusive_taxes =
+        company?.settings?.inclusive_taxes ?? false;
+
       const clients = collect(tasks).pluck('client_id').unique().toArray();
 
       if (clients.length > 1) {
@@ -157,6 +160,7 @@ export function useInvoiceTask() {
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
           task_id: task.id,
+          tax_id: '',
         };
 
         const projectName =
@@ -169,19 +173,23 @@ export function useInvoiceTask() {
             projectName + '### ' + task?.description + ' ' + parsed.join(' ');
         }
 
-        invoice.line_items = parsed.length ? [item] : [];
+        if (typeof invoice.line_items === 'string') {
+          invoice.line_items = [];
+        }
 
-        setInvoice(invoice);
-
-        navigate(
-          route(
-            '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
-            {
-              projectAssigned: Boolean(tasks[0].project_id),
-            }
-          )
-        );
+        invoice.line_items.push(item);
       });
+
+      setInvoice(invoice);
+
+      navigate(
+        route(
+          '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
+          {
+            projectAssigned: Boolean(tasks[0].project_id),
+          }
+        )
+      );
     }
   };
 }

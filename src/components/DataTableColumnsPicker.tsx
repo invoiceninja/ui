@@ -11,10 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import {
-  CompanyUser,
-  ReactTableColumns,
-} from '$app/common/interfaces/company-user';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
@@ -34,7 +31,10 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  ReactTableColumns,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {
@@ -87,20 +87,18 @@ export function DataTableColumnsPicker(props: Props) {
 
     toast.processing();
 
-    request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), user)
-      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-        set(user, 'company_user', response.data.data);
-        setIsModalVisible(false);
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: user.id }),
+      user
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(user, 'company_user', response.data.data);
+      setIsModalVisible(false);
 
-        dispatch(updateUser(user));
+      dispatch(updateUser(user));
 
-        toast.success('saved_settings');
-      })
-      .catch((error) => {
-        toast.error();
-
-        console.error(error);
-      });
+      toast.success('saved_settings');
+    });
   };
 
   const handleDelete = (columnKey: string) => {

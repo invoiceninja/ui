@@ -35,16 +35,19 @@ export function useHandleCompanySave() {
 
   const shouldUpdate = useShouldUpdateCompany();
 
-  return () => {
+  return async (excludeToasters?: boolean) => {
     if (!shouldUpdate()) {
       return;
     }
 
-    toast.processing();
+    const adjustedExcludeToaster =
+      typeof excludeToasters === 'boolean' && excludeToasters;
+
+    !adjustedExcludeToaster && toast.processing();
 
     setErrors(undefined);
 
-    request(
+    return request(
       'PUT',
       endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
       companyChanges
@@ -52,22 +55,19 @@ export function useHandleCompanySave() {
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-        toast.dismiss();
+        !adjustedExcludeToaster && toast.dismiss();
 
         if (hasLanguageChanged) {
           queryClient.invalidateQueries('/api/v1/statics');
           setHasLanguageIdChanged(false);
         }
 
-        toast.success('updated_settings');
+        !adjustedExcludeToaster && toast.success('updated_settings');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

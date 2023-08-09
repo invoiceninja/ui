@@ -11,42 +11,34 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Quote } from '$app/common/interfaces/quote';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useMarkSent() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (quote: Quote) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'PUT',
       endpoint('/api/v1/quotes/:id?mark_sent=true', { id: quote.id }),
       quote
-    )
-      .then(() => {
-        toast.success(t('quote_sent'), { id: toastId });
+    ).then(() => {
+      toast.success('quote_sent');
 
-        queryClient.invalidateQueries('/api/v1/quotes');
+      queryClient.invalidateQueries('/api/v1/quotes');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/quotes/:id', { id: quote.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/quotes/:id', { id: quote.id })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error) => {
-        toast.error(t('error_title'), { id: toastId });
-
-        console.error(error);
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

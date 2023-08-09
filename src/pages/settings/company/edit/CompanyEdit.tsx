@@ -139,13 +139,8 @@ export function CompanyEdit(props: Props) {
               if (error.response?.status === 422) {
                 setErrors(error.response.data);
                 toast.dismiss();
-              } else {
-                toast.error();
               }
             });
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
         })
         .finally(() => setIsFormBusy(false));
     }

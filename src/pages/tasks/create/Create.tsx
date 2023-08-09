@@ -83,7 +83,7 @@ export default function Create() {
         if (searchParams.get('rate')) {
           _task.rate = parseFloat(searchParams.get('rate')!);
         }
-          
+
         value = _task;
       }
 
@@ -114,9 +114,6 @@ export default function Create() {
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

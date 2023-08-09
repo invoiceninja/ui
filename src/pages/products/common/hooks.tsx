@@ -14,7 +14,6 @@ import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -30,7 +29,7 @@ import {
   MdDelete,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
@@ -39,6 +38,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -91,7 +91,6 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -122,8 +121,13 @@ export function useProductColumns() {
       label: t('notes'),
       format: (value) => {
         return (
-          <Tooltip size="regular" truncate message={value as string}>
-            <span>{value}</span>
+          <Tooltip
+            size="regular"
+            truncate
+            containsUnsafeHTMLTags
+            message={value as string}
+          >
+            <span dangerouslySetInnerHTML={{ __html: value as string }} />
           </Tooltip>
         );
       },
@@ -135,8 +139,8 @@ export function useProductColumns() {
       format: (value, product) =>
         formatMoney(
           value,
-          product.company?.settings.country_id || company.settings.country_id,
-          product.company?.settings.currency_id || company.settings.currency_id
+          product.company?.settings.country_id,
+          product.company?.settings.currency_id
         ),
     },
     {
@@ -236,17 +240,17 @@ export function useProductColumns() {
 }
 
 export function useActions() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
 
   const setProduct = useSetAtom(productAtom);
 
-  const isEditPage = location.pathname.includes(id!);
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'product',
+    editPageTabs: ['documents', 'product_fields'],
+  });
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
@@ -260,17 +264,12 @@ export function useActions() {
   ) => {
     toast.processing();
 
-    bulk([id], action)
-      .then(() => {
-        toast.success(t(`${action}d_product`) || '');
+    bulk([id], action).then(() => {
+      toast.success(`${action}d_product`);
 
-        queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
-        queryClient.invalidateQueries('/api/v1/products');
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+      queryClient.invalidateQueries('/api/v1/products');
+    });
   };
 
   const actions = [

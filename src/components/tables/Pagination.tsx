@@ -12,7 +12,12 @@ import { trans } from '$app/common/helpers';
 import { datatablePerPageAtom } from '$app/components/DataTable';
 import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
-import { ChevronLeft, ChevronRight } from 'react-feather';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
@@ -39,15 +44,9 @@ export function Pagination(props: Props) {
   const [t] = useTranslation();
   const [perPage] = useAtom(datatablePerPageAtom);
 
-  const next = () => {
-    if (props.currentPage + 1 <= props.totalPages) {
-      props.onPageChange(props.currentPage + 1);
-    }
-  };
-
-  const previous = () => {
-    if (props.currentPage - 1 >= 1) {
-      props.onPageChange(props.currentPage - 1);
+  const goToPage = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= props.totalPages) {
+      props.onPageChange(pageNumber);
     }
   };
 
@@ -93,17 +92,31 @@ export function Pagination(props: Props) {
         {props.leftSideChevrons}
 
         <button
-          onClick={previous}
-          className="py-1.5 px-2 bg-white border-b border-t rounded-l hover:bg-gray-50 border"
+          onClick={() => goToPage(1)}
+          className="py-1.5 px-2 bg-white border rounded-l hover:bg-gray-50"
+        >
+          <ChevronsLeft />
+        </button>
+
+        <button
+          onClick={() => goToPage(props.currentPage - 1)}
+          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
         >
           <ChevronLeft />
         </button>
 
         <button
-          onClick={next}
-          className="py-1.5 px-2 bg-white border-b border-t border-r rounded-r hover:bg-gray-50"
+          onClick={() => goToPage(props.currentPage + 1)}
+          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
         >
           <ChevronRight />
+        </button>
+
+        <button
+          onClick={() => goToPage(props.totalPages)}
+          className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50 rounded-r"
+        >
+          <ChevronsRight />
         </button>
       </nav>
     </div>

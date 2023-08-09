@@ -115,9 +115,6 @@ export default function Create() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
@@ -140,11 +137,19 @@ export default function Create() {
         </div>
 
         <div className="col-span-12 xl:col-span-4">
-          <Notes expense={expense} handleChange={handleChange} />
+          <Notes
+            expense={expense}
+            handleChange={handleChange}
+            errors={errors}
+          />
         </div>
 
         <div className="col-span-12 xl:col-span-4 space-y-4">
-          <AdditionalInfo expense={expense} handleChange={handleChange} />
+          <AdditionalInfo
+            expense={expense}
+            handleChange={handleChange}
+            errors={errors}
+          />
 
           <TaxSettings
             expense={expense}

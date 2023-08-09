@@ -9,14 +9,10 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { CustomBulkAction, DataTable } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
-import { MdPrint } from 'react-icons/md';
 import {
   defaultColumns,
   useActions,
@@ -24,6 +20,7 @@ import {
   useCreditColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Credits() {
   useTitle('credits');
@@ -35,20 +32,9 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
 
-  const printPdf = usePrintPdf({ entity: 'credit' });
-
   const creditColumns = useAllCreditColumns();
 
-  const customBulkActions: CustomBulkAction[] = [
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
-    ),
-  ];
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
@@ -59,7 +45,7 @@ export default function Credits() {
     >
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client&sort=id|desc"
+        endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"

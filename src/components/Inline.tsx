@@ -8,14 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  className?: string;
 }
 
-export function Inline(props: Props) {
+export function Inline({ children, className }: Props) {
   return (
-    <div className="inline-flex items-center space-x-2">{props.children}</div>
+    <div
+      className={classNames('inline-flex items-center space-x-2', className)}
+    >
+      {children}
+    </div>
   );
 }

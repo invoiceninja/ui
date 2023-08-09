@@ -24,6 +24,7 @@ interface Props extends CommonProps {
   currency?: DecimalInputSeparators;
   initialValue?: string;
   onValueChange?: (value: string) => unknown;
+  onBlurValue?: (value: string) => unknown;
 }
 
 export function DecimalNumberInput(props: Props) {
@@ -45,7 +46,7 @@ export function DecimalNumberInput(props: Props) {
     <section>
       {props.currency && (
         <DebounceInput
-          debounceTimeout={600}
+          debounceTimeout={1200}
           id={props.id}
           type={'text'}
           className={classNames(
@@ -76,6 +77,20 @@ export function DecimalNumberInput(props: Props) {
                 ? value.toString().split('.')[1]?.length || 2
                 : props.precision,
           }).format()}
+          onBlur={(event) =>
+            props.onBlurValue
+              ? props.onBlurValue(
+                  String(
+                    currency(event.target.value, {
+                      separator: props.currency?.thousandSeparator,
+                      decimal: props.currency?.decimalSeparator,
+                      symbol: '',
+                      precision: props.precision,
+                    }).value
+                  )
+                )
+              : null
+          }
         />
       )}
 

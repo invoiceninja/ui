@@ -70,10 +70,9 @@ export default function Create() {
           })
           .catch((e: AxiosError<ValidationBag>) => {
             if (e.response?.status === 422) {
+              toast.dismiss();
               setErrors(e.response.data);
             }
-
-            toast.error();
           });
       },
     },

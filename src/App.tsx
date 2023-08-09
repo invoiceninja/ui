@@ -10,7 +10,7 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -18,22 +18,37 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { atom, useSetAtom } from 'jotai';
-
-export const dayJSLocaleAtom = atom<ILocale | null>(null);
+import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
+import { dayJSLocaleAtom } from './components/forms';
+import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useAdmin } from './common/hooks/permissions/useHasPermission';
 
 export function App() {
+  const [t] = useTranslation();
   const { i18n } = useTranslation();
+
+  const { isOwner } = useAdmin();
 
   const company = useCurrentCompany();
 
+  const navigate = useNavigate();
+
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+  const updateAntdLocale = useSetAtom(antdLocaleAtom);
 
   const resolveLanguage = useResolveLanguage();
 
   const resolveDayJSLocale = useResolveDayJSLocale();
 
+  const resolveAntdLocale = useResolveAntdLocale();
+
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
+
+  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
+    useState(false);
 
   const resolvedLanguage = company
     ? resolveLanguage(company.settings.language_id)
@@ -50,6 +65,10 @@ export function App() {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
         updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
+      });
+
+      resolveAntdLocale(resolvedLanguage.locale).then((antdResolvedLocale) => {
+        updateAntdLocale(antdResolvedLocale);
       });
 
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
@@ -70,11 +89,37 @@ export function App() {
     }
   }, [darkMode, resolvedLanguage]);
 
-  return (
-    <div className="App">
-      <Toaster position="top-center" />
+  useEffect(() => {
+    window.addEventListener('navigate.invalid.page', () =>
+      navigate('/not_found')
+    );
+  }, []);
 
-      {routes}
-    </div>
+  useEffect(() => {
+    const companyName = company?.settings?.name;
+
+    if (
+      company &&
+      (!companyName || companyName === t('untitled_company')) &&
+      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
+    ) {
+      localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
+      setIsCompanyEditModalOpened(true);
+    }
+  }, [company]);
+
+  return (
+    <>
+      <div className="App">
+        <Toaster position="top-center" />
+
+        {routes}
+      </div>
+
+      <CompanyEdit
+        isModalOpen={isCompanyEditModalOpened && isOwner}
+        setIsModalOpen={setIsCompanyEditModalOpened}
+      />
+    </>
   );
 }

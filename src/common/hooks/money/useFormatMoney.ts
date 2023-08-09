@@ -18,9 +18,16 @@ export function useFormatMoney() {
   const resolveCurrency = useResolveCurrency();
   const company = useCurrentCompany();
 
-  return (value: string | number, countryId: string, currencyId: string) => {
-    const country = resolveCountry(countryId);
-    const currency = resolveCurrency(currencyId);
+  return (
+    value: string | number,
+    countryId: string | undefined,
+    currencyId: string | undefined
+  ) => {
+    const currentCountryId = countryId || company?.settings.country_id;
+    const currentCurrencyId = currencyId || company?.settings.currency_id;
+
+    const country = resolveCountry(currentCountryId);
+    const currency = resolveCurrency(currentCurrencyId);
 
     if (country && currency) {
       return Number.formatMoney(value, currency, country, {

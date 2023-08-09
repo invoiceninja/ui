@@ -43,7 +43,7 @@ const gatewaysStyles = [
   { name: 'checkoutcom', width: 170 },
 ];
 
-const gatewaysDetails = [
+export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
@@ -63,7 +63,7 @@ const gatewaysDetails = [
 export function Create() {
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('online_payments');
+  const { documentTitle } = useTitle('add_gateway');
 
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
 

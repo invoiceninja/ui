@@ -27,9 +27,13 @@ import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
 import { useLogin } from './common/hooks';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Disable2faModal } from './components/Disable2faModal';
 
 export function Login() {
   useTitle('login');
+
+  const accentColor = useAccentColor();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
@@ -37,6 +41,9 @@ export function Login() {
   const [t] = useTranslation();
 
   const [secret, setSecret] = useState<string>('');
+
+  const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
+    useState<boolean>(false);
 
   const login = useLogin();
 
@@ -79,6 +86,7 @@ export function Login() {
           <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField
               type="email"
+              autoComplete="on"
               label={t('email_address')}
               id="email"
               onChange={form.handleChange}
@@ -87,6 +95,7 @@ export function Login() {
 
             <InputField
               type="password"
+              autoComplete="on"
               label={t('password')}
               id="password"
               onChange={form.handleChange}
@@ -102,16 +111,30 @@ export function Login() {
 
             <InputField
               type="text"
+              autoComplete="on"
               id="one_time_password"
               onChange={form.handleChange}
               placeholder={t('plaid_optional')}
               errorMessage={errors?.one_time_password}
             />
 
+            <div className="space-y-2">
+              <div className="flex flex-col lg:flex-row items-center justify-between">
+                <InputLabel>{t('secret')}</InputLabel>
+                <div
+                  className="text-sm hover:underline cursor-pointer"
+                  onClick={() => setIsDisable2faModalOpen(true)}
+                  style={{ color: accentColor }}
+                >
+                  {t('disable_2fa')}
+                </div>
+              </div>
+            </div>
+
             {isSelfHosted() && (
               <InputField
                 type="password"
-                label={t('secret')}
+                autoComplete="on"
                 placeholder={t('plaid_optional')}
                 value={secret}
                 onValueChange={(value) => setSecret(value)}
@@ -144,6 +167,11 @@ export function Login() {
           </>
         )}
       </div>
+
+      <Disable2faModal
+        visible={isDisable2faModalOpen}
+        setVisible={setIsDisable2faModalOpen}
+      />
     </div>
   );
 }

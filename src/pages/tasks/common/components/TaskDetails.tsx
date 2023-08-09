@@ -9,25 +9,19 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
-import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 
 interface Props {
   task: Task;
@@ -43,7 +37,6 @@ export function TaskDetails(props: Props) {
 
   const company = useCurrentCompany();
   const location = useLocation();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -58,7 +51,7 @@ export function TaskDetails(props: Props) {
                   handleChange(
                     'rate',
                     client?.settings?.default_task_rate ?? 0
-                  )
+                  );
                 }
               }}
               value={task.client_id}
@@ -73,6 +66,7 @@ export function TaskDetails(props: Props) {
             onChange={(project) => {
               handleChange('project_id', project.id);
               handleChange('client_id', '');
+              handleChange('rate', project.task_rate);
             }}
             value={task.project_id}
             clearButton={Boolean(task.project_id)}
@@ -82,20 +76,10 @@ export function TaskDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('user')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/users"
-            label={'first_name'}
-            clearButton={Boolean(task.assigned_user_id)}
-            formatLabel={(resource) =>
-              `${resource.first_name} ${resource.last_name}`
-            }
-            onChange={(user: Record<User>) =>
-              user.resource &&
-              handleChange('assigned_user_id', user.resource.id)
-            }
+          <UserSelector
+            value={task?.assigned_user_id}
+            onChange={(user) => handleChange('assigned_user_id', user.id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
-            queryAdditional
-            defaultValue={task.assigned_user_id}
             errorMessage={errors?.errors.assigned_user_id}
           />
         </Element>
@@ -137,16 +121,14 @@ export function TaskDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('status')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/task_statuses"
-            label="name"
-            onChange={(value: Record<TaskStatus>) =>
-              value.resource && handleChange('status_id', value.resource.id)
+          <TaskStatusSelector
+            value={task.status_id}
+            onChange={(taskStatus: TaskStatus) =>
+              taskStatus && handleChange('status_id', taskStatus.id)
             }
-            defaultValue={task.status_id}
-            queryAdditional
+            onClearButtonClick={() => handleChange('status_id', '')}
+            readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
-            disabled={props.taskModal}
           />
         </Element>
 
@@ -182,21 +164,12 @@ export function TaskDetails(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['task1', 'task2', 'task3', 'task4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('task_field')}
-                    onChange={(value: any) =>
-                      handleCustomFieldChange(field, value)
-                    }
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link to="/settings/custom_fields/tasks" className="capitalize">
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>

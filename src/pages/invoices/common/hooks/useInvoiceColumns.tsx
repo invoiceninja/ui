@@ -12,7 +12,6 @@ import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Credit } from '$app/common/interfaces/credit';
@@ -115,7 +114,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
 
   const reactSettings = useReactSettings();
@@ -136,10 +134,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (_value, invoice) => (
-        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-          {invoice.number}
-        </Link>
+      format: (value, invoice) => (
+        <Link to={`/invoices/${invoice.id}/edit`}>{value}</Link>
       ),
     },
     {
@@ -149,8 +145,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -170,8 +166,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -277,8 +273,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -338,8 +334,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {
@@ -358,8 +354,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -368,8 +369,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -404,8 +410,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         formatMoney(
           value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
         ),
     },
     {

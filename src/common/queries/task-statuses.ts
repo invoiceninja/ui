@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
@@ -33,13 +32,20 @@ export function useBlankTaskStatusQuery() {
   );
 }
 
-export function useTaskStatusesQuery() {
+interface Params {
+  status?: string;
+}
+
+export function useTaskStatusesQuery(params?: Params) {
   return useQuery<GenericManyResponse<TaskStatus>>(
-    route('/api/v1/task_statuses'),
+    ['/api/v1/task_statuses', params],
     () =>
-      request('GET', endpoint('/api/v1/task_statuses')).then(
-        (response) => response.data
-      )
+      request(
+        'GET',
+        endpoint('/api/v1/task_statuses?status=:status', {
+          status: params?.status || 'all',
+        })
+      ).then((response) => response.data)
   );
 }
 
@@ -61,20 +67,12 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/task_statuses/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_task_status`);
+    }).then(() => {
+      toast.success(`${action}d_task_status`);
 
-        queryClient.invalidateQueries('/api/v1/task_statuses');
+      queryClient.invalidateQueries('/api/v1/task_statuses');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/task_statuses/:id', { id })
-        );
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/task_statuses/:id', { id }));
+    });
   };
 }

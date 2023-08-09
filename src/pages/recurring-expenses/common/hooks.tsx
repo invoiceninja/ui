@@ -12,10 +12,9 @@ import { Expense } from '$app/common/interfaces/expense';
 import { StatusBadge } from '$app/components/StatusBadge';
 import recurringExpensesFrequency from '$app/common/constants/recurring-expense-frequency';
 import { useTranslation } from 'react-i18next';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
@@ -36,8 +35,11 @@ import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Icon } from '$app/components/icons/Icon';
 import {
+  MdArchive,
   MdControlPointDuplicate,
+  MdDelete,
   MdNotStarted,
+  MdRestore,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -46,6 +48,9 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { EntityState } from '$app/common/enums/entity-state';
+import { useBulk } from '$app/common/queries/recurring-expense';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'status',
@@ -116,8 +121,6 @@ export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
 
@@ -195,11 +198,12 @@ export function useRecurringExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value) =>
+      format: (value, recurringExpense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          recurringExpense.client?.country_id,
+          recurringExpense.currency_id ||
+            recurringExpense.client?.settings.currency_id
         ),
     },
     {
@@ -207,8 +211,13 @@ export function useRecurringExpenseColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -272,11 +281,12 @@ export function useRecurringExpenseColumns() {
       column: 'net_amount',
       id: 'amount',
       label: t('net_amount'),
-      format: (value) =>
+      format: (value, recurringExpense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          recurringExpense.client?.country_id,
+          recurringExpense.currency_id ||
+            recurringExpense.client?.settings.currency_id
         ),
     },
     {
@@ -298,8 +308,13 @@ export function useRecurringExpenseColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -397,26 +412,24 @@ export function useToggleStartStop() {
         ? '/api/v1/recurring_expenses/:id?start=true'
         : '/api/v1/recurring_expenses/:id?stop=true';
 
-    request('PUT', endpoint(url, { id: recurringExpense.id }), recurringExpense)
-      .then(() => {
-        queryClient.invalidateQueries('/api/v1/recurring_expenses');
+    request(
+      'PUT',
+      endpoint(url, { id: recurringExpense.id }),
+      recurringExpense
+    ).then(() => {
+      queryClient.invalidateQueries('/api/v1/recurring_expenses');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', {
-            id: recurringExpense.id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/recurring_expenses/:id', {
+          id: recurringExpense.id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        toast.success(action === 'start' ? 'start' : 'stop');
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      toast.success(action === 'start' ? 'start' : 'stop');
+    });
   };
 }
 
@@ -430,6 +443,13 @@ export function useActions() {
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
   const toggleStartStop = useToggleStartStop();
+
+  const bulk = useBulk();
+
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'recurring_expense',
+    editPageTabs: ['documents'],
+  });
 
   const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {
     setRecurringExpense({ ...recurringExpense, documents: [], number: '' });
@@ -484,6 +504,39 @@ export function useActions() {
         {t('clone_to_expense')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (recurringExpense) =>
+      isEditPage &&
+      getEntityState(recurringExpense) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk(recurringExpense.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (recurringExpense) =>
+      isEditPage &&
+      (getEntityState(recurringExpense) === EntityState.Archived ||
+        getEntityState(recurringExpense) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk(recurringExpense.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (recurringExpense) =>
+      isEditPage &&
+      (getEntityState(recurringExpense) === EntityState.Active ||
+        getEntityState(recurringExpense) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk(recurringExpense.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

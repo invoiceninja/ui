@@ -22,8 +22,8 @@ import { Upload } from '$app/pages/settings/company/documents/components';
 import { TaskStatus } from '$app/pages/tasks/common/components/TaskStatus';
 import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
 import {
-  calculateTime,
   calculateDifferenceBetweenLogs,
+  calculateHours,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -61,15 +61,14 @@ export function ViewSlider() {
         {currentTask && (
           <>
             <Element leftSide={t('duration')}>
-              {calculateTime(currentTask.time_log.toString())}
+              {calculateHours(currentTask.time_log.toString())}
             </Element>
 
             <Element leftSide={t('rate')}>
               {formatMoney(
                 currentTask.rate || company.settings.default_task_rate,
-                currentTask.client?.country_id || company?.settings.country_id,
-                currentTask.client?.settings.currency_id ||
-                  company?.settings.currency_id
+                currentTask.client?.country_id,
+                currentTask.client?.settings.currency_id
               )}
             </Element>
 

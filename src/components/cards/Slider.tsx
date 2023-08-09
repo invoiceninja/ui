@@ -13,6 +13,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import { MdClose } from 'react-icons/md';
 import classNames from 'classnames';
+import { Inline } from '../Inline';
 
 interface Props extends CommonProps {
   visible: boolean;
@@ -22,6 +23,7 @@ interface Props extends CommonProps {
   size: 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge';
   withContainer?: boolean;
   withoutActionContainer?: boolean;
+  topRight?: ReactNode;
 }
 
 export function Slider(props: Props) {
@@ -57,11 +59,16 @@ export function Slider(props: Props) {
                       <span className="text-lg font-medium text-gray-900">
                         {props.title}
                       </span>
-                      <MdClose
-                        fontSize={24}
-                        className="cursor-pointer"
-                        onClick={() => props.onClose()}
-                      />
+
+                      <Inline>
+                        {props.topRight}
+
+                        <MdClose
+                          fontSize={24}
+                          className="cursor-pointer"
+                          onClick={() => props.onClose()}
+                        />
+                      </Inline>
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col justify-between items-center">

@@ -25,8 +25,15 @@ import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
+import {
+  SortableColumns,
+  reportColumn,
+} from '../common/components/SortableColumns';
+import { useReports } from '../common/useReports';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import collect from 'collect.js';
 
-type Identifier =
+export type Identifier =
   | 'activity'
   | 'client'
   | 'contact'
@@ -42,6 +49,9 @@ type Identifier =
   | 'product'
   | 'product_sales'
   | 'task'
+  | 'vendor'
+  | 'purchase_order'
+  | 'purchase_order_item'
   | 'profitloss'
   | 'client_balance_report'
   | 'client_sales_report'
@@ -49,339 +59,6 @@ type Identifier =
   | 'aged_receivable_summary_report'
   | 'user_sales_report'
   | 'tax_summary_report';
-
-interface Report {
-  identifier: Identifier;
-  label: string;
-  endpoint: string;
-  payload: Payload;
-}
-
-interface Payload {
-  start_date: string;
-  end_date: string;
-  date_key?: string;
-  client_id?: string;
-  date_range: string;
-  report_keys: string[];
-  send_email: boolean;
-  is_income_billed?: boolean;
-  is_expense_billed?: boolean;
-  include_tax?: boolean;
-  status?: string;
-}
-
-const reports: Report[] = [
-  {
-    identifier: 'activity',
-    label: 'activity',
-    endpoint: '/api/v1/reports/activities',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'client',
-    label: 'client',
-    endpoint: '/api/v1/reports/clients',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'contact',
-    label: 'contact',
-    endpoint: '/api/v1/reports/contacts',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'credit',
-    label: 'credit',
-    endpoint: '/api/v1/reports/credits',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'document',
-    label: 'document',
-    endpoint: '/api/v1/reports/documents',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'expense',
-    label: 'expense',
-    endpoint: '/api/v1/reports/expenses',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'invoice',
-    label: 'invoice',
-    endpoint: '/api/v1/reports/invoices',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      status: '',
-    },
-  },
-  {
-    identifier: 'invoice_item',
-    label: 'invoice_item',
-    endpoint: '/api/v1/reports/invoice_items',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'quote',
-    label: 'quote',
-    endpoint: '/api/v1/reports/quotes',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'quote_item',
-    label: 'quote_item',
-    endpoint: '/api/v1/reports/quote_items',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'recurring_invoice',
-    label: 'recurring_invoice',
-    endpoint: '/api/v1/reports/recurring_invoices',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'payment',
-    label: 'payment',
-    endpoint: '/api/v1/reports/payments',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'product',
-    label: 'product',
-    endpoint: '/api/v1/reports/products',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'product_sales',
-    label: 'product_sales',
-    endpoint: '/api/v1/reports/product_sales',
-    payload: {
-      start_date: '',
-      end_date: '',
-      client_id: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'task',
-    label: 'task',
-    endpoint: '/api/v1/reports/tasks',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'profitloss',
-    label: 'profitloss',
-    endpoint: '/api/v1/reports/profitloss',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'aged_receivable_detailed_report',
-    label: 'aged_receivable_detailed_report',
-    endpoint: '/api/v1/reports/ar_detail_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'aged_receivable_summary_report',
-    label: 'aged_receivable_summary_report',
-    endpoint: '/api/v1/reports/ar_summary_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'client_balance_report',
-    label: 'client_balance_report',
-    endpoint: '/api/v1/reports/client_balance_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'client_sales_report',
-    label: 'client_sales_report',
-    endpoint: '/api/v1/reports/client_sales_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'tax_summary_report',
-    label: 'tax_summary_report',
-    endpoint: '/api/v1/reports/tax_summary_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-  {
-    identifier: 'user_sales_report',
-    label: 'user_sales_report',
-    endpoint: '/api/v1/reports/user_sales_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-  },
-];
 
 interface Range {
   identifier: string;
@@ -400,18 +77,48 @@ const ranges: Range[] = [
   { identifier: 'custom', label: 'custom' },
 ];
 
+interface Report {
+  identifier: Identifier;
+  label: string;
+  endpoint: string;
+  payload: Payload;
+  custom_columns: string[];
+  allow_custom_column: boolean;
+}
+
+interface Payload {
+  start_date: string;
+  end_date: string;
+  date_key?: string;
+  client_id?: string;
+  date_range: string;
+  report_keys: string[];
+  send_email: boolean;
+  is_income_billed?: boolean;
+  is_expense_billed?: boolean;
+  include_tax?: boolean;
+  status?: string;
+}
+
 export default function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
 
+  const reports = useReports();
+
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [showCustomColumns, setShowCustomColumns] = useState(false);
+
+  const { save, preferences } = usePreferences();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
+
+    setShowCustomColumns(false);
 
     if (report) {
       setReport(report);
@@ -479,10 +186,22 @@ export default function Reports() {
 
     const { client_id } = report.payload;
 
-    const updatedPayload =
+    let updatedPayload =
       report.identifier === 'product_sales'
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
+
+    let reportKeys: string[] = [];
+
+    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+      reportKeys = collect(
+        preferences.reports.columns[report.identifier][reportColumn]
+      )
+        .pluck('value')
+        .toArray() as string[];
+    }
+
+    updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
     request('POST', endpoint(report.endpoint), updatedPayload, {
       responseType: report.payload.send_email ? 'json' : 'blob',
@@ -510,8 +229,6 @@ export default function Reports() {
         toast.success();
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           if (report.payload.send_email) {
             setErrors(error.response.data as ValidationBag);
@@ -523,10 +240,11 @@ export default function Reports() {
             blob.text().then((text) => setErrors(JSON.parse(text)));
           }
         }
-
-        toast.error();
       })
-      .finally(() => setIsPendingExport(false));
+      .finally(() => {
+        setIsPendingExport(false);
+        save({ silent: true });
+      });
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -682,8 +400,24 @@ export default function Reports() {
               />
             </Element>
           )}
+
+          {report.allow_custom_column && (
+            <Element leftSide={`${t('customize')} ${t('columns')}`}>
+              <Toggle
+                checked={showCustomColumns}
+                onValueChange={(value) => setShowCustomColumns(Boolean(value))}
+              />
+            </Element>
+          )}
         </Card>
       </div>
+
+      {showCustomColumns && (
+        <SortableColumns
+          report={report.identifier}
+          columns={report.custom_columns}
+        />
+      )}
     </Default>
   );
 }

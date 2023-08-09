@@ -17,10 +17,8 @@ import {
   changeCurrentIndex,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import { setMsal } from '$app/common/stores/slices/user';
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
-import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -83,17 +81,19 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
-  const authHandler = (err: any, data: any, msal: any) => {
-    dispatch(setMsal(msal));
+  // const authHandler = (err: any, data: any, msal: any) => {
+  //   console.log(err, data, msal);
 
-    request(
-      'POST',
-      endpoint('/api/v1/oauth_login?provider=microsoft'),
-      data
-    ).then((response) => login(response));
-  };
+  //   dispatch(setMsal(msal));
 
-  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
+  //   request(
+  //     'POST',
+  //     endpoint('/api/v1/oauth_login?provider=microsoft'),
+  //     data
+  //   ).then((response) => login(response));
+  // };
+
+  // const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
@@ -110,7 +110,7 @@ export function SignInProviders() {
           @typescript-eslint/ban-ts-comment 
         */}
         {/* @ts-ignore */}
-        <MicrosoftLogin
+        {/* <MicrosoftLogin
           clientId={microsoftClientId}
           authCallback={authHandler}
           redirectUri={'https://app.invoicing.co/'}
@@ -131,7 +131,7 @@ export function SignInProviders() {
 
             <p>Log in with Microsoft</p>
           </SignInProviderButton>
-        </MicrosoftLogin>
+        </MicrosoftLogin> */}
       </div>
     </div>
   );

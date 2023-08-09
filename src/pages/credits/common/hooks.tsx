@@ -48,7 +48,7 @@ import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -69,6 +69,7 @@ import {
   MdDelete,
   MdDownload,
   MdMarkEmailRead,
+  MdPaid,
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
@@ -84,6 +85,8 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useMarkPaid } from './hooks/useMarkPaid';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -204,11 +207,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/credits'), credit)
       .then((response: GenericSingleResourceResponse<Credit>) => {
@@ -217,11 +224,14 @@ export function useCreate(props: CreateProps) {
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
 
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+          if (error.response.data.errors.invoice_id) {
+            toast.error(error.response.data.errors.invoice_id[0]);
+          }
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -236,12 +246,12 @@ export function useSave(props: CreateProps) {
 
   const saveCompany = useHandleCompanySave();
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
 
     setErrors(undefined);
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
       .then(() => {
@@ -252,11 +262,10 @@ export function useSave(props: CreateProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -272,11 +281,15 @@ export function useActions() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'credit',
+  });
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
+  const markPaid = useMarkPaid();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
@@ -295,6 +308,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/credits/create?action=clone');
@@ -315,6 +329,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/invoices/create?action=clone');
@@ -335,6 +350,7 @@ export function useActions() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      po_number: '',
     });
 
     navigate('/quotes/create?action=clone');
@@ -354,6 +370,7 @@ export function useActions() {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
+      po_number: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -372,6 +389,7 @@ export function useActions() {
       subscription_id: '',
       status_id: '1',
       vendor_id: '',
+      po_number: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
@@ -451,6 +469,20 @@ export function useActions() {
           </DropdownElement>
         </div>
       ),
+    (credit) =>
+      (credit.status_id === CreditStatus.Draft ||
+        credit.status_id === CreditStatus.Sent ||
+        credit.status_id === CreditStatus.Partial) &&
+      credit.amount < 0 && (
+        <div>
+          <DropdownElement
+            onClick={() => markPaid(credit)}
+            icon={<Icon element={MdPaid} />}
+          >
+            {t('mark_paid')}
+          </DropdownElement>
+        </div>
+      ),
     () => <Divider withoutPadding />,
     (credit) => (
       <DropdownElement
@@ -492,9 +524,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'archive')}
@@ -504,7 +536,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'restore')}
@@ -514,7 +546,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !credit?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'delete')}
@@ -593,7 +625,6 @@ export function useCreditColumns() {
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
 
@@ -636,8 +667,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -650,13 +681,12 @@ export function useCreditColumns() {
       column: 'remaining',
       id: 'balance',
       label: t('remaining'),
-      format: (_, credit) => {
-        return formatMoney(
+      format: (_, credit) =>
+        formatMoney(
           credit.balance,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        );
-      },
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
+        ),
     },
     {
       column: 'archived_at',
@@ -742,8 +772,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -791,8 +821,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -811,8 +841,13 @@ export function useCreditColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -821,8 +856,13 @@ export function useCreditColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
         </Tooltip>
       ),
     },
@@ -833,8 +873,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {

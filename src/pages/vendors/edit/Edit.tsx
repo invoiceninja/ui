@@ -57,10 +57,10 @@ export default function Edit() {
 
   const saveCompany = useHandleCompanySave();
 
-  const onSave = () => {
+  const onSave = async () => {
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/vendors/:id', { id }), vendor)
       .then(() => {
@@ -73,9 +73,6 @@ export default function Edit() {
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

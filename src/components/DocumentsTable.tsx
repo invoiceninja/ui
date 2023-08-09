@@ -48,25 +48,25 @@ export function DocumentsTable(props: Props) {
   const queryClient = useQueryClient();
 
   const downloadDocument = (doc: Document, inline: boolean) => {
-
     toast.processing();
 
-    queryClient.fetchQuery(endpoint('/documents/:hash', { hash: doc.hash }), () =>
-      request(
-        'GET',
-        endpoint('/documents/:hash', { hash: doc.hash }),
-        { headers: defaultHeaders() },
-        { responseType: 'arraybuffer' }
-      )
-        .then((response) => {
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    queryClient.fetchQuery(
+      endpoint('/documents/:hash', { hash: doc.hash }),
+      () =>
+        request(
+          'GET',
+          endpoint('/documents/:hash', { hash: doc.hash }),
+          { headers: defaultHeaders() },
+          { responseType: 'arraybuffer' }
+        ).then((response) => {
+          const blob = new Blob([response.data], {
+            type: response.headers['content-type'],
+          });
           const url = URL.createObjectURL(blob);
 
           if (inline) {
-
             window.open(url);
             return;
-
           }
 
           const link = document.createElement('a');
@@ -83,13 +83,8 @@ export function DocumentsTable(props: Props) {
 
           toast.dismiss();
         })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        })
     );
-
-  }
+  };
 
   const destroy = (password: string) => {
     toast.processing();
@@ -108,9 +103,6 @@ export function DocumentsTable(props: Props) {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
@@ -153,7 +145,6 @@ export function DocumentsTable(props: Props) {
                     icon={<Icon element={MdPageview} />}
                   >
                     {t('view')}
-
                   </DropdownElement>
 
                   <DropdownElement

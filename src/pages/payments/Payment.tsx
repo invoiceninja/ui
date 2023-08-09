@@ -87,7 +87,7 @@ export default function Payment() {
       }
     >
       <Container>
-        <Tabs tabs={tabs} />
+        <Tabs tabs={tabs} disableBackupNavigation />
 
         <Outlet
           context={{

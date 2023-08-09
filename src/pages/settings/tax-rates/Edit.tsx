@@ -22,15 +22,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useActions } from '$app/pages/settings/tax-rates/common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function Edit() {
+  const { setDocumentTitle } = useTitle('edit_tax_rate');
+
   const [t] = useTranslation();
   const { id } = useParams();
 
@@ -50,9 +53,7 @@ export function Edit() {
   const actions = useActions();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${
-      data?.data.data.name
-    }`;
+    setDocumentTitle(data?.data.data.name);
   }, [data]);
 
   const invalidatePaymentTermCache = () => {
@@ -67,20 +68,15 @@ export function Edit() {
     },
     onSubmit: (value) => {
       setErrors({});
-      toast.loading(t('processing'));
+      toast.processing();
 
       request('PUT', endpoint('/api/v1/tax_rates/:id', { id }), value)
-        .then(() => {
-          toast.dismiss();
-          toast.success(t('updated_tax_rate'));
-        })
+        .then(() => toast.success('updated_tax_rate'))
         .catch((error: AxiosError<ValidationBag>) => {
-          console.error(error);
-          toast.dismiss();
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
         })
         .finally(() => {
           formik.setSubmitting(false);
@@ -143,7 +139,7 @@ export function Edit() {
               />
 
               <InputField
-                type="text"
+                type="number"
                 id="rate"
                 label={t('rate')}
                 onChange={formik.handleChange}

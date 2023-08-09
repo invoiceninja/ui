@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-
 interface ActivityRecordBase {
-label: string;
-hashed_id: string;
-contact_entity: string;
+  label: string;
+  hashed_id: string;
+  contact_entity: string;
 }
 export interface ActivityRecord {
   id: string;
@@ -38,21 +37,21 @@ export interface ActivityRecord {
   purchase_order_id: string;
   notes: string;
   ip: string;
-  client: ActivityRecordBase
-  task:  ActivityRecordBase
-  contact: ActivityRecordBase 
-  user: ActivityRecordBase 
-  expense: ActivityRecordBase 
-  invoice: ActivityRecordBase 
-  recurring_invoice: ActivityRecordBase 
-  recurring_expense: ActivityRecordBase 
-  payment: ActivityRecordBase 
-  credit: ActivityRecordBase 
-  quote: ActivityRecordBase 
-  vendor: ActivityRecordBase
-  vendor_contact: ActivityRecordBase 
-  purchase_order: ActivityRecordBase 
-  subscription: ActivityRecordBase
-  payment_amount: ActivityRecordBase
+  client: ActivityRecordBase;
+  task: ActivityRecordBase;
+  contact: ActivityRecordBase;
+  user: ActivityRecordBase;
+  expense: ActivityRecordBase;
+  invoice: ActivityRecordBase;
+  recurring_invoice: ActivityRecordBase;
+  recurring_expense: ActivityRecordBase;
+  payment: ActivityRecordBase;
+  credit: ActivityRecordBase;
+  quote: ActivityRecordBase;
+  vendor: ActivityRecordBase;
+  vendor_contact: ActivityRecordBase;
+  purchase_order: ActivityRecordBase;
+  subscription: ActivityRecordBase;
+  payment_amount: ActivityRecordBase;
   adjustment: ActivityRecordBase;
 }

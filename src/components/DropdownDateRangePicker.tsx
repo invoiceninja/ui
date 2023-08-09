@@ -12,17 +12,21 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { DatePicker } from 'antd';
+import { ConfigProvider, DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
+import { atom, useAtomValue } from 'jotai';
 
 type Props = {
+  value?: string;
   startDate: string;
   endDate: string;
   handleDateChange: (value: string) => unknown;
   handleDateRangeChange: (value: string) => unknown;
 };
+
+export const antdLocaleAtom = atom<any | null>(null);
 
 export function DropdownDateRangePicker(props: Props) {
   const [t] = useTranslation();
@@ -33,6 +37,7 @@ export function DropdownDateRangePicker(props: Props) {
   const [customEndDate, setCustomEndDate] = useState<string>();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const antdLocale = useAtomValue(antdLocaleAtom);
 
   useEffect(() => {
     setCustomStartDate(props.startDate);
@@ -56,18 +61,16 @@ export function DropdownDateRangePicker(props: Props) {
     <div className="flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
-        defaultValue={props.startDate + '/' + props.startDate}
+        value={props.value}
         className={
           'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
         }
         onValueChange={(value) => {
-          if (value === 'custom') {
-            setIsModalVisible(true);
-          } else {
-            setIsModalVisible(false);
+          value === 'custom'
+            ? setIsModalVisible(true)
+            : setIsModalVisible(false);
 
-            props.handleDateRangeChange(value);
-          }
+          props.handleDateRangeChange(value);
         }}
         style={{ width: '9.7rem' }}
       >
@@ -83,15 +86,16 @@ export function DropdownDateRangePicker(props: Props) {
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
         <option value={'custom'}>{`${t('custom')}`}</option>
       </SelectField>
-      
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
-          <RangePicker
-            size="large"
-            defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
-            format={dateFormat}
-            onChange={(_, dateString) => handleCustomDateChange(dateString)}
-          />
+          <ConfigProvider locale={antdLocale?.default}>
+            <RangePicker
+              size="large"
+              defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
+              format={dateFormat}
+              onChange={(_, dateString) => handleCustomDateChange(dateString)}
+            />
+          </ConfigProvider>
         </div>
       )}
     </div>

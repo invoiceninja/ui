@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -18,6 +18,9 @@ import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { TaxCategorySelector } from '$app/components/tax-rates/TaxCategorySelector';
+import { Alert } from '$app/components/Alert';
+import { useSearchParams } from 'react-router-dom';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -31,23 +34,24 @@ interface Props {
 
 export function ProductForm(props: Props) {
   const [t] = useTranslation();
+  const [, setSearchParams] = useSearchParams();
 
   const company = useCurrentCompany();
 
-  const { errors, handleChange, type } = props;
+  const { errors, handleChange, type, product } = props;
 
   return (
     <>
       {type === 'edit' && (
         <Element leftSide={t('status')}>
-          <EntityStatus entity={props.product} />
+          <EntityStatus entity={product} />
         </Element>
       )}
 
       <Element leftSide={t('item')} required>
         <InputField
           required
-          value={props.product.product_key}
+          value={product.product_key}
           onValueChange={(value) => handleChange('product_key', value)}
           errorMessage={errors?.errors.product_key}
         />
@@ -56,7 +60,7 @@ export function ProductForm(props: Props) {
       <Element leftSide={t('description')}>
         <InputField
           element="textarea"
-          value={props.product.notes}
+          value={product.notes}
           onValueChange={(value) => handleChange('notes', value)}
           errorMessage={errors?.errors.notes}
         />
@@ -64,7 +68,8 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('price')}>
         <InputField
-          value={props.product.price}
+          type="number"
+          value={product.price}
           onValueChange={(value) => handleChange('price', value)}
           errorMessage={errors?.errors.price}
         />
@@ -73,7 +78,7 @@ export function ProductForm(props: Props) {
       {company?.enable_product_cost && (
         <Element leftSide={t('cost')}>
           <InputField
-            value={props.product.cost}
+            value={product.cost}
             onValueChange={(value) => handleChange('cost', value)}
             errorMessage={errors?.errors.cost}
           />
@@ -83,7 +88,8 @@ export function ProductForm(props: Props) {
       {company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
           <InputField
-            value={props.product.quantity}
+            type="number"
+            value={product.quantity}
             onValueChange={(value) => handleChange('quantity', value)}
             errorMessage={errors?.errors.quantity}
           />
@@ -92,33 +98,29 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('max_quantity')}>
         <InputField
-          value={props.product.max_quantity}
+          type="number"
+          value={product.max_quantity}
           onValueChange={(value) => handleChange('max_quantity', value)}
           errorMessage={errors?.errors.max_quantity}
         />
       </Element>
 
       <Element leftSide={t('tax_category')}>
-        <SelectField
-          value={props.product.tax_id}
-          onValueChange={(value) => handleChange('tax_id', value)}
-          errorMessage={errors?.errors.tax_id}
-        >
-          <option value="1">{t('physical_goods')}</option>
-          <option value="2">{t('services')}</option>
-          <option value="3">{t('digital_products')}</option>
-          <option value="4">{t('shipping')}</option>
-          <option value="5">{t('tax_exempt')}</option>
-          <option value="6">{t('reduced_tax')}</option>
-          <option value="7">{t('override_tax')}</option>
-          <option value="8">{t('zero_rated')}</option>
-          <option value="9">{t('reverse_tax')}</option>
-        </SelectField>
+        <TaxCategorySelector
+          value={product.tax_id}
+          onChange={(taxCategory) => handleChange('tax_id', taxCategory.value)}
+        />
+
+        {errors?.errors.tax_id ? (
+          <Alert className="mt-2" type="danger">
+            {errors.errors.tax_id}
+          </Alert>
+        ) : null}
       </Element>
 
       <Element leftSide={t('image_url')}>
         <InputField
-          value={props.product.product_image}
+          value={product.product_image}
           onValueChange={(value) => handleChange('product_image', value)}
           errorMessage={errors?.errors.product_image}
         />
@@ -128,17 +130,25 @@ export function ProductForm(props: Props) {
         <>
           <Element leftSide={t('stock_quantity')}>
             <InputField
-              value={props.product.in_stock_quantity}
-              onValueChange={(value) =>
-                handleChange('in_stock_quantity', Number(value))
-              }
+              type="number"
+              value={product.in_stock_quantity}
+              onValueChange={(value) => {
+                handleChange('in_stock_quantity', Number(value));
+
+                if (type === 'edit') {
+                  setSearchParams((params) => ({
+                    ...params,
+                    update_in_stock_quantity: 'true',
+                  }));
+                }
+              }}
               errorMessage={errors?.errors.in_stock_quantity}
             />
           </Element>
 
           <Element leftSide={t('stock_notifications')}>
             <Toggle
-              checked={props.product.stock_notification}
+              checked={product.stock_notification}
               onValueChange={(value) =>
                 handleChange('stock_notification', value)
               }
@@ -147,7 +157,8 @@ export function ProductForm(props: Props) {
 
           <Element leftSide={t('notification_threshold')}>
             <InputField
-              value={props.product.stock_notification_threshold}
+              type="number"
+              value={product.stock_notification_threshold}
               onValueChange={(value) =>
                 handleChange('stock_notification_threshold', value)
               }
@@ -164,8 +175,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate1', value.resource?.rate);
               handleChange('tax_name1', value.resource?.name);
             }}
-            defaultValue={props.product.tax_rate1}
-            clearButton={Boolean(props.product.tax_rate1)}
+            defaultValue={product.tax_name1}
             onClearButtonClick={() => {
               handleChange('tax_rate1', 0);
               handleChange('tax_name1', '');
@@ -185,8 +195,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate2', value.resource?.rate);
               handleChange('tax_name2', value.resource?.name);
             }}
-            defaultValue={props.product.tax_rate2}
-            clearButton={Boolean(props.product.tax_rate2)}
+            defaultValue={product.tax_name2}
             onClearButtonClick={() => {
               handleChange('tax_rate2', 0);
               handleChange('tax_name2', '');
@@ -206,8 +215,7 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate3', value.resource?.rate);
               handleChange('tax_name3', value.resource?.name);
             }}
-            defaultValue={props.product.tax_rate3}
-            clearButton={Boolean(props.product.tax_rate3)}
+            defaultValue={product.tax_name3}
             onClearButtonClick={() => {
               handleChange('tax_rate3', 0);
               handleChange('tax_name3', '');
@@ -223,7 +231,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
-          defaultValue={props.product.custom_value1}
+          defaultValue={product.custom_value1}
           value={company.custom_fields.product1}
           onValueChange={(value) => handleChange('custom_value1', value)}
         />
@@ -232,7 +240,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product2 && (
         <CustomField
           field="custom_value2"
-          defaultValue={props.product.custom_value2}
+          defaultValue={product.custom_value2}
           value={company.custom_fields.product2}
           onValueChange={(value) => handleChange('custom_value2', value)}
         />
@@ -241,7 +249,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product3 && (
         <CustomField
           field="custom_value3"
-          defaultValue={props.product.custom_value3}
+          defaultValue={product.custom_value3}
           value={company.custom_fields.product3}
           onValueChange={(value) => handleChange('custom_value3', value)}
         />
@@ -250,7 +258,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product4 && (
         <CustomField
           field="custom_value4"
-          defaultValue={props.product.custom_value4}
+          defaultValue={product.custom_value4}
           value={company.custom_fields.product4}
           onValueChange={(value) => handleChange('custom_value4', value)}
         />

@@ -9,13 +9,10 @@
  */
 
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
@@ -25,7 +22,6 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useAtom } from 'jotai';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
@@ -43,13 +39,10 @@ export function QuoteFooter(props: Props) {
   const { id } = useParams();
   const { handleChange, errors } = props;
 
-  const company = useCurrentCompany();
   const location = useLocation();
   const queryClient = useQueryClient();
 
   const [quote] = useAtom(quoteAtom);
-
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const tabs = [
     t('terms'),
@@ -132,6 +125,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={quote?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   errorMessage={errors?.errors.vendor_id}
                 />
               </div>
@@ -141,7 +135,6 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('design')}
                   value={quote?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(quote?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
@@ -184,19 +177,12 @@ export function QuoteFooter(props: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert />
-
-          {company &&
-            ['quote1', 'quote2', 'quote3', 'quote4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('custom_field')}
-                onChange={(value: any) => handleCustomFieldChange(field, value)}
-                noExternalPadding
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/quotes" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
       </TabGroup>
     </Card>

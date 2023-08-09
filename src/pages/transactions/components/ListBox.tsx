@@ -37,6 +37,8 @@ export interface ResourceItem {
   payment_type_id: string;
   archived_at: number;
   is_deleted: boolean;
+  country_id: string;
+  currency_id: string;
 }
 
 export interface SearchInput {
@@ -80,6 +82,7 @@ export function ListBox(props: Props) {
   });
 
   const { data: invoicesResponse } = useInvoicesQuery({
+    include: 'client',
     clientStatus: 'unpaid',
     filter: searchParams.searchTerm,
     clientId,
@@ -97,12 +100,14 @@ export function ListBox(props: Props) {
   });
 
   const { data: paymentsResponse } = usePaymentsQuery({
+    include: 'client',
     filter: searchParams.searchTerm,
     enabled: isPaymentsDataKey,
     matchTransactions: true,
   });
 
   const { data: expensesResponse } = useExpensesQuery({
+    include: 'client',
     filter: searchParams.searchTerm,
     enabled: isExpensesDataKey,
     matchTransactions: true,
@@ -154,6 +159,9 @@ export function ListBox(props: Props) {
       payment_date: resourceItem.payment_date,
       transaction_reference: resourceItem.transaction_reference,
       payment_type_id: resourceItem.payment_type_id,
+      country_id: resourceItem.country_id || resourceItem.client?.country_id,
+      currency_id:
+        resourceItem.currency_id || resourceItem.client?.settings.currency_id,
     }));
   };
 

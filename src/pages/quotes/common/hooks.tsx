@@ -38,7 +38,7 @@ import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -86,6 +86,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -206,11 +207,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/quotes'), quote)
       .then((response: GenericSingleResourceResponse<Quote>) => {
@@ -219,11 +224,10 @@ export function useCreate(props: CreateProps) {
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -236,11 +240,11 @@ export function useSave(props: CreateProps) {
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
       .then(() => {
@@ -251,11 +255,10 @@ export function useSave(props: CreateProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -270,7 +273,6 @@ export function useActions() {
 
   const { t } = useTranslation();
 
-  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const printPdf = usePrintPdf({ entity: 'quote' });
@@ -278,6 +280,8 @@ export function useActions() {
   const approve = useApprove();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
+
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -495,9 +499,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'archive')}
@@ -507,7 +511,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'restore')}
@@ -517,7 +521,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'delete')}
@@ -598,7 +602,6 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
@@ -629,7 +632,7 @@ export function useQuoteColumns() {
         <div className="flex items-center space-x-2">
           <QuoteStatusBadge entity={quote} />
 
-          {quote.status_id === QuoteStatus.Converted && (
+          {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
             <MdTextSnippet
               className="cursor-pointer"
               fontSize={19}
@@ -667,8 +670,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company.settings.country_id,
-          quote.client?.settings.currency_id || company.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -767,8 +770,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -816,8 +819,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -836,8 +839,13 @@ export function useQuoteColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -846,8 +854,13 @@ export function useQuoteColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
         </Tooltip>
       ),
     },
@@ -858,8 +871,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {

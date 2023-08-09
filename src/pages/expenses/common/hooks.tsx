@@ -13,7 +13,6 @@ import paymentType from '$app/common/constants/payment-type';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
@@ -36,7 +35,7 @@ import {
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -54,10 +53,11 @@ import { AxiosResponse } from 'axios';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export function useActions() {
   const [t] = useTranslation();
-  const { id } = useParams();
 
   const navigate = useNavigate();
   const bulk = useBulk();
@@ -65,7 +65,11 @@ export function useActions() {
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
-  const isEditPage = location.pathname.includes(id!);
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'expense',
+    editPageTabs: ['documents'],
+  });
+
   const { create, calculatedTaxRate } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
@@ -95,31 +99,31 @@ export function useActions() {
   const AddToInvoice = ({ expense }: AddToInvoiceProps) => {
     const { data } = useQuery({
       queryFn: () => {
-        const url = new URL(endpoint('/api/v1/expenses?include=invoice.client'));
+        const url = new URL(
+          endpoint(
+            '/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true'
+          )
+        );
 
         if (expense.client_id) {
-          url.searchParams.set('has_invoices', `client,${expense.client_id}`);
-        }
-    
-        if (expense.project_id) {
-          url.searchParams.set('has_invoices', `project,${expense.project_id}`);
+          url.searchParams.set('client_id', expense.client_id);
         }
 
         return request('GET', url.href).then(
-          (response: AxiosResponse<GenericManyResponse<Expense>>) =>
+          (response: AxiosResponse<GenericManyResponse<Invoice>>) =>
             response.data
-        )
+        );
       },
       enabled: showAddToInvoiceModal,
     });
 
-    const handle = (expense: Expense) => {
+    const handle = (invoice: Invoice) => {
       setInvoice(
         () =>
-          expense.invoice && {
-            ...expense.invoice,
+          invoice && {
+            ...invoice,
             line_items: [
-              ...expense.invoice.line_items,
+              ...invoice.line_items,
               {
                 ...blankLineItem(),
                 type_id: InvoiceItemType.Product,
@@ -152,13 +156,10 @@ export function useActions() {
           }
       );
 
-      navigate(
-        route(`/invoices/${expense?.invoice?.id}/edit?action=invoice_expense`)
-      );
+      navigate(route(`/invoices/${invoice?.id}/edit?action=invoice_expense`));
     };
 
     const formatMoney = useFormatMoney();
-    const company = useCurrentCompany();
 
     if (!data) {
       return null;
@@ -166,25 +167,24 @@ export function useActions() {
 
     return (
       <Modal
-        title={t('add_to_invoice')}
+        title={t('action_add_to_invoice')}
         onClose={setShowAddToInvoiceModal}
         visible={showAddToInvoiceModal}
       >
-        {data.data.map((expense) =>
-          expense.invoice ? (
+        {data.data.map((invoice) =>
+          invoice ? (
             <button
-              key={expense.id}
-              onClick={() => handle(expense)}
+              key={invoice.id}
+              onClick={() => handle(invoice)}
               className="inline-flex items-center justify-between"
             >
-              <p>{expense.invoice?.number}</p>
+              <p>{invoice?.number}</p>
 
               <p>
                 {formatMoney(
-                  expense.invoice.amount,
-                  expense.invoice.client?.country_id ??
-                    company.settings.country_id,
-                  expense.invoice.client?.settings.currency_id
+                  invoice.amount,
+                  invoice.client?.country_id,
+                  invoice.client?.settings.currency_id
                 )}
               </p>
             </button>
@@ -215,7 +215,7 @@ export function useActions() {
             onClick={() => setShowAddToInvoiceModal(true)}
             icon={<Icon element={MdTextSnippet} />}
           >
-            {t('add_to_invoice')}
+            {t('action_add_to_invoice')}
           </DropdownElement>
         </>
       ),
@@ -336,7 +336,6 @@ export function useExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   const reactSettings = useReactSettings();
 
@@ -409,11 +408,11 @@ export function useExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value) =>
+      format: (value, expense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          expense.client?.country_id,
+          expense.currency_id || expense.client?.settings.currency_id
         ),
     },
     {
@@ -421,8 +420,13 @@ export function useExpenseColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -485,11 +489,11 @@ export function useExpenseColumns() {
       column: 'net_amount',
       id: 'amount',
       label: t('net_amount'),
-      format: (value) =>
+      format: (value, expense) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          expense.client?.country_id,
+          expense.currency_id || expense.client?.settings.currency_id
         ),
     },
     {
@@ -511,8 +515,13 @@ export function useExpenseColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },

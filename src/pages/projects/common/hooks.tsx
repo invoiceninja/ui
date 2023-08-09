@@ -13,7 +13,6 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Project } from '$app/common/interfaces/project';
 import { Divider } from '$app/components/cards/Divider';
@@ -32,7 +31,7 @@ import {
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -41,9 +40,11 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Task } from '$app/common/interfaces/task';
-import { AxiosError } from 'axios';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
+import { CustomBulkAction } from '$app/components/DataTable';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export const defaultColumns: string[] = [
   'name',
@@ -84,7 +85,7 @@ export function useAllProjectColumns() {
     'is_deleted',
     'number',
     'updated_at',
-    'current_hours',
+    'total_hours',
   ] as const;
 
   return projectColumns;
@@ -94,7 +95,6 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -120,11 +120,11 @@ export function useProjectColumns() {
       column: 'task_rate',
       id: 'task_rate',
       label: t('task_rate'),
-      format: (value) =>
+      format: (value, task) =>
         formatMoney(
           value,
-          company?.settings.country_id,
-          company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -138,8 +138,13 @@ export function useProjectColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -148,8 +153,13 @@ export function useProjectColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -160,7 +170,7 @@ export function useProjectColumns() {
       format: (value) => value,
     },
     {
-      column: 'current_hours',
+      column: 'total_hours',
       id: 'current_hours',
       label: t('total_hours'),
       format: (value) => value,
@@ -238,9 +248,7 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
 
   const queryClient = useQueryClient();
 
@@ -248,10 +256,10 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const shouldShowEditAction =
-    location.pathname.includes(id!) && !location.pathname.includes('/edit');
-
-  const isEditOrShowPage = location.pathname.includes(id!);
+  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
+    entity: 'project',
+    editPageTabs: ['documents'],
+  });
 
   const setProject = useSetAtom(projectAtom);
 
@@ -280,30 +288,25 @@ export function useActions() {
               projectId: project.id,
             }
           )
-        )
-          .then((response: GenericSingleResourceResponse<Task[]>) => {
-            toast.dismiss();
+        ).then((response: GenericSingleResourceResponse<Task[]>) => {
+          toast.dismiss();
 
-            const unInvoicedTasks = response.data.data.filter(
-              (task) => !task.invoice_id
-            );
+          const unInvoicedTasks = response.data.data.filter(
+            (task) => !task.invoice_id
+          );
 
-            if (!response.data.data.length) {
-              return toast.error('no_assigned_tasks');
-            }
+          if (!response.data.data.length) {
+            return toast.error('no_assigned_tasks');
+          }
 
-            invoiceProject(unInvoicedTasks);
-          })
-          .catch((error: AxiosError) => {
-            toast.error();
-            console.error(error);
-          })
+          invoiceProject(unInvoicedTasks);
+        })
     );
   };
 
   const actions = [
     (project: Project) =>
-      shouldShowEditAction && (
+      isShowPage && (
         <DropdownElement
           onClick={() =>
             navigate(route('/projects/:id/edit', { id: project.id }))
@@ -313,7 +316,7 @@ export function useActions() {
           {t('edit')}
         </DropdownElement>
       ),
-    () => shouldShowEditAction && <Divider withoutPadding />,
+    () => isShowPage && <Divider withoutPadding />,
     (project: Project) => (
       <DropdownElement
         onClick={() => handleInvoiceProject(project)}
@@ -367,3 +370,38 @@ export function useActions() {
 
   return actions;
 }
+
+export const useCustomBulkActions = () => {
+  const [t] = useTranslation();
+  const invoiceProject = useInvoiceProject();
+  const combineProjectsTasks = useCombineProjectsTasks();
+
+  const handleInvoiceProjects = (tasks: Task[] | null) => {
+    if (tasks && !tasks.length) {
+      return toast.error('no_assigned_tasks');
+    }
+
+    if (!tasks) {
+      return toast.error('multiple_client_error');
+    }
+
+    invoiceProject(tasks);
+  };
+
+  const customBulkActions: CustomBulkAction<Project>[] = [
+    (selectedIds, selectedProjects) => (
+      <DropdownElement
+        onClick={async () =>
+          handleInvoiceProjects(
+            await combineProjectsTasks(selectedIds, selectedProjects)
+          )
+        }
+        icon={<Icon element={MdTextSnippet} />}
+      >
+        {t('invoice_project')}
+      </DropdownElement>
+    ),
+  ];
+
+  return customBulkActions;
+};

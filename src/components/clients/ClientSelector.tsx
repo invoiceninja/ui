@@ -75,7 +75,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || 500}
-        sortBy="created_at|desc"
+        sortBy={null}
         exclude={props.exclude}
         action={{
           label: t('new_client'),
@@ -83,7 +83,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           onClick: () => setIsModalOpen(true),
         }}
         key="client_selector"
-        // clearInputAfterFirstSelection
+        clearInputAfterSelection={props.clearInputAfterSelection}
       />
 
       {props.errorMessage && (

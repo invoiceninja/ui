@@ -145,7 +145,7 @@ export function Details(props: Props) {
           {formatMoney(
             transaction?.amount || 0,
             company?.settings.country_id,
-            transaction?.currency_id || ''
+            transaction?.currency_id
           )}
         </Element>
 

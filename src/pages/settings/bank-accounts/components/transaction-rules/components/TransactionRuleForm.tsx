@@ -92,7 +92,6 @@ export function TransactionRuleForm(props: Props) {
           <VendorSelector
             value={transactionRule.vendor_id}
             onChange={(vendor) => handleChange('vendor_id', vendor.id)}
-            clearButton={Boolean(transactionRule.vendor_id)}
             onClearButtonClick={() => handleChange('vendor_id', '')}
             errorMessage={errors?.errors.vendor_id}
           />
@@ -104,7 +103,6 @@ export function TransactionRuleForm(props: Props) {
             onChange={(expenseCategory) =>
               handleChange('category_id', expenseCategory.id)
             }
-            clearButton={Boolean(transactionRule.category_id)}
             onClearButtonClick={() => handleChange('category_id', '')}
             errorMessage={errors?.errors.category_id}
           />

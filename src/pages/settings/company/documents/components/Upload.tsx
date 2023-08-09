@@ -44,18 +44,13 @@ export function Upload(props: Props) {
 
       request('POST', props.endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      })
-        .then(() => {
-          toast.success('uploaded_document');
+      }).then(() => {
+        toast.success('uploaded_document');
 
-          setFormData(new FormData());
+        setFormData(new FormData());
 
-          props.onSuccess?.();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        });
+        props.onSuccess?.();
+      });
     },
   });
 
@@ -103,9 +98,7 @@ export function Upload(props: Props) {
             <input {...getInputProps()} />
             <Image className="mx-auto h-12 w-12 text-gray-400" />
             <span className="mt-2 block text-sm font-medium text-gray-900">
-              {isDragActive
-                ? 'drop_your_files_here'
-                : t('dropzone_default_message')}
+              {isDragActive ? 'drop_file_here' : t('dropzone_default_message')}
             </span>
           </div>
         </div>
@@ -146,7 +139,7 @@ export function Upload(props: Props) {
               <Image className="mx-auto h-12 w-12 text-gray-400" />
               <span className="mt-2 block text-sm font-medium text-gray-900">
                 {isDragActive
-                  ? 'drop_your_files_here'
+                  ? 'drop_file_here'
                   : t('dropzone_default_message')}
               </span>
             </div>

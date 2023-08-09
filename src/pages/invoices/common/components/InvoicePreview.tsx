@@ -28,15 +28,15 @@ interface Props {
   for: 'create' | 'invoice';
   resource: Resource;
   entity:
-  | 'invoice'
-  | 'recurring_invoice'
-  | 'quote'
-  | 'credit'
-  | 'purchase_order';
+    | 'invoice'
+    | 'recurring_invoice'
+    | 'quote'
+    | 'credit'
+    | 'purchase_order';
   relationType: RelationType;
   endpoint?:
-  | '/api/v1/live_preview?entity=:entity'
-  | '/api/v1/live_preview/purchase_order?entity=:entity';
+    | '/api/v1/live_preview?entity=:entity'
+    | '/api/v1/live_preview/purchase_order?entity=:entity';
 }
 
 export function InvoicePreview(props: Props) {
@@ -54,7 +54,6 @@ export function InvoicePreview(props: Props) {
     );
   }
 
-
   if (
     props.resource?.id &&
     props.resource?.[props.relationType] &&
@@ -62,16 +61,18 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={previewEndpoint('/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id', {
-          entity: props.entity,
-          id: props.resource?.id,
-        })}
+        link={previewEndpoint(
+          '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
+          {
+            entity: props.entity,
+            id: props.resource?.id,
+          }
+        )}
         resource={props.resource}
         method="POST"
       />
     );
   }
-
 
   if (
     props.resource?.id &&
@@ -80,16 +81,18 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={previewEndpoint('/api/v1/live_preview?entity=:entity&entity_id=:id', {
-          entity: props.entity,
-          id: props.resource?.id,
-        })}
+        link={previewEndpoint(
+          '/api/v1/live_preview?entity=:entity&entity_id=:id',
+          {
+            entity: props.entity,
+            id: props.resource?.id,
+          }
+        )}
         resource={props.resource}
         method="POST"
       />
     );
   }
-
 
   return <></>;
 }

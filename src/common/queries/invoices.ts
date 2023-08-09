@@ -8,14 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '../helpers/toast/toast';
+import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
+import { ValidationBag } from '../interfaces/validation-bag';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -62,4 +67,73 @@ export function bulk(
     action,
     ids: Array.from(id),
   });
+}
+
+const successMessages = {
+  mark_sent: 'marked_sent_invoices',
+  email: 'emailed_invoices',
+  mark_paid: 'marked_invoices_as_paid',
+  download: 'exported_data',
+  cancel: 'cancelled_invoices',
+  auto_bill: 'auto_billed_invoices',
+};
+
+interface Params {
+  onSuccess?: () => void;
+}
+
+export function useBulk(params?: Params) {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (
+    ids: string[],
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'email'
+      | 'mark_sent'
+      | 'mark_paid'
+      | 'download'
+      | 'cancel'
+      | 'auto_bill',
+    emailType?: EmailType
+  ) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/invoices/bulk'), {
+      action,
+      ids,
+      ...(emailType && { email_type: emailType }),
+    })
+      .then(() => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
+
+        toast.success(message);
+
+        params?.onSuccess?.();
+
+        ids.forEach((id) => {
+          queryClient.invalidateQueries(
+            route('/api/v1/invoices/:id', { id })
+          ); 
+        });
+        
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
+        
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (
+          error.response?.status === 422 &&
+          error.response.data.errors.ids?.length
+        ) {
+          toast.error(error.response.data.errors.ids[0]);
+        }
+      });
+  };
 }

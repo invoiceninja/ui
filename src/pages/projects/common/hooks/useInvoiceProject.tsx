@@ -21,12 +21,31 @@ import {
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import collect from 'collect.js';
-import toast from 'react-hot-toast';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { toast } from '$app/common/helpers/toast/toast';
+
+export const calculateTaskHours = (timeLog: string) => {
+  const parsedTimeLogs = parseTimeLog(timeLog);
+
+  let hoursSum = 0;
+
+  if (parsedTimeLogs.length) {
+    parsedTimeLogs.forEach(([start, stop]) => {
+      const unixStart = dayjs.unix(start);
+      const unixStop = dayjs.unix(stop);
+
+      hoursSum += Number(
+        (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+      );
+    });
+  }
+
+  return hoursSum;
+};
 
 export function useInvoiceProject() {
   const navigate = useNavigate();
@@ -37,25 +56,6 @@ export function useInvoiceProject() {
   const { data } = useBlankInvoiceQuery();
 
   const setInvoice = useSetAtom(invoiceAtom);
-
-  const calculateTaskHours = (timeLog: string) => {
-    const parsedTimeLogs = parseTimeLog(timeLog);
-
-    let hoursSum = 0;
-
-    if (parsedTimeLogs.length) {
-      parsedTimeLogs.forEach(([start, stop]) => {
-        const unixStart = dayjs.unix(start);
-        const unixStop = dayjs.unix(stop);
-
-        hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-        );
-      });
-    }
-
-    return hoursSum;
-  };
 
   return (tasks: Task[]) => {
     if (data) {
@@ -105,9 +105,11 @@ export function useInvoiceProject() {
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
+          task_id: task.id,
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          tax_id: '',
         };
 
         item.notes = [

@@ -19,14 +19,18 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Selector() {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
 
+  const errors = useAtomValue(companySettingsErrorsAtom);
+
   const { data } = useQuery('/api/v1/tax_rates', () =>
-    request('GET', endpoint('/api/v1/tax_rates?status=active'))
+    request('GET', endpoint('/api/v1/tax_rates?status=active&per_page=100'))
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -59,6 +63,7 @@ export function Selector() {
                 id="settings.tax_rate1"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name1 || '0'}
+                errorMessage={errors?.errors['settings.tax_rate1']}
               >
                 <option
                   data-rate={0}
@@ -86,6 +91,7 @@ export function Selector() {
                 id="settings.tax_rate2"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name2 || '0'}
+                errorMessage={errors?.errors['settings.tax_rate2']}
               >
                 <option
                   data-rate={0}
@@ -113,6 +119,7 @@ export function Selector() {
                 id="settings.tax_rate3"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name3 || '0'}
+                errorMessage={errors?.errors['settings.tax_rate3']}
               >
                 <option
                   data-rate={0}

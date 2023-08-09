@@ -17,7 +17,6 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
@@ -32,8 +31,6 @@ interface Props {
 }
 
 export function CreateTaskStatusModal(props: Props) {
-  useTitle('kanban');
-
   const [t] = useTranslation();
 
   const accentColor = useAccentColor();
@@ -74,12 +71,10 @@ export function CreateTaskStatusModal(props: Props) {
           props.setVisible(false);
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-          console.error(error);
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error();
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
         })
         .finally(() => setIsFormBusy(false));
     }

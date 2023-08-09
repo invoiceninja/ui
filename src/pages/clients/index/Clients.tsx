@@ -51,9 +51,7 @@ export default function Clients() {
   });
 
   const columns = useClientColumns();
-
   const clientColumns = useAllClientColumns();
-
   const handlePurgeClient = usePurgeClient(purgeClientId);
 
   return (

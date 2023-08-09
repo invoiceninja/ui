@@ -83,17 +83,20 @@ export default function Create() {
     setCredit((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'reverse'
+      ) {
         value = undefined;
       }
 
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone'
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'reverse'
       ) {
         const _credit = cloneDeep(data);
-
 
         if (company && company.enabled_tax_rates > 0) {
           _credit.tax_name1 = company.settings.tax_name1;

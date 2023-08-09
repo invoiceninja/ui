@@ -57,9 +57,8 @@ export function Details(props: Props) {
         <Element leftSide={t('vendor')}>
           <VendorSelector
             value={expense.vendor_id}
-            clearButton={Boolean(expense.vendor_id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
             onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+            onClearButtonClick={() => handleChange('vendor_id', '')}
             errorMessage={errors?.errors.vendor_id}
           />
         </Element>
@@ -94,7 +93,6 @@ export function Details(props: Props) {
         <Element leftSide={t('category')}>
           <ExpenseCategorySelector
             value={expense.category_id}
-            clearButton={Boolean(expense.category_id)}
             onClearButtonClick={() => handleChange('category_id', '')}
             onChange={(category) => handleChange('category_id', category.id)}
             errorMessage={errors?.errors.category_id}
@@ -120,8 +118,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate1}
-              clearButton={Boolean(expense.tax_rate1)}
+              defaultValue={expense.tax_name1}
               onClearButtonClick={() => {
                 handleChange('tax_name1', '');
                 handleChange('tax_rate1', 0);
@@ -166,8 +163,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate2}
-              clearButton={Boolean(expense.tax_rate2)}
+              defaultValue={expense.tax_name2}
               onClearButtonClick={() => {
                 handleChange('tax_name2', '');
                 handleChange('tax_rate2', 0);
@@ -212,8 +208,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate3}
-              clearButton={Boolean(expense.tax_rate3)}
+              defaultValue={expense.tax_name3}
               onClearButtonClick={() => {
                 handleChange('tax_name3', '');
                 handleChange('tax_rate3', 0);
@@ -269,6 +264,7 @@ export function Details(props: Props) {
           <CurrencySelector
             value={expense.currency_id}
             onChange={(currency) => handleChange('currency_id', currency)}
+            errorMessage={errors?.errors.currency_id}
           />
         </Element>
       )}

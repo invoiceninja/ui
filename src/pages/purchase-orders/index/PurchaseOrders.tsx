@@ -10,14 +10,10 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { CustomBulkAction, DataTable } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
-import { MdPrint } from 'react-icons/md';
 import {
   defaultColumns,
   useActions,
@@ -26,6 +22,7 @@ import {
   usePurchaseOrderFilters,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -40,28 +37,17 @@ export default function PurchaseOrders() {
 
   const filters = usePurchaseOrderFilters();
 
-  const printPdf = usePrintPdf({ entity: 'purchase_order' });
-
   const actions = useActions();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
-  const customBulkActions: CustomBulkAction[] = [
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
-    ),
-  ];
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="purchase_order"
-        endpoint="/api/v1/purchase_orders?include=vendor,expense&sort=id|desc"
+        endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
@@ -69,7 +55,6 @@ export default function PurchaseOrders() {
         customActions={actions}
         customBulkActions={customBulkActions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={

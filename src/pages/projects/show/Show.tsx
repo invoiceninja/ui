@@ -20,7 +20,6 @@ import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
 import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
@@ -35,10 +34,15 @@ import {
   useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
+  useCustomBulkActions,
 } from '$app/pages/tasks/common/hooks';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import { Task } from '$app/common/interfaces/task';
+import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings';
 
 dayjs.extend(duration);
 
@@ -47,6 +51,8 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const enabled = useEnabled();
 
   const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
@@ -73,6 +79,10 @@ export default function Show() {
   const filters = useTaskFilters();
   const taskColumns = useAllTaskColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
+  const showEditOption = useShowEditOption();
+
   if (!project) {
     return (
       <Default title={documentTitle} breadcrumbs={pages}>
@@ -80,16 +90,6 @@ export default function Show() {
       </Default>
     );
   }
-
-  const duration = () => {
-    let duration = 0;
-
-    project.tasks?.map((task) => {
-      duration += parseInt(calculateTime(task.time_log, { inSeconds: true }));
-    });
-
-    return dayjs.duration(duration, 'seconds').format('HH:mm:ss');
-  };
 
   return (
     <Default
@@ -126,7 +126,7 @@ export default function Show() {
             {t('task_rate')}:
             {formatMoney(
               project.task_rate,
-              project.client?.country_id || '',
+              project.client?.country_id,
               project.client?.settings.currency_id
             )}
           </p>
@@ -142,33 +142,37 @@ export default function Show() {
           </p>
 
           <p>
-            {t('duration')}: {duration()}
+            {t('total_hours')}: {project.current_hours}
           </p>
         </InfoCard>
       </div>
 
-      <div className="my-4">
-        <DataTable
-          resource="task"
-          columns={columns}
-          customActions={taskActions}
-          endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
-          bulkRoute="/api/v1/tasks/bulk"
-          linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
-          customFilters={filters}
-          customFilterQueryKey="client_status"
-          customFilterPlaceholder="status"
-          withResourcefulActions
-          leftSideChevrons={
-            <DataTableColumnsPicker
-              columns={taskColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-              table="task"
-            />
-          }
-          linkToCreateGuards={[permission('create_task')]}
-        />
-      </div>
+      {enabled(ModuleBitmask.Tasks) && (
+        <div className="my-4">
+          <DataTable
+            resource="task"
+            columns={columns}
+            customActions={taskActions}
+            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
+            bulkRoute="/api/v1/tasks/bulk"
+            linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
+            linkToEdit="/tasks/:id/edit"
+            showEdit={(task: Task) => showEditOption(task)}
+            customFilters={filters}
+            customBulkActions={customBulkActions}
+            customFilterPlaceholder="status"
+            withResourcefulActions
+            leftSideChevrons={
+              <DataTableColumnsPicker
+                columns={taskColumns as unknown as string[]}
+                defaultColumns={defaultColumns}
+                table="task"
+              />
+            }
+            linkToCreateGuards={[permission('create_task')]}
+          />
+        </div>
+      )}
     </Default>
   );
 }

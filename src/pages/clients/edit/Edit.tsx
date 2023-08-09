@@ -93,10 +93,10 @@ export default function Edit() {
 
   const saveCompany = useHandleCompanySave();
 
-  const onSave = () => {
+  const onSave = async () => {
     toast.processing();
 
-    saveCompany();
+    await saveCompany(true);
 
     request('PUT', endpoint('/api/v1/clients/:id', { id }), {
       ...client,
@@ -104,6 +104,8 @@ export default function Edit() {
     })
       .then(() => {
         toast.success('updated_client');
+
+        queryClient.invalidateQueries('/api/v1/clients');
 
         queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
 
@@ -117,11 +119,6 @@ export default function Edit() {
 
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
-        }
-
-        if (error.response?.status !== 412 && error.response?.status !== 422) {
-          console.error(error);
-          toast.error();
         }
       });
   };

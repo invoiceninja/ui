@@ -8,37 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../../components/cards';
-import { Settings } from '../../../../components/layouts/Settings';
-import { Field } from '../components';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Field } from '../components/Field';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Payments() {
-  const { documentTitle } = useTitle('custom_fields');
+  useTitle('custom_fields');
 
   const [t] = useTranslation();
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('payments'), href: '/settings/custom_fields/payments' },
-  ];
+  const title = `${t('custom_fields')}: ${t('payments')}`;
+  const company = useCompanyChanges();
+  const handleChange = useHandleCustomFieldChange();
+
+  if (!company) {
+    return null;
+  }
 
   return (
-    <Settings
-      title={documentTitle}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-    >
-      <CustomFieldsPlanAlert />
-
-      <Card title={`${t('custom_fields')}: ${t('payments')}`}>
-        {['payment1', 'payment2', 'payment3', 'payment4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('payment_field')} />
-        ))}
-      </Card>
-    </Settings>
+    <Card title={title}>
+      {['payment1', 'payment2', 'payment3', 'payment4'].map((field) => (
+        <Field
+          key={field}
+          field={field}
+          placeholder={t('payment_field')}
+          onChange={(value) => handleChange(field, value)}
+          initialValue={company.custom_fields[field]}
+        />
+      ))}
+    </Card>
   );
 }

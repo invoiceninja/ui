@@ -36,6 +36,7 @@ import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
 import { Icon } from '$app/components/icons/Icon';
 import { MdNotStarted, MdSend } from 'react-icons/md';
+import dayjs from 'dayjs';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
@@ -112,6 +113,10 @@ export default function Create() {
 
         if (searchParams.get('client')) {
           _recurringInvoice.client_id = searchParams.get('client')!;
+        }
+
+        if (_recurringInvoice.next_send_date === '') {
+          _recurringInvoice.next_send_date = dayjs().format('YYYY-MM-DD');
         }
 
         _recurringInvoice.uses_inclusive_taxes =

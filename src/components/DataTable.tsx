@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint, isProduction } from '$app/common/helpers';
+import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
@@ -49,6 +48,8 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
+import { EntityState } from '$app/common/enums/entity-state';
+import collect from 'collect.js';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -56,7 +57,10 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
-export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
+export type CustomBulkAction<T> = (
+  selectedIds: string[],
+  selectedResources?: T[]
+) => ReactNode;
 
 interface StyleOptions {
   withoutBottomBorder?: boolean;
@@ -80,9 +84,8 @@ interface Props<T> extends CommonProps {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
-  customBulkActions?: CustomBulkAction[];
+  customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
-  customFilterQueryKey?: string;
   customFilterPlaceholder?: string;
   withoutActions?: boolean;
   withoutPagination?: boolean;
@@ -92,6 +95,7 @@ interface Props<T> extends CommonProps {
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
+  showEdit?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
@@ -116,7 +120,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const { styleOptions } = props;
+  const { styleOptions, customFilters } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -128,8 +132,41 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
+  const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
+
+  const handleChangingCustomFilters = () => {
+    if (customFilters) {
+      const queryKeys: string[] = collect(props.customFilters)
+        .pluck('queryKey')
+        .unique()
+        .toArray();
+
+      queryKeys.forEach((queryKey) => {
+        const currentQueryKey = queryKey || 'client_status';
+        const selectedFiltersByKey: string[] = [];
+
+        customFilters.forEach((filter, index) => {
+          const customFilterQueryKey = filter.queryKey || null;
+
+          if (
+            customFilterQueryKey === queryKey &&
+            customFilter.includes(filter.value)
+          ) {
+            selectedFiltersByKey.push(filter.value);
+          }
+
+          if (index === customFilters.length - 1) {
+            apiEndpoint.searchParams.set(
+              currentQueryKey,
+              selectedFiltersByKey.join(',')
+            );
+          }
+        });
+      });
+    }
+  };
 
   useEffect(() => {
     const perPageParameter = apiEndpoint.searchParams.get('perPage');
@@ -143,12 +180,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
-    if (props.customFilterQueryKey) {
-      apiEndpoint.searchParams.set(
-        props.customFilterQueryKey,
-        customFilter.join(',')
-      );
-    }
+
+    handleChangingCustomFilters();
+
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
@@ -197,6 +231,14 @@ export function DataTable<T extends object>(props: Props<T>) {
     },
   ];
 
+  const showRestoreBulkAction = () => {
+    return !selectedResources.some(
+      (resource) =>
+        getEntityState(resource) !== EntityState.Archived ||
+        getEntityState(resource) !== EntityState.Deleted
+    );
+  };
+
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
@@ -219,12 +261,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           })
         );
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        console.error(error.response?.data);
-
-        toast.error();
-      })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);
         queryClient.invalidateQueries([apiEndpoint.pathname]);
@@ -232,6 +268,16 @@ export function DataTable<T extends object>(props: Props<T>) {
         setSelected([]);
       });
   };
+
+  useEffect(() => {
+    if (data) {
+      const filteredSelectedResources = data.data.data.filter((resource: any) =>
+        selected.includes(resource.id)
+      );
+
+      setSelectedResources(filteredSelectedResources);
+    }
+  }, [selected]);
 
   return (
     <>
@@ -243,7 +289,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           defaultOption={options[0]}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
-          customFilterQueryKey={props.customFilterQueryKey}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={
@@ -265,11 +310,13 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
         >
-          <Dropdown label={t('more_actions')}>
+          <Dropdown label={t('more_actions')} disabled={!selected.length}>
             {props.customBulkActions &&
               props.customBulkActions.map(
-                (bulkAction: CustomBulkAction, index: number) => (
-                  <div key={index}>{bulkAction(selected)}</div>
+                (bulkAction: CustomBulkAction<T>, index: number) => (
+                  <div key={index}>
+                    {bulkAction(selected, selectedResources)}
+                  </div>
                 )
               )}
 
@@ -283,18 +330,20 @@ export function DataTable<T extends object>(props: Props<T>) {
             </DropdownElement>
 
             <DropdownElement
-              onClick={() => bulk('restore')}
-              icon={<Icon element={MdRestore} />}
-            >
-              {t('restore')}
-            </DropdownElement>
-
-            <DropdownElement
               onClick={() => bulk('delete')}
               icon={<Icon element={MdDelete} />}
             >
               {t('delete')}
             </DropdownElement>
+
+            {showRestoreBulkAction() && (
+              <DropdownElement
+                onClick={() => bulk('restore')}
+                icon={<Icon element={MdRestore} />}
+              >
+                {t('restore')}
+              </DropdownElement>
+            )}
           </Dropdown>
         </Actions>
       )}
@@ -438,20 +487,23 @@ export function DataTable<T extends object>(props: Props<T>) {
                 {props.withResourcefulActions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
-                      {props.linkToEdit && (
-                        <DropdownElement
-                          to={route(props.linkToEdit, {
-                            id: resource?.id,
-                          })}
-                          icon={<Icon element={MdEdit} />}
-                        >
-                          {t('edit')}
-                        </DropdownElement>
-                      )}
+                      {props.linkToEdit &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <DropdownElement
+                            to={route(props.linkToEdit, {
+                              id: resource?.id,
+                            })}
+                            icon={<Icon element={MdEdit} />}
+                          >
+                            {t('edit')}
+                          </DropdownElement>
+                        )}
 
-                      {props.linkToEdit && props.customActions && (
-                        <Divider withoutPadding />
-                      )}
+                      {props.linkToEdit &&
+                        props.customActions &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <Divider withoutPadding />
+                        )}
 
                       {props.customActions &&
                         props.customActions.map(
