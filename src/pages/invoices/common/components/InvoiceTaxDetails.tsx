@@ -17,6 +17,10 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { EntityTaxData } from '$app/pages/settings/tax-settings/components/calculate-taxes/EntityTaxData';
+import { route } from '$app/common/helpers/route';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     isModalOpen: boolean;
@@ -27,6 +31,9 @@ interface Props {
 export function InvoiceTaxDetails(props: Props) {
     const [t] = useTranslation();
 
+    const navigate = useNavigate();
+    const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
+
     const resolveCountry = useResolveCountry();
     const updateClientTaxData = () => {
     };
@@ -34,6 +41,13 @@ export function InvoiceTaxDetails(props: Props) {
     const hasInvalidAddress = () => {
         return props.resource?.client?.postal_code === "" || props.resource?.client?.city === "" || props.resource?.client?.state === ""
     };
+
+    const redirectToClientEdit = (id: string) => {
+        setInvalidationQueryAtom(route('/api/v1/invoices'));
+        navigate(route('/clients/:id/edit', { id: id }));
+    };
+
+    console.log(props.resource.client);
 
     return (
         <Modal
@@ -43,8 +57,9 @@ export function InvoiceTaxDetails(props: Props) {
             backgroundColor="white"
             size="regular"
         >
-            {props.resource.client && (
             <>
+            {props.resource.client && (
+            
             <div className="col-span-12 lg:col-span-3">
                 <p>{props.resource.client.display_name}</p>
                 <p>
@@ -69,32 +84,35 @@ export function InvoiceTaxDetails(props: Props) {
                 </div>
                 )}
             </div>
-            </>
+            
             )}
 
-            <Divider />
+            {hasInvalidAddress() && props.resource.client&& (
+                <>
+                <Divider />
+
+                <div className='flex flex-col items-center '>
+                    <p className="text-center">Minimum required fields are Zip, City, State.</p>
+                    <p className="text-center">For highest accuracy, also include a valid street address.</p>
+                    <Button className='mt-5 mb-5' onClick={() => redirectToClientEdit(props.resource.client?.id ?? '')}>{t('edit_client')}</Button>
+                </div>
+                </>
+            )}
             
-            {props.resource.tax_info && (
+            {!hasInvalidAddress() && props.resource.tax_info && (
+                <>
+                <Divider />
+
                 <div className="flex flex-col">
                     <EntityTaxData
                         entity={props.resource.tax_info}
                     />
                 </div>
-            )}
-            {hasInvalidAddress() && props.resource.client && (
-                <div className='flex flex-col items-center '>
-                    <p className="text-center">Minimum required fields are Zip, City, State. For highest accuracy, also include a valid street address.</p>
-                    <Link
-                        to={`/clients/${props.resource.client.id}/edit`}
-                    >
-                        <Button className='mt-5 mb-5'>Update Client Address</Button>
-                    </Link>
-
-                </div>
+                </>
             )}
 
             <Button onClick={() => props.setIsModalOpen(false)}>{t('close')}</Button>
-
+            </>
         </Modal>
     );
 }
