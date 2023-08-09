@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
