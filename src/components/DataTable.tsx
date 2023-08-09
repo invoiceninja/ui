@@ -16,6 +16,7 @@ import React, {
   ReactElement,
   ReactNode,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -59,7 +60,8 @@ export type DataTableColumns<T = any> = {
 
 export type CustomBulkAction<T> = (
   selectedIds: string[],
-  selectedResources?: T[]
+  selectedResources?: T[],
+  onActionCall?: () => void
 ) => ReactNode;
 
 interface StyleOptions {
@@ -269,6 +271,24 @@ export function DataTable<T extends object>(props: Props<T>) {
       });
   };
 
+  const onBulkActionCall = () => {
+    if (mainCheckbox.current) {
+      mainCheckbox.current.checked = false;
+
+      setSelected([]);
+    }
+  };
+
+  const showCustomBulkActionDivider = useMemo(() => {
+    return props.customBulkActions
+      ? props.customBulkActions.every((action) =>
+          React.isValidElement(
+            action(selected, selectedResources, onBulkActionCall)
+          )
+        )
+      : false;
+  }, [props.customBulkActions, selected, selectedResources]);
+
   useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
@@ -315,12 +335,14 @@ export function DataTable<T extends object>(props: Props<T>) {
               props.customBulkActions.map(
                 (bulkAction: CustomBulkAction<T>, index: number) => (
                   <div key={index}>
-                    {bulkAction(selected, selectedResources)}
+                    {bulkAction(selected, selectedResources, onBulkActionCall)}
                   </div>
                 )
               )}
 
-            {props.customBulkActions && <Divider withoutPadding />}
+            {props.customBulkActions && showCustomBulkActionDivider && (
+              <Divider withoutPadding />
+            )}
 
             <DropdownElement
               onClick={() => bulk('archive')}
