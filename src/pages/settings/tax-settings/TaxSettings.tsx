@@ -158,7 +158,8 @@ export function TaxSettings() {
                   <div className="mx-5 my-1">
                     <Button type="minimal" behavior="button"
                       onClick={() => setIsModalVisible(true)}
-                    >{t('info')}</Button>
+                    >
+                      {t('info')}</Button>
                   </div>
                 )}
               </div>

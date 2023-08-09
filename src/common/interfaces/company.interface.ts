@@ -57,7 +57,7 @@ export interface Company {
   invoice_task_locked: boolean;
   invoice_task_documents: boolean;
   oauth_password_required: boolean;
-  origin_tax_data?: OriginTaxData;
+  origin_tax_data?: TaxData;
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
@@ -300,7 +300,7 @@ export interface Settings {
   mark_paid_payment_email: boolean;
 }
 
-export interface OriginTaxData{
+export interface TaxData{
   geoPostalCode: string;
   geoCity: string; 
   geoCounty: string;

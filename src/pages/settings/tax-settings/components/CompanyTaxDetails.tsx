@@ -9,12 +9,21 @@
  */
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Button } from '$app/components/forms';
-import { Element } from '$app/components/cards';
+import { Button, Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { CompanyDetails } from './calculate-taxes/CompanyDetails';
+import { Divider } from 'antd';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useDispatch } from 'react-redux';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { EntityTaxData } from './calculate-taxes/EntityTaxData';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import { LoginValidation } from '$app/pages/authentication/common/ValidationInterface';
 
 interface Props {
     isModalOpen: boolean;
@@ -25,10 +34,30 @@ export function CompanyTaxDetails(props: Props) {
     const [t] = useTranslation();
 
     const company = useCurrentCompany();
-    
-    const formatTaxRate = (rate: number) => {
 
-        return rate*100 === 0 ? '0%' : `${(rate * 100).toFixed(3)}%`;
+    const dispatch = useDispatch();
+
+    const updateCompanyTaxData = () => {
+        toast.processing();
+
+        request(
+            'POST',
+            endpoint('/api/v1/companies/updateOriginTaxData/:id', {
+                id: company.id,
+            }),
+        ).then((response: AxiosResponse) => {
+
+            toast.success('success');
+
+            dispatch(
+                updateRecord({ object: 'company', data: response.data.data })
+            );
+
+        }).catch(
+            (error: AxiosError<GenericValidationBag<LoginValidation>>) => {
+                toast.error(error.response?.data?.message as string);
+            }
+        );
     };
 
     return (
@@ -37,80 +66,36 @@ export function CompanyTaxDetails(props: Props) {
             visible={props.isModalOpen}
             onClose={() => props.setIsModalOpen(false)}
             backgroundColor="white"
+            size="regular"
         >
-        {company.origin_tax_data?.geoPostalCode === undefined && (
-            <div></div>
-        )}
-        {company.origin_tax_data?.geoPostalCode && (
-        <div className="">
-            <Element 
-                leftSide={t('postal_code')}
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.geoPostalCode}
-            </Element>
-            <Element
-                leftSide={t('city')}
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.geoCity}
-            </Element>
-            <Element
-                leftSide={t('county')}
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.geoCounty}
-            </Element>
-            <Element
-                leftSide={t('state')}
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.geoState}
-            </Element>
-            <Element
-                leftSide="State Sales Tax"
-                className="whitespace-nowrap"
-            >
-                {formatTaxRate(company.origin_tax_data.stateSalesTax)}
-            </Element>
-            <Element
-                leftSide="City Sales Tax"
-                className="whitespace-nowrap"
-            >
-                {formatTaxRate(company.origin_tax_data.citySalesTax)}
-            </Element>
-            <Element
-                leftSide="City Sales Tax"
-                className="whitespace-nowrap"
-            >
-                {formatTaxRate(company.origin_tax_data.countySalesTax)}
-            </Element>
-            <Element
-                leftSide="Total Sales Tax"
-                className="whitespace-nowrap"
-            >
-                {formatTaxRate(company.origin_tax_data.taxSales)}
-            </Element>
-            <Element
-                leftSide="Tax Location"
-                className="whitespace-nowrap"
-            >
-            {company.origin_tax_data.originDestination === 'D' ? 'Destination' : 'Origin'}
-            </Element>
-            <Element
-                leftSide="Tax on services"
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.txbService === 'Y' ? 'Yes' : 'No'}
-            </Element>
-            <Element
-                leftSide="Tax on freight"
-                className="whitespace-nowrap"
-            >
-                {company.origin_tax_data.txbFreight === 'Y' ? 'Yes' : 'No'}
-            </Element>
-        </div>
-        )}
+            <CompanyDetails />
+
+            <Divider />
+
+            {company.origin_tax_data?.geoPostalCode === undefined || company.origin_tax_data?.geoPostalCode === "" && (
+                <div className='flex flex-col items-center '>
+                    <p className="text-center">Minimum required fields are Zip, City, State. For highest accuracy, also include a valid street address.</p>
+                    <Link 
+                        to="/settings/company_details/address"
+                    >
+                        <Button className='mt-5 mb-5'>Update Company Address</Button>
+                    </Link>
+                    
+                </div>
+            )}
+            {company.origin_tax_data?.geoPostalCode && (
+                <div className="flex flex-col">
+                    <EntityTaxData
+                        entity={company.origin_tax_data}
+                    />
+                    <div className='flex justify-center items-center'>
+                        <Button onClick={updateCompanyTaxData} className='mt-5 mb-5'>Refresh Company Tax Data</Button>
+                    </div>
+                </div>
+            )}
+
+            <Divider />
+
             <Button onClick={() => props.setIsModalOpen(false)}>{t('close')}</Button>
 
         </Modal>
