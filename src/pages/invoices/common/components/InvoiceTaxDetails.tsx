@@ -47,8 +47,6 @@ export function InvoiceTaxDetails(props: Props) {
         navigate(route('/clients/:id/edit', { id: id }));
     };
 
-    console.log(props.resource.client);
-
     return (
         <Modal
             title="Invoice Tax Details"
