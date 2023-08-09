@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { Client } from './client';
+import { TaxData } from './company.interface';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { Invitation } from './purchase-order';
@@ -80,6 +81,7 @@ export interface Invoice {
   client?: Client;
   activities?: Activity[];
   payments?: Payment[];
+  tax_info?: TaxData;
 }
 
 export interface Activity {

@@ -11,7 +11,7 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
@@ -21,6 +21,10 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Entry } from '$app/components/forms/Combobox';
+import { Button } from 'antd';
+import { InvoiceTaxDetails } from './InvoiceTaxDetails';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 interface Props {
   resource: ProductTableResource;
@@ -45,6 +49,8 @@ export function InvoiceTotals(props: Props) {
     props.onChange(property, value);
 
   const [t] = useTranslation();
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
@@ -157,6 +163,20 @@ export function InvoiceTotals(props: Props) {
           value={resource?.custom_surcharge4.toString() || ''}
           onValueChange={(value) => handleChange('custom_surcharge4', value)}
         />
+      )}
+
+      {props.resource && props.resource.tax_info && props.resource.client_id && (
+        <>
+        <div className='flex justify-center items-center'>
+          <Button onClick={() => setIsModalVisible(true)} className='mt-5 mb-5'>{t('tax_details')}</Button>
+        </div>
+
+        <InvoiceTaxDetails
+          isModalOpen={isModalVisible}
+          setIsModalOpen={setIsModalVisible}
+          resource={props.resource as Invoice | RecurringInvoice} 
+          />
+        </>
       )}
     </Card>
   );
