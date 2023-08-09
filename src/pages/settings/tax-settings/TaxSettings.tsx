@@ -29,6 +29,7 @@ import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { CompanyTaxDetails } from './components/CompanyTaxDetails';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -41,7 +42,8 @@ export function TaxSettings() {
   useInjectCompanyChanges();
   useTitle('tax_settings');
   const errors = useAtomValue(companySettingsErrorsAtom);
-
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
 
