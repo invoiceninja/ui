@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Button, Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
@@ -28,7 +27,6 @@ interface Props {
 export function InvoiceTaxDetails(props: Props) {
     const [t] = useTranslation();
 
-    const company = useCurrentCompany();
     const resolveCountry = useResolveCountry();
     const updateClientTaxData = () => {
     };
