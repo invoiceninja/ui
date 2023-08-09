@@ -9,14 +9,11 @@
  */
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Button } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Divider } from 'antd';
-import { ProductTableResource } from './ProductsTable';
-import { Client } from '$app/common/interfaces/client';
-import { Address } from '$app/pages/clients/show/components/Address';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -33,6 +30,8 @@ export function InvoiceTaxDetails(props: Props) {
 
     const company = useCurrentCompany();
     const resolveCountry = useResolveCountry();
+    const updateClientTaxData = () => {
+    };
 
     const hasInvalidAddress = () => {
         return props.resource?.client?.postal_code === "" || props.resource?.client?.city === "" || props.resource?.client?.state === ""
@@ -63,11 +62,20 @@ export function InvoiceTaxDetails(props: Props) {
                 </p>
 
                 <p>{resolveCountry(props.resource.client.country_id)?.name}</p>
+                
+                {!hasInvalidAddress() && props.resource.client &&(
+                <div className="flex flex-col">
+                    <div className='flex justify-center items-center'>
+                        <Button onClick={updateClientTaxData} className='mt-5 mb-5'>Refresh Client Tax Data</Button>
+                    </div>
+                </div>
+                )}
             </div>
             </>
             )}
 
             <Divider />
+            
             {props.resource.tax_info && (
                 <div className="flex flex-col">
                     <EntityTaxData
@@ -75,32 +83,17 @@ export function InvoiceTaxDetails(props: Props) {
                     />
                 </div>
             )}
-            {/* {props.resource.tax_info === undefined ||
-                company.origin_tax_data?.geoPostalCode === "" ||
-                hasInvalidAddress()
-                && (
-                    <div className='flex flex-col items-center '>
-                        <p className="text-center">Minimum required fields are Zip, City, State. For highest accuracy, also include a valid street address.</p>
-                        <Link
-                            to="/settings/company_details/address"
-                        >
-                            <Button className='mt-5 mb-5'>Update Company Address</Button>
-                        </Link>
+            {hasInvalidAddress() && props.resource.client && (
+                <div className='flex flex-col items-center '>
+                    <p className="text-center">Minimum required fields are Zip, City, State. For highest accuracy, also include a valid street address.</p>
+                    <Link
+                        to={`/clients/${props.resource.client.id}/edit`}
+                    >
+                        <Button className='mt-5 mb-5'>Update Client Address</Button>
+                    </Link>
 
-                    </div>
-                )}
-            {company.origin_tax_data && !hasInvalidAddress() && (
-                <div className="flex flex-col">
-                    <EntityTaxData
-                        entity={company.origin_tax_data}
-                    />
-                    <div className='flex justify-center items-center'>
-                        <Button onClick={updateCompanyTaxData} className='mt-5 mb-5'>Refresh Company Tax Data</Button>
-                    </div>
                 </div>
-            )} */}
-
-            {/* <Divider /> */}
+            )}
 
             <Button onClick={() => props.setIsModalOpen(false)}>{t('close')}</Button>
 
