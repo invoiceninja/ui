@@ -38,41 +38,43 @@ export function useAuthenticated(): boolean {
     return true;
   }
 
-  queryClient.fetchQuery('/api/v1/refresh', () =>
-    request('POST', endpoint('/api/v1/refresh'))
-      .then((response) => {
-        let currentIndex = 0;
+  queryClient.fetchQuery(
+    `/api/v1/refresh?per_page=${import.meta.env.VITE_MAX_COMPANY}`,
+    () =>
+      request('POST', endpoint(`/api/v1/refresh?per_page=100`))
+        .then((response) => {
+          let currentIndex = 0;
 
-        if (localStorage.getItem('X-CURRENT-INDEX')) {
-          currentIndex = parseInt(
-            localStorage.getItem('X-CURRENT-INDEX') || '0'
+          if (localStorage.getItem('X-CURRENT-INDEX')) {
+            currentIndex = parseInt(
+              localStorage.getItem('X-CURRENT-INDEX') || '0'
+            );
+          } else {
+            const companyUsers: CompanyUser[] = response.data.data;
+            const defaultCompanyId = companyUsers[0].account.default_company_id;
+
+            currentIndex =
+              companyUsers.findIndex(
+                (companyUser) => companyUser.company.id === defaultCompanyId
+              ) || 0;
+          }
+
+          dispatch(
+            authenticate({
+              type: AuthenticationTypes.TOKEN,
+              user: response.data.data[currentIndex].user,
+              token: localStorage.getItem('X-NINJA-TOKEN') as string,
+            })
           );
-        } else {
-          const companyUsers: CompanyUser[] = response.data.data;
-          const defaultCompanyId = companyUsers[0].account.default_company_id;
 
-          currentIndex =
-            companyUsers.findIndex(
-              (companyUser) => companyUser.company.id === defaultCompanyId
-            ) || 0;
-        }
+          dispatch(updateCompanyUsers(response.data.data));
+          dispatch(changeCurrentIndex(currentIndex));
+        })
+        .catch(() => {
+          localStorage.removeItem('X-NINJA-TOKEN');
 
-        dispatch(
-          authenticate({
-            type: AuthenticationTypes.TOKEN,
-            user: response.data.data[currentIndex].user,
-            token: localStorage.getItem('X-NINJA-TOKEN') as string,
-          })
-        );
-
-        dispatch(updateCompanyUsers(response.data.data));
-        dispatch(changeCurrentIndex(currentIndex));
-      })
-      .catch(() => {
-        localStorage.removeItem('X-NINJA-TOKEN');
-
-        navigate('/login');
-      })
+          navigate('/login');
+        })
   );
 
   return true;

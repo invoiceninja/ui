@@ -8,35 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Menu, Transition } from '@headlessui/react';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { classNames, isHosted, isSelfHosted } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useCompanyName, useLogo } from '$app/common/hooks/useLogo';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
+import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
+import { Combobox, Menu, Transition } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
+import { BsChevronExpand } from 'react-icons/bs';
+import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { route } from '$app/common/helpers/route';
 import { DropdownElement } from './dropdown/DropdownElement';
-import { useLogo } from '$app/common/hooks/useLogo';
-import { useCompanyName } from '$app/common/hooks/useLogo';
-import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
-import { freePlan } from '$app/common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
-import { MdLogout, MdManageAccounts } from 'react-icons/md';
-import { BiPlusCircle } from 'react-icons/bi';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
 
-  const state = useSelector((state: RootState) => state.companyUsers);
-
+  const state = useSelector((state: RootState) => {
+    return state.companyUsers;
+  });
+  console.debug('🚀 ~ file: CompanySwitcher.tsx:40 ~ state ~ state:', state);
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
   const dispatch = useDispatch();
@@ -50,12 +53,16 @@ export function CompanySwitcher() {
   const currentCompany = useCurrentCompany();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
+    console.debug(
+      '🚀 ~ file: CompanySwitcher.tsx:61 ~ switchCompany ~ index:',
+      index
+    );
     dispatch(
       authenticate({
         type: AuthenticationTypes.TOKEN,
@@ -74,16 +81,30 @@ export function CompanySwitcher() {
 
     window.location.href = route('/');
   };
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    if (state.api.length < 10) {
-      setShouldShowAddCompany(true);
-    }
-
-    if (isDemo()) {
-      setShouldShowAddCompany(false);
-    }
+    // if (state.api.length < 10) {
+    //   setShouldShowAddCompany(true);
+    // }
+    // if (isDemo()) {
+    //   setShouldShowAddCompany(false);
+    // }
+    //setQuery(currentCompany.settings.name);
   }, [currentCompany]);
+
+  const filteredCompanies =
+    query === ''
+      ? state.api
+      : state.api.filter((cmp: CompanyUser) => {
+          return cmp.company.settings.name
+            .toLowerCase()
+            .includes(query.toLowerCase());
+        });
+  console.debug(
+    '🚀 ~ file: CompanySwitcher.tsx:96 ~ CompanySwitcher ~ filteredCompanies:',
+    filteredCompanies
+  );
 
   return (
     <>
@@ -132,21 +153,71 @@ export function CompanySwitcher() {
             </div>
 
             <div className="py-1">
-              {state?.api?.length >= 1 &&
-                state?.api?.map((record: any, index: number) => (
-                  <Menu.Item key={index}>
-                    <DropdownElement onClick={() => switchCompany(index)}>
-                      <div className="flex items-center space-x-3">
-                        <span>
-                          {record.company.settings.name ||
-                            t('untitled_company')}
-                        </span>
+              {state?.api?.length >= import.meta.env.VITE_MAX_COMPANY ? (
+                <Combobox
+                  value={currentCompany.settings.name}
+                  onChange={(e: string) => {
+                    switchCompany(parseInt(e));
+                  }}
+                >
+                  <div className="relative w-full cursor-default overflow-hidden  bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2  sm:text-sm">
+                    <Combobox.Input
+                      className={classNames(
+                        `w-full py-2 px-3  text-sm border border-gray-300 text-gray-900`
+                      )}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                      <BsChevronExpand
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                    </Combobox.Button>
+                  </div>
 
-                        {state.currentIndex === index && <Check size={18} />}
-                      </div>
-                    </DropdownElement>
-                  </Menu.Item>
-                ))}
+                  <Combobox.Options>
+                    {filteredCompanies.map((record: any, index: number) => (
+                      <Combobox.Option
+                        key={index}
+                        value={state.api.indexOf(record)}
+                      >
+                        <DropdownElement>
+                          <div className="flex items-center space-x-3">
+                            <span>
+                              {record.company.settings.name ||
+                                t('untitled_company')}
+                            </span>
+
+                            {state.currentIndex === index && (
+                              <Check size={18} />
+                            )}
+                          </div>
+                        </DropdownElement>
+                      </Combobox.Option>
+                    ))}
+                  </Combobox.Options>
+                </Combobox>
+              ) : (
+                <>
+                  {state?.api?.length >= 1 &&
+                    state?.api?.map((record: any, index: number) => (
+                      <Menu.Item key={index}>
+                        <DropdownElement onClick={() => switchCompany(index)}>
+                          <div className="flex items-center space-x-3">
+                            <span>
+                              {record.company.settings.name ||
+                                t('untitled_company')}
+                            </span>
+
+                            {state.currentIndex === index && (
+                              <Check size={18} />
+                            )}
+                          </div>
+                        </DropdownElement>
+                      </Menu.Item>
+                    ))}
+                </>
+              )}
             </div>
             <div className="py-1">
               {shouldShowAddCompany && canUserAddCompany && (

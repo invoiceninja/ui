@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { request } from '$app/common/helpers/request';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LoginForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
-import { AxiosError } from 'axios';
-import { LoginValidation } from './common/ValidationInterface';
-import { useTranslation } from 'react-i18next';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { Link } from '../../components/forms/Link';
-import { InputLabel } from '../../components/forms/InputLabel';
 import { Alert } from '../../components/Alert';
-import { HostedLinks } from './components/HostedLinks';
-import { Header } from './components/Header';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { request } from '$app/common/helpers/request';
-import { SignInProviders } from './components/SignInProviders';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { InputLabel } from '../../components/forms/InputLabel';
+import { Link } from '../../components/forms/Link';
+import { LoginValidation } from './common/ValidationInterface';
 import { useLogin } from './common/hooks';
-import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
+import { SignInProviders } from './components/SignInProviders';
 
 export function Login() {
   useTitle('login');
@@ -58,11 +58,16 @@ export function Login() {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/login'), values, {
-        ...(secret && {
-          headers: { 'X-API-SECRET': secret },
-        }),
-      })
+      request(
+        'POST',
+        endpoint(`/api/v1/login?per_page=${import.meta.env.VITE_MAX_COMPANY}`),
+        values,
+        {
+          ...(secret && {
+            headers: { 'X-API-SECRET': secret },
+          }),
+        }
+      )
         .then((response) => login(response))
         .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
           return error.response?.status === 422
