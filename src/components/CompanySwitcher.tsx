@@ -20,7 +20,7 @@ import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
 import { Combobox, Menu, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
@@ -52,8 +52,7 @@ export function CompanySwitcher() {
 
   const currentCompany = useCurrentCompany();
 
-  const [shouldShowAddCompany, setShouldShowAddCompany] =
-    useState<boolean>(true);
+  const [shouldShowAddCompany] = useState<boolean>(true);
 
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
     useState<boolean>(false);
@@ -82,16 +81,6 @@ export function CompanySwitcher() {
     window.location.href = route('/');
   };
   const [query, setQuery] = useState('');
-
-  useEffect(() => {
-    // if (state.api.length < 10) {
-    //   setShouldShowAddCompany(true);
-    // }
-    // if (isDemo()) {
-    //   setShouldShowAddCompany(false);
-    // }
-    //setQuery(currentCompany.settings.name);
-  }, [currentCompany]);
 
   const filteredCompanies =
     query === ''
