@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { Alert } from '$app/components/Alert';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -35,12 +35,19 @@ interface Props extends CommonProps {
   step?: string;
   maxLength?: number;
   autoComplete?: string;
+  collapseOnFocus?: boolean;
+  parentClassName?: string;
 }
 
 export function InputField(props: Props) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const isInitialTypePassword = props.type === 'password';
 
+  const { collapseOnFocus, parentClassName } = props;
+
   const [isInputMasked, setIsInputMasked] = useState(true);
+
+  const [isFocused, setIsFocused] = useState(false);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -54,6 +61,18 @@ export function InputField(props: Props) {
     return props.type;
   }, [props.type, isInputMasked]);
 
+  useEffect(() => {
+    if (collapseOnFocus && inputRef.current) {
+      inputRef.current.style.height = 'auto';
+
+      if (isFocused) {
+        inputRef.current.style.height = `${
+          inputRef.current.scrollHeight + 5
+        }px`;
+      }
+    }
+  }, [isFocused, props.value]);
+
   return (
     <section>
       {props.label && (
@@ -63,14 +82,19 @@ export function InputField(props: Props) {
         </InputLabel>
       )}
 
-      <div className="relative">
+      <div className={`relative ${parentClassName}`}>
         <DebounceInput
           min={props.min}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
           element={props.element || 'input'}
-          inputRef={props.innerRef}
+          inputRef={(ref) => {
+            if (props.innerRef) {
+              props.innerRef(ref);
+            }
+            inputRef.current = ref;
+          }}
           debounceTimeout={props.debounceTimeout ?? 300}
           required={props.required}
           id={props.id}
@@ -79,6 +103,7 @@ export function InputField(props: Props) {
             `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
+              'overflow-y-hidden hover:overflow-y-auto': collapseOnFocus,
             }
           )}
           placeholder={props.placeholder || ''}
@@ -86,6 +111,8 @@ export function InputField(props: Props) {
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}
+          onFocus={() => collapseOnFocus && setIsFocused(true)}
+          onBlur={() => collapseOnFocus && setIsFocused(false)}
           value={props.value}
           list={props.list}
           rows={props.textareaRows || 5}
