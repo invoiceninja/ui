@@ -15,6 +15,7 @@ import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
+import { or } from '$app/common/guards/guards/or';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -184,9 +185,33 @@ export const settingsRoutes = (
       </Route>
       <Route path="integrations">
         <Route path="api_tokens">
-          <Route path="" element={<Settings.ApiTokens />} />
-          <Route path="create" element={<Settings.CreateApiToken />} />
-          <Route path=":id/edit" element={<Settings.EditApiToken />} />
+          <Route
+            path=""
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro'))]}
+                component={<Settings.ApiTokens />}
+              />
+            }
+          />
+          <Route
+            path="create"
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro'))]}
+                component={<Settings.CreateApiToken />}
+              />
+            }
+          />
+          <Route
+            path=":id/edit"
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro'))]}
+                component={<Settings.EditApiToken />}
+              />
+            }
+          />
         </Route>
         <Route path="api_webhooks">
           <Route path="" element={<Settings.ApiWebhooks />} />
