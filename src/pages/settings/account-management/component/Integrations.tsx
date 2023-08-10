@@ -11,15 +11,19 @@
 import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../../components/cards';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
 
 export function Integrations() {
   const [t] = useTranslation();
 
   return (
     <Card title={t('integrations')}>
-      <ClickableElement to="/settings/integrations/api_tokens">
-        {t('api_tokens')}
-      </ClickableElement>
+      {((!freePlan() && isHosted()) || isSelfHosted()) && (
+        <ClickableElement to="/settings/integrations/api_tokens">
+          {t('api_tokens')}
+        </ClickableElement>
+      )}
 
       <ClickableElement to="/settings/integrations/api_webhooks">
         {t('api_webhooks')}
