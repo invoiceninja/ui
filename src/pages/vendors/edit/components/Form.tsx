@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useLanguages } from '$app/common/hooks/useLanguages';
 
 interface Props {
   vendor: Vendor;
@@ -84,6 +85,8 @@ export function Form(props: Props) {
 
     handleChange('contacts', contacts);
   };
+
+  const languages = useLanguages();
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -333,6 +336,25 @@ export function Form(props: Props) {
                   errorMessage={errors?.errors.currency_id}
                 />
               </Element>
+
+              {languages.length > 1 && (
+                <Element leftSide={t('language')} noExternalPadding>
+                  <SelectField
+                    value={vendor.language_id}
+                    onValueChange={(value) =>
+                      handleChange('language_id', value)
+                    }
+                    errorMessage={errors?.errors.language_id}
+                    withBlank
+                  >
+                    {languages.map((language, index) => (
+                      <option key={index} value={language.id}>
+                        {language.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
+              )}
 
               <MarkdownEditor
                 label={t('public_notes').toString()}
