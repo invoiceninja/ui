@@ -91,7 +91,7 @@ export function InputField(props: Props) {
           element={props.element || 'input'}
           inputRef={(ref) => {
             if (props.innerRef) {
-              props.innerRef(ref);
+              props.innerRef.current = ref;
             }
 
             inputRef.current = ref;
