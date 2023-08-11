@@ -93,6 +93,7 @@ export function InputField(props: Props) {
             if (props.innerRef) {
               props.innerRef(ref);
             }
+
             inputRef.current = ref;
           }}
           debounceTimeout={props.debounceTimeout ?? 300}
@@ -112,7 +113,12 @@ export function InputField(props: Props) {
             props.onChange && props.onChange(event);
           }}
           onFocus={() => collapseOnFocus && setIsFocused(true)}
-          onBlur={() => collapseOnFocus && setIsFocused(false)}
+          onBlur={() =>
+            collapseOnFocus &&
+            setTimeout(() => {
+              setIsFocused(false);
+            }, 5)
+          }
           value={props.value}
           list={props.list}
           rows={props.textareaRows || 5}
