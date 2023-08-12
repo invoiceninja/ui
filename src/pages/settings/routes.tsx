@@ -189,7 +189,7 @@ export const settingsRoutes = (
             path=""
             element={
               <Guard
-                guards={[or(plan('enterprise'), plan('pro'))]}
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
                 component={<Settings.ApiTokens />}
               />
             }
@@ -198,7 +198,7 @@ export const settingsRoutes = (
             path="create"
             element={
               <Guard
-                guards={[or(plan('enterprise'), plan('pro'))]}
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
                 component={<Settings.CreateApiToken />}
               />
             }
@@ -207,7 +207,7 @@ export const settingsRoutes = (
             path=":id/edit"
             element={
               <Guard
-                guards={[or(plan('enterprise'), plan('pro'))]}
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
                 component={<Settings.EditApiToken />}
               />
             }
