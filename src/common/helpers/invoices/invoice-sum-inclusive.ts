@@ -36,7 +36,7 @@ export class InvoiceSumInclusive {
   }
 
   public build() {
-    console.log('inclusively');
+
     this.calculateLineItems()
       .calculateDiscount()
       .calculateCustomValues()
