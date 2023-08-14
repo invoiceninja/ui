@@ -39,6 +39,8 @@ import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemProper
 import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { useSave } from './hooks/useSave';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Card } from '$app/components/cards';
+import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -121,16 +123,26 @@ export default function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <VendorSelector
-          readonly
-          resource={purchaseOrder}
-          onChange={(id) => handleChange('vendor_id', id)}
-          onClearButtonClick={() => handleChange('vendor_id', '')}
-          onContactCheckboxChange={(id, checked) =>
-            purchaseOrder && handleInvitationChange(purchaseOrder, id, checked)
-          }
-          errorMessage={errors?.errors.vendor_id}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          {purchaseOrder && (
+            <div className="flex space-x-20">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <PurchaseOrderStatus entity={purchaseOrder} />
+            </div>
+          )}
+
+          <VendorSelector
+            readonly
+            resource={purchaseOrder}
+            onChange={(id) => handleChange('vendor_id', id)}
+            onClearButtonClick={() => handleChange('vendor_id', '')}
+            onContactCheckboxChange={(id, checked) =>
+              purchaseOrder &&
+              handleInvitationChange(purchaseOrder, id, checked)
+            }
+            errorMessage={errors?.errors.vendor_id}
+          />
+        </Card>
 
         {purchaseOrder && (
           <Details

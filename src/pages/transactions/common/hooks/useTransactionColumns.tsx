@@ -15,6 +15,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Tooltip } from '$app/components/Tooltip';
+import { Link } from '$app/components/forms';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
@@ -31,10 +32,9 @@ export function useTransactionColumns() {
       label: t('status'),
       format: (value, transaction) => {
         return (
-          <EntityStatus
-            route={route('/transactions/:id/edit', { id: transaction.id })}
-            status={transaction.status_id}
-          />
+          <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
+            <EntityStatus transaction={transaction} />
+          </Link>
         );
       },
     },
