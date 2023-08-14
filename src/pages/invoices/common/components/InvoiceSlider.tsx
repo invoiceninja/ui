@@ -98,10 +98,11 @@ export function InvoiceSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`)
+        endpoint(
+          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`
+        )
       ).then(
-        (response: GenericSingleResourceResponse<Invoice>) =>
-          response.data.data
+        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
   });
@@ -190,11 +191,8 @@ export function InvoiceSlider() {
             </Element>
 
             <Element leftSide={t('status')}>
-              {invoice ?
-              <InvoiceStatus entity={invoice} />
-                : null}
+              {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
-
           </div>
 
           <Divider withoutPadding />
@@ -233,49 +231,46 @@ export function InvoiceSlider() {
 
           {invoice && invoice.next_send_date ? (
             <div className="space-y-2 whitespace-nowrap">
-
               <Tooltip
                 size="regular"
                 width="auto"
                 placement="top"
                 containsUnsafeHTMLTags
-                message={resource?.reminder_schedule as string ?? ''}
+                message={(resource?.reminder_schedule as string) ?? ''}
               >
-                <h3 className='flex ml-3 mt-2 italic'>
-                  {t('reminders')} <MdInfo className='mt-1 ml-1'/>
+                <h3 className="flex ml-3 mt-2 italic">
+                  {t('reminders')} <MdInfo className="mt-1 ml-1" />
                 </h3>
               </Tooltip>
 
               <Element leftSide={t('next_send_date')}>
                 {invoice ? date(invoice.next_send_date, dateFormat) : null}
               </Element>
-              
+
               <Element leftSide={t('reminder_last_sent')}>
-                {invoice ? date(invoice.reminder_last_sent, dateFormat) : null }
+                {invoice ? date(invoice.reminder_last_sent, dateFormat) : null}
               </Element>
 
-              {invoice.reminder1_sent ?
-              <Element leftSide={t('first_reminder')}>
-                {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
-              </Element>
-              : null}
+              {invoice.reminder1_sent ? (
+                <Element leftSide={t('first_reminder')}>
+                  {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
+                </Element>
+              ) : null}
 
-              {invoice.reminder2_sent ?
+              {invoice.reminder2_sent ? (
                 <Element leftSide={t('second_reminder')}>
                   {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
                 </Element>
-              : null}
+              ) : null}
 
-              {invoice.reminder3_sent ?
+              {invoice.reminder3_sent ? (
                 <Element leftSide={t('third_reminder')}>
                   {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
                 </Element>
-              : null}
-
+              ) : null}
             </div>
-            
           ) : null}
-          
+
           <div className="divide-y">
             {resource?.payments &&
               resource.payments.map((payment: Payment) => (
@@ -307,7 +302,6 @@ export function InvoiceSlider() {
                 </ClickableElement>
               ))}
           </div>
-
         </div>
 
         <div>

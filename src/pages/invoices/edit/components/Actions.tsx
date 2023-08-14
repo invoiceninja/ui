@@ -198,13 +198,13 @@ export function useActions() {
   return [
     (invoice: Invoice) => (
       <>
-      <DropdownElement
-        to={route('/invoices/:id/edit', { id: invoice.id })}
-        icon={<Icon element={MdEdit} />}
-      >
-        {t('edit')}
-      </DropdownElement>
-      <Divider withoutPadding />
+        <DropdownElement
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+        <Divider withoutPadding />
       </>
     ),
     (invoice: Invoice) => (
@@ -308,7 +308,7 @@ export function useActions() {
     ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-      invoice.status_id === InvoiceStatus.Partial) && (
+        invoice.status_id === InvoiceStatus.Partial) && (
         <DropdownElement
           onClick={() => cancel(invoice)}
           icon={<Icon element={MdCancel} />}
