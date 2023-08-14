@@ -35,6 +35,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
@@ -200,6 +201,17 @@ export function useActions() {
   };
 
   return [
+    (invoice: Invoice) => (
+      <>
+        <DropdownElement
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+        <Divider withoutPadding />
+      </>
+    ),
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/email', { id: invoice.id })}

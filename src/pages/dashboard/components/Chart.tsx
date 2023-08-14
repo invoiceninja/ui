@@ -226,7 +226,7 @@ export function Chart(props: Props) {
           dot={false}
           strokeWidth={2}
         />
-        
+
         <Line
           id="expenses"
           type="monotone"

@@ -850,7 +850,9 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -865,7 +867,9 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }} />
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
