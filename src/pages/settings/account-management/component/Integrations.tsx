@@ -11,15 +11,24 @@
 import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../../components/cards';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export function Integrations() {
   const [t] = useTranslation();
 
+  const { isAdmin } = useAdmin();
+
   return (
     <Card title={t('integrations')}>
-      <ClickableElement to="/settings/integrations/api_tokens">
-        {t('api_tokens')}
-      </ClickableElement>
+      {(((proPlan() || enterprisePlan()) && isHosted()) || isSelfHosted()) &&
+        isAdmin && (
+          <ClickableElement to="/settings/integrations/api_tokens">
+            {t('api_tokens')}
+          </ClickableElement>
+        )}
 
       <ClickableElement to="/settings/integrations/api_webhooks">
         {t('api_webhooks')}
