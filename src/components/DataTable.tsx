@@ -281,7 +281,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const showCustomBulkActionDivider = useMemo(() => {
     return props.customBulkActions
-      ? props.customBulkActions.every((action) =>
+      ? props.customBulkActions.some((action) =>
           React.isValidElement(
             action(selected, selectedResources, onBulkActionCall)
           )

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
@@ -16,32 +16,58 @@ import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
+const successMessages = {
+  convert_to_invoice: 'converted_quote',
+  convert_to_project: 'converted_quote',
+  email: 'emailed_quotes',
+  sent: 'marked_quote_as_sent',
+};
 export function useBulkAction() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (
-    id: string,
-    action: 'archive' | 'restore' | 'delete' | 'convert_to_invoice'
+    ids: string[],
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'convert_to_invoice'
+      | 'convert_to_project'
+      | 'email'
+      | 'approve'
+      | 'sent',
+    onActionSuccess?: () => void,
+    onActionFinish?: () => void
   ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
-      ids: [id],
+      ids,
     })
       .then(() => {
-        action === 'convert_to_invoice'
-          ? toast.success('converted_quote')
-          : toast.success(`${action}d_quote`);
-      })
-      .finally(() => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_quote`;
+
+        if (action === 'approve') {
+          toast.success(trans('approved_quotes', { value: ids.length }));
+        } else {
+          toast.success(message);
+        }
+
+        onActionSuccess?.();
+
         queryClient.invalidateQueries('/api/v1/quotes');
 
-        queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }));
+        ids.forEach((id) =>
+          queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
+        );
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
-      });
+      })
+      .finally(() => onActionFinish?.());
   };
 }
