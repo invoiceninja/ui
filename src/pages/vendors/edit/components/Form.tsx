@@ -25,16 +25,18 @@ import { TabGroup } from '$app/components/TabGroup';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useLanguages } from '$app/common/hooks/useLanguages';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 interface Props {
   vendor: Vendor;
   setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor, errors } = props;
+  const { vendor, setVendor, errors, page } = props;
 
   const company = useCurrentCompany();
 
@@ -93,6 +95,12 @@ export function Form(props: Props) {
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-12 xl:col-span-6 space-y-4">
         <Card title={t('details')}>
+          {page === 'edit' && (
+            <Element leftSide={t('status')}>
+              <EntityStatus entity={vendor} />
+            </Element>
+          )}
+
           <Element leftSide={t('name')}>
             <InputField
               value={vendor.name}

@@ -22,6 +22,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { EntityStatus } from './EntityStatus';
 
 interface Props {
   transaction: Transaction;
@@ -31,6 +32,7 @@ interface Props {
   ) => void;
   errors: ValidationBag | undefined;
   currencySeparators: DecimalInputSeparators;
+  page?: 'create' | 'edit';
 }
 
 export function TransactionForm(props: Props) {
@@ -40,6 +42,12 @@ export function TransactionForm(props: Props) {
 
   return (
     <>
+      {props.page === 'edit' && (
+        <Element leftSide={t('status')}>
+          <EntityStatus transaction={props.transaction} />
+        </Element>
+      )}
+
       <Element required leftSide={t('type')}>
         <SelectField
           value={

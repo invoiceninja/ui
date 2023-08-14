@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { Checkbox, Link } from '$app/components/forms';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
@@ -36,7 +35,7 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
 
-  const resource = props.resource;
+  const { resource } = props;
 
   const clientResolver = useClientResolver();
 
@@ -58,7 +57,7 @@ export function ClientSelector(props: Props) {
   const hasPermission = useHasPermission();
 
   return (
-    <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+    <>
       <div className="flex  flex-col justify-between space-y-2">
         {hasPermission('view_client') ? (
           props.textOnly ? (
@@ -146,6 +145,6 @@ export function ClientSelector(props: Props) {
             </div>
           </div>
         ))}
-    </Card>
+    </>
   );
 }
