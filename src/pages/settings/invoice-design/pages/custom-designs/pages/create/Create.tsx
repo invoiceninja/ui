@@ -94,6 +94,12 @@ export default function Create() {
           <DesignSelector
             onChange={(design) => handleChange('design', design.design)}
             actionVisibility={false}
+            errorMessage={
+              errors?.errors['design.header'] ||
+              errors?.errors['design.body'] ||
+              errors?.errors['design.footer'] ||
+              errors?.errors['design.includes']
+            }
           />
         </Element>
       </Card>
