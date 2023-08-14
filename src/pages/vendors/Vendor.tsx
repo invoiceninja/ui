@@ -25,6 +25,8 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { Inline } from '$app/components/Inline';
 import { useTabs } from './show/hooks/useTabs';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date } from '$app/common/helpers';
 import { EntityStatus } from '$app/components/EntityStatus';
 
 export default function Vendor() {
@@ -51,6 +53,12 @@ export default function Vendor() {
   ];
 
   const tabs = useTabs();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const lastLogin =(last_login: number | undefined) => {
+    return last_login ? date(last_login, dateFormat) : t('never');
+  };
+
 
   return (
     <Default
@@ -88,7 +96,9 @@ export default function Vendor() {
           <p>
             {t('vat_number')}: {vendor?.vat_number}
           </p>
-
+          <p>
+            {t('last_login')}: {lastLogin(vendor?.last_login)}
+          </p>
           {vendor?.website && (
             <Link to={vendor.website} external>
               {vendor.website}
