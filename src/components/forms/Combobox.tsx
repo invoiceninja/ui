@@ -107,7 +107,7 @@ export function ComboboxStatic({
         return onEmptyValues(query);
       }
 
-      if (filteredValues.length === 0) {
+      if (filteredValues.length <= 3) {
         return onEmptyValues(query);
       }
     },
