@@ -111,6 +111,8 @@ export function Connect() {
             <Element leftSide="Microsoft">
               <SignInProviderButton
                 onClick={async () => {
+                  await msal.handleRedirectPromise();
+
                   msal
                     .loginPopup({
                       scopes: ['user.read'],
