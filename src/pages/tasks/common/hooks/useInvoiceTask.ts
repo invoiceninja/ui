@@ -94,7 +94,7 @@ export function useInvoiceTask() {
 
       invoice.client_id = tasks[0].client_id;
 
-      tasks.forEach(async (task) => {
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 

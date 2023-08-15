@@ -87,7 +87,7 @@ export function useInvoiceProject() {
 
       invoice.line_items = [];
 
-      tasks.forEach(async (task) => {
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 

@@ -42,9 +42,9 @@ export function useAddTasksOnInvoice(params: Params) {
 
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
-  return async (invoice: Invoice) => {
+  return (invoice: Invoice) => {
     if (tasks) {
-      tasks.forEach(async (task) => {
+      tasks.forEach( (task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
