@@ -9,22 +9,18 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -78,9 +74,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
     setClient($client);
   };
-
-  const company = useInjectCompanyChanges();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const [tabs, setTabs] = useState([
     t('settings'),
@@ -287,33 +280,21 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert className="px-6" />
-
-          {company &&
-            ['client1', 'client2', 'client3', 'client4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('client_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/clients" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
 
         <div>
-          <CustomFieldsPlanAlert className="px-6" />
-
-          {company &&
-            ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('contact_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/clients" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
 
         {id ? (

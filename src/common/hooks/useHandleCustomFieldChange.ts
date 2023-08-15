@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux';
 import { useInjectCompanyChanges } from './useInjectCompanyChanges';
 
 export function useHandleCustomFieldChange() {
-  const company = useInjectCompanyChanges();
+  const company = useInjectCompanyChanges({ overwrite: false });
   const dispatch = useDispatch();
 
   return (field: string, value: string) => {

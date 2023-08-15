@@ -82,8 +82,9 @@ export function useInvoiceTask() {
         invoice.tax_name3 = company.settings?.tax_name3;
         invoice.tax_rate3 = company.settings?.tax_rate3;
       }
-      
-      invoice.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false
+
+      invoice.uses_inclusive_taxes =
+        company?.settings?.inclusive_taxes ?? false;
 
       const clients = collect(tasks).pluck('client_id').unique().toArray();
 
@@ -93,7 +94,7 @@ export function useInvoiceTask() {
 
       invoice.client_id = tasks[0].client_id;
 
-      tasks.forEach(async (task) => {
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 

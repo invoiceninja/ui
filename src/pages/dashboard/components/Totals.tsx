@@ -262,7 +262,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('dashboard_charts_default_view')}
+              label={t('range')}
               value={settings.preferences.dashboard_charts.default_view}
               onValueChange={(value) =>
                 update(
@@ -277,7 +277,7 @@ export function Totals() {
             </SelectField>
 
             <SelectField
-              label={t('range')}
+              label={t('date_range')}
               value={settings.preferences.dashboard_charts.range}
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.range', value)
@@ -339,7 +339,7 @@ export function Totals() {
                     </span>
                   </Badge>
                 </div>
-                
+
                 <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">{t('expenses')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Gray }}>

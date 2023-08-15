@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InputField } from '$app/components/forms';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -56,6 +57,20 @@ export function Preferences() {
               value
             )
           }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('number_precision')}
+        leftSideHelp={t('number_precision_help')}
+      >
+        <InputField
+          value={reactSettings?.number_precision}
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.number_precision', value)
+          }
+          type="number"
+          placeholder={t('number_precision')}
         />
       </Element>
     </Card>

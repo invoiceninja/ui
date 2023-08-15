@@ -35,6 +35,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
@@ -69,8 +70,6 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
   );
 };
 
-
-
 export function useActions() {
   const { t } = useTranslation();
 
@@ -101,6 +100,7 @@ export function useActions() {
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({
       ...invoice,
+      id: '',
       number: '',
       documents: [],
       due_date: '',
@@ -121,6 +121,7 @@ export function useActions() {
   const cloneToQuote = (invoice: Invoice) => {
     setQuote({
       ...(invoice as unknown as Quote),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -141,6 +142,7 @@ export function useActions() {
   const cloneToCredit = (invoice: Invoice) => {
     setCredit({
       ...(invoice as unknown as Credit),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -161,6 +163,7 @@ export function useActions() {
   const cloneToRecurringInvoice = (invoice: Invoice) => {
     setRecurringInvoice({
       ...(invoice as unknown as RecurringInvoice),
+      id: '',
       number: '',
       documents: [],
       frequency_id: '5',
@@ -180,6 +183,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (invoice: Invoice) => {
     setPurchaseOrder({
       ...(invoice as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -197,6 +201,17 @@ export function useActions() {
   };
 
   return [
+    (invoice: Invoice) => (
+      <>
+        <DropdownElement
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+        <Divider withoutPadding />
+      </>
+    ),
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/email', { id: invoice.id })}
@@ -298,7 +313,7 @@ export function useActions() {
     ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-      invoice.status_id === InvoiceStatus.Partial) && (
+        invoice.status_id === InvoiceStatus.Partial) && (
         <DropdownElement
           onClick={() => cancel(invoice)}
           icon={<Icon element={MdCancel} />}
