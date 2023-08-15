@@ -115,7 +115,15 @@ export function SignInProviders() {
           onError={() => toast.error()}
         />
 
-        <SignInProviderButton>
+        <SignInProviderButton
+          onClick={async () => {
+            msal
+              .loginPopup({
+                scopes: ['user.read'],
+              })
+              .then((response) => console.log(response));
+          }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
