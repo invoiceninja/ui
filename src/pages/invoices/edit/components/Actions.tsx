@@ -70,8 +70,14 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
   );
 };
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const { t } = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -201,17 +207,16 @@ export function useActions() {
   };
 
   return [
-    (invoice: Invoice) => (
-      <>
+    (invoice: Invoice) =>
+      Boolean(showEditAction) && (
         <DropdownElement
           to={route('/invoices/:id/edit', { id: invoice.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}
         </DropdownElement>
-        <Divider withoutPadding />
-      </>
-    ),
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/email', { id: invoice.id })}
@@ -374,9 +379,12 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at === 0 && (
         <DropdownElement
           onClick={() => archive(invoice)}
@@ -386,7 +394,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement
@@ -397,7 +405,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !invoice.is_deleted && (
         <DropdownElement
           onClick={() => destroy(invoice)}
