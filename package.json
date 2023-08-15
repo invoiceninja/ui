@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@azure/msal-browser": "^3.0.1",
     "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.7.4",
     "@headlessui/tailwindcss": "^0.1.3",
