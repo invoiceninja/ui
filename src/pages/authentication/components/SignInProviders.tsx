@@ -92,24 +92,10 @@ export function SignInProviders() {
   };
 
   const handleMicrosoft = (token: string) => {
-    //   dispatch(setMsal(msal));
-
     request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
       accessToken: token,
     }).then((response) => login(response));
   };
-
-  // const authHandler = (err: any, data: any, msal: any) => {
-  //   console.log(err, data, msal);
-
-  //   dispatch(setMsal(msal));
-
-  //   request(
-  //     'POST',
-  //     endpoint('/api/v1/oauth_login?provider=microsoft'),
-  //     data
-  //   ).then((response) => login(response));
-  // };
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
