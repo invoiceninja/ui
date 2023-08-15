@@ -89,7 +89,10 @@ export function InvoiceSlider() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const actions = useActions();
+  const actions = useActions({
+    showCommonBulkAction: true,
+    showEditAction: true,
+  });
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
