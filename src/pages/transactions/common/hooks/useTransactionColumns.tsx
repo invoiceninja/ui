@@ -46,10 +46,9 @@ export function useTransactionColumns() {
       label: t('status'),
       format: (_, transaction) => {
         return (
-          <EntityStatus
-            route={route('/transactions/:id/edit', { id: transaction.id })}
-            status={transaction.status_id}
-          />
+          <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
+            <EntityStatus transaction={transaction} />
+          </Link>
         );
       },
     },

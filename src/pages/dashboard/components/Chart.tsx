@@ -9,7 +9,7 @@
  */
 
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
 import { ChartData, TotalColors } from './Totals';
@@ -50,7 +50,7 @@ export function Chart(props: Props) {
 
   const formatMoney = useFormatMoney();
 
-  const [chartData, setChartData] = useState<unknown[]>([]);
+  const [chartData, setChartData] = useState<LineChartData>([]);
 
   const generateDateRange = (start: Date, end: Date, range: 1 | 7 | 30) => {
     const date = new Date(start.getTime());
@@ -89,6 +89,24 @@ export function Chart(props: Props) {
 
     return recordIndex;
   };
+
+  const yAxisWidth = useMemo(() => {
+    const properties = ['invoices', 'outstanding', 'payments', 'expenses'];
+
+    const largestTick = chartData.reduce((maxTick, data) => {
+      return properties.reduce((currentMax, property) => {
+        const currentTickLength = formatMoney(
+          Number(data[property as keyof typeof data]) ?? 0,
+          company?.settings.country_id,
+          currency
+        ).toString().length;
+
+        return Math.max(currentMax, currentTickLength);
+      }, maxTick);
+    }, 0);
+
+    return largestTick ? largestTick * 8.5 : undefined;
+  }, [chartData]);
 
   useEffect(() => {
     const data: LineChartData = [];
@@ -196,7 +214,7 @@ export function Chart(props: Props) {
 
   return (
     <ResponsiveContainer width="100%" height={330}>
-      <LineChart height={200} data={chartData} margin={{ top: 17, left: 36 }}>
+      <LineChart height={200} data={chartData} margin={{ top: 17, left: 5 }}>
         <Line
           id="invoices"
           type="monotone"
@@ -226,7 +244,7 @@ export function Chart(props: Props) {
           dot={false}
           strokeWidth={2}
         />
-        
+
         <Line
           id="expenses"
           type="monotone"
@@ -248,6 +266,7 @@ export function Chart(props: Props) {
             formatTooltipValues(value).replace(/ /g, '\u00A0')
           }
           tick={{ fontSize: 14 }}
+          width={yAxisWidth}
         />
       </LineChart>
     </ResponsiveContainer>

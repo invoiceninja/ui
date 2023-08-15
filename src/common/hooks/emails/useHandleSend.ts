@@ -47,7 +47,6 @@ export function useHandleSend({ setErrors }: Params) {
     })
       .then(() => {
         toast.success(t(`emailed_${entity}`) || '');
-
         navigate(redirectUrl);
       })
       .catch((error: AxiosError<ValidationBag>) => {

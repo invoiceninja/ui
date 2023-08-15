@@ -27,6 +27,7 @@ import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { toast } from '$app/common/helpers/toast/toast';
+import { t } from 'i18next';
 
 export const calculateTaskHours = (timeLog: string) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
@@ -86,18 +87,61 @@ export function useInvoiceProject() {
 
       invoice.line_items = [];
 
-      tasks.forEach((task) => {
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop]) => {
-          parsed.push(
-            `${dayjs
-              .unix(start)
-              .format(`${dateFormat} ${timeFormat}`)} - ${dayjs
-              .unix(stop)
-              .format(timeFormat)} <br />`
-          );
+        logs.forEach(([start, stop, intervalDescription, billable]) => {
+          if (
+            billable ||
+            !company?.settings.allow_billable_task_items ||
+            typeof billable === 'undefined'
+          ) {
+            let hoursDescription = '';
+
+            if (company.invoice_task_hours) {
+              const unixStart = dayjs.unix(start);
+              const unixStop = dayjs.unix(stop);
+
+              const hours = (
+                unixStop.diff(unixStart, 'seconds') / 3600
+              ).toFixed(4);
+
+              hoursDescription = `• ${hours} ${t('hours')}`;
+            }
+
+            const description = [];
+
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('<div class="task-time-details">');
+            }
+
+            if (company.invoice_task_datelog) {
+              description.push(dayjs.unix(start).format(dateFormat));
+            }
+
+            if (company.invoice_task_timelog) {
+              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+            }
+
+            if (company.invoice_task_timelog) {
+              description.push(dayjs.unix(stop).format(timeFormat));
+            }
+
+            if (company.invoice_task_hours) {
+              description.push(hoursDescription);
+            }
+
+            if (company.invoice_task_item_description) {
+              description.push(intervalDescription);
+            }
+
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
+              description.push('</div>\n');
+            }
+
+            parsed.push(description.join(' '));
+          }
         });
 
         const taskQuantity = calculateTaskHours(task.time_log);
@@ -105,21 +149,26 @@ export function useInvoiceProject() {
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
-          task_id: task.id,
           cost: task.rate,
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
+          task_id: task.id,
           tax_id: '',
         };
 
-        item.notes = [
-          task.description,
-          '<div class="task-time-details">',
-          ...parsed,
-          '</div>',
-        ]
-          .join('\n')
-          .trim();
+        const projectName =
+          company.invoice_task_project && task?.project?.name
+            ? '## ' + task.project?.name + '\n'
+            : '';
+
+        if (parsed.length) {
+          item.notes =
+            projectName + '### ' + task?.description + ' ' + parsed.join(' ');
+        }
+
+        if (typeof invoice.line_items === 'string') {
+          invoice.line_items = [];
+        }
 
         invoice.line_items.push(item);
       });

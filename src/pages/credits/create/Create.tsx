@@ -34,6 +34,7 @@ import { CreditFooter } from '../common/components/CreditFooter';
 import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Card } from '$app/components/cards';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');
@@ -166,14 +167,16 @@ export default function Create() {
       disableSaveButton={credit?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={credit}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={credit}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <CreditDetails handleChange={handleChange} errors={errors} />
 
