@@ -109,6 +109,8 @@ export function SignInProviders() {
 
         <SignInProviderButton
           onClick={async () => {
+            await msal.handleRedirectPromise(); 
+
             msal
               .loginPopup({
                 scopes: ['user.read'],
