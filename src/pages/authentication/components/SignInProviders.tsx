@@ -24,7 +24,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
 
-const msal = new PublicClientApplication({
+export const msal = new PublicClientApplication({
   auth: {
     clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
     redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
@@ -91,6 +91,14 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
+  const handleMicrosoft = (token: string) => {
+    //   dispatch(setMsal(msal));
+
+    request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
+      accessToken: token,
+    }).then((response) => login(response));
+  };
+
   // const authHandler = (err: any, data: any, msal: any) => {
   //   console.log(err, data, msal);
 
@@ -102,8 +110,6 @@ export function SignInProviders() {
   //     data
   //   ).then((response) => login(response));
   // };
-
-  // const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
@@ -121,7 +127,7 @@ export function SignInProviders() {
               .loginPopup({
                 scopes: ['user.read'],
               })
-              .then((response) => console.log(response));
+              .then((response) => handleMicrosoft(response.accessToken));
           }}
         >
           <svg
