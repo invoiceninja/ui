@@ -95,7 +95,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   };
 
   return (
-    <Card className="mt-4" title={t('additional_info')}>
+    <Card title={t('additional_info')}>
       <TabGroup className="px-5" tabs={tabs}>
         <div className="-mx-5">
           {currencies.length > 1 && (
