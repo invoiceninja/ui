@@ -13,15 +13,13 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useBulkAction } from '../queries';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
 import { BiChevronUpSquare } from 'react-icons/bi';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
-  recurringInvoices: RecurringInvoice[];
-  onActionCall?: () => void;
+  selectedIds: string[];
 }
 
 export const IncreasePricesAction = (props: Props) => {
@@ -40,20 +38,7 @@ export const IncreasePricesAction = (props: Props) => {
 
   const bulk = useBulkAction({ onSuccess: handleOnUpdatedPrices, setErrors });
 
-  const { recurringInvoices, onActionCall } = props;
-
-  const getRecurringInvoicesIds = () => {
-    return recurringInvoices.map(({ id }) => id);
-  };
-
-  const handleSave = () => {
-    bulk(
-      getRecurringInvoicesIds(),
-      'increase_prices',
-      onActionCall,
-      increasingPercent
-    );
-  };
+  const { selectedIds } = props;
 
   return (
     <>
@@ -79,7 +64,12 @@ export const IncreasePricesAction = (props: Props) => {
           errorMessage={errors?.errors.percentage_increase}
         />
 
-        <Button className="self-end" onClick={handleSave}>
+        <Button
+          className="self-end"
+          onClick={() =>
+            bulk(selectedIds, 'increase_prices', increasingPercent)
+          }
+        >
           {t('submit')}
         </Button>
       </Modal>

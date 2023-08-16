@@ -13,14 +13,12 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useBulkAction } from '../queries';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { MdSync } from 'react-icons/md';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 
 interface Props {
-  recurringInvoices: RecurringInvoice[];
-  onActionCall?: () => void;
+  selectedIds: string[];
 }
 
 export const UpdatePricesAction = (props: Props) => {
@@ -34,15 +32,7 @@ export const UpdatePricesAction = (props: Props) => {
 
   const bulk = useBulkAction({ onSuccess: handleOnUpdatedPrices });
 
-  const { recurringInvoices, onActionCall } = props;
-
-  const getRecurringInvoicesIds = () => {
-    return recurringInvoices.map(({ id }) => id);
-  };
-
-  const handleSave = () => {
-    bulk(getRecurringInvoicesIds(), 'update_prices', onActionCall);
-  };
+  const { selectedIds } = props;
 
   return (
     <>
@@ -60,7 +50,10 @@ export const UpdatePricesAction = (props: Props) => {
       >
         <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
 
-        <Button className="self-end" onClick={handleSave}>
+        <Button
+          className="self-end"
+          onClick={() => bulk(selectedIds, 'update_prices')}
+        >
           {t('yes')}
         </Button>
       </Modal>

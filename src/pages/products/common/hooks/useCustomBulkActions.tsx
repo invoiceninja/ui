@@ -70,17 +70,13 @@ export const useCustomBulkActions = () => {
           {t('new_purchase_order')}
         </DropdownElement>
       ),
-    (_, selectedProducts, onActionCall) =>
+    (_, selectedProducts) =>
       selectedProducts &&
       shouldShowDownloadDocuments(selectedProducts) && (
         <DropdownElement
           onClick={() =>
             shouldDownloadDocuments(selectedProducts)
-              ? documentsBulk(
-                  getDocumentsIds(selectedProducts),
-                  'download',
-                  onActionCall
-                )
+              ? documentsBulk(getDocumentsIds(selectedProducts), 'download')
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}

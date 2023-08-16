@@ -423,11 +423,11 @@ export function useActions() {
       ),
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
-        <UpdatePricesAction recurringInvoices={[recurringInvoice]} />
+        <UpdatePricesAction selectedIds={[recurringInvoice.id]} />
       ),
     (recurringInvoice) =>
       !recurringInvoice.is_deleted && (
-        <IncreasePricesAction recurringInvoices={[recurringInvoice]} />
+        <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
       ),
     () => <Divider withoutPadding />,
     (recurringInvoice) => (

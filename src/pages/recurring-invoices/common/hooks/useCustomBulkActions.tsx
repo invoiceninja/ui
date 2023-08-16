@@ -67,43 +67,37 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<RecurringInvoice>[] = [
-    (selectedIds, selectedRecurringInvoices, onActionCall) =>
+    (selectedIds, selectedRecurringInvoices) =>
       selectedRecurringInvoices &&
       shouldShowStartAction(selectedRecurringInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'start', onActionCall)}
+          onClick={() => bulk(selectedIds, 'start')}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedRecurringInvoices, onActionCall) =>
+    (selectedIds, selectedRecurringInvoices) =>
       selectedRecurringInvoices &&
       shouldShowStopAction(selectedRecurringInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'stop', onActionCall)}
+          onClick={() => bulk(selectedIds, 'stop')}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedRecurringInvoices, onActionCall) =>
+    (selectedIds, selectedRecurringInvoices) =>
       selectedRecurringInvoices &&
       shouldShowUpdatePrices(selectedRecurringInvoices) && (
-        <UpdatePricesAction
-          recurringInvoices={selectedRecurringInvoices}
-          onActionCall={onActionCall}
-        />
+        <UpdatePricesAction selectedIds={selectedIds} />
       ),
-    (_, selectedRecurringInvoices, onActionCall) =>
+    (selectedIds, selectedRecurringInvoices) =>
       selectedRecurringInvoices &&
       shouldShowIncreasePrices(selectedRecurringInvoices) && (
-        <IncreasePricesAction
-          recurringInvoices={selectedRecurringInvoices}
-          onActionCall={onActionCall}
-        />
+        <IncreasePricesAction selectedIds={selectedIds} />
       ),
-    (_, selectedRecurringInvoices, onActionCall) =>
+    (_, selectedRecurringInvoices) =>
       selectedRecurringInvoices &&
       shouldShowDownloadDocuments(selectedRecurringInvoices) && (
         <DropdownElement
@@ -111,8 +105,7 @@ export const useCustomBulkActions = () => {
             shouldDownloadDocuments(selectedRecurringInvoices)
               ? documentsBulk(
                   getDocumentsIds(selectedRecurringInvoices),
-                  'download',
-                  onActionCall
+                  'download'
                 )
               : toast.error('no_documents_to_download')
           }

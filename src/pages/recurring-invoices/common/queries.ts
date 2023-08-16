@@ -21,6 +21,7 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { useDeselectTableEntities } from '$app/common/hooks/useDeselectTableEntities';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -80,14 +81,11 @@ export function useBulkAction(params?: Params) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
+  const deselectTableEntities = useDeselectTableEntities();
+
   const { onSuccess, setErrors } = params || {};
 
-  return (
-    ids: string[],
-    action: Action,
-    onActionCall?: () => void,
-    increasePercentage?: number
-  ) => {
+  return (ids: string[], action: Action, increasePercentage?: number) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
@@ -106,7 +104,7 @@ export function useBulkAction(params?: Params) {
 
         onSuccess?.();
 
-        onActionCall?.();
+        deselectTableEntities();
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
