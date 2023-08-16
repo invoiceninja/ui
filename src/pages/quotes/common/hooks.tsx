@@ -286,6 +286,7 @@ export function useActions() {
   const cloneToQuote = (quote: Quote) => {
     setQuote({
       ...quote,
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -306,6 +307,7 @@ export function useActions() {
   const cloneToCredit = (quote: Quote) => {
     setCredit({
       ...quote,
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -326,6 +328,7 @@ export function useActions() {
   const cloneToRecurringInvoice = (quote: Quote) => {
     setRecurringInvoice({
       ...(quote as unknown as RecurringInvoice),
+      id: '',
       number: '',
       documents: [],
       frequency_id: '5',
@@ -344,6 +347,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (quote: Quote) => {
     setPurchaseOrder({
       ...(quote as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -362,6 +366,7 @@ export function useActions() {
   const cloneToInvoice = (quote: Quote) => {
     setInvoice({
       ...quote,
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -845,7 +850,9 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -860,7 +867,9 @@ export function useQuoteColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },

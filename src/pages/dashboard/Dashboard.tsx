@@ -9,7 +9,7 @@
  */
 
 import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
@@ -31,9 +31,9 @@ export default function Dashboard() {
 
   const user = useCurrentUser();
 
-  const { isAdmin } = useAdmin();
-
   const enabled = useEnabled();
+
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -47,7 +47,7 @@ export default function Dashboard() {
       }
       withoutBackButton
     >
-      {isAdmin && <Totals />}
+      {hasPermission('view_dashboard') && <Totals />}
 
       <div className="grid grid-cols-12 gap-4 my-6">
         <div className="col-span-12 xl:col-span-6">

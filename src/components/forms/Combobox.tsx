@@ -26,6 +26,7 @@ export interface Entry<T = any> {
   value: string | number | boolean;
   resource: T | null;
   eventType: EventType;
+  searchable: string;
 }
 
 type EventType = 'internal' | 'external';
@@ -88,7 +89,8 @@ export function ComboboxStatic({
             entry.value
               ?.toString()
               ?.toLowerCase()
-              ?.includes(query?.toLowerCase())
+              ?.includes(query?.toLowerCase()) ||
+            entry.searchable.toLowerCase().includes(query?.toLowerCase())
         );
 
   filteredValues = filteredValues.filter((entry) =>
@@ -107,7 +109,7 @@ export function ComboboxStatic({
         return onEmptyValues(query);
       }
 
-      if (filteredValues.length === 0) {
+      if (filteredValues.length <= 3) {
         return onEmptyValues(query);
       }
     },
@@ -151,6 +153,7 @@ export function ComboboxStatic({
           value: inputOptions.value ? inputOptions.value.toString() : '',
           resource: null,
           eventType: 'external',
+          searchable: entryOptions.searchable || entryOptions.value,
         })
       : setSelectedValue(null);
   }, [entries, inputOptions.value]);
@@ -317,6 +320,7 @@ interface EntryOptions<T = any> {
   id: string;
   label: string;
   value: string;
+  searchable?: string;
   dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
 }
@@ -384,6 +388,8 @@ export function ComboboxAsync<T = any>({
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
+              searchable:
+                entry[entryOptions.searchable || entryOptions.id],
             })
           );
 

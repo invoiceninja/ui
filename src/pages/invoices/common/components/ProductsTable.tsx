@@ -22,9 +22,8 @@ import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { useParams } from 'react-router-dom';
 import { atom, useSetAtom } from 'jotai';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
@@ -52,19 +51,10 @@ interface Props {
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
-  const { id } = useParams();
 
-  const {
-    resource,
-    items,
-    columns,
-    relationType,
-    shouldCreateInitialLineItem,
-  } = props;
+  const { resource, items, columns, relationType } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
-
-  const isEditPage = location.pathname.includes(id!);
 
   const resolveTranslation = useResolveTranslation({ type: props.type });
 
@@ -91,7 +81,10 @@ export function ProductsTable(props: Props) {
     return resource.line_items.indexOf(lineItem);
   };
 
-  useEffect(() => {
+  // This portion of the code pertains to the automatic creation of line items.
+  // Currently, we do not support this functionality, and we will comment it out until we begin providing support for it.
+
+  /*useEffect(() => {
     if (
       (resource.client_id || resource.vendor_id) &&
       !resource.line_items.length &&
@@ -101,7 +94,7 @@ export function ProductsTable(props: Props) {
     ) {
       props.onCreateItemClick();
     }
-  }, [resource.client_id, resource.vendor_id]);
+  }, [resource.client_id, resource.vendor_id]); */
 
   return (
     <Table>

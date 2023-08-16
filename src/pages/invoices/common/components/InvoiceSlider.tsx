@@ -38,11 +38,12 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
-import { MdCloudCircle, MdOutlineContentCopy } from 'react-icons/md';
+import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment } from '$app/common/interfaces/payment';
+import { Tooltip } from '$app/components/Tooltip';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -88,35 +89,40 @@ export function InvoiceSlider() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const actions = useActions();
+  const actions = useActions({
+    showCommonBulkAction: true,
+    showEditAction: true,
+  });
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { data: payments } = useQuery({
+  const { data: resource } = useQuery({
     queryKey: ['/api/v1/invoices', invoice?.id, 'payments'],
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/invoices/${invoice?.id}?include=payments`)
+        endpoint(
+          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`
+        )
       ).then(
-        (response: GenericSingleResourceResponse<Invoice>) =>
-          response.data.data.payments
+        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
   });
 
-  const { data: activities } = useQuery({
-    queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
-    queryFn: () =>
-      request(
-        'GET',
-        endpoint(`/api/v1/invoices/${invoice?.id}?include=activities.history`)
-      ).then(
-        (response: GenericSingleResourceResponse<Invoice>) =>
-          response.data.data.activities
-      ),
-    enabled: invoice !== null && isVisible,
-  });
+  //duplicate not needed
+  // const { data: activities } = useQuery({
+  //   queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
+  //   queryFn: () =>
+  //     request(
+  //       'GET',
+  //       endpoint(`/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`)
+  //     ).then(
+  //       (response: GenericSingleResourceResponse<Invoice>) =>
+  //         response.data.data.activities
+  //     ),
+  //   enabled: invoice !== null && isVisible,
+  // });
 
   const { data: activities2 } = useQuery({
     queryKey: ['/api/v1/activities/entity', invoice?.id],
@@ -182,6 +188,14 @@ export function InvoiceSlider() {
             <Element leftSide={t('date')}>
               {invoice ? date(invoice?.date, dateFormat) : null}
             </Element>
+
+            <Element leftSide={t('due_date')}>
+              {invoice ? date(invoice.due_date, dateFormat) : null}
+            </Element>
+
+            <Element leftSide={t('status')}>
+              {invoice ? <InvoiceStatus entity={invoice} /> : null}
+            </Element>
           </div>
 
           <Divider withoutPadding />
@@ -218,9 +232,51 @@ export function InvoiceSlider() {
 
           <Divider withoutPadding />
 
+          {invoice && invoice.next_send_date ? (
+            <div className="space-y-2 whitespace-nowrap">
+              <Tooltip
+                size="regular"
+                width="auto"
+                placement="top"
+                containsUnsafeHTMLTags
+                message={(resource?.reminder_schedule as string) ?? ''}
+              >
+                <h3 className="flex ml-3 mt-2 italic">
+                  {t('reminders')} <MdInfo className="mt-1 ml-1" />
+                </h3>
+              </Tooltip>
+
+              <Element leftSide={t('next_send_date')}>
+                {invoice ? date(invoice.next_send_date, dateFormat) : null}
+              </Element>
+
+              <Element leftSide={t('reminder_last_sent')}>
+                {invoice ? date(invoice.reminder_last_sent, dateFormat) : null}
+              </Element>
+
+              {invoice.reminder1_sent ? (
+                <Element leftSide={t('first_reminder')}>
+                  {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
+                </Element>
+              ) : null}
+
+              {invoice.reminder2_sent ? (
+                <Element leftSide={t('second_reminder')}>
+                  {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
+                </Element>
+              ) : null}
+
+              {invoice.reminder3_sent ? (
+                <Element leftSide={t('third_reminder')}>
+                  {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
+                </Element>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="divide-y">
-            {payments &&
-              payments.map((payment: Payment) => (
+            {resource?.payments &&
+              resource.payments.map((payment: Payment) => (
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
@@ -249,33 +305,17 @@ export function InvoiceSlider() {
                 </ClickableElement>
               ))}
           </div>
-
-          {payments?.length === 0 && invoice ? (
-            <div>
-              <Element leftSide={t('date')}>
-                {date(invoice.date, dateFormat)}
-              </Element>
-
-              <Element leftSide={t('due_date')}>
-                {date(invoice.due_date, dateFormat)}
-              </Element>
-
-              <Element leftSide={t('status')}>
-                <InvoiceStatus entity={invoice} />
-              </Element>
-            </div>
-          ) : null}
         </div>
 
         <div>
-          {activities && activities.length === 0 && (
+          {resource?.activities && resource.activities.length === 0 && (
             <NonClickableElement>
               {t('nothing_to_see_here')}
             </NonClickableElement>
           )}
 
-          {activities &&
-            activities.map((activity) => (
+          {resource?.activities &&
+            resource.activities.map((activity) => (
               <ClickableElement
                 key={activity.id}
                 to={`/activities/${activity.id}`}
