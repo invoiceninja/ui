@@ -117,7 +117,7 @@ export function InputField(props: Props) {
             collapseOnFocus &&
             setTimeout(() => {
               setIsFocused(false);
-            }, 5)
+            }, 100)
           }
           value={props.value}
           list={props.list}

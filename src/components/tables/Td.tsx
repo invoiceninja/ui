@@ -23,6 +23,7 @@ export function Td(props: Props) {
       colSpan={props.colSpan}
       rowSpan={props.rowSpan}
       className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
+      onClick={props.onClick}
     >
       {props.children}
     </td>
