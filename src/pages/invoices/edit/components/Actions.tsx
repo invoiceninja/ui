@@ -46,10 +46,6 @@ import {
   MdSend,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { useHandleArchive } from '../hooks/useHandleArchive';
-import { useHandleCancel } from '../hooks/useHandleCancel';
-import { useHandleDelete } from '../hooks/useHandleDelete';
-import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -91,11 +87,6 @@ export function useActions(params?: Params) {
   const bulk = useBulk();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
-
-  const archive = useHandleArchive();
-  const restore = useHandleRestore();
-  const destroy = useHandleDelete();
-  const cancel = useHandleCancel();
 
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -320,7 +311,7 @@ export function useActions(params?: Params) {
       (invoice.status_id === InvoiceStatus.Sent ||
         invoice.status_id === InvoiceStatus.Partial) && (
         <DropdownElement
-          onClick={() => cancel(invoice)}
+          onClick={() => bulk([invoice.id], 'cancel')}
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
@@ -387,7 +378,7 @@ export function useActions(params?: Params) {
       (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at === 0 && (
         <DropdownElement
-          onClick={() => archive(invoice)}
+          onClick={() => bulk([invoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -398,7 +389,7 @@ export function useActions(params?: Params) {
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement
-          onClick={() => restore(invoice)}
+          onClick={() => bulk([invoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -408,7 +399,7 @@ export function useActions(params?: Params) {
       (isEditPage || Boolean(showCommonBulkAction)) &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => destroy(invoice)}
+          onClick={() => bulk([invoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
