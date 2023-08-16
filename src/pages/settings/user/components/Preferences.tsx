@@ -66,13 +66,13 @@ export function Preferences() {
       >
         <InputField
           value={reactSettings?.number_precision}
-          onValueChange={(value) => handleChange('company_user.react_settings.number_precision', value)}
-          type='number'
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.number_precision', value)
+          }
+          type="number"
           placeholder={t('number_precision')}
         />
-
       </Element>
-
     </Card>
   );
 }

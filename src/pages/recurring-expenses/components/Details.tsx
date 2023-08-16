@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
+import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -52,13 +53,19 @@ export function Details(props: Props) {
   return (
     <Card title={t('details')} isLoading={!recurringExpense}>
       {recurringExpense && pageType === 'edit' && (
-        <Element leftSide={t('number')}>
-          <InputField
-            value={recurringExpense.number}
-            onValueChange={(value) => handleChange('number', value)}
-            errorMessage={errors?.errors.number}
-          />
-        </Element>
+        <>
+          <Element leftSide={t('status')}>
+            <RecurringExpenseStatus recurringExpense={recurringExpense} />
+          </Element>
+
+          <Element leftSide={t('number')}>
+            <InputField
+              value={recurringExpense.number}
+              onValueChange={(value) => handleChange('number', value)}
+              errorMessage={errors?.errors.number}
+            />
+          </Element>
+        </>
       )}
 
       {recurringExpense && (

@@ -302,7 +302,12 @@ export function useActions() {
   const toggleStartStop = useToggleStartStop();
 
   const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
-    setRecurringInvoice({ ...recurringInvoice, documents: [], number: '' });
+    setRecurringInvoice({
+      ...recurringInvoice,
+      id: '',
+      documents: [],
+      number: '',
+    });
 
     navigate('/recurring_invoices/create?action=clone');
   };
@@ -310,6 +315,7 @@ export function useActions() {
   const cloneToInvoice = (recurringInvoice: RecurringInvoice) => {
     setInvoice({
       ...(recurringInvoice as unknown as Invoice),
+      id: '',
       documents: [],
       number: '',
       due_date: '',
@@ -329,6 +335,7 @@ export function useActions() {
   const cloneToQuote = (recurringInvoice: RecurringInvoice) => {
     setQuote({
       ...(recurringInvoice as unknown as Quote),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -348,6 +355,7 @@ export function useActions() {
   const cloneToCredit = (recurringInvoice: RecurringInvoice) => {
     setCredit({
       ...(recurringInvoice as unknown as Credit),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
@@ -366,6 +374,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (recurringInvoice: RecurringInvoice) => {
     setPurchaseOrder({
       ...(recurringInvoice as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),

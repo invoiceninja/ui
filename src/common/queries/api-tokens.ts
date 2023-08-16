@@ -69,7 +69,7 @@ export function useBulkAction() {
 }
 
 export function useBlankApiTokenQuery() {
-  const { isOwner } = useAdmin();
+  const { isAdmin } = useAdmin();
 
   return useQuery<ApiToken>(
     '/api/v1/tokens/create',
@@ -78,6 +78,6 @@ export function useBlankApiTokenQuery() {
         (response: GenericSingleResourceResponse<ApiToken>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isOwner }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }

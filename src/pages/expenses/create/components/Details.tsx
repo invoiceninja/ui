@@ -21,6 +21,7 @@ import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
+import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -44,13 +45,19 @@ export function Details(props: Props) {
   return (
     <Card title={t('details')} isLoading={!expense}>
       {expense && pageType === 'edit' && (
-        <Element leftSide={t('expense_number')}>
-          <InputField
-            value={expense.number}
-            onValueChange={(value) => handleChange('number', value)}
-            errorMessage={errors?.errors.number}
-          />
-        </Element>
+        <>
+          <Element leftSide={t('status')}>
+            <ExpenseStatus entity={expense} />
+          </Element>
+
+          <Element leftSide={t('expense_number')}>
+            <InputField
+              value={expense.number}
+              onValueChange={(value) => handleChange('number', value)}
+              errorMessage={errors?.errors.number}
+            />
+          </Element>
+        </>
       )}
 
       {expense && (
