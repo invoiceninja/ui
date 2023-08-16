@@ -33,11 +33,11 @@ export function Address(props: Props) {
         className="px-5"
         tabs={[t('billing_address'), t('shipping_address')]}
       >
-        <div>
+        <div className="-mx-5">
           <BillingAddress {...props} />
         </div>
 
-        <div>
+        <div className='-mx-5'>
           <ShippingAddress {...props} />
         </div>
       </TabGroup>

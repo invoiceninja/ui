@@ -97,7 +97,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   return (
     <Card className="mt-4" title={t('additional_info')}>
       <TabGroup className="px-5" tabs={tabs}>
-        <div>
+        <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
               <SelectField
@@ -221,7 +221,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className="-mx-5">
           <Element leftSide={t('public_notes')}>
             <MarkdownEditor
               value={client?.public_notes}
@@ -237,7 +237,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className='-mx-5'>
           {statics && (
             <Element leftSide={t('size_id')}>
               <SelectField
