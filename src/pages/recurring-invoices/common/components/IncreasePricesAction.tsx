@@ -11,7 +11,7 @@
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useBulkAction } from '../queries';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
@@ -20,6 +20,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   selectedIds: string[];
+  setSelected?: Dispatch<SetStateAction<string[]>>;
 }
 
 export const IncreasePricesAction = (props: Props) => {
@@ -38,7 +39,13 @@ export const IncreasePricesAction = (props: Props) => {
 
   const bulk = useBulkAction({ onSuccess: handleOnUpdatedPrices, setErrors });
 
-  const { selectedIds } = props;
+  const { selectedIds, setSelected } = props;
+
+  const handleSave = () => {
+    bulk(selectedIds, 'increase_prices', increasingPercent);
+
+    setSelected?.([]);
+  };
 
   return (
     <>
@@ -64,12 +71,7 @@ export const IncreasePricesAction = (props: Props) => {
           errorMessage={errors?.errors.percentage_increase}
         />
 
-        <Button
-          className="self-end"
-          onClick={() =>
-            bulk(selectedIds, 'increase_prices', increasingPercent)
-          }
-        >
+        <Button className="self-end" onClick={handleSave}>
           {t('submit')}
         </Button>
       </Modal>

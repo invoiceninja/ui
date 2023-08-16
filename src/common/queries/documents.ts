@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { toast } from '../helpers/toast/toast';
-import { useDeselectTableEntities } from '../hooks/useDeselectTableEntities';
 
 export function useDocumentsQuery(params: Params) {
   return useQuery(['/api/v1/documents', params], () =>
@@ -32,16 +31,12 @@ export function useDocumentsQuery(params: Params) {
 }
 
 export const useDocumentsBulk = () => {
-  const deselectTableEntities = useDeselectTableEntities();
-
   return (ids: string[], action: 'download') => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/documents?per_page=100'), {
       action,
       ids,
-    })
-      .then(() => toast.success('exported_data'))
-      .finally(() => deselectTableEntities());
+    }).then(() => toast.success('exported_data'));
   };
 };

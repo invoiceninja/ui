@@ -20,6 +20,7 @@ import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-stat
 import { useBulkAction } from '../queries';
 import { UpdatePricesAction } from '../components/UpdatePricesAction';
 import { IncreasePricesAction } from '../components/IncreasePricesAction';
+import { Dispatch, SetStateAction } from 'react';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -66,47 +67,68 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const handleDownloadDocuments = (
+    selectedRecurringInvoices: RecurringInvoice[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const recurringInvoiceIds = getDocumentsIds(selectedRecurringInvoices);
+
+    documentsBulk(recurringInvoiceIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<RecurringInvoice>[] = [
-    (selectedIds, selectedRecurringInvoices) =>
+    (selectedIds, selectedRecurringInvoices, setSelected) =>
       selectedRecurringInvoices &&
       shouldShowStartAction(selectedRecurringInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'start')}
+          onClick={() => {
+            bulk(selectedIds, 'start');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedRecurringInvoices) =>
+    (selectedIds, selectedRecurringInvoices, setSelected) =>
       selectedRecurringInvoices &&
       shouldShowStopAction(selectedRecurringInvoices) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'stop')}
+          onClick={() => {
+            bulk(selectedIds, 'stop');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (selectedIds, selectedRecurringInvoices) =>
+    (selectedIds, selectedRecurringInvoices, setSelected) =>
       selectedRecurringInvoices &&
       shouldShowUpdatePrices(selectedRecurringInvoices) && (
-        <UpdatePricesAction selectedIds={selectedIds} />
+        <UpdatePricesAction
+          selectedIds={selectedIds}
+          setSelected={setSelected}
+        />
       ),
-    (selectedIds, selectedRecurringInvoices) =>
+    (selectedIds, selectedRecurringInvoices, setSelected) =>
       selectedRecurringInvoices &&
       shouldShowIncreasePrices(selectedRecurringInvoices) && (
-        <IncreasePricesAction selectedIds={selectedIds} />
+        <IncreasePricesAction
+          selectedIds={selectedIds}
+          setSelected={setSelected}
+        />
       ),
-    (_, selectedRecurringInvoices) =>
+    (_, selectedRecurringInvoices, setSelected) =>
       selectedRecurringInvoices &&
       shouldShowDownloadDocuments(selectedRecurringInvoices) && (
         <DropdownElement
           onClick={() =>
             shouldDownloadDocuments(selectedRecurringInvoices)
-              ? documentsBulk(
-                  getDocumentsIds(selectedRecurringInvoices),
-                  'download'
-                )
+              ? handleDownloadDocuments(selectedRecurringInvoices, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}

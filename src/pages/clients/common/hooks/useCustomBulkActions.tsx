@@ -16,6 +16,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Dispatch, SetStateAction } from 'react';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -34,14 +35,24 @@ export const useCustomBulkActions = () => {
     return clients.every(({ is_deleted }) => !is_deleted);
   };
 
+  const handleDownloadDocuments = (
+    selectedClients: Client[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const clientIds = getDocumentsIds(selectedClients);
+
+    documentsBulk(clientIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Client>[] = [
-    (_, selectedClients) =>
+    (_, selectedClients, setSelected) =>
       selectedClients &&
       shouldShowDownloadDocuments(selectedClients) && (
         <DropdownElement
           onClick={() =>
             shouldDownloadDocuments(selectedClients)
-              ? documentsBulk(getDocumentsIds(selectedClients), 'download')
+              ? handleDownloadDocuments(selectedClients, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}

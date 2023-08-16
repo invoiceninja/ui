@@ -11,7 +11,7 @@
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useBulkAction } from '../queries';
 import { MdSync } from 'react-icons/md';
 import { Modal } from '$app/components/Modal';
@@ -19,6 +19,7 @@ import { Button } from '$app/components/forms';
 
 interface Props {
   selectedIds: string[];
+  setSelected?: Dispatch<SetStateAction<string[]>>;
 }
 
 export const UpdatePricesAction = (props: Props) => {
@@ -32,7 +33,13 @@ export const UpdatePricesAction = (props: Props) => {
 
   const bulk = useBulkAction({ onSuccess: handleOnUpdatedPrices });
 
-  const { selectedIds } = props;
+  const { selectedIds, setSelected } = props;
+
+  const handleSave = () => {
+    bulk(selectedIds, 'update_prices');
+
+    setSelected?.([]);
+  };
 
   return (
     <>
@@ -50,10 +57,7 @@ export const UpdatePricesAction = (props: Props) => {
       >
         <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
 
-        <Button
-          className="self-end"
-          onClick={() => bulk(selectedIds, 'update_prices')}
-        >
+        <Button className="self-end" onClick={handleSave}>
           {t('yes')}
         </Button>
       </Modal>

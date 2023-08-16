@@ -19,6 +19,7 @@ import { Product } from '$app/common/interfaces/product';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './useInvoiceProducts';
 import { usePurchaseOrderProducts } from './usePurchaseOrderProducts';
+import { Dispatch, SetStateAction } from 'react';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -49,6 +50,16 @@ export const useCustomBulkActions = () => {
     return products.every(({ is_deleted }) => !is_deleted);
   };
 
+  const handleDownloadDocuments = (
+    selectedProducts: Product[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const productIds = getDocumentsIds(selectedProducts);
+
+    documentsBulk(productIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Product>[] = [
     (_, selectedProducts) =>
       selectedProducts &&
@@ -70,13 +81,13 @@ export const useCustomBulkActions = () => {
           {t('new_purchase_order')}
         </DropdownElement>
       ),
-    (_, selectedProducts) =>
+    (_, selectedProducts, setSelected) =>
       selectedProducts &&
       shouldShowDownloadDocuments(selectedProducts) && (
         <DropdownElement
           onClick={() =>
             shouldDownloadDocuments(selectedProducts)
-              ? documentsBulk(getDocumentsIds(selectedProducts), 'download')
+              ? handleDownloadDocuments(selectedProducts, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}
