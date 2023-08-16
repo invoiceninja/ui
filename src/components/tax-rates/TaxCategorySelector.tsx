@@ -27,6 +27,7 @@ export function useTaxCategories() {
       label: t('physical_goods'),
       resource: null,
       eventType: 'external',
+      searchable: t('physical_goods'),
     },
     {
       id: '2',
@@ -34,6 +35,7 @@ export function useTaxCategories() {
       label: t('services'),
       resource: null,
       eventType: 'external',
+      searchable: t('services'),
     },
     {
       id: '3',
@@ -41,6 +43,7 @@ export function useTaxCategories() {
       label: t('digital_products'),
       resource: null,
       eventType: 'external',
+      searchable: t('digital_products'),
     },
     {
       id: '4',
@@ -48,6 +51,7 @@ export function useTaxCategories() {
       label: t('shipping'),
       resource: null,
       eventType: 'external',
+      searchable: t('shipping'),
     },
     {
       id: '5',
@@ -55,6 +59,7 @@ export function useTaxCategories() {
       label: t('tax_exempt'),
       resource: null,
       eventType: 'external',
+      searchable: t('tax_exempt'),
     },
     {
       id: '6',
@@ -62,6 +67,7 @@ export function useTaxCategories() {
       label: t('reduced_tax'),
       resource: null,
       eventType: 'external',
+      searchable: t('reduced_tax'),
     },
     {
       id: '7',
@@ -69,6 +75,7 @@ export function useTaxCategories() {
       label: t('override_tax'),
       resource: null,
       eventType: 'external',
+      searchable: t('override_tax'),
     },
     {
       id: '8',
@@ -76,6 +83,7 @@ export function useTaxCategories() {
       label: t('zero_rated'),
       resource: null,
       eventType: 'external',
+      searchable: t('zero_rated'),
     },
     {
       id: '9',
@@ -83,6 +91,7 @@ export function useTaxCategories() {
       label: t('reverse_tax'),
       resource: null,
       eventType: 'external',
+      searchable: t('reverse_tax'),
     },
   ];
 
