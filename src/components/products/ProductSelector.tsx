@@ -45,7 +45,8 @@ export function ProductSelector(props: Props) {
         entryOptions={{
           id: 'id',
           label: 'product_key',
-          value: 'notes',
+          value: 'id',
+          searchable: 'notes',
           dropdownLabelFn: (product) => (
             <div>
               <p className="font-semibold">{product.product_key}</p>
