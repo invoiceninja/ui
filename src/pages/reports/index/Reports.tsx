@@ -498,6 +498,14 @@ function Preview() {
             ))}
           </Thead>
           <Tbody>
+            <Tr>
+              {preview.data[0].map((column, i) => (
+                <Th key={i}>
+                  <InputField />
+                </Th>
+              ))}
+            </Tr>
+
             {preview.data.slice(0).map((row, i) => (
               <Tr key={i}>
                 {row.map((column, i) => (
