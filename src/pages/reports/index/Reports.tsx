@@ -32,6 +32,9 @@ import {
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
+import { atom, useAtom } from 'jotai';
+import Papa, { ParseResult } from 'papaparse';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 
 export type Identifier =
   | 'activity'
@@ -248,6 +251,8 @@ export default function Reports() {
       });
   };
 
+  const [, setPreview] = useAtom(previewAtom);
+
   const handlePreview = () => {
     setErrors(undefined);
     setShowPreview(false);
@@ -271,14 +276,11 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.endpoint), updatedPayload, {
-      responseType: 'blob',
-    })
+    request('POST', endpoint(report.endpoint), updatedPayload, {})
       .then((response) => {
-        const blob = new Blob([response.data], { type: 'text/csv' });
+        const result = Papa.parse<string[]>(response.data);
 
-        console.log(blob);
-
+        setPreview(result);
         setShowPreview(true);
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
@@ -478,12 +480,34 @@ export default function Reports() {
   );
 }
 
+const previewAtom = atom<ParseResult<string[]> | null>(null);
+
 function Preview() {
   const [t] = useTranslation();
+  const [preview] = useAtom(previewAtom);
+
+  console.log(preview?.data);
 
   return (
-    <Card className="my-6" title={t('preview')} withContainer>
-      Lorem, ipsum dolor.
+    <Card className="my-6" title={t('preview')}>
+      {preview ? (
+        <Table>
+          <Thead>
+            {preview.data[0].map((column, i) => (
+              <Th key={i}>{column}</Th>
+            ))}
+          </Thead>
+          <Tbody>
+            {preview.data.slice(0).map((row, i) => (
+              <Tr key={i}>
+                {row.map((column, i) => (
+                  <Td key={i}>{column}</Td>
+                ))}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      ) : null}
     </Card>
   );
 }
