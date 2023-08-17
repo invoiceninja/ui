@@ -60,6 +60,7 @@ export function CreateVendorForm(props: Props) {
             custom_value3: '',
             custom_value4: '',
             link: '',
+            last_login: 0
           },
         ],
       });

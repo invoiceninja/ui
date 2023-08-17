@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
@@ -24,16 +24,19 @@ import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 interface Props {
   vendor: Vendor;
   setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor, errors } = props;
+  const { vendor, setVendor, errors, page } = props;
 
   const company = useCurrentCompany();
 
@@ -80,15 +83,24 @@ export function Form(props: Props) {
       custom_value3: '',
       custom_value4: '',
       link: '',
+      last_login: 0,
     });
 
     handleChange('contacts', contacts);
   };
 
+  const languages = useLanguages();
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-12 xl:col-span-6 space-y-4">
         <Card title={t('details')}>
+          {page === 'edit' && (
+            <Element leftSide={t('status')}>
+              <EntityStatus entity={vendor} />
+            </Element>
+          )}
+
           <Element leftSide={t('name')}>
             <InputField
               value={vendor.name}
@@ -333,6 +345,25 @@ export function Form(props: Props) {
                   errorMessage={errors?.errors.currency_id}
                 />
               </Element>
+
+              {languages.length > 1 && (
+                <Element leftSide={t('language')} noExternalPadding>
+                  <SelectField
+                    value={vendor.language_id}
+                    onValueChange={(value) =>
+                      handleChange('language_id', value)
+                    }
+                    errorMessage={errors?.errors.language_id}
+                    withBlank
+                  >
+                    {languages.map((language, index) => (
+                      <option key={index} value={language.id}>
+                        {language.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
+              )}
 
               <MarkdownEditor
                 label={t('public_notes').toString()}

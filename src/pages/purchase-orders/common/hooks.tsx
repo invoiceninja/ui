@@ -386,6 +386,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({
       ...purchaseOrder,
+      id: '',
       number: '',
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),

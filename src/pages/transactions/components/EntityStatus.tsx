@@ -8,42 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { transactionStatuses } from '$app/common/constants/transactions';
 import { TransactionStatus } from '$app/common/enums/transactions';
+import { Transaction } from '$app/common/interfaces/transactions';
 import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  route: string;
-  status: string;
+  transaction: Transaction;
 }
 
 export function EntityStatus(props: Props) {
   const [t] = useTranslation();
 
-  if (TransactionStatus.Unmatched === props.status) {
-    return (
-      <Link to={props.route}>
-        <Badge variant="generic">{t(transactionStatuses[1])}</Badge>
-      </Link>
-    );
+  const { is_deleted, archived_at, status_id } = props.transaction;
+
+  if (is_deleted) {
+    return <Badge variant="red">{t('deleted')}</Badge>;
   }
 
-  if (TransactionStatus.Matched === props.status) {
-    return (
-      <Link to={props.route}>
-        <Badge variant="dark-blue">{t(transactionStatuses[2])}</Badge>
-      </Link>
-    );
+  if (archived_at) {
+    return <Badge variant="orange">{t('archived')}</Badge>;
   }
 
-  if (TransactionStatus.Converted === props.status) {
-    return (
-      <Link to={props.route}>
-        <Badge variant="green">{t(transactionStatuses[3])}</Badge>
-      </Link>
-    );
+  if (TransactionStatus.Unmatched === status_id) {
+    return <Badge variant="generic">{t(transactionStatuses[1])}</Badge>;
+  }
+
+  if (TransactionStatus.Matched === status_id) {
+    return <Badge variant="dark-blue">{t(transactionStatuses[2])}</Badge>;
+  }
+
+  if (TransactionStatus.Converted === status_id) {
+    return <Badge variant="green">{t(transactionStatuses[3])}</Badge>;
   }
 
   return <></>;

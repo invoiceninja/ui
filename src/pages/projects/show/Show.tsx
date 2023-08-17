@@ -43,6 +43,7 @@ import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 dayjs.extend(duration);
 
@@ -105,6 +106,13 @@ export default function Show() {
     >
       <div className="grid grid-cols-3 gap-4">
         <InfoCard title={t('details')}>
+          {project && (
+            <div className="flex space-x-20 my-3">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <EntityStatus entity={project} />
+            </div>
+          )}
+
           <Link
             className="block"
             to={route('/clients/:id', { id: project.client_id })}

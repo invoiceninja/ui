@@ -48,6 +48,7 @@ export function useAllVendorColumns() {
     'created_at',
     'address2',
     'archived_at',
+    'last_login_at',
     //   'assigned_to', @Todo: Need to resolve relationship
     'contacts',
     'country_id',
@@ -134,6 +135,12 @@ export function useVendorColumns() {
       column: 'created_at',
       id: 'created_at',
       label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'last_login_at',
+      id: 'last_login',
+      label: t('last_login'),
       format: (value) => date(value, dateFormat),
     },
     {
@@ -227,7 +234,9 @@ export function useVendorColumns() {
           containsUnsafeHTMLTags
           message={value as string}
         >
-          <span dangerouslySetInnerHTML={{ __html: (value as string).slice(0,50) }} />
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },

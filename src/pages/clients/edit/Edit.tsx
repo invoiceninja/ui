@@ -153,6 +153,7 @@ export default function Edit() {
               setClient={setClient}
               setErrors={setErrors}
               errors={errors}
+              page="edit"
             />
             <Address
               client={client}

@@ -73,7 +73,7 @@ export function useActions() {
   const { create, calculatedTaxRate } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
-    setExpense({ ...expense, documents: [], number: '' });
+    setExpense({ ...expense, id: '', documents: [], number: '' });
 
     navigate('/expenses/create?action=clone');
   };
@@ -81,6 +81,7 @@ export function useActions() {
   const cloneToRecurringExpense = (expense: Expense) => {
     setRecurringExpense({
       ...(expense as RecurringExpense),
+      id: '',
       documents: [],
       number: '',
     });

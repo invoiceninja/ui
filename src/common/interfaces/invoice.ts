@@ -82,6 +82,7 @@ export interface Invoice {
   activities?: Activity[];
   payments?: Payment[];
   tax_info?: TaxData;
+  reminder_schedule?: string;
 }
 
 export interface Activity {

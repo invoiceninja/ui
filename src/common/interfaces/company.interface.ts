@@ -48,6 +48,7 @@ export interface Company {
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
   default_password_timeout: number;
+  default_quantity: boolean;
   subdomain: string;
   client_can_register: boolean;
   invoice_task_item_description: boolean;

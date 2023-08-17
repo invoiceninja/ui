@@ -30,9 +30,7 @@ export function Restore() {
           />
         ) : (
           <Card title={t('restore')}>
-            <span className="text-gray-600 pl-6">
-              {t('import_started')}
-            </span>
+            <span className="text-gray-600 pl-6">{t('import_started')}</span>
           </Card>
         )}
       </div>

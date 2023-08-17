@@ -38,6 +38,7 @@ type PurchaseOrderPermissions =
   | 'view_purchase_order'
   | 'edit_purchase_order';
 type ReportPermissions = 'view_reports';
+type DashboardPermissions = 'view_dashboard';
 
 export type Permissions =
   | AllPermissions
@@ -55,7 +56,8 @@ export type Permissions =
   | RecurringExpensePermissions
   | BankTransactionsPermissions
   | PurchaseOrderPermissions
-  | ReportPermissions;
+  | ReportPermissions
+  | DashboardPermissions;
 
 export function useHasPermission() {
   const user = useCurrentCompanyUser();

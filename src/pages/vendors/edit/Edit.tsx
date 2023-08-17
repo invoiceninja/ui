@@ -92,7 +92,14 @@ export default function Edit() {
         )
       }
     >
-      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
+      {vendor && (
+        <Form
+          vendor={vendor}
+          setVendor={setVendor}
+          errors={errors}
+          page="edit"
+        />
+      )}
     </Default>
   );
 }
