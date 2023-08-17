@@ -24,6 +24,7 @@ import { ImportButton } from '$app/components/import/ImportButton';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Products() {
   useTitle('products');
@@ -37,6 +38,8 @@ export default function Products() {
   const columns = useProductColumns();
 
   const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
@@ -54,6 +57,7 @@ export default function Products() {
         linkToEdit="/products/:id/edit"
         withResourcefulActions
         customActions={actions}
+        customBulkActions={customBulkActions}
         rightSide={
           <Guard
             type="component"

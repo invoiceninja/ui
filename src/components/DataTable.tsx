@@ -13,9 +13,12 @@ import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
   CSSProperties,
+  Dispatch,
   ReactElement,
   ReactNode,
+  SetStateAction,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -59,7 +62,8 @@ export type DataTableColumns<T = any> = {
 
 export type CustomBulkAction<T> = (
   selectedIds: string[],
-  selectedResources?: T[]
+  selectedResources?: T[],
+  setSelected?: Dispatch<SetStateAction<string[]>>
 ) => ReactNode;
 
 interface StyleOptions {
@@ -267,6 +271,14 @@ export function DataTable<T extends object>(props: Props<T>) {
       });
   };
 
+  const showCustomBulkActionDivider = useMemo(() => {
+    return props.customBulkActions
+      ? props.customBulkActions.some((action) =>
+          React.isValidElement(action(selected, selectedResources))
+        )
+      : false;
+  }, [props.customBulkActions, selected, selectedResources]);
+
   useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
@@ -313,12 +325,14 @@ export function DataTable<T extends object>(props: Props<T>) {
               props.customBulkActions.map(
                 (bulkAction: CustomBulkAction<T>, index: number) => (
                   <div key={index}>
-                    {bulkAction(selected, selectedResources)}
+                    {bulkAction(selected, selectedResources, setSelected)}
                   </div>
                 )
               )}
 
-            {props.customBulkActions && <Divider withoutPadding />}
+            {props.customBulkActions && showCustomBulkActionDivider && (
+              <Divider withoutPadding />
+            )}
 
             <DropdownElement
               onClick={() => bulk('archive')}
