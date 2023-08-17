@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { TaxData } from './company.interface';
 import { Expense } from './expense';
 import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
@@ -77,6 +78,7 @@ export interface PurchaseOrder {
   documents: any[];
   vendor?: Vendor;
   expense?: Expense;
+  tax_info?: TaxData;
 }
 
 export interface Invitation {

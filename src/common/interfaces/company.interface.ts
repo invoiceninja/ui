@@ -58,6 +58,7 @@ export interface Company {
   invoice_task_locked: boolean;
   invoice_task_documents: boolean;
   oauth_password_required: boolean;
+  origin_tax_data?: TaxData;
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
@@ -298,6 +299,43 @@ export interface Settings {
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
   mark_paid_payment_email: boolean;
+}
+
+export interface TaxData{
+  geoPostalCode: string;
+  geoCity: string; 
+  geoCounty: string;
+  geoState: string;
+  taxSales: number;
+  taxUse: number;
+  txbService: null | "N" | "Y" | "L";
+  txbFreight: null | "Y" | "N";
+  stateSalesTax: number;
+  stateUseTax: number;
+  citySalesTax: number;
+  cityUseTax: number;
+  cityTaxCode: string;
+  countySalesTax: number;
+  countyUseTax: number;
+  countyTaxCode: string;
+  districtSalesTax: number;
+  districtUseTax: number;
+  district1Code: string;
+  district1SalesTax: number;
+  district1UseTax: number;
+  district2Code: string;
+  district2SalesTax: number;
+  district2UseTax: number;
+  district3Code: string;
+  district3SalesTax: number;
+  district3UseTax: number;
+  district4Code: string; 
+  district4SalesTax: number;
+  district4UseTax: number;
+  district5Code: string;
+  district5SalesTax: number;
+  district5UseTax: number;
+  originDestination: null | "D" | "O";
 }
 
 export interface TaxData {

@@ -12,12 +12,12 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
 import { Card, Element } from '../../../components/cards';
-import { SelectField } from '../../../components/forms';
+import { Button, SelectField } from '../../../components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -29,6 +29,7 @@ import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { CompanyTaxDetails } from './components/CompanyTaxDetails';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -40,9 +41,9 @@ export function TaxSettings() {
 
   useInjectCompanyChanges();
   useTitle('tax_settings');
-
   const errors = useAtomValue(companySettingsErrorsAtom);
-
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
 
@@ -144,13 +145,30 @@ export function TaxSettings() {
               <Divider />
 
               <Element leftSide={t('calculate_taxes')}>
+                <div className="flex">
                 <Toggle
                   checked={companyChanges?.calculate_taxes}
                   onChange={(value: boolean) =>
                     handleToggleChange('calculate_taxes', value)
                   }
                 />
+
+                {companyChanges.calculate_taxes && companyChanges.settings.country_id === '840' &&(
+
+                  <div className="mx-5 my-1">
+                    <Button type="minimal" behavior="button"
+                      onClick={() => setIsModalVisible(true)}
+                    >
+                      {t('info')}</Button>
+                  </div>
+                )}
+              </div>
               </Element>
+            
+              <CompanyTaxDetails
+                isModalOpen={isModalVisible}
+                setIsModalOpen={setIsModalVisible}
+              />
 
               {companyChanges.calculate_taxes && <CalculateTaxes />}
             </>

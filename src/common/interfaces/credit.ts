@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { Client } from './client';
+import { TaxData } from './company.interface';
 import { InvoiceItem } from './invoice-item';
 
 export interface Credit {
@@ -76,4 +77,5 @@ export interface Credit {
   invitations: any[];
   documents: any[];
   client?: Client;
+  tax_info?: TaxData;
 }
