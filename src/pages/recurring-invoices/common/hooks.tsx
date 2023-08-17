@@ -59,6 +59,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdNotStarted,
   MdPictureAsPdf,
   MdRestore,
@@ -281,7 +282,12 @@ export function useToggleStartStop() {
   };
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonActions?: boolean;
+}
+
+export function useActions(params?: Params) {
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -291,6 +297,8 @@ export function useActions() {
   const { t } = useTranslation();
 
   const bulk = useBulkAction();
+
+  const { showEditAction, showCommonActions } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
@@ -390,6 +398,18 @@ export function useActions() {
   };
 
   const actions: Action<RecurringInvoice>[] = [
+    (recurringInvoice) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/recurring_invoices/:id/edit', {
+            id: recurringInvoice.id,
+          })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (recurringInvoice) => (
       <DropdownElement
         to={route('/recurring_invoices/:id/pdf', {
@@ -460,9 +480,10 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonActions)) && <Divider withoutPadding />,
     (recurringInvoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonActions)) &&
       getEntityState(recurringInvoice) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(recurringInvoice.id, 'archive')}
@@ -472,7 +493,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringInvoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
         <DropdownElement
@@ -483,7 +504,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringInvoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
         <DropdownElement

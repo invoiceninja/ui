@@ -34,7 +34,7 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 
