@@ -93,7 +93,10 @@ export const RecurringInvoiceSlider = () => {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const actions = useActions({ showCommonActions: true, showEditAction: true });
+  const actions = useActions({
+    showCommonBulkActions: true,
+    showEditAction: true,
+  });
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 

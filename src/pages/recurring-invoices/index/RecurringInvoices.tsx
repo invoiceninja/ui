@@ -60,6 +60,7 @@ export default function RecurringInvoices() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
   const columns = useRecurringInvoiceColumns();
+  const customBulkActions = useCustomBulkActions();
 
   const setRecurringInvoiceSlider = useSetAtom(recurringInvoiceSliderAtom);
   const setRecurringInvoiceSliderVisibility = useSetAtom(
@@ -71,8 +72,6 @@ export default function RecurringInvoices() {
       setRecurringInvoiceSlider(recurringInvoiceResponse);
     }
   }, [recurringInvoiceResponse]);
-
-  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default

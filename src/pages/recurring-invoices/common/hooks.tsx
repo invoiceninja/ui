@@ -286,7 +286,7 @@ export function useToggleStartStop() {
 
 interface Params {
   showEditAction?: boolean;
-  showCommonActions?: boolean;
+  showCommonBulkActions?: boolean;
 }
 
 export function useActions(params?: Params) {
@@ -300,7 +300,7 @@ export function useActions(params?: Params) {
 
   const bulk = useBulkAction();
 
-  const { showEditAction, showCommonActions } = params || {};
+  const { showEditAction, showCommonBulkActions } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
@@ -491,9 +491,11 @@ export function useActions(params?: Params) {
       </DropdownElement>
     ),
     () =>
-      (isEditPage || Boolean(showCommonActions)) && <Divider withoutPadding />,
+      (isEditPage || Boolean(showCommonBulkActions)) && (
+        <Divider withoutPadding />
+      ),
     (recurringInvoice) =>
-      (isEditPage || Boolean(showCommonActions)) &&
+      (isEditPage || Boolean(showCommonBulkActions)) &&
       getEntityState(recurringInvoice) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([recurringInvoice.id], 'archive')}
@@ -503,7 +505,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (recurringInvoice) =>
-      (isEditPage || Boolean(showCommonActions)) &&
+      (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
         <DropdownElement
@@ -514,7 +516,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (recurringInvoice) =>
-      (isEditPage || Boolean(showCommonActions)) &&
+      (isEditPage || Boolean(showCommonBulkActions)) &&
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
         <DropdownElement
