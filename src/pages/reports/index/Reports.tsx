@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -110,6 +110,7 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const { save, preferences } = usePreferences();
 
@@ -247,6 +248,54 @@ export default function Reports() {
       });
   };
 
+  const handlePreview = () => {
+    setErrors(undefined);
+    setShowPreview(false);
+
+    const { client_id } = report.payload;
+
+    let updatedPayload =
+      report.identifier === 'product_sales'
+        ? { ...report.payload, client_id: client_id || null }
+        : report.payload;
+
+    let reportKeys: string[] = [];
+
+    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+      reportKeys = collect(
+        preferences.reports.columns[report.identifier][reportColumn]
+      )
+        .pluck('value')
+        .toArray() as string[];
+    }
+
+    updatedPayload = { ...updatedPayload, report_keys: reportKeys };
+
+    request('POST', endpoint(report.endpoint), updatedPayload, {
+      responseType: 'blob',
+    })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: 'text/csv' });
+
+        console.log(blob);
+
+        setShowPreview(true);
+      })
+      .catch((error: AxiosError<ValidationBag | Blob>) => {
+        if (error.response?.status === 422) {
+          if (report.payload.send_email) {
+            setErrors(error.response.data as ValidationBag);
+          }
+
+          if (!report.payload.send_email) {
+            const blob = error.response.data as Blob;
+
+            blob.text().then((text) => setErrors(JSON.parse(text)));
+          }
+        }
+      });
+  };
+
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
       return {
@@ -278,6 +327,11 @@ export default function Reports() {
       onSaveClick={handleExport}
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
+      navigationTopRight={
+        <Button type="secondary" onClick={handlePreview}>
+          {t('preview')}
+        </Button>
+      }
       withoutBackButton
     >
       <div className="grid grid-cols-12 gap-4">
@@ -418,6 +472,18 @@ export default function Reports() {
           columns={report.custom_columns}
         />
       )}
+
+      {showPreview && <Preview />}
     </Default>
+  );
+}
+
+function Preview() {
+  const [t] = useTranslation();
+
+  return (
+    <Card className="my-6" title={t('preview')} withContainer>
+      Lorem, ipsum dolor.
+    </Card>
   );
 }
