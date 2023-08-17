@@ -149,7 +149,7 @@ export function useProductColumns() {
     {
       column: 'quantity',
       id: 'quantity',
-      label: t('quantity'),
+      label: t('default_quantity'),
     },
     {
       column: 'archived_at',
@@ -209,7 +209,7 @@ export function useProductColumns() {
     {
       column: 'stock_quantity',
       id: 'quantity',
-      label: t('quantity'),
+      label: t('stock_quantity'),
     },
     {
       column: 'tax_name1',
