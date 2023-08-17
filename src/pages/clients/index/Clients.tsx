@@ -28,6 +28,7 @@ import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Clients() {
   useTitle('clients');
@@ -54,6 +55,8 @@ export default function Clients() {
   const clientColumns = useAllClientColumns();
   const handlePurgeClient = usePurgeClient(purgeClientId);
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default
       breadcrumbs={pages}
@@ -70,6 +73,7 @@ export default function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
+        customBulkActions={customBulkActions}
         rightSide={
           <Guard
             type="component"

@@ -16,23 +16,18 @@ interface UserState {
   authenticated: boolean;
   user: any;
   changes: any;
-  msal: any;
 }
 
 const initialState: UserState = {
   authenticated: false,
   user: {},
   changes: {},
-  msal: {},
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setMsal: (state, action) => {
-      state.msal = action.payload;
-    },
     updateUser: (state, action) => {
       state.user = action.payload;
     },
@@ -71,7 +66,6 @@ export const userSlice = createSlice({
 });
 
 export const {
-  setMsal,
   updateUser,
   injectInChanges,
   injectInChangesWithData,

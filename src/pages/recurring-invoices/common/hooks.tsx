@@ -76,6 +76,8 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { UpdatePricesAction } from './components/UpdatePricesAction';
+import { IncreasePricesAction } from './components/IncreasePricesAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -439,6 +441,14 @@ export function useActions(params?: Params) {
           {t('stop')}
         </DropdownElement>
       ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <UpdatePricesAction selectedIds={[recurringInvoice.id]} />
+      ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
+      ),
     () => <Divider withoutPadding />,
     (recurringInvoice) => (
       <DropdownElement
@@ -486,7 +496,7 @@ export function useActions(params?: Params) {
       (isEditPage || Boolean(showCommonActions)) &&
       getEntityState(recurringInvoice) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'archive')}
+          onClick={() => bulk([recurringInvoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -497,7 +507,7 @@ export function useActions(params?: Params) {
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'restore')}
+          onClick={() => bulk([recurringInvoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -508,7 +518,7 @@ export function useActions(params?: Params) {
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'delete')}
+          onClick={() => bulk([recurringInvoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

@@ -75,7 +75,10 @@ export default function Create() {
     setPurchaseOrder((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'purchase_order_product'
+      ) {
         value = undefined;
       }
 

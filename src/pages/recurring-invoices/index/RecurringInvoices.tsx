@@ -35,6 +35,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useRecurringInvoiceQuery } from '../common/queries';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -71,6 +72,8 @@ export default function RecurringInvoices() {
     }
   }, [recurringInvoiceResponse]);
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -87,6 +90,7 @@ export default function RecurringInvoices() {
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
         customFilters={filters}
+        customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={

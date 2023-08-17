@@ -46,10 +46,6 @@ import {
   MdSend,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { useHandleArchive } from '../hooks/useHandleArchive';
-import { useHandleCancel } from '../hooks/useHandleCancel';
-import { useHandleDelete } from '../hooks/useHandleDelete';
-import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -70,8 +66,14 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
   );
 };
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const { t } = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -85,11 +87,6 @@ export function useActions() {
   const bulk = useBulk();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
-
-  const archive = useHandleArchive();
-  const restore = useHandleRestore();
-  const destroy = useHandleDelete();
-  const cancel = useHandleCancel();
 
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -201,17 +198,16 @@ export function useActions() {
   };
 
   return [
-    (invoice: Invoice) => (
-      <>
+    (invoice: Invoice) =>
+      Boolean(showEditAction) && (
         <DropdownElement
           to={route('/invoices/:id/edit', { id: invoice.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}
         </DropdownElement>
-        <Divider withoutPadding />
-      </>
-    ),
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/email', { id: invoice.id })}
@@ -315,7 +311,7 @@ export function useActions() {
       (invoice.status_id === InvoiceStatus.Sent ||
         invoice.status_id === InvoiceStatus.Partial) && (
         <DropdownElement
-          onClick={() => cancel(invoice)}
+          onClick={() => bulk([invoice.id], 'cancel')}
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
@@ -374,33 +370,36 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at === 0 && (
         <DropdownElement
-          onClick={() => archive(invoice)}
+          onClick={() => bulk([invoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement
-          onClick={() => restore(invoice)}
+          onClick={() => bulk([invoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => destroy(invoice)}
+          onClick={() => bulk([invoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

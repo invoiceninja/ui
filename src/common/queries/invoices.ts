@@ -38,7 +38,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 

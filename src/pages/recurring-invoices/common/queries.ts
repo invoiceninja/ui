@@ -16,6 +16,11 @@ import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Dispatch, SetStateAction } from 'react';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -50,21 +55,66 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
   );
 }
 
-export function useBulkAction() {
-  const queryClient = useQueryClient();
+type Action =
+  | 'archive'
+  | 'restore'
+  | 'delete'
+  | 'start'
+  | 'stop'
+  | 'update_prices'
+  | 'increase_prices';
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+const successMessages = {
+  start: 'started_recurring_invoice',
+  stop: 'stopped_recurring_invoice',
+  update_prices: 'updated_prices',
+  increase_prices: 'updated_prices',
+};
+
+interface Params {
+  onSuccess?: () => void;
+  setErrors?: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+
+export function useBulkAction(params?: Params) {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  const { onSuccess, setErrors } = params || {};
+
+  return (ids: string[], action: Action, increasePercentage?: number) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
       action,
-      ids: [id],
-    }).then(() => {
-      toast.success(`${action}d_recurring_invoice`);
+      ids,
+      ...(typeof increasePercentage === 'number' && {
+        percentage_increase: increasePercentage,
+      }),
+    })
+      .then(() => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
 
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_invoices/:id', { id })
-      );
-    });
+        toast.success(message);
+
+        onSuccess?.();
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
+        ids.forEach((id) =>
+          queryClient.invalidateQueries(
+            route('/api/v1/recurring_invoices/:id', { id })
+          )
+        );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors?.(error.response.data);
+          toast.dismiss();
+        }
+      });
   };
 }
