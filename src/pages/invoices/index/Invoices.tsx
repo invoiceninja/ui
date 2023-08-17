@@ -30,12 +30,18 @@ import {
   invoiceSliderAtom,
   invoiceSliderVisibilityAtom,
 } from '../common/components/InvoiceSlider';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { useEffect, useState } from 'react';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
+
+  const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
+
+  const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
   const actions = useActions();
 
@@ -49,8 +55,14 @@ export default function Invoices() {
 
   const customBulkActions = useCustomBulkActions();
 
-  const [, setInvoiceSlider] = useAtom(invoiceSliderAtom);
-  const [, setInvoiceSliderVisibility] = useAtom(invoiceSliderVisibilityAtom);
+  const setInvoiceSlider = useSetAtom(invoiceSliderAtom);
+  const setInvoiceSliderVisibility = useSetAtom(invoiceSliderVisibilityAtom);
+
+  useEffect(() => {
+    if (invoiceResponse) {
+      setInvoiceSlider(invoiceResponse);
+    }
+  }, [invoiceResponse]);
 
   return (
     <Default
@@ -89,7 +101,7 @@ export default function Invoices() {
         }
         linkToCreateGuards={[permission('create_invoice')]}
         onTableRowClick={(invoice) => {
-          setInvoiceSlider(invoice);
+          setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);
         }}
       />
