@@ -312,7 +312,7 @@ export const RecurringInvoiceSlider = () => {
               <span className="w-1/2">
                 {date(recurringDate.send_date, dateFormat)}
               </span>
-              <span className="w-1/2 text-sm">
+              <span className="w-1/2">
                 {date(recurringDate.due_date, dateFormat)}
               </span>
             </div>
