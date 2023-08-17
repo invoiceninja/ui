@@ -26,7 +26,7 @@ export function usePaymentTermsQuery(params: Params) {
       endpoint(
         '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
         {
-          perPage: params.perPage,
+          perPage: params.perPage ?? 1000,
           currentPage: params.currentPage,
           sort: params.sort ?? 'id|asc',
         }

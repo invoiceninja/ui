@@ -28,7 +28,7 @@ export function useTaxRatesQuery(params: Params) {
         endpoint(
           '/api/v1/tax_rates?per_page=:perPage&page=:currentPage&sort=:sort',
           {
-            perPage: params.perPage,
+            perPage: params.perPage ?? 1000,
             currentPage: params.currentPage,
             sort: params.sort ?? 'id|asc',
           }
