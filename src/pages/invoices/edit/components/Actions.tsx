@@ -46,8 +46,6 @@ import {
   MdSend,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { useMarkPaid } from '../hooks/useMarkPaid';
-import { useMarkSent } from '../hooks/useMarkSent';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { getEntityState } from '$app/common/helpers';
@@ -78,8 +76,6 @@ export function useActions(params?: Params) {
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
-  const markSent = useMarkSent();
-  const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
 
   const reverseInvoice = useReverseInvoice();
@@ -262,7 +258,7 @@ export function useActions(params?: Params) {
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => markSent(invoice)}
+          onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
@@ -272,7 +268,7 @@ export function useActions(params?: Params) {
       parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => markPaid(invoice)}
+          onClick={() => bulk([invoice.id], 'mark_paid')}
           icon={<Icon element={MdPaid} />}
         >
           {t('mark_paid')}
