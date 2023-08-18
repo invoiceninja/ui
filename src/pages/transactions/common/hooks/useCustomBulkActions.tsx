@@ -29,11 +29,13 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Transaction>[] = [
-    (selectedIds, selectedTransactions, onActionCall) =>
+    (selectedIds, selectedTransactions) =>
       selectedTransactions &&
       showConvertAction(selectedTransactions) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'convert_matched', onActionCall)}
+          onClick={() => {
+            bulk(selectedIds, 'convert_matched');
+          }}
           icon={<Icon element={MdOutlineContentCopy} />}
         >
           {t('convert')}

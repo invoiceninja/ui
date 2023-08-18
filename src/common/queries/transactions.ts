@@ -60,8 +60,7 @@ export function useBulk() {
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'convert_matched',
-    onActionCall?: () => void
+    action: 'archive' | 'restore' | 'delete' | 'convert_matched'
   ) => {
     toast.processing();
 
@@ -74,8 +73,6 @@ export function useBulk() {
         `${action}d_invoice`;
 
       toast.success(message);
-
-      onActionCall?.();
 
       queryClient.invalidateQueries('/api/v1/bank_transactions');
 
