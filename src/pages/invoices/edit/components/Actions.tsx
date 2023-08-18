@@ -46,8 +46,6 @@ import {
   MdSend,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { useMarkPaid } from '../hooks/useMarkPaid';
-import { useMarkSent } from '../hooks/useMarkSent';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { getEntityState } from '$app/common/helpers';
