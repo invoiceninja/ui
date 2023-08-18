@@ -70,7 +70,7 @@ export function useTasksQuery(params: TasksParams) {
   );
 }
 
-export function useBulk() {
+export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
@@ -104,4 +104,4 @@ export function useBulk() {
       });
     });
   };
-}
+};

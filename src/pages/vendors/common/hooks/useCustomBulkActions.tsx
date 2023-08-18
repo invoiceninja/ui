@@ -14,6 +14,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 
@@ -30,13 +31,22 @@ export const useCustomBulkActions = () => {
     return vendors.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
+  const handleDownloadDocuments = (
+    selectedVendors: Vendor[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const vendorIds = getDocumentsIds(selectedVendors);
+
+    documentsBulk(vendorIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Vendor>[] = [
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_, selectedVendors, onActionCall) => (
+    (_, selectedVendors, setSelected) => (
       <DropdownElement
         onClick={() =>
           selectedVendors && shouldDownloadDocuments(selectedVendors)
-            ? documentsBulk(getDocumentsIds(selectedVendors), 'download')
+            ? handleDownloadDocuments(selectedVendors, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

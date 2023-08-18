@@ -61,6 +61,7 @@ import {
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Dispatch, SetStateAction } from 'react';
 
 export const defaultColumns: string[] = [
   'status',
@@ -495,24 +496,40 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const handleDownloadDocuments = (
+    selectedTasks: Task[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const taskIds = getDocumentsIds(selectedTasks);
+
+    documentsBulk(taskIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Task>[] = [
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedTasks, onActionCall) =>
+    (selectedIds, selectedTasks, setSelected) =>
       selectedTasks &&
       showStartAction(selectedTasks) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'start')}
+          onClick={() => {
+            bulk(selectedIds, 'start');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedTasks, onActionCall) =>
+    (selectedIds, selectedTasks, setSelected) =>
       selectedTasks &&
       showStopAction(selectedTasks) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'stop')}
+          onClick={() => {
+            bulk(selectedIds, 'stop');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
@@ -532,12 +549,11 @@ export const useCustomBulkActions = () => {
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_, selectedTasks, onActionCall) => (
+    (_, selectedTasks, setSelected) => (
       <DropdownElement
         onClick={() =>
           selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? documentsBulk(getDocumentsIds(selectedTasks), 'download')
+            ? handleDownloadDocuments(selectedTasks, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

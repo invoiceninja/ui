@@ -47,6 +47,7 @@ import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Dispatch, SetStateAction } from 'react';
 
 export const defaultColumns: string[] = [
   'name',
@@ -400,6 +401,16 @@ export const useCustomBulkActions = () => {
     return projects.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
+  const handleDownloadDocuments = (
+    selectedProjects: Project[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const projectIds = getDocumentsIds(selectedProjects);
+
+    documentsBulk(projectIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Project>[] = [
     (selectedIds, selectedProjects) => (
       <DropdownElement
@@ -413,12 +424,11 @@ export const useCustomBulkActions = () => {
         {t('invoice_project')}
       </DropdownElement>
     ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_, selectedProjects, onActionCall) => (
+    (_, selectedProjects, setSelected) => (
       <DropdownElement
         onClick={() =>
           selectedProjects && shouldDownloadDocuments(selectedProjects)
-            ? documentsBulk(getDocumentsIds(selectedProjects), 'download')
+            ? handleDownloadDocuments(selectedProjects, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
