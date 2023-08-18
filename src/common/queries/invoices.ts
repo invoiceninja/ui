@@ -111,7 +111,7 @@ export function useBulk(params?: Params) {
         const message =
           successMessages[action as keyof typeof successMessages] ||
           `${action}d_invoice`;
-
+          
         toast.success(message);
 
         params?.onSuccess?.();
