@@ -173,7 +173,7 @@ export function useResolveInputField(props: Props) {
   };
 
   const company = useCurrentCompany();
-  const reactSettings = useReactSettings(); 
+  const reactSettings = useReactSettings();
   const resource = props.resource;
 
   const formatMoney = useFormatMoney({
@@ -317,7 +317,12 @@ export function useResolveInputField(props: Props) {
         inputCurrencySeparators && (
           <DecimalNumberInput
             precision={
-              property === 'quantity' ? 6 : (reactSettings?.number_precision && reactSettings?.number_precision > 0) ? reactSettings.number_precision : (inputCurrencySeparators?.precision || 2)
+              property === 'quantity'
+                ? 6
+                : reactSettings?.number_precision &&
+                  reactSettings?.number_precision > 0
+                ? reactSettings.number_precision
+                : inputCurrencySeparators?.precision || 2
             }
             id={property}
             currency={inputCurrencySeparators}

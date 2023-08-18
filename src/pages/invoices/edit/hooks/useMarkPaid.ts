@@ -38,6 +38,8 @@ export function useMarkPaid() {
         route('/api/v1/invoices/:id', { id: invoice.id })
       );
 
+      queryClient.invalidateQueries('/api/v1/clients');
+
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
     });

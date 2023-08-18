@@ -39,6 +39,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
+import { Card } from '$app/components/cards';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -99,7 +100,8 @@ export default function Create() {
         searchParams.get('action') !== 'clone' &&
         searchParams.get('action') !== 'invoice_project' &&
         searchParams.get('action') !== 'invoice_task' &&
-        searchParams.get('action') !== 'invoice_expense'
+        searchParams.get('action') !== 'invoice_expense' &&
+        searchParams.get('action') !== 'invoice_product'
       ) {
         value = undefined;
       }
@@ -179,15 +181,17 @@ export default function Create() {
       disableSaveButton={invoice?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={invoice}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('project') === 'true'}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={invoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            readonly={searchParams.get('project') === 'true'}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <InvoiceDetails
           invoice={invoice}

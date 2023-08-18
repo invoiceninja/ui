@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { Checkbox } from '$app/components/forms';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -49,7 +48,7 @@ export function VendorSelector(props: Props) {
   };
 
   return (
-    <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+    <>
       <div className="flex items-center justify-between">
         <Selector
           inputLabel={t('vendor')}
@@ -83,6 +82,6 @@ export function VendorSelector(props: Props) {
             <span className="text-sm text-gray-700">{contact.email}</span>
           </div>
         ))}
-    </Card>
+    </>
   );
 }

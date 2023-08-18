@@ -46,6 +46,7 @@ export function ProductSelector(props: Props) {
           id: 'id',
           label: 'product_key',
           value: 'id',
+          searchable: 'notes',
           dropdownLabelFn: (product) => (
             <div>
               <p className="font-semibold">{product.product_key}</p>

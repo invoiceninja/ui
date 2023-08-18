@@ -38,7 +38,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 
@@ -117,15 +117,11 @@ export function useBulk(params?: Params) {
         params?.onSuccess?.();
 
         ids.forEach((id) => {
-          queryClient.invalidateQueries(
-            route('/api/v1/invoices/:id', { id })
-          ); 
+          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }));
         });
-        
+
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
-
-        
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (

@@ -22,18 +22,20 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
+import { TaskStatus as TaskStatusBadge } from './TaskStatus';
 
 interface Props {
   task: Task;
   handleChange: (property: keyof Task, value: unknown) => unknown;
   errors: ValidationBag | undefined;
   taskModal?: boolean;
+  page?: 'create' | 'edit';
 }
 
 export function TaskDetails(props: Props) {
   const [t] = useTranslation();
 
-  const { task, handleChange, errors } = props;
+  const { task, handleChange, errors, page } = props;
 
   const company = useCurrentCompany();
   const location = useLocation();
@@ -41,6 +43,12 @@ export function TaskDetails(props: Props) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 xl:col-span-4 h-max">
+        {task && page === 'edit' && (
+          <Element leftSide={t('status')}>
+            <TaskStatusBadge entity={task} />
+          </Element>
+        )}
+
         {!task.project_id && (
           <Element leftSide={t('client')}>
             <ClientSelector
