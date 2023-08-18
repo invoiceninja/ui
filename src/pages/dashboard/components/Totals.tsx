@@ -339,7 +339,7 @@ export function Totals() {
                     </span>
                   </Badge>
                 </div>
-                
+
                 <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">{t('expenses')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Gray }}>

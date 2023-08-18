@@ -143,6 +143,7 @@ export default function Edit() {
         <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm
+              page="edit"
               errors={errors}
               transaction={transaction}
               handleChange={handleChange}

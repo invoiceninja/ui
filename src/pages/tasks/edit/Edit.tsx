@@ -95,7 +95,12 @@ export default function Edit() {
       }
     >
       {task && (
-        <TaskDetails task={task} handleChange={handleChange} errors={errors} />
+        <TaskDetails
+          task={task}
+          handleChange={handleChange}
+          errors={errors}
+          page="edit"
+        />
       )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
     </Default>
