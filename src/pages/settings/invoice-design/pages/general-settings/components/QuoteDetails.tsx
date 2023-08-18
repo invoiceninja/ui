@@ -25,19 +25,19 @@ export function QuoteDetails() {
     { value: '$quote.total', label: t('quote_total') },
     {
       value: '$quote.custom1',
-      label: customField('quote1').label() || t('custom1'),
+      label: customField('invoice1').label() || t('custom1'),
     },
     {
       value: '$quote.custom2',
-      label: customField('quote2').label() || t('custom2'),
+      label: customField('invoice2').label() || t('custom2'),
     },
     {
       value: '$quote.custom3',
-      label: customField('quote3').label() || t('custom3'),
+      label: customField('invoice3').label() || t('custom3'),
     },
     {
       value: '$quote.custom4',
-      label: customField('quote4').label() || t('custom4'),
+      label: customField('invoice4').label() || t('custom4'),
     },
     { value: '$client.balance', label: t('client_balance') },
   ];
