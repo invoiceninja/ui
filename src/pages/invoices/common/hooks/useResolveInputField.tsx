@@ -303,6 +303,9 @@ export function useResolveInputField(props: Props) {
         <InputField
           id={property}
           key={`${property}${index}`}
+          parentClassName="flex items-end"
+          collapseOnFocus
+          textareaRows={1}
           element="textarea"
           value={resource?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>

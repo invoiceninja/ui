@@ -167,16 +167,17 @@ export function ProductsTable(props: Props) {
 
               {resource?.[relationType] ? (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
-                  <Td colSpan={100}>
-                    <button
-                      onClick={() =>
-                        !isAnyLineItemEmpty() && props.onCreateItemClick()
-                      }
-                      className="w-full py-2 inline-flex justify-center items-center space-x-2"
-                    >
+                  <Td
+                    colSpan={100}
+                    className="cursor-pointer"
+                    onClick={() =>
+                      !isAnyLineItemEmpty() && props.onCreateItemClick()
+                    }
+                  >
+                    <div className="flex py-2 justify-center items-center space-x-2">
                       <Plus size={18} />
                       <span>{t('add_item')}</span>
-                    </button>
+                    </div>
                   </Td>
                 </Tr>
               ) : (
