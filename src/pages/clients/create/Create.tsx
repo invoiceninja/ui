@@ -124,12 +124,15 @@ export default function Create() {
             setErrors={setErrors}
             errors={errors}
           />
-          <Address
-            client={client}
-            setClient={setClient}
-            setErrors={setErrors}
-            errors={errors}
-          />
+
+          <div className="mt-5">
+            <Address
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+          </div>
         </div>
 
         <div className="w-full xl:w-1/2">
@@ -139,12 +142,15 @@ export default function Create() {
             setErrors={setErrors}
             errors={errors}
           />
-          <AdditionalInfo
-            client={client}
-            setClient={setClient}
-            setErrors={setErrors}
-            errors={errors}
-          />
+
+          <div className="mt-5">
+            <AdditionalInfo
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+          </div>
         </div>
       </div>
     </Default>

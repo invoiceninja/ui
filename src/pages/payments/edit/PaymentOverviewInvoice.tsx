@@ -16,6 +16,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { MdOutlineFileOpen } from 'react-icons/md';
 
 interface Props {
   payment: Payment;
@@ -40,14 +41,16 @@ export function PaymentOverviewInvoice(props: Props) {
       {props.paymentable.invoice_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
-            <span className="text-gray-800">
+            <span className="flex item-center text-gray-800 gap-2">
               {`${t('invoice')} `}
               <Link
                 to={route('/invoices/:id/edit', {
                   id: props.paymentable.invoice_id,
                 })}
               >
-                {setLabel(props.payment, props.paymentable)}
+                <span className='flex items-center gap-2'>
+                   {setLabel(props.payment, props.paymentable)} <MdOutlineFileOpen /> 
+                </span>
               </Link>
             </span>
           </div>

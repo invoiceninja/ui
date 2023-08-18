@@ -26,6 +26,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -44,6 +45,8 @@ export default function RecurringInvoices() {
 
   const columns = useRecurringInvoiceColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -60,6 +63,7 @@ export default function RecurringInvoices() {
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
         customFilters={filters}
+        customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={

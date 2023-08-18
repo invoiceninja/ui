@@ -38,7 +38,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 
@@ -111,7 +111,7 @@ export function useBulk(params?: Params) {
         const message =
           successMessages[action as keyof typeof successMessages] ||
           `${action}d_invoice`;
-
+          
         toast.success(message);
 
         params?.onSuccess?.();
