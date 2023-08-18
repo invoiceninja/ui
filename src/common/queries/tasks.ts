@@ -76,8 +76,7 @@ export function useBulk() {
 
   return (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop',
-    onActionCall?: () => void
+    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop'
   ) => {
     toast.processing();
 
@@ -88,8 +87,6 @@ export function useBulk() {
       if (action !== 'start' && action !== 'stop') {
         toast.success(`${action}d_task`);
       }
-
-      onActionCall?.();
 
       if (action === 'start') {
         toast.success(trans('started_tasks', { value: ids.length }));

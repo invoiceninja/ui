@@ -31,15 +31,12 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Vendor>[] = [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_, selectedVendors, onActionCall) => (
       <DropdownElement
         onClick={() =>
           selectedVendors && shouldDownloadDocuments(selectedVendors)
-            ? documentsBulk(
-                getDocumentsIds(selectedVendors),
-                'download',
-                onActionCall
-              )
+            ? documentsBulk(getDocumentsIds(selectedVendors), 'download')
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

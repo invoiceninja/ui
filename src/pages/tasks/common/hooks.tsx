@@ -496,21 +496,23 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Task>[] = [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedTasks, onActionCall) =>
       selectedTasks &&
       showStartAction(selectedTasks) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'start', onActionCall)}
+          onClick={() => bulk(selectedIds, 'start')}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedTasks, onActionCall) =>
       selectedTasks &&
       showStopAction(selectedTasks) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'stop', onActionCall)}
+          onClick={() => bulk(selectedIds, 'stop')}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
@@ -530,15 +532,12 @@ export const useCustomBulkActions = () => {
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_, selectedTasks, onActionCall) => (
       <DropdownElement
         onClick={() =>
           selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? documentsBulk(
-                getDocumentsIds(selectedTasks),
-                'download',
-                onActionCall
-              )
+            ? documentsBulk(getDocumentsIds(selectedTasks), 'download')
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
