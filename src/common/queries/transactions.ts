@@ -54,7 +54,7 @@ const successMessages = {
   convert_matched: 'converted_transactions',
 };
 
-export function useBulk() {
+export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
@@ -86,4 +86,4 @@ export function useBulk() {
         queryClient.invalidateQueries([invalidateQueryValue]);
     });
   };
-}
+};
