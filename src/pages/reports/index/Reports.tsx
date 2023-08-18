@@ -35,6 +35,7 @@ import collect from 'collect.js';
 import { atom, useAtom } from 'jotai';
 import Papa, { ParseResult } from 'papaparse';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useQueryClient } from 'react-query';
 
 export type Identifier =
   | 'activity'
@@ -253,7 +254,9 @@ export default function Reports() {
 
   const [, setPreview] = useAtom(previewAtom);
 
-  const handlePreview = () => {
+  const queryClient = useQueryClient();
+
+  const handlePreview = async () => {
     setErrors(undefined);
     setShowPreview(false);
 
@@ -276,26 +279,26 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.endpoint), updatedPayload, {})
-      .then((response) => {
-        const result = Papa.parse<string[]>(response.data);
+    request(
+      'POST',
+      endpoint('/api/v1/reports/credits?output=json'),
+      updatedPayload,
+      {}
+    ).then((response) => {
+      const hash = response.data.message as string;
 
-        setPreview(result);
-        setShowPreview(true);
-      })
-      .catch((error: AxiosError<ValidationBag | Blob>) => {
-        if (error.response?.status === 422) {
-          if (report.payload.send_email) {
-            setErrors(error.response.data as ValidationBag);
-          }
-
-          if (!report.payload.send_email) {
-            const blob = error.response.data as Blob;
-
-            blob.text().then((text) => setErrors(JSON.parse(text)));
-          }
-        }
-      });
+      queryClient
+        .fetchQuery({
+          queryKey: ['reports', hash],
+          queryFn: () =>
+            request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
+              (response) => response.data
+            ),
+          retry: 10,
+          retryDelay: 10000,
+        })
+        .then((value) => console.log(value));
+    });
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
