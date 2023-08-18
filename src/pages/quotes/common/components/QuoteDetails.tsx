@@ -74,22 +74,22 @@ export function QuoteDetails(props: Props) {
           </Element>
         )}
 
-        {quote && company?.custom_fields?.quote1 && (
+        {quote && company?.custom_fields?.invoice1 && (
           <CustomField
             field="quote1"
             defaultValue={quote?.custom_value1 || ''}
-            value={company.custom_fields.quote1}
+            value={company.custom_fields.invoice1}
             onValueChange={(value) =>
               handleChange('custom_value1', String(value))
             }
           />
         )}
 
-        {quote && company?.custom_fields?.quote2 && (
+        {quote && company?.custom_fields?.invoice2 && (
           <CustomField
             field="quote2"
             defaultValue={quote?.custom_value2 || ''}
-            value={company.custom_fields.quote2}
+            value={company.custom_fields.invoice2}
             onValueChange={(value) =>
               handleChange('custom_value2', String(value))
             }
@@ -144,22 +144,22 @@ export function QuoteDetails(props: Props) {
           </div>
         </Element>
 
-        {quote && company?.custom_fields?.quote3 && (
+        {quote && company?.custom_fields?.invoice3 && (
           <CustomField
             field="quote3"
             defaultValue={quote?.custom_value3 || ''}
-            value={company.custom_fields.quote3}
+            value={company.custom_fields.invoice3}
             onValueChange={(value) =>
               handleChange('custom_value3', String(value))
             }
           />
         )}
 
-        {quote && company?.custom_fields?.quote4 && (
+        {quote && company?.custom_fields?.invoice4 && (
           <CustomField
             field="quote4"
             defaultValue={quote?.custom_value4 || ''}
-            value={company.custom_fields.quote4}
+            value={company.custom_fields.invoice4}
             onValueChange={(value) =>
               handleChange('custom_value4', String(value))
             }
