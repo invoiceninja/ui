@@ -72,12 +72,13 @@ export function useCustomBulkActions() {
   };
 
   const customBulkActions: CustomBulkAction<Quote>[] = [
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedQuotes, onActionSuccess) =>
       selectedQuotes && (
         <SendEmailBulkAction
           selectedIds={selectedIds}
           selectedQuotes={selectedQuotes}
-          onActionSuccess={onActionSuccess}
+          onActionSuccess={() => {}}
         />
       ),
     (selectedIds) => (
@@ -123,40 +124,44 @@ export function useCustomBulkActions() {
         {t('documents')}
       </DropdownElement>
     ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedQuotes, onActionSuccess) =>
       selectedQuotes &&
       showMarkSentAction(selectedQuotes) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'sent', onActionSuccess)}
+          onClick={() => bulk(selectedIds, 'sent', () => {})}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedQuotes, onActionSuccess) =>
       selectedQuotes &&
       showApproveAction(selectedQuotes) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'approve', onActionSuccess)}
+          onClick={() => bulk(selectedIds, 'approve', () => {})}
           icon={<Icon element={MdDone} />}
         >
           {t('approve')}
         </DropdownElement>
       ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedQuotes, onActionSuccess) =>
       selectedQuotes &&
       showConvertToInvoiceAction(selectedQuotes) && (
         <ConvertToInvoiceBulkAction
           selectedIds={selectedIds}
-          onActionSuccess={onActionSuccess}
+          onActionSuccess={() => {}}
         />
       ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (selectedIds, selectedQuotes, onActionSuccess) =>
       selectedQuotes &&
       showConvertToProjectAction(selectedQuotes) && (
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
-          onActionSuccess={onActionSuccess}
+          onActionSuccess={() => {}}
         />
       ),
   ];

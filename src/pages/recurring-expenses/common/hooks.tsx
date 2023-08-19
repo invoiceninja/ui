@@ -452,7 +452,12 @@ export function useActions() {
   });
 
   const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {
-    setRecurringExpense({ ...recurringExpense, documents: [], number: '' });
+    setRecurringExpense({
+      ...recurringExpense,
+      id: '',
+      documents: [],
+      number: '',
+    });
 
     navigate('/recurring_expenses/create?action=clone');
   };
@@ -460,6 +465,7 @@ export function useActions() {
   const cloneToExpense = (recurringExpense: RecurringExpense) => {
     setExpense({
       ...(recurringExpense as Expense),
+      id: '',
       documents: [],
       number: '',
     });

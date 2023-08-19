@@ -80,6 +80,7 @@ export interface Invoice {
   client?: Client;
   activities?: Activity[];
   payments?: Payment[];
+  reminder_schedule?: string;
 }
 
 export interface Activity {

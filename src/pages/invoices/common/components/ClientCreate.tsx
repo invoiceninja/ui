@@ -16,7 +16,6 @@ import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
-import { Modal } from '$app/components/Modal';
 import { set } from 'lodash';
 import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
 import { Address } from '$app/pages/clients/edit/components/Address';
@@ -27,6 +26,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
+import { Slider } from '$app/components/cards/Slider';
+import { Inline } from '$app/components/Inline';
 
 interface Props {
   isModalOpen: boolean;
@@ -128,58 +129,54 @@ export function ClientCreate({
   };
 
   return (
-    <Modal
-      title={t('new_client')}
+    <Slider
+      title={t('new_client')!}
       visible={isModalOpen}
-      onClose={(value) => handleClose(value)}
-      size="large"
-      backgroundColor="gray"
+      onClose={() => handleClose(false)}
+      size="regular"
+      actionChildren={
+        <Inline className="w-full flex justify-end">
+          <Button type="secondary" onClick={() => handleClose(false)}>
+            {t('cancel')}
+          </Button>
+
+          <Button onClick={onSave}>{t('save')}</Button>
+        </Inline>
+      }
     >
       {client ? (
-        <>
-          <div className="flex flex-col xl:flex-row xl:gap-4">
-            <div className="w-full xl:w-1/2">
-              <Details
-                client={client}
-                setClient={setClient}
-                setErrors={setErrors}
-                errors={errors}
-              />
-              <Address
-                client={client}
-                setClient={setClient}
-                setErrors={setErrors}
-                errors={errors}
-              />
-            </div>
+        <div className="flex flex-col divide-y">
+          <Details
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
 
-            <div className="w-full xl:w-1/2">
-              <Contacts
-                contacts={contacts}
-                setContacts={setContacts}
-                setErrors={setErrors}
-                errors={errors}
-              />
-              <AdditionalInfo
-                client={client}
-                setClient={setClient}
-                setErrors={setErrors}
-                errors={errors}
-              />
-            </div>
-          </div>
+          <Contacts
+            contacts={contacts}
+            setContacts={setContacts}
+            setErrors={setErrors}
+            errors={errors}
+          />
 
-          <div className="flex justify-end space-x-4">
-            <Button type="secondary" onClick={() => handleClose(false)}>
-              {t('cancel')}
-            </Button>
+          <Address
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
 
-            <Button onClick={onSave}>{t('save')}</Button>
-          </div>
-        </>
+          <AdditionalInfo
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
+        </div>
       ) : (
         <Spinner />
       )}
-    </Modal>
+    </Slider>
   );
 }
