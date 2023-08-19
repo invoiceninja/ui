@@ -110,15 +110,12 @@ export function useCustomBulkActions() {
           {t('view_invoice')}
         </DropdownElement>
       ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_, selectedProjects, onActionCall) => (
       <DropdownElement
         onClick={() =>
           selectedProjects && shouldDownloadDocuments(selectedProjects)
-            ? documentsBulk(
-                getDocumentsIds(selectedProjects),
-                'download',
-                onActionCall
-              )
+            ? documentsBulk(getDocumentsIds(selectedProjects), 'download')
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
