@@ -12,7 +12,7 @@ import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
@@ -22,16 +22,18 @@ import { toast } from '$app/common/helpers/toast/toast';
 interface Props {
   selectedIds: string[];
   selectedQuotes: Quote[];
-  onActionSuccess: (() => void) | undefined;
+  setSelected?: Dispatch<SetStateAction<string[]>> | undefined;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
 
-  const { selectedIds, selectedQuotes, onActionSuccess } = props;
-
-  const bulk = useBulkAction();
+  const { selectedIds, selectedQuotes, setSelected } = props;
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const onActionCall = () => setIsModalOpen(false);
+
+  const bulk = useBulkAction({ onActionCall });
 
   const handleOpenModal = () => {
     const clientHasContacts = selectedQuotes.some(
@@ -45,8 +47,6 @@ export const SendEmailBulkAction = (props: Props) => {
 
     setIsModalOpen(true);
   };
-
-  const onActionFinish = () => setIsModalOpen(false);
 
   return (
     <>
@@ -67,9 +67,11 @@ export const SendEmailBulkAction = (props: Props) => {
         <div className="flex justify-end space-x-4 mt-5">
           <Button
             behavior="button"
-            onClick={() =>
-              bulk(selectedIds, 'email', onActionSuccess, onActionFinish)
-            }
+            onClick={() => {
+              bulk(selectedIds, 'email');
+
+              setSelected?.([]);
+            }}
           >
             <span className="text-base mx-3">{t('yes')}</span>
           </Button>

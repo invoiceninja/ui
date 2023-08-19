@@ -31,6 +31,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { Dispatch, SetStateAction } from 'react';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -71,14 +72,23 @@ export function useCustomBulkActions() {
     return quotes.flatMap(({ documents }) => documents.map(({ id }) => id));
   };
 
+  const handleDownloadDocuments = (
+    selectedQuotes: Quote[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const quoteIds = getDocumentsIds(selectedQuotes);
+
+    documentsBulk(quoteIds, 'download');
+    setSelected?.([]);
+  };
+
   const customBulkActions: CustomBulkAction<Quote>[] = [
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedQuotes, onActionSuccess) =>
+    (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes && (
         <SendEmailBulkAction
           selectedIds={selectedIds}
           selectedQuotes={selectedQuotes}
-          onActionSuccess={() => {}}
+          setSelected={setSelected}
         />
       ),
     (selectedIds) => (
@@ -111,12 +121,11 @@ export function useCustomBulkActions() {
           {t('view_invoice')}
         </DropdownElement>
       ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_, selectedProjects, onActionCall) => (
+    (_, selectedQuotes, setSelected) => (
       <DropdownElement
         onClick={() =>
-          selectedProjects && shouldDownloadDocuments(selectedProjects)
-            ? documentsBulk(getDocumentsIds(selectedProjects), 'download')
+          selectedQuotes && shouldDownloadDocuments(selectedQuotes)
+            ? handleDownloadDocuments(selectedQuotes, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
@@ -124,44 +133,48 @@ export function useCustomBulkActions() {
         {t('documents')}
       </DropdownElement>
     ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedQuotes, onActionSuccess) =>
+    (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
       showMarkSentAction(selectedQuotes) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'sent', () => {})}
+          onClick={() => {
+            bulk(selectedIds, 'sent');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedQuotes, onActionSuccess) =>
+    (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
       showApproveAction(selectedQuotes) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'approve', () => {})}
+          onClick={() => {
+            bulk(selectedIds, 'approve');
+
+            setSelected?.([]);
+          }}
           icon={<Icon element={MdDone} />}
         >
           {t('approve')}
         </DropdownElement>
       ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedQuotes, onActionSuccess) =>
+    (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
       showConvertToInvoiceAction(selectedQuotes) && (
         <ConvertToInvoiceBulkAction
           selectedIds={selectedIds}
-          onActionSuccess={() => {}}
+          setSelected={setSelected}
         />
       ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (selectedIds, selectedQuotes, onActionSuccess) =>
+    (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
       showConvertToProjectAction(selectedQuotes) && (
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
-          onActionSuccess={() => {}}
+          setSelected={setSelected}
         />
       ),
   ];

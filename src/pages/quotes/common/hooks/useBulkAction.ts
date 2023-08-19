@@ -22,9 +22,15 @@ const successMessages = {
   email: 'emailed_quotes',
   sent: 'marked_quote_as_sent',
 };
-export function useBulkAction() {
+
+interface Params {
+  onActionCall?: () => void;
+}
+export function useBulkAction(params?: Params) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  const { onActionCall } = params || {};
 
   return (
     ids: string[],
@@ -36,9 +42,7 @@ export function useBulkAction() {
       | 'convert_to_project'
       | 'email'
       | 'approve'
-      | 'sent',
-    onActionSuccess?: () => void,
-    onActionFinish?: () => void
+      | 'sent'
   ) => {
     toast.processing();
 
@@ -57,8 +61,6 @@ export function useBulkAction() {
           toast.success(message);
         }
 
-        onActionSuccess?.();
-
         queryClient.invalidateQueries('/api/v1/quotes');
 
         ids.forEach((id) =>
@@ -68,6 +70,6 @@ export function useBulkAction() {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
       })
-      .finally(() => onActionFinish?.());
+      .finally(() => onActionCall?.());
   };
 }

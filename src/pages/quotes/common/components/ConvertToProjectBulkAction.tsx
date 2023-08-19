@@ -12,25 +12,25 @@ import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSwitchRight } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
 
 interface Props {
   selectedIds: string[];
-  onActionSuccess: (() => void) | undefined;
+  setSelected?: Dispatch<SetStateAction<string[]>>;
 }
 export const ConvertToProjectBulkAction = (props: Props) => {
   const [t] = useTranslation();
 
-  const { selectedIds, onActionSuccess } = props;
-
-  const bulk = useBulkAction();
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const onActionFinish = () => setIsModalOpen(false);
+  const onActionCall = () => setIsModalOpen(false);
+
+  const { selectedIds, setSelected } = props;
+
+  const bulk = useBulkAction({ onActionCall });
 
   return (
     <>
@@ -51,14 +51,11 @@ export const ConvertToProjectBulkAction = (props: Props) => {
         <div className="flex justify-end space-x-4 mt-5">
           <Button
             behavior="button"
-            onClick={() =>
-              bulk(
-                selectedIds,
-                'convert_to_project',
-                onActionSuccess,
-                onActionFinish
-              )
-            }
+            onClick={() => {
+              bulk(selectedIds, 'convert_to_project');
+
+              setSelected?.([]);
+            }}
           >
             <span className="text-base mx-3">{t('yes')}</span>
           </Button>
