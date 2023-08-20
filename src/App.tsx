@@ -27,21 +27,20 @@ import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
-import { useCurrentUser } from './common/hooks/useCurrentUser';
-import { useCurrentAccount } from './common/hooks/useCurrentAccount';
 
 export function App() {
   const [t] = useTranslation();
   const { i18n } = useTranslation();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const user = useCurrentUser();
-  const location = useLocation();
-  const navigate = useNavigate();
+
   const { isOwner } = useAdmin();
 
   const company = useCurrentCompany();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const account = useCurrentAccount();
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const switchToCompanySettings = useSwitchToCompanySettings();
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
   const { isCompanyLevelActive, isGroupLevelActive } =
@@ -120,7 +119,7 @@ export function App() {
 
   useEffect(() => {
     if (!location.pathname.startsWith('/settings') && !isCompanyLevelActive) {
-      useSwitchToCompanySettings();
+      switchToCompanySettings();
     }
 
     if (
