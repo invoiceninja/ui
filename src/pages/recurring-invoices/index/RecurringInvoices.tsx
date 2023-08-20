@@ -26,7 +26,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import {
   RecurringInvoiceSlider,
   recurringInvoiceSliderAtom,
@@ -63,15 +63,16 @@ export default function RecurringInvoices() {
   const customBulkActions = useCustomBulkActions();
 
   const setRecurringInvoiceSlider = useSetAtom(recurringInvoiceSliderAtom);
-  const setRecurringInvoiceSliderVisibility = useSetAtom(
-    recurringInvoiceSliderVisibilityAtom
-  );
+  const [
+    recurringInvoiceSliderVisibility,
+    setRecurringInvoiceSliderVisibility,
+  ] = useAtom(recurringInvoiceSliderVisibilityAtom);
 
   useEffect(() => {
-    if (recurringInvoiceResponse) {
+    if (recurringInvoiceResponse && recurringInvoiceSliderVisibility) {
       setRecurringInvoiceSlider(recurringInvoiceResponse);
     }
-  }, [recurringInvoiceResponse]);
+  }, [recurringInvoiceResponse, recurringInvoiceSliderVisibility]);
 
   return (
     <Default

@@ -21,6 +21,7 @@ interface Props {
   onClick?: () => unknown;
   noExternalPadding?: boolean;
   withoutItemsCenter?: boolean;
+  withoutWrappingLeftSide?: boolean;
 }
 
 export function Element(props: Props) {
@@ -36,7 +37,11 @@ export function Element(props: Props) {
       onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
-        <span className="text-gray-500 font-medium">
+        <span
+          className={classNames('text-gray-500 font-medium', {
+            'whitespace-nowrap': props.withoutWrappingLeftSide,
+          })}
+        >
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </span>

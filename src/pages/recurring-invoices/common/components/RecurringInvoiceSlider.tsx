@@ -178,17 +178,13 @@ export const RecurringInvoiceSlider = () => {
                 : null}
             </Element>
 
-            <Element leftSide={t('date')}>
-              {recurringInvoice
-                ? date(recurringInvoice?.date, dateFormat)
-                : null}
-            </Element>
-
-            <Element leftSide={t('due_date')}>
-              {recurringInvoice
-                ? date(recurringInvoice.due_date, dateFormat)
-                : null}
-            </Element>
+            {recurringInvoice && recurringInvoice.next_send_date ? (
+              <Element leftSide={t('next_send_date')}>
+                {recurringInvoice
+                  ? date(recurringInvoice.next_send_date, dateFormat)
+                  : null}
+              </Element>
+            ) : null}
 
             <Element leftSide={t('frequency')}>
               {t(
@@ -198,7 +194,7 @@ export const RecurringInvoiceSlider = () => {
               )}
             </Element>
 
-            <Element leftSide={t('remaining_cycles')}>
+            <Element leftSide={t('remaining_cycles')} withoutWrappingLeftSide>
               {recurringInvoice?.remaining_cycles === -1
                 ? t('endless')
                 : recurringInvoice?.remaining_cycles}
@@ -248,16 +244,6 @@ export const RecurringInvoiceSlider = () => {
               </ClickableElement>
             ) : null}
           </Inline>
-
-          <Divider withoutPadding />
-
-          {recurringInvoice && recurringInvoice.next_send_date ? (
-            <Element leftSide={t('next_send_date')}>
-              {recurringInvoice
-                ? date(recurringInvoice.next_send_date, dateFormat)
-                : null}
-            </Element>
-          ) : null}
         </div>
 
         <div>
@@ -308,7 +294,7 @@ export const RecurringInvoiceSlider = () => {
           </div>
 
           {resource?.recurring_dates.map((recurringDate, index) => (
-            <div key={index} className="flex px-6 my-1 text-sm">
+            <div key={index} className="flex px-6 py-2 text-sm">
               <span className="w-1/2">
                 {date(recurringDate.send_date, dateFormat)}
               </span>
