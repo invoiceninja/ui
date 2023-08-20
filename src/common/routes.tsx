@@ -29,6 +29,9 @@ import { transactionRoutes } from '$app/pages/transactions/routes';
 import { recurringExpenseRoutes } from '$app/pages/recurring-expenses/routes';
 import { lazy } from 'react';
 import { Index } from '$app/pages/Index';
+import { TestingRoute } from '$app/components/TestingRoute';
+import { TestingPage } from '$app/components/TestingPage';
+import { activityRoutes } from '$app/pages/activities/routes';
 
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
@@ -55,6 +58,10 @@ export const routes = (
       {reportRoutes}
       {transactionRoutes}
       {settingsRoutes}
+      {activityRoutes}
+      <Route element={<TestingRoute />}>
+        <Route path="/testing" element={<TestingPage />} />
+      </Route>
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>

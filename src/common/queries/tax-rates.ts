@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
@@ -28,7 +28,7 @@ export function useTaxRatesQuery(params: Params) {
         endpoint(
           '/api/v1/tax_rates?per_page=:perPage&page=:currentPage&sort=:sort',
           {
-            perPage: params.perPage,
+            perPage: params.perPage ?? 1000,
             currentPage: params.currentPage,
             sort: params.sort ?? 'id|asc',
           }
@@ -78,18 +78,12 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/tax_rates/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_tax_rate`);
+    }).then(() => {
+      toast.success(`${action}d_tax_rate`);
 
-        queryClient.invalidateQueries('/api/v1/tax_rates');
+      queryClient.invalidateQueries('/api/v1/tax_rates');
 
-        queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.error();
-      });
+      queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
+    });
   };
 }

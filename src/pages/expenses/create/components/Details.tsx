@@ -21,6 +21,7 @@ import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
+import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -44,22 +45,27 @@ export function Details(props: Props) {
   return (
     <Card title={t('details')} isLoading={!expense}>
       {expense && pageType === 'edit' && (
-        <Element leftSide={t('expense_number')}>
-          <InputField
-            value={expense.number}
-            onValueChange={(value) => handleChange('number', value)}
-            errorMessage={errors?.errors.number}
-          />
-        </Element>
+        <>
+          <Element leftSide={t('status')}>
+            <ExpenseStatus entity={expense} />
+          </Element>
+
+          <Element leftSide={t('expense_number')}>
+            <InputField
+              value={expense.number}
+              onValueChange={(value) => handleChange('number', value)}
+              errorMessage={errors?.errors.number}
+            />
+          </Element>
+        </>
       )}
 
       {expense && (
         <Element leftSide={t('vendor')}>
           <VendorSelector
             value={expense.vendor_id}
-            clearButton={Boolean(expense.vendor_id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
             onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+            onClearButtonClick={() => handleChange('vendor_id', '')}
             errorMessage={errors?.errors.vendor_id}
           />
         </Element>
@@ -94,7 +100,6 @@ export function Details(props: Props) {
         <Element leftSide={t('category')}>
           <ExpenseCategorySelector
             value={expense.category_id}
-            clearButton={Boolean(expense.category_id)}
             onClearButtonClick={() => handleChange('category_id', '')}
             onChange={(category) => handleChange('category_id', category.id)}
             errorMessage={errors?.errors.category_id}
@@ -120,8 +125,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate1}
-              clearButton={Boolean(expense.tax_rate1)}
+              defaultValue={expense.tax_name1}
               onClearButtonClick={() => {
                 handleChange('tax_name1', '');
                 handleChange('tax_rate1', 0);
@@ -144,11 +148,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={expense.tax_name1}
                 onValueChange={(value) => handleChange('tax_name1', value)}
                 errorMessage={errors?.errors.tax_name1}
               />
               <InputField
                 label={t('tax_amount')}
+                value={expense.tax_amount1}
                 onValueChange={(value) =>
                   handleChange('tax_amount1', parseFloat(value))
                 }
@@ -164,8 +170,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate2}
-              clearButton={Boolean(expense.tax_rate2)}
+              defaultValue={expense.tax_name2}
               onClearButtonClick={() => {
                 handleChange('tax_name2', '');
                 handleChange('tax_rate2', 0);
@@ -188,11 +193,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={expense.tax_name2}
                 onValueChange={(value) => handleChange('tax_name2', value)}
                 errorMessage={errors?.errors.tax_name2}
               />
               <InputField
                 label={t('tax_amount')}
+                value={expense.tax_amount2}
                 onValueChange={(value) =>
                   handleChange('tax_amount2', parseFloat(value))
                 }
@@ -208,8 +215,7 @@ export function Details(props: Props) {
         taxInputType === 'by_rate' && (
           <Element leftSide={t('tax')}>
             <TaxRateSelector
-              defaultValue={expense.tax_rate3}
-              clearButton={Boolean(expense.tax_rate3)}
+              defaultValue={expense.tax_name3}
               onClearButtonClick={() => {
                 handleChange('tax_name3', '');
                 handleChange('tax_rate3', 0);
@@ -232,11 +238,13 @@ export function Details(props: Props) {
             <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
               <InputField
                 label={t('tax_name')}
+                value={expense.tax_name3}
                 onValueChange={(value) => handleChange('tax_name3', value)}
                 errorMessage={errors?.errors.tax_name3}
               />
               <InputField
                 label={t('tax_amount')}
+                value={expense.tax_amount3}
                 onValueChange={(value) =>
                   handleChange('tax_amount3', parseFloat(value))
                 }
@@ -263,6 +271,7 @@ export function Details(props: Props) {
           <CurrencySelector
             value={expense.currency_id}
             onChange={(currency) => handleChange('currency_id', currency)}
+            errorMessage={errors?.errors.currency_id}
           />
         </Element>
       )}

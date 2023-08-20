@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 
 interface Props {
   children: ReactElement[];
@@ -34,6 +34,10 @@ export function TabGroup(props: Props) {
 
     props.onTabChange?.(index);
   };
+
+  useEffect(() => {
+    setCurrentIndex(props.defaultTabIndex || 0);
+  }, [props.defaultTabIndex]);
 
   return (
     <div className={props.className}>

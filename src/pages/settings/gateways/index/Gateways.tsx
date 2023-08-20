@@ -15,9 +15,13 @@ import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { Tooltip } from '$app/components/Tooltip';
+import { MdWarning } from 'react-icons/md';
 
 export function Gateways() {
   const [t] = useTranslation();
+
+  const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 
   const columns: DataTableColumns<CompanyGateway> = [
     {
@@ -28,11 +32,38 @@ export function Gateways() {
     {
       id: 'label',
       label: t('label'),
-      format: (field, resource) => (
-        <Link to={route('/settings/gateways/:id/edit', { id: resource.id })}>
-          {field}
-        </Link>
-      ),
+      format: (field, gateway) => {
+        const gatewayConfig = JSON.parse(gateway.config);
+
+        const showWarning =
+          STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
+
+        return (
+          <div className="flex items-center space-x-2">
+            <Link
+              to={route('/settings/gateways/:id/edit?tab=:tab', {
+                id: gateway.id,
+                tab: showWarning ? 1 : 0,
+              })}
+            >
+              {field}
+            </Link>
+
+            {showWarning && (
+              <Tooltip
+                message={t('stripe_connect_migration_title') as string}
+                width="auto"
+                placement="top"
+              >
+                <div className="flex space-x-2">
+                  <MdWarning color="red" size={22} />
+                  <MdWarning color="red" size={22} />
+                </div>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
     {
       id: 'test_mode',

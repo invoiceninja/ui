@@ -30,33 +30,27 @@ export function useStart() {
       'PUT',
       endpoint('/api/v1/tasks/:id?start=true', { id: task.id }),
       task
-    )
-      .then(() => {
-        !location.pathname.endsWith('/create')
-          ? toast.success('started_task')
-          : toast.dismiss();
+    ).then(() => {
+      !location.pathname.endsWith('/create')
+        ? toast.success('started_task')
+        : toast.dismiss();
 
-        queryClient.invalidateQueries('/api/v1/tasks');
+      queryClient.invalidateQueries('/api/v1/tasks');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/tasks/:id', { id: task.id })
+      );
 
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+      queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+          projectId: task.project_id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

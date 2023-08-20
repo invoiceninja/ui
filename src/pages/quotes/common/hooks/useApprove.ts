@@ -28,23 +28,17 @@ export function useApprove() {
       'PUT',
       endpoint('/api/v1/quotes/:id?approve=true', { id: quote.id }),
       quote
-    )
-      .then(() => {
-        toast.success('approved_quote');
+    ).then(() => {
+      toast.success('approved_quote');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/quotes/:id', { id: quote.id })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/quotes/:id', { id: quote.id })
+      );
 
-        queryClient.invalidateQueries('/api/v1/quotes');
+      queryClient.invalidateQueries('/api/v1/quotes');
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error) => {
-        toast.error();
-
-        console.error(error);
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

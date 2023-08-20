@@ -10,17 +10,10 @@
 
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
-import { Element } from '$app/components/cards';
-import { useHandleCustomSurchargeFieldChange } from '$app/common/hooks/useHandleCustomSurchargeFieldChange';
-import { Divider } from '$app/components/cards/Divider';
-import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
@@ -33,45 +26,22 @@ import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   invoice?: Invoice;
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
 
   const queryClient = useQueryClient();
-
-  const company = useCurrentCompany();
   const location = useLocation();
 
-  const { invoice, handleChange } = props;
+  const { invoice, handleChange, errors } = props;
   const { id } = useParams();
-
-  const handleCustomFieldChange = useHandleCustomFieldChange();
-  const handleCustomSurchargeFieldChange =
-    useHandleCustomSurchargeFieldChange();
-
-  const disabledCustomFields = useShouldDisableCustomFields();
-
-  const surchargeValue = (index: number) => {
-    switch (index) {
-      case 0:
-        return company?.custom_surcharge_taxes1;
-      case 1:
-        return company?.custom_surcharge_taxes2;
-      case 2:
-        return company?.custom_surcharge_taxes3;
-      case 3:
-        return company?.custom_surcharge_taxes4;
-    }
-  };
-
-  const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   const tabs = [
     t('public_notes'),
@@ -145,6 +115,8 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('project')}
                   value={invoice?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
+                  onClearButtonClick={() => handleChange('project_id', '')}
                 />
               </div>
 
@@ -154,6 +126,7 @@ export function InvoiceFooter(props: Props) {
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value) || 1)
                 }
+                errorMessage={errors?.errors.exchange_rate}
               />
 
               <Toggle
@@ -167,9 +140,9 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('design')}
                   value={invoice?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(invoice?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -180,6 +153,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('user')}
                   value={invoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -187,9 +161,9 @@ export function InvoiceFooter(props: Props) {
                 <VendorSelector
                   inputLabel={t('vendor')}
                   value={invoice?.vendor_id}
-                  clearButton={Boolean(invoice?.vendor_id)}
-                  onClearButtonClick={() => handleChange('vendor_id', '')}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 
@@ -205,48 +179,12 @@ export function InvoiceFooter(props: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert />
-
-          {company &&
-            ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('invoice_field')}
-                onChange={(value: any) => handleCustomFieldChange(field, value)}
-                noExternalPadding
-              />
-            ))}
-
-          <Divider />
-
-          {company &&
-            ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
-              (field, index) => (
-                <Element
-                  noExternalPadding
-                  key={index}
-                  leftSide={
-                    <InputField
-                      id={field}
-                      value={company.custom_fields[field]}
-                      placeholder={t('surcharge_field')}
-                      onValueChange={(value) =>
-                        handleCustomSurchargeFieldChange(field, value)
-                      }
-                      disabled={disabledCustomFields}
-                    />
-                  }
-                >
-                  <Toggle
-                    label={t('charge_taxes')}
-                    checked={surchargeValue(index)}
-                    onChange={() => setSurchargeTaxValue(index)}
-                  />
-                </Element>
-              )
-            )}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/invoices" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
       </TabGroup>
     </Card>

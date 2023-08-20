@@ -18,26 +18,25 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { Alert } from '$app/components/Alert';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import collect from 'collect.js';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export default function Apply() {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
-  const { data: payment } = usePaymentQuery({ id });
+  const { data: payment, isLoading } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
@@ -48,24 +47,24 @@ export default function Apply() {
       invoices: [],
     },
     onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
       setErrors(undefined);
 
       request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
         .then((data) => {
-          toast.success(t('updated_payment'), { id: toastId });
+          toast.success('updated_payment');
           navigate(route('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
           if (error.response?.status === 422) {
             setErrors(error.response.data);
+            toast.dismiss();
           }
         })
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+          queryClient.invalidateQueries(route('/api/v1/invoices'));
         });
     },
   });
@@ -92,72 +91,103 @@ export default function Apply() {
     });
   }, [formik.values.invoices]);
 
+  useSaveBtn(
+    {
+      onClick: () => formik.submitForm(),
+      disableSaveButton: formik.isSubmitting,
+    },
+    [formik.values, formik.isSubmitting]
+  );
+
   return (
-    <Card
-      title={t('apply_payment')}
-      disableSubmitButton={formik.isSubmitting}
-      onFormSubmit={formik.handleSubmit}
-      withSaveButton
-    >
-      <Element leftSide={t('number')}>
-        <InputField disabled value={payment?.number} />
-      </Element>
+    <Card title={t('apply_payment')}>
+      <Element leftSide={t('number')}>{payment?.number}</Element>
 
       {payment && payment.client && (
         <>
           <Element leftSide={t('amount')}>
-            <InputField
-              disabled
-              value={formatMoney(
-                payment?.amount - payment?.refunded,
-                payment?.client.country_id,
-                payment?.client.settings.currency_id
-              )}
-            />
+            {formatMoney(
+              payment?.amount - payment?.refunded,
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
+            )}
           </Element>
+
           <Element leftSide={t('applied')}>
-            <InputField
-              disabled
-              value={formatMoney(
-                payment?.applied,
-                payment?.client.country_id,
-                payment?.client.settings.currency_id
-              )}
-            />
+            {formatMoney(
+              payment?.applied,
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
+            )}
           </Element>
+
           <Element leftSide={t('unapplied')}>
-            <InputField
-              disabled
-              value={formatMoney(
-                payment?.amount - payment?.refunded - payment?.applied,
-                payment?.client.country_id,
-                payment?.client.settings.currency_id
-              )}
-            />
+            {formatMoney(
+              payment?.amount - payment?.refunded - payment?.applied,
+              payment.client?.country_id,
+              payment.client?.settings.currency_id
+            )}
           </Element>
         </>
       )}
 
       <Element leftSide={t('invoices')}>
-        <DebouncedCombobox
-          endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.client_id}`}
-          label="number"
-          onChange={(value: Record<Invoice>) =>
-            handleInvoiceChange(
-              value.resource?.id as string,
-              value.resource?.amount as number,
-              value.resource?.number as string
-            )
-          }
-        />
+        {payment?.client_id ? (
+          <ComboboxAsync<Invoice>
+            endpoint={
+              new URL(
+                endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+              )
+            }
+            inputOptions={{
+              value: 'id',
+            }}
+            entryOptions={{
+              id: 'id',
+              value: 'id',
+              label: 'name',
+              dropdownLabelFn: (invoice) =>
+                `${t('invoice_number_short')}${invoice.number} - ${t(
+                  'balance'
+                )} ${formatMoney(
+                  invoice.balance,
+                  payment.client?.country_id,
+                  payment.client?.settings.currency_id
+                )}`,
+            }}
+            onChange={({ resource }) =>
+              resource
+                ? handleInvoiceChange(
+                    resource.id,
+                    resource.balance,
+                    resource.number
+                  )
+                : null
+            }
+            initiallyVisible={isLoading}
+            exclude={collect(formik.values.invoices)
+              .pluck('invoice_id')
+              .toArray()}
+          />
+        ) : null}
+
         {errors?.errors.invoices && (
           <div className="py-2">
             <Alert type="danger">{errors.errors.invoices}</Alert>
           </div>
         )}
       </Element>
+
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string }, index) => (
+        (
+          record: {
+            _id: string;
+            amount: number;
+            number: string;
+            balance: number;
+          },
+          index
+        ) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField

@@ -16,33 +16,43 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export function useHandleCreate(
   setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const saveCompany = useHandleCompanySave();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (invoice: Invoice) => {
+  return async (invoice: Invoice) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/invoices'), invoice)
       .then((response: GenericSingleResourceResponse<Invoice>) => {
         toast.success('created_invoice');
 
-        navigate(route('/invoices/:id/edit', { id: response.data.data.id }));
+        navigate(
+          route('/invoices/:id/edit?table=:table', {
+            id: response.data.data.id,
+            table: searchParams.get('table') ?? 'products',
+          })
+        );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };

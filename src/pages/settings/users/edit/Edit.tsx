@@ -30,6 +30,7 @@ import { Notifications } from './components/Notifications';
 import { Permissions } from './components/Permissions';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Edit() {
   const [passwordValidated, setPasswordValidated] = useState(false);
@@ -59,6 +60,8 @@ export function Edit() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   useEffect(() => {
@@ -85,10 +88,11 @@ export function Edit() {
 
         queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       });
   };
 
@@ -112,9 +116,6 @@ export function Edit() {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
@@ -137,7 +138,9 @@ export function Edit() {
       )}
 
       <TabGroup tabs={tabs}>
-        <div>{user && <Details user={user} setUser={setUser} />}</div>
+        <div>
+          {user && <Details user={user} setUser={setUser} errors={errors} />}
+        </div>
         <div>{user && <Notifications user={user} setUser={setUser} />}</div>
         <div>{user && <Permissions user={user} setUser={setUser} />}</div>
       </TabGroup>

@@ -20,7 +20,6 @@ import { Project } from '$app/common/interfaces/project';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankProjectQuery } from '$app/common/queries/projects';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import {
@@ -32,6 +31,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 interface Props {
   visible: boolean;
@@ -110,9 +110,6 @@ export function CreateProjectModal(props: Props) {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));
@@ -149,21 +146,12 @@ export function CreateProjectModal(props: Props) {
               staleTime={Infinity}
             />
 
-            <DebouncedCombobox
+            <UserSelector
               inputLabel={t('user')}
-              defaultValue={project.assigned_user_id}
-              endpoint="/api/v1/users"
-              label="first_name"
-              formatLabel={(resource) =>
-                `${resource.first_name} ${resource.last_name}`
-              }
-              onChange={(value) =>
-                handleChange('assigned_user_id', value.value)
-              }
-              clearButton={Boolean(project.assigned_user_id)}
+              value={project.assigned_user_id}
+              onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}
-              queryAdditional
             />
 
             <InputField

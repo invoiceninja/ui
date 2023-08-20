@@ -36,6 +36,8 @@ import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
 import { Icon } from '$app/components/icons/Icon';
 import { MdNotStarted, MdSend } from 'react-icons/md';
+import dayjs from 'dayjs';
+import { Card } from '$app/components/cards';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
@@ -114,6 +116,13 @@ export default function Create() {
           _recurringInvoice.client_id = searchParams.get('client')!;
         }
 
+        if (_recurringInvoice.next_send_date === '') {
+          _recurringInvoice.next_send_date = dayjs().format('YYYY-MM-DD');
+        }
+
+        _recurringInvoice.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
+
         value = _recurringInvoice;
       }
 
@@ -170,14 +179,16 @@ export default function Create() {
       additionalSaveOptions={saveOptions}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={recurringInvoice}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={recurringInvoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <InvoiceDetails handleChange={handleChange} errors={errors} />
 
@@ -186,8 +197,13 @@ export default function Create() {
             <ProductsTable
               type="product"
               resource={recurringInvoice}
-              items={recurringInvoice.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={recurringInvoice.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -202,7 +218,7 @@ export default function Create() {
           )}
         </div>
 
-        <InvoiceFooter handleChange={handleChange} />
+        <InvoiceFooter handleChange={handleChange} errors={errors} />
 
         {recurringInvoice && (
           <InvoiceTotals

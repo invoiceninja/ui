@@ -38,7 +38,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { Quote } from '$app/common/interfaces/quote';
@@ -46,7 +46,6 @@ import { creditAtom } from '$app/pages/credits/common/atoms';
 import { Credit } from '$app/common/interfaces/credit';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -71,6 +70,13 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { UpdatePricesAction } from './components/UpdatePricesAction';
+import { IncreasePricesAction } from './components/IncreasePricesAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -176,7 +182,9 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
-      const invoiceSum = new InvoiceSum(recurringInvoice, currency).build();
+      const invoiceSum = recurringInvoice.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(recurringInvoice, currency).build()
+        : new InvoiceSum(recurringInvoice, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -229,11 +237,10 @@ export function useSave(props: RecurringInvoiceSaveProps) {
         toast.success('updated_recurring_invoice');
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -251,35 +258,32 @@ export function useToggleStartStop() {
         ? '/api/v1/recurring_invoices/:id?start=true'
         : '/api/v1/recurring_invoices/:id?stop=true';
 
-    request('PUT', endpoint(url, { id: recurringInvoice.id }), recurringInvoice)
-      .then(() => {
-        queryClient.invalidateQueries('/api/v1/recurring_invoices');
+    request(
+      'PUT',
+      endpoint(url, { id: recurringInvoice.id }),
+      recurringInvoice
+    ).then(() => {
+      queryClient.invalidateQueries('/api/v1/recurring_invoices');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_invoices/:id', {
-            id: recurringInvoice.id,
-          })
-        );
+      queryClient.invalidateQueries(
+        route('/api/v1/recurring_invoices/:id', {
+          id: recurringInvoice.id,
+        })
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
 
-        toast.success(
-          action === 'start'
-            ? 'started_recurring_invoice'
-            : 'stopped_recurring_invoice'
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      toast.success(
+        action === 'start'
+          ? 'started_recurring_invoice'
+          : 'stopped_recurring_invoice'
+      );
+    });
   };
 }
 
 export function useActions() {
-  const location = useLocation();
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -290,13 +294,20 @@ export function useActions() {
 
   const bulk = useBulkAction();
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'recurring_invoice',
+  });
 
   const navigate = useNavigate();
   const toggleStartStop = useToggleStartStop();
 
   const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
-    setRecurringInvoice({ ...recurringInvoice, documents: [], number: '' });
+    setRecurringInvoice({
+      ...recurringInvoice,
+      id: '',
+      documents: [],
+      number: '',
+    });
 
     navigate('/recurring_invoices/create?action=clone');
   };
@@ -304,9 +315,18 @@ export function useActions() {
   const cloneToInvoice = (recurringInvoice: RecurringInvoice) => {
     setInvoice({
       ...(recurringInvoice as unknown as Invoice),
+      id: '',
       documents: [],
       number: '',
       due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/invoices/create?action=clone');
@@ -315,8 +335,18 @@ export function useActions() {
   const cloneToQuote = (recurringInvoice: RecurringInvoice) => {
     setQuote({
       ...(recurringInvoice as unknown as Quote),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/quotes/create?action=clone');
@@ -325,8 +355,17 @@ export function useActions() {
   const cloneToCredit = (recurringInvoice: RecurringInvoice) => {
     setCredit({
       ...(recurringInvoice as unknown as Credit),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/credits/create?action=clone');
@@ -335,8 +374,18 @@ export function useActions() {
   const cloneToPurchaseOrder = (recurringInvoice: RecurringInvoice) => {
     setPurchaseOrder({
       ...(recurringInvoice as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/purchase_orders/create?action=clone');
@@ -371,6 +420,14 @@ export function useActions() {
         >
           {t('stop')}
         </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <UpdatePricesAction selectedIds={[recurringInvoice.id]} />
+      ),
+    (recurringInvoice) =>
+      !recurringInvoice.is_deleted && (
+        <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
       ),
     () => <Divider withoutPadding />,
     (recurringInvoice) => (
@@ -418,7 +475,7 @@ export function useActions() {
       isEditPage &&
       getEntityState(recurringInvoice) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'archive')}
+          onClick={() => bulk([recurringInvoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -429,7 +486,7 @@ export function useActions() {
       (getEntityState(recurringInvoice) === EntityState.Archived ||
         getEntityState(recurringInvoice) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'restore')}
+          onClick={() => bulk([recurringInvoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -440,7 +497,7 @@ export function useActions() {
       (getEntityState(recurringInvoice) === EntityState.Active ||
         getEntityState(recurringInvoice) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(recurringInvoice.id, 'delete')}
+          onClick={() => bulk([recurringInvoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
@@ -478,11 +535,10 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -545,9 +601,8 @@ export function useRecurringInvoiceColumns() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
-  const company = useCurrentCompany();
-  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+  const reactSettings = useReactSettings();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -597,9 +652,8 @@ export function useRecurringInvoiceColumns() {
       format: (value, recurringInvoice) =>
         formatMoney(
           value,
-          recurringInvoice.client?.country_id || company.settings.country_id,
-          recurringInvoice.client?.settings.currency_id ||
-            company.settings.currency_id
+          recurringInvoice.client?.country_id,
+          recurringInvoice.client?.settings.currency_id
         ),
     },
     {
@@ -678,10 +732,8 @@ export function useRecurringInvoiceColumns() {
         recurringInvoice.is_amount_discount
           ? formatMoney(
               value,
-              recurringInvoice.client?.country_id ||
-                company?.settings.country_id,
-              recurringInvoice.client?.settings.currency_id ||
-                company?.settings.currency_id
+              recurringInvoice.client?.country_id,
+              recurringInvoice.client?.settings.currency_id
             )
           : `${recurringInvoice.discount}%`,
     },
@@ -720,8 +772,13 @@ export function useRecurringInvoiceColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -730,8 +787,13 @@ export function useRecurringInvoiceColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -744,8 +806,7 @@ export function useRecurringInvoiceColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns
-      ?.recurringInvoice || defaultColumns;
+    reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

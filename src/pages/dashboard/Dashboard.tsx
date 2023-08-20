@@ -9,7 +9,7 @@
  */
 
 import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '../settings';
 
 export default function Dashboard() {
   useTitle('dashboard');
@@ -29,7 +31,9 @@ export default function Dashboard() {
 
   const user = useCurrentUser();
 
-  const { isAdmin } = useAdmin();
+  const enabled = useEnabled();
+
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -43,7 +47,7 @@ export default function Dashboard() {
       }
       withoutBackButton
     >
-      {isAdmin && <Totals />}
+      {hasPermission('view_dashboard') && <Totals />}
 
       <div className="grid grid-cols-12 gap-4 my-6">
         <div className="col-span-12 xl:col-span-6">
@@ -54,21 +58,29 @@ export default function Dashboard() {
           <RecentPayments />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
-          <UpcomingInvoices />
-        </div>
+        {enabled(ModuleBitmask.Invoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingInvoices />
+          </div>
+        )}
 
-        <div className="col-span-12 xl:col-span-6">
-          <PastDueInvoices />
-        </div>
+        {enabled(ModuleBitmask.Invoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <PastDueInvoices />
+          </div>
+        )}
 
-        <div className="col-span-12 xl:col-span-6">
-          <ExpiredQuotes />
-        </div>
+        {enabled(ModuleBitmask.Quotes) && (
+          <div className="col-span-12 xl:col-span-6">
+            <ExpiredQuotes />
+          </div>
+        )}
 
-        <div className="col-span-12 xl:col-span-6">
-          <UpcomingQuotes />
-        </div>
+        {enabled(ModuleBitmask.Quotes) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingQuotes />
+          </div>
+        )}
       </div>
     </Default>
   );

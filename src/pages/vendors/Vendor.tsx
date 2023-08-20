@@ -17,13 +17,17 @@ import { useVendorQuery } from '$app/common/queries/vendor';
 import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Default } from '$app/components/layouts/Default';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { Inline } from '$app/components/Inline';
+import { useTabs } from './show/hooks/useTabs';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date } from '$app/common/helpers';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -48,24 +52,13 @@ export default function Vendor() {
     { name: documentTitle || '', href: route('/vendors/:id', { id }) },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('purchase_orders'),
-      href: route('/vendors/:id', { id }),
-    },
-    {
-      name: t('expenses'),
-      href: route('/vendors/:id/expenses', { id }),
-    },
-    {
-      name: t('recurring_expenses'),
-      href: route('/vendors/:id/recurring_expenses', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/vendors/:id/documents', { id }),
-    },
-  ];
+  const tabs = useTabs();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const lastLogin =(last_login: number | undefined) => {
+    return last_login ? date(last_login, dateFormat) : t('never');
+  };
+
 
   return (
     <Default
@@ -89,6 +82,13 @@ export default function Vendor() {
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
+          {vendor && (
+            <div className="flex space-x-20 my-3">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <EntityStatus entity={vendor} />
+            </div>
+          )}
+
           <p>
             {t('id_number')}: {vendor?.id_number}
           </p>
@@ -96,7 +96,9 @@ export default function Vendor() {
           <p>
             {t('vat_number')}: {vendor?.vat_number}
           </p>
-
+          <p>
+            {t('last_login')}: {lastLogin(vendor?.last_login)}
+          </p>
           {vendor?.website && (
             <Link to={vendor.website} external>
               {vendor.website}

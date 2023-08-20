@@ -24,8 +24,11 @@ interface Props {
   height?: number;
 }
 
+export const android = Boolean(navigator.userAgent.match(/Android/i));
+
 export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (props.withToast) {
@@ -37,26 +40,41 @@ export function InvoiceViewer(props: Props) {
     request(props.method, props.link, props.resource, {
       responseType: 'arraybuffer',
       signal: controller.signal,
-    })
-      .then((response) => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    }).then((response) => {
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
 
-        if (iframeRef.current) {
-          iframeRef.current.src = url;
+      if (android && linkRef.current) {
+        linkRef.current.href = url;
 
-          props.onLink && props.onLink(url);
-        }
+        props.onLink && props.onLink(url);
+      }
 
-        toast.dismiss();
-      })
-      .catch((error) => console.error(error));
+      if (!android && iframeRef.current) {
+        iframeRef.current.src = url;
+
+        props.onLink && props.onLink(url);
+      }
+
+      toast.dismiss();
+    });
 
     return () => {
       controller.abort();
       toast.dismiss();
     };
   }, [props.link, props.resource]);
+
+  if (android) {
+    return (
+      <p>
+        Unable to preview PDF. &nbsp;
+        <a ref={linkRef} style={{ textDecoration: 'underline' }}>
+          Click to download it.
+        </a>
+      </p>
+    );
+  }
 
   return <iframe ref={iframeRef} width="100%" height={props.height || 1500} />;
 }

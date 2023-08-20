@@ -13,10 +13,11 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { cloneDeep } from 'lodash';
 import { useCalculateInvoiceSum } from './useCalculateInvoiceSum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 export function useHandleProductChange(
   setPurchaseOrder: (purchaseOrder: PurchaseOrder) => unknown,
-  setInvoiceSum: (invoiceSum: InvoiceSum) => unknown
+  setInvoiceSum: (invoiceSum: InvoiceSum | InvoiceSumInclusive) => unknown
 ) {
   const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 

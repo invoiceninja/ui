@@ -8,13 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted } from '$app/common/helpers';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
-import { AccountWarningsModal } from '$app/components/AccountWarningsModal';
-import { VerifyModal } from '$app/components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -23,39 +18,47 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { atom, useSetAtom } from 'jotai';
+import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
+import { useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
-
-export const dayJSLocaleAtom = atom<ILocale | null>(null);
+import { dayJSLocaleAtom } from './components/forms';
+import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import { useCurrentUser } from './common/hooks/useCurrentUser';
+import { useCurrentAccount } from './common/hooks/useCurrentAccount';
 
 export function App() {
+  const [t] = useTranslation();
   const { i18n } = useTranslation();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const user = useCurrentUser();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isOwner } = useAdmin();
+
   const company = useCurrentCompany();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const account = useCurrentAccount();
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
-
   const { isCompanyLevelActive, isGroupLevelActive } =
     useCurrentSettingsLevel();
 
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
-
-  const [showCompanyActivityModal, setShowCompanyActivityModal] =
-    useState<boolean>(false);
-
-  const [showSmsVerificationModal, setShowSmsVerificationModal] =
-    useState<boolean>(false);
+  const updateAntdLocale = useSetAtom(antdLocaleAtom);
 
   const resolveLanguage = useResolveLanguage();
 
   const resolveDayJSLocale = useResolveDayJSLocale();
 
+  const resolveAntdLocale = useResolveAntdLocale();
+
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
+
+  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
+    useState(false);
 
   const resolvedLanguage = company
     ? resolveLanguage(company.settings.language_id)
@@ -72,6 +75,10 @@ export function App() {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
         updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
+      });
+
+      resolveAntdLocale(resolvedLanguage.locale).then((antdResolvedLocale) => {
+        updateAntdLocale(antdResolvedLocale);
       });
 
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
@@ -93,28 +100,21 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    if (user && Object.keys(user).length) {
-      setIsEmailVerified(Boolean(user.email_verified_at));
-    }
-  }, [user]);
+    window.addEventListener('navigate.invalid.page', () =>
+      navigate('/not_found')
+    );
+  }, []);
 
   useEffect(() => {
-    const modalShown = sessionStorage.getItem('PHONE-VERIFICATION-SHOWN');
+    const companyName = company?.settings?.name;
 
-    if (account && (modalShown === 'false' || !modalShown)) {
-      setShowSmsVerificationModal(!account?.account_sms_verified);
-
-      sessionStorage.setItem('PHONE-VERIFICATION-SHOWN', 'true');
-    }
-  }, [account]);
-
-  useEffect(() => {
-    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
-
-    if (company && (modalShown === 'false' || !modalShown)) {
-      setShowCompanyActivityModal(company.is_disabled);
-
-      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
+    if (
+      company &&
+      (!companyName || companyName === t('untitled_company')) &&
+      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
+    ) {
+      localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
+      setIsCompanyEditModalOpened(true);
     }
   }, [company]);
 
@@ -132,24 +132,17 @@ export function App() {
   }, [location]);
 
   return (
-    <div className="App">
-      <VerifyModal visible={!isEmailVerified && isHosted()} type="email" />
+    <>
+      <div className="App">
+        <Toaster position="top-center" />
 
-      <AccountWarningsModal
-        type="activity"
-        visible={Boolean(company) && showCompanyActivityModal}
-        setVisible={setShowCompanyActivityModal}
+        {routes}
+      </div>
+
+      <CompanyEdit
+        isModalOpen={isCompanyEditModalOpened && isOwner}
+        setIsModalOpen={setIsCompanyEditModalOpened}
       />
-
-      <AccountWarningsModal
-        type="phone"
-        visible={Boolean(account) && showSmsVerificationModal && isHosted()}
-        setVisible={setShowSmsVerificationModal}
-      />
-
-      <Toaster position="top-center" />
-
-      {routes}
-    </div>
+    </>
   );
 }

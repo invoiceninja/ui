@@ -11,6 +11,7 @@
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { Payment } from '$app/common/interfaces/payment';
 import { useBulk } from '$app/common/queries/payments';
 import { Divider } from '$app/components/cards/Divider';
@@ -26,15 +27,14 @@ import {
   MdSend,
   MdSettingsBackupRestore,
 } from 'react-icons/md';
-import { useLocation, useParams } from 'react-router-dom';
 
 export function useActions() {
-  const { id } = useParams();
-
   const [t] = useTranslation();
-  const location = useLocation();
 
-  const isEditPage = location.pathname.includes(id!);
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'payment',
+    editPageTabs: ['documents', 'payment_fields', 'apply', 'refund'],
+  });
 
   const bulk = useBulk();
 

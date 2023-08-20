@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useSubscriptionColumns } from '../common/hooks/useSubscriptionColumns';
 
 export function Subscriptions() {
-  const { documentTitle } = useTitle('subscriptions');
+  const { documentTitle } = useTitle('payment_links');
 
   const [t] = useTranslation();
 
@@ -23,7 +23,7 @@ export function Subscriptions() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('subscriptions'), href: '/settings/subscriptions' },
+    { name: t('payment_links'), href: '/settings/subscriptions' },
   ];
 
   return (
@@ -34,7 +34,7 @@ export function Subscriptions() {
       withoutBackButton
     >
       <DataTable
-        resource="subscription"
+        resource="payment_link"
         endpoint="/api/v1/subscriptions?sort=id|desc"
         bulkRoute="/api/v1/subscriptions/bulk"
         columns={columns}

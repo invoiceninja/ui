@@ -9,6 +9,8 @@
  */
 
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 export type TimeLogType = [number, number, string, boolean];
 export type TimeLogsType = TimeLogType[];
@@ -28,6 +30,35 @@ export function parseTimeLog(log: string) {
   return parsed;
 }
 
+export function calculateHours(log: string, includeRunning = false) {
+  const times = parseTimeLog(log);
+
+  let seconds = 0;
+
+  for (const [start, finish] of times) {
+    if (start > finish && !includeRunning) {
+      continue;
+    }
+
+    const finishTime = finish !== 0 ? finish : Math.floor(Date.now() / 1000);
+    const durationInSeconds = finishTime - start;
+
+    seconds += Math.max(durationInSeconds, 0);
+  }
+
+  const totalHours = Math.floor(seconds / 3600);
+  const totalMinutes = Math.floor((seconds % 3600) / 60);
+  const totalSecondsRemaining = seconds % 60;
+
+  if (totalHours < 24) {
+    return `${totalHours}:${totalMinutes
+      .toString()
+      .padStart(2, '0')}:${totalSecondsRemaining.toString().padStart(2, '0')}`;
+  }
+
+  return `${totalHours}h`;
+}
+
 interface CalculateTimeOptions {
   inSeconds?: boolean;
   calculateLastTimeLog?: boolean;
@@ -35,6 +66,8 @@ interface CalculateTimeOptions {
 
 export function calculateTime(log: string, options?: CalculateTimeOptions) {
   const times = parseTimeLog(log);
+  dayjs.extend(duration);
+  dayjs.extend(relativeTime);
 
   let seconds = 0;
 
@@ -58,7 +91,9 @@ export function calculateTime(log: string, options?: CalculateTimeOptions) {
     return seconds.toString();
   }
 
-  return new Date(seconds * 1000).toISOString().slice(11, 19);
+  return seconds > 86400
+    ? dayjs.duration(seconds, 'seconds').humanize()
+    : dayjs.duration(seconds, 'seconds').format('HH:mm:ss');
 }
 
 export function calculateDifferenceBetweenLogs(log: string, logIndex: number) {

@@ -14,7 +14,6 @@ import { Link, SelectField } from '$app/components/forms';
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { route } from '$app/common/helpers/route';
 import { BsBox } from 'react-icons/bs';
@@ -36,8 +35,6 @@ interface Props {
 
 export function MultipleProductSelector(props: Props) {
   const accentColor = useAccentColor();
-
-  const company = useCurrentCompany();
 
   const navigate = useNavigate();
 
@@ -65,14 +62,14 @@ export function MultipleProductSelector(props: Props) {
     }
   };
 
-  const getOptionLabelText = (productKey: string, price: number) => {
+  const getOptionLabelText = (product: Product) => {
     return (
-      productKey +
+      product.product_key +
       ' ' +
       formatMoney(
-        price,
-        company?.settings.country_id,
-        company?.settings.currency_id
+        product.price,
+        product.company?.settings.country_id,
+        product.company?.settings.currency_id
       ).toString()
     );
   };
@@ -121,7 +118,7 @@ export function MultipleProductSelector(props: Props) {
         >
           {props.products.map((product, index) => (
             <option key={index} value={product.id}>
-              {getOptionLabelText(product.product_key, product.price)}
+              {getOptionLabelText(product)}
             </option>
           ))}
         </SelectField>
@@ -165,8 +162,8 @@ export function MultipleProductSelector(props: Props) {
                       <span>
                         {formatMoney(
                           product.price,
-                          company?.settings.country_id,
-                          company?.settings.currency_id
+                          product.company?.settings.country_id,
+                          product.company?.settings.currency_id
                         )}
                       </span>
                     </div>

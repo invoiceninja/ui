@@ -14,10 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { Modal } from '$app/components/Modal';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
@@ -29,6 +25,7 @@ import {
   handleTaskDateChange,
   handleTaskDurationChange,
   handleTaskTimeChange,
+  parseTime,
   parseTimeToDate,
 } from '$app/pages/tasks/common/helpers';
 import {
@@ -42,7 +39,7 @@ import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { TimePicker } from '$app/components/forms/TimePicker';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 
 export function EditSlider() {
   const [t] = useTranslation();
@@ -67,7 +64,7 @@ export function EditSlider() {
     if (task?.time_log) {
       setTimeLog(parseTimeLog(task.time_log));
     }
-  }, [timeLogIndex]);
+  }, [timeLogIndex, task?.time_log]);
 
   const handleDateChange = (
     unix: number,
@@ -131,9 +128,11 @@ export function EditSlider() {
               }
             />
 
-            <TimePicker
+            <InputField
               label={t('start_time')}
-              value={timeLog[timeLogIndex!][LogPosition.Start]}
+              type="time"
+              step="1"
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.Start])}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.Start],
@@ -160,9 +159,11 @@ export function EditSlider() {
               />
             )}
 
-            <TimePicker
+            <InputField
+              type="time"
+              step="1"
               label={t('end_time')}
-              value={timeLog[timeLogIndex!][LogPosition.End]}
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.End])}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.End],
@@ -232,15 +233,13 @@ export function EditSlider() {
               onValueChange={(rate) => handleChange('rate', rate)}
             />
 
-            <DebouncedCombobox
+            <TaskStatusSelector
               inputLabel={t('status')}
-              endpoint="/api/v1/task_statuses"
-              label="name"
-              onChange={(value: Record<TaskStatus>) =>
-                value.resource && handleChange('status_id', value.resource.id)
+              value={task?.status_id}
+              onChange={(taskStatus: TaskStatus) =>
+                taskStatus && handleChange('status_id', taskStatus.id)
               }
-              defaultValue={task?.status_id}
-              queryAdditional
+              onClearButtonClick={() => handleChange('status_id', '')}
             />
 
             <InputField

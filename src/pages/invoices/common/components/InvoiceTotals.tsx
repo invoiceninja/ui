@@ -11,8 +11,7 @@
 import { Card, Element } from '$app/components/cards';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Record } from '$app/components/forms/DebouncedCombobox';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
@@ -20,10 +19,12 @@ import { CustomSurchargeField } from '$app/components/CustomSurchargeField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Entry } from '$app/components/forms/Combobox';
 
 interface Props {
   resource: ProductTableResource;
-  invoiceSum?: InvoiceSum;
+  invoiceSum?: InvoiceSum | InvoiceSumInclusive;
   relationType: RelationType;
   onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
 }
@@ -43,16 +44,13 @@ export function InvoiceTotals(props: Props) {
   const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
 
-  const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
   const [t] = useTranslation();
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map(
         (variable, index) =>
-          (variable === '$subtotal' ||
-            variable === '$paid_to_date' ||
-            variable === '$taxes') && (
+          (variable === '$subtotal' || variable === '$taxes') && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )
       )}
@@ -60,9 +58,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate1}
-            clearButton={Boolean(resource?.tax_rate1)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={resource?.tax_name1}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
             }}
@@ -71,17 +68,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate1', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name1', taxRate.name);
+              handleChange('tax_rate1', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(1)}
           />
         </Element>
       )}
@@ -89,9 +78,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate2}
-            clearButton={Boolean(resource?.tax_rate2)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={resource?.tax_name2}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
@@ -100,17 +88,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate2', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name2', taxRate.name);
+              handleChange('tax_rate2', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(2)}
           />
         </Element>
       )}
@@ -118,9 +98,8 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate3}
-            clearButton={Boolean(resource?.tax_rate3)}
-            onChange={(value: Record<TaxRate>) => {
+            defaultValue={resource?.tax_name3}
+            onChange={(value: Entry<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}
@@ -129,17 +108,9 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_rate3', 0);
             }}
             onTaxCreated={(taxRate) => {
-              handleChange(
-                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.name
-              );
-
-              handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
-                taxRate.rate
-              );
+              handleChange('tax_name3', taxRate.name);
+              handleChange('tax_rate3', taxRate.rate);
             }}
-            onInputFocus={() => setCurrentTaxRateInput(3)}
           />
         </Element>
       )}
@@ -147,7 +118,6 @@ export function InvoiceTotals(props: Props) {
       {variables.map(
         (variable, index) =>
           variable !== '$subtotal' &&
-          variable !== '$paid_to_date' &&
           variable !== '$taxes' && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )

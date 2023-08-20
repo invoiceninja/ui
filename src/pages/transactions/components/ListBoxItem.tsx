@@ -13,7 +13,6 @@ import { StatusBadge } from '$app/components/StatusBadge';
 import invoiceStatus from '$app/common/constants/invoice-status';
 import { ResourceItem } from './ListBox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import paymentStatus from '$app/common/constants/payment-status';
 import { ExpenseStatus } from '$app/pages/expenses/common/components/ExpenseStatus';
 import { date as formatDate } from '$app/common/helpers';
@@ -27,8 +26,6 @@ interface Props {
 }
 
 export function ListBoxItem(props: Props) {
-  const company = useCurrentCompany();
-
   const formatMoney = useFormatMoney();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -58,12 +55,12 @@ export function ListBoxItem(props: Props) {
             {formatDate(props.resourceItem.date || '', dateFormat)}
           </span>
         </div>
-        {props.resourceItem.amount && (
+        {typeof props.resourceItem.amount === 'number' && (
           <span className="text-sm">
             {formatMoney(
-              props.resourceItem.amount,
-              company.settings.country_id,
-              company.settings.currency_id
+              props.resourceItem.amount || 0,
+              props.resourceItem.country_id,
+              props.resourceItem.currency_id
             )}
           </span>
         )}

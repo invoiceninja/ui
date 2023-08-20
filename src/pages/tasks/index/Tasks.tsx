@@ -18,12 +18,15 @@ import {
   defaultColumns,
   useActions,
   useAllTaskColumns,
+  useCustomBulkActions,
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
+import { Task } from '$app/common/interfaces/task';
+import { useShowEditOption } from '../common/hooks/useShowEditOption';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -40,17 +43,23 @@ export default function Tasks() {
 
   const taskColumns = useAllTaskColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
+  const showEditOption = useShowEditOption();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client,project&sort=id|desc"
+        endpoint="/api/v1/tasks?include=status,client,project&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
+        linkToEdit="/tasks/:id/edit"
+        showEdit={(task: Task) => showEditOption(task)}
         customFilters={filters}
-        customFilterQueryKey="client_status"
+        customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={

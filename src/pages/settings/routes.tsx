@@ -15,6 +15,7 @@ import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
+import { or } from '$app/common/guards/guards/or';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -76,8 +77,7 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
       </Route>
-      <Route path="custom_fields">
-        <Route path="" element={<Settings.CustomFields />} />
+      <Route path="custom_fields" element={<Settings.CustomFields />}>
         <Route path="company" element={<Settings.CompanyCustomFields />} />
         <Route path="clients" element={<Settings.ClientsCustomFields />} />
         <Route path="products" element={<Settings.ProductsCustomFields />} />
@@ -88,6 +88,8 @@ export const settingsRoutes = (
         <Route path="vendors" element={<Settings.VendorsCustomFields />} />
         <Route path="expenses" element={<Settings.ExpensesCustomFields />} />
         <Route path="users" element={<Settings.UsersCustomFields />} />
+        {/* <Route path="quotes" element={<Settings.QuotesCustomFields />} /> */}
+        {/* <Route path="credits" element={<Settings.CreditCustomFields />} /> */}
       </Route>
       <Route path="generated_numbers" element={<Settings.GeneratedNumbers />}>
         <Route path="" element={<Settings.GeneratedNumbersSettings />} />
@@ -187,9 +189,33 @@ export const settingsRoutes = (
       </Route>
       <Route path="integrations">
         <Route path="api_tokens">
-          <Route path="" element={<Settings.ApiTokens />} />
-          <Route path="create" element={<Settings.CreateApiToken />} />
-          <Route path=":id/edit" element={<Settings.EditApiToken />} />
+          <Route
+            path=""
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
+                component={<Settings.ApiTokens />}
+              />
+            }
+          />
+          <Route
+            path="create"
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
+                component={<Settings.CreateApiToken />}
+              />
+            }
+          />
+          <Route
+            path=":id/edit"
+            element={
+              <Guard
+                guards={[or(plan('enterprise'), plan('pro')), admin()]}
+                component={<Settings.EditApiToken />}
+              />
+            }
+          />
         </Route>
         <Route path="api_webhooks">
           <Route path="" element={<Settings.ApiWebhooks />} />

@@ -9,12 +9,10 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import paymentStatus from '$app/common/constants/payment-status';
 import { Payment } from '$app/common/interfaces/payment';
 import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
+import { PaymentStatus } from '../common/components/PaymentStatus';
 
 interface Props {
   payment: Payment;
@@ -23,7 +21,6 @@ interface Props {
 export function PaymentOverview(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   return (
     <div>
@@ -32,8 +29,8 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('amount')}: ${formatMoney(
               props?.payment?.amount || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              props.payment.client?.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>
@@ -42,22 +39,22 @@ export function PaymentOverview(props: Props) {
           <span className="text-gray-800">
             {`${t('applied')}: ${formatMoney(
               props?.payment?.applied || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              props.payment.client?.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>
 
         <div className="flex items-center justify-center">
-          <StatusBadge for={paymentStatus} code={props?.payment?.status_id} />
+          <PaymentStatus entity={props.payment} />
         </div>
 
         <div className="flex items-center justify-center">
           <span className="text-gray-800">
             {`${t('refunded')}: ${formatMoney(
               props?.payment?.refunded || 0,
-              company.settings.country_id ?? '1',
-              props.payment?.currency_id ?? '1'
+              props.payment.client?.country_id,
+              props.payment?.currency_id
             )}`}
           </span>
         </div>

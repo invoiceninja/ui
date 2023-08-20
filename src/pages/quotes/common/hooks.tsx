@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { QuoteStatus } from '$app/common/enums/quote-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
@@ -38,7 +38,7 @@ import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -48,10 +48,6 @@ import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
-import { useDispatch } from 'react-redux';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { updateRecord } from '$app/common/stores/slices/company-users';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { Link } from '$app/components/forms';
@@ -86,6 +82,11 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { EntityState } from '$app/common/enums/entity-state';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -178,7 +179,9 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     );
 
     if (currency && quote) {
-      const invoiceSum = new InvoiceSum(quote, currency).build();
+      const invoiceSum = quote.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(quote, currency).build()
+        : new InvoiceSum(quote, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -204,11 +207,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/quotes'), quote)
       .then((response: GenericSingleResourceResponse<Quote>) => {
@@ -217,11 +224,10 @@ export function useCreate(props: CreateProps) {
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -231,41 +237,28 @@ export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
-  const company = useInjectCompanyChanges();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+  const saveCompany = useHandleCompanySave();
 
-  return (quote: Quote) => {
+  return async (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
 
-    axios
-      .all([
-        request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        toast.success('updated_quote');
+    await saveCompany(true);
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
+      .then(() => {
+        toast.success('updated_quote');
 
         queryClient.invalidateQueries(
           route('/api/v1/quotes/:id', { id: quote.id })
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -280,7 +273,6 @@ export function useActions() {
 
   const { t } = useTranslation();
 
-  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const printPdf = usePrintPdf({ entity: 'quote' });
@@ -289,14 +281,46 @@ export function useActions() {
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+
   const cloneToQuote = (quote: Quote) => {
-    setQuote({ ...quote, number: '', documents: [] });
+    setQuote({
+      ...quote,
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (quote: Quote) => {
-    setCredit({ ...quote, number: '', documents: [] });
+    setCredit({
+      ...quote,
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/credits/create?action=clone');
   };
@@ -304,8 +328,17 @@ export function useActions() {
   const cloneToRecurringInvoice = (quote: Quote) => {
     setRecurringInvoice({
       ...(quote as unknown as RecurringInvoice),
+      id: '',
       number: '',
       documents: [],
+      frequency_id: '5',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -314,15 +347,39 @@ export function useActions() {
   const cloneToPurchaseOrder = (quote: Quote) => {
     setPurchaseOrder({
       ...(quote as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [], due_date: '' });
+    setInvoice({
+      ...quote,
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
     navigate('/invoices/create?action=clone');
   };
 
@@ -447,9 +504,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'archive')}
@@ -459,7 +516,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'restore')}
@@ -469,7 +526,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(quote.id, 'delete')}
@@ -550,10 +607,9 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
-  const currentUser = useCurrentUser();
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+  const reactSettings = useReactSettings();
 
   const quoteViewedAt = useCallback((quote: Quote) => {
     let viewed = '';
@@ -581,7 +637,7 @@ export function useQuoteColumns() {
         <div className="flex items-center space-x-2">
           <QuoteStatusBadge entity={quote} />
 
-          {quote.status_id === QuoteStatus.Converted && (
+          {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
             <MdTextSnippet
               className="cursor-pointer"
               fontSize={19}
@@ -619,8 +675,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company.settings.country_id,
-          quote.client?.settings.currency_id || company.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -719,8 +775,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -768,8 +824,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -788,8 +844,15 @@ export function useQuoteColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -798,8 +861,15 @@ export function useQuoteColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -810,8 +880,8 @@ export function useQuoteColumns() {
       format: (value, quote) =>
         formatMoney(
           value,
-          quote.client?.country_id || company?.settings.country_id,
-          quote.client?.settings.currency_id || company?.settings.currency_id
+          quote.client?.country_id,
+          quote.client?.settings.currency_id
         ),
     },
     {
@@ -823,8 +893,7 @@ export function useQuoteColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.quote ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.quote || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

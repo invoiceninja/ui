@@ -32,15 +32,18 @@ import { Frequency } from '$app/common/enums/frequency';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Create() {
+  const { documentTitle } = useTitle('new_payment_link');
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   const { data } = useBlankSubscriptionQuery();
 
-  const { data: productsData } = useProductsQuery();
+  const { data: productsData } = useProductsQuery({ include: 'company' });
 
   const queryClient = useQueryClient();
 
@@ -48,8 +51,8 @@ export function Create() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('subscriptions'), href: '/settings/subscriptions' },
-    { name: t('new_subscription'), href: '/settings/subscriptions/create' },
+    { name: t('payment_links'), href: '/settings/subscriptions' },
+    { name: t('new_payment_link'), href: '/settings/subscriptions/create' },
   ];
 
   const tabs = [t('overview'), t('settings'), t('webhook')];
@@ -111,16 +114,13 @@ export function Create() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
 
   return (
     <Settings
-      title={t('new_subscription')}
+      title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}

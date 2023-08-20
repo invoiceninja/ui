@@ -33,6 +33,8 @@ import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Card } from '$app/components/cards';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -47,6 +49,7 @@ export default function Create() {
       href: '/quotes/create',
     },
   ];
+  const company = useCurrentCompany();
 
   const [searchParams] = useSearchParams();
 
@@ -88,6 +91,21 @@ export default function Create() {
       ) {
         const _quote = cloneDeep(data);
 
+        if (company && company.enabled_tax_rates > 0) {
+          _quote.tax_name1 = company.settings.tax_name1;
+          _quote.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _quote.tax_name2 = company.settings.tax_name2;
+          _quote.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _quote.tax_name3 = company.settings.tax_name3;
+          _quote.tax_rate3 = company.settings.tax_rate3;
+        }
+
         if (typeof _quote.line_items === 'string') {
           _quote.line_items = [];
         }
@@ -95,6 +113,9 @@ export default function Create() {
         if (searchParams.get('client')) {
           _quote.client_id = searchParams.get('client')!;
         }
+
+        _quote.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         return (value = _quote);
       }
@@ -138,14 +159,16 @@ export default function Create() {
       disableSaveButton={quote?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={quote}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={quote}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <QuoteDetails handleChange={handleChange} errors={errors} />
 
@@ -170,7 +193,7 @@ export default function Create() {
           )}
         </div>
 
-        <QuoteFooter handleChange={handleChange} />
+        <QuoteFooter handleChange={handleChange} errors={errors} />
 
         {quote && (
           <InvoiceTotals

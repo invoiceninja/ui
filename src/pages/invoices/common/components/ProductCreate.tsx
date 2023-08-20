@@ -11,7 +11,6 @@
 import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { useBlankProductQuery } from '$app/common/queries/products';
 import { Modal } from '$app/components/Modal';
 import { FormEvent, useEffect, useState } from 'react';
@@ -35,8 +34,6 @@ export function ProductCreate(props: Props) {
   const [t] = useTranslation();
 
   const { data: blankProduct } = useBlankProductQuery();
-
-  useTitle(t('new_product'));
 
   const queryClient = useQueryClient();
 
@@ -75,9 +72,6 @@ export function ProductCreate(props: Props) {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

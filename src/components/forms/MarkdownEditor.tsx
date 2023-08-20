@@ -9,9 +9,9 @@
  */
 
 import { InputLabel } from '$app/components/forms/InputLabel';
-import MDEditor from '@uiw/react-md-editor';
 import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
 
 interface Props {
   value?: string | undefined;
@@ -21,6 +21,7 @@ interface Props {
 
 export function MarkdownEditor(props: Props) {
   const [value, setValue] = useState<string | undefined>();
+  const editorRef = useRef<Editor | null>(null);
 
   useEffect(() => {
     setValue(props.value);
@@ -43,11 +44,45 @@ export function MarkdownEditor(props: Props) {
     <div className="space-y-4">
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
-      <MDEditor
+      <Editor
+        tinymceScriptSrc="/tinymce_6.4.2/tinymce/js/tinymce/tinymce.min.js"
+        ref={editorRef}
         value={value}
-        onChange={handleChange}
-        preview="edit"
-        data-color-mode="light"
+        init={{
+          height: 300,
+          menubar: false,
+          plugins: [
+            'advlist',
+            'autolink',
+            'lists',
+            'link',
+            'image',
+            'charmap',
+            'anchor',
+            'searchreplace',
+            'visualblocks',
+            'code',
+            'fullscreen',
+            'insertdatetime',
+            'media',
+            'table',
+            'preview',
+            'help',
+            'wordcount',
+            'mceCodeEditor',
+          ],
+          toolbar:
+            'undo redo | blocks | link ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | code | help',
+          content_style:
+            'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+          contextmenu: '',
+          content_css: '/tinymce_6.4.2/tinymce/content.css',
+          body_class: 'h-screen',
+        }}
+        onEditorChange={handleChange}
       />
     </div>
   );

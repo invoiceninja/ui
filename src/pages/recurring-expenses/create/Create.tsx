@@ -110,9 +110,6 @@ export default function Create() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
@@ -138,6 +135,7 @@ export default function Create() {
           <Notes
             recurringExpense={recurringExpense}
             handleChange={handleChange}
+            errors={errors}
           />
         </div>
 
@@ -145,6 +143,7 @@ export default function Create() {
           <AdditionalInfo
             recurringExpense={recurringExpense}
             handleChange={handleChange}
+            errors={errors}
           />
 
           <TaxSettings

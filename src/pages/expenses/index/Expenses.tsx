@@ -47,14 +47,13 @@ export default function Expenses() {
     >
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor&sort=id|desc"
+        endpoint="/api/v1/expenses?include=client,vendor,category&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
         customActions={actions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={<ImportButton route="/expenses/import" />}

@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { CustomBulkAction, DataTable } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
@@ -21,24 +21,31 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { MdPrint } from 'react-icons/md';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { or } from '$app/common/guards/guards/or';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import {
+  InvoiceSlider,
+  invoiceSliderAtom,
+  invoiceSliderVisibilityAtom,
+} from '../common/components/InvoiceSlider';
+import { useSetAtom } from 'jotai';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { useEffect, useState } from 'react';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
 
+  const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
+
+  const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
+
   const actions = useActions();
 
   const filters = useInvoiceFilters();
-
-  const printPdf = usePrintPdf({ entity: 'invoice' });
 
   const invoiceColumns = useAllInvoiceColumns();
 
@@ -46,16 +53,16 @@ export default function Invoices() {
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
-  const customBulkActions: CustomBulkAction[] = [
-    (selectedIds) => (
-      <DropdownElement
-        onClick={() => printPdf(selectedIds)}
-        icon={<Icon element={MdPrint} />}
-      >
-        {t('print_pdf')}
-      </DropdownElement>
-    ),
-  ];
+  const customBulkActions = useCustomBulkActions();
+
+  const setInvoiceSlider = useSetAtom(invoiceSliderAtom);
+  const setInvoiceSliderVisibility = useSetAtom(invoiceSliderVisibilityAtom);
+
+  useEffect(() => {
+    if (invoiceResponse) {
+      setInvoiceSlider(invoiceResponse);
+    }
+  }, [invoiceResponse]);
 
   return (
     <Default
@@ -75,7 +82,6 @@ export default function Invoices() {
         customActions={actions}
         customBulkActions={customBulkActions}
         customFilters={filters}
-        customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         rightSide={
           <Guard
@@ -94,7 +100,13 @@ export default function Invoices() {
           />
         }
         linkToCreateGuards={[permission('create_invoice')]}
+        onTableRowClick={(invoice) => {
+          setSliderInvoiceId(invoice.id);
+          setInvoiceSliderVisibility(true);
+        }}
       />
+
+      <InvoiceSlider />
     </Default>
   );
 }

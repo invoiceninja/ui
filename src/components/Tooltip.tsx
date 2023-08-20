@@ -18,9 +18,14 @@ interface Props {
   className?: string;
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
+  width?: number | string;
+  placement?: 'top';
+  containsUnsafeHTMLTags?: boolean;
 }
 
 export function Tooltip(props: Props) {
+  const { width, placement } = props;
+
   const parentChildrenElement = useRef<HTMLDivElement>(null);
 
   const [messageWidth, setMessageWidth] = useState<number>(0);
@@ -53,7 +58,7 @@ export function Tooltip(props: Props) {
       })}
     >
       <Tippy
-        placement="top-start"
+        placement={placement || 'top-start'}
         interactive={true}
         render={() => (
           <div className="flex flex-col items-center whitespace-normal">
@@ -65,9 +70,13 @@ export function Tooltip(props: Props) {
                   'leading-none': !includeLeading,
                 }
               )}
-              style={{ width: messageWidth }}
+              style={{ width: width || messageWidth }}
             >
-              {props.message}
+              {props.containsUnsafeHTMLTags ? (
+                <span dangerouslySetInnerHTML={{ __html: props.message }} />
+              ) : (
+                props.message
+              )}
             </span>
 
             <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>

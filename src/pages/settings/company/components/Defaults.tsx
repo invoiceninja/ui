@@ -15,18 +15,23 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { ChangeEvent } from 'react';
-import MDEditor from '@uiw/react-md-editor';
 import { endpoint } from '$app/common/helpers';
 import { useQuery } from 'react-query';
 import { RootState } from '$app/common/stores/store';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';
 import { request } from '$app/common/helpers/request';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { Divider } from '$app/components/cards/Divider';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const { data: statics } = useStaticsQuery();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>
     request('GET', endpoint('/api/v1/payment_terms'))
@@ -56,6 +61,7 @@ export function Defaults() {
               id="settings.payment_type_id"
               blankOptionValue="0"
               withBlank
+              errorMessage={errors?.errors['settings.payment_type_id']}
             >
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
@@ -74,6 +80,7 @@ export function Defaults() {
                 id="settings.valid_until"
                 onChange={handleChange}
                 withBlank
+                errorMessage={errors?.errors['settings.valid_until']}
               >
                 {terms.data.data.map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days}>
@@ -91,6 +98,9 @@ export function Defaults() {
               id="settings.default_expense_payment_type_id"
               blankOptionValue="0"
               withBlank
+              errorMessage={
+                errors?.errors['settings.default_expense_payment_type_id']
+              }
             >
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
@@ -102,7 +112,7 @@ export function Defaults() {
             </SelectField>
           </Element>
 
-          <div className="pt-6 border-b"></div>
+          <Divider />
 
           <Element className="mt-6" leftSide={t('manual_payment_email')}>
             <Toggle
@@ -141,26 +151,7 @@ export function Defaults() {
           </Element>
 
           <Element
-            leftSide={t('mark_paid_payment_email')}
-            leftSideHelp={t('mark_paid_payment_email_help')}
-          >
-            <Toggle
-              checked={
-                companyChanges?.settings?.mark_paid_payment_email || false
-              }
-              onChange={(value: boolean) =>
-                dispatch(
-                  updateChanges({
-                    object: 'company',
-                    property: 'settings.mark_paid_payment_email',
-                    value,
-                  })
-                )
-              }
-            />
-          </Element>
-
-          <Element
+            className="mb-3.5"
             leftSide={t('use_quote_terms')}
             leftSideHelp={t('use_quote_terms_help')}
           >
@@ -178,10 +169,10 @@ export function Defaults() {
             />
           </Element>
 
-          <div className="pt-6 border-b"></div>
+          <Divider withoutPadding />
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.invoice_terms}
               onChange={(value) =>
                 dispatch(
@@ -196,7 +187,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('invoice_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.invoice_footer}
               onChange={(value) =>
                 dispatch(
@@ -211,7 +202,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('quote_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.quote_terms}
               onChange={(value) =>
                 dispatch(
@@ -226,7 +217,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('quote_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.quote_footer}
               onChange={(value) =>
                 dispatch(
@@ -241,7 +232,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('credit_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.credit_terms}
               onChange={(value) =>
                 dispatch(
@@ -256,7 +247,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('credit_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.credit_footer}
               onChange={(value) =>
                 dispatch(
@@ -271,7 +262,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('purchase_order_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.purchase_order_terms}
               onChange={(value) =>
                 dispatch(
@@ -286,7 +277,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('purchase_order_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.purchase_order_footer}
               onChange={(value) =>
                 dispatch(

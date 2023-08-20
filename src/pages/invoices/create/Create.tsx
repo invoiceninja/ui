@@ -39,6 +39,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
+import { Card } from '$app/components/cards';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -98,7 +99,9 @@ export default function Create() {
       if (
         searchParams.get('action') !== 'clone' &&
         searchParams.get('action') !== 'invoice_project' &&
-        searchParams.get('action') !== 'invoice_task'
+        searchParams.get('action') !== 'invoice_task' &&
+        searchParams.get('action') !== 'invoice_expense' &&
+        searchParams.get('action') !== 'invoice_product'
       ) {
         value = undefined;
       }
@@ -132,6 +135,9 @@ export default function Create() {
         if (searchParams.get('client')) {
           _invoice.client_id = searchParams.get('client')!;
         }
+
+        _invoice.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         value = _invoice;
       }
@@ -175,15 +181,17 @@ export default function Create() {
       disableSaveButton={invoice?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={invoice}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('project') === 'true'}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={invoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            readonly={searchParams.get('project') === 'true'}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <InvoiceDetails
           invoice={invoice}
@@ -204,8 +212,13 @@ export default function Create() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Product
+                  items={invoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
                   )}
                   columns={productColumns}
                   relationType="client_id"
@@ -250,7 +263,11 @@ export default function Create() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals

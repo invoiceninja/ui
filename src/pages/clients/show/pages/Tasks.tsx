@@ -9,8 +9,15 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import { Task } from '$app/common/interfaces/task';
 import { DataTable } from '$app/components/DataTable';
-import { useTaskColumns, useTaskFilters } from '$app/pages/tasks/common/hooks';
+import {
+  useActions,
+  useCustomBulkActions,
+  useTaskColumns,
+  useTaskFilters,
+} from '$app/pages/tasks/common/hooks';
+import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;
@@ -21,6 +28,12 @@ export default function Tasks() {
   const columns = useTaskColumns();
 
   const filters = useTaskFilters();
+
+  const actions = useActions();
+
+  const customBulkActions = useCustomBulkActions();
+
+  const showEditOption = useShowEditOption();
 
   return (
     <DataTable
@@ -33,12 +46,14 @@ export default function Tasks() {
       )}
       columns={columns}
       customFilters={filters}
-      customFilterQueryKey="client_status"
+      customActions={actions}
+      customBulkActions={customBulkActions}
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/tasks/bulk"
       linkToCreate={route('/tasks/create?client=:id', { id })}
       linkToEdit="/tasks/:id/edit"
+      showEdit={(task: Task) => showEditOption(task)}
       staleTime={dataTableStaleTime}
     />
   );

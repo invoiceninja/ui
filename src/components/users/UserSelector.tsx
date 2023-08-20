@@ -10,34 +10,50 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { User } from '$app/common/interfaces/user';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { ComboboxAsync } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
-export function UserSelector(props: GenericSelectorProps<User>) {
+interface UserSelectorProps extends GenericSelectorProps<User> {
+  endpoint?: string;
+  staleTime?: number;
+}
+
+export function UserSelector(props: UserSelectorProps) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
   return (
-    <DebouncedCombobox
-      inputLabel={props.inputLabel}
-      endpoint="/api/v1/users"
-      label="name"
-      onChange={(value: Record<User>) =>
-        value.resource && props.onChange(value.resource)
+    <ComboboxAsync<User>
+      inputOptions={{
+        label: props.inputLabel?.toString(),
+        value: props.value ?? null,
+      }}
+      endpoint={
+        new URL(endpoint(props.endpoint || '/api/v1/users?status=active'))
       }
-      formatLabel={(resource) => `${resource.first_name} ${resource.last_name}`}
-      defaultValue={props.value}
-      disabled={props.readonly}
-      clearButton={props.clearButton}
-      onClearButtonClick={props.onClearButtonClick}
-      queryAdditional
-      actionLabel={t('new_user')}
-      onActionClick={() => navigate('/settings/users')}
-      errorMessage={props.errorMessage}
+      entryOptions={{
+        id: 'id',
+        value: 'id',
+        label: 'first_name',
+        inputLabelFn: (resource) =>
+          resource ? `${resource.first_name} ${resource.last_name}` : '',
+        dropdownLabelFn: (resource) =>
+          `${resource.first_name} ${resource.last_name}`,
+      }}
+      readonly={props.readonly}
+      onDismiss={props.onClearButtonClick}
+      action={{
+        label: t('new_user'),
+        onClick: () => navigate('/settings/users'),
+        visible: true,
+      }}
+      onChange={(entry) =>
+        entry.resource ? props.onChange(entry.resource) : null
+      }
+      staleTime={props.staleTime || Infinity}
     />
   );
 }

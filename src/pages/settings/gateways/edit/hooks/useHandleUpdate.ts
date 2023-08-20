@@ -38,6 +38,9 @@ export function useHandleUpdate(
     )
       .then(() => {
         toast.success('updated_company_gateway');
+
+        queryClient.invalidateQueries('/api/v1/company_gateways');
+
         queryClient.invalidateQueries(
           route('/api/v1/company_gateways/:id', {
             id: companyGateway?.id,
@@ -48,9 +51,6 @@ export function useHandleUpdate(
         if (error?.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

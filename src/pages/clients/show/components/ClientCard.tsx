@@ -12,6 +12,7 @@ import { route } from '$app/common/helpers/route';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
+import { MdOutlineFileOpen } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 interface Props {
@@ -29,7 +30,7 @@ export function ClientCard(props: Props) {
             title={t('client')}
             value={
               <Link to={route('/clients/:id', { id: props.client.id })}>
-                {props.client.display_name}
+                <span className='flex items-center gap-2'> {props.client.display_name} <MdOutlineFileOpen /> </span>
               </Link>
             }
             className="h-full"

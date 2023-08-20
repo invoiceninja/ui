@@ -10,11 +10,16 @@
 import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { Credit } from '$app/common/interfaces/credit';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { TaxItem } from './invoice-sum';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Currency } from '$app/common/interfaces/currency';
 
 export class InvoiceSumInclusive {
-  protected taxMap = collect();
-  protected invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+  protected taxMap = collect<TaxItem>();
+  public declare invoiceItems: InvoiceItemSumInclusive;
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public totalDiscount = 0;
@@ -23,23 +28,29 @@ export class InvoiceSumInclusive {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice) {}
+  constructor(
+    public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice,
+    protected currency: Currency
+  ) {
+    this.invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+  }
 
-  public async build() {
-    await this.calculateLineItems();
-    await this.calculateDiscount();
-    await this.calculateCustomValues();
-    await this.calculateInvoiceTaxes();
-    await this.setTaxMap();
-    await this.calculateTotals();
-    await this.calculateBalance();
-    await this.calculatePartial();
+  public build() {
+
+    this.calculateLineItems()
+      .calculateDiscount()
+      .calculateCustomValues()
+      .calculateInvoiceTaxes()
+      .setTaxMap()
+      .calculateTotals()
+      .calculateBalance()
+      .calculatePartial();
 
     return this;
   }
 
-  protected async calculateLineItems() {
-    await this.invoiceItems.process();
+  protected calculateLineItems() {
+    this.invoiceItems.process();
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
@@ -48,14 +59,14 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected async calculateDiscount() {
+  protected calculateDiscount() {
     this.totalDiscount = this.discount(this.invoiceItems.subTotal);
     this.total -= this.totalDiscount;
 
     return this;
   }
 
-  protected async calculateInvoiceTaxes() {
+  protected calculateInvoiceTaxes() {
     let amount = this.total;
 
     if (this.invoice.discount > 0 && this.invoice.is_amount_discount) {
@@ -73,7 +84,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(2)
+          this.invoice.tax_rate1.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -85,7 +96,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(2)
+          this.invoice.tax_rate2.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -97,7 +108,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(2)
+          this.invoice.tax_rate3.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -105,7 +116,11 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected async calculateCustomValues() {
+  public getTaxMap() {
+    return this.taxMap;
+  }
+
+  protected calculateCustomValues() {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge1);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge2);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge3);
@@ -121,85 +136,94 @@ export class InvoiceSumInclusive {
 
     if (this.invoice.custom_surcharge_tax1) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(
+          this.currency.precision
+        )
       );
     }
 
     if (this.invoice.custom_surcharge_tax2) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(
+          this.currency.precision
+        )
       );
     }
 
     if (this.invoice.custom_surcharge_tax3) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(
+          this.currency.precision
+        )
       );
     }
 
     if (this.invoice.custom_surcharge_tax4) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(
+          this.currency.precision
+        )
       );
     }
 
     return taxComponent;
   }
 
-  protected async setTaxMap() {
+  protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
     }
 
     this.taxMap = collect();
 
-    const keys = this.invoiceItems.taxCollection.pluck('key').unique();
-    const values = this.invoiceItems.taxCollection;
+    let taxCollection = collect<TaxItem>();
+    taxCollection = this.invoiceItems.taxCollection.pluck('items');
+
+    const keys = taxCollection.pluck('key').unique();
 
     keys.map((key) => {
-      const taxName = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] == key)
-        .pluck('tax_name')
+      const taxName = taxCollection
+        .filter((item) => item.key === key)
+        .pluck('name')
         .first();
 
-      const totalLineTax = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] === key)
+      const totalLineTax = taxCollection
+        .filter((item) => item.key === key)
         .sum('total');
 
-      this.taxMap.push({ name: taxName, total: totalLineTax });
-
-      this.totalTaxes += this.invoiceItems.totalTaxes;
+      this.taxMap.push({
+        name: taxName as string,
+        total: totalLineTax as number,
+      });
     });
 
-    return this;
-  }
-
-  protected async calculateTotals() {
-    this.totalTaxes = Number(this.totalTaxes.toFixed(2));
+    this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
   }
 
-  protected async calculateBalance() {
+  protected calculateTotals() {
+    this.totalTaxes = Number(this.totalTaxes.toFixed(this.currency.precision));
+
+    return this;
+  }
+
+  protected calculateBalance() {
     this.setCalculatedAttributes();
 
     return this;
   }
 
   protected setCalculatedAttributes() {
-    if (this.invoice.status_id !== InvoiceStatus.Draft) {
-      if (this.invoice.amount !== this.invoice.balance) {
-        const paidToDate = this.invoice.amount - this.invoice.balance;
+    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
+    if (this.invoice.amount !== this.invoice.balance) {
+      const paidToDate = this.invoice.amount - this.invoice.balance;
 
-        this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
-      } else {
-        this.invoice.balance = this.total; // Needs implementing formatting with number class.
-      }
+      this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
+    } else {
+      this.invoice.balance = this.total; // Needs implementing formatting with number class.
     }
+    // }
 
     this.invoice.amount = this.total; // Needs implementing formatting with number class.
     this.invoice.total_taxes = this.totalTaxes;
@@ -227,13 +251,17 @@ export class InvoiceSumInclusive {
       return this.invoice.discount;
     }
 
-    return parseFloat((amount * (this.invoice.discount / 100)).toFixed(2));
+    return parseFloat(
+      (amount * (this.invoice.discount / 100)).toFixed(this.currency.precision)
+    );
   }
 
   protected taxer(amount: number, tax_rate: number) {
     // This needs extraction in the taxer service/class.
 
-    return parseFloat((amount * ((tax_rate ?? 0) / 100)).toFixed(2));
+    return parseFloat(
+      (amount * ((tax_rate ?? 0) / 100)).toFixed(this.currency.precision)
+    );
   }
 
   protected valuer(customValue: number | undefined): number {

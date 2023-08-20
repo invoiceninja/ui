@@ -9,7 +9,9 @@
  */
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
+import { Payment } from './payment';
 import { Invitation } from './purchase-order';
+import { TaxInfo } from './tax-info';
 
 export interface Invoice {
   id: string;
@@ -76,4 +78,45 @@ export interface Invoice {
   invitations: Invitation[];
   documents: any[];
   client?: Client;
+  activities?: Activity[];
+  payments?: Payment[];
+  reminder_schedule?: string;
+}
+
+export interface Activity {
+  id: string;
+  activity_type_id: string;
+  client_id: string;
+  recurring_invoice_id: string;
+  recurring_expense_id: string;
+  purchase_order_id: string;
+  vendor_id: string;
+  vendor_contact_id: string;
+  company_id: string;
+  user_id: string;
+  invoice_id: string;
+  quote_id: string;
+  payment_id: string;
+  credit_id: string;
+  updated_at: number;
+  created_at: number;
+  expense_id: string;
+  is_system: boolean;
+  contact_id: string;
+  task_id: string;
+  token_id: string;
+  notes: string;
+  ip: string;
+  history: History;
+}
+
+export interface History {
+  id: string;
+  activity_id: string;
+  json_backup: string;
+  html_backup: string;
+  amount: number;
+  created_at: number;
+  updated_at: number;
+  tax_info?: TaxInfo;
 }

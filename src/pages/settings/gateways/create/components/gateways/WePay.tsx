@@ -19,18 +19,18 @@ export function WePay() {
   const [t] = useTranslation();
 
   const handleSetup = () => {
-    request('POST', endpoint('/api/v1/one_time_token'), { context: 'wepay' })
-      .then((response) =>
-        window
-          .open(
-            route('https://invoicing.co/wepay/signup/:token', {
-              token: response.data.hash,
-            }),
-            '_blank'
-          )
-          ?.focus()
-      )
-      .catch((error) => console.error(error));
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'wepay',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/wepay/signup/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
   };
 
   return (

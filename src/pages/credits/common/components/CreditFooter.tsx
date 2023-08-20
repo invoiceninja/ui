@@ -9,12 +9,9 @@
  */
 
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { InputField, Link } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { TabGroup } from '$app/components/TabGroup';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
@@ -30,29 +27,26 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { route } from '$app/common/helpers/route';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function CreditFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
-  const company = useCurrentCompany();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const [credit] = useAtom(creditAtom);
 
   const onSuccess = () => {
     queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
   };
-
-  console.log(credit?.design_id);
 
   const tabs = [
     t('terms'),
@@ -122,6 +116,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('user')}
                   value={credit?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -130,6 +125,8 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={credit?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 
@@ -138,9 +135,9 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('design')}
                   value={credit?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(credit?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -151,6 +148,7 @@ export function CreditFooter(props: Props) {
                   inputLabel={t('project')}
                   value={credit?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -161,14 +159,17 @@ export function CreditFooter(props: Props) {
                   onValueChange={(value) =>
                     handleChange('exchange_rate', parseFloat(value))
                   }
+                  errorMessage={errors?.errors.exchange_rate}
                 />
               </div>
 
               <div className="pt-9">
                 <Toggle
-                  label={t('auto_bill_enabled')}
-                  checked={credit?.auto_bill_enabled || false}
-                  onChange={(value) => handleChange('auto_bill_enabled', value)}
+                  label={t('inclusive_taxes')}
+                  checked={credit?.uses_inclusive_taxes || false}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>
@@ -176,21 +177,12 @@ export function CreditFooter(props: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert />
-
-          {company &&
-            ['credit1', 'credit2', 'credit3', 'credit4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('custom_field')}
-                onChange={(value: string) =>
-                  handleCustomFieldChange(field, value)
-                }
-                noExternalPadding
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/credits" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
       </TabGroup>
     </Card>

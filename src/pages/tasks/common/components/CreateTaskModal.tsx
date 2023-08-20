@@ -76,6 +76,8 @@ export function CreateTaskModal(props: Props) {
         .then(() => {
           toast.success('created_task');
 
+          queryClient.invalidateQueries('/api/v1/tasks');
+
           queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
           queryClient.invalidateQueries(
@@ -93,9 +95,6 @@ export function CreateTaskModal(props: Props) {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

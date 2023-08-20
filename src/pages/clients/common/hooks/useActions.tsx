@@ -27,8 +27,8 @@ import {
   MdPictureAsPdf,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation } from 'react-router-dom';
 import { useBulk } from './useBulk';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface Params {
   setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -40,7 +40,10 @@ interface Params {
 export function useActions(params: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
-  const location = useLocation();
+
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'client',
+  });
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -110,10 +113,9 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !location.pathname.endsWith('/clients') &&
-      !client.is_deleted && <Divider withoutPadding />,
+      isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>
-      !location.pathname.endsWith('/clients') &&
+      isEditOrShowPage &&
       getEntityState(client) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(client.id, 'archive')}
@@ -123,7 +125,7 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !location.pathname.endsWith('/clients') &&
+      isEditOrShowPage &&
       (getEntityState(client) === EntityState.Archived ||
         getEntityState(client) === EntityState.Deleted) && (
         <DropdownElement
@@ -134,7 +136,7 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !location.pathname.endsWith('/clients') &&
+      isEditOrShowPage &&
       (getEntityState(client) === EntityState.Active ||
         getEntityState(client) === EntityState.Archived) && (
         <DropdownElement

@@ -12,10 +12,20 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { resolveKey } from '$app/pages/invoices/common/helpers/resolve-key';
 import { useTranslation } from 'react-i18next';
 
-export function useResolveTranslation() {
+interface Params {
+  type?: 'product' | 'task';
+}
+
+export function useResolveTranslation(params?: Params) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
-  const customFields = ['product1', 'product2', 'product3', 'product4'];
+
+  const { type } = params || {};
+
+  const customFields =
+    type === 'product' || !type
+      ? ['product1', 'product2', 'product3', 'product4']
+      : ['task1', 'task2', 'task3', 'task4'];
 
   const aliases: Record<string, string> = {
     '$product.tax_rate1': t('tax_rate1'),

@@ -25,9 +25,13 @@ import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
+import Toggle from '$app/components/forms/Toggle';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceFooter(props: Props) {
@@ -35,7 +39,7 @@ export function InvoiceFooter(props: Props) {
 
   const { id } = useParams();
   const { t } = useTranslation();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -113,6 +117,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('project')}
                   value={recurringInvoice?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -122,7 +127,19 @@ export function InvoiceFooter(props: Props) {
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value))
                 }
+                errorMessage={errors?.errors.exchange_rate}
               />
+
+              <div className="space-y-2">
+                <DesignSelector
+                  inputLabel={t('design')}
+                  value={recurringInvoice?.design_id}
+                  onChange={(design) => handleChange('design_id', design.id)}
+                  onClearButtonClick={() => handleChange('design_id', '')}
+                  disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
+                />
+              </div>
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
@@ -131,6 +148,7 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('user')}
                   value={recurringInvoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -139,6 +157,18 @@ export function InvoiceFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={recurringInvoice?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
+                  errorMessage={errors?.errors.vendor_id}
+                />
+              </div>
+
+              <div className="pt-9">
+                <Toggle
+                  label={t('inclusive_taxes')}
+                  checked={recurringInvoice?.uses_inclusive_taxes || false}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>

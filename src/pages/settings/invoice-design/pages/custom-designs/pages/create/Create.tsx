@@ -24,11 +24,14 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export default function Create() {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery();
+
+  const queryClient = useQueryClient();
 
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -57,6 +60,8 @@ export default function Create() {
           .then((response: GenericSingleResourceResponse<Design>) => {
             toast.success('design_created');
 
+            queryClient.invalidateQueries(['/api/v1/designs']);
+
             navigate(
               route('/settings/invoice_design/custom_designs/:id/edit', {
                 id: response.data.data.id,
@@ -65,10 +70,9 @@ export default function Create() {
           })
           .catch((e: AxiosError<ValidationBag>) => {
             if (e.response?.status === 422) {
+              toast.dismiss();
               setErrors(e.response.data);
             }
-
-            toast.error();
           });
       },
     },
@@ -90,6 +94,12 @@ export default function Create() {
           <DesignSelector
             onChange={(design) => handleChange('design', design.design)}
             actionVisibility={false}
+            errorMessage={
+              errors?.errors['design.header'] ||
+              errors?.errors['design.body'] ||
+              errors?.errors['design.footer'] ||
+              errors?.errors['design.includes']
+            }
           />
         </Element>
       </Card>

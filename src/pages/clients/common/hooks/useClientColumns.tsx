@@ -14,7 +14,6 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
@@ -28,6 +27,7 @@ import { useCallback } from 'react';
 import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'name',
@@ -92,8 +92,8 @@ export function useClientColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
@@ -296,8 +296,13 @@ export function useClientColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -306,8 +311,13 @@ export function useClientColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -360,8 +370,7 @@ export function useClientColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.client ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.client || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

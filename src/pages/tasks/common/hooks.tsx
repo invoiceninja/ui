@@ -9,44 +9,56 @@
  */
 
 import { Link } from '$app/components/forms';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Task } from '$app/common/interfaces/task';
 import { Divider } from '$app/components/cards/Divider';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
-import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdArchive,
   MdControlPointDuplicate,
-  MdEdit,
+  MdDelete,
   MdNotStarted,
+  MdRestore,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
-import { calculateTime, parseTimeLog } from './helpers/calculate-time';
+import { calculateHours } from './helpers/calculate-time';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { EntityState } from '$app/common/enums/entity-state';
+import { useBulk } from '$app/common/queries/tasks';
+import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
+import { CustomBulkAction } from '$app/components/DataTable';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
 
 export const defaultColumns: string[] = [
   'status',
@@ -98,21 +110,9 @@ export function useTaskColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
-
-  const calculateDate = (task: Task) => {
-    const timeLog = parseTimeLog(task.time_log);
-
-    if (timeLog.length === 0) {
-      return '';
-    }
-
-    const [startTime] = timeLog[0];
-
-    return dayjs.unix(startTime).format(dateFormat);
-  };
+  const reactSettings = useReactSettings();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -127,8 +127,10 @@ export function useTaskColumns() {
       column: 'project',
       id: 'project_id',
       label: t('project'),
-      format: (value, task) =>(
-        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>{task?.project?.name}</Link>
+      format: (value, task) => (
+        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
+          {task?.project?.name}
+        </Link>
       ),
     },
     {
@@ -161,8 +163,13 @@ export function useTaskColumns() {
       id: 'description',
       label: t('description'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -170,7 +177,7 @@ export function useTaskColumns() {
       column: 'duration',
       id: 'time_log',
       label: t('duration'),
-      format: (value) => calculateTime(value.toString()),
+      format: (value) => calculateHours(value.toString(), true),
     },
     {
       column: 'entity_state',
@@ -191,8 +198,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           task.rate || company.settings.default_task_rate,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -223,9 +230,9 @@ export function useTaskColumns() {
     },
     {
       column: 'date',
-      id: 'id',
+      id: 'calculated_start_date',
       label: t('date'),
-      format: (value, task) => calculateDate(task),
+      format: (value, task) => date(task.date, dateFormat),
     },
     {
       column: 'documents',
@@ -258,8 +265,8 @@ export function useTaskColumns() {
       format: (value, task) =>
         formatMoney(
           value,
-          task.client?.country_id || company?.settings.country_id,
-          task.client?.settings.currency_id || company?.settings.currency_id
+          task.client?.country_id,
+          task.client?.settings.currency_id
         ),
     },
     {
@@ -271,8 +278,7 @@ export function useTaskColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.task ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.task || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))
@@ -283,24 +289,34 @@ export function useSave() {
   const queryClient = useQueryClient();
 
   return (task: Task) => {
-    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
-      .then(() => {
+    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
+      () => {
         toast.success('updated_task');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId: task.project_id,
+          })
+        );
+
+        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
         queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
-      });
+      }
+    );
   };
 }
 
 export function useTaskFilters() {
   const [t] = useTranslation();
+
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const { data: taskStatuses } = useTaskStatusesQuery({
+    status: 'active',
+  });
 
   const filters: SelectOption[] = [
     {
@@ -317,6 +333,20 @@ export function useTaskFilters() {
     },
   ];
 
+  taskStatuses?.data.forEach((taskStatus) => {
+    const { red, green, blue, hex } = hexToRGB(taskStatus.color);
+
+    const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+    filters.push({
+      label: taskStatus.name,
+      value: taskStatus.id,
+      color: adjustColorDarkness(hex, darknessAmount),
+      backgroundColor: taskStatus.color,
+      queryKey: 'task_status',
+    });
+  });
+
   return filters;
 }
 
@@ -325,40 +355,27 @@ export function useActions() {
 
   const navigate = useNavigate();
 
-  const location = useLocation();
-
-  const company = useCurrentCompany();
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'task',
+  });
 
   const start = useStart();
 
   const stop = useStop();
+
+  const bulk = useBulk();
 
   const invoiceTask = useInvoiceTask();
 
   const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = (task: Task) => {
-    setTask({ ...task, id: '', documents: [], number: '' });
+    setTask({ ...task, id: '', documents: [], number: '', invoice_id: '' });
 
     navigate('/tasks/create?action=clone');
   };
 
   const actions = [
-    (task: Task) =>
-      !location.pathname.endsWith('/edit') &&
-      (!task.invoice_id || !company?.invoice_task_lock) && (
-        <DropdownElement
-          onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    (task: Task) =>
-      !location.pathname.endsWith('/edit') &&
-      (!task.invoice_id || !company?.invoice_task_lock) && (
-        <Divider withoutPadding />
-      ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -389,6 +406,7 @@ export function useActions() {
           {t('invoice_task')}
         </DropdownElement>
       ),
+    (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
     (task: Task) => (
       <DropdownElement
         onClick={() => cloneToTask(task)}
@@ -397,7 +415,64 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (task: Task) =>
+      isEditPage &&
+      getEntityState(task) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isEditPage &&
+      (getEntityState(task) === EntityState.Archived ||
+        getEntityState(task) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isEditPage &&
+      (getEntityState(task) === EntityState.Active ||
+        getEntityState(task) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk(task.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;
 }
+
+export const useCustomBulkActions = () => {
+  const [t] = useTranslation();
+  const invoiceTask = useInvoiceTask();
+
+  const customBulkActions: CustomBulkAction<Task>[] = [
+    (_, selectedTasks) =>
+      selectedTasks && (
+        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+      ),
+
+    (_, selectedTasks) =>
+      selectedTasks ? (
+        <DropdownElement
+          onClick={() => invoiceTask(selectedTasks)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_task')}
+        </DropdownElement>
+      ) : null,
+  ];
+
+  return customBulkActions;
+};

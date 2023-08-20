@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { CreditStatus } from '$app/common/enums/credit-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
@@ -17,8 +17,6 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
@@ -34,7 +32,6 @@ import {
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
@@ -51,8 +48,7 @@ import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -73,6 +69,7 @@ import {
   MdDelete,
   MdDownload,
   MdMarkEmailRead,
+  MdPaid,
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
@@ -84,6 +81,12 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useMarkPaid } from './hooks/useMarkPaid';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -176,7 +179,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
-      const invoiceSum = new InvoiceSum(credit, currency).build();
+      const invoiceSum = credit.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(credit, currency).build()
+        : new InvoiceSum(credit, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -202,11 +207,15 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const saveCompany = useHandleCompanySave();
+
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (credit: Credit) => {
+  return async (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
+
+    await saveCompany(true);
 
     request('POST', endpoint('/api/v1/credits'), credit)
       .then((response: GenericSingleResourceResponse<Credit>) => {
@@ -215,11 +224,14 @@ export function useCreate(props: CreateProps) {
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
 
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+          if (error.response.data.errors.invoice_id) {
+            toast.error(error.response.data.errors.invoice_id[0]);
+          }
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -228,46 +240,32 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const company = useInjectCompanyChanges();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
-  return (credit: Credit) => {
+  const saveCompany = useHandleCompanySave();
+
+  return async (credit: Credit) => {
     toast.processing();
+
     setErrors(undefined);
 
-    axios
-      .all([
-        request(
-          'PUT',
-          endpoint('/api/v1/credits/:id', { id: credit.id }),
-          credit
-        ),
-        request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company
-        ),
-      ])
-      .then((response) => {
-        toast.success('updated_credit');
+    await saveCompany(true);
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
+      .then(() => {
+        toast.success('updated_credit');
 
         queryClient.invalidateQueries(
           route('/api/v1/credits/:id', { id: credit.id })
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -283,28 +281,80 @@ export function useActions() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'credit',
+  });
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
+  const markPaid = useMarkPaid();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
-    setCredit({ ...credit, number: '', documents: [] });
+    setCredit({
+      ...credit,
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+      po_number: '',
+    });
 
     navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
-    setInvoice({ ...credit, number: '', documents: [], due_date: '' });
+    setInvoice({
+      ...credit,
+      id: '',
+      number: '',
+      documents: [],
+      due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+      po_number: '',
+    });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (credit: Credit) => {
-    setQuote({ ...(credit as Quote), number: '', documents: [] });
+    setQuote({
+      ...(credit as Quote),
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+      po_number: '',
+    });
 
     navigate('/quotes/create?action=clone');
   };
@@ -312,8 +362,19 @@ export function useActions() {
   const cloneToRecurringInvoice = (credit: Credit) => {
     setRecurringInvoice({
       ...(credit as unknown as RecurringInvoice),
+      id: '',
       number: '',
       documents: [],
+      frequency_id: '5',
+      paid_to_date: 0,
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      po_number: '',
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -322,8 +383,18 @@ export function useActions() {
   const cloneToPurchaseOrder = (credit: Credit) => {
     setPurchaseOrder({
       ...(credit as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      po_number: '',
     });
 
     navigate('/purchase_orders/create?action=clone');
@@ -403,6 +474,20 @@ export function useActions() {
           </DropdownElement>
         </div>
       ),
+    (credit) =>
+      (credit.status_id === CreditStatus.Draft ||
+        credit.status_id === CreditStatus.Sent ||
+        credit.status_id === CreditStatus.Partial) &&
+      credit.amount < 0 && (
+        <div>
+          <DropdownElement
+            onClick={() => markPaid(credit)}
+            icon={<Icon element={MdPaid} />}
+          >
+            {t('mark_paid')}
+          </DropdownElement>
+        </div>
+      ),
     () => <Divider withoutPadding />,
     (credit) => (
       <DropdownElement
@@ -444,9 +529,9 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => isEditPage && <Divider withoutPadding />,
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'archive')}
@@ -456,7 +541,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       credit.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'restore')}
@@ -466,7 +551,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (credit) =>
-      location.pathname.endsWith('/edit') &&
+      isEditPage &&
       !credit?.is_deleted && (
         <DropdownElement
           onClick={() => bulk(credit.id, 'delete')}
@@ -545,10 +630,10 @@ export function useCreditColumns() {
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
-  const currentUser = useCurrentUser();
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+
+  const reactSettings = useReactSettings();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -587,8 +672,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -601,13 +686,12 @@ export function useCreditColumns() {
       column: 'remaining',
       id: 'balance',
       label: t('remaining'),
-      format: (_, credit) => {
-        return formatMoney(
+      format: (_, credit) =>
+        formatMoney(
           credit.balance,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        );
-      },
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
+        ),
     },
     {
       column: 'archived_at',
@@ -693,8 +777,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -742,8 +826,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -762,8 +846,15 @@ export function useCreditColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -772,8 +863,15 @@ export function useCreditColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -784,8 +882,8 @@ export function useCreditColumns() {
       format: (value, credit) =>
         formatMoney(
           value,
-          credit.client?.country_id || company?.settings.country_id,
-          credit.client?.settings.currency_id || company?.settings.currency_id
+          credit.client?.country_id,
+          credit.client?.settings.currency_id
         ),
     },
     {
@@ -803,8 +901,7 @@ export function useCreditColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.credit ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.credit || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

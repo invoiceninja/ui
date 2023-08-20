@@ -20,6 +20,7 @@ export function CurrencySelector(props: GenericSelectorProps) {
       value={props.value}
       onValueChange={props.onChange}
       label={props.label}
+      errorMessage={props.errorMessage}
       withBlank
     >
       {currencies.map((currency, index) => (

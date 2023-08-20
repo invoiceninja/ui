@@ -11,10 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import {
-  CompanyUser,
-  ReactTableColumns,
-} from '$app/common/interfaces/company-user';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
@@ -34,6 +31,11 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
+import {
+  ReactTableColumns,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {
   columns: string[];
@@ -51,12 +53,15 @@ export function DataTableColumnsPicker(props: Props) {
   const { t } = useTranslation();
   const { table, defaultColumns } = props;
 
+  useInjectUserChanges();
+
+  const reactSettings = useReactSettings();
+
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
 
   const [currentColumns, setCurrentColumns] = useState<string[]>(
-    currentUser?.company_user?.settings?.react_table_columns?.[
-      table as ReactTableColumns
-    ] || defaultColumns
+    reactSettings?.react_table_columns?.[table as ReactTableColumns] ||
+      defaultColumns
   );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -76,26 +81,24 @@ export function DataTableColumnsPicker(props: Props) {
 
     set(
       user,
-      `company_user.settings.react_table_columns.${table}`,
+      `company_user.react_settings.react_table_columns.${table}`,
       currentColumns
     );
 
     toast.processing();
 
-    request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), user)
-      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-        set(user, 'company_user', response.data.data);
-        setIsModalVisible(false);
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: user.id }),
+      user
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(user, 'company_user', response.data.data);
+      setIsModalVisible(false);
 
-        dispatch(updateUser(user));
+      dispatch(updateUser(user));
 
-        toast.success('saved_settings');
-      })
-      .catch((error) => {
-        toast.error();
-
-        console.error(error);
-      });
+      toast.success('saved_settings');
+    });
   };
 
   const handleDelete = (columnKey: string) => {

@@ -9,37 +9,36 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { Divider } from '$app/components/cards/Divider';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import Toggle from '$app/components/forms/Toggle';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { set } from 'lodash';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 interface Props {
   vendor: Vendor;
   setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor, errors } = props;
+  const { vendor, setVendor, errors, page } = props;
 
   const company = useCurrentCompany();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -84,15 +83,24 @@ export function Form(props: Props) {
       custom_value3: '',
       custom_value4: '',
       link: '',
+      last_login: 0,
     });
 
     handleChange('contacts', contacts);
   };
 
+  const languages = useLanguages();
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-12 xl:col-span-6 space-y-4">
         <Card title={t('details')}>
+          {page === 'edit' && (
+            <Element leftSide={t('status')}>
+              <EntityStatus entity={vendor} />
+            </Element>
+          )}
+
           <Element leftSide={t('name')}>
             <InputField
               value={vendor.name}
@@ -233,6 +241,7 @@ export function Form(props: Props) {
             <CountrySelector
               value={vendor.country_id}
               onChange={(value) => handleChange('country_id', value)}
+              errorMessage={errors?.errors.country_id}
             />
           </Element>
         </Card>
@@ -248,6 +257,9 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('first_name', value, index)
                   }
+                  errorMessage={
+                    props.errors?.errors[`contacts.${index}.first_name`]
+                  }
                 />
               </Element>
 
@@ -256,6 +268,9 @@ export function Form(props: Props) {
                   value={contact.last_name}
                   onValueChange={(value) =>
                     handleContactChange('last_name', value, index)
+                  }
+                  errorMessage={
+                    props.errors?.errors[`contacts.${index}.last_name`]
                   }
                 />
               </Element>
@@ -266,6 +281,7 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('email', value, index)
                   }
+                  errorMessage={props.errors?.errors[`contacts.${index}.email`]}
                 />
               </Element>
 
@@ -275,6 +291,7 @@ export function Form(props: Props) {
                   onValueChange={(value) =>
                     handleContactChange('phone', value, index)
                   }
+                  errorMessage={props.errors?.errors[`contacts.${index}.phone`]}
                 />
               </Element>
 
@@ -325,8 +342,28 @@ export function Form(props: Props) {
                   onChange={(value) =>
                     handleChange('currency_id', parseInt(value))
                   }
+                  errorMessage={errors?.errors.currency_id}
                 />
               </Element>
+
+              {languages.length > 1 && (
+                <Element leftSide={t('language')} noExternalPadding>
+                  <SelectField
+                    value={vendor.language_id}
+                    onValueChange={(value) =>
+                      handleChange('language_id', value)
+                    }
+                    errorMessage={errors?.errors.language_id}
+                    withBlank
+                  >
+                    {languages.map((language, index) => (
+                      <option key={index} value={language.id}>
+                        {language.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
+              )}
 
               <MarkdownEditor
                 label={t('public_notes').toString()}
@@ -342,19 +379,12 @@ export function Form(props: Props) {
             </div>
 
             <div>
-              <CustomFieldsPlanAlert />
-
-              {company &&
-                ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-                  <Field
-                    key={field}
-                    initialValue={company.custom_fields[field]}
-                    field={field}
-                    placeholder={t('contact_field')}
-                    onChange={(value) => handleCustomFieldChange(field, value)}
-                    noExternalPadding
-                  />
-                ))}
+              <span className="text-sm">
+                {t('custom_fields_location_changed')} &nbsp;
+              </span>
+              <Link to="/settings/custom_fields/vendors" className="capitalize">
+                {t('click_here')}
+              </Link>
             </div>
           </TabGroup>
         </Card>

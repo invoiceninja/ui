@@ -9,7 +9,7 @@
  */
 
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
 import { ChartData, TotalColors } from './Totals';
@@ -23,11 +23,14 @@ import {
   LineChart,
 } from 'recharts';
 import dayjs from 'dayjs';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 type Props = {
   data: ChartData;
   dates: any;
   chartSensitivity: 'day' | 'week' | 'month';
+  currency: string;
 };
 
 type LineChartData = {
@@ -35,13 +38,19 @@ type LineChartData = {
   invoices: number;
   outstanding: number;
   payments: number;
+  expenses: number;
 }[];
 
 export function Chart(props: Props) {
   const { t } = useTranslation();
+  const { currency } = props;
+
+  const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const [chartData, setChartData] = useState<unknown[]>([]);
+  const formatMoney = useFormatMoney();
+
+  const [chartData, setChartData] = useState<LineChartData>([]);
 
   const generateDateRange = (start: Date, end: Date, range: 1 | 7 | 30) => {
     const date = new Date(start.getTime());
@@ -81,6 +90,24 @@ export function Chart(props: Props) {
     return recordIndex;
   };
 
+  const yAxisWidth = useMemo(() => {
+    const properties = ['invoices', 'outstanding', 'payments', 'expenses'];
+
+    const largestTick = chartData.reduce((maxTick, data) => {
+      return properties.reduce((currentMax, property) => {
+        const currentTickLength = formatMoney(
+          Number(data[property as keyof typeof data]) ?? 0,
+          company?.settings.country_id,
+          currency
+        ).toString().length;
+
+        return Math.max(currentMax, currentTickLength);
+      }, maxTick);
+    }, 0);
+
+    return largestTick ? largestTick * 8.5 : undefined;
+  }, [chartData]);
+
   useEffect(() => {
     const data: LineChartData = [];
 
@@ -97,6 +124,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -114,6 +142,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -131,6 +160,7 @@ export function Chart(props: Props) {
           invoices: 0,
           outstanding: 0,
           payments: 0,
+          expenses: 0,
         });
       });
     }
@@ -162,12 +192,29 @@ export function Chart(props: Props) {
       }
     });
 
+    props.data?.expenses.forEach((expense) => {
+      const date = formatDate(expense.date, dateFormat);
+      const recordIndex = getRecordIndex(data, date);
+
+      if (recordIndex >= 0) {
+        data[recordIndex].expenses += parseFloat(expense.total);
+      }
+    });
+
     setChartData(data);
   }, [props]);
 
+  const formatTooltipValues = (number: string) => {
+    return formatMoney(
+      Number(number) || 0,
+      company.settings.country_id,
+      currency
+    ).toString();
+  };
+
   return (
     <ResponsiveContainer width="100%" height={330}>
-      <LineChart height={200} data={chartData} margin={{ top: 17, left: 20 }}>
+      <LineChart height={200} data={chartData} margin={{ top: 17, left: 5 }}>
         <Line
           id="invoices"
           type="monotone"
@@ -198,11 +245,29 @@ export function Chart(props: Props) {
           strokeWidth={2}
         />
 
-        <CartesianGrid strokeDasharray="0" vertical={false} />
-        <Tooltip />
+        <Line
+          id="expenses"
+          type="monotone"
+          name={t('expenses') || ''}
+          dataKey="expenses"
+          stroke={TotalColors.Gray}
+          dot={false}
+          strokeWidth={2}
+        />
 
-        <XAxis dataKey="date" />
-        <YAxis interval={0} tickCount={6} />
+        <CartesianGrid strokeDasharray="0" vertical={false} />
+        <Tooltip formatter={formatTooltipValues} />
+
+        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} />
+        <YAxis
+          interval={0}
+          tickCount={6}
+          tickFormatter={(value) =>
+            formatTooltipValues(value).replace(/ /g, '\u00A0')
+          }
+          tick={{ fontSize: 14 }}
+          width={yAxisWidth}
+        />
       </LineChart>
     </ResponsiveContainer>
   );

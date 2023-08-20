@@ -48,8 +48,19 @@ export interface Company {
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
   default_password_timeout: number;
+  default_quantity: boolean;
   subdomain: string;
   client_can_register: boolean;
+  invoice_task_item_description: boolean;
+  show_tasks_table: boolean;
+  invoice_task_datelog: boolean;
+  invoice_task_timelog: boolean;
+  invoice_task_locked: boolean;
+  invoice_task_documents: boolean;
+  oauth_password_required: boolean;
+  first_month_of_year: string;
+  company_key: string;
+  fill_products: boolean;
 }
 
 export interface CompanyInput {
@@ -286,6 +297,7 @@ export interface Settings {
   e_invoice_type: string;
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
+  mark_paid_payment_email: boolean;
 }
 
 export interface TaxData {

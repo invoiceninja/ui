@@ -17,13 +17,21 @@ import {
   changeCurrentIndex,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import { setMsal } from '$app/common/stores/slices/user';
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
-import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
+import { PublicClientApplication } from '@azure/msal-browser';
+
+export const msal = new PublicClientApplication({
+  auth: {
+    clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
+    redirectUri: import.meta.env.VITE_MICROSOFT_REDIRECT_URI,
+  },
+});
+
+msal.initialize();
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -83,17 +91,11 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
-  const authHandler = (err: any, data: any, msal: any) => {
-    dispatch(setMsal(msal));
-
-    request(
-      'POST',
-      endpoint('/api/v1/oauth_login?provider=microsoft'),
-      data
-    ).then((response) => login(response));
+  const handleMicrosoft = (token: string) => {
+    request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
+      accessToken: token,
+    }).then((response) => login(response));
   };
-
-  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
@@ -105,12 +107,39 @@ export function SignInProviders() {
           onError={() => toast.error()}
         />
 
+        <SignInProviderButton
+          onClick={async () => {
+            await msal.handleRedirectPromise(); 
+
+            msal
+              .loginPopup({
+                scopes: ['user.read'],
+              })
+              .then((response) => handleMicrosoft(response.accessToken));
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 23 23"
+          >
+            <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+            <path fill="#f35325" d="M1 1h10v10H1z"></path>
+            <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+            <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+            <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+          </svg>
+
+          <p>Log in with Microsoft</p>
+        </SignInProviderButton>
+
         {/* 
           eslint-disable-next-line 
           @typescript-eslint/ban-ts-comment 
         */}
         {/* @ts-ignore */}
-        <MicrosoftLogin
+        {/* <MicrosoftLogin
           clientId={microsoftClientId}
           authCallback={authHandler}
           redirectUri={'https://app.invoicing.co/'}
@@ -131,7 +160,7 @@ export function SignInProviders() {
 
             <p>Log in with Microsoft</p>
           </SignInProviderButton>
-        </MicrosoftLogin>
+        </MicrosoftLogin> */}
       </div>
     </div>
   );

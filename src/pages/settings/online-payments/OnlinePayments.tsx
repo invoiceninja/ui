@@ -26,9 +26,15 @@ import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useEffect, useState } from 'react';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../common/atoms';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
+
+  const dispatch = useDispatch();
 
   useTitle('online_payments');
 
@@ -41,6 +47,8 @@ export function OnlinePayments() {
 
   const { data: termsResponse } = usePaymentTermsQuery({});
 
+  const errors = useAtomValue(companySettingsErrorsAtom);
+
   const company = useInjectCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChange();
@@ -48,6 +56,16 @@ export function OnlinePayments() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
+
+  const handleToggleChange = (id: string, value: boolean) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: id,
+        value,
+      })
+    );
+  };
 
   useEffect(() => {
     if (termsResponse) {
@@ -79,11 +97,11 @@ export function OnlinePayments() {
 
         <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
           <SelectField
-            value={company?.settings?.auto_bill}
+            value={company?.settings.auto_bill || 'off'}
             onChange={handleChange}
             id="settings.auto_bill"
+            errorMessage={errors?.errors['settings.auto_bill']}
           >
-            <option defaultChecked></option>
             <option value="always">
               {t('enabled')} ({t('auto_bill_help_always')})
             </option>
@@ -104,6 +122,7 @@ export function OnlinePayments() {
             id="settings.auto_bill_date"
             value={company?.settings.auto_bill_date || 'on_send_date'}
             onChange={handleChange}
+            errorMessage={errors?.errors['settings.auto_bill_date']}
           >
             <option value="on_send_date">{t('send_date')}</option>
             <option value="on_due_date">{t('due_date')}</option>
@@ -115,6 +134,7 @@ export function OnlinePayments() {
             value={company?.settings.use_credits_payment || 'off'}
             id="settings.use_credits_payment"
             onChange={handleChange}
+            errorMessage={errors?.errors['settings.use_credits_payment']}
           >
             <option value="always">{t('enabled')}</option>
             <option value="option">{t('show_option')}</option>
@@ -129,6 +149,7 @@ export function OnlinePayments() {
                 value={company?.settings?.payment_terms}
                 id="settings.payment_terms"
                 onChange={handleChange}
+                errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
                 {paymentTerms.map((type: PaymentTerm) => (
@@ -146,6 +167,46 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
+
+        <Element leftSide={t('manual_payment_email')}>
+          <Toggle
+            checked={Boolean(
+              company?.settings.client_manual_payment_notification
+            )}
+            onChange={(value: boolean) =>
+              handleToggleChange(
+                'settings.client_manual_payment_notification',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('online_payment_email')}>
+          <Toggle
+            checked={Boolean(
+              company?.settings.client_online_payment_notification
+            )}
+            onChange={(value: boolean) =>
+              handleToggleChange(
+                'settings.client_online_payment_notification',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('mark_paid_payment_email')}
+          leftSideHelp={t('mark_paid_payment_email_help')}
+        >
+          <Toggle
+            checked={Boolean(company?.settings.mark_paid_payment_email)}
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.mark_paid_payment_email', value)
+            }
+          />
+        </Element>
 
         <Element leftSide={t('enable_applying_payments')}>
           <Toggle
@@ -199,6 +260,9 @@ export function OnlinePayments() {
                   value
                 )
               }
+              errorMessage={
+                errors?.errors['settings.client_portal_under_payment_minimum']
+              }
             />
           </Element>
         )}
@@ -223,6 +287,9 @@ export function OnlinePayments() {
                   'settings.client_initiated_payments_minimum',
                   value
                 )
+              }
+              errorMessage={
+                errors?.errors['settings.client_initiated_payments_minimum']
               }
             />
           </Element>

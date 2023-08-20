@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InputField } from '$app/components/forms';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -33,10 +34,43 @@ export function Preferences() {
     <Card title={t('preferences')}>
       <Element leftSide={t('show_pdf_preview')}>
         <Toggle
-          checked={reactSettings.show_pdf_preview}
+          checked={
+            typeof reactSettings.show_pdf_preview === 'boolean'
+              ? reactSettings.show_pdf_preview
+              : true
+          }
           onValueChange={(value) =>
             handleChange('company_user.react_settings.show_pdf_preview', value)
           }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('react_notification_link')}
+        leftSideHelp={t('react_notification_link_help')}
+      >
+        <Toggle
+          checked={reactSettings.react_notification_link}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.react_notification_link',
+              value
+            )
+          }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('number_precision')}
+        leftSideHelp={t('number_precision_help')}
+      >
+        <InputField
+          value={reactSettings?.number_precision}
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.number_precision', value)
+          }
+          type="number"
+          placeholder={t('number_precision')}
         />
       </Element>
     </Card>

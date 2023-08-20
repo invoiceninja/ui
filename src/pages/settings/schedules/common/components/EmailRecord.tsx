@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -17,10 +18,7 @@ import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -37,6 +35,14 @@ export function EmailRecord(props: Props) {
   const formatMoney = useFormatMoney();
 
   const { schedule, handleChange, errors } = props;
+
+  const formatEntityLabel = (entity: Invoice | Quote) => {
+    return `${entity.number} (${formatMoney(
+      entity.amount,
+      entity?.client?.country_id,
+      entity?.client?.settings.currency_id
+    )})`;
+  };
 
   return (
     <>
@@ -59,29 +65,31 @@ export function EmailRecord(props: Props) {
 
       {schedule.parameters.entity === 'invoice' && (
         <Element leftSide={t('invoice')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/invoices?include=client"
-            label="number"
-            defaultValue={schedule.parameters.entity_id}
-            formatLabel={(resource: Invoice) =>
-              `${resource.number} (${formatMoney(
-                resource.amount,
-                resource?.client?.country_id ?? '1',
-                resource?.client?.settings.currency_id
-              )})`
+          <ComboboxAsync<Invoice>
+            endpoint={
+              new URL(endpoint('/api/v1/invoices?include=client&status=active'))
             }
-            onChange={(value: Record<Invoice>) =>
-              value.resource &&
+            onChange={(invoice: Entry<Invoice>) =>
+              invoice.resource &&
               handleChange(
                 'parameters.entity_id' as keyof Schedule,
-                value.resource.id
+                invoice.resource.id
               )
             }
-            clearButton
-            onClearButtonClick={() =>
+            inputOptions={{
+              value: schedule.parameters.entity_id,
+            }}
+            entryOptions={{
+              id: 'id',
+              label: 'number',
+              value: 'id',
+              dropdownLabelFn: (invoice) => formatEntityLabel(invoice),
+              inputLabelFn: (invoice) =>
+                invoice ? formatEntityLabel(invoice) : '',
+            }}
+            onDismiss={() =>
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
-            queryAdditional
             errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
@@ -89,29 +97,30 @@ export function EmailRecord(props: Props) {
 
       {schedule.parameters.entity === 'quote' && (
         <Element leftSide={t('quote')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/quotes?include=client"
-            label="number"
-            defaultValue={schedule.parameters.entity_id}
-            formatLabel={(resource: Quote) =>
-              `${resource.number} (${formatMoney(
-                resource.amount,
-                resource?.client?.country_id ?? '1',
-                resource?.client?.settings.currency_id
-              )})`
+          <ComboboxAsync<Quote>
+            endpoint={
+              new URL(endpoint('/api/v1/quotes?include=client&status=active'))
             }
-            onChange={(value: Record<Quote>) =>
-              value.resource &&
+            onChange={(quote: Entry<Quote>) =>
+              quote.resource &&
               handleChange(
                 'parameters.entity_id' as keyof Schedule,
-                value.resource.id
+                quote.resource.id
               )
             }
-            clearButton
-            onClearButtonClick={() =>
+            inputOptions={{
+              value: schedule.parameters.entity_id,
+            }}
+            entryOptions={{
+              id: 'id',
+              label: 'number',
+              value: 'id',
+              dropdownLabelFn: (quote) => formatEntityLabel(quote),
+              inputLabelFn: (quote) => (quote ? formatEntityLabel(quote) : ''),
+            }}
+            onDismiss={() =>
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
-            queryAdditional
             errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
@@ -119,29 +128,31 @@ export function EmailRecord(props: Props) {
 
       {schedule.parameters.entity === 'credit' && (
         <Element leftSide={t('credit')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/credits?include=client"
-            label="number"
-            defaultValue={schedule.parameters.entity_id}
-            formatLabel={(resource: Credit) =>
-              `${resource.number} (${formatMoney(
-                resource.amount,
-                resource?.client?.country_id ?? '1',
-                resource?.client?.settings.currency_id
-              )})`
+          <ComboboxAsync<Credit>
+            endpoint={
+              new URL(endpoint('/api/v1/credits?include=client&status=active'))
             }
-            onChange={(value: Record<Credit>) =>
-              value.resource &&
+            onChange={(credit: Entry<Credit>) =>
+              credit.resource &&
               handleChange(
                 'parameters.entity_id' as keyof Schedule,
-                value.resource.id
+                credit.resource.id
               )
             }
-            clearButton
-            onClearButtonClick={() =>
+            inputOptions={{
+              value: schedule.parameters.entity_id,
+            }}
+            entryOptions={{
+              id: 'id',
+              label: 'number',
+              value: 'id',
+              dropdownLabelFn: (credit) => formatEntityLabel(credit),
+              inputLabelFn: (credit) =>
+                credit ? formatEntityLabel(credit) : '',
+            }}
+            onDismiss={() =>
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
-            queryAdditional
             errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
@@ -149,29 +160,44 @@ export function EmailRecord(props: Props) {
 
       {schedule.parameters.entity === 'purchase_order' && (
         <Element leftSide={t('purchase_order')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/purchase_orders?include=vendor"
-            label="number"
-            defaultValue={schedule.parameters.entity_id}
-            formatLabel={(resource: PurchaseOrder) =>
-              `${resource.number} (${formatMoney(
-                resource.amount,
-                resource?.vendor?.country_id ?? '1',
-                resource?.vendor?.currency_id ?? '1'
-              )})`
+          <ComboboxAsync<PurchaseOrder>
+            endpoint={
+              new URL(
+                endpoint('/api/v1/purchase_orders?include=vendor&status=active')
+              )
             }
-            onChange={(value: Record<PurchaseOrder>) =>
+            onChange={(value: Entry<PurchaseOrder>) =>
               value.resource &&
               handleChange(
                 'parameters.entity_id' as keyof Schedule,
                 value.resource.id
               )
             }
-            clearButton
-            onClearButtonClick={() =>
+            inputOptions={{
+              value: schedule.parameters.entity_id,
+            }}
+            entryOptions={{
+              id: 'id',
+              label: 'number',
+              value: 'id',
+              dropdownLabelFn: (purchaseOrder) =>
+                `${purchaseOrder.number} (${formatMoney(
+                  purchaseOrder.amount,
+                  purchaseOrder?.vendor?.country_id,
+                  purchaseOrder?.vendor?.currency_id
+                )})`,
+              inputLabelFn: (purchaseOrder) =>
+                purchaseOrder
+                  ? `${purchaseOrder.number} (${formatMoney(
+                      purchaseOrder.amount,
+                      purchaseOrder?.vendor?.country_id,
+                      purchaseOrder?.vendor?.currency_id
+                    )})`
+                  : '',
+            }}
+            onDismiss={() =>
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
-            queryAdditional
             errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>

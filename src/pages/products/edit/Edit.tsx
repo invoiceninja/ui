@@ -11,13 +11,13 @@
 import { Card } from '$app/components/cards';
 import { useProductQuery } from '$app/common/queries/products';
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { ProductForm } from '../common/components/ProductForm';
 import { useHandleChange } from '../common/hooks';
 import { Spinner } from '$app/components/Spinner';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Product } from '$app/common/interfaces/product';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -27,7 +27,7 @@ interface Context {
 }
 
 export default function Edit() {
-  const [t] = useTranslation();
+  const { documentTitle } = useTitle('edit_product');
 
   const { id } = useParams();
 
@@ -48,9 +48,7 @@ export default function Edit() {
   return (
     <>
       {productResponse && product ? (
-        <Card
-          title={productResponse.data.data.product_key || t('edit_product')}
-        >
+        <Card title={productResponse.data.data.product_key || documentTitle}>
           <ProductForm
             product={product}
             errors={errors}

@@ -63,14 +63,7 @@ export default function Payment() {
 
   useEffect(() => {
     if (data) {
-      const paymentResponse: PaymentEntity = {
-        ...data,
-        invoices: [],
-        credits: [],
-      };
-      delete paymentResponse.documents;
-
-      setPaymentValue(paymentResponse);
+      setPaymentValue(data);
     }
   }, [data]);
 
@@ -94,7 +87,7 @@ export default function Payment() {
       }
     >
       <Container>
-        <Tabs tabs={tabs} />
+        <Tabs tabs={tabs} disableBackupNavigation />
 
         <Outlet
           context={{

@@ -17,7 +17,6 @@ import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { Tab } from '$app/components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
@@ -30,11 +29,12 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { Button } from '$app/components/forms';
+import { useTabs } from './hooks/useTabs';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
   const { id } = useParams();
-  const { data: client, isLoading } = useClientQuery({ id });
+  const { data: client, isLoading } = useClientQuery({ id, enabled: true });
 
   const [t] = useTranslation();
 
@@ -44,7 +44,7 @@ export default function Client() {
     useState<boolean>(false);
 
   useEffect(() => {
-    setDocumentTitle(client?.data?.data?.display_name || 'view_client');
+    setDocumentTitle(client?.display_name || 'view_client');
   }, [client]);
 
   const pages: Page[] = [
@@ -57,38 +57,7 @@ export default function Client() {
 
   const handlePurgeClient = usePurgeClient(id);
 
-  const tabs: Tab[] = [
-    { name: t('invoices'), href: route('/clients/:id', { id }) },
-    { name: t('quotes'), href: route('/clients/:id/quotes', { id }) },
-    {
-      name: t('payments'),
-      href: route('/clients/:id/payments', { id }),
-    },
-    {
-      name: t('recurring_invoices'),
-      href: route('/clients/:id/recurring_invoices', { id }),
-    },
-    {
-      name: t('credits'),
-      href: route('/clients/:id/credits', { id }),
-    },
-    {
-      name: t('projects'),
-      href: route('/clients/:id/projects', { id }),
-    },
-    {
-      name: t('tasks'),
-      href: route('/clients/:id/tasks', { id }),
-    },
-    {
-      name: t('expenses'),
-      href: route('/clients/:id/expenses', { id }),
-    },
-    {
-      name: t('recurring_expenses'),
-      href: route('/clients/:id/recurring_expenses', { id }),
-    },
-  ];
+  const tabs = useTabs();
 
   const actions = useActions({
     setIsMergeModalOpen,
@@ -108,7 +77,7 @@ export default function Client() {
           {client && (
             <ResourceActions
               label={t('more_actions')}
-              resource={client.data.data}
+              resource={client}
               actions={actions}
             />
           )}
@@ -120,13 +89,11 @@ export default function Client() {
       {client && (
         <>
           <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
-            <Details client={client.data.data} />
-            <Address client={client.data.data} />
-            <Contacts client={client.data.data} />
-            <Standing client={client.data.data} />
-            {client.data.data.gateway_tokens.length > 0 && (
-              <Gateways client={client.data.data} />
-            )}
+            <Details client={client} />
+            <Address client={client} />
+            <Contacts client={client} />
+            <Standing client={client} />
+            {client.gateway_tokens.length > 0 && <Gateways client={client} />}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />

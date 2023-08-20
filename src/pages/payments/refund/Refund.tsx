@@ -23,12 +23,12 @@ import Toggle from '$app/components/forms/Toggle';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export default function Refund() {
   const { id } = useParams();
@@ -60,7 +60,7 @@ export default function Refund() {
       invoices: [],
     },
     onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
       setErrors(undefined);
 
       let endPointUrl = '/api/v1/payments/refund?&email_receipt=:email';
@@ -71,14 +71,13 @@ export default function Refund() {
 
       request('POST', endpoint(endPointUrl, { email }), values)
         .then(() => {
-          toast.success(t('refunded_payment'), { id: toastId });
+          toast.success('refunded_payment');
           navigate('/payments');
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
           if (error.response?.status === 422) {
             setErrors(error.response.data);
+            toast.dismiss();
           }
         })
         .finally(() => {
@@ -88,6 +87,8 @@ export default function Refund() {
               email: String(email),
             })
           );
+          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+          queryClient.invalidateQueries(route('/api/v1/payments'));
         });
     },
   });

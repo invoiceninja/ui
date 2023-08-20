@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 import { Header } from './components/Header';
 import { request } from '$app/common/helpers/request';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 interface Response {
   message: string;
@@ -29,18 +30,14 @@ interface Response {
 }
 
 export function RecoverPassword() {
+  useTitle('recover_password');
+
   const [t] = useTranslation();
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState<Response | undefined>(undefined);
   const [errors, setErrors] = useState<ForgotPasswordValidation | undefined>(
     undefined
   );
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'recover_password'
-    )}`;
-  });
 
   const form = useFormik({
     initialValues: {

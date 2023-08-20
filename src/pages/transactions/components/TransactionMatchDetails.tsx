@@ -12,7 +12,6 @@ import { FormEvent, useEffect, useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from '$app/common/enums/transactions';
 import { route } from '$app/common/helpers/route';
@@ -87,7 +86,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -96,10 +95,6 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('converted_transaction');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -124,7 +119,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries('/api/v1/payments');
           queryClient.invalidateQueries(
@@ -134,10 +129,6 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('linked_transaction');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -163,7 +154,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
 
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -178,10 +169,6 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('converted_transaction');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -206,7 +193,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries(invalidationQuery);
+          queryClient.invalidateQueries([invalidationQuery]);
 
           queryClient.invalidateQueries('/api/v1/expenses');
 
@@ -224,10 +211,7 @@ export function TransactionMatchDetails(props: Props) {
 
           toast.success('linked_transaction');
         })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error();
-        })
+
         .finally(() => setIsFormBusy(false));
     }
   };

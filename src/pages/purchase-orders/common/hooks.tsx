@@ -16,9 +16,7 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -47,7 +45,7 @@ import {
   MdSend,
   MdSwitchRight,
 } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { purchaseOrderAtom } from './atoms';
 import { useBulk, useMarkSent } from './queries';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -58,6 +56,9 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -85,11 +86,10 @@ export function useCreate(props: CreateProps) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        error.response?.status === 422
-          ? toast.dismiss() && setErrors(error.response.data)
-          : toast.error();
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
@@ -143,8 +143,7 @@ export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
-  const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
 
   const formatMoney = useFormatMoney();
 
@@ -214,12 +213,8 @@ export function usePurchaseOrderColumns() {
         column: 'amount',
         id: 'amount',
         label: t('amount'),
-        format: (amount) =>
-          formatMoney(
-            amount,
-            company?.settings.country_id,
-            company?.settings.currency_id
-          ),
+        format: (amount, po) =>
+          formatMoney(amount, po.vendor?.country_id, po.vendor?.currency_id),
       },
       {
         column: 'date',
@@ -294,8 +289,8 @@ export function usePurchaseOrderColumns() {
         format: (value, purchaseOrder) =>
           formatMoney(
             value,
-            purchaseOrder.vendor?.country_id || company?.settings.country_id,
-            purchaseOrder.vendor?.currency_id || company?.settings.currency_id
+            purchaseOrder.vendor?.country_id,
+            purchaseOrder.vendor?.currency_id
           ),
       },
       {
@@ -320,8 +315,7 @@ export function usePurchaseOrderColumns() {
     ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.purchaseOrder ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))
@@ -372,8 +366,6 @@ export function useActions() {
 
   const navigate = useNavigate();
 
-  const location = useLocation();
-
   const bulk = useBulk();
 
   const markSent = useMarkSent();
@@ -385,12 +377,28 @@ export function useActions() {
   });
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'purchase_order',
+  });
 
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
-    setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
+    setPurchaseOrder({
+      ...purchaseOrder,
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/purchase_orders/create?action=clone');
   };

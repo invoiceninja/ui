@@ -9,24 +9,17 @@
  */
 
 import { bulk } from '$app/common/queries/payment-terms';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useInvalidatePaymentTermCache } from './useInvalidatePaymentTermCache';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useHandleDelete() {
-  const [t] = useTranslation();
   const invalidateCache = useInvalidatePaymentTermCache();
 
   return (id: string) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     bulk([id], 'delete')
-      .then(() => toast.success(t('deleted_payment_term'), { id: toastId }))
-      .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-      })
+      .then(() => toast.success('deleted_payment_term'))
       .finally(() => invalidateCache(id));
   };
 }

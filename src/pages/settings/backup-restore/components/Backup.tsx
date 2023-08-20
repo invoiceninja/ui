@@ -27,14 +27,9 @@ export function Backup() {
     request('POST', endpoint('/api/v1/export'), {
       send_email: true,
       report_keys: [],
-    })
-      .then((response) => {
-        toast.success(response.data.message);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+    }).then((response) => {
+      toast.success(response.data.message);
+    });
   };
 
   return (

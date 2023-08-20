@@ -14,41 +14,10 @@ import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { t } from 'i18next';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const { t } = useTranslation();
-
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
-
-  const contact = (activity: ActivityRecord) => {
-    if (!activity.client) {
-      return t('client');
-    }
-
-    // First use primary contact, if possible.
-    const primary = activity.client.contacts.find(
-      (contact) => contact.is_primary
-    );
-
-    if (primary) {
-      return `${primary.first_name} ${primary.last_name}`;
-    }
-
-    // If we don't have a primary, let's just use first contact.
-    const first = activity.client.contacts[0];
-
-    if (first) {
-      return `${first.first_name} ${first.last_name}`;
-    }
-
-    // As a fallback, use client name.
-    return activity.client.display_name;
-  };
 
   const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
@@ -56,27 +25,29 @@ export function useGenerateActivityElement() {
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.display_name}
+          {activity.client?.label}
         </Link>
       ),
       contact: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {contact(activity)}
+        <Link
+          to={route(`/${activity?.contact?.contact_entity}/:id`, {
+            id: activity.contact?.hashed_id,
+          })}
+        >
+          {activity.contact?.label}
         </Link>
       ),
       quote: (
         <Link to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}>
-          {activity.quote?.number}
+          {activity.quote?.label}
         </Link>
       ),
-      user: activity?.user
-        ? `${activity?.user?.first_name} ${activity?.user?.last_name}`
-        : 'System',
+      user: activity.user?.label ?? t('system'),
       expense: (
         <Link
           to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
         >
-          {activity?.expense?.number}
+          {activity?.expense?.label}
         </Link>
       ),
       recurring_invoice: (
@@ -85,7 +56,7 @@ export function useGenerateActivityElement() {
             id: activity.recurring_invoice?.hashed_id,
           })}
         >
-          {activity?.recurring_invoice?.number}
+          {activity?.recurring_invoice?.label}
         </Link>
       ),
       recurring_expense: (
@@ -94,7 +65,7 @@ export function useGenerateActivityElement() {
             id: activity.recurring_expense?.hashed_id,
           })}
         >
-          {activity?.recurring_expense?.number}
+          {activity?.recurring_expense?.label}
         </Link>
       ),
       purchase_order: (
@@ -103,43 +74,41 @@ export function useGenerateActivityElement() {
             id: activity.purchase_order?.hashed_id,
           })}
         >
-          {activity?.purchase_order?.number}
+          {activity?.purchase_order?.label}
         </Link>
       ),
       invoice: (
         <Link
           to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
         >
-          {activity?.invoice?.number}
+          {activity?.invoice?.label}
         </Link>
       ),
-      payment_amount:
-        activity.payment &&
-        formatMoney(
-          activity.payment.amount,
-          activity.client?.country_id || company?.settings.country_id,
-          activity.client?.settings.currency_id || company?.settings.currency_id
-        ),
+      payment_amount: activity?.payment_amount?.label,
       payment: (
-        <Link to={route('/payments/:id', { id: activity.payment?.hashed_id })}>
-          {activity?.payment?.number}
+        <Link
+          to={route('/payments/:id/edit', { id: activity.payment?.hashed_id })}
+        >
+          {activity?.payment?.label}
         </Link>
       ),
       credit: (
         <Link
           to={route('/credits/:id/edit', { id: activity.credit?.hashed_id })}
         >
-          {activity?.credit?.number}
+          {activity?.credit?.label}
         </Link>
       ),
       task: (
-        <Link to={route('/tasks/:id/edit', { id: activity.credit?.hashed_id })}>
-          {activity?.task?.number}
+        <Link to={route('/tasks/:id/edit', { id: activity.task?.hashed_id })}>
+          {activity?.task?.label}
         </Link>
       ),
       vendor: (
-        <Link to={route('/vendors/:id', { id: activity.vendor?.hashed_id })}>
-          {activity?.vendor?.name}
+        <Link
+          to={route('/vendors/:id/edit', { id: activity.vendor?.hashed_id })}
+        >
+          {activity?.vendor?.label}
         </Link>
       ),
       subscription: (
@@ -148,16 +117,10 @@ export function useGenerateActivityElement() {
             id: activity.subscription?.hashed_id,
           })}
         >
-          {activity?.subscription?.name}
+          {activity?.subscription?.label}
         </Link>
       ),
-      adjustment:
-        activity.payment &&
-        formatMoney(
-          activity.payment.refunded,
-          activity.client?.country_id || company?.settings.country_id,
-          activity.client?.settings.currency_id || company?.settings.currency_id
-        ),
+      adjustment: activity?.adjustment?.label,
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -180,6 +143,7 @@ export function useGenerateActivityElement() {
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>
+          <span className="text-gray-500 text-sm">{activity.notes}</span>
         </div>
       </div>
     </div>

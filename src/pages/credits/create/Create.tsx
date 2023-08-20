@@ -33,12 +33,15 @@ import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Card } from '$app/components/cards';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
 
   const reactSettings = useReactSettings();
+  const company = useCurrentCompany();
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -81,16 +84,35 @@ export default function Create() {
     setCredit((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'reverse'
+      ) {
         value = undefined;
       }
 
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone'
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'reverse'
       ) {
         const _credit = cloneDeep(data);
+
+        if (company && company.enabled_tax_rates > 0) {
+          _credit.tax_name1 = company.settings.tax_name1;
+          _credit.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _credit.tax_name2 = company.settings.tax_name2;
+          _credit.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _credit.tax_name3 = company.settings.tax_name3;
+          _credit.tax_rate3 = company.settings.tax_rate3;
+        }
 
         if (typeof _credit.line_items === 'string') {
           _credit.line_items = [];
@@ -99,6 +121,9 @@ export default function Create() {
         if (searchParams.get('client')) {
           _credit.client_id = searchParams.get('client')!;
         }
+
+        _credit.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
         value = _credit;
       }
@@ -142,14 +167,16 @@ export default function Create() {
       disableSaveButton={credit?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={credit}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          disableWithSpinner={searchParams.get('action') === 'create'}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <ClientSelector
+            resource={credit}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            disableWithSpinner={searchParams.get('action') === 'create'}
+          />
+        </Card>
 
         <CreditDetails handleChange={handleChange} errors={errors} />
 
@@ -158,8 +185,13 @@ export default function Create() {
             <ProductsTable
               type="product"
               resource={credit}
-              items={credit.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={credit.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -174,7 +206,7 @@ export default function Create() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} />
+        <CreditFooter handleChange={handleChange} errors={errors} />
 
         {credit && (
           <InvoiceTotals

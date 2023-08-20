@@ -40,6 +40,8 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
+import { Card } from '$app/components/cards';
+import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -81,8 +83,12 @@ export default function Edit() {
   } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    if (data) {
-      const _invoice = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentInvoice = isAnyAction && invoice ? invoice : data;
+
+    if (currentInvoice) {
+      const _invoice = cloneDeep(currentInvoice);
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
@@ -123,14 +129,24 @@ export default function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={invoice}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          readonly
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          {invoice && (
+            <div className="flex space-x-20">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <InvoiceStatusBadge entity={invoice} />
+            </div>
+          )}
+
+          <ClientSelector
+            resource={invoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            textOnly
+            readonly
+          />
+        </Card>
 
         <InvoiceDetails
           invoice={invoice}
@@ -151,8 +167,13 @@ export default function Edit() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Product
+                  items={invoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
                   )}
                   columns={productColumns}
                   relationType="client_id"
@@ -197,7 +218,11 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
+        <InvoiceFooter
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {invoice && (
           <InvoiceTotals

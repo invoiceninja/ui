@@ -16,15 +16,13 @@ import { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
-import { useDispatch } from 'react-redux';
-import { setMsal } from '$app/common/stores/slices/user';
-import { SignInProviderButton } from '$app/pages/authentication/components/SignInProviders';
+import {
+  SignInProviderButton,
+  msal,
+} from '$app/pages/authentication/components/SignInProviders';
 import { GoogleLogin } from '@react-oauth/google';
-import MicrosoftLogin from 'react-microsoft-login';
 
 export function Connect() {
-  const dispatch = useDispatch();
-
   const [t] = useTranslation();
 
   const user = useCurrentUser();
@@ -49,15 +47,10 @@ export function Connect() {
       'POST',
       endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
       {}
-    )
-      .then((response) => {
-        toast.success(response.data.message);
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error();
-        console.error(error);
-      });
+    ).then((response) => {
+      toast.success(response.data.message);
+      window.location.reload();
+    });
   };
 
   const handleDisconnectOauth = (event: FormEvent<HTMLButtonElement>) => {
@@ -68,34 +61,22 @@ export function Connect() {
     request(
       'POST',
       endpoint('/api/v1/users/:id/disconnect_oauth', { id: user!.id })
-    )
-      .then((response) => {
-        toast.success(response.data.message);
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error();
-        console.error(error);
-      });
+    ).then((response) => {
+      toast.success(response.data.message);
+      window.location.reload();
+    });
   };
 
-  const authHandler = (err: any, data: any, msal: any) => {
-    dispatch(setMsal(msal));
-
+  const handleMicrosoft = (token: string) => {
     request(
       'POST',
       endpoint(
         '/api/v1/connected_account?include=company_user&provider=microsoft'
       ),
-      data
-    )
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+      { accessToken: token }
+    ).then(() => {
+      window.location.reload();
+    });
   };
 
   const handleGoogle = (token: string) => {
@@ -107,17 +88,10 @@ export function Connect() {
           token,
         }
       )
-    )
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
+    ).then(() => {
+      window.location.reload();
+    });
   };
-
-  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <Card title={t('oneclick_login')}>
@@ -135,33 +109,32 @@ export function Connect() {
           </div>
           <div className="grid grid-cols-3 text-sm mt-4">
             <Element leftSide="Microsoft">
-              {/* 
-          eslint-disable-next-line 
-          @typescript-eslint/ban-ts-comment 
-          */}
-              {/* @ts-ignore */}
-              <MicrosoftLogin
-                clientId={microsoftClientId}
-                authCallback={authHandler}
-                redirectUri={'https://app.invoicing.co/'}
-              >
-                <SignInProviderButton>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 23 23"
-                  >
-                    <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
-                    <path fill="#f35325" d="M1 1h10v10H1z"></path>
-                    <path fill="#81bc06" d="M12 1h10v10H12z"></path>
-                    <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
-                    <path fill="#ffba08" d="M12 12h10v10H12z"></path>
-                  </svg>
+              <SignInProviderButton
+                onClick={async () => {
+                  await msal.handleRedirectPromise();
 
-                  <p>Log in with Microsoft</p>
-                </SignInProviderButton>
-              </MicrosoftLogin>
+                  msal
+                    .loginPopup({
+                      scopes: ['user.read'],
+                    })
+                    .then((response) => handleMicrosoft(response.accessToken));
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 23 23"
+                >
+                  <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+                  <path fill="#f35325" d="M1 1h10v10H1z"></path>
+                  <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+                  <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+                  <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+                </svg>
+
+                <p>Log in with Microsoft</p>
+              </SignInProviderButton>
             </Element>
           </div>
         </>

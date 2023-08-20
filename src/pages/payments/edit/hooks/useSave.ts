@@ -16,21 +16,33 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
   const queryClient = useQueryClient();
 
-  return (payment: Payment) => {
+  const saveCompany = useHandleCompanySave();
+
+  return async (payment: Payment) => {
     setErrors(undefined);
 
     toast.processing();
 
+    await saveCompany(true);
+
+    const adjustedPaymentPayload = { ...payment };
+
+    delete adjustedPaymentPayload.invoices;
+    delete adjustedPaymentPayload.credits;
+
+    await saveCompany(true);
+
     request(
       'PUT',
       endpoint('/api/v1/payments/:id', { id: payment.id }),
-      payment
+      adjustedPaymentPayload
     )
       .then(() => {
         toast.success('updated_payment');
@@ -39,9 +51,6 @@ export function useSave(
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       })
       .finally(() =>

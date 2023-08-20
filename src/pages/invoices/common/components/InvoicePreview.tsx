@@ -57,14 +57,37 @@ export function InvoicePreview(props: Props) {
   if (
     props.resource?.id &&
     props.resource?.[props.relationType] &&
+    props.entity === 'purchase_order'
+  ) {
+    return (
+      <InvoiceViewer
+        link={previewEndpoint(
+          '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
+          {
+            entity: props.entity,
+            id: props.resource?.id,
+          }
+        )}
+        resource={props.resource}
+        method="POST"
+      />
+    );
+  }
+
+  if (
+    props.resource?.id &&
+    props.resource?.[props.relationType] &&
     props.for === 'invoice'
   ) {
     return (
       <InvoiceViewer
-        link={previewEndpoint(endpoint, {
-          entity: props.entity,
-          id: props.resource?.id,
-        })}
+        link={previewEndpoint(
+          '/api/v1/live_preview?entity=:entity&entity_id=:id',
+          {
+            entity: props.entity,
+            id: props.resource?.id,
+          }
+        )}
         resource={props.resource}
         method="POST"
       />

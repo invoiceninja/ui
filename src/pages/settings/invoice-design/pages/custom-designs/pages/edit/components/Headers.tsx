@@ -24,7 +24,7 @@ export function Header() {
   const { t } = useTranslation();
   const { handleBlockChange } = useDesignUtilities();
 
-  useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
+  useDebounce(() => value && handleBlockChange('header', value), 1000, [value]);
 
   return (
     <Card title={t('header')} padding="small" collapsed={true}>

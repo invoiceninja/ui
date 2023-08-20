@@ -100,9 +100,6 @@ export default function Edit() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       })
       .finally(() => setIsFormBusy(false));
@@ -146,6 +143,7 @@ export default function Edit() {
         <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm
+              page="edit"
               errors={errors}
               transaction={transaction}
               handleChange={handleChange}

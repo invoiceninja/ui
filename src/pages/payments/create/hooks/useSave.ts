@@ -44,13 +44,12 @@ export function useSave(
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          toast.error();
-          console.error(error);
         }
       })
       .finally(() => {
         queryClient.invalidateQueries(route('/api/v1/payments'));
+        queryClient.invalidateQueries(route('/api/v1/credits'));
+        queryClient.invalidateQueries(route('/api/v1/invoices'));
       });
   };
 }

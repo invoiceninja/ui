@@ -41,4 +41,6 @@ export interface Task {
   status?: TaskStatus;
   project?: Project;
   documents: any[];
+  date: string;
+  calculated_start_date: string;
 }

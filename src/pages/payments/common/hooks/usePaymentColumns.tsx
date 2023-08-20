@@ -13,9 +13,7 @@ import paymentType from '$app/common/constants/payment-type';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Payment } from '$app/common/interfaces/payment';
 import { EntityStatus } from '$app/components/EntityStatus';
@@ -25,6 +23,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'status',
@@ -81,10 +80,10 @@ export function usePaymentColumns() {
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
 
-  const currentUser = useCurrentUser();
-  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCurrency = useResolveCurrency();
+
+  const reactSettings = useReactSettings();
 
   const calculateConvertedAmount = (payment: Payment) => {
     if (payment.exchange_rate) {
@@ -141,15 +140,19 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
-          payment.client?.country_id || company.settings.country_id,
-          payment.client?.settings.currency_id || company.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {
       column: 'invoice_number',
       id: 'id',
       label: t('invoice_number'),
-      format: (value, payment) => payment.invoices?.[0]?.number,
+      format: (value, payment) => (
+        <Link to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}>
+          {payment.invoices?.[0]?.number}
+        </Link>
+      )
     },
     {
       column: 'date',
@@ -183,8 +186,8 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           calculateConvertedAmount(payment),
-          payment.client?.country_id || company?.settings.country_id,
-          payment.client?.settings.currency_id || company?.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {
@@ -235,8 +238,13 @@ export function usePaymentColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -247,8 +255,8 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
-          payment.client?.country_id || company?.settings.country_id,
-          payment.client?.settings.currency_id || company?.settings.currency_id
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
         ),
     },
     {
@@ -260,8 +268,7 @@ export function usePaymentColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.payment ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.payment || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

@@ -35,6 +35,8 @@ import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
 import { useQuoteQuery } from '../common/queries';
+import { Card } from '$app/components/cards';
+import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -111,14 +113,24 @@ export default function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={quote}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          readonly
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          {quote && (
+            <div className="flex space-x-20">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <QuoteStatusBadge entity={quote} />
+            </div>
+          )}
+
+          <ClientSelector
+            resource={quote}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            textOnly
+            readonly
+          />
+        </Card>
 
         <QuoteDetails handleChange={handleChange} errors={errors} />
 
@@ -127,8 +139,13 @@ export default function Edit() {
             <ProductsTable
               type="product"
               resource={quote}
-              items={quote.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={quote.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -143,7 +160,7 @@ export default function Edit() {
           )}
         </div>
 
-        <QuoteFooter handleChange={handleChange} />
+        <QuoteFooter handleChange={handleChange} errors={errors} />
 
         {quote && (
           <InvoiceTotals

@@ -8,45 +8,51 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../../components/cards';
-import { Settings } from '../../../../components/layouts/Settings';
-import { Field } from '../components';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Field } from '../components/Field';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Clients() {
+  useTitle('custom_fields');
+
   const [t] = useTranslation();
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('custom_fields'), href: '/settings/custom_fields' },
-    { name: t('clients'), href: '/settings/custom_fields/clients' },
-  ];
+  const title = `${t('custom_fields')}: ${t('clients')}`;
+  const company = useCompanyChanges();
+  const handleChange = useHandleCustomFieldChange();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
-  });
+  if (!company) {
+    return null;
+  }
 
   return (
-    <Settings
-      title={t('custom_fields')}
-      breadcrumbs={pages}
-      docsLink="en/advanced-settings/#custom_fields"
-    >
-      <CustomFieldsPlanAlert />
-
-      <Card title={`${t('custom_fields')}: ${t('clients')}`}>
+    <>
+      <Card title={title}>
         {['client1', 'client2', 'client3', 'client4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('client_field')} />
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('client_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
         ))}
       </Card>
 
       <Card title={`${t('custom_fields')}: ${t('contacts')}`}>
         {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
-          <Field key={field} field={field} placeholder={t('contact_field')} />
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('contact_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
         ))}
       </Card>
-    </Settings>
+    </>
   );
 }

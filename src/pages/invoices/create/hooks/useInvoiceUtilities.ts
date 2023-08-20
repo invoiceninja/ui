@@ -22,6 +22,7 @@ import { useAtom } from 'jotai';
 import { invoiceAtom, invoiceSumAtom } from '$app/pages/invoices/common/atoms';
 import { ChangeHandler } from '../Create';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface Props {
   client?: Client;
@@ -67,7 +68,9 @@ export function useInvoiceUtilities(props: Props) {
     );
 
     if (currency && invoice) {
-      const invoiceSum = new InvoiceSum(invoice, currency).build();
+      const invoiceSum = invoice.uses_inclusive_taxes
+        ? new InvoiceSumInclusive(invoice, currency).build()
+        : new InvoiceSum(invoice, currency).build();
 
       setInvoiceSum(invoiceSum);
     }

@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -17,6 +16,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { MdOutlineFileOpen } from 'react-icons/md';
 
 interface Props {
   payment: Payment;
@@ -34,38 +34,74 @@ export function setLabel(payment: Payment, paymentable: Paymentable): string {
 export function PaymentOverviewInvoice(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
-    <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
-      <div className="flex items-center justify-center">
-        <span className="text-gray-800">
-          {`${t('invoice')} `}
-          <Link
-            to={route('/invoices/:id/edit', {
-              id: props.paymentable.invoice_id,
-            })}
-          >
-            {setLabel(props.payment, props.paymentable)}
-          </Link>
-        </span>
-      </div>
-      <div className="flex items-center justify-center">
-        <span className="text-gray-400">
-          {formatMoney(
-            props?.paymentable?.amount || 0,
-            company.settings.country_id,
-            props.payment?.currency_id
-          )}
-        </span>
-        <span className="text-gray-400 mx-5">
-          {formatDate(
-            new Date(props.paymentable.created_at * 1000).toString(),
-            dateFormat
-          )}
-        </span>
-      </div>
-    </div>
+    <>
+      {props.paymentable.invoice_id && (
+        <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
+          <div className="flex items-center justify-center">
+            <span className="flex item-center text-gray-800 gap-2">
+              {`${t('invoice')} `}
+              <Link
+                to={route('/invoices/:id/edit', {
+                  id: props.paymentable.invoice_id,
+                })}
+              >
+                <span className='flex items-center gap-2'>
+                   {setLabel(props.payment, props.paymentable)} <MdOutlineFileOpen /> 
+                </span>
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">
+              {formatMoney(
+                props?.paymentable?.amount || 0,
+                props.payment.client?.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+            <span className="text-gray-400 mx-5">
+              {formatDate(
+                new Date(props.paymentable.created_at * 1000).toString(),
+                dateFormat
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {props.paymentable.credit_id && (
+        <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
+          <div className="flex items-center justify-center">
+            <span className="text-gray-800">
+              <Link
+                to={route('/credits/:id/edit', {
+                  id: props.paymentable.credit_id,
+                })}
+              >
+                {`${t('credit')} `}
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">
+              {formatMoney(
+                props?.paymentable?.amount || 0,
+                props.payment.client?.country_id,
+                props.payment?.currency_id
+              )}
+            </span>
+            <span className="text-gray-400 mx-5">
+              {formatDate(
+                new Date(props.paymentable.created_at * 1000).toString(),
+                dateFormat
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

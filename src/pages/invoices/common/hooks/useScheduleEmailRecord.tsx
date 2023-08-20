@@ -27,6 +27,7 @@ export function useScheduleEmailRecord({ entity }: Props) {
       show_aging_table: false,
       show_credits_table: false,
       show_payments_table: false,
+      only_clients_with_invoices: false,
       status: 'all',
       date_range: 'last7_days',
       entity,

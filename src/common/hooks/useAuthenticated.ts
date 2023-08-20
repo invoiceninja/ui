@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -69,9 +68,7 @@ export function useAuthenticated(): boolean {
         dispatch(updateCompanyUsers(response.data.data));
         dispatch(changeCurrentIndex(currentIndex));
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
+      .catch(() => {
         localStorage.removeItem('X-NINJA-TOKEN');
 
         navigate('/login');

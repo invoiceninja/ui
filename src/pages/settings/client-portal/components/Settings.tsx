@@ -26,7 +26,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export function Settings() {
   const [t] = useTranslation();
-  
+
   useInjectCompanyChanges();
 
   const company = useCompanyChanges();
@@ -37,7 +37,7 @@ export function Settings() {
   const [subdomainValidation, setSubdomainValidation] = useState('');
 
   const checkSubdomain = (value: string) => {
-    setErrors(undefined)
+    setErrors(undefined);
     request('POST', endpoint('/api/v1/check_subdomain'), {
       subdomain: value,
     })
@@ -49,61 +49,66 @@ export function Settings() {
         setSubdomainValidation(t('subdomain_is_not_available') ?? '');
         handleChange('subdomain', value);
       });
-
-  }
+  };
 
   return (
     <Card title={t('settings')}>
-
       {isHosted() && (
-      <>
-        <Element leftSide={t('portal_mode')} leftSideHelp={t('subdomain_guide')}>
-          <SelectField
-            disabled={freePlan()}
-            id="portal_mode"
-            value={company?.portal_mode}
-            onValueChange={(value) =>
-              handleChange('portal_mode', value)
-            }>
-            <option value="subdomain" key="subdomain">
-              {t('subdomain')}
-            </option>
-            <option value="domain" key="domain">
-              {t('domain')}
-            </option>
-          </SelectField>
-        </Element>
-        
-        {company?.portal_mode === 'subdomain' && (
-        <Element leftSide={t('subdomain')}>
-          <InputField
-            value={company?.subdomain}
-            disabled={freePlan()}
-            onValueChange={(value) => checkSubdomain(value)}
-            errorMessage={errors?.errors.subdomain ?? subdomainValidation}
-          />
-        </Element>
-        )}
-
-        {company?.portal_mode === 'domain' && (
-          <Element leftSide={t('domain_url')} leftSideHelp="custom domain info">
-            <InputField
-              value={company?.portal_domain}
-              onValueChange={(value) => handleChange('portal_domain', value)}
-            />
+        <>
+          <Element
+            leftSide={t('portal_mode')}
+            leftSideHelp={t('subdomain_guide')}
+          >
+            <SelectField
+              disabled={freePlan()}
+              id="portal_mode"
+              value={company?.portal_mode}
+              onValueChange={(value) => handleChange('portal_mode', value)}
+              errorMessage={errors?.errors.portal_mode}
+            >
+              <option value="subdomain" key="subdomain">
+                {t('subdomain')}
+              </option>
+              <option value="domain" key="domain">
+                {t('domain')}
+              </option>
+            </SelectField>
           </Element>
-        )}
 
+          {company?.portal_mode === 'subdomain' && (
+            <Element leftSide={t('subdomain')}>
+              <InputField
+                value={company?.subdomain}
+                disabled={freePlan()}
+                onValueChange={(value) => checkSubdomain(value)}
+                errorMessage={errors?.errors.subdomain ?? subdomainValidation}
+              />
+            </Element>
+          )}
+
+          {company?.portal_mode === 'domain' && (
+            <Element
+              leftSide={t('domain_url')}
+              leftSideHelp="custom domain info"
+            >
+              <InputField
+                value={company?.portal_domain}
+                onValueChange={(value) => handleChange('portal_domain', value)}
+                errorMessage={errors?.errors.portal_domain}
+              />
+            </Element>
+          )}
         </>
       )}
 
       {isSelfHosted() && (
-      <Element leftSide={t('domain_url')}>
-        <InputField
-          value={company?.portal_domain}
-          onValueChange={(value) => handleChange('portal_domain', value)}
-        />
-      </Element>
+        <Element leftSide={t('domain_url')}>
+          <InputField
+            value={company?.portal_domain}
+            onValueChange={(value) => handleChange('portal_domain', value)}
+            errorMessage={errors?.errors.portal_domain}
+          />
+        </Element>
       )}
 
       <Element
@@ -178,7 +183,6 @@ export function Settings() {
         />
       </Element>
 
-      
       {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
       </Element> */}
@@ -192,6 +196,7 @@ export function Settings() {
             handleChange('settings.client_portal_terms', value)
           }
           value={company?.settings.client_portal_terms}
+          errorMessage={errors?.errors['settings.client_portal_terms']}
         />
       </Element>
 
@@ -202,6 +207,7 @@ export function Settings() {
             handleChange('settings.client_portal_privacy_policy', value)
           }
           value={company?.settings.client_portal_privacy_policy}
+          errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>
     </Card>

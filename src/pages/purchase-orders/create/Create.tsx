@@ -42,10 +42,14 @@ import { useHandleLineItemPropertyChange } from '../edit/hooks/useHandleLineItem
 import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Card } from '$app/components/cards';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
+  const company = useCurrentCompany();
 
   const reactSettings = useReactSettings();
 
@@ -71,7 +75,10 @@ export default function Create() {
     setPurchaseOrder((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'purchase_order_product'
+      ) {
         value = undefined;
       }
 
@@ -98,6 +105,8 @@ export default function Create() {
               invitation.client_contact_id || '')
         );
 
+        po.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
+
         value = po;
       }
 
@@ -105,7 +114,9 @@ export default function Create() {
     });
   }, [data]);
 
-  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
+  const [invoiceSum, setInvoiceSum] = useState<
+    InvoiceSum | InvoiceSumInclusive
+  >();
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();
@@ -161,15 +172,18 @@ export default function Create() {
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
     >
       <div className="grid grid-cols-12 gap-4">
-        <VendorSelector
-          resource={purchaseOrder}
-          onChange={(id) => handleChange('vendor_id', id)}
-          onClearButtonClick={() => handleChange('vendor_id', '')}
-          onContactCheckboxChange={(id, checked) =>
-            purchaseOrder && handleInvitationChange(purchaseOrder, id, checked)
-          }
-          errorMessage={errors?.errors.vendor_id}
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <VendorSelector
+            resource={purchaseOrder}
+            onChange={(id) => handleChange('vendor_id', id)}
+            onClearButtonClick={() => handleChange('vendor_id', '')}
+            onContactCheckboxChange={(id, checked) =>
+              purchaseOrder &&
+              handleInvitationChange(purchaseOrder, id, checked)
+            }
+            errorMessage={errors?.errors.vendor_id}
+          />
+        </Card>
 
         {purchaseOrder && (
           <Details

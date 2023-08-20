@@ -83,6 +83,7 @@ export function Create() {
             show_aging_table: false,
             show_credits_table: false,
             show_payments_table: false,
+            only_clients_with_invoices: false,
             status: 'all',
             entity: 'invoice',
             entity_id: '',
@@ -118,9 +119,6 @@ export function Create() {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

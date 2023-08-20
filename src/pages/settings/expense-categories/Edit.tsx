@@ -27,6 +27,7 @@ import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { useActions } from '$app/pages/settings/expense-categories/common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 interface ExpenseCategoryInput {
   name: string;
@@ -34,6 +35,7 @@ interface ExpenseCategoryInput {
 }
 
 export function Edit() {
+  const { setDocumentTitle } = useTitle('edit_expense_category');
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -98,9 +100,6 @@ export function Edit() {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));
@@ -108,9 +107,7 @@ export function Edit() {
   };
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${
-      data?.data.data.name
-    }`;
+    setDocumentTitle(data?.data.data.name);
 
     setExpenseCategory(data?.data.data);
   }, [data]);

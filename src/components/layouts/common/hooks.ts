@@ -107,6 +107,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('custom_fields'),
+      href: '/settings/custom_fields',
+      current: location.pathname.endsWith('/settings/custom_fields'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
       current: location.pathname.startsWith('/settings/generated_numbers'),
@@ -145,7 +151,7 @@ export function useSettingsRoutes() {
       enabled: ((isAdmin || isOwner) && isCompanyLevelActive) || false,
     },
     {
-      name: t('subscriptions'),
+      name: t('payment_links'),
       href: '/settings/subscriptions',
       current: location.pathname.startsWith('/settings/subscriptions'),
       enabled: ((isAdmin || isOwner) && isCompanyLevelActive) || false,

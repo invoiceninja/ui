@@ -34,7 +34,7 @@ export function Footer(props: PurchaseOrderCardProps) {
 
   const queryClient = useQueryClient();
 
-  const { purchaseOrder, handleChange } = props;
+  const { purchaseOrder, handleChange, errors } = props;
 
   const tabs = [
     t('terms'),
@@ -87,6 +87,7 @@ export function Footer(props: PurchaseOrderCardProps) {
                 inputLabel={t('User')}
                 value={purchaseOrder.assigned_user_id}
                 onChange={(user) => handleChange('assigned_user_id', user.id)}
+                errorMessage={errors?.errors.assigned_user_id}
               />
             </div>
 
@@ -95,6 +96,7 @@ export function Footer(props: PurchaseOrderCardProps) {
                 inputLabel={t('project')}
                 value={purchaseOrder.project_id}
                 onChange={(project) => handleChange('project_id', project.id)}
+                errorMessage={errors?.errors.project_id}
               />
             </div>
 
@@ -103,6 +105,7 @@ export function Footer(props: PurchaseOrderCardProps) {
                 inputLabel={t('client')}
                 value={purchaseOrder.client_id}
                 onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
               />
             </div>
 
@@ -113,6 +116,7 @@ export function Footer(props: PurchaseOrderCardProps) {
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value) || 1.0)
                 }
+                errorMessage={errors?.errors.exchange_rate}
               />
             </div>
 
@@ -121,9 +125,9 @@ export function Footer(props: PurchaseOrderCardProps) {
                 inputLabel={t('design')}
                 value={purchaseOrder?.design_id}
                 onChange={(design) => handleChange('design_id', design.id)}
-                clearButton={Boolean(purchaseOrder?.design_id)}
                 onClearButtonClick={() => handleChange('design_id', '')}
                 disableWithQueryParameter
+                errorMessage={errors?.errors.design_id}
               />
             </div>
           </div>

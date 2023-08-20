@@ -9,13 +9,10 @@
  */
 
 import { Card } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
@@ -25,29 +22,27 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useAtom } from 'jotai';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function QuoteFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
-  const company = useCurrentCompany();
   const location = useLocation();
   const queryClient = useQueryClient();
 
   const [quote] = useAtom(quoteAtom);
-
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const tabs = [
     t('terms'),
@@ -121,6 +116,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('user')}
                   value={quote?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
+                  errorMessage={errors?.errors.assigned_user_id}
                 />
               </div>
 
@@ -129,6 +125,8 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('vendor')}
                   value={quote?.vendor_id}
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                  onClearButtonClick={() => handleChange('vendor_id', '')}
+                  errorMessage={errors?.errors.vendor_id}
                 />
               </div>
 
@@ -137,9 +135,9 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('design')}
                   value={quote?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
-                  clearButton={Boolean(quote?.design_id)}
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
+                  errorMessage={errors?.errors.design_id}
                 />
               </div>
             </div>
@@ -150,6 +148,7 @@ export function QuoteFooter(props: Props) {
                   inputLabel={t('project')}
                   value={quote?.project_id}
                   onChange={(project) => handleChange('project_id', project.id)}
+                  errorMessage={errors?.errors.project_id}
                 />
               </div>
 
@@ -160,14 +159,17 @@ export function QuoteFooter(props: Props) {
                   onValueChange={(value) =>
                     handleChange('exchange_rate', parseFloat(value))
                   }
+                  errorMessage={errors?.errors.exchange_rate}
                 />
               </div>
 
               <div className="pt-9">
                 <Toggle
-                  label={t('auto_bill_enabled')}
-                  checked={quote?.auto_bill_enabled || false}
-                  onChange={(value) => handleChange('auto_bill_enabled', value)}
+                  label={t('inclusive_taxes')}
+                  checked={quote?.uses_inclusive_taxes || false}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>
@@ -175,19 +177,12 @@ export function QuoteFooter(props: Props) {
         </div>
 
         <div>
-          <CustomFieldsPlanAlert />
-
-          {company &&
-            ['quote1', 'quote2', 'quote3', 'quote4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('custom_field')}
-                onChange={(value: any) => handleCustomFieldChange(field, value)}
-                noExternalPadding
-              />
-            ))}
+          <span className="text-sm">
+            {t('custom_fields_location_changed')} &nbsp;
+          </span>
+          <Link to="/settings/custom_fields/quotes" className="capitalize">
+            {t('click_here')}
+          </Link>
         </div>
       </TabGroup>
     </Card>

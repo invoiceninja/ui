@@ -16,16 +16,18 @@ import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
-import { Modal } from '$app/components/Modal';
 import { set } from 'lodash';
 import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
 import { Address } from '$app/pages/clients/edit/components/Address';
 import { Contacts } from '$app/pages/clients/edit/components/Contacts';
 import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { Spinner } from '$app/components/Spinner';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Slider } from '$app/components/cards/Slider';
+import { Inline } from '$app/components/Inline';
 
 interface Props {
   isModalOpen: boolean;
@@ -33,7 +35,11 @@ interface Props {
   onClientCreated?: (client: Client) => unknown;
 }
 
-export function ClientCreate(props: Props) {
+export function ClientCreate({
+  isModalOpen,
+  setIsModalOpen,
+  onClientCreated,
+}: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -54,14 +60,29 @@ export function ClientCreate(props: Props) {
   });
 
   useEffect(() => {
-    if (blankClient) {
-      setClient(blankClient);
+    if (blankClient && isModalOpen) {
+      setClient({ ...blankClient });
     }
-  }, [blankClient]);
+  }, [isModalOpen]);
+
+  const handleClose = (value: boolean) => {
+    setIsModalOpen(value);
+    setErrors(undefined);
+    setClient(undefined);
+    setContacts(() => [
+      {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        send_email: false,
+      },
+    ]);
+  };
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
 
     if (
@@ -75,17 +96,16 @@ export function ClientCreate(props: Props) {
         message: t('invalid_data //needs translation'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
-      toast.error(t('error_title'), { id: toastId });
+      toast.error();
 
       return onSave;
     }
 
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
-        toast.success(t('created_client'), { id: toastId });
-        props.setIsModalOpen(false);
+        toast.success('created_client');
 
-        props.onClientCreated && props.onClientCreated(response.data.data);
+        onClientCreated && onClientCreated(response.data.data);
 
         queryClient.invalidateQueries('/api/v1/clients');
         queryClient.invalidateQueries(endpoint('/api/v1/clients'));
@@ -97,52 +117,66 @@ export function ClientCreate(props: Props) {
             },
           })
         );
+
+        handleClose(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           setErrors(error.response.data);
+          toast.dismiss();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 
   return (
-    <Modal
-      title={t('new_client')}
-      visible={props.isModalOpen}
-      onClose={(value) => {
-        props.setIsModalOpen(value);
-        setErrors(undefined);
-      }}
-      size="large"
-      backgroundColor="gray"
-    >
-      <div className="flex flex-col xl:flex-row xl:gap-4">
-        <div className="w-full xl:w-1/2">
-          <Details client={client} setClient={setClient} errors={errors} />
-          <Address client={client} setClient={setClient} />
-        </div>
+    <Slider
+      title={t('new_client')!}
+      visible={isModalOpen}
+      onClose={() => handleClose(false)}
+      size="regular"
+      actionChildren={
+        <Inline className="w-full flex justify-end">
+          <Button type="secondary" onClick={() => handleClose(false)}>
+            {t('cancel')}
+          </Button>
 
-        <div className="w-full xl:w-1/2">
+          <Button onClick={onSave}>{t('save')}</Button>
+        </Inline>
+      }
+    >
+      {client ? (
+        <div className="flex flex-col divide-y">
+          <Details
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
+
           <Contacts
             contacts={contacts}
             setContacts={setContacts}
+            setErrors={setErrors}
             errors={errors}
           />
-          <AdditionalInfo client={client} setClient={setClient} />
+
+          <Address
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
+
+          <AdditionalInfo
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
         </div>
-      </div>
-
-      <div className="flex justify-end space-x-4">
-        <Button type="minimal" onClick={() => props.setIsModalOpen(false)}>
-          {t('cancel')}
-        </Button>
-
-        <Button onClick={onSave}>{t('save')}</Button>
-      </div>
-    </Modal>
+      ) : (
+        <Spinner />
+      )}
+    </Slider>
   );
 }

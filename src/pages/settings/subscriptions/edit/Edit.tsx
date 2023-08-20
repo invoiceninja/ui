@@ -29,8 +29,11 @@ import { Settings as SubscriptionSettings } from '../common/components/Settings'
 import { Webhook } from '../common/components/Webhook';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export function Edit() {
+  const { documentTitle } = useTitle('edit_payment_link');
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -45,9 +48,9 @@ export function Edit() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('subscriptions'), href: '/settings/subscriptions' },
+    { name: t('payment_links'), href: '/settings/subscriptions' },
     {
-      name: t('edit_subscription'),
+      name: t('edit_payment_link'),
       href: route('/settings/subscriptions/:id/edit', { id }),
     },
   ];
@@ -123,16 +126,13 @@ export function Edit() {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };
 
   return (
     <Settings
-      title={t('edit_subscription')}
+      title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}

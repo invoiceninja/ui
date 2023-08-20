@@ -48,10 +48,19 @@ export function EmailStatement(props: Props) {
 
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
 
+  const handleChangeParameters = (clients: Client[]) => {
+    const currentParameters = { ...schedule.parameters };
+    currentParameters.clients = clients.map(({ id }) => id);
+
+    handleChange('parameters', currentParameters);
+  };
+
   const handleRemoveClient = (clientIndex: number) => {
     const updatedClientsList = selectedClients.filter(
       (client, index) => index !== clientIndex
     );
+
+    handleChangeParameters(updatedClientsList);
 
     setSelectedClients(updatedClientsList);
   };
@@ -66,13 +75,6 @@ export function EmailStatement(props: Props) {
     }
   }, [clientsResponse]);
 
-  useEffect(() => {
-    const currentParameters = { ...schedule.parameters };
-    currentParameters.clients = selectedClients?.map(({ id }) => id);
-
-    handleChange('parameters', currentParameters);
-  }, [selectedClients]);
-
   return (
     <>
       <Element leftSide={t('date_range')}>
@@ -81,7 +83,7 @@ export function EmailStatement(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.date_range' as keyof Schedule, value)
           }
-          errorMessage={errors?.errors.date_range}
+          errorMessage={errors?.errors['parameters.date_range']}
         >
           <option value="last7_days">{t('last7_days')}</option>
           <option value="last30_days">{t('last30_days')}</option>
@@ -92,6 +94,7 @@ export function EmailStatement(props: Props) {
           <option value="last_quarter">{t('last_quarter')}</option>
           <option value="this_year">{t('this_year')}</option>
           <option value="last_year">{t('last_year')}</option>
+          <option value="all_time">{t('all_time')}</option>
         </SelectField>
       </Element>
 
@@ -101,7 +104,7 @@ export function EmailStatement(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.status' as keyof Schedule, value)
           }
-          errorMessage={errors?.errors.status}
+          errorMessage={errors?.errors['parameters.status']}
         >
           <option value="all">{t('all')}</option>
           <option value="paid">{t('paid')}</option>
@@ -142,11 +145,28 @@ export function EmailStatement(props: Props) {
         />
       </Element>
 
+      <Element leftSide={t('only_clients_with_invoices')}>
+        <Toggle
+          checked={schedule.parameters.only_clients_with_invoices}
+          onValueChange={(value) =>
+            handleChange(
+              'parameters.only_clients_with_invoices' as keyof Schedule,
+              value
+            )
+          }
+        />
+      </Element>
+
       <Element leftSide={t('client')}>
         <ClientSelector
-          onChange={(client) =>
-            setSelectedClients((prevState) => [...prevState, client])
-          }
+          onChange={(client) => {
+            setSelectedClients((prevState) => {
+              const currentClients = [...prevState, client];
+              handleChangeParameters(currentClients);
+
+              return currentClients;
+            });
+          }}
           withoutAction
           clearInputAfterSelection
           exclude={schedule.parameters.clients}

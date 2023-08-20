@@ -30,25 +30,24 @@ export function useHandleCreate(
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return () => {
+  return (defaultTabIndex: number) => {
     toast.processing();
 
     setErrors(undefined);
 
-    request(
-      'POST',
-      endpoint('/api/v1/company_gateways?sort=id|desc'),
-      companyGateway
-    )
+    request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
       .then((response: GenericSingleResourceResponse<CompanyGateway>) => {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
+        queryClient.invalidateQueries('/api/v1/company_gateways');
+
         toast.success('created_company_gateway');
 
         navigate(
-          route('/settings/gateways/:id/edit', {
+          route('/settings/gateways/:id/edit?tab=:defaultTabIndex', {
             id: response.data.data.id,
+            defaultTabIndex,
           })
         );
       })
@@ -56,9 +55,6 @@ export function useHandleCreate(
         if (error?.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

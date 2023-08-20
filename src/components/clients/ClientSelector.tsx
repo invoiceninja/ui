@@ -39,29 +39,6 @@ export function ClientSelector(props: ClientSelectorProps) {
         onClientCreated={(client) => props.onChange(client)}
       />
 
-      {/* <DebouncedCombobox
-        inputLabel={props.inputLabel}
-        endpoint="/api/v1/clients"
-        label="display_name"
-        onChange={(value: Record<Client>) =>
-          value.resource && props.onChange(value.resource)
-        }
-        defaultValue={props.value}
-        disabled={props.readonly}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        queryAdditional
-        initiallyVisible={props.initiallyVisible}
-        actionLabel={props.withoutAction ? '' : t('new_client')}
-        onActionClick={() => setIsModalOpen(true)}
-        sortBy="display_name|asc"
-        exclude={props.exclude}
-        staleTime={props.staleTime || 500}
-        clearInputAfterSelection={props.clearInputAfterSelection}
-        disableWithSpinner={props.disableWithSpinner}
-        errorMessage={props.errorMessage}
-      /> */}
-
       <ComboboxAsync<Client>
         inputOptions={{
           label: props.inputLabel?.toString(),
@@ -75,7 +52,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || 500}
-        sortBy="display_name|asc"
+        sortBy={null}
         exclude={props.exclude}
         action={{
           label: t('new_client'),
@@ -83,7 +60,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           onClick: () => setIsModalOpen(true),
         }}
         key="client_selector"
-        // clearInputAfterFirstSelection
+        clearInputAfterSelection={props.clearInputAfterSelection}
       />
 
       {props.errorMessage && (

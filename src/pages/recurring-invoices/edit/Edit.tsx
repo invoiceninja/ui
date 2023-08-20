@@ -43,6 +43,8 @@ import { Icon } from '$app/components/icons/Icon';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { Card } from '$app/components/cards';
+import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -159,14 +161,24 @@ export default function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector
-          resource={recurringInvoice}
-          onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={handleInvitationChange}
-          errorMessage={errors?.errors.client_id}
-          readonly
-        />
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          {recurringInvoice && (
+            <div className="flex space-x-20">
+              <span className="text-sm text-gray-900">{t('status')}</span>
+              <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+            </div>
+          )}
+
+          <ClientSelector
+            resource={recurringInvoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={handleInvitationChange}
+            errorMessage={errors?.errors.client_id}
+            textOnly
+            readonly
+          />
+        </Card>
 
         <InvoiceDetails handleChange={handleChange} errors={errors} />
 
@@ -175,8 +187,13 @@ export default function Edit() {
             <ProductsTable
               type="product"
               resource={recurringInvoice}
-              items={recurringInvoice.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+              items={recurringInvoice.line_items.filter((item) =>
+                [
+                  InvoiceItemType.Product,
+                  InvoiceItemType.UnpaidFee,
+                  InvoiceItemType.PaidFee,
+                  InvoiceItemType.LateFee,
+                ].includes(item.type_id)
               )}
               columns={productColumns}
               relationType="client_id"
@@ -191,7 +208,7 @@ export default function Edit() {
           )}
         </div>
 
-        <InvoiceFooter handleChange={handleChange} />
+        <InvoiceFooter handleChange={handleChange} errors={errors} />
 
         {recurringInvoice && (
           <InvoiceTotals

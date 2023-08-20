@@ -10,13 +10,11 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Vendor } from '$app/common/interfaces/vendor';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { CreateVendorModal } from '$app/pages/vendors/components/CreateVendorModal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
   initiallyVisible?: boolean;
@@ -40,22 +38,28 @@ export function VendorSelector(props: VendorSelectorProps) {
       />
 
       {!props.setSelectedIds && (
-        <DebouncedCombobox
-          inputLabel={props.inputLabel}
-          value="id"
-          endpoint="/api/v1/vendors"
-          label="name"
-          onChange={(value: Record<Vendor>) =>
-            value.resource && props.onChange(value.resource)
+        <ComboboxAsync<Vendor>
+          endpoint={new URL(endpoint('/api/v1/vendors?status=active'))}
+          onChange={(vendor: Entry<Vendor>) =>
+            vendor.resource && props.onChange(vendor.resource)
           }
-          defaultValue={props.value}
-          disabled={props.readonly}
-          clearButton={props.clearButton}
-          onClearButtonClick={props.onClearButtonClick}
-          queryAdditional
+          inputOptions={{
+            label: props.inputLabel?.toString(),
+            value: props.value || null,
+          }}
+          entryOptions={{
+            id: 'id',
+            label: 'name',
+            value: 'id',
+          }}
+          action={{
+            label: t('new_vendor'),
+            onClick: () => setIsModalOpen(true),
+            visible: true,
+          }}
+          readonly={props.readonly}
+          onDismiss={props.onClearButtonClick}
           initiallyVisible={props.initiallyVisible}
-          actionLabel={t('new_vendor')}
-          onActionClick={() => setIsModalOpen(true)}
           sortBy="name|asc"
           staleTime={props.staleTime || 500}
           errorMessage={props.errorMessage}

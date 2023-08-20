@@ -16,7 +16,6 @@ import { Expense } from '$app/common/interfaces/expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   setErrors: (errors: ValidationBag | undefined) => unknown;
@@ -24,8 +23,6 @@ interface Props {
 
 export function useSave(params: Props) {
   const queryClient = useQueryClient();
-
-  const navigate = useNavigate();
 
   const { setErrors } = params;
 
@@ -46,15 +43,12 @@ export function useSave(params: Props) {
           route('/api/v1/expenses/:id', { id: expense.id })
         );
 
-        navigate('/expenses');
+        queryClient.invalidateQueries('/api/v1/expenses');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

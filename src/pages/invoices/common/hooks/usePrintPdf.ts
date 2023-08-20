@@ -17,8 +17,20 @@ interface Props {
   entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
 }
 
-export function usePrintPdf({ entity }: Props) {
+export const usePrintPdf = ({ entity }: Props) => {
   const queryClient = useQueryClient();
+
+  const appendIframe = (element: HTMLElement) => {
+    return new Promise<void>((resolve) => {
+      const onLoad = () => {
+        element.removeEventListener('load', onLoad);
+        resolve();
+      };
+
+      document.body.appendChild(element);
+      element.addEventListener('load', onLoad);
+    });
+  };
 
   return (resourceIds: string[]) => {
     if (!resourceIds.length) {
@@ -33,29 +45,24 @@ export function usePrintPdf({ entity }: Props) {
         endpoint(`/api/v1/${entity}s/bulk`),
         { action: 'bulk_print', ids: resourceIds },
         { responseType: 'arraybuffer' }
-      )
-        .then((response) => {
-          const blob = new Blob([response.data], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
+      ).then(async (response) => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
 
-          const iframeElement = document.createElement('iframe');
+        const iframeElement = document.createElement('iframe');
 
-          iframeElement.style.display = 'none';
-          iframeElement.src = url;
+        iframeElement.style.display = 'none';
+        iframeElement.src = url;
 
-          document.body.appendChild(iframeElement);
+        await appendIframe(iframeElement);
 
-          if (iframeElement && iframeElement.contentWindow) {
-            iframeElement.contentWindow.focus();
-            iframeElement.contentWindow.print();
-          }
+        if (iframeElement && iframeElement.contentWindow) {
+          iframeElement.contentWindow.focus();
+          iframeElement.contentWindow.print();
+        }
 
-          toast.dismiss();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error();
-        })
+        toast.dismiss();
+      })
     );
   };
-}
+};

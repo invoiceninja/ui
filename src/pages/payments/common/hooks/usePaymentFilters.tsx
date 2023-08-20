@@ -62,7 +62,7 @@ export function usePaymentFilters() {
       value: 'partially_unapplied',
       color: 'white',
       backgroundColor: '#bf83cc',
-    }
+    },
   ];
 
   return filters;

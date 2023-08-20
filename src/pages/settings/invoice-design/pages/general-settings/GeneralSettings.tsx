@@ -28,6 +28,10 @@ import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceView
 import { endpoint } from '$app/common/helpers';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useAtom } from 'jotai';
+import { updatingRecordsAtom } from '../../common/atoms';
+import { request } from '$app/common/helpers/request';
+import axios, { AxiosPromise } from 'axios';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -49,6 +53,25 @@ export default function GeneralSettings() {
     settings_type: 'company',
   });
 
+  const [updatingRecords] = useAtom(updatingRecordsAtom);
+
+  const handleSave = () => {
+    onSave();
+
+    const requests: AxiosPromise[] = [];
+
+    updatingRecords.map(({ design_id, entity }) => {
+      requests.push(
+        request('POST', endpoint('/api/v1/designs/set/default'), {
+          design_id,
+          entity,
+        })
+      );
+    });
+
+    axios.all(requests);
+  };
+
   useEffect(() => {
     if (company?.settings) {
       setPayload(
@@ -59,9 +82,9 @@ export default function GeneralSettings() {
 
   useSaveBtn(
     {
-      onClick: onSave,
+      onClick: handleSave,
     },
-    [company]
+    [company, updatingRecords]
   );
 
   return (

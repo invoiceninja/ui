@@ -12,13 +12,11 @@ import { Card, Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
 import paymentType from '$app/common/constants/payment-type';
-import { route } from '$app/common/helpers/route';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
@@ -28,10 +26,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { FormEvent, useEffect, useState } from 'react';
@@ -42,6 +37,12 @@ import { v4 } from 'uuid';
 import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
+import { Alert } from '$app/components/Alert';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
+import { endpoint } from '$app/common/helpers';
+import { useAtom } from 'jotai';
+import { paymentAtom } from '../common/atoms';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -72,82 +73,91 @@ export default function Create() {
   const creditResolver = useCreditResolver();
   const formatMoney = useFormatMoney();
 
-  const [payment, setPayment] = useState<PaymentOnCreation>();
+  const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
-  const [sendEmail, setSendEmail] = useState(false);
+  const [sendEmail, setSendEmail] = useState(
+    company?.settings?.client_manual_payment_notification
+  );
   const [convertCurrency, setConvertCurrency] = useState(false);
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
   useEffect(() => {
-    if (blankPayment?.data.data) {
-      setPayment({
-        ...blankPayment.data.data,
-        invoices: [],
-        credits: [],
-        client_id: '',
-      });
+    setPayment((current) => {
+      let value = current;
 
-      if (searchParams.has('client')) {
+      if (searchParams.get('action') !== 'enter') {
+        value = undefined;
+      }
+
+      if (typeof blankPayment !== 'undefined' && typeof value === 'undefined') {
+        value = {
+          ...blankPayment.data.data,
+          invoices: [],
+          credits: [],
+          client_id: '',
+        };
+      }
+
+      return value;
+    });
+
+    if (searchParams.has('client')) {
+      setPayment(
+        (current) =>
+          current && {
+            ...current,
+            client_id: searchParams.get('client') as string,
+          }
+      );
+    }
+
+    if (searchParams.has('client') && searchParams.has('invoice')) {
+      invoiceResolver
+        .find(searchParams.get('invoice') as string)
+        .then((invoice) =>
+          setPayment(
+            (current) =>
+              current && {
+                ...current,
+                invoices: [
+                  {
+                    _id: v4(),
+                    invoice_id: invoice.id,
+                    amount:
+                      invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    credit_id: '',
+                  },
+                ],
+              }
+          )
+        );
+    }
+
+    if (searchParams.has('client') && searchParams.has('credit')) {
+      creditResolver.find(searchParams.get('credit') as string).then((credit) =>
         setPayment(
           (current) =>
             current && {
               ...current,
-              client_id: searchParams.get('client') as string,
+              credits: [
+                {
+                  _id: v4(),
+                  credit_id: credit.id,
+                  amount: credit.balance > 0 ? credit.balance : credit.amount,
+                  invoice_id: '',
+                },
+              ],
             }
-        );
-      }
+        )
+      );
+    }
 
-      if (searchParams.has('client') && searchParams.has('invoice')) {
-        invoiceResolver
-          .find(searchParams.get('invoice') as string)
-          .then((invoice) =>
-            setPayment(
-              (current) =>
-                current && {
-                  ...current,
-                  invoices: [
-                    {
-                      _id: v4(),
-                      invoice_id: invoice.id,
-                      amount:
-                        invoice.balance > 0 ? invoice.balance : invoice.amount,
-                      credit_id: '',
-                    },
-                  ],
-                }
-            )
-          );
-      }
-
-      if (searchParams.has('client') && searchParams.has('credit')) {
-        creditResolver
-          .find(searchParams.get('credit') as string)
-          .then((credit) =>
-            setPayment(
-              (current) =>
-                current && {
-                  ...current,
-                  credits: [
-                    {
-                      _id: v4(),
-                      credit_id: credit.id,
-                      amount:
-                        credit.balance > 0 ? credit.balance : credit.amount,
-                      invoice_id: '',
-                    },
-                  ],
-                }
-            )
-          );
-      }
-
-      if (searchParams.has('type')) {
-        setPayment(
-          (current) =>
-            current && { ...current, type_id: searchParams.get('type') ?? '' }
-        );
-      }
+    if (searchParams.has('type')) {
+      setPayment(
+        (current) =>
+          current && { ...current, type_id: searchParams.get('type') ?? '' }
+      );
     }
   }, [blankPayment]);
 
@@ -156,7 +166,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
-          amount: collect(payment?.invoices).sum('amount') as number,
+          // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
   }, [payment?.invoices]);
@@ -203,28 +213,38 @@ export default function Create() {
       <Container>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
-            <DebouncedCombobox
-              endpoint="/api/v1/clients"
-              label="name"
-              onChange={(value: Record<Client>) => {
-                handleChange('client_id', value.resource?.id as string);
-
-                handleChange(
-                  'currency_id',
-                  value.resource?.settings.currency_id
-                );
+            <ClientSelector
+              onChange={(client) => {
+                handleChange('client_id', client?.id as string);
+                handleChange('currency_id', client?.settings.currency_id);
               }}
-              defaultValue={payment?.client_id}
+              onClearButtonClick={() => {
+                handleChange('client_id', '');
+                handleChange('currency_id', '');
+              }}
               errorMessage={errors?.errors.client_id}
+              defaultValue={payment?.client_id}
+              value={payment?.client_id}
+              readonly={
+                searchParams.has('invoice') ||
+                searchParams.get('action') === 'enter'
+              }
+              initiallyVisible={!payment?.client_id}
             />
           </Element>
 
-          <Element leftSide={t('amount_received')}>
+          <Element
+            leftSide={t('amount_received')}
+            leftSideHelp={t('amount_received_help')}
+          >
             <InputField
               id="amount"
               value={payment?.amount}
               onValueChange={(value) =>
-                handleChange('amount', parseFloat(value))
+                handleChange(
+                  'amount',
+                  isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                )
               }
               errorMessage={errors?.errors.amount}
             />
@@ -236,62 +256,95 @@ export default function Create() {
             payment.invoices.length > 0 &&
             payment.invoices.map((invoice, index) => (
               <Element key={index}>
-                <div className="flex items-center space-x-2">
-                  <DebouncedCombobox
-                    className="w-1/2"
-                    inputLabel={t('invoice')}
-                    endpoint={route('/api/v1/invoices?payable=:clientId', {
-                      clientId: payment.client_id,
-                    })}
-                    label="number"
-                    onChange={(value: Record<Invoice>) =>
-                      value.resource &&
-                      handleExistingInvoiceChange(value.resource, index)
-                    }
-                    defaultValue={invoice.invoice_id}
-                    queryAdditional
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <ComboboxAsync<Invoice>
+                      inputOptions={{
+                        value: invoice.invoice_id,
+                        label: t('invoice') ?? '',
+                      }}
+                      endpoint={
+                        new URL(
+                          endpoint(
+                            `/api/v1/invoices?payable=${payment.client_id}`
+                          )
+                        )
+                      }
+                      entryOptions={{
+                        label: 'number',
+                        id: 'id',
+                        value: 'id',
+                      }}
+                      onChange={(entry) =>
+                        entry.resource
+                          ? handleExistingInvoiceChange(entry.resource, index)
+                          : null
+                      }
+                    />
 
-                  <InputField
-                    label={t('amount_received')}
-                    onValueChange={(value) =>
-                      handleInvoiceInputChange(index, parseFloat(value))
-                    }
-                    className="w-full"
-                    value={invoice.amount}
-                  />
+                    <InputField
+                      label={t('amount_received')}
+                      onValueChange={(value) =>
+                        handleInvoiceInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
+                      }
+                      className="w-full"
+                      value={invoice.amount}
+                    />
 
-                  <Button
-                    behavior="button"
-                    type="minimal"
-                    className="mt-6"
-                    onClick={() => handleDeletingInvoice(invoice._id)}
-                  >
-                    <X />
-                  </Button>
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      className="mt-6"
+                      onClick={() => handleDeletingInvoice(invoice._id)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+
+                  {errors?.errors[`invoices.${index}.amount`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`invoices.${index}.amount`]}
+                    </Alert>
+                  )}
+
+                  {errors?.errors[`invoices.${index}.invoice_id`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`invoices.${index}.invoice_id`]}
+                    </Alert>
+                  )}
                 </div>
               </Element>
             ))}
 
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
-              <DebouncedCombobox
-                endpoint={route('/api/v1/invoices?payable=:clientId', {
-                  clientId: payment.client_id,
-                })}
-                label="number"
-                clearInputAfterSelection
-                onChange={(value: Record<Invoice>) =>
-                  value.resource && handleInvoiceChange(value.resource)
+              <ComboboxAsync<Invoice>
+                endpoint={
+                  new URL(
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                  )
                 }
-                formatLabel={(resource: Invoice) =>
-                  `${t('invoice_number_short')} ${
-                    resource.number
-                  } (${formatMoney(
-                    resource.amount,
-                    resource?.client?.country_id ?? '1',
-                    resource?.client?.settings.currency_id
-                  )})`
+                inputOptions={{
+                  value: 'id',
+                }}
+                entryOptions={{
+                  id: 'id',
+                  value: 'id',
+                  label: 'name',
+                  dropdownLabelFn: (invoice) =>
+                    `${t('invoice_number_short')}${invoice.number} - ${t(
+                      'balance'
+                    )} ${formatMoney(
+                      invoice.balance,
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
+                    )}`,
+                }}
+                onChange={({ resource }) =>
+                  resource ? handleInvoiceChange(resource) : null
                 }
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
@@ -306,60 +359,103 @@ export default function Create() {
             payment.credits.length > 0 &&
             payment.credits.map((credit, index) => (
               <Element key={index}>
-                <div className="flex items-center space-x-2">
-                  <DebouncedCombobox
-                    className="w-1/2"
-                    inputLabel={t('credit')}
-                    endpoint={route('/api/v1/credits?client_id=:clientId', {
-                      clientId: payment.client_id,
-                    })}
-                    label="number"
-                    onChange={(value: Record<Credit>) =>
-                      value.resource &&
-                      handleExistingCreditChange(value.resource, index)
-                    }
-                    defaultValue={credit.credit_id}
-                    queryAdditional
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <ComboboxAsync<Credit>
+                      inputOptions={{
+                        value: credit.credit_id,
+                        label: t('credit') ?? '',
+                      }}
+                      endpoint={
+                        new URL(
+                          endpoint(
+                            `/api/v1/credits?client_id=${payment.client_id}`
+                          )
+                        )
+                      }
+                      entryOptions={{
+                        id: 'id',
+                        value: 'id',
+                        label: 'number',
+                        dropdownLabelFn: (credit) =>
+                          `${t('credit')} #${credit.number} - ${t(
+                            'balance'
+                          )} ${formatMoney(
+                            credit.balance,
+                            payment.client?.country_id,
+                            payment.client?.settings.currency_id
+                          )}`,
+                      }}
+                      onChange={(entry) =>
+                        entry.resource
+                          ? handleExistingCreditChange(entry.resource, index)
+                          : null
+                      }
+                    />
 
-                  <InputField
-                    label={t('amount')}
-                    onValueChange={(value) =>
-                      handleCreditInputChange(index, parseFloat(value))
-                    }
-                    className="w-full"
-                    value={credit.amount}
-                  />
+                    <InputField
+                      label={t('amount')}
+                      onValueChange={(value) =>
+                        handleCreditInputChange(
+                          index,
+                          isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                        )
+                      }
+                      className="w-full"
+                      value={credit.amount}
+                    />
 
-                  <Button
-                    behavior="button"
-                    type="minimal"
-                    className="mt-6"
-                    onClick={() => handleDeletingCredit(credit._id)}
-                  >
-                    <X />
-                  </Button>
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      className="mt-6"
+                      onClick={() => handleDeletingCredit(credit._id)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+
+                  {errors?.errors[`credits.${index}.amount`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`credits.${index}.amount`]}
+                    </Alert>
+                  )}
+
+                  {errors?.errors[`credits.${index}.credit_id`] && (
+                    <Alert className="mt-2" type="danger">
+                      {errors?.errors[`credits.${index}.credit_id`]}
+                    </Alert>
+                  )}
                 </div>
               </Element>
             ))}
 
           {payment?.client_id && (
             <Element leftSide={t('credits')}>
-              <DebouncedCombobox
-                endpoint={route('/api/v1/credits?client_id=:clientId', {
-                  clientId: payment.client_id,
-                })}
-                label="number"
-                clearInputAfterSelection
-                onChange={(value: Record<Credit>) =>
-                  value.resource && handleCreditChange(value.resource)
+              <ComboboxAsync<Credit>
+                endpoint={
+                  new URL(
+                    endpoint(`/api/v1/credits?client_id=${payment.client_id}`)
+                  )
                 }
-                formatLabel={(resource: Credit) =>
-                  `${resource.number} (${formatMoney(
-                    resource.amount,
-                    resource?.client?.country_id ?? '1',
-                    resource?.client?.settings.currency_id
-                  )})`
+                inputOptions={{
+                  value: null,
+                }}
+                entryOptions={{
+                  id: 'id',
+                  label: 'number',
+                  value: 'id',
+                  dropdownLabelFn: (credit) =>
+                    `${t('credit')} #${credit.number} - ${t(
+                      'balance'
+                    )} ${formatMoney(
+                      credit.balance,
+                      payment.client?.country_id,
+                      payment.client?.settings.currency_id
+                    )}`,
+                }}
+                onChange={(entry) =>
+                  entry.resource ? handleCreditChange(entry.resource) : null
                 }
                 exclude={collect(payment.credits).pluck('credit_id').toArray()}
               />

@@ -74,6 +74,16 @@ export default function Create() {
           _task.client_id = searchParams.get('client')!;
         }
 
+        if (searchParams.get('project')) {
+          _task.project_id = searchParams.get('project')!;
+        }
+
+        _task.rate = company?.settings?.default_task_rate || 0;
+
+        if (searchParams.get('rate')) {
+          _task.rate = parseFloat(searchParams.get('rate')!);
+        }
+
         value = _task;
       }
 
@@ -104,9 +114,6 @@ export default function Create() {
         if (error.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);
-        } else {
-          console.error(error);
-          toast.error();
         }
       });
   };

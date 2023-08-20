@@ -10,12 +10,11 @@
 
 import classNames from 'classnames';
 import { Alert } from '$app/components/Alert';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
-import { DatePicker } from '$app/components/forms/Datepicker';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -35,12 +34,20 @@ interface Props extends CommonProps {
   textareaRows?: number;
   step?: string;
   maxLength?: number;
+  autoComplete?: string;
+  collapseOnFocus?: boolean;
+  parentClassName?: string;
 }
 
 export function InputField(props: Props) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const isInitialTypePassword = props.type === 'password';
 
+  const { collapseOnFocus, parentClassName } = props;
+
   const [isInputMasked, setIsInputMasked] = useState(true);
+
+  const [isFocused, setIsFocused] = useState(false);
 
   const inputType = useMemo(() => {
     if (props.type === 'password' && isInputMasked) {
@@ -54,6 +61,18 @@ export function InputField(props: Props) {
     return props.type;
   }, [props.type, isInputMasked]);
 
+  useEffect(() => {
+    if (collapseOnFocus && inputRef.current) {
+      inputRef.current.style.height = 'auto';
+
+      if (isFocused) {
+        inputRef.current.style.height = `${
+          inputRef.current.scrollHeight + 5
+        }px`;
+      }
+    }
+  }, [isFocused, props.value]);
+
   return (
     <section>
       {props.label && (
@@ -63,46 +82,49 @@ export function InputField(props: Props) {
         </InputLabel>
       )}
 
-      <div className="relative">
-        {props.type === 'date' ? (
-          <DatePicker
-            id={props.id}
-            required={props.required}
-            value={props.value}
-            onChange={props.onChange}
-            onValueChange={props.onValueChange}
-            disabled={props.disabled}
-            minDate={props.min}
-          />
-        ) : (
-          <DebounceInput
-            min={props.min}
-            maxLength={props.maxLength}
-            disabled={props.disabled}
-            element={props.element || 'input'}
-            inputRef={props.innerRef}
-            debounceTimeout={props.debounceTimeout ?? 300}
-            required={props.required}
-            id={props.id}
-            type={inputType}
-            className={classNames(
-              `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
-              {
-                'border border-gray-300': props.border !== false,
-              }
-            )}
-            placeholder={props.placeholder || ''}
-            onChange={(event) => {
-              props.onValueChange && props.onValueChange(event.target.value);
-              props.onChange && props.onChange(event);
-            }}
-            value={props.value}
-            list={props.list}
-            rows={props.textareaRows || 5}
-            step={props.step}
-            data-cy={props.cypressRef}
-          />
-        )}
+      <div className={`relative ${parentClassName}`}>
+        <DebounceInput
+          min={props.min}
+          maxLength={props.maxLength}
+          autoComplete={props.autoComplete || 'new-password'}
+          disabled={props.disabled}
+          element={props.element || 'input'}
+          inputRef={(ref) => {
+            if (props.innerRef) {
+              props.innerRef.current = ref;
+            }
+
+            inputRef.current = ref;
+          }}
+          debounceTimeout={props.debounceTimeout ?? 300}
+          required={props.required}
+          id={props.id}
+          type={inputType}
+          className={classNames(
+            `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            {
+              'border border-gray-300': props.border !== false,
+              'overflow-y-hidden hover:overflow-y-auto': collapseOnFocus,
+            }
+          )}
+          placeholder={props.placeholder || ''}
+          onChange={(event) => {
+            props.onValueChange && props.onValueChange(event.target.value);
+            props.onChange && props.onChange(event);
+          }}
+          onFocus={() => collapseOnFocus && setIsFocused(true)}
+          onBlur={() =>
+            collapseOnFocus &&
+            setTimeout(() => {
+              setIsFocused(false);
+            }, 100)
+          }
+          value={props.value}
+          list={props.list}
+          rows={props.textareaRows || 5}
+          step={props.step}
+          data-cy={props.cypressRef}
+        />
 
         {isInitialTypePassword && (
           <span className="absolute top-1/4 right-3 cursor-pointer">

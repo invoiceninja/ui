@@ -16,13 +16,27 @@ import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useCurrentSettingsLevel } from './useCurrentSettingsLevel';
 
-export function useInjectCompanyChanges(): Company | undefined {
+interface Options {
+  overwrite?: boolean;
+}
+
+export function useInjectCompanyChanges(
+  options?: Options
+): Company | undefined {
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
   const { isCompanyLevelActive } = useCurrentSettingsLevel();
 
   useEffect(() => {
+    if (companyChanges && options?.overwrite === false) {
+      // We don't want to overwrite existing changes,
+      // so let's just not inject anything if we already have a value,
+      // and relative argument.
+
+      return;
+    }
+
     if (isCompanyLevelActive) {
       dispatch(injectInChanges({ object: 'company', data: company }));
     }

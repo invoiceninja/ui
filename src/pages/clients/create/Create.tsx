@@ -21,18 +21,27 @@ import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useQueryClient } from 'react-query';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export default function Create() {
+  const { documentTitle } = useTitle('new_client');
+
   const [t] = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const queryClient = useQueryClient();
+
+  const saveCompany = useHandleCompanySave();
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -68,10 +77,11 @@ export default function Create() {
     }
   }, [blankClient]);
 
-  const onSave = () => {
+  const onSave = async () => {
     set(client as Client, 'contacts', contacts);
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
+
     if (
       !(
         client?.name != '' ||
@@ -83,45 +93,68 @@ export default function Create() {
         message: t('invalid_name // needs translation'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
-      toast.error(t('error_title'), { id: toastId });
+      toast.error();
 
       return onSave;
     }
 
+    await saveCompany(true);
+
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
-        toast.success(t('created_client'), { id: toastId });
+        toast.success('created_client');
+
+        queryClient.invalidateQueries('/api/v1/clients');
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
         if (error.response?.status === 422) {
           setErrors(error.response.data);
+          toast.dismiss();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 
   return (
-    <Default title={t('new_client')} breadcrumbs={pages} onSaveClick={onSave}>
+    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
       {isLoading && <Spinner />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
-          <Details client={client} setClient={setClient} errors={errors} />
-          <Address client={client} setClient={setClient} />
+          <Details
+            client={client}
+            setClient={setClient}
+            setErrors={setErrors}
+            errors={errors}
+          />
+
+          <div className="mt-5">
+            <Address
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+          </div>
         </div>
 
         <div className="w-full xl:w-1/2">
           <Contacts
             contacts={contacts}
             setContacts={setContacts}
+            setErrors={setErrors}
             errors={errors}
           />
-          <AdditionalInfo client={client} setClient={setClient} />
+
+          <div className="mt-5">
+            <AdditionalInfo
+              client={client}
+              setClient={setClient}
+              setErrors={setErrors}
+              errors={errors}
+            />
+          </div>
         </div>
       </div>
     </Default>

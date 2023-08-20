@@ -14,12 +14,16 @@ import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useAtomValue } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Settings() {
   const [t] = useTranslation();
 
   const companyChanges = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
     <Card title={t('settings')}>
@@ -30,16 +34,18 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.counter_padding', value)
           }
+          errorMessage={errors?.errors['settings.counter_padding']}
         >
           <option value="1">1</option>
           <option value="2">01</option>
-          <option value="3">0001</option>
-          <option value="4">00001</option>
-          <option value="5">000001</option>
-          <option value="6">0000001</option>
-          <option value="7">00000001</option>
-          <option value="8">000000001</option>
-          <option value="9">0000000001</option>
+          <option value="3">001</option>
+          <option value="4">0001</option>
+          <option value="5">00001</option>
+          <option value="6">000001</option>
+          <option value="7">0000001</option>
+          <option value="8">00000001</option>
+          <option value="9">000000001</option>
+          <option value="10">0000000001</option>
         </SelectField>
       </Element>
 
@@ -50,6 +56,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.counter_number_applied', value)
           }
+          errorMessage={errors?.errors['settings.counter_number_applied']}
         >
           <option value="when_saved">{t('when_saved')}</option>
           <option value="when_sent">{t('when_sent')}</option>
@@ -62,6 +69,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.recurring_number_prefix', value)
           }
+          errorMessage={errors?.errors['settings.recurring_number_prefix']}
         />
       </Element>
 
@@ -93,6 +101,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.reset_counter_frequency_id', parseInt(value))
           }
+          errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
         >
           <option value="0">{t('never')}</option>
           <option value="1">{t('freq_daily')}</option>
@@ -119,6 +128,7 @@ export function Settings() {
               onValueChange={(value) =>
                 handleChange('settings.reset_counter_date', value)
               }
+              errorMessage={errors?.errors['settings.reset_counter_date']}
             />
           </Element>
         )}

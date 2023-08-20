@@ -111,7 +111,7 @@ export function TemplatesAndReminders() {
       subject: templateBody?.subject,
       entity: '',
       entity_id: '',
-      template: '',
+      template: `email_template_${templateId}`,
     }).then((response) => setPreview(response.data));
   }, [templateBody]);
 
@@ -325,7 +325,7 @@ export function TemplatesAndReminders() {
       )}
 
       {preview && (
-        <Card style={{ height: 800 }} title={preview.subject}>
+        <Card className="scale-y-100" title={preview.subject}>
           <iframe
             srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
             frameBorder="0"

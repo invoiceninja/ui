@@ -27,7 +27,7 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCancel,
@@ -35,41 +35,54 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
   MdPrint,
+  MdRefresh,
   MdRestore,
   MdSchedule,
   MdSend,
 } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useHandleArchive } from '../hooks/useHandleArchive';
-import { useHandleCancel } from '../hooks/useHandleCancel';
-import { useHandleDelete } from '../hooks/useHandleDelete';
-import { useHandleRestore } from '../hooks/useHandleRestore';
-import { useMarkPaid } from '../hooks/useMarkPaid';
-import { useMarkSent } from '../hooks/useMarkSent';
+import { useNavigate } from 'react-router-dom';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
+import dayjs from 'dayjs';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk } from '$app/common/queries/invoices';
+import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 
-export function useActions() {
+export const isInvoiceAutoBillable = (invoice: Invoice) => {
+  return (
+    invoice.balance > 0 &&
+    (invoice.status_id === InvoiceStatus.Sent ||
+      invoice.status_id === InvoiceStatus.Partial) &&
+    Boolean(invoice.client?.gateway_tokens.length)
+  );
+};
+
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const location = useLocation();
+  const { showEditAction, showCommonBulkAction } = params || {};
+
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
-  const markSent = useMarkSent();
-  const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
 
-  const archive = useHandleArchive();
-  const restore = useHandleRestore();
-  const destroy = useHandleDelete();
-  const cancel = useHandleCancel();
+  const reverseInvoice = useReverseInvoice();
+
+  const bulk = useBulk();
+
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -78,19 +91,64 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, number: '', documents: [], due_date: '' });
+    setInvoice({
+      ...invoice,
+      id: '',
+      number: '',
+      documents: [],
+      due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
-    setQuote({ ...(invoice as unknown as Quote), number: '', documents: [] });
+    setQuote({
+      ...(invoice as unknown as Quote),
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (invoice: Invoice) => {
-    setCredit({ ...(invoice as unknown as Credit), number: '', documents: [] });
+    setCredit({
+      ...(invoice as unknown as Credit),
+      id: '',
+      number: '',
+      documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      due_date: '',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
+    });
 
     navigate('/credits/create?action=clone');
   };
@@ -98,8 +156,18 @@ export function useActions() {
   const cloneToRecurringInvoice = (invoice: Invoice) => {
     setRecurringInvoice({
       ...(invoice as unknown as RecurringInvoice),
+      id: '',
       number: '',
       documents: [],
+      frequency_id: '5',
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -108,14 +176,34 @@ export function useActions() {
   const cloneToPurchaseOrder = (invoice: Invoice) => {
     setPurchaseOrder({
       ...(invoice as unknown as PurchaseOrder),
+      id: '',
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '1',
+      vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/purchase_orders/create?action=clone');
   };
 
   return [
+    (invoice: Invoice) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/email', { id: invoice.id })}
@@ -170,7 +258,7 @@ export function useActions() {
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => markSent(invoice)}
+          onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
@@ -180,10 +268,19 @@ export function useActions() {
       parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => markPaid(invoice)}
+          onClick={() => bulk([invoice.id], 'mark_paid')}
           icon={<Icon element={MdPaid} />}
         >
           {t('mark_paid')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      isInvoiceAutoBillable(invoice) && (
+        <DropdownElement
+          onClick={() => bulk([invoice.id], 'auto_bill')}
+          icon={<Icon element={BiMoney} />}
+        >
+          {t('auto_bill')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
@@ -207,12 +304,25 @@ export function useActions() {
       </DropdownElement>
     ),
     (invoice: Invoice) =>
-      invoice.status_id === InvoiceStatus.Sent && (
+      (invoice.status_id === InvoiceStatus.Sent ||
+        invoice.status_id === InvoiceStatus.Partial) && (
         <DropdownElement
-          onClick={() => cancel(invoice)}
+          onClick={() => bulk([invoice.id], 'cancel')}
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Paid ||
+        invoice.status_id === InvoiceStatus.Partial) &&
+      !invoice.is_deleted &&
+      !invoice.archived_at && (
+        <DropdownElement
+          onClick={() => reverseInvoice(invoice)}
+          icon={<Icon element={MdRefresh} />}
+        >
+          {t('reverse')}
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
@@ -256,33 +366,36 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at === 0 && (
         <DropdownElement
-          onClick={() => archive(invoice)}
+          onClick={() => bulk([invoice.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement
-          onClick={() => restore(invoice)}
+          onClick={() => bulk([invoice.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      location.pathname.endsWith('/edit') &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !invoice.is_deleted && (
         <DropdownElement
-          onClick={() => destroy(invoice)}
+          onClick={() => bulk([invoice.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

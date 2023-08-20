@@ -12,7 +12,6 @@ import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Vendor } from '$app/common/interfaces/vendor';
@@ -23,6 +22,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'number',
@@ -48,6 +48,7 @@ export function useAllVendorColumns() {
     'created_at',
     'address2',
     'archived_at',
+    'last_login_at',
     //   'assigned_to', @Todo: Need to resolve relationship
     'contacts',
     'country_id',
@@ -75,9 +76,9 @@ export function useVendorColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
+  const reactSettings = useReactSettings();
 
   const vendorColumns = useAllVendorColumns();
   type VendorColumns = (typeof vendorColumns)[number];
@@ -134,6 +135,12 @@ export function useVendorColumns() {
       column: 'created_at',
       id: 'created_at',
       label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'last_login_at',
+      id: 'last_login',
+      label: t('last_login'),
       format: (value) => date(value, dateFormat),
     },
     {
@@ -221,8 +228,15 @@ export function useVendorColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate message={value as string}>
-          <span>{value}</span>
+        <Tooltip
+          size="regular"
+          truncate
+          containsUnsafeHTMLTags
+          message={value as string}
+        >
+          <span
+            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
+          />
         </Tooltip>
       ),
     },
@@ -246,8 +260,7 @@ export function useVendorColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.vendor ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.vendor || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

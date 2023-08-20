@@ -10,11 +10,12 @@
 import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
 
 export interface TaxItem {
   key?: string;
@@ -35,7 +36,7 @@ export class InvoiceSum {
   public subTotal = 0;
 
   constructor(
-    public invoice: Invoice | RecurringInvoice | PurchaseOrder,
+    public invoice: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote,
     protected currency: Currency
   ) {
     this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
@@ -227,20 +228,20 @@ export class InvoiceSum {
   }
 
   protected setCalculatedAttributes() {
-    if (this.invoice.status_id !== InvoiceStatus.Draft) {
-      if (this.invoice.amount !== this.invoice.balance) {
-        const paidToDate = this.invoice.amount - this.invoice.balance;
+    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
+    if (this.invoice.amount !== this.invoice.balance) {
+      const paidToDate = this.invoice.amount - this.invoice.balance;
 
-        this.invoice.balance =
-          parseFloat(
-            NumberFormatter.formatValue(this.total, this.currency.precision)
-          ) - paidToDate;
-      } else {
-        this.invoice.balance = parseFloat(
+      this.invoice.balance =
+        parseFloat(
           NumberFormatter.formatValue(this.total, this.currency.precision)
-        );
-      }
+        ) - paidToDate;
+    } else {
+      this.invoice.balance = parseFloat(
+        NumberFormatter.formatValue(this.total, this.currency.precision)
+      );
     }
+    // }
 
     this.invoice.amount = parseFloat(
       NumberFormatter.formatValue(this.total, this.currency.precision)
