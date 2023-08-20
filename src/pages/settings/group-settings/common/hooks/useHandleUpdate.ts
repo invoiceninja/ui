@@ -23,7 +23,7 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
-import { Dispatch, FormEvent, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -35,20 +35,18 @@ interface Params {
   isFormBusy?: boolean;
 }
 
-export function useHandleUpdate(params: Params) {
+export const useHandleUpdate = (params: Params) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
   const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-  const { isGroupLevelActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive } = useCurrentSettingsLevel();
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
-  return (event?: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
+  return () => {
     if (!isFormBusy) {
       toast.processing();
       setErrors?.(undefined);
@@ -73,7 +71,7 @@ export function useHandleUpdate(params: Params) {
             })
           );
 
-          if (isGroupLevelActive) {
+          if (isGroupSettingsActive) {
             dispatch(
               updateChanges({
                 object: 'company',
@@ -99,12 +97,9 @@ export function useHandleUpdate(params: Params) {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors?.(error.response.data);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy?.(false));
     }
   };
-}
+};

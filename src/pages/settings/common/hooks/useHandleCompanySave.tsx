@@ -28,7 +28,7 @@ export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
-  const { isGroupLevelActive, isCompanyLevelActive } =
+  const { isGroupSettingsActive, isCompanySettingsActive } =
     useCurrentSettingsLevel();
 
   const handleUpdateGroupSettings = useHandleUpdate({});
@@ -53,11 +53,11 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
-    if (isGroupLevelActive) {
+    if (isGroupSettingsActive) {
       handleUpdateGroupSettings();
     }
 
-    if (isCompanyLevelActive) {
+    if (isCompanySettingsActive) {
       return request(
         'PUT',
         endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),

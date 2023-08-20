@@ -19,16 +19,17 @@ import { useDispatch } from 'react-redux';
 
 export function useDiscardChanges() {
   const dispatch = useDispatch();
-  const { isCompanyLevelActive, isGroupLevelActive } =
+  const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
+
   const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
 
   return () => {
-    if (isCompanyLevelActive) {
+    if (isCompanySettingsActive) {
       dispatch(resetChanges('company'));
     }
 
-    if (isGroupLevelActive) {
+    if (isGroupSettingsActive) {
       dispatch(
         updateChanges({
           object: 'company',

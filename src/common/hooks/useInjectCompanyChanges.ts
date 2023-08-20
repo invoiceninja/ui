@@ -26,7 +26,7 @@ export function useInjectCompanyChanges(
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
-  const { isCompanyLevelActive } = useCurrentSettingsLevel();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   useEffect(() => {
     if (companyChanges && options?.overwrite === false) {
@@ -37,7 +37,7 @@ export function useInjectCompanyChanges(
       return;
     }
 
-    if (isCompanyLevelActive) {
+    if (isCompanySettingsActive) {
       dispatch(injectInChanges({ object: 'company', data: company }));
     }
   }, [company]);

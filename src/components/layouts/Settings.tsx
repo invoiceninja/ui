@@ -43,7 +43,7 @@ export function Settings(props: Props) {
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
   const activeSettings = useActiveSettingsDetails();
   const switchToCompanySettings = useSwitchToCompanySettings();
-  const { isGroupLevelActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive } = useCurrentSettingsLevel();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,10 +67,8 @@ export function Settings(props: Props) {
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
-          {isGroupLevelActive && (
-            <div
-              className={`flex items-center justify-between px-2 bg-white border border-gray-200 py-3 rounded space-x-3`}
-            >
+          {isGroupSettingsActive && (
+            <div className="flex items-center justify-between px-2 bg-white border border-gray-200 py-3 rounded space-x-3">
               <div className="flex items-center space-x-1 lg:space-x-3 3xl:space-x-1 flex-1 w-[90%] lg:w-[75%] 3xl:w-[90%]">
                 <div>
                   <Icon element={FaObjectGroup} size={20} />

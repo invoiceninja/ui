@@ -43,7 +43,8 @@ export function App() {
   const switchToCompanySettings = useSwitchToCompanySettings();
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
-  const { isCompanyLevelActive, isGroupLevelActive } =
+
+  const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
@@ -118,13 +119,16 @@ export function App() {
   }, [company]);
 
   useEffect(() => {
-    if (!location.pathname.startsWith('/settings') && !isCompanyLevelActive) {
+    if (
+      !location.pathname.startsWith('/settings') &&
+      !isCompanySettingsActive
+    ) {
       switchToCompanySettings();
     }
 
     if (
       location.pathname.startsWith('/settings/group_settings') &&
-      isGroupLevelActive
+      isGroupSettingsActive
     ) {
       navigate('/settings/company_details');
     }

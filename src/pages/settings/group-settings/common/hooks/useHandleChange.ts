@@ -18,7 +18,7 @@ interface Params {
   isCreatePage?: boolean;
 }
 
-export const blankGateway: GroupSettings = {
+export const blankGroupSettings: GroupSettings = {
   id: '',
   name: '',
   settings: {},
@@ -40,7 +40,7 @@ export function useHandleChange(params: Params) {
 
     if (isCreatePage) {
       setGroupSettings({
-        ...blankGateway,
+        ...blankGroupSettings,
         [property]: value,
       });
     } else {

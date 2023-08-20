@@ -14,14 +14,18 @@ import { useActiveSettingsDetails } from './useActiveSettingsDetails';
 export function useCurrentSettingsLevel() {
   const activeSettingsDetails = useActiveSettingsDetails();
 
-  const isCompanyLevelActive =
+  const isCompanySettingsActive =
     SettingsLevel.Company === activeSettingsDetails.level;
 
-  const isGroupLevelActive =
+  const isGroupSettingsActive =
     SettingsLevel.Group === activeSettingsDetails.level;
 
-  const isClientLevelActive =
+  const isClientSettingsActive =
     SettingsLevel.Client === activeSettingsDetails.level;
 
-  return { isCompanyLevelActive, isGroupLevelActive, isClientLevelActive };
+  return {
+    isCompanySettingsActive,
+    isGroupSettingsActive,
+    isClientSettingsActive,
+  };
 }

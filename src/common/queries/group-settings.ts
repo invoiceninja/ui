@@ -15,7 +15,6 @@ import { route } from '../helpers/route';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
-import { AxiosError } from 'axios';
 
 export function useGroupSettingsQuery() {
   return useQuery('/api/v1/group_settings', () => {
@@ -27,7 +26,7 @@ interface Params {
   id: string | undefined;
 }
 
-export function useGroupQuery(params: Params) {
+export const useGroupQuery = (params: Params) => {
   const { id } = params;
 
   return useQuery<GroupSettings>(
@@ -39,9 +38,9 @@ export function useGroupQuery(params: Params) {
       ),
     { staleTime: Infinity }
   );
-}
+};
 
-export function useBulkAction() {
+export const useBulkAction = () => {
   const queryClient = useQueryClient();
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
@@ -50,18 +49,14 @@ export function useBulkAction() {
     request('POST', endpoint('/api/v1/group_settings/bulk'), {
       action,
       ids: [id],
-    })
-      .then(() => {
-        toast.success(`${action}d_group`);
+    }).then(() => {
+      toast.success(`${action}d_group`);
 
-        queryClient.invalidateQueries(
-          route('/api/v1/group_settings/:id', { id })
-        );
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
+      queryClient.invalidateQueries('/api/v1/group_settings');
 
-        toast.error();
-      });
+      queryClient.invalidateQueries(
+        route('/api/v1/group_settings/:id', { id })
+      );
+    });
   };
-}
+};

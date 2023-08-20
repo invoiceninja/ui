@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { blankGateway, useHandleChange } from '../common/hooks/useHandleChange';
+import {
+  blankGroupSettings,
+  useHandleChange,
+} from '../common/hooks/useHandleChange';
 import { useEffect, useState } from 'react';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -48,7 +51,7 @@ export function Create() {
   });
 
   useEffect(() => {
-    setGroupSettings(blankGateway);
+    setGroupSettings(blankGroupSettings);
   }, []);
 
   return (

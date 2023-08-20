@@ -18,7 +18,7 @@ import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
-import { Dispatch, FormEvent, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,9 +36,7 @@ export function useHandleCreate(params: Params) {
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
-  return (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  return () => {
     if (!isFormBusy) {
       toast.processing();
       setErrors(undefined);
@@ -63,9 +61,6 @@ export function useHandleCreate(params: Params) {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
-          } else {
-            console.error(error);
-            toast.error();
           }
         })
         .finally(() => setIsFormBusy(false));

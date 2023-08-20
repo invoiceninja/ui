@@ -23,7 +23,6 @@ import { Settings } from 'react-feather';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { route } from '$app/common/helpers/route';
 import { useConfigureGroupSettings } from './useConfigureGroupSettings';
@@ -49,14 +48,9 @@ export function useActions() {
         request(
           'GET',
           endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
-        )
-          .then((response: GenericSingleResourceResponse<GroupSettings>) => {
-            configureGroupSettings(response.data.data);
-          })
-          .catch((error) => {
-            toast.error();
-            console.error(error);
-          })
+        ).then((response: GenericSingleResourceResponse<GroupSettings>) => {
+          configureGroupSettings(response.data.data);
+        })
     );
   };
 

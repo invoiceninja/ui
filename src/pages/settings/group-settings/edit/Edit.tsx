@@ -9,7 +9,7 @@
  */
 
 import { useHandleChange } from '../common/hooks/useHandleChange';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GroupSettingsForm } from '../common/components/GroupSettingsForm';
@@ -81,7 +81,7 @@ export function Edit() {
     }
   }, [groupSettingsResponse]);
 
-  const getShouldShowProperties = () => {
+  const shouldShowProperties = () => {
     const filteredProperties = Object.keys(
       groupSettings?.settings || []
     ).filter((key) => key !== 'entity');
@@ -116,10 +116,8 @@ export function Edit() {
               title={t('edit_group')}
               topRight={
                 <Button
-                  onClick={(event: FormEvent<HTMLButtonElement>) => {
-                    event.preventDefault();
-                    configureGroupSettings(groupSettingsResponse);
-                  }}
+                  behavior="button"
+                  onClick={() => configureGroupSettings(groupSettingsResponse)}
                 >
                   <Icon
                     className="h-4 w-4"
@@ -133,7 +131,7 @@ export function Edit() {
             >
               <div
                 className={classNames({
-                  'pb-4': getShouldShowProperties(),
+                  'pb-4': shouldShowProperties(),
                 })}
               >
                 <GroupSettingsForm
@@ -143,7 +141,7 @@ export function Edit() {
                 />
               </div>
 
-              {getShouldShowProperties() && (
+              {shouldShowProperties() && (
                 <>
                   <Divider withoutPadding />
 
