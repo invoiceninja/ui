@@ -16,25 +16,46 @@ import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
-export function useBulkAction() {
+const successMessages = {
+  email: 'emailed_credits',
+  mark_sent: 'marked_credit_as_sent',
+};
+
+interface Params {
+  onActionCall?: () => void;
+}
+export const useBulk = (params?: Params) => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  const { onActionCall } = params || {};
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'email' | 'mark_sent'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/credits/bulk'), {
       action,
-      ids: [id],
+      ids,
     })
-      .then(() => toast.success(`${action}d_credit`))
-      .finally(() => {
+      .then(() => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_invoice`;
+
+        toast.success(message);
+
         queryClient.invalidateQueries('/api/v1/credits');
 
-        queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
+        ids.forEach((id) =>
+          queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }))
+        );
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
-      });
+      })
+      .finally(() => onActionCall?.());
   };
-}
+};

@@ -86,7 +86,10 @@ export default function Create() {
     setPayment((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'enter') {
+      if (
+        searchParams.get('action') !== 'enter' &&
+        searchParams.get('action') !== 'apply'
+      ) {
         value = undefined;
       }
 
@@ -227,7 +230,8 @@ export default function Create() {
               value={payment?.client_id}
               readonly={
                 searchParams.has('invoice') ||
-                searchParams.get('action') === 'enter'
+                searchParams.get('action') === 'enter' ||
+                searchParams.get('action') === 'apply'
               }
               initiallyVisible={!payment?.client_id}
             />

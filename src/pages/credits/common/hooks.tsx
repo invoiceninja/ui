@@ -50,7 +50,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
-import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { Link } from '$app/components/forms';
@@ -64,7 +63,6 @@ import {
   MdArchive,
   MdCloudCircle,
   MdControlPointDuplicate,
-  MdCreditCard,
   MdCreditScore,
   MdDelete,
   MdDownload,
@@ -74,6 +72,7 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
+  MdSend,
 } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -87,6 +86,7 @@ import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk } from '$app/common/queries/credits';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -290,7 +290,7 @@ export function useActions() {
   const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
-  const bulk = useBulkAction();
+  const bulk = useBulk();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
@@ -437,7 +437,7 @@ export function useActions() {
     (credit) => (
       <DropdownElement
         to={route('/credits/:id/email', { id: credit.id })}
-        icon={<Icon element={MdCreditCard} />}
+        icon={<Icon element={MdSend} />}
       >
         {t('email_credit')}
       </DropdownElement>
@@ -534,7 +534,7 @@ export function useActions() {
       isEditPage &&
       credit.archived_at === 0 && (
         <DropdownElement
-          onClick={() => bulk(credit.id, 'archive')}
+          onClick={() => bulk([credit.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -544,7 +544,7 @@ export function useActions() {
       isEditPage &&
       credit.archived_at > 0 && (
         <DropdownElement
-          onClick={() => bulk(credit.id, 'restore')}
+          onClick={() => bulk([credit.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -554,7 +554,7 @@ export function useActions() {
       isEditPage &&
       !credit?.is_deleted && (
         <DropdownElement
-          onClick={() => bulk(credit.id, 'delete')}
+          onClick={() => bulk([credit.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
