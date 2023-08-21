@@ -114,7 +114,6 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
 
   const { save, preferences } = usePreferences();
 
@@ -258,7 +257,7 @@ export default function Reports() {
 
   const handlePreview = async () => {
     setErrors(undefined);
-    setShowPreview(false);
+    setPreview(null);
 
     const { client_id } = report.payload;
 
@@ -295,9 +294,9 @@ export default function Reports() {
               (response) => response.data
             ),
           retry: 10,
-          retryDelay: 10000,
+          retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
-        .then((value) => console.log(value));
+        .then((value) => setPreview(value));
     });
   };
 
@@ -478,41 +477,47 @@ export default function Reports() {
         />
       )}
 
-      {showPreview && <Preview />}
+      <Preview />
     </Default>
   );
 }
 
-const previewAtom = atom<ParseResult<string[]> | null>(null);
+const previewAtom = atom<PreviewRecord[][] | null>(null);
+
+export interface PreviewRecord {
+  entity: string;
+  id: string;
+  hashed_id: null;
+  value: string;
+  display_value: string;
+}
 
 function Preview() {
   const [t] = useTranslation();
   const [preview] = useAtom(previewAtom);
 
-  console.log(preview?.data);
+  if (!preview) {
+    return null;
+  }
+
+  const columns = preview[0] as unknown as string[];
 
   return (
     <Card className="my-6" title={t('preview')}>
       {preview ? (
         <Table>
           <Thead>
-            {preview.data[0].map((column, i) => (
+            {columns.map((column: string, i) => (
               <Th key={i}>{column}</Th>
             ))}
           </Thead>
           <Tbody>
-            <Tr>
-              {preview.data[0].map((column, i) => (
-                <Th key={i}>
-                  <InputField />
-                </Th>
-              ))}
-            </Tr>
-
-            {preview.data.slice(0).map((row, i) => (
+            {preview.map((row, i) => (
               <Tr key={i}>
-                {row.map((column, i) => (
-                  <Td key={i}>{column}</Td>
+                {row.map((cell, j) => (
+                  <Td key={j}>
+                    {i === 0 ? <InputField /> : cell.display_value}
+                  </Td>
                 ))}
               </Tr>
             ))}
