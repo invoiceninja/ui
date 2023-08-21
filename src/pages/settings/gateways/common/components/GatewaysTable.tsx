@@ -307,6 +307,8 @@ export function GatewaysTable(props: Props) {
                 ) : (
                   <Fragment />
                 )}
+
+                {droppableProvided.placeholder}
               </Tbody>
             )}
           </Droppable>
