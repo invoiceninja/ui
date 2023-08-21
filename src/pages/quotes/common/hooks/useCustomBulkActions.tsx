@@ -91,17 +91,25 @@ export function useCustomBulkActions() {
           setSelected={setSelected}
         />
       ),
-    (selectedIds) => (
+    (selectedIds, _, setSelected) => (
       <DropdownElement
-        onClick={() => printPdf(selectedIds)}
+        onClick={() => {
+          printPdf(selectedIds);
+
+          setSelected?.([]);
+        }}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
     ),
-    (selectedIds) => (
+    (selectedIds, _, setSelected) => (
       <DropdownElement
-        onClick={() => downloadPdfs(selectedIds)}
+        onClick={() => {
+          downloadPdfs(selectedIds);
+
+          setSelected?.([]);
+        }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
