@@ -107,7 +107,7 @@ interface Props<T> extends CommonProps {
 
 type ResourceAction<T> = (resource: T) => ReactElement;
 
-export const datatablePerPageAtom = atomWithStorage('perPage', '10');
+export const datatablePerPageAtom = atomWithStorage('perPage', '100');
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
