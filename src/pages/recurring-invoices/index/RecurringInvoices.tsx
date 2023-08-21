@@ -26,12 +26,28 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useAtom, useSetAtom } from 'jotai';
+import {
+  RecurringInvoiceSlider,
+  recurringInvoiceSliderAtom,
+  recurringInvoiceSliderVisibilityAtom,
+} from '../common/components/RecurringInvoiceSlider';
+import { useEffect, useState } from 'react';
+import { useRecurringInvoiceQuery } from '../common/queries';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();
+
+  const [sliderRecurringInvoiceId, setSliderRecurringInvoiceId] =
+    useState<string>('');
+
+  const { data: recurringInvoiceResponse } = useRecurringInvoiceQuery({
+    id: sliderRecurringInvoiceId,
+  });
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -44,8 +60,19 @@ export default function RecurringInvoices() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
   const columns = useRecurringInvoiceColumns();
-
   const customBulkActions = useCustomBulkActions();
+
+  const setRecurringInvoiceSlider = useSetAtom(recurringInvoiceSliderAtom);
+  const [
+    recurringInvoiceSliderVisibility,
+    setRecurringInvoiceSliderVisibility,
+  ] = useAtom(recurringInvoiceSliderVisibilityAtom);
+
+  useEffect(() => {
+    if (recurringInvoiceResponse && recurringInvoiceSliderVisibility) {
+      setRecurringInvoiceSlider(recurringInvoiceResponse);
+    }
+  }, [recurringInvoiceResponse, recurringInvoiceSliderVisibility]);
 
   return (
     <Default
@@ -86,7 +113,15 @@ export default function RecurringInvoices() {
           />
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
+        onTableRowClick={(recurringInvoice) => {
+          setSliderRecurringInvoiceId(
+            (recurringInvoice as RecurringInvoice).id
+          );
+          setRecurringInvoiceSliderVisibility(true);
+        }}
       />
+
+      <RecurringInvoiceSlider />
     </Default>
   );
 }
