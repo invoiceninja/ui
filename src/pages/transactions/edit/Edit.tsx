@@ -22,7 +22,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useTransactionQuery } from '../common/queries';
 import { useResolveCurrencySeparator } from '../common/hooks/useResolveCurrencySeparator';
 import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
@@ -30,6 +29,7 @@ import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
+import { useTransactionQuery } from '$app/common/queries/transactions';
 
 export default function Edit() {
   const [t] = useTranslation();
