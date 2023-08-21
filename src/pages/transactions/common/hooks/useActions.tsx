@@ -9,23 +9,23 @@
  */
 
 import { Transaction } from '$app/common/interfaces/transactions';
+import { useBulk } from '$app/common/queries/transactions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
-import { useBulkAction } from './useBulkAction';
 
 export function useActions() {
   const [t] = useTranslation();
 
-  const bulk = useBulkAction();
+  const bulk = useBulk();
 
   const actions: Action<Transaction>[] = [
     (transaction) =>
       transaction.archived_at === 0 && (
         <DropdownElement
-          onClick={() => bulk(transaction.id, 'archive')}
+          onClick={() => bulk([transaction.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -34,7 +34,7 @@ export function useActions() {
     (transaction) =>
       transaction.archived_at > 0 && (
         <DropdownElement
-          onClick={() => bulk(transaction.id, 'restore')}
+          onClick={() => bulk([transaction.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -43,7 +43,7 @@ export function useActions() {
     (transaction) =>
       !transaction.is_deleted && (
         <DropdownElement
-          onClick={() => bulk(transaction.id, 'delete')}
+          onClick={() => bulk([transaction.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

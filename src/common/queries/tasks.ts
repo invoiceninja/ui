@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Task } from '$app/common/interfaces/task';
@@ -70,23 +70,38 @@ export function useTasksQuery(params: TasksParams) {
   );
 }
 
-export function useBulk() {
+export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/tasks/bulk'), {
       action,
-      ids: [id],
+      ids,
     }).then(() => {
-      toast.success(`${action}d_task`);
+      if (action !== 'start' && action !== 'stop') {
+        toast.success(`${action}d_task`);
+      }
+
+      if (action === 'start') {
+        toast.success(trans('started_tasks', { value: ids.length }));
+      }
+
+      if (action === 'stop') {
+        toast.success(trans('stopped_tasks', { value: ids.length }));
+      }
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
+      ids.forEach((id) => {
+        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
+      });
     });
   };
-}
+};

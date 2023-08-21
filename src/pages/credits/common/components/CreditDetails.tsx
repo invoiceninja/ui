@@ -75,22 +75,22 @@ export function CreditDetails(props: Props) {
           </Element>
         )}
 
-        {credit && company?.custom_fields?.credit1 && (
+        {credit && company?.custom_fields?.invoice1 && (
           <CustomField
             field="credit1"
             defaultValue={credit?.custom_value1 || ''}
-            value={company.custom_fields.credit1}
+            value={company.custom_fields.invoice1}
             onValueChange={(value) =>
               handleChange('custom_value1', String(value))
             }
           />
         )}
 
-        {credit && company?.custom_fields?.credit2 && (
+        {credit && company?.custom_fields?.invoice2 && (
           <CustomField
             field="credit2"
             defaultValue={credit?.custom_value2 || ''}
-            value={company.custom_fields.credit2}
+            value={company.custom_fields.invoice2}
             onValueChange={(value) =>
               handleChange('custom_value2', String(value))
             }
@@ -145,22 +145,22 @@ export function CreditDetails(props: Props) {
           </div>
         </Element>
 
-        {credit && company?.custom_fields?.credit3 && (
+        {credit && company?.custom_fields?.invoice3 && (
           <CustomField
             field="credit3"
             defaultValue={credit?.custom_value3 || ''}
-            value={company.custom_fields.credit3}
+            value={company.custom_fields.invoice3}
             onValueChange={(value) =>
               handleChange('custom_value3', String(value))
             }
           />
         )}
 
-        {credit && company?.custom_fields?.credit4 && (
+        {credit && company?.custom_fields?.invoice4 && (
           <CustomField
             field="credit4"
             defaultValue={credit?.custom_value4 || ''}
-            value={company.custom_fields.credit4}
+            value={company.custom_fields.invoice4}
             onValueChange={(value) =>
               handleChange('custom_value4', String(value))
             }

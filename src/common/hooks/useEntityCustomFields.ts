@@ -22,9 +22,7 @@ export type Entity =
   | 'project'
   | 'task'
   | 'vendor'
-  | 'expense'
-  | 'quote'
-  | 'credit';
+  | 'expense';
 
 interface Params {
   entity: Entity;
