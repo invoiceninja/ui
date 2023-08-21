@@ -10,17 +10,32 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
+import { toast } from '../helpers/toast/toast';
 
-export function useCompanyGatewaysQuery() {
+interface CompanyGatewaysParams {
+  enabled?: boolean;
+  status?: string;
+}
+export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { isAdmin } = useAdmin();
+
+  const { enabled, status } = params || {};
 
   return useQuery(
     '/api/v1/company_gateways',
-    () => request('GET', endpoint('/api/v1/company_gateways?sort=id|desc')),
-    { staleTime: Infinity, enabled: isAdmin }
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/company_gateways?sort=id|desc&status=:status', {
+          status: status || 'active',
+        })
+      ),
+    { staleTime: Infinity, enabled: (enabled ?? true) && isAdmin }
   );
 }
 
@@ -60,3 +75,28 @@ export function useBlankCompanyGatewayQuery() {
     { staleTime: Infinity, enabled: isAdmin }
   );
 }
+
+export const useBulk = () => {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/company_gateways/bulk'), {
+      action,
+      ids,
+    }).then(() => {
+      toast.success(`${action}d_company_gateway`);
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(
+          route('/api/v1/d_company_gateways/:id', { id })
+        )
+      );
+    });
+  };
+};
