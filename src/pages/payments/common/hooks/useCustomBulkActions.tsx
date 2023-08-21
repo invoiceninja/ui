@@ -21,9 +21,10 @@ export const useCustomBulkActions = () => {
 
   const bulk = useBulk();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const showEmailPaymentAction = (payments: Payment[]) => {
-    return true;
+    return payments.every(({ client }) =>
+      client?.contacts.some(({ email }) => email)
+    );
   };
 
   const customBulkActions: CustomBulkAction<Payment>[] = [
