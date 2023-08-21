@@ -552,7 +552,7 @@ export const defaultColumns: string[] = [
 export function useAllQuoteColumns() {
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
-      entity: 'quote',
+      entity: 'invoice',
     });
 
   const quoteColumns = [
@@ -625,7 +625,7 @@ export function useQuoteColumns() {
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
-      entity: 'quote',
+      entity: 'invoice',
     });
 
   const columns: DataTableColumnsExtended<Quote, QuoteColumns> = [

@@ -9,6 +9,7 @@
  */
 
 import { Client } from './client';
+import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 
 export interface RecurringInvoice {
@@ -77,4 +78,5 @@ export interface RecurringInvoice {
   invitations: any[];
   documents: any[];
   client?: Client;
+  activities?: Activity[];
 }

@@ -577,7 +577,7 @@ export const defaultColumns: string[] = [
 export function useAllCreditColumns() {
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
-      entity: 'credit',
+      entity: 'invoice',
     });
 
   const creditColumns = [
@@ -637,7 +637,7 @@ export function useCreditColumns() {
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
-      entity: 'credit',
+      entity: 'invoice',
     });
 
   const columns: DataTableColumnsExtended<Credit, CreditColumns> = [

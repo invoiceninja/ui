@@ -25,19 +25,19 @@ export function CreditDetails() {
     { value: '$credit.total', label: t('credit_total') },
     {
       value: '$credit.custom1',
-      label: customField('credit1').label() || t('custom1'),
+      label: customField('invoice1').label() || t('custom1'),
     },
     {
       value: '$credit.custom2',
-      label: customField('credit2').label() || t('custom2'),
+      label: customField('invoice2').label() || t('custom2'),
     },
     {
       value: '$credit.custom3',
-      label: customField('credit3').label() || t('custom3'),
+      label: customField('invoice3').label() || t('custom3'),
     },
     {
       value: '$credit.custom4',
-      label: customField('credit4').label() || t('custom4'),
+      label: customField('invoice4').label() || t('custom4'),
     },
     { value: '$client.balance', label: t('client_balance') },
   ];
