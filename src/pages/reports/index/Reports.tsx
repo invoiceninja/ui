@@ -495,12 +495,27 @@ export interface PreviewRecord {
 function Preview() {
   const [t] = useTranslation();
   const [preview] = useAtom(previewAtom);
+  const [filtered, setFiltered] = useState<PreviewRecord[][]|null>(null);
 
   if (!preview) {
     return null;
   }
 
   const columns = preview[0] as unknown as string[];
+
+  const filter = (column: string, value: string) => {
+    console.log(column, value, preview);
+
+    const filtered = preview.filter((sub) =>
+      sub.some(
+        (item) => item.id === column && item.display_value.includes(value)
+      )
+    );
+
+    setFiltered(filtered)
+  };
+
+  const data = filtered || preview;
 
   return (
     <Card className="my-6" title={t('preview')}>
@@ -512,12 +527,16 @@ function Preview() {
             ))}
           </Thead>
           <Tbody>
-            {preview.map((row, i) => (
+            {preview[1].map((cell, i) => (
+              <Td key={i}>
+                <InputField onValueChange={(value) => filter(cell.id, value)} />
+              </Td>
+            ))}
+
+            {data.map((row, i) => (
               <Tr key={i}>
                 {row.map((cell, j) => (
-                  <Td key={j}>
-                    {i === 0 ? <InputField /> : cell.display_value}
-                  </Td>
+                  <Td key={j}>{i === 0 ? null : cell.display_value}</Td>
                 ))}
               </Tr>
             ))}
