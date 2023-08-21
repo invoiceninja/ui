@@ -30,7 +30,7 @@ import {
   invoiceSliderAtom,
   invoiceSliderVisibilityAtom,
 } from '../common/components/InvoiceSlider';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 
@@ -56,13 +56,15 @@ export default function Invoices() {
   const customBulkActions = useCustomBulkActions();
 
   const setInvoiceSlider = useSetAtom(invoiceSliderAtom);
-  const setInvoiceSliderVisibility = useSetAtom(invoiceSliderVisibilityAtom);
+  const [invoiceSliderVisibility, setInvoiceSliderVisibility] = useAtom(
+    invoiceSliderVisibilityAtom
+  );
 
   useEffect(() => {
-    if (invoiceResponse) {
+    if (invoiceResponse && invoiceSliderVisibility) {
       setInvoiceSlider(invoiceResponse);
     }
-  }, [invoiceResponse]);
+  }, [invoiceResponse, invoiceSliderVisibility]);
 
   return (
     <Default
