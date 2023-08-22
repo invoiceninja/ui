@@ -26,11 +26,9 @@ export const ConvertToProjectBulkAction = (props: Props) => {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const onActionCall = () => setIsModalOpen(false);
-
   const { selectedIds, setSelected } = props;
 
-  const bulk = useBulkAction({ onActionCall });
+  const bulk = useBulkAction();
 
   return (
     <>
@@ -55,6 +53,8 @@ export const ConvertToProjectBulkAction = (props: Props) => {
               bulk(selectedIds, 'convert_to_project');
 
               setSelected?.([]);
+
+              setIsModalOpen(false);
             }}
           >
             <span className="text-base mx-3">{t('yes')}</span>

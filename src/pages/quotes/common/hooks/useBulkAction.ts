@@ -23,14 +23,9 @@ const successMessages = {
   sent: 'marked_quote_as_sent',
 };
 
-interface Params {
-  onActionCall?: () => void;
-}
-export function useBulkAction(params?: Params) {
+export const useBulkAction = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-
-  const { onActionCall } = params || {};
 
   return (
     ids: string[],
@@ -49,27 +44,25 @@ export function useBulkAction(params?: Params) {
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids,
-    })
-      .then(() => {
-        const message =
-          successMessages[action as keyof typeof successMessages] ||
-          `${action}d_quote`;
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_quote`;
 
-        if (action === 'approve') {
-          toast.success(trans('approved_quotes', { value: ids.length }));
-        } else {
-          toast.success(message);
-        }
+      if (action === 'approve') {
+        toast.success(trans('approved_quotes', { value: ids.length }));
+      } else {
+        toast.success(message);
+      }
 
-        queryClient.invalidateQueries('/api/v1/quotes');
+      queryClient.invalidateQueries('/api/v1/quotes');
 
-        ids.forEach((id) =>
-          queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
-        );
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .finally(() => onActionCall?.());
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
-}
+};

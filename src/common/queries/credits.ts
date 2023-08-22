@@ -21,14 +21,9 @@ const successMessages = {
   mark_sent: 'marked_credit_as_sent',
 };
 
-interface Params {
-  onActionCall?: () => void;
-}
-export const useBulk = (params?: Params) => {
+export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-
-  const { onActionCall } = params || {};
 
   return (
     ids: string[],
@@ -39,23 +34,21 @@ export const useBulk = (params?: Params) => {
     request('POST', endpoint('/api/v1/credits/bulk'), {
       action,
       ids,
-    })
-      .then(() => {
-        const message =
-          successMessages[action as keyof typeof successMessages] ||
-          `${action}d_invoice`;
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_invoice`;
 
-        toast.success(message);
+      toast.success(message);
 
-        queryClient.invalidateQueries('/api/v1/credits');
+      queryClient.invalidateQueries('/api/v1/credits');
 
-        ids.forEach((id) =>
-          queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }))
-        );
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }))
+      );
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .finally(() => onActionCall?.());
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 };

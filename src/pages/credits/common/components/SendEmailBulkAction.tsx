@@ -26,11 +26,9 @@ export const SendEmailBulkAction = (props: Props) => {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const onActionCall = () => setIsModalOpen(false);
-
   const { selectedIds, setSelected } = props;
 
-  const bulk = useBulk({ onActionCall });
+  const bulk = useBulk();
 
   return (
     <>
@@ -55,6 +53,8 @@ export const SendEmailBulkAction = (props: Props) => {
               bulk(selectedIds, 'email');
 
               setSelected?.([]);
+
+              setIsModalOpen(false);
             }}
           >
             <span className="text-base mx-3">{t('yes')}</span>
