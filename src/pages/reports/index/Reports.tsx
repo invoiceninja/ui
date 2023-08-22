@@ -20,7 +20,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
@@ -36,6 +36,7 @@ import { atom, useAtom } from 'jotai';
 import Papa, { ParseResult } from 'papaparse';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useQueryClient } from 'react-query';
+import { useLocation } from 'react-router-dom';
 
 export type Identifier =
   | 'activity'
@@ -251,7 +252,7 @@ export default function Reports() {
       });
   };
 
-  const [, setPreview] = useAtom(previewAtom);
+  const [preview, setPreview] = useAtom(previewAtom);
 
   const queryClient = useQueryClient();
 
@@ -296,7 +297,10 @@ export default function Reports() {
           retry: 10,
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
-        .then((value) => setPreview(value));
+        .then((value) => {
+          setPreview(value);
+          toast.success();
+        });
     });
   };
 
@@ -323,6 +327,13 @@ export default function Reports() {
   };
 
   const filters = useInvoiceFilters();
+
+  useEffect(() => {
+    return () => {
+      queryClient.cancelQueries(['reports']);
+      toast.dismiss();
+    };
+  }, []);
 
   return (
     <Default
@@ -477,7 +488,7 @@ export default function Reports() {
         />
       )}
 
-      <Preview />
+      {preview && <Preview />}
     </Default>
   );
 }
@@ -493,9 +504,8 @@ export interface PreviewRecord {
 }
 
 function Preview() {
-  const [t] = useTranslation();
   const [preview] = useAtom(previewAtom);
-  const [filtered, setFiltered] = useState<PreviewRecord[][]|null>(null);
+  const [filtered, setFiltered] = useState<PreviewRecord[][] | null>(null);
 
   if (!preview) {
     return null;
@@ -504,22 +514,20 @@ function Preview() {
   const columns = preview[0] as unknown as string[];
 
   const filter = (column: string, value: string) => {
-    console.log(column, value, preview);
-
     const filtered = preview.filter((sub) =>
       sub.some(
         (item) => item.id === column && item.display_value.includes(value)
       )
     );
 
-    setFiltered(filtered)
+    setFiltered(filtered);
   };
 
   const data = filtered || preview;
 
-  return (
-    <Card className="my-6" title={t('preview')}>
-      {preview ? (
+  if (preview) {
+    return (
+      <div id="preview-table">
         <Table>
           <Thead>
             {columns.map((column: string, i) => (
@@ -533,16 +541,22 @@ function Preview() {
               </Td>
             ))}
 
-            {data.map((row, i) => (
-              <Tr key={i}>
-                {row.map((cell, j) => (
-                  <Td key={j}>{i === 0 ? null : cell.display_value}</Td>
-                ))}
-              </Tr>
-            ))}
+            {data.map(
+              (row, i) =>
+                row.length > 0 &&
+                Object.hasOwn(row[0], 'display_value') && (
+                  <Tr key={i}>
+                    {row.map((cell, j) => (
+                      <Td key={j}>{cell.display_value}</Td>
+                    ))}
+                  </Tr>
+                )
+            )}
           </Tbody>
         </Table>
-      ) : null}
-    </Card>
-  );
+      </div>
+    );
+  }
+
+  return null;
 }
