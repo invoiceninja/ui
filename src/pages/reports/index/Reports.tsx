@@ -37,7 +37,6 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useQueryClient } from 'react-query';
 import { cloneDeep } from 'lodash';
 import { BiSortAlt2 } from 'react-icons/bi';
-import { Inline } from '$app/components/Inline';
 
 export type Identifier =
   | 'activity'
