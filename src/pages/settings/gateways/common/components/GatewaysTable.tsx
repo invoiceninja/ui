@@ -300,7 +300,7 @@ export function GatewaysTable(props: Props) {
                   </Draggable>
                 ))}
 
-                {!gateways.length ? (
+                {!currentGateways.length ? (
                   <Tr>
                     <Td colSpan={100}>{t('no_records_found')}.</Td>
                   </Tr>
