@@ -21,6 +21,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -33,6 +34,8 @@ export default function Vendors() {
 
   const vendorColumns = useAllVendorColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
@@ -43,6 +46,7 @@ export default function Vendors() {
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions
+        customBulkActions={customBulkActions}
         rightSide={<ImportButton route="/vendors/import" />}
         leftSideChevrons={
           <DataTableColumnsPicker

@@ -24,6 +24,7 @@ import { date as formatDate } from '$app/common/helpers';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -33,6 +34,8 @@ export default function Transactions() {
   const columns = useTransactionColumns();
 
   const filters = useTransactionFilters();
+
+  const customBulkActions = useCustomBulkActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -85,6 +88,7 @@ export default function Transactions() {
           linkToEdit="/transactions/:id/edit"
           onTableRowClick={getSelectedTransaction}
           customFilters={filters}
+          customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
           rightSide={
             <Guard
