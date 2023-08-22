@@ -376,6 +376,31 @@ export function useResolveInputField(props: Props) {
       );
     }
 
+    if (['task1', 'task2', 'task3', 'task4'].includes(property)) {
+      const field = property.replace(
+        'task',
+        'custom_value'
+      ) as keyof InvoiceItem;
+
+      return company.custom_fields?.[property] ? (
+        <CustomField
+          field={property}
+          defaultValue={resource?.line_items[index][field]}
+          value={company.custom_fields?.[property]}
+          onValueChange={(value) => onChange(field, value, index)}
+          fieldOnly
+        />
+      ) : (
+        <InputField
+          id={property}
+          value={resource?.line_items[index][property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(property, event.target.value, index)
+          }
+        />
+      );
+    }
+
     return (
       <InputField
         id={property}
