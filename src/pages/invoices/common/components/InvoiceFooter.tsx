@@ -180,7 +180,7 @@ export function InvoiceFooter(props: Props) {
 
         <div>
           <span className="text-sm">
-            {t('custom_fields_location_changed')} &nbsp;
+            {t('custom_fields')} &nbsp;
           </span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
             {t('click_here')}
