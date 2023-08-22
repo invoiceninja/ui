@@ -36,6 +36,8 @@ import { atom, useAtom } from 'jotai';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useQueryClient } from 'react-query';
 import { cloneDeep } from 'lodash';
+import { BiSortAlt2 } from 'react-icons/bi';
+import { Inline } from '$app/components/Inline';
 
 export type Identifier =
   | 'activity'
@@ -494,6 +496,7 @@ export default function Reports() {
 
 const previewAtom = atom<PreviewRecord[][] | null>(null);
 const previewFiltersAtom = atom<Record<string, string>>({});
+const previewSortsAtom = atom<Record<string, string>>({});
 
 export interface PreviewRecord {
   entity: string;
@@ -540,6 +543,7 @@ function Preview() {
   const preview = usePreview();
   const [filtered, setFiltered] = useState<PreviewRecord[][] | null>(null);
   const [previewFilters, setPreviewFilters] = useAtom(previewFiltersAtom);
+  const [previewSorts, setPreviewSorts] = useAtom(previewSortsAtom);
 
   if (!preview) {
     return null;
@@ -592,7 +596,14 @@ function Preview() {
         <Table>
           <Thead>
             {columns.map((column: string, i) => (
-              <Th key={i}>{column}</Th>
+              <Th key={i}>
+                <div
+                  // onClick={() => sort(i)}
+                  className="cursor-pointer inline-flex items-center space-x-2"
+                >
+                  <p>{column}</p> <BiSortAlt2 />
+                </div>
+              </Th>
             ))}
           </Thead>
           <Tbody>
