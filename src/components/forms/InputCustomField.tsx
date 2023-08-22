@@ -18,8 +18,6 @@ export interface Props {
   field: string;
   value: string;
   onValueChange: (value: string | number | boolean) => unknown;
-  collapseOnFocus?: boolean;
-  textareaRows?: number;
 }
 
 export function InputCustomField(props: Props) {
@@ -47,8 +45,6 @@ export function InputCustomField(props: Props) {
       {type === AvailableTypes.MultiLineText && (
         <InputField
           element="textarea"
-          collapseOnFocus={Boolean(props.collapseOnFocus)}
-          textareaRows={props.textareaRows}
           id={props.field}
           onValueChange={props.onValueChange}
           value={props.defaultValue || ''}

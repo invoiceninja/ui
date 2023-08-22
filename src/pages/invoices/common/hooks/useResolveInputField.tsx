@@ -360,8 +360,6 @@ export function useResolveInputField(props: Props) {
       return company.custom_fields?.[property] ? (
         <CustomField
           field={property}
-          collapseOnFocus
-          textareaRows={1}
           defaultValue={resource?.line_items[index][field]}
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}
@@ -387,8 +385,6 @@ export function useResolveInputField(props: Props) {
       return company.custom_fields?.[property] ? (
         <CustomField
           field={property}
-          collapseOnFocus
-          textareaRows={1}
           defaultValue={resource?.line_items[index][field]}
           value={company.custom_fields?.[property]}
           onValueChange={(value) => onChange(field, value, index)}

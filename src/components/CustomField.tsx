@@ -20,8 +20,6 @@ import { Entity } from '$app/common/hooks/useEntityCustomFields';
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
-  collapseOnFocus?: boolean;
-  textareaRows?: number;
 }
 
 export function customField(value: string) {
