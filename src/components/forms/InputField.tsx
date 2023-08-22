@@ -70,6 +70,15 @@ export function InputField(props: Props) {
           inputRef.current.scrollHeight + 5
         }px`;
       }
+
+      if (!isFocused) {
+        const y =
+          inputRef.current.getBoundingClientRect().top + window.scrollY + -150;
+
+        if (inputRef.current.value.length > 2800) {
+          window.scrollTo({ top: y, behavior: 'instant' });
+        }
+      }
     }
   }, [isFocused, props.value]);
 
