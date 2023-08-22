@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,7 +20,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
@@ -33,10 +33,9 @@ import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { atom, useAtom } from 'jotai';
-import Papa, { ParseResult } from 'papaparse';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useQueryClient } from 'react-query';
-import { useLocation } from 'react-router-dom';
+import { cloneDeep } from 'lodash';
 
 export type Identifier =
   | 'activity'
@@ -494,18 +493,53 @@ export default function Reports() {
 }
 
 const previewAtom = atom<PreviewRecord[][] | null>(null);
+const previewFiltersAtom = atom<Record<string, string>>({});
 
 export interface PreviewRecord {
   entity: string;
   id: string;
   hashed_id: null;
   value: string;
-  display_value: string;
+  display_value: string | JSX.Element | number;
+}
+
+function usePreview() {
+  const [preview] = useAtom(previewAtom);
+  const [processed, setProcessed] = useState<PreviewRecord[][] | null>(null);
+
+  useEffect(() => {
+    if (!preview) {
+      return;
+    }
+
+    const copy = cloneDeep(preview);
+
+    copy.map((row, i) => {
+      if (i === 0) {
+        // We are working with columns, skip this for processing.
+
+        return;
+      }
+
+      row.map((cell) => {
+        if (cell.entity === 'credit' && cell.id === 'number') {
+          cell.display_value = (
+            <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
+          );
+        }
+      });
+    });
+
+    setProcessed(copy);
+  }, [preview]);
+
+  return processed;
 }
 
 function Preview() {
-  const [preview] = useAtom(previewAtom);
+  const preview = usePreview();
   const [filtered, setFiltered] = useState<PreviewRecord[][] | null>(null);
+  const [previewFilters, setPreviewFilters] = useAtom(previewFiltersAtom);
 
   if (!preview) {
     return null;
@@ -514,10 +548,35 @@ function Preview() {
   const columns = preview[0] as unknown as string[];
 
   const filter = (column: string, value: string) => {
+    setPreviewFilters((current) => ({ ...current, [column]: value }));
+
     const filtered = preview.filter((sub) =>
-      sub.some(
-        (item) => item.id === column && item.display_value.includes(value)
-      )
+      sub.some((item) => {
+        if (!Object.hasOwn(item, 'display_value')) {
+          return false;
+        }
+
+        if (item.id !== column) {
+          return false;
+        }
+
+        if (typeof item.display_value === 'number') {
+          return item.display_value
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        }
+
+        if (typeof item.display_value === 'string') {
+          return item.display_value.toLowerCase().includes(value.toLowerCase());
+        }
+
+        if (typeof item.display_value === 'object') {
+          return item.display_value.props.children
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        }
+      })
     );
 
     setFiltered(filtered);
@@ -528,6 +587,8 @@ function Preview() {
   if (preview) {
     return (
       <div id="preview-table">
+        {JSON.stringify(previewFilters)}
+
         <Table>
           <Thead>
             {columns.map((column: string, i) => (
