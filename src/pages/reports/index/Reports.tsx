@@ -596,11 +596,14 @@ function Preview() {
             ))}
           </Thead>
           <Tbody>
-            {preview[1].map((cell, i) => (
-              <Td key={i}>
-                <InputField onValueChange={(value) => filter(cell.id, value)} />
-              </Td>
-            ))}
+            {preview.length > 0 &&
+              preview[1].map((cell, i) => (
+                <Td key={i}>
+                  <InputField
+                    onValueChange={(value) => filter(cell.id, value)}
+                  />
+                </Td>
+              ))}
 
             {data.map(
               (row, i) =>
