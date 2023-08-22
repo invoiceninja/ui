@@ -19,7 +19,7 @@ export default function PaymentFields() {
     <Card title={t('custom_fields')} withContainer>
       <div>
         <span className="text-sm">
-          {t('custom_fields_location_changed')} &nbsp;
+          {t('custom_fields')} &nbsp;
         </span>
         <Link to="/settings/custom_fields/payments" className="capitalize">
           {t('click_here')}
