@@ -62,6 +62,14 @@ export function GatewaysTable() {
       setCurrentGateways,
     });
 
+  const handleDeselect = () => {
+    setSelected([]);
+
+    if (mainCheckbox.current) {
+      mainCheckbox.current.checked = false;
+    }
+  };
+
   const showRestoreBulkAction = () => {
     return selectedResources.every(
       (resource) => getEntityState(resource) !== EntityState.Active
@@ -92,6 +100,11 @@ export function GatewaysTable() {
   useEffect(() => {
     if (gateways) {
       setCurrentGateways(gateways.filter((gateway) => gateway));
+
+      handleChange(
+        'settings.company_gateway_ids',
+        gateways.map(({ id }) => id).join(',')
+      );
     }
   }, [gateways]);
 
@@ -110,14 +123,22 @@ export function GatewaysTable() {
       <div className="flex justify-between">
         <Dropdown label={t('more_actions')} disabled={!selected.length}>
           <DropdownElement
-            onClick={() => bulk(selected, 'archive')}
+            onClick={() => {
+              bulk(selected, 'archive');
+
+              handleDeselect();
+            }}
             icon={<Icon element={MdArchive} />}
           >
             {t('archive')}
           </DropdownElement>
 
           <DropdownElement
-            onClick={() => bulk(selected, 'delete')}
+            onClick={() => {
+              bulk(selected, 'delete');
+
+              handleDeselect();
+            }}
             icon={<Icon element={MdDelete} />}
           >
             {t('delete')}
@@ -125,7 +146,11 @@ export function GatewaysTable() {
 
           {showRestoreBulkAction() && (
             <DropdownElement
-              onClick={() => bulk(selected, 'restore')}
+              onClick={() => {
+                bulk(selected, 'restore');
+
+                handleDeselect();
+              }}
               icon={<Icon element={MdRestore} />}
             >
               {t('restore')}
