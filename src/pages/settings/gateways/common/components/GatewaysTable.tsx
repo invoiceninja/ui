@@ -37,23 +37,13 @@ import {
   MdRestore,
   MdWarning,
 } from 'react-icons/md';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { STRIPE_CONNECT } from '../../index/Gateways';
+import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 
-interface Props {
-  gateways: CompanyGateway[];
-  allGateways?: CompanyGateway[];
-}
-export function GatewaysTable(props: Props) {
+export function GatewaysTable() {
   const [t] = useTranslation();
-
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { gateways, allGateways } = props;
-
-  const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 
   const bulk = useBulk();
 
@@ -66,19 +56,15 @@ export function GatewaysTable(props: Props) {
     []
   );
 
+  const { gateways, handleChange, handleRemoveGateway, handleReset } =
+    useGatewayUtilities({
+      currentGateways,
+      setCurrentGateways,
+    });
+
   const showRestoreBulkAction = () => {
     return selectedResources.every(
       (resource) => getEntityState(resource) !== EntityState.Active
-    );
-  };
-
-  const handleChange = (property: string, value: string) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property,
-        value,
-      })
     );
   };
 
@@ -103,40 +89,16 @@ export function GatewaysTable(props: Props) {
     return STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
   };
 
-  const handleRemoveGateway = (gatewayId: string) => {
-    const filteredGateways = currentGateways.filter(
-      ({ id }) => id !== gatewayId
-    );
-
-    setCurrentGateways(filteredGateways);
-
-    handleChange(
-      'settings.company_gateway_ids',
-      filteredGateways.map(({ id }) => id).join(',')
-    );
-  };
-
-  const handleReset = () => {
-    if (allGateways) {
-      setCurrentGateways(allGateways);
-
-      handleChange(
-        'settings.company_gateway_ids',
-        allGateways.map(({ id }) => id).join(',')
-      );
-    }
-  };
-
   useEffect(() => {
     if (gateways) {
-      setCurrentGateways(gateways);
+      setCurrentGateways(gateways.filter((gateway) => gateway));
     }
   }, [gateways]);
 
   useEffect(() => {
     if (gateways) {
-      const filteredSelectedResources = gateways.filter((resource: any) =>
-        selected.includes(resource.id)
+      const filteredSelectedResources = gateways.filter(
+        (resource: CompanyGateway) => selected.includes(resource.id)
       );
 
       setSelectedResources(filteredSelectedResources);
@@ -231,7 +193,7 @@ export function GatewaysTable(props: Props) {
                         innerRef={provided.innerRef}
                         key={index}
                       >
-                        <Td width="15%">
+                        <Td width="10%">
                           <Checkbox
                             checked={selected.includes(gateway.id)}
                             className="child-checkbox"
@@ -247,7 +209,7 @@ export function GatewaysTable(props: Props) {
                           />
                         </Td>
 
-                        <Td width="22%">
+                        <Td width="30%">
                           <EntityStatus entity={gateway} />
                         </Td>
 

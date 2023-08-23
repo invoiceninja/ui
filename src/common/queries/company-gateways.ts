@@ -18,13 +18,12 @@ import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 
 interface CompanyGatewaysParams {
-  enabled?: boolean;
   status?: string;
 }
 export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { isAdmin } = useAdmin();
 
-  const { enabled, status } = params || {};
+  const { status } = params || {};
 
   return useQuery(
     '/api/v1/company_gateways',
@@ -35,7 +34,7 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
           status: status || 'active',
         })
       ),
-    { staleTime: Infinity, enabled: (enabled ?? true) && isAdmin }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 

@@ -19,28 +19,13 @@ import { Tooltip } from '$app/components/Tooltip';
 import { MdWarning } from 'react-icons/md';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { GatewaysTable } from '../common/components/GatewaysTable';
-import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
-import { useEffect, useState } from 'react';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
+export const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 export function Gateways() {
   const [t] = useTranslation();
 
-  const companyChanges = useCompanyChanges();
-
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
-
-  const { data: companyGatewaysResponse } = useCompanyGatewaysQuery({
-    status: 'active',
-    enabled: isGroupSettingsActive,
-  });
-
-  const [groupCompanyGateways, setGroupCompanyGateways] = useState<
-    CompanyGateway[]
-  >([]);
-
-  const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 
   const columns: DataTableColumns<CompanyGateway> = [
     {
@@ -91,31 +76,6 @@ export function Gateways() {
     },
   ];
 
-  useEffect(() => {
-    if (companyGatewaysResponse) {
-      if (companyChanges?.settings.company_gateway_ids) {
-        const filteredCompanyGateways =
-          companyChanges.settings.company_gateway_ids
-            .split(',')
-            .map((id: string) =>
-              companyGatewaysResponse.data.data.find(
-                (gateway: CompanyGateway) => gateway.id === id
-              )
-            );
-
-        setGroupCompanyGateways(filteredCompanyGateways);
-      } else {
-        const filteredCompanyGateways =
-          companyGatewaysResponse.data.data.filter(
-            (gateway: CompanyGateway) =>
-              !gateway.archived_at && !gateway.is_deleted
-          );
-
-        setGroupCompanyGateways(filteredCompanyGateways);
-      }
-    }
-  }, [companyGatewaysResponse]);
-
   return (
     <>
       {isCompanySettingsActive && (
@@ -130,12 +90,7 @@ export function Gateways() {
         />
       )}
 
-      {isGroupSettingsActive && (
-        <GatewaysTable
-          gateways={groupCompanyGateways}
-          allGateways={companyGatewaysResponse?.data.data}
-        />
-      )}
+      {isGroupSettingsActive && <GatewaysTable />}
     </>
   );
 }
