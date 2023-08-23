@@ -16,7 +16,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
-import { useBulkAction } from '$app/common/queries/group-settings';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Divider } from '$app/components/cards/Divider';
 import { Settings } from 'react-feather';
@@ -26,8 +25,9 @@ import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { route } from '$app/common/helpers/route';
 import { useConfigureGroupSettings } from './useConfigureGroupSettings';
+import { useBulk } from '$app/common/queries/group-settings';
 
-export function useActions() {
+export const useActions = () => {
   const [t] = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export function useActions() {
 
   const { id } = useParams();
 
-  const bulk = useBulkAction();
+  const bulk = useBulk();
 
   const isEditPage = location.pathname.includes(id!);
 
@@ -84,7 +84,7 @@ export function useActions() {
       isEditPage &&
       getEntityState(group) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(group.id, 'archive')}
+          onClick={() => bulk([group.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -95,7 +95,7 @@ export function useActions() {
       (getEntityState(group) === EntityState.Archived ||
         getEntityState(group) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(group.id, 'restore')}
+          onClick={() => bulk([group.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -106,7 +106,7 @@ export function useActions() {
       (getEntityState(group) === EntityState.Active ||
         getEntityState(group) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(group.id, 'delete')}
+          onClick={() => bulk([group.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
@@ -115,4 +115,4 @@ export function useActions() {
   ];
 
   return actions;
-}
+};

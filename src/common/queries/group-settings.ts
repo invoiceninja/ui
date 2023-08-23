@@ -40,22 +40,24 @@ export const useGroupQuery = (params: Params) => {
   );
 };
 
-export const useBulkAction = () => {
+export const useBulk = () => {
   const queryClient = useQueryClient();
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/group_settings/bulk'), {
       action,
-      ids: [id],
+      ids,
     }).then(() => {
       toast.success(`${action}d_group`);
 
       queryClient.invalidateQueries('/api/v1/group_settings');
 
-      queryClient.invalidateQueries(
-        route('/api/v1/group_settings/:id', { id })
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(
+          route('/api/v1/group_settings/:id', { id })
+        )
       );
     });
   };

@@ -27,7 +27,7 @@ export function Authorization() {
         leftSideHelp={t('enable_portal_password_help')}
       >
         <Toggle
-          checked={company?.settings.enable_client_portal_password || false}
+          checked={Boolean(company?.settings.enable_client_portal_password)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal_password', value)
           }
@@ -39,7 +39,7 @@ export function Authorization() {
         leftSideHelp={t('show_accept_invoice_terms_help')}
       >
         <Toggle
-          checked={company?.settings.show_accept_invoice_terms || false}
+          checked={Boolean(company?.settings.show_accept_invoice_terms)}
           onValueChange={(value) =>
             handleChange('settings.show_accept_invoice_terms', value)
           }
@@ -51,7 +51,7 @@ export function Authorization() {
         leftSideHelp={t('show_accept_quote_terms_help')}
       >
         <Toggle
-          checked={company?.settings.show_accept_quote_terms || false}
+          checked={Boolean(company?.settings.show_accept_quote_terms)}
           onValueChange={(value) =>
             handleChange('settings.show_accept_quote_terms', value)
           }
@@ -65,7 +65,7 @@ export function Authorization() {
         leftSideHelp={t('require_invoice_signature_help')}
       >
         <Toggle
-          checked={company?.settings.require_invoice_signature || false}
+          checked={Boolean(company?.settings.require_invoice_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_invoice_signature', value)
           }
@@ -77,7 +77,7 @@ export function Authorization() {
         leftSideHelp={t('require_quote_signature_help')}
       >
         <Toggle
-          checked={company?.settings.require_quote_signature || false}
+          checked={Boolean(company?.settings.require_quote_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_quote_signature', value)
           }
@@ -89,7 +89,7 @@ export function Authorization() {
         leftSideHelp={t('require_purchase_order_signature_help')}
       >
         <Toggle
-          checked={company?.settings.require_purchase_order_signature || false}
+          checked={Boolean(company?.settings.require_purchase_order_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_purchase_order_signature', value)
           }
@@ -101,7 +101,7 @@ export function Authorization() {
         leftSideHelp={t('signature_on_pdf_help')}
       >
         <Toggle
-          checked={company?.settings.signature_on_pdf || false}
+          checked={Boolean(company?.settings.signature_on_pdf)}
           onValueChange={(value) =>
             handleChange('settings.signature_on_pdf', value)
           }

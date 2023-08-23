@@ -93,7 +93,7 @@ export const useBulk = () => {
 
       ids.forEach((id) =>
         queryClient.invalidateQueries(
-          route('/api/v1/d_company_gateways/:id', { id })
+          route('/api/v1/company_gateways/:id', { id })
         )
       );
     });
