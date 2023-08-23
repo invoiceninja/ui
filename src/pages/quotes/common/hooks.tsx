@@ -457,7 +457,7 @@ export function useActions() {
     (quote) =>
       quote.status_id !== QuoteStatus.Converted && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'convert_to_invoice')}
+          onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
         >
           {t('convert_to_invoice')}
@@ -509,7 +509,7 @@ export function useActions() {
       isEditPage &&
       quote.archived_at === 0 && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'archive')}
+          onClick={() => bulk([quote.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -519,7 +519,7 @@ export function useActions() {
       isEditPage &&
       quote.archived_at > 0 && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'restore')}
+          onClick={() => bulk([quote.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -529,7 +529,7 @@ export function useActions() {
       isEditPage &&
       !quote?.is_deleted && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'delete')}
+          onClick={() => bulk([quote.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
