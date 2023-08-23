@@ -95,9 +95,13 @@ export function Gateways() {
     if (companyGatewaysResponse) {
       if (companyChanges?.settings.company_gateway_ids) {
         const filteredCompanyGateways =
-          companyGatewaysResponse.data.data.filter((gateway: CompanyGateway) =>
-            companyChanges?.settings.company_gateway_ids.includes(gateway.id)
-          );
+          companyChanges.settings.company_gateway_ids
+            .split(',')
+            .map((id: string) =>
+              companyGatewaysResponse.data.data.find(
+                (gateway: CompanyGateway) => gateway.id === id
+              )
+            );
 
         setGroupCompanyGateways(filteredCompanyGateways);
       } else {

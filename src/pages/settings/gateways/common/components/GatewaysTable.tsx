@@ -72,11 +72,26 @@ export function GatewaysTable(props: Props) {
     );
   };
 
+  const handleChange = (property: string, value: string) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property,
+        value,
+      })
+    );
+  };
+
   const onDragEnd = (result: DropResult) => {
     const sorted = arrayMoveImmutable(
       currentGateways,
       result.source.index,
       result.destination?.index as unknown as number
+    );
+
+    handleChange(
+      'settings.company_gateway_ids',
+      sorted.map(({ id }) => id).join(',')
     );
 
     setCurrentGateways(sorted);
@@ -86,16 +101,6 @@ export function GatewaysTable(props: Props) {
     const gatewayConfig = JSON.parse(gateway.config);
 
     return STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
-  };
-
-  const handleChange = (property: string, value: string) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property,
-        value,
-      })
-    );
   };
 
   const handleRemoveGateway = (gatewayId: string) => {
@@ -221,13 +226,12 @@ export function GatewaysTable(props: Props) {
                   >
                     {(provided) => (
                       <Tr
-                        className="py-3"
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         innerRef={provided.innerRef}
                         key={index}
                       >
-                        <Td width="20%">
+                        <Td width="15%">
                           <Checkbox
                             checked={selected.includes(gateway.id)}
                             className="child-checkbox"
@@ -243,11 +247,11 @@ export function GatewaysTable(props: Props) {
                           />
                         </Td>
 
-                        <Td width="20%">
+                        <Td width="22%">
                           <EntityStatus entity={gateway} />
                         </Td>
 
-                        <Td width="20%">
+                        <Td width="30%">
                           <div className="flex items-center space-x-2">
                             <Link
                               to={route(
@@ -282,8 +286,8 @@ export function GatewaysTable(props: Props) {
                           {gateway.test_mode ? <Check size={20} /> : ''}
                         </Td>
 
-                        <Td width="20%">
-                          <div className="flex items-center space-x-7">
+                        <Td width="25%">
+                          <div className="flex items-center space-x-7 py-1">
                             <Button
                               behavior="button"
                               type="minimal"
