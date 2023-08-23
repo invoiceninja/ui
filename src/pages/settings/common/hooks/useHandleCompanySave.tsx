@@ -16,24 +16,18 @@ import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
-import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
-  const { isGroupSettingsActive, isCompanySettingsActive } =
-    useCurrentSettingsLevel();
 
-  const handleUpdateGroupSettings = useHandleUpdate({});
-
-  const setErrors = useSetAtom(companySettingsErrorsAtom);
+  const [, setErrors] = useAtom(companySettingsErrorsAtom);
 
   const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
     hasLanguageChangedAtom
@@ -53,56 +47,28 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
-    if (isGroupSettingsActive) {
-      handleUpdateGroupSettings();
-    }
+    return request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+      companyChanges
+    )
+      .then((response) => {
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-    if (isCompanySettingsActive) {
-      return request(
-        'PUT',
-        endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
-        companyChanges
-      )
-        .then((response) => {
-          dispatch(
-            updateRecord({ object: 'company', data: response.data.data })
-          );
+        !adjustedExcludeToaster && toast.dismiss();
 
+        if (hasLanguageChanged) {
           queryClient.invalidateQueries('/api/v1/statics');
+          setHasLanguageIdChanged(false);
+        }
 
+        !adjustedExcludeToaster && toast.success('updated_settings');
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
           toast.dismiss();
-
-          // updatingRecords?.forEach((record) => {
-          //   toast.processing();
-
-          //   if (record.checked) {
-          //     request('POST', endpoint('/api/v1/designs/set/default'), {
-          //       design_id: record.design_id,
-          //       entity: record.entity,
-          //     }).catch((error) => {
-          //       console.log(error);
-          //       toast.error();
-          //     });
-          //   }
-          // });
-
-          if (hasLanguageChanged) {
-            queryClient.invalidateQueries('/api/v1/statics');
-            setHasLanguageIdChanged(false);
-          }
-
-          toast.success('updated_settings');
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-            toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
-          }
-        });
-      //.finally(() => setUpdatingRecords(undefined));
-    }
+        }
+      });
   };
 }
