@@ -110,7 +110,7 @@ export function useSettingsRoutes() {
       name: t('custom_fields'),
       href: '/settings/custom_fields',
       current: location.pathname.endsWith('/settings/custom_fields'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('generated_numbers'),
