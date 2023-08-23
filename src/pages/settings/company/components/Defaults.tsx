@@ -116,10 +116,9 @@ export function Defaults() {
 
           <Element className="mt-6" leftSide={t('manual_payment_email')}>
             <Toggle
-              checked={
-                companyChanges?.settings?.client_manual_payment_notification ||
-                false
-              }
+              checked={Boolean(
+                companyChanges?.settings?.client_manual_payment_notification
+              )}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -134,10 +133,9 @@ export function Defaults() {
 
           <Element leftSide={t('online_payment_email')}>
             <Toggle
-              checked={
-                companyChanges?.settings?.client_online_payment_notification ||
-                false
-              }
+              checked={Boolean(
+                companyChanges?.settings?.client_online_payment_notification
+              )}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -156,7 +154,7 @@ export function Defaults() {
             leftSideHelp={t('use_quote_terms_help')}
           >
             <Toggle
-              checked={companyChanges?.use_quote_terms_on_conversion || false}
+              checked={Boolean(companyChanges?.use_quote_terms_on_conversion)}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({

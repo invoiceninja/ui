@@ -1086,7 +1086,7 @@ export function GeneralSettings() {
       <Element leftSide={t('show_paid_stamp')}>
         <Toggle
           onValueChange={(value) => handleChange('show_paid_stamp', value)}
-          checked={company?.settings.show_paid_stamp || false}
+          checked={Boolean(company?.settings.show_paid_stamp)}
         />
       </Element>
 
@@ -1095,7 +1095,7 @@ export function GeneralSettings() {
           onValueChange={(value) =>
             handleChange('show_shipping_address', value)
           }
-          checked={company?.settings.show_shipping_address || false}
+          checked={Boolean(company?.settings.show_shipping_address)}
         />
       </Element>
 
@@ -1120,7 +1120,7 @@ export function GeneralSettings() {
 
       <Element leftSide={t('page_numbering')}>
         <Toggle
-          checked={company?.settings?.page_numbering || false}
+          checked={Boolean(company?.settings?.page_numbering)}
           id="settings.page_numbering"
           onChange={(value) => handleChange('page_numbering', value)}
         />

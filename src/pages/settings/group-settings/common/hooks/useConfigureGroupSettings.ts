@@ -16,7 +16,7 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 
-export function useConfigureGroupSettings() {
+export const useConfigureGroupSettings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -44,4 +44,4 @@ export function useConfigureGroupSettings() {
 
     navigate('/settings/company_details');
   };
-}
+};

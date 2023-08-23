@@ -155,7 +155,7 @@ export function Settings() {
 
         <Element leftSide={t('military_time')}>
           <Toggle
-            checked={company?.settings?.military_time || false}
+            checked={Boolean(company?.settings?.military_time)}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({

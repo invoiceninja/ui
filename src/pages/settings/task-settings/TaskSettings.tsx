@@ -87,7 +87,7 @@ export function TaskSettings() {
           leftSideHelp={t('auto_start_tasks_help')}
         >
           <Toggle
-            checked={companyChanges?.auto_start_tasks || false}
+            checked={Boolean(companyChanges?.auto_start_tasks)}
             onChange={(value: boolean) =>
               handleToggleChange('auto_start_tasks', value)
             }
@@ -99,7 +99,7 @@ export function TaskSettings() {
           leftSideHelp={t('show_task_end_date_help')}
         >
           <Toggle
-            checked={companyChanges?.show_task_end_date || false}
+            checked={Boolean(companyChanges?.show_task_end_date)}
             onChange={(value: boolean) =>
               handleToggleChange('show_task_end_date', value)
             }
@@ -111,9 +111,9 @@ export function TaskSettings() {
           leftSideHelp={t('show_task_item_description_help')}
         >
           <Toggle
-            checked={
-              companyChanges?.settings.show_task_item_description || false
-            }
+            checked={Boolean(
+              companyChanges?.settings.show_task_item_description
+            )}
             onChange={(value: boolean) =>
               handleToggleChange('settings.show_task_item_description', value)
             }
@@ -125,9 +125,9 @@ export function TaskSettings() {
           leftSideHelp={t('allow_billable_task_items_help')}
         >
           <Toggle
-            checked={
-              companyChanges?.settings.allow_billable_task_items || false
-            }
+            checked={Boolean(
+              companyChanges?.settings.allow_billable_task_items
+            )}
             onChange={(value: boolean) =>
               handleToggleChange('settings.allow_billable_task_items', value)
             }
@@ -141,7 +141,7 @@ export function TaskSettings() {
           leftSideHelp={t('show_tasks_table_help')}
         >
           <Toggle
-            checked={companyChanges?.show_tasks_table || false}
+            checked={Boolean(companyChanges?.show_tasks_table)}
             onChange={(value: boolean) =>
               handleToggleChange('show_tasks_table', value)
             }
@@ -153,7 +153,7 @@ export function TaskSettings() {
           leftSideHelp={t('invoice_task_datelog_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_datelog || false}
+            checked={Boolean(companyChanges?.invoice_task_datelog)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_datelog', value)
             }
@@ -165,7 +165,7 @@ export function TaskSettings() {
           leftSideHelp={t('invoice_task_timelog_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_timelog || false}
+            checked={Boolean(companyChanges?.invoice_task_timelog)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_timelog', value)
             }
@@ -177,7 +177,7 @@ export function TaskSettings() {
           leftSideHelp={t('invoice_task_hours_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_hours || false}
+            checked={Boolean(companyChanges?.invoice_task_hours)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_hours', value)
             }
@@ -189,7 +189,7 @@ export function TaskSettings() {
           leftSideHelp={t('invoice_task_project_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_project || false}
+            checked={Boolean(companyChanges?.invoice_task_project)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_project', value)
             }
@@ -201,7 +201,7 @@ export function TaskSettings() {
           leftSideHelp={t('invoice_task_item_description_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_item_description || false}
+            checked={Boolean(companyChanges?.invoice_task_item_description)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_item_description', value)
             }
@@ -213,7 +213,7 @@ export function TaskSettings() {
           leftSideHelp={t('lock_invoiced_tasks_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_lock || false}
+            checked={Boolean(companyChanges?.invoice_task_lock)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_lock', value)
             }
@@ -225,7 +225,7 @@ export function TaskSettings() {
           leftSideHelp={t('add_documents_to_invoice_help')}
         >
           <Toggle
-            checked={companyChanges?.invoice_task_documents || false}
+            checked={Boolean(companyChanges?.invoice_task_documents)}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_documents', value)
             }
@@ -236,9 +236,9 @@ export function TaskSettings() {
 
         <Element leftSide={t('show_tasks_in_client_portal')}>
           <Toggle
-            checked={
-              companyChanges?.settings?.enable_client_portal_tasks || false
-            }
+            checked={Boolean(
+              companyChanges?.settings?.enable_client_portal_tasks
+            )}
             onChange={(value: boolean) =>
               handleToggleChange('settings.enable_client_portal_tasks', value)
             }

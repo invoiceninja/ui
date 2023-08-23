@@ -29,7 +29,7 @@ interface Params {
   isFormBusy: boolean;
 }
 
-export function useHandleCreate(params: Params) {
+export const useHandleCreate = (params: Params) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
@@ -66,4 +66,4 @@ export function useHandleCreate(params: Params) {
         .finally(() => setIsFormBusy(false));
     }
   };
-}
+};

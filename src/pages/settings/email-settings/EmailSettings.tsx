@@ -135,7 +135,7 @@ export function EmailSettings() {
       <Card title={t('settings')}>
         <Element leftSide={t('show_email_footer')}>
           <Toggle
-            checked={company?.settings.show_email_footer || false}
+            checked={Boolean(company?.settings.show_email_footer)}
             onValueChange={(value) =>
               handleChange('settings.show_email_footer', value)
             }
@@ -144,7 +144,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_pdf')}>
           <Toggle
-            checked={company?.settings.pdf_email_attachment || false}
+            checked={Boolean(company?.settings.pdf_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.pdf_email_attachment', value)
             }
@@ -153,7 +153,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_documents')}>
           <Toggle
-            checked={company?.settings.document_email_attachment || false}
+            checked={Boolean(company?.settings.document_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.document_email_attachment', value)
             }
@@ -162,7 +162,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_ubl')}>
           <Toggle
-            checked={company?.settings.ubl_email_attachment || false}
+            checked={Boolean(company?.settings.ubl_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.ubl_email_attachment', value)
             }
@@ -171,7 +171,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('enable_e_invoice')}>
           <Toggle
-            checked={company?.settings.enable_e_invoice}
+            checked={Boolean(company?.settings.enable_e_invoice)}
             onValueChange={(value) =>
               handleChange('settings.enable_e_invoice', value)
             }
