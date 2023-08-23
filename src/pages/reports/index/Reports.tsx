@@ -9,8 +9,8 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, Link, SelectField } from '$app/components/forms';
-import { AxiosError, AxiosResponse } from 'axios';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -32,11 +32,9 @@ import {
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
-import { atom, useAtom } from 'jotai';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
-import { cloneDeep } from 'lodash';
-import { BiSortAlt2 } from 'react-icons/bi';
+import { Preview, PreviewResponse, previewAtom } from '../common/components/Preview';
 
 export type Identifier =
   | 'activity'
@@ -494,169 +492,4 @@ export default function Reports() {
       {preview && <Preview />}
     </Default>
   );
-}
-
-const previewAtom = atom<Preview | null>(null);
-const previewFiltersAtom = atom<Record<string, string>>({});
-const previewSortsAtom = atom<Record<string, string>>({});
-
-export interface PreviewResponse {
-  columns: Column[];
-  [key: number]: Cell[];
-}
-
-export interface Preview {
-  columns: Column[];
-  rows: Cell[][];
-}
-
-export interface Column {
-  identifier: string;
-  display_value: string;
-}
-
-export interface Cell {
-  entity: string;
-  id: string;
-  hashed_id: null;
-  value: string;
-  display_value: string | JSX.Element | number;
-  identifier: string;
-}
-
-interface Replacement {
-  identifier: string;
-  format: (cell: Cell) => string | number | JSX.Element;
-}
-
-function usePreview() {
-  const [preview] = useAtom(previewAtom);
-  const [processed, setProcessed] = useState<Preview | null>(null);
-
-  const replacements: Replacement[] = [
-    {
-      identifier: 'credit.number',
-      format: (cell) => (
-        <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
-      ),
-    },
-  ];
-
-  useEffect(() => {
-    if (!preview) {
-      return;
-    }
-
-    const copy = cloneDeep(preview);
-
-    copy.rows.map((row) => {
-      row.map((cell) => {
-        const replacement = replacements.find(
-          (replacement) => replacement.identifier === cell.identifier
-        );
-
-        if (replacement) {
-          cell.display_value = replacement.format(cell);
-        }
-      });
-    });
-
-    setProcessed(copy);
-  }, [preview]);
-
-  return processed;
-}
-
-function Preview() {
-  const preview = usePreview();
-  const [filtered, setFiltered] = useState<Preview | null>(null);
-  const [previewFilters, setPreviewFilters] = useAtom(previewFiltersAtom);
-  const [previewSorts, setPreviewSorts] = useAtom(previewSortsAtom);
-
-  if (!preview) {
-    return null;
-  }
-
-  const filter = (column: string, value: string) => {
-    setPreviewFilters((current) => ({ ...current, [column]: value }));
-
-    const copy = cloneDeep(preview);
-
-    copy.rows = copy.rows.filter((sub) =>
-      sub.some((item) => {
-        const [, $column] = column.split('.');
-
-        if (item.id !== $column) {
-          return false;
-        }
-
-        if (typeof item.display_value === 'number') {
-          return item.display_value
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-
-        if (typeof item.display_value === 'string') {
-          return item.display_value.toLowerCase().includes(value.toLowerCase());
-        }
-
-        if (typeof item.display_value === 'object') {
-          return item.display_value.props.children
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-      })
-    );
-
-    console.log(copy);
-
-    setFiltered(copy);
-  };
-
-  const data = filtered?.rows || preview.rows;
-
-  if (preview) {
-    return (
-      <div id="preview-table">
-        {JSON.stringify(previewFilters)}
-
-        <Table>
-          <Thead>
-            {preview.columns.map((column, i) => (
-              <Th key={i}>
-                <div
-                  // onClick={() => sort(i)}
-                  className="cursor-pointer inline-flex items-center space-x-2"
-                >
-                  <p>{column.display_value}</p> <BiSortAlt2 />
-                </div>
-              </Th>
-            ))}
-          </Thead>
-          <Tbody>
-            <Tr>
-              {preview.columns.map((column, i) => (
-                <Td key={i}>
-                  <InputField
-                    onValueChange={(value) => filter(column.identifier, value)}
-                  />
-                </Td>
-              ))}
-            </Tr>
-
-            {data.map((row, i) => (
-              <Tr key={i}>
-                {row.map((cell, i) => (
-                  <Td key={i}>{cell.display_value}</Td>
-                ))}
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </div>
-    );
-  }
-
-  return null;
 }
