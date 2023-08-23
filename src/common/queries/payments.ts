@@ -86,12 +86,15 @@ export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete' | 'email') => {
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'email'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/payments/bulk'), {
       action,
-      ids: [id],
+      ids,
     }).then(() => {
       const translationKeyword = action === 'email' ? 'emaile' : action;
 
@@ -100,7 +103,9 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }))
+      );
     });
   };
 }
