@@ -101,9 +101,7 @@ export function Preview() {
 
     copy.rows = copy.rows.filter((sub) =>
       sub.some((item) => {
-        const [, $column] = column.split('.');
-
-        if (item.id !== $column) {
+        if (item.id !== column) {
           return false;
         }
 
@@ -129,19 +127,42 @@ export function Preview() {
     setFiltered(copy);
   };
 
+  const sort = (column: string) => {
+    const value = sorts?.[column] === 'asc' ? 'desc' : 'asc';
+
+    setSorts((current) => ({ ...current, [column]: value }));
+
+    const copy = cloneDeep(preview);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    copy.rows = copy.rows.sort((first, second) => {
+      const a = first.find((cell) => cell.id === column);
+      const b = second.find((cell) => cell.id === column);
+
+      if (a && b) {
+        if (value === 'asc') {
+          return a.display_value > b.display_value ? 1 : -1;
+        } else {
+          return a.display_value < b.display_value ? 1 : -1;
+        }
+      }
+    });
+
+    setFiltered(copy);
+  };
+
   const data = filtered?.rows || preview.rows;
 
   if (preview) {
     return (
       <div id="preview-table">
-        {JSON.stringify(filters)}
-
         <Table>
           <Thead>
             {preview.columns.map((column, i) => (
               <Th key={i}>
                 <div
-                  // onClick={() => sort(i)}
+                  onClick={() => sort(column.identifier)}
                   className="cursor-pointer inline-flex items-center space-x-2"
                 >
                   <p>{column.display_value}</p> <BiSortAlt2 />
