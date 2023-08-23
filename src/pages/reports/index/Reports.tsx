@@ -10,7 +10,7 @@
 
 import { Card, Element } from '$app/components/cards';
 import { Button, InputField, Link, SelectField } from '$app/components/forms';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -288,7 +288,7 @@ export default function Reports() {
       const hash = response.data.message as string;
 
       queryClient
-        .fetchQuery({
+        .fetchQuery<PreviewResponse>({
           queryKey: ['reports', hash],
           queryFn: () =>
             request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
@@ -297,8 +297,11 @@ export default function Reports() {
           retry: 10,
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
-        .then((value) => {
-          setPreview(value);
+        .then((response) => {
+          const { columns, ...rows } = response;
+
+          setPreview({ columns, rows: Object.values(rows) });
+
           toast.success();
         });
     });
@@ -493,21 +496,51 @@ export default function Reports() {
   );
 }
 
-const previewAtom = atom<PreviewRecord[][] | null>(null);
+const previewAtom = atom<Preview | null>(null);
 const previewFiltersAtom = atom<Record<string, string>>({});
 const previewSortsAtom = atom<Record<string, string>>({});
 
-export interface PreviewRecord {
+export interface PreviewResponse {
+  columns: Column[];
+  [key: number]: Cell[];
+}
+
+export interface Preview {
+  columns: Column[];
+  rows: Cell[][];
+}
+
+export interface Column {
+  identifier: string;
+  display_value: string;
+}
+
+export interface Cell {
   entity: string;
   id: string;
   hashed_id: null;
   value: string;
   display_value: string | JSX.Element | number;
+  identifier: string;
+}
+
+interface Replacement {
+  identifier: string;
+  format: (cell: Cell) => string | number | JSX.Element;
 }
 
 function usePreview() {
   const [preview] = useAtom(previewAtom);
-  const [processed, setProcessed] = useState<PreviewRecord[][] | null>(null);
+  const [processed, setProcessed] = useState<Preview | null>(null);
+
+  const replacements: Replacement[] = [
+    {
+      identifier: 'credit.number',
+      format: (cell) => (
+        <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (!preview) {
@@ -516,18 +549,14 @@ function usePreview() {
 
     const copy = cloneDeep(preview);
 
-    copy.map((row, i) => {
-      if (i === 0) {
-        // We are working with columns, skip this for processing.
-
-        return;
-      }
-
+    copy.rows.map((row) => {
       row.map((cell) => {
-        if (cell.entity === 'credit' && cell.id === 'number') {
-          cell.display_value = (
-            <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
-          );
+        const replacement = replacements.find(
+          (replacement) => replacement.identifier === cell.identifier
+        );
+
+        if (replacement) {
+          cell.display_value = replacement.format(cell);
         }
       });
     });
@@ -540,7 +569,7 @@ function usePreview() {
 
 function Preview() {
   const preview = usePreview();
-  const [filtered, setFiltered] = useState<PreviewRecord[][] | null>(null);
+  const [filtered, setFiltered] = useState<Preview | null>(null);
   const [previewFilters, setPreviewFilters] = useAtom(previewFiltersAtom);
   const [previewSorts, setPreviewSorts] = useAtom(previewSortsAtom);
 
@@ -548,18 +577,16 @@ function Preview() {
     return null;
   }
 
-  const columns = preview[0] as unknown as string[];
-
   const filter = (column: string, value: string) => {
     setPreviewFilters((current) => ({ ...current, [column]: value }));
 
-    const filtered = preview.filter((sub) =>
-      sub.some((item) => {
-        if (!Object.hasOwn(item, 'display_value')) {
-          return false;
-        }
+    const copy = cloneDeep(preview);
 
-        if (item.id !== column) {
+    copy.rows = copy.rows.filter((sub) =>
+      sub.some((item) => {
+        const [, $column] = column.split('.');
+
+        if (item.id !== $column) {
           return false;
         }
 
@@ -582,10 +609,12 @@ function Preview() {
       })
     );
 
-    setFiltered(filtered);
+    console.log(copy);
+
+    setFiltered(copy);
   };
 
-  const data = filtered || preview;
+  const data = filtered?.rows || preview.rows;
 
   if (preview) {
     return (
@@ -594,38 +623,35 @@ function Preview() {
 
         <Table>
           <Thead>
-            {columns.map((column: string, i) => (
+            {preview.columns.map((column, i) => (
               <Th key={i}>
                 <div
                   // onClick={() => sort(i)}
                   className="cursor-pointer inline-flex items-center space-x-2"
                 >
-                  <p>{column}</p> <BiSortAlt2 />
+                  <p>{column.display_value}</p> <BiSortAlt2 />
                 </div>
               </Th>
             ))}
           </Thead>
           <Tbody>
-            {preview.length > 0 &&
-              preview[1].map((cell, i) => (
+            <Tr>
+              {preview.columns.map((column, i) => (
                 <Td key={i}>
                   <InputField
-                    onValueChange={(value) => filter(cell.id, value)}
+                    onValueChange={(value) => filter(column.identifier, value)}
                   />
                 </Td>
               ))}
+            </Tr>
 
-            {data.map(
-              (row, i) =>
-                row.length > 0 &&
-                Object.hasOwn(row[0], 'display_value') && (
-                  <Tr key={i}>
-                    {row.map((cell, j) => (
-                      <Td key={j}>{cell.display_value}</Td>
-                    ))}
-                  </Tr>
-                )
-            )}
+            {data.map((row, i) => (
+              <Tr key={i}>
+                {row.map((cell, i) => (
+                  <Td key={i}>{cell.display_value}</Td>
+                ))}
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </div>
