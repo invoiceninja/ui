@@ -100,11 +100,6 @@ export function GatewaysTable() {
   useEffect(() => {
     if (gateways) {
       setCurrentGateways(gateways.filter((gateway) => gateway));
-
-      handleChange(
-        'settings.company_gateway_ids',
-        gateways.map(({ id }) => id).join(',')
-      );
     }
   }, [gateways]);
 
