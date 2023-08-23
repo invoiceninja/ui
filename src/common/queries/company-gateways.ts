@@ -88,6 +88,8 @@ export const useBulk = () => {
     }).then(() => {
       toast.success(`${action}d_company_gateway`);
 
+      queryClient.invalidateQueries('/api/v1/company_gateways');
+
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
