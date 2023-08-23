@@ -16,9 +16,14 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 
-export const useConfigureGroupSettings = () => {
+interface Params {
+  withoutNavigation: boolean;
+}
+export const useConfigureGroupSettings = (params?: Params) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { withoutNavigation } = params || {};
 
   const setActiveSettingsAtom = useSetAtom(activeGroupSettingsAtom);
 
@@ -42,6 +47,6 @@ export const useConfigureGroupSettings = () => {
       })
     );
 
-    navigate('/settings/company_details');
+    !withoutNavigation && navigate('/settings/company_details');
   };
 };
