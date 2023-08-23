@@ -122,10 +122,8 @@ export function Registration() {
         leftSideHelp={t('client_registration_help')}
       >
         <Toggle
-          checked={company?.client_can_register}
-          onValueChange={(value) =>
-            handleChange('settings.client_can_register', value)
-          }
+          checked={Boolean(company?.client_can_register)}
+          onValueChange={(value) => handleChange('client_can_register', value)}
         />
       </Element>
 

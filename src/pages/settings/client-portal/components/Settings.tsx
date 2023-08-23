@@ -140,7 +140,7 @@ export function Settings() {
 
       <Element className="mt-4" leftSide={t('client_portal')}>
         <Toggle
-          checked={company?.settings.enable_client_portal || false}
+          checked={Boolean(company?.settings.enable_client_portal)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal', value)
           }
@@ -152,7 +152,7 @@ export function Settings() {
         leftSideHelp={t('document_upload_help')}
       >
         <Toggle
-          checked={company?.settings.client_portal_enable_uploads || false}
+          checked={Boolean(company?.settings.client_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.client_portal_enable_uploads', value)
           }
@@ -164,7 +164,7 @@ export function Settings() {
         leftSideHelp={t('vendor_document_upload_help')}
       >
         <Toggle
-          checked={company?.settings.vendor_portal_enable_uploads || false}
+          checked={Boolean(company?.settings.vendor_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.vendor_portal_enable_uploads', value)
           }
@@ -176,7 +176,9 @@ export function Settings() {
         leftSideHelp={t('accept_purchase_order_number_help')}
       >
         <Toggle
-          checked={company?.settings.accept_client_input_quote_approval}
+          checked={Boolean(
+            company?.settings.accept_client_input_quote_approval
+          )}
           onValueChange={(value) =>
             handleChange('settings.accept_client_input_quote_approval', value)
           }

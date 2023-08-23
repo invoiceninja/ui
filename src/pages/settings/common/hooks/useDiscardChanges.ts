@@ -29,12 +29,12 @@ export function useDiscardChanges() {
       dispatch(resetChanges('company'));
     }
 
-    if (isGroupSettingsActive) {
+    if (isGroupSettingsActive && activeGroupSettings) {
       dispatch(
         updateChanges({
           object: 'company',
           property: 'settings',
-          value: activeGroupSettings?.settings,
+          value: activeGroupSettings.settings,
         })
       );
     }
