@@ -68,28 +68,14 @@ export function Settings(props: Props) {
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
           {isGroupSettingsActive && (
-            <div className="flex items-center justify-between px-2 bg-white border border-gray-200 py-3 rounded space-x-3">
-              <div className="flex items-center space-x-1 lg:space-x-3 3xl:space-x-1 flex-1 w-[90%] lg:w-[75%] 3xl:w-[90%]">
+            <div className="flex items-center justify-between bg-white border border-gray-200 py-3 rounded space-x-3 px-2">
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
                 <div>
                   <Icon element={FaObjectGroup} size={20} />
                 </div>
 
-                <div className="flex-col hidden lg:inline 3xl:hidden w-[70%]">
-                  <p className="text-sm truncate w-full">
-                    {t('group_settings')}
-                  </p>
-
-                  <p className="text-sm truncate w-full">
-                    {activeSettings.name}
-                  </p>
-                </div>
-
-                <span className="text-sm lg:hidden 3xl:inline">
-                  {t('group_settings')}:
-                </span>
-
-                <span className="text-sm truncate lg:hidden 3xl:inline flex-1">
-                  {activeSettings.name}
+                <span className="text-sm truncate">
+                  {t('group_settings')}: {activeSettings.name}
                 </span>
               </div>
 
