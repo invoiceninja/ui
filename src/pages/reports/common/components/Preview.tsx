@@ -87,7 +87,6 @@ export function usePreview() {
 export function Preview() {
   const preview = usePreview();
   const [filtered, setFiltered] = useState<Preview | null>(null);
-  const [filters, setFilters] = useState<Record<string, string>>({});
   const [sorts, setSorts] = useState<Record<string, string>>();
 
   if (!preview) {
@@ -95,8 +94,6 @@ export function Preview() {
   }
 
   const filter = (column: string, value: string) => {
-    setFilters((current) => ({ ...current, [column]: value }));
-
     const copy = cloneDeep(preview);
 
     copy.rows = copy.rows.filter((sub) =>
