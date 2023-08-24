@@ -65,7 +65,7 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `bg-white shadow rounded overflow-visible ${props.className}`,
+        `bg-white dark:bg-ninja-gray-lighter shadow rounded overflow-visible ${props.className}`,
         { 'overflow-y-auto': props.withScrollableBody }
       )}
       style={props.style}
@@ -77,7 +77,7 @@ export function Card(props: Props) {
               'bg-white sticky top-0': props.withScrollableBody,
               'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
-              'border-b border-gray-200': !props.withoutHeaderBorder,
+              'border-b border-gray-200 dark:border-ninja-gray': !props.withoutHeaderBorder,
             })}
             onClick={() =>
               typeof props.collapsed !== 'undefined' &&
@@ -92,7 +92,7 @@ export function Card(props: Props) {
             >
               <div>
                 <h3
-                  className={classNames('leading-6 font-medium text-gray-900', {
+                  className={classNames('leading-6 font-medium text-gray-900 dark:text-gray-200', {
                     'text-lg': padding == 'regular',
                     'text-md': padding == 'small',
                   })}
