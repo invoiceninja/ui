@@ -119,12 +119,12 @@ export function CompanySwitcher() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
+          <Menu.Items className="origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg bg-white dark:bg-ninja-gray-lighter ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-ninja-gray focus:outline-none">
             <div className="py-1">
               <Menu.Item>
                 <DropdownElement>
                   <p className="text-sm">{t('signed_in_as')}</p>
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
                     {user?.email}
                   </p>
                 </DropdownElement>
