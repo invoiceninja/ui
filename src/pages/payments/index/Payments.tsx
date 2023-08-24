@@ -23,6 +23,7 @@ import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Payments() {
   useTitle('payments');
@@ -38,6 +39,8 @@ export default function Payments() {
   const paymentColumns = useAllPaymentColumns();
 
   const filters = usePaymentFilters();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
@@ -56,6 +59,7 @@ export default function Payments() {
         withResourcefulActions
         customActions={actions}
         customFilters={filters}
+        customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={

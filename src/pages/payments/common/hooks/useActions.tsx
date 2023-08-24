@@ -61,7 +61,7 @@ export function useActions() {
       ),
     (payment: Payment) => (
       <DropdownElement
-        onClick={() => bulk(payment.id, 'email')}
+        onClick={() => bulk([payment.id], 'email')}
         icon={<Icon element={MdSend} />}
       >
         {t('email_payment')}
@@ -76,7 +76,7 @@ export function useActions() {
       getEntityState(payment) === EntityState.Active &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(payment.id, 'archive')}
+          onClick={() => bulk([payment.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -87,7 +87,7 @@ export function useActions() {
       getEntityState(payment) !== EntityState.Deleted &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(payment.id, 'restore')}
+          onClick={() => bulk([payment.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -98,7 +98,7 @@ export function useActions() {
         getEntityState(payment) === EntityState.Archived) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(payment.id, 'delete')}
+          onClick={() => bulk([payment.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

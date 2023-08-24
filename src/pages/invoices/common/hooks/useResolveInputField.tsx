@@ -303,9 +303,6 @@ export function useResolveInputField(props: Props) {
         <InputField
           id={property}
           key={`${property}${index}`}
-          parentClassName="flex items-end"
-          collapseOnFocus
-          textareaRows={1}
           element="textarea"
           value={resource?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -354,6 +351,31 @@ export function useResolveInputField(props: Props) {
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
       const field = property.replace(
         'product',
+        'custom_value'
+      ) as keyof InvoiceItem;
+
+      return company.custom_fields?.[property] ? (
+        <CustomField
+          field={property}
+          defaultValue={resource?.line_items[index][field]}
+          value={company.custom_fields?.[property]}
+          onValueChange={(value) => onChange(field, value, index)}
+          fieldOnly
+        />
+      ) : (
+        <InputField
+          id={property}
+          value={resource?.line_items[index][property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(property, event.target.value, index)
+          }
+        />
+      );
+    }
+
+    if (['task1', 'task2', 'task3', 'task4'].includes(property)) {
+      const field = property.replace(
+        'task',
         'custom_value'
       ) as keyof InvoiceItem;
 
