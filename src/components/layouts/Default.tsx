@@ -381,7 +381,7 @@ export function Default(props: Props) {
           isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
         } flex flex-col flex-1`}
       >
-        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
+        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-ninja-gray-lighter shadow">
           <button
             type="button"
             className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
@@ -495,7 +495,7 @@ export function Default(props: Props) {
           </div>
         </div>
 
-        <main className="flex-1">
+        <main className="flex-1 dark:bg-ninja-gray">
           {(props.breadcrumbs || props.topRight) && (
             <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
               <div className="">
