@@ -25,11 +25,10 @@ export function QuickCreatePopover() {
           <Popover.Button
             className={classNames(
               open ? 'text-gray-500' : 'text-gray-900',
-              'group inline-flex items-center rounded bg-white text-base font-medium hover:text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-200 focus:ring-offset-2'
+              'group inline-flex items-center rounded bg-white dark:bg-ninja-gray-lighter dark:text-gray-200 text-base font-medium hover:text-gray-900 dark:hover:text-gray-200'
             )}
           >
             <BiPlus className="cursor-pointer text-xl" />
-
             <MdArrowDropDown className="cursor-pointer text-xl" />
           </Popover.Button>
 
@@ -54,7 +53,7 @@ export function QuickCreatePopover() {
               <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                 <div
                   className={classNames(
-                    'relative grid gap-y-4 md:gap-y-0 bg-white px-2 py-4 grid-cols-2',
+                    'relative grid gap-y-4 md:gap-y-0 bg-white dark:bg-ninja-gray-lighter px-2 py-4 grid-cols-2',
                     {
                       'md:grid-cols-3': isHosted(),
                     }
@@ -73,7 +72,7 @@ export function QuickCreatePopover() {
                               color={accentColor}
                             />
 
-                            <p className="uppercase text-sm tracking-wide font-medium text-gray-800 ml-1 md:ml-2">
+                            <p className="uppercase text-sm tracking-wide font-medium text-gray-800 dark:text-gray-200 ml-1 md:ml-2">
                               {t(section.name)}
                             </p>
                           </div>
@@ -85,7 +84,7 @@ export function QuickCreatePopover() {
                                 action.visible && (
                                   <div
                                     key={action.key}
-                                    className="flex items-center pl-3 space-x-1 py-1 cursor-pointer hover:bg-gray-100 rounded"
+                                    className="flex items-center pl-3 space-x-1 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-ninja-gray rounded"
                                     onClick={() => {
                                       !action.externalLink &&
                                         navigate(action.url);
@@ -94,9 +93,9 @@ export function QuickCreatePopover() {
                                         window.open(action.url, '_blank');
                                     }}
                                   >
-                                    <BiPlus className="text-base text-gray-600" />
+                                    <BiPlus className="text-base text-gray-600 dark:text-gray-200" />
 
-                                    <span className="text-sm text-gray-800">
+                                    <span className="text-sm text-gray-800 dark:text-gray-200">
                                       {t(action.key)}
                                     </span>
                                   </div>
