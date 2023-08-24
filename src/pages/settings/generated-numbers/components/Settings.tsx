@@ -30,7 +30,7 @@ export function Settings() {
       <Element leftSide={t('number_padding')}>
         <SelectField
           id="settings.counter_padding"
-          value={companyChanges?.settings?.counter_padding}
+          value={companyChanges?.settings?.counter_padding || '1'}
           onValueChange={(value) =>
             handleChange('settings.counter_padding', value)
           }
@@ -52,7 +52,9 @@ export function Settings() {
       <Element leftSide={t('generate_number')}>
         <SelectField
           id="settings.counter_number_applied"
-          value={companyChanges?.settings?.counter_number_applied}
+          value={
+            companyChanges?.settings?.counter_number_applied || 'when_saved'
+          }
           onValueChange={(value) =>
             handleChange('settings.counter_number_applied', value)
           }
@@ -65,7 +67,7 @@ export function Settings() {
 
       <Element leftSide={t('recurring_prefix')}>
         <InputField
-          value={companyChanges?.settings?.recurring_number_prefix}
+          value={companyChanges?.settings?.recurring_number_prefix || ''}
           onValueChange={(value) =>
             handleChange('settings.recurring_number_prefix', value)
           }
@@ -78,9 +80,9 @@ export function Settings() {
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_quote_counter', value)
           }
-          checked={
-            companyChanges?.settings?.shared_invoice_quote_counter || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.shared_invoice_quote_counter
+          )}
         />
       </Element>
 
@@ -89,15 +91,15 @@ export function Settings() {
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_credit_counter', value)
           }
-          checked={
-            companyChanges?.settings?.shared_invoice_credit_counter || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.shared_invoice_credit_counter
+          )}
         />
       </Element>
 
       <Element leftSide={t('reset_counter')}>
         <SelectField
-          value={companyChanges?.settings?.reset_counter_frequency_id}
+          value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
           onValueChange={(value) =>
             handleChange('settings.reset_counter_frequency_id', parseInt(value))
           }

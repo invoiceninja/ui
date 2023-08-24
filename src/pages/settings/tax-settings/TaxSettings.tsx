@@ -127,7 +127,7 @@ export function TaxSettings() {
               onChange={(value: boolean) =>
                 handleToggleChange('settings.inclusive_taxes', value)
               }
-              checked={companyChanges?.settings.inclusive_taxes || false}
+              checked={Boolean(companyChanges?.settings.inclusive_taxes)}
             />
 
             {companyChanges?.settings.inclusive_taxes ? (
@@ -145,7 +145,7 @@ export function TaxSettings() {
 
               <Element leftSide={t('calculate_taxes')}>
                 <Toggle
-                  checked={companyChanges?.calculate_taxes}
+                  checked={Boolean(companyChanges?.calculate_taxes)}
                   onChange={(value: boolean) =>
                     handleToggleChange('calculate_taxes', value)
                   }

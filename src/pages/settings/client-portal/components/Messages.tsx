@@ -28,7 +28,7 @@ export function Messages() {
       <Element leftSide={t('dashboard')}>
         <InputField
           element="textarea"
-          value={company?.settings.custom_message_dashboard}
+          value={company?.settings.custom_message_dashboard || ''}
           onValueChange={(value) =>
             handleChange('settings.custom_message_dashboard', value)
           }
@@ -39,7 +39,7 @@ export function Messages() {
       <Element leftSide={t('unpaid_invoice')}>
         <InputField
           element="textarea"
-          value={company?.settings.custom_message_unpaid_invoice}
+          value={company?.settings.custom_message_unpaid_invoice || ''}
           onValueChange={(value) =>
             handleChange('settings.custom_message_unpaid_invoice', value)
           }
@@ -52,7 +52,7 @@ export function Messages() {
       <Element leftSide={t('paid_invoice')}>
         <InputField
           element="textarea"
-          value={company?.settings.custom_message_paid_invoice}
+          value={company?.settings.custom_message_paid_invoice || ''}
           onValueChange={(value) =>
             handleChange('settings.custom_message_paid_invoice', value)
           }
@@ -63,7 +63,7 @@ export function Messages() {
       <Element leftSide={t('unapproved_quote')}>
         <InputField
           element="textarea"
-          value={company?.settings.custom_message_unapproved_quote}
+          value={company?.settings.custom_message_unapproved_quote || ''}
           onValueChange={(value) =>
             handleChange('settings.custom_message_unapproved_quote', value)
           }

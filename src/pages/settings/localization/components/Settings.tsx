@@ -102,7 +102,9 @@ export function Settings() {
             }
             name="show_currency_code"
             options={currencyFormats}
-            defaultSelected={company?.settings?.show_currency_code?.toString()}
+            defaultSelected={
+              company?.settings?.show_currency_code?.toString() ?? 'false'
+            }
           />
         </Element>
 

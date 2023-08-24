@@ -62,7 +62,7 @@ export function Settings() {
             <SelectField
               disabled={freePlan()}
               id="portal_mode"
-              value={company?.portal_mode}
+              value={company?.portal_mode || 'subdomain'}
               onValueChange={(value) => handleChange('portal_mode', value)}
               errorMessage={errors?.errors.portal_mode}
             >
@@ -78,7 +78,7 @@ export function Settings() {
           {company?.portal_mode === 'subdomain' && (
             <Element leftSide={t('subdomain')}>
               <InputField
-                value={company?.subdomain}
+                value={company?.subdomain || ''}
                 disabled={freePlan()}
                 onValueChange={(value) => checkSubdomain(value)}
                 errorMessage={errors?.errors.subdomain ?? subdomainValidation}
@@ -92,7 +92,7 @@ export function Settings() {
               leftSideHelp="custom domain info"
             >
               <InputField
-                value={company?.portal_domain}
+                value={company?.portal_domain || ''}
                 onValueChange={(value) => handleChange('portal_domain', value)}
                 errorMessage={errors?.errors.portal_domain}
               />
@@ -104,7 +104,7 @@ export function Settings() {
       {isSelfHosted() && (
         <Element leftSide={t('domain_url')}>
           <InputField
-            value={company?.portal_domain}
+            value={company?.portal_domain || ''}
             onValueChange={(value) => handleChange('portal_domain', value)}
             errorMessage={errors?.errors.portal_domain}
           />
@@ -197,7 +197,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.client_portal_terms', value)
           }
-          value={company?.settings.client_portal_terms}
+          value={company?.settings.client_portal_terms || ''}
           errorMessage={errors?.errors['settings.client_portal_terms']}
         />
       </Element>
@@ -208,7 +208,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.client_portal_privacy_policy', value)
           }
-          value={company?.settings.client_portal_privacy_policy}
+          value={company?.settings.client_portal_privacy_policy || ''}
           errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>

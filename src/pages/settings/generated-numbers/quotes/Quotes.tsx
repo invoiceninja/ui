@@ -60,7 +60,7 @@ export function Quotes() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.quote_number_pattern"
-          value={companyChanges?.settings?.quote_number_pattern}
+          value={companyChanges?.settings?.quote_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.quote_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Quotes() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.quote_number_counter"
-          value={companyChanges?.settings?.quote_number_counter}
+          value={companyChanges?.settings?.quote_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.quote_number_counter']}
         />

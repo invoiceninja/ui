@@ -43,7 +43,7 @@ export function Invoices() {
         leftSideHelp={t('auto_email_invoice_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_email_invoice || false}
+          checked={Boolean(companyChanges?.settings?.auto_email_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_email_invoice', value)
           }
@@ -55,7 +55,7 @@ export function Invoices() {
         leftSideHelp={t('stop_on_unpaid_help')}
       >
         <Toggle
-          checked={companyChanges?.stop_on_unpaid_recurring || false}
+          checked={Boolean(companyChanges?.stop_on_unpaid_recurring)}
           onChange={(value: boolean) =>
             handleToggleChange('stop_on_unpaid_recurring', value)
           }
@@ -69,7 +69,7 @@ export function Invoices() {
         leftSideHelp={t('auto_archive_invoice_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_archive_invoice || false}
+          checked={Boolean(companyChanges?.settings?.auto_archive_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice', value)
           }
@@ -81,9 +81,9 @@ export function Invoices() {
         leftSideHelp={t('auto_archive_invoice_cancelled_help')}
       >
         <Toggle
-          checked={
-            companyChanges?.settings?.auto_archive_invoice_cancelled || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.auto_archive_invoice_cancelled
+          )}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice_cancelled', value)
           }

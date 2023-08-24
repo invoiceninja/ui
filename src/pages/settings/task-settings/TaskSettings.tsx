@@ -254,7 +254,10 @@ export function TaskSettings() {
                 ? false
                 : true
             }
-            value={companyChanges?.settings?.show_all_tasks_client_portal?.toString()}
+            value={
+              companyChanges?.settings?.show_all_tasks_client_portal?.toString() ||
+              'invoiced'
+            }
             errorMessage={
               errors?.errors['settings.show_all_tasks_client_portal']
             }

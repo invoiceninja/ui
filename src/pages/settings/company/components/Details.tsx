@@ -169,7 +169,7 @@ export function Details() {
           {companyChanges?.custom_fields?.company1 && (
             <CustomField
               field="company1"
-              defaultValue={companyChanges.settings.custom_value1}
+              defaultValue={companyChanges.settings.custom_value1 || ''}
               value={companyChanges.custom_fields.company1}
               onValueChange={(value) =>
                 handleChange('settings.custom_value1', value.toString())
@@ -180,7 +180,7 @@ export function Details() {
           {companyChanges?.custom_fields?.company2 && (
             <CustomField
               field="company2"
-              defaultValue={companyChanges.settings.custom_value2}
+              defaultValue={companyChanges.settings.custom_value2 || ''}
               value={companyChanges.custom_fields.company2}
               onValueChange={(value) =>
                 handleChange('settings.custom_value2', value.toString())
@@ -191,7 +191,7 @@ export function Details() {
           {companyChanges?.custom_fields?.company3 && (
             <CustomField
               field="company3"
-              defaultValue={companyChanges.settings.custom_value3}
+              defaultValue={companyChanges.settings.custom_value3 || ''}
               value={companyChanges.custom_fields.company3}
               onValueChange={(value) =>
                 handleChange('settings.custom_value3', value.toString())
@@ -202,7 +202,7 @@ export function Details() {
           {companyChanges?.custom_fields?.company4 && (
             <CustomField
               field="company4"
-              defaultValue={companyChanges.settings.custom_value4}
+              defaultValue={companyChanges.settings.custom_value4 || ''}
               value={companyChanges.custom_fields.company4}
               onValueChange={(value) =>
                 handleChange('settings.custom_value4', value.toString())

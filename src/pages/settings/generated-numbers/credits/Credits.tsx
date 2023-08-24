@@ -60,7 +60,7 @@ export function Credits() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.credit_number_pattern"
-          value={companyChanges?.settings?.credit_number_pattern}
+          value={companyChanges?.settings?.credit_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.credit_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Credits() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.credit_number_counter"
-          value={companyChanges?.settings?.credit_number_counter}
+          value={companyChanges?.settings?.credit_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.credit_number_counter']}
         />

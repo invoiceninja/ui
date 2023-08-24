@@ -809,8 +809,8 @@ export function GeneralSettings() {
   };
 
   useEffect(() => {
-    if (company?.settings) {
-      const value = company?.settings.company_logo_size
+    if (company?.settings && company?.settings.company_logo_size) {
+      const value = company.settings.company_logo_size
         ?.replaceAll('%', '')
         ?.replaceAll('px', '');
 
@@ -1013,7 +1013,7 @@ export function GeneralSettings() {
         <div className="w-full inline-flex items-center space-x-2">
           <div className="w-full">
             <InputField
-              value={company?.settings.company_logo_size
+              value={company.settings.company_logo_size
                 ?.replaceAll('px', '')
                 ?.replaceAll('%', '')}
               onValueChange={(value) =>
@@ -1114,7 +1114,9 @@ export function GeneralSettings() {
               value === 'true' ? true : false
             )
           }
-          defaultSelected={company?.settings?.hide_empty_columns_on_pdf?.toString()}
+          defaultSelected={
+            company?.settings?.hide_empty_columns_on_pdf?.toString() ?? 'false'
+          }
         />
       </Element>
 
@@ -1130,7 +1132,7 @@ export function GeneralSettings() {
         <SelectField
           id="settings.page_numbering_alignment"
           disabled={company?.settings?.page_numbering ? false : true}
-          value={company?.settings?.page_numbering_alignment?.toString()}
+          value={company?.settings?.page_numbering_alignment?.toString() || 'C'}
           onValueChange={(value) =>
             handleChange('page_numbering_alignment', value)
           }
