@@ -13,6 +13,8 @@ import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
+import { useResolvePropertyLabel } from '../hooks/useResolvePropertyLabel';
+import { useResolvePropertyValue } from '../hooks/useResolvePropertyValue';
 
 interface Props {
   groupSettings: GroupSettings;
@@ -40,13 +42,9 @@ export function GroupSettingsProperties(props: Props) {
 
   const { groupSettings, handleChange } = props;
 
-  const customizeValueOutput = (value: string | boolean) => {
-    if (typeof value === 'boolean') {
-      return value ? t('enabled') : t('disabled');
-    }
+  const resolvePropertyLabel = useResolvePropertyLabel();
 
-    return t(value);
-  };
+  const resolvePropertyValue = useResolvePropertyValue();
 
   const handleRemoveProperty = (property: string) => {
     const updatedSettings = { ...groupSettings.settings };
@@ -57,12 +55,16 @@ export function GroupSettingsProperties(props: Props) {
   };
 
   const shouldSectionBeAvailable = (sectionKey: string) => {
-    return Object.keys(groupSettings.settings).some((key) =>
-      GroupSectionProperties[
-        sectionKey as keyof typeof GroupSectionProperties
-      ].includes(key)
+    return Object.entries(groupSettings.settings).some(
+      ([key, value]) =>
+        GroupSectionProperties[
+          sectionKey as keyof typeof GroupSectionProperties
+        ].includes(key) &&
+        (value || typeof value === 'boolean')
     );
   };
+
+  console.log(groupSettings?.settings);
 
   return (
     <div className="flex flex-col px-6 pt-6 w-full">
@@ -77,18 +79,22 @@ export function GroupSettingsProperties(props: Props) {
                   ([property, value], index: number) =>
                     GroupSectionProperties[
                       section as keyof typeof GroupSectionProperties
-                    ].includes(property) && (
+                    ].includes(property) &&
+                    (value || typeof value === 'boolean') && (
                       <div
                         key={index}
                         className="flex justify-between border-gray-200 rounded pl-3 pr-2 py-2 items-center w-1/2 first:mt-2"
                       >
                         <div className="flex flex-1 text-sm truncate">
-                          {t(property)}:
+                          {resolvePropertyLabel(property)}:
                         </div>
 
-                        <span className="flex flex-1 justify-start text-sm whitespace-normal pl-4">
-                          {customizeValueOutput(value)}
-                        </span>
+                        <span
+                          className="flex flex-1 justify-start text-sm whitespace-normal pl-4"
+                          dangerouslySetInnerHTML={{
+                            __html: resolvePropertyValue(property, value),
+                          }}
+                        />
 
                         <div className="flex justify-end">
                           <Icon

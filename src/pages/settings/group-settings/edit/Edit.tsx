@@ -82,9 +82,14 @@ export function Edit() {
   }, [groupSettingsResponse]);
 
   const shouldShowProperties = () => {
-    const filteredProperties = Object.keys(
+    const filteredProperties = Object.entries(
       groupSettings?.settings || []
-    ).filter((key) => key !== 'entity');
+    ).filter(
+      ([key, value]) =>
+        key !== 'entity' &&
+        key !== 'company_logo' &&
+        (value || typeof value === 'boolean')
+    );
 
     return Boolean(filteredProperties.length);
   };

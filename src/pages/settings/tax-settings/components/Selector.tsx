@@ -22,10 +22,15 @@ import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 
-export function Selector() {
+interface Props {
+  title?: string;
+}
+export function Selector(props: Props) {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
+
+  const { title } = props;
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -56,7 +61,7 @@ export function Selector() {
   return (
     <>
       {companyChanges?.enabled_tax_rates > 0 && (
-        <Card>
+        <Card title={title ? t(title) : undefined}>
           {companyChanges?.enabled_tax_rates > 0 && (
             <Element leftSide={t('default_tax_rate')}>
               <SelectField

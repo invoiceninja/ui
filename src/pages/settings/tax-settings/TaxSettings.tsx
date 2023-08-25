@@ -29,6 +29,7 @@ import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -40,6 +41,13 @@ export function TaxSettings() {
 
   useInjectCompanyChanges();
   useTitle('tax_settings');
+
+  const isPaidOrSelfHost = usePaidOrSelfHost();
+
+  const calculateTaxesRegion = useCalculateTaxesRegion();
+
+  const { isCompanySettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -78,85 +86,92 @@ export function TaxSettings() {
       docsLink="en/basic-settings/#tax_settings"
       withoutBackButton
     >
-      <Card title={t('tax_settings')}>
-        <Element leftSide={t('invoice_tax_rates')}>
-          <SelectField
-            id="enabled_tax_rates"
-            onChange={handleChange}
-            value={companyChanges?.enabled_tax_rates || 0}
-            errorMessage={errors?.errors.enabled_tax_rates}
-          >
-            <option value="0">{t('disabled')}</option>
-            <option value="1">{t('one_tax_rate')}</option>
-            <option value="2">{t('two_tax_rates')}</option>
-            <option value="3">{t('three_tax_rates')}</option>
-          </SelectField>
-        </Element>
+      {isCompanySettingsActive && (
+        <>
+          <Card title={t('tax_settings')}>
+            <Element leftSide={t('invoice_tax_rates')}>
+              <SelectField
+                id="enabled_tax_rates"
+                onChange={handleChange}
+                value={companyChanges?.enabled_tax_rates || 0}
+                errorMessage={errors?.errors.enabled_tax_rates}
+              >
+                <option value="0">{t('disabled')}</option>
+                <option value="1">{t('one_tax_rate')}</option>
+                <option value="2">{t('two_tax_rates')}</option>
+                <option value="3">{t('three_tax_rates')}</option>
+              </SelectField>
+            </Element>
 
-        <Element leftSide={t('line_item_tax_rates')}>
-          <SelectField
-            id="enabled_item_tax_rates"
-            onChange={handleChange}
-            value={companyChanges?.enabled_item_tax_rates || 0}
-            errorMessage={errors?.errors.enabled_item_tax_rates}
-          >
-            <option value="0">{t('disabled')}</option>
-            <option value="1">{t('one_tax_rate')}</option>
-            <option value="2">{t('two_tax_rates')}</option>
-            <option value="3">{t('three_tax_rates')}</option>
-          </SelectField>
-        </Element>
+            <Element leftSide={t('line_item_tax_rates')}>
+              <SelectField
+                id="enabled_item_tax_rates"
+                onChange={handleChange}
+                value={companyChanges?.enabled_item_tax_rates || 0}
+                errorMessage={errors?.errors.enabled_item_tax_rates}
+              >
+                <option value="0">{t('disabled')}</option>
+                <option value="1">{t('one_tax_rate')}</option>
+                <option value="2">{t('two_tax_rates')}</option>
+                <option value="3">{t('three_tax_rates')}</option>
+              </SelectField>
+            </Element>
 
-        <Element leftSide={t('expense_tax_rates')}>
-          <SelectField
-            id="enabled_expense_tax_rates"
-            onChange={handleChange}
-            value={companyChanges?.enabled_expense_tax_rates || 0}
-            errorMessage={errors?.errors.enabled_expense_tax_rates}
-          >
-            <option value="0">{t('disabled')}</option>
-            <option value="1">{t('one_tax_rate')}</option>
-            <option value="2">{t('two_tax_rates')}</option>
-            <option value="3">{t('three_tax_rates')}</option>
-          </SelectField>
-        </Element>
+            <Element leftSide={t('expense_tax_rates')}>
+              <SelectField
+                id="enabled_expense_tax_rates"
+                onChange={handleChange}
+                value={companyChanges?.enabled_expense_tax_rates || 0}
+                errorMessage={errors?.errors.enabled_expense_tax_rates}
+              >
+                <option value="0">{t('disabled')}</option>
+                <option value="1">{t('one_tax_rate')}</option>
+                <option value="2">{t('two_tax_rates')}</option>
+                <option value="3">{t('three_tax_rates')}</option>
+              </SelectField>
+            </Element>
 
-        <Element leftSide={t('inclusive_taxes')}>
-          <div className="flex items-center space-x-7">
-            <Toggle
-              onChange={(value: boolean) =>
-                handleToggleChange('settings.inclusive_taxes', value)
-              }
-              checked={Boolean(companyChanges?.settings.inclusive_taxes)}
-            />
-
-            {companyChanges?.settings.inclusive_taxes ? (
-              <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
-            ) : (
-              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
-            )}
-          </div>
-        </Element>
-
-        {usePaidOrSelfHost() &&
-          useCalculateTaxesRegion(companyChanges?.settings?.country_id) && (
-            <>
-              <Divider />
-
-              <Element leftSide={t('calculate_taxes')}>
+            <Element leftSide={t('inclusive_taxes')}>
+              <div className="flex items-center space-x-7">
                 <Toggle
-                  checked={Boolean(companyChanges?.calculate_taxes)}
                   onChange={(value: boolean) =>
-                    handleToggleChange('calculate_taxes', value)
+                    handleToggleChange('settings.inclusive_taxes', value)
                   }
+                  checked={Boolean(companyChanges?.settings.inclusive_taxes)}
                 />
-              </Element>
 
-              {companyChanges.calculate_taxes && <CalculateTaxes />}
-            </>
-          )}
-      </Card>
-      <Selector />
+                {companyChanges?.settings.inclusive_taxes ? (
+                  <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
+                ) : (
+                  <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+                )}
+              </div>
+            </Element>
+
+            {isPaidOrSelfHost &&
+              calculateTaxesRegion(companyChanges?.settings?.country_id) && (
+                <>
+                  <Divider />
+
+                  <Element leftSide={t('calculate_taxes')}>
+                    <Toggle
+                      checked={Boolean(companyChanges?.calculate_taxes)}
+                      onChange={(value: boolean) =>
+                        handleToggleChange('calculate_taxes', value)
+                      }
+                    />
+                  </Element>
+
+                  {companyChanges.calculate_taxes && <CalculateTaxes />}
+                </>
+              )}
+          </Card>
+
+          <Selector />
+        </>
+      )}
+
+      {isGroupSettingsActive && <Selector title="tax_settings" />}
       <TaxRates />
     </Settings>
   );

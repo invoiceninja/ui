@@ -20,11 +20,14 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Details() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { data: statics } = useStaticsQuery();
 
@@ -132,39 +135,43 @@ export function Details() {
             ''
           )}
 
-          <Element leftSide={t('size_id')}>
-            <SelectField
-              value={companyChanges?.size_id || '1'}
-              onValueChange={(value) =>
-                handleChange('size_id', value.toString())
-              }
-              errorMessage={errors?.errors.size_id}
-            >
-              {statics?.sizes.map((size: { id: string; name: string }) => (
-                <option key={size.id} value={size.id}>
-                  {size.name}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-
-          <Element leftSide={t('industry_id')}>
-            <SelectField
-              value={companyChanges?.industry_id || '1'}
-              onValueChange={(value) =>
-                handleChange('industry_id', value.toString())
-              }
-              errorMessage={errors?.errors.industry_id}
-            >
-              {statics?.industries.map(
-                (industry: { id: string; name: string }) => (
-                  <option key={industry.id} value={industry.id}>
-                    {industry.name}
+          {isCompanySettingsActive && (
+            <Element leftSide={t('size_id')}>
+              <SelectField
+                value={companyChanges?.size_id || '1'}
+                onValueChange={(value) =>
+                  handleChange('size_id', value.toString())
+                }
+                errorMessage={errors?.errors.size_id}
+              >
+                {statics?.sizes.map((size: { id: string; name: string }) => (
+                  <option key={size.id} value={size.id}>
+                    {size.name}
                   </option>
-                )
-              )}
-            </SelectField>
-          </Element>
+                ))}
+              </SelectField>
+            </Element>
+          )}
+
+          {isCompanySettingsActive && (
+            <Element leftSide={t('industry_id')}>
+              <SelectField
+                value={companyChanges?.industry_id || '1'}
+                onValueChange={(value) =>
+                  handleChange('industry_id', value.toString())
+                }
+                errorMessage={errors?.errors.industry_id}
+              >
+                {statics?.industries.map(
+                  (industry: { id: string; name: string }) => (
+                    <option key={industry.id} value={industry.id}>
+                      {industry.name}
+                    </option>
+                  )
+                )}
+              </SelectField>
+            </Element>
+          )}
 
           {companyChanges?.custom_fields?.company1 && (
             <CustomField
