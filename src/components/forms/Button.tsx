@@ -14,6 +14,8 @@ import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { Spinner } from '../Spinner';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   children?: ReactNode;
@@ -32,9 +34,22 @@ const defaultProps: Props = {
   behavior: 'submit',
 };
 
+const StyledLink = styled(Link)`
+  color: ${(props) => props.theme.color} !important;
+  background-color: ${(props) => props.theme.backgroundColor} !important;
+  border-color: ${(props) => props.theme.borderColor} !important;
+`;
+
+const StyledButton = styled.button`
+  color: ${(props) => props.theme.color} !important;
+  background-color: ${(props) => props.theme.backgroundColor} !important;
+  border-color: ${(props) => props.theme.borderColor} !important;
+`;
+
 export function Button(props: Props) {
   props = { ...defaultProps, ...props };
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
 
   const css: React.CSSProperties = {
@@ -50,35 +65,42 @@ export function Button(props: Props) {
 
   if (props.to) {
     return (
-      <Link
+      <StyledLink
         to={props.to}
+        theme={{
+          backgroundColor: props.type === 'primary' ? accentColor : colors.$2,
+          color: props.type === 'primary' ? colors.$8 : colors.$3,
+          borderColor: colors.$5,
+        }}
         className={classNames(
-          `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-gray-900 ${props.className}`,
+          `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
           {
+            'py-2 px-4': props.type !== 'minimal',
             'w-full': props.variant === 'block',
-            'text-white': props.type === 'primary',
-            'text-gray-900 border border-gray-300': props.type === 'secondary',
-            'border-gray-600': props.type == 'minimal',
+            'p-0 m-0': props.type === 'minimal',
           }
         )}
         style={css}
       >
         {props.disabled ? <Spinner variant="light" /> : props.children}
-      </Link>
+      </StyledLink>
     );
   }
 
   return (
-    <button
+    <StyledButton
       type={props.behavior}
       disabled={props.disabled}
+      theme={{
+        backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
+        color: props.type === 'primary' ? colors.$9 : colors.$3,
+        borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
+      }}
       className={classNames(
-        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
+        `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
         {
           'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',
-          'text-white': props.type === 'primary',
-          'text-gray-900 border border-gray-300': props.type === 'secondary',
           'p-0 m-0': props.type === 'minimal',
         }
       )}
@@ -90,6 +112,6 @@ export function Button(props: Props) {
       ) : (
         props.children
       )}
-    </button>
+    </StyledButton>
   );
 }
