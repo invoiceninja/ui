@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   defaultValue?: any;
@@ -24,6 +25,8 @@ interface Props extends CommonProps {
 }
 
 export function SelectField(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <section>
       {props.label && (
@@ -40,13 +43,13 @@ export function SelectField(props: Props) {
         }}
         id={props.id}
         className={classNames(
-          `w-full py-2 px-3 rounded text-sm border border-gray-300 text-gray-900 ${props.className}`
+          `w-full py-2 px-3 rounded text-sm border ${props.className}`
         )}
         defaultValue={props.defaultValue}
         value={props.value}
         ref={props.innerRef}
         disabled={props.disabled}
-        style={props.style}
+        style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, ...props.style }}
       >
         {props.withBlank && (
           <option value={props.blankOptionValue ?? ''}></option>
