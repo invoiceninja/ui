@@ -35,7 +35,6 @@ export function Activity() {
       title={t('recent_activity')}
       className="h-96 relative"
       withoutBodyPadding
-      withoutHeaderBorder
     >
       {isLoading && (
         <NonClickableElement>
