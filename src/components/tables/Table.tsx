@@ -11,6 +11,7 @@
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   withoutPadding?: boolean;
@@ -74,6 +75,8 @@ export function Table(props: Props) {
     }
   }, [isVerticallyOverflow]);
 
+  const colors = useColorScheme();
+
   return (
     <div
       className={classNames('flex flex-col', {
@@ -87,7 +90,7 @@ export function Table(props: Props) {
       >
         <div
           className={classNames(
-            'overflow-hidden border border-gray-200 dark:border-transparent rounded border-b border-t',
+            'overflow-hidden border rounded border-b border-t',
             {
               'border-b-0': props.withoutBottomBorder,
               'border-t-0': props.withoutTopBorder,
@@ -95,6 +98,11 @@ export function Table(props: Props) {
               'border-r-0': props.withoutRightBorder,
             }
           )}
+          style={{
+            backgroundColor: colors.$1,
+            color: colors.$3,
+            borderColor: colors.$4,
+          }}
         >
           <div
             ref={handleTableParentHeight}
@@ -106,7 +114,7 @@ export function Table(props: Props) {
           >
             <table
               ref={handleTableHeight}
-              className="min-w-full table-auto divide-y divide-gray-200"
+              className="min-w-full table-auto"
             >
               {props.children}
             </table>
