@@ -28,6 +28,7 @@ import {
 } from '$app/common/hooks/useReactSettings';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
+import { useColorScheme } from '$app/common/colors';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -175,6 +176,8 @@ export function Totals() {
     getChartData();
   }, [body]);
 
+  const colors = useColorScheme();
+
   return (
     <>
       {isLoadingTotals && (
@@ -303,18 +306,19 @@ export function Totals() {
             title={t('account_login_text')}
             className="col-span-12 xl:col-span-4"
           >
-            <div className="px-6 pb-8">
-              <div className="flex flex-col space-y-2">
+            <div className="pb-8">
+              <div className="flex flex-col space-y-2 px-6">
                 <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
 
-                <span className="text-sm text-gray-600">
-                  {t('recent_transactions')}
-                </span>
+                <span className="text-sm">{t('recent_transactions')}</span>
               </div>
 
               <div className="flex flex-col mt-8">
-                <div className="flex justify-between items-center border-b border-gray-200 py-3">
-                  <span className="text-gray-600">{t('invoices')}</span>
+                <div
+                  style={{ borderColor: colors.$4 }}
+                  className="flex justify-between items-center border-b py-3 px-6"
+                >
+                  <span>{t('invoices')}</span>
 
                   <Badge style={{ backgroundColor: TotalColors.Blue }}>
                     <span className="mx-2 text-base">
@@ -327,8 +331,11 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-200 py-3">
-                  <span className="text-gray-600">{t('payments')}</span>
+                <div
+                  style={{ borderColor: colors.$4 }}
+                  className="flex justify-between items-center border-b py-3 px-6"
+                >
+                  <span>{t('payments')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Green }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
@@ -340,8 +347,11 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-200 py-3">
-                  <span className="text-gray-600">{t('expenses')}</span>
+                <div
+                  style={{ borderColor: colors.$4 }}
+                  className="flex justify-between items-center border-b py-3 px-6"
+                >
+                  <span>{t('expenses')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Gray }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
@@ -353,8 +363,11 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-200 py-3">
-                  <span className="text-gray-600">{t('outstanding')}</span>
+                <div
+                  style={{ borderColor: colors.$4 }}
+                  className="flex justify-between items-center border-b py-3 px-6"
+                >
+                  <span>{t('outstanding')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Red }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
@@ -366,10 +379,11 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-200 py-3">
-                  <span className="text-gray-600">
-                    {t('total_invoices_outstanding')}
-                  </span>
+                <div
+                  style={{ borderColor: colors.$4 }}
+                  className="flex justify-between items-center border-b py-3 px-6"
+                >
+                  <span>{t('total_invoices_outstanding')}</span>
 
                   <Badge variant="white">
                     <span className="mx-2 text-base">
