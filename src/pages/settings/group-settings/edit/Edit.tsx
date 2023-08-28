@@ -27,10 +27,8 @@ import { endpoint } from '$app/common/helpers';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
-import { Divider } from '$app/components/cards/Divider';
 import { Card } from '$app/components/cards';
 import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
-import classNames from 'classnames';
 import { Clients } from './components/Clients';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -81,19 +79,6 @@ export function Edit() {
     }
   }, [groupSettingsResponse]);
 
-  const shouldShowProperties = () => {
-    const filteredProperties = Object.entries(
-      groupSettings?.settings || []
-    ).filter(
-      ([key, value]) =>
-        key !== 'entity' &&
-        key !== 'company_logo' &&
-        (value || typeof value === 'boolean')
-    );
-
-    return Boolean(filteredProperties.length);
-  };
-
   const onSuccess = () => {
     queryClient.invalidateQueries(route('/api/v1/group_settings/:id', { id }));
   };
@@ -134,29 +119,21 @@ export function Edit() {
                 </Button>
               }
             >
-              <div
-                className={classNames({
-                  'pb-4': shouldShowProperties(),
-                })}
-              >
+              <div>
                 <GroupSettingsForm
                   groupSettings={groupSettings}
                   handleChange={handleChange}
                   errors={errors}
                 />
               </div>
-
-              {shouldShowProperties() && (
-                <>
-                  <Divider withoutPadding />
-
-                  <GroupSettingsProperties
-                    groupSettings={groupSettings}
-                    handleChange={handleChange}
-                  />
-                </>
-              )}
             </Card>
+          )}
+
+          {groupSettings && (
+            <GroupSettingsProperties
+              groupSettings={groupSettings}
+              handleChange={handleChange}
+            />
           )}
         </div>
 

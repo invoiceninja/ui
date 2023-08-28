@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 import { useResolvePropertyLabel } from '../hooks/useResolvePropertyLabel';
 import { useResolvePropertyValue } from '../hooks/useResolvePropertyValue';
+import { Card } from '$app/components/cards';
 
 interface Props {
   groupSettings: GroupSettings;
@@ -65,14 +66,18 @@ export function GroupSettingsProperties(props: Props) {
   };
 
   return (
-    <div className="flex flex-col px-6 pt-6 w-full">
+    <div className="flex flex-col pt-6 w-full">
       {GroupSettingsSections.map(
         (section, index) =>
           shouldSectionBeAvailable(section) && (
-            <div key={index} className="mb-4 last:mb-0">
-              <span className="text-gray-600">{t(section)}:</span>
-
-              <div className="flex flex-col mb-2">
+            <Card
+              key={index}
+              title={t(section)}
+              className="mb-4 last:mb-0"
+              padding="regular"
+              collapsed={index === 0 ? false : true}
+            >
+              <div className="flex flex-col mb-2 px-6">
                 {Object.entries(groupSettings.settings).map(
                   ([property, value], index: number) =>
                     GroupSectionProperties[
@@ -106,7 +111,7 @@ export function GroupSettingsProperties(props: Props) {
                     )
                 )}
               </div>
-            </div>
+            </Card>
           )
       )}
     </div>
