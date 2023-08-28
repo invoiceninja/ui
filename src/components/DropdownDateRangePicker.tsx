@@ -17,6 +17,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { SelectField } from './forms';
 import { atom, useAtomValue } from 'jotai';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 type Props = {
   value?: string;
@@ -57,9 +58,11 @@ export function DropdownDateRangePicker(props: Props) {
     );
   };
 
+  const accentColor = useAccentColor();
+
   return (
     <div className="flex justify-end items-center">
-      <Calendar className="mx-2" />{' '}
+      <Calendar style={{ color: accentColor }} className="mx-2" />
       <SelectField
         value={props.value}
         className={
