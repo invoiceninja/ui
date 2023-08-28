@@ -19,11 +19,14 @@ import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -50,17 +53,19 @@ export function Invoices() {
         />
       </Element>
 
-      <Element
-        leftSide={t('stop_on_unpaid')}
-        leftSideHelp={t('stop_on_unpaid_help')}
-      >
-        <Toggle
-          checked={Boolean(companyChanges?.stop_on_unpaid_recurring)}
-          onChange={(value: boolean) =>
-            handleToggleChange('stop_on_unpaid_recurring', value)
-          }
-        />
-      </Element>
+      {isCompanySettingsActive && (
+        <Element
+          leftSide={t('stop_on_unpaid')}
+          leftSideHelp={t('stop_on_unpaid_help')}
+        >
+          <Toggle
+            checked={Boolean(companyChanges?.stop_on_unpaid_recurring)}
+            onChange={(value: boolean) =>
+              handleToggleChange('stop_on_unpaid_recurring', value)
+            }
+          />
+        </Element>
+      )}
 
       <Divider />
 

@@ -37,11 +37,14 @@ import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function EmailSettings() {
   useTitle('email_settings');
 
   const [t] = useTranslation();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -177,7 +180,7 @@ export function EmailSettings() {
             }
           />
         </Element>
-        {company?.settings.enable_e_invoice ? (
+        {company?.settings.enable_e_invoice && isCompanySettingsActive ? (
           <>
             <Element
               leftSide={t('upload_certificate')}

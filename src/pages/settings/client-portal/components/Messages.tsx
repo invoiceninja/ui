@@ -15,26 +15,31 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Messages() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
     <Card title={t('messages')}>
-      <Element leftSide={t('dashboard')}>
-        <InputField
-          element="textarea"
-          value={company?.settings.custom_message_dashboard || ''}
-          onValueChange={(value) =>
-            handleChange('settings.custom_message_dashboard', value)
-          }
-          errorMessage={errors?.errors['settings.custom_message_dashboard']}
-        />
-      </Element>
+      {isCompanySettingsActive && (
+        <Element leftSide={t('dashboard')}>
+          <InputField
+            element="textarea"
+            value={company?.settings.custom_message_dashboard || ''}
+            onValueChange={(value) =>
+              handleChange('settings.custom_message_dashboard', value)
+            }
+            errorMessage={errors?.errors['settings.custom_message_dashboard']}
+          />
+        </Element>
+      )}
 
       <Element leftSide={t('unpaid_invoice')}>
         <InputField

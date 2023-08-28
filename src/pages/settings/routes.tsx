@@ -127,7 +127,13 @@ export const settingsRoutes = (
           element={<Settings.RecurringExpensesGeneratedNumbers />}
         />
       </Route>
-      <Route path="client_portal" element={<Settings.ClientPortal />} />
+      <Route path="client_portal" element={<Settings.ClientPortal />}>
+        <Route path="" element={<Settings.ClientPortalSettings />} />
+        <Route path="authorization" element={<Settings.Authorization />} />
+        <Route path="registration" element={<Settings.Registration />} />
+        <Route path="messages" element={<Settings.Messages />} />
+        <Route path="customize" element={<Settings.Customize />} />
+      </Route>
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"

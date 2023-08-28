@@ -23,11 +23,15 @@ import { request } from '$app/common/helpers/request';
 import { useState } from 'react';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { freePlan } from '$app/common/guards/guards/free-plan';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import classNames from 'classnames';
 
 export function Settings() {
   const [t] = useTranslation();
 
   useInjectCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useCompanyChanges();
 
@@ -53,7 +57,7 @@ export function Settings() {
 
   return (
     <Card title={t('settings')}>
-      {isHosted() && (
+      {isHosted() && isCompanySettingsActive && (
         <>
           <Element
             leftSide={t('portal_mode')}
@@ -101,7 +105,7 @@ export function Settings() {
         </>
       )}
 
-      {isSelfHosted() && (
+      {isSelfHosted() && isCompanySettingsActive && (
         <Element leftSide={t('domain_url')}>
           <InputField
             value={company?.portal_domain || ''}
@@ -111,34 +115,39 @@ export function Settings() {
         </Element>
       )}
 
+      {isCompanySettingsActive && (
+        <Element
+          leftSide={
+            <span>
+              {t('login')} {t('url')}
+            </span>
+          }
+        >
+          <div className="flex flex-col space-y-1">
+            <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+
+            {isHosted() && company.portal_mode === 'domain' && (
+              <div>
+                <span>{t('app_help_link')}</span>
+                <Link
+                  external
+                  to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
+                >
+                  {t('here')}
+                </Link>
+                .
+              </div>
+            )}
+          </div>
+        </Element>
+      )}
+
+      {isCompanySettingsActive && <Divider />}
+
       <Element
-        leftSide={
-          <span>
-            {t('login')} {t('url')}
-          </span>
-        }
+        className={classNames({ 'mt-4': isCompanySettingsActive })}
+        leftSide={t('client_portal')}
       >
-        <div className="flex flex-col space-y-1">
-          <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
-
-          {isHosted() && company.portal_mode === 'domain' && (
-            <div>
-              <span>{t('app_help_link')}</span>
-              <Link
-                external
-                to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
-              >
-                {t('here')}
-              </Link>
-              .
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Divider />
-
-      <Element className="mt-4" leftSide={t('client_portal')}>
         <Toggle
           checked={Boolean(company?.settings.enable_client_portal)}
           onValueChange={(value) =>

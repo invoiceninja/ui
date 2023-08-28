@@ -1070,14 +1070,26 @@ export function GeneralSettings() {
       <Element leftSide={t('primary_color')}>
         <ColorPicker
           value={company?.settings?.primary_color || colors.primary}
-          onValueChange={(value) => handleChange('primary_color', value)}
+          onValueChange={(value) => {
+            const currentColor = company?.settings?.primary_color;
+
+            if ((!currentColor && value !== colors.primary) || currentColor) {
+              handleChange('primary_color', value);
+            }
+          }}
         />
       </Element>
 
       <Element leftSide={t('secondary_color')}>
         <ColorPicker
           value={company?.settings?.secondary_color || colors.secondary}
-          onValueChange={(value) => handleChange('secondary_color', value)}
+          onValueChange={(value) => {
+            const currentColor = company?.settings?.secondary_color;
+
+            if ((!currentColor && value !== colors.secondary) || currentColor) {
+              handleChange('secondary_color', value);
+            }
+          }}
         />
       </Element>
 

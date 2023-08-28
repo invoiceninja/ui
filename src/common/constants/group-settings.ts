@@ -86,6 +86,9 @@ export const GroupSectionProperties = {
     'enabled_item_tax_rates',
     'enabled_expense_tax_rates',
     'inclusive_taxes',
+    'default_task_rate',
+    'enable_client_portal_tasks',
+    'show_all_tasks_client_portal',
   ],
   workflow_settings: [
     'auto_email_invoice',
@@ -153,6 +156,7 @@ export const GroupSectionProperties = {
     'enable_client_portal',
     'client_portal_enable_uploads',
     'vendor_portal_enable_uploads',
+    'accept_client_input_quote_approval',
     'client_portal_terms',
     'client_portal_privacy_policy',
     'enable_client_portal_password',
@@ -191,6 +195,7 @@ export const GroupSectionProperties = {
     'email_style',
     'email_style_custom',
     'email_signature',
+    'enable_e_invoice',
   ],
   template_and_reminders: [
     'endless_reminder_frequency_id',

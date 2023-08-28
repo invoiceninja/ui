@@ -35,6 +35,7 @@ import { paymentVariables } from './common/constants/variables/payment-variables
 import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -56,6 +57,8 @@ export function TemplatesAndReminders() {
   const handleSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
   const user = useCurrentUser();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState('invoice');
@@ -103,8 +106,13 @@ export function TemplatesAndReminders() {
   }, [statics, templateId]);
 
   useEffect(() => {
-    handleChange(`settings.email_subject_${templateId}`, templateBody?.subject);
-    handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+    if (isCompanySettingsActive) {
+      handleChange(
+        `settings.email_subject_${templateId}`,
+        templateBody?.subject
+      );
+      handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+    }
 
     request('POST', endpoint('/api/v1/templates'), {
       body: templateBody?.body,
