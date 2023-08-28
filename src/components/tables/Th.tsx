@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown, ChevronUp } from 'react-feather';
+import { useColorScheme } from '$app/common/colors';
 
 export interface ColumnSortPayload {
   sort: string;
@@ -46,11 +47,17 @@ export function Th(props: Props) {
     });
   }
 
+  const colors = useColorScheme();
+
   return (
     <th
+      style={{
+        color: colors.$3,
+        borderColor: colors.$4,
+      }}
       onClick={handleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap ${props.className}`,
+        `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap ${props.className}`,
         {
           'cursor-pointer': props.onColumnClick,
         }
