@@ -54,6 +54,7 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useColorScheme } from '$app/common/colors';
 
 export interface SaveOption {
   label: string;
@@ -361,6 +362,7 @@ export function Default(props: Props) {
 
   const { isOwner } = useAdmin();
   const saveBtn = useSaveBtn();
+  const colors = useColorScheme();
 
   return (
     <div>
@@ -381,10 +383,13 @@ export function Default(props: Props) {
           isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
         } flex flex-col flex-1`}
       >
-        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
+        <div
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          className="sticky top-0 z-10 flex-shrink-0 flex h-16 border-b shadow"
+        >
           <button
             type="button"
-            className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+            className="px-4 border-r border-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -392,7 +397,7 @@ export function Default(props: Props) {
           </button>
           <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h2 className="text-sm md:text-xl dark:text-gray-100">
+              <h2 style={{ color: colors.$3 }} className="text-sm md:text-xl">
                 {props.title}
               </h2>
 
@@ -506,7 +511,10 @@ export function Default(props: Props) {
             </div>
           )}
 
-          <div className="p-4 md:py-8 xl:p-8 dark:text-gray-100">
+          <div
+            style={{ backgroundColor: colors.$2 }}
+            className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
+          >
             {props.children}
           </div>
         </main>
