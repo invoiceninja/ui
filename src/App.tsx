@@ -25,6 +25,7 @@ import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import { useColorScheme } from './common/colors';
 
 export function App() {
   const [t] = useTranslation();
@@ -54,13 +55,13 @@ export function App() {
     ? resolveLanguage(company.settings.language_id)
     : undefined;
 
+  const colors = useColorScheme();
+
   useEffect(() => {
-    document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
+    document.body.style.backgroundColor = colors.$2;
+  }, [colors.$2]);
 
-    darkMode
-      ? document.querySelector('html')?.classList.add('dark')
-      : document.querySelector('html')?.classList.remove('dark');
-
+  useEffect(() => {
     if (resolvedLanguage?.locale) {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
         updateDayJSLocale(resolvedLocale);
