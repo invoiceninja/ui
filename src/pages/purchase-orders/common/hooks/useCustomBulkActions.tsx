@@ -64,7 +64,7 @@ export function useCustomBulkActions() {
     setSelected?.([]);
   };
 
-  const showMarkSendOption = (purchaseOrders: PurchaseOrder[]) => {
+  const showMarkSendAction = (purchaseOrders: PurchaseOrder[]) => {
     return purchaseOrders.every(
       ({ status_id }) => status_id === PurchaseOrderStatus.Draft
     );
@@ -89,7 +89,7 @@ export function useCustomBulkActions() {
     ),
     (selectedIds, selectedPurchaseOrders, setSelected) =>
       selectedPurchaseOrders &&
-      showMarkSendOption(selectedPurchaseOrders) && (
+      showMarkSendAction(selectedPurchaseOrders) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'mark_sent');
