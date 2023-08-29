@@ -23,11 +23,25 @@ import { DropdownElement } from './DropdownElement';
 import { useClickAway } from 'react-use';
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
 }
+
+const LabelButton = styled.button`
+  color: ${(props) => props.theme.color} !important;
+  background-color: ${(props) => props.theme.backgroundColor} !important;
+  border-color: ${(props) => props.theme.borderColor} !important;
+`;
+
+const DropdownElements = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 export function Dropdown(props: Props) {
   const ref = useRef(null);
@@ -59,6 +73,8 @@ export function Dropdown(props: Props) {
     setChildren(Children.toArray(props.children));
   }, [props.children]);
 
+  const colors = useColorScheme();
+
   return (
     <div ref={ref}>
       <Tippy
@@ -66,9 +82,15 @@ export function Dropdown(props: Props) {
         placement="bottom"
         interactive={true}
         render={() => (
-          <div
-            className={`box rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
-            style={{ minWidth: '12rem', maxWidth: '14.7rem' }}
+          <DropdownElements
+            theme={{ hoverColor: colors.$2 }}
+            className={`border box rounded-md shadow-lg focus:outline-none ${props.className}`}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+              minWidth: '12rem',
+              maxWidth: '14.7rem',
+            }}
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
@@ -81,16 +103,21 @@ export function Dropdown(props: Props) {
                   )
                 : child
             )}
-          </div>
+          </DropdownElements>
         )}
         visible={visible}
       >
-        <button
+        <LabelButton
+          theme={{
+            backgroundColor: colors.$1,
+            color: colors.$3,
+            borderColor: colors.$5,
+          }}
           type="button"
           disabled={props.disabled}
           onClick={() => setVisible(!visible)}
           className={classNames(
-            `inline-flex text-gray-900 border border-transparent dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
+            `inline-flex border border-transparent dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
             {
               'hover:bg-white hover:border-gray-300': !props.cardActions,
               'hover:opacity-90': props.cardActions,
@@ -103,7 +130,7 @@ export function Dropdown(props: Props) {
         >
           {!props.cardActions && <span>{props.label}</span>}
           <ChevronDown size={props.cardActions ? 18 : 14} />
-        </button>
+        </LabelButton>
       </Tippy>
     </div>
   );
