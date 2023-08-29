@@ -11,11 +11,23 @@
 import { PaymentTerm } from '../interfaces/payment-term';
 import { usePaymentTermsQuery } from '../queries/payment-terms';
 
-export const useResolvePaymentTerm = () => {
+interface Params {
+  resolveWithNumDays?: boolean;
+}
+export const useResolvePaymentTerm = (params?: Params) => {
+  const { resolveWithNumDays } = params || {};
+
   const { data: paymentTerms } = usePaymentTermsQuery({});
 
-  return (numDays: number) =>
+  if (resolveWithNumDays) {
+    return (numDays: string) =>
+      paymentTerms?.data.data.find(
+        (paymentTerm: PaymentTerm) => paymentTerm.num_days === Number(numDays)
+      );
+  }
+
+  return (id: string) =>
     paymentTerms?.data.data.find(
-      (paymentTerm: PaymentTerm) => paymentTerm.num_days === numDays
+      (paymentTerm: PaymentTerm) => paymentTerm.id === id
     );
 };

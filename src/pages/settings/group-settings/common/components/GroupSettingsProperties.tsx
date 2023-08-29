@@ -36,6 +36,7 @@ const GroupSettingsSections = [
   'generated_numbers',
   'client_portal',
   'email_settings',
+  'templates_and_reminders',
 ];
 
 export function GroupSettingsProperties(props: Props) {
@@ -65,6 +66,8 @@ export function GroupSettingsProperties(props: Props) {
     );
   };
 
+  console.log(groupSettings?.settings);
+
   return (
     <div className="flex flex-col pt-6 w-full">
       {GroupSettingsSections.map(
@@ -75,7 +78,7 @@ export function GroupSettingsProperties(props: Props) {
               title={t(section)}
               className="mb-4 last:mb-0"
               padding="regular"
-              collapsed={index === 0 ? false : true}
+              collapsed={index !== 0}
             >
               <div className="flex flex-col mb-2 px-6">
                 {Object.entries(groupSettings.settings).map(
@@ -86,18 +89,20 @@ export function GroupSettingsProperties(props: Props) {
                     (value || typeof value === 'boolean') && (
                       <div
                         key={index}
-                        className="flex justify-between border-gray-200 rounded pl-3 pr-2 py-2 items-center w-1/2 first:mt-2"
+                        className="flex justify-between pl-3 pr-2 py-2 w-[70%] items-center first:mt-2"
                       >
-                        <div className="flex flex-1 text-sm truncate">
-                          {resolvePropertyLabel(property)}:
-                        </div>
+                        <div className="flex flex-1 space-x-2 text-sm">
+                          <span className="flex flex-1 text-sm truncate">
+                            {resolvePropertyLabel(property)}:
+                          </span>
 
-                        <span
-                          className="flex flex-1 justify-start text-sm whitespace-normal pl-4"
-                          dangerouslySetInnerHTML={{
-                            __html: resolvePropertyValue(property, value),
-                          }}
-                        />
+                          <span
+                            className="flex flex-1 justify-start text-sm whitespace-normal pl-4"
+                            dangerouslySetInnerHTML={{
+                              __html: resolvePropertyValue(property, value),
+                            }}
+                          />
+                        </div>
 
                         <div className="flex justify-end">
                           <Icon

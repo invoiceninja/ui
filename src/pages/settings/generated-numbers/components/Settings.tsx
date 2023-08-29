@@ -17,6 +17,35 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 
+export const COUNTER_PADDINGS = [
+  '1',
+  '01',
+  '001',
+  '0001',
+  '00001',
+  '000001',
+  '0000001',
+  '00000001',
+  '000000001',
+  '0000000001',
+];
+
+export const RESECT_COUNTER_FREQUENCIES = [
+  'never',
+  'freq_daily',
+  'freq_weekly',
+  'freq_two_weeks',
+  'freq_four_weeks',
+  'freq_monthly',
+  'freq_two_months',
+  'freq_three_months',
+  'freq_four_months',
+  'freq_six_months',
+  'freq_annually',
+  'freq_two_years',
+  'freq_three_years',
+];
+
 export function Settings() {
   const [t] = useTranslation();
 
@@ -36,16 +65,11 @@ export function Settings() {
           }
           errorMessage={errors?.errors['settings.counter_padding']}
         >
-          <option value="1">1</option>
-          <option value="2">01</option>
-          <option value="3">001</option>
-          <option value="4">0001</option>
-          <option value="5">00001</option>
-          <option value="6">000001</option>
-          <option value="7">0000001</option>
-          <option value="8">00000001</option>
-          <option value="9">000000001</option>
-          <option value="10">0000000001</option>
+          {COUNTER_PADDINGS.map((value, index) => (
+            <option key={index} value={index + 1}>
+              {value}
+            </option>
+          ))}
         </SelectField>
       </Element>
 
@@ -105,19 +129,11 @@ export function Settings() {
           }
           errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
         >
-          <option value="0">{t('never')}</option>
-          <option value="1">{t('freq_daily')}</option>
-          <option value="2">{t('freq_weekly')}</option>
-          <option value="3">{t('freq_two_weeks')}</option>
-          <option value="4">{t('freq_four_weeks')}</option>
-          <option value="5">{t('freq_monthly')}</option>
-          <option value="6">{t('freq_two_months')}</option>
-          <option value="7">{t('freq_three_months')}</option>
-          <option value="8">{t('freq_four_months')}</option>
-          <option value="9">{t('freq_six_months')}</option>
-          <option value="10">{t('freq_annually')}</option>
-          <option value="11">{t('freq_two_years')}</option>
-          <option value="12">{t('freq_three_years')}</option>
+          {RESECT_COUNTER_FREQUENCIES.map((value, index) => (
+            <option key={index} value={index}>
+              {t(value)}
+            </option>
+          ))}
         </SelectField>
       </Element>
 

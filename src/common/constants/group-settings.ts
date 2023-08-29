@@ -42,6 +42,7 @@ export const GroupSectionProperties = {
     'credit_footer',
     'purchase_order_terms',
     'purchase_order_footer',
+    'company_logo',
   ],
   localization: [
     'currency_id',
@@ -68,6 +69,7 @@ export const GroupSectionProperties = {
     'client_manual_payment_notification',
     'client_online_payment_notification',
     'mark_paid_payment_email',
+    'company_gateway_ids',
   ],
   tax_settings: [
     'enabled_tax_rates',
@@ -197,7 +199,7 @@ export const GroupSectionProperties = {
     'email_signature',
     'enable_e_invoice',
   ],
-  template_and_reminders: [
+  templates_and_reminders: [
     'endless_reminder_frequency_id',
     'enable_reminder_endless',
     'late_fee_percent1',

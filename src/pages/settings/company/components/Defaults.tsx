@@ -116,42 +116,8 @@ export function Defaults() {
 
           <Divider />
 
-          <Element className="mt-6" leftSide={t('manual_payment_email')}>
-            <Toggle
-              checked={Boolean(
-                companyChanges?.settings?.client_manual_payment_notification
-              )}
-              onChange={(value: boolean) =>
-                dispatch(
-                  updateChanges({
-                    object: 'company',
-                    property: 'settings.client_manual_payment_notification',
-                    value,
-                  })
-                )
-              }
-            />
-          </Element>
-
-          <Element leftSide={t('online_payment_email')}>
-            <Toggle
-              checked={Boolean(
-                companyChanges?.settings?.client_online_payment_notification
-              )}
-              onChange={(value: boolean) =>
-                dispatch(
-                  updateChanges({
-                    object: 'company',
-                    property: 'settings.client_online_payment_notification',
-                    value,
-                  })
-                )
-              }
-            />
-          </Element>
-
           <Element
-            className="mb-3.5"
+            className="mb-3"
             leftSide={t('use_quote_terms')}
             leftSideHelp={t('use_quote_terms_help')}
           >
