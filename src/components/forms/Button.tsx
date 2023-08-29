@@ -69,7 +69,7 @@ export function Button(props: Props) {
         to={props.to}
         theme={{
           backgroundColor: props.type === 'primary' ? accentColor : colors.$2,
-          color: props.type === 'primary' ? colors.$8 : colors.$3,
+          color: props.type === 'primary' ? colors.$9 : colors.$3,
           borderColor: colors.$5,
         }}
         className={classNames(
@@ -93,7 +93,7 @@ export function Button(props: Props) {
       disabled={props.disabled}
       theme={{
         backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
-        color: props.type === 'primary' ? colors.$9 : colors.$3,
+        color: props.type === 'primary' ? 'colors.$9' : colors.$3,
         borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
       }}
       className={classNames(
