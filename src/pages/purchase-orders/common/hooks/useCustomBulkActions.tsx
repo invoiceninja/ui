@@ -15,30 +15,170 @@ import { Icon } from '$app/components/icons/Icon';
 import { useDownloadPdfs } from '$app/pages/invoices/common/hooks/useDownloadPdfs';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
-import { MdDownload, MdPrint } from 'react-icons/md';
+import {
+  MdContactPage,
+  MdDownload,
+  MdInventory,
+  MdMarkEmailRead,
+  MdPrint,
+  MdSwitchRight,
+} from 'react-icons/md';
+import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
+import { useDocumentsBulk } from '$app/common/queries/documents';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Dispatch, SetStateAction } from 'react';
+import { useBulk } from '$app/common/queries/purchase-orders';
+import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
+import { route } from '$app/common/helpers/route';
+import { useNavigate } from 'react-router-dom';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
+  const navigate = useNavigate();
+
+  const bulk = useBulk();
+
+  const documentsBulk = useDocumentsBulk();
+
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
   const downloadPdfs = useDownloadPdfs({ entity: 'purchase_order' });
 
+  const shouldDownloadDocuments = (purchaseOrders: PurchaseOrder[]) => {
+    return purchaseOrders.some(({ documents }) => documents.length);
+  };
+
+  const getDocumentsIds = (purchaseOrders: PurchaseOrder[]) => {
+    return purchaseOrders.flatMap(({ documents }) =>
+      documents.map(({ id }) => id)
+    );
+  };
+
+  const handleDownloadDocuments = (
+    selectedPurchaseOrders: PurchaseOrder[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const purchaseOrderIds = getDocumentsIds(selectedPurchaseOrders);
+
+    documentsBulk(purchaseOrderIds, 'download');
+    setSelected?.([]);
+  };
+
+  const showMarkSendOption = (purchaseOrders: PurchaseOrder[]) => {
+    return purchaseOrders.every(
+      ({ status_id }) => status_id === PurchaseOrderStatus.Draft
+    );
+  };
+
+  const showConvertToExpenseAction = (purchaseOrders: PurchaseOrder[]) => {
+    return purchaseOrders.every(({ expense_id }) => !expense_id);
+  };
+
+  const showAddToInventoryAction = (purchaseOrders: PurchaseOrder[]) => {
+    return purchaseOrders.every(
+      ({ status_id }) => status_id === PurchaseOrderStatus.Accepted
+    );
+  };
+
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
-    (selectedIds) => (
-      <>
+    (selectedIds, _, setSelected) => (
+      <SendEmailBulkAction
+        selectedIds={selectedIds}
+        setSelected={setSelected}
+      />
+    ),
+    (selectedIds, selectedPurchaseOrders, setSelected) =>
+      selectedPurchaseOrders &&
+      showMarkSendOption(selectedPurchaseOrders) && (
         <DropdownElement
-          onClick={() => printPdf(selectedIds)}
-          icon={<Icon element={MdPrint} />}
+          onClick={() => {
+            bulk(selectedIds, 'mark_sent');
+
+            setSelected?.([]);
+          }}
+          icon={<Icon element={MdMarkEmailRead} />}
         >
-          {t('print_pdf')}
+          {t('mark_sent')}
         </DropdownElement>
+      ),
+    (selectedIds, _, setSelected) => (
+      <DropdownElement
+        onClick={() => {
+          printPdf(selectedIds);
+          setSelected?.([]);
+        }}
+        icon={<Icon element={MdPrint} />}
+      >
+        {t('print_pdf')}
+      </DropdownElement>
+    ),
+    (selectedIds, _, setSelected) => (
+      <DropdownElement
+        onClick={() => {
+          downloadPdfs(selectedIds);
+          setSelected?.([]);
+        }}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (_, selectedPurchaseOrders) =>
+      selectedPurchaseOrders?.length &&
+      selectedPurchaseOrders[0].expense_id && (
         <DropdownElement
-          onClick={() => downloadPdfs(selectedIds)}
-          icon={<Icon element={MdDownload} />}
+          onClick={() =>
+            navigate(
+              route('/expenses/:id/edit', {
+                id: selectedPurchaseOrders[0].expense_id,
+              })
+            )
+          }
+          icon={<Icon element={MdContactPage} />}
         >
-          {t('download_pdf')}
+          {`${t('view')} ${t('expense')}`}
         </DropdownElement>
-      </>
+      ),
+    (selectedIds, selectedPurchaseOrders, setSelected) =>
+      selectedPurchaseOrders &&
+      showConvertToExpenseAction(selectedPurchaseOrders) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'expense');
+
+            setSelected?.([]);
+          }}
+          icon={<Icon element={MdSwitchRight} />}
+        >
+          {t('convert_to_expense')}
+        </DropdownElement>
+      ),
+    (selectedIds, selectedPurchaseOrders, setSelected) =>
+      selectedPurchaseOrders &&
+      showAddToInventoryAction(selectedPurchaseOrders) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'add_to_inventory');
+
+            setSelected?.([]);
+          }}
+          icon={<Icon element={MdInventory} />}
+        >
+          {t('add_to_inventory')}
+        </DropdownElement>
+      ),
+    (_, selectedPurchaseOrders, setSelected) => (
+      <DropdownElement
+        onClick={() =>
+          selectedPurchaseOrders &&
+          shouldDownloadDocuments(selectedPurchaseOrders)
+            ? handleDownloadDocuments(selectedPurchaseOrders, setSelected)
+            : toast.error('no_documents_to_download')
+        }
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('documents')}
+      </DropdownElement>
     ),
   ];
 

@@ -31,7 +31,6 @@ import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { purchaseOrderAtom } from '../common/atoms';
 import { useCreate } from '../common/hooks';
-import { useBlankPurchaseOrderQuery } from '../common/queries';
 import { Details } from '../edit/components/Details';
 import { Footer } from '../edit/components/Footer';
 import { VendorSelector } from '../edit/components/VendorSelector';
@@ -45,6 +44,7 @@ import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Card } from '$app/components/cards';
+import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_purchase_order');

@@ -11,8 +11,8 @@
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
+import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { useBlankPurchaseOrderQuery } from '$app/pages/purchase-orders/common/queries';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 

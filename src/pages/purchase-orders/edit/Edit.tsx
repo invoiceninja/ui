@@ -28,7 +28,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useActions } from '../common/hooks';
-import { usePurchaseOrderQuery } from '../common/queries';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
@@ -41,6 +40,7 @@ import { useSave } from './hooks/useSave';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
