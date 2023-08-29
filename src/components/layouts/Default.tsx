@@ -54,7 +54,9 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useColorScheme } from '$app/common/colors';
+import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
+import { useAtom } from 'jotai';
+import Toggle from '../forms/Toggle';
 
 export interface SaveOption {
   label: string;
@@ -364,6 +366,8 @@ export function Default(props: Props) {
   const saveBtn = useSaveBtn();
   const colors = useColorScheme();
 
+  const [, setColorScheme] = useAtom(colorSchemeAtom);
+
   return (
     <div>
       <ActivateCompany />
@@ -405,6 +409,12 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+              <Toggle
+                onValueChange={(value) =>
+                  value ? setColorScheme($2) : setColorScheme($1)
+                }
+              />
+
               {shouldShowUnlockButton && (
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
