@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Dialog, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { Fragment, useState, useEffect, ReactNode } from 'react';
@@ -32,6 +33,8 @@ export function Modal(props: Props) {
   useEffect(() => {
     setOpen(props.visible);
   }, [props.visible]);
+
+  const colors = useColorScheme();
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -73,6 +76,7 @@ export function Modal(props: Props) {
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
+              style={{ backgroundColor: colors.$2 }}
               className={classNames(
                 'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
                 {
@@ -82,19 +86,21 @@ export function Modal(props: Props) {
                   'max-w-lg': props.size === 'small',
                   'max-w-7xl': props.size === 'large',
                   'max-w-2xl': props.size === 'regular',
-                  'bg-white':
-                    props.backgroundColor === 'white' ||
-                    typeof props.backgroundColor === 'undefined',
+                  'bg-white': props.backgroundColor === 'white',
                   'bg-gray-50': props.backgroundColor === 'gray',
                   'overflow-hidden': !props.overflowVisible,
                 }
               )}
             >
-              <div className="flex flex-col justify-between items-start">
+              <div
+                className="flex flex-col justify-between items-start"
+                style={{ color: colors.$3 }}
+              >
                 <div className="flex w-full justify-between">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg leading-6 font-medium text-gray-900"
+                    className="text-lg leading-6 font-medium"
+                    style={{ color: colors.$3 }}
                   >
                     {props.title}
                   </Dialog.Title>
@@ -110,20 +116,20 @@ export function Modal(props: Props) {
 
                 <div className="mt-2">
                   {props.text && (
-                    <p className="text-sm text-gray-500">{props.text}</p>
+                    <p style={{ color: colors.$3 }} className="text-sm">
+                      {props.text}
+                    </p>
                   )}
                 </div>
               </div>
 
               {props.children && (
                 <div
-                  className={classNames(
-                    'text-sm text-gray-500 flex flex-col space-y-4',
-                    {
-                      'justify-center items-center': props.centerContent,
-                      'mt-5 sm:mt-6': !props.disableClosing,
-                    }
-                  )}
+                  style={{ color: colors.$3 }}
+                  className={classNames('text-sm flex flex-col space-y-4', {
+                    'justify-center items-center': props.centerContent,
+                    'mt-5 sm:mt-6': !props.disableClosing,
+                  })}
                 >
                   {props.children}
                 </div>
