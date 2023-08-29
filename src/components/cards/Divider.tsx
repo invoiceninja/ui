@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 
 interface Props {
@@ -15,8 +16,11 @@ interface Props {
 }
 
 export function Divider(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <div
+      style={{ backgroundColor: colors.$4 }}
       className={classNames('border-b', {
         'pt-6 mb-4 border-b': !props.withoutPadding,
       })}
