@@ -18,9 +18,6 @@ export function useCalculateTaxesRegion() {
 
   const resolveCountry = useResolveCountry();
 
-  return (countryId: string | number) => {
-    return supportedCountries.includes(
-      resolveCountry(countryId)?.iso_3166_2 || ''
-    );
-  };
+  return (countryId: string | number) =>
+    supportedCountries.includes(resolveCountry(countryId)?.iso_3166_2 || '');
 }

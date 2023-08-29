@@ -66,8 +66,6 @@ export function GroupSettingsProperties(props: Props) {
     );
   };
 
-  console.log(groupSettings?.settings);
-
   return (
     <div className="flex flex-col pt-6 w-full">
       {GroupSettingsSections.map(
