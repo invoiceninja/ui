@@ -52,7 +52,7 @@ export function Th(props: Props) {
   return (
     <th
       style={{
-        color: colors.$3,
+        color: colors.$9,
         borderColor: colors.$4,
       }}
       onClick={handleClick}
