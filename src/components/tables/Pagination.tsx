@@ -20,6 +20,8 @@ import {
 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
+import { SelectField } from '../forms';
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -50,32 +52,32 @@ export function Pagination(props: Props) {
     }
   };
 
+  const colors = useColorScheme();
+
   return (
     <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
       <div className="flex justify-center md:justify-start items-center space-x-4">
-        {/* <span className="text-sm">Showing 1 to 1 of 1 entires</span> */}
         <div className="flex items-center space-x-2 flex-wrap">
-          <select
-            id="location"
-            name="location"
-            className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
-            defaultValue={perPage}
-            onChange={(element) => props.onRowsChange(element.target.value)}
-          >
+          <SelectField onValueChange={(value) => props.onRowsChange(value)}>
             <option value="10">10</option>
             <option>50</option>
             <option>100</option>
-          </select>
+          </SelectField>
+
           <label
             htmlFor="location"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium"
+            style={{ color: colors.$3 }}
           >
             {t('rows')}
           </label>
         </div>
       </div>
 
-      <p className="hidden lg:block text-sm font-medium text-gray-700">
+      <p
+        className="hidden lg:block text-sm font-medium"
+        style={{ color: colors.$3 }}
+      >
         {trans('pdf_page_info', {
           current: props.currentPage,
           total: props.totalPages,
@@ -88,12 +90,16 @@ export function Pagination(props: Props) {
         )}
       </p>
 
-      <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
+      <nav
+        className="flex justify-center md:justify-end my-4 md:my-0 items-center"
+        style={{ color: colors.$3 }}
+      >
         {props.leftSideChevrons}
 
         <button
           onClick={() => goToPage(1)}
-          className="py-1.5 px-2 bg-white border rounded-l hover:bg-gray-50"
+          className="py-1.5 px-2  border rounded-l"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         >
           <ChevronsLeft />
         </button>
@@ -101,6 +107,7 @@ export function Pagination(props: Props) {
         <button
           onClick={() => goToPage(props.currentPage - 1)}
           className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         >
           <ChevronLeft />
         </button>
@@ -108,6 +115,7 @@ export function Pagination(props: Props) {
         <button
           onClick={() => goToPage(props.currentPage + 1)}
           className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         >
           <ChevronRight />
         </button>
@@ -115,6 +123,7 @@ export function Pagination(props: Props) {
         <button
           onClick={() => goToPage(props.totalPages)}
           className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50 rounded-r"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         >
           <ChevronsRight />
         </button>
