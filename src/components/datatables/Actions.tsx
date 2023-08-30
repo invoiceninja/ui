@@ -85,7 +85,7 @@ export function Actions(props: Props) {
       color: data.color,
     }),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    multiValueRemove: (styles, { data }) => ({
+    multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
         color: 'white',
