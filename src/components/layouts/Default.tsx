@@ -409,11 +409,13 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
-              <Toggle
-                onValueChange={(value) =>
-                  value ? setColorScheme($2) : setColorScheme($1)
-                }
-              />
+              {import.meta.env.DEV && (
+                <Toggle
+                  onValueChange={(value) =>
+                    value ? setColorScheme($2) : setColorScheme($1)
+                  }
+                />
+              )}
 
               {shouldShowUnlockButton && (
                 <button
@@ -522,7 +524,7 @@ export function Default(props: Props) {
           )}
 
           <div
-            style={{ backgroundColor: colors.$2 }}
+            style={{ color: colors.$3, backgroundColor: colors.$2 }}
             className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
           >
             {props.children}
