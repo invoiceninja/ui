@@ -68,9 +68,9 @@ export function Button(props: Props) {
       <StyledLink
         to={props.to}
         theme={{
-          backgroundColor: props.type === 'primary' ? accentColor : colors.$2,
+          backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
           color: props.type === 'primary' ? colors.$9 : colors.$3,
-          borderColor: colors.$5,
+          borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
         }}
         className={classNames(
           `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
@@ -93,7 +93,7 @@ export function Button(props: Props) {
       disabled={props.disabled}
       theme={{
         backgroundColor: props.type === 'primary' ? accentColor : colors.$1,
-        color: props.type === 'primary' ? 'colors.$9' : colors.$3,
+        color: props.type === 'primary' ? colors.$9 : colors.$3,
         borderColor: props.type === 'primary' ? 'transparent' : colors.$5,
       }}
       className={classNames(
