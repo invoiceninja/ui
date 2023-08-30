@@ -106,7 +106,7 @@ export function Table(props: Props) {
         >
           <div
             ref={handleTableParentHeight}
-            className={`overflow-y-auto ${props.className}`}
+            className={`overflow-y-auto rounded ${props.className}`}
             style={{
               ...props.style,
               height: manualTableHeight,
