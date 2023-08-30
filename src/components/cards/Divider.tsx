@@ -20,7 +20,7 @@ export function Divider(props: Props) {
 
   return (
     <div
-      style={{ backgroundColor: colors.$4 }}
+      style={{ backgroundColor: colors.$4, borderColor: colors.$5 }}
       className={classNames('border-b', {
         'pt-6 mb-4 border-b': !props.withoutPadding,
       })}
