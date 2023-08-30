@@ -25,7 +25,7 @@ export const $1 = {
 export const $2 = {
   $1: '#ffffff', // Primary background
   $2: '#f7f7f7', // Secondary background
-  $3: '#0f172a', // Primary text
+  $3: '#2a303d', // Primary text
   $4: '#f7f7f7', // Primary border
   $5: '#d1d5db', // Secondary border (sidebar)
   $6: '#242930', // Secondary background
