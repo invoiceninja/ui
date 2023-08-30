@@ -55,7 +55,8 @@ export function Checkbox(props: Props) {
       <div className="ml-3 text-sm">
         <label
           htmlFor={props.id}
-          className="font-medium text-gray-700 cursor-pointer"
+          className="font-medium cursor-pointer"
+          style={{ color: colors.$3 }}
         >
           {props.label}
         </label>
