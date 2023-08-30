@@ -45,7 +45,7 @@ export default function Pdf() {
   }, [data]);
 
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !searchParams.has('delivery_note')) {
       setPdfUrl(url(invoice));
     }
   }, [invoice]);
@@ -62,7 +62,7 @@ export default function Pdf() {
             blobUrl={blobUrl}
             deliveryNote={deliveryNote}
             setDeliveryNote={setDeliveryNote}
-            onHandleDeliveryNote={(value, isDeliveryNote = deliveryNote) =>
+            onHandleDeliveryNote={(value, isDeliveryNote) =>
               isDeliveryNote
                 ? setPdfUrl(value)
                 : setPdfUrl(url(invoice as Invoice))
