@@ -195,7 +195,6 @@ export function Totals() {
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.currency', parseInt(value))
               }
-              style={{ width: '5rem' }}
             >
               {currencies.map((currency, index) => (
                 <option key={index} value={currency.value}>
