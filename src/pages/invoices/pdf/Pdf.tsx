@@ -62,7 +62,7 @@ export default function Pdf() {
             blobUrl={blobUrl}
             deliveryNote={deliveryNote}
             setDeliveryNote={setDeliveryNote}
-            onHandleDeliveryNote={(value, isDeliveryNote) =>
+            onHandleDeliveryNote={(value, isDeliveryNote = deliveryNote) =>
               isDeliveryNote
                 ? setPdfUrl(value)
                 : setPdfUrl(url(invoice as Invoice))
