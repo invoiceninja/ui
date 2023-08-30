@@ -11,6 +11,7 @@
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactElement, useEffect, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   children: ReactElement[];
@@ -39,9 +40,11 @@ export function TabGroup(props: Props) {
     setCurrentIndex(props.defaultTabIndex || 0);
   }, [props.defaultTabIndex]);
 
+  const colors = useColorScheme()
+
   return (
     <div className={props.className}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
+      <div className="-mb-px flex space-x-8 overflow-x-auto border-b" style={{ borderColor: colors.$5 }}>
         {props.tabs.map((tab, index) => (
           <div
             key={index}
@@ -53,7 +56,7 @@ export function TabGroup(props: Props) {
               style={{
                 borderColor:
                   currentIndex === index ? accentColor : 'transparent',
-                color: currentIndex === index ? accentColor : '#6B7280',
+                color: currentIndex === index ? accentColor : colors.$3,
               }}
               className={classNames(
                 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
