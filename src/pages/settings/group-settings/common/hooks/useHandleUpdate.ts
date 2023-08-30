@@ -46,6 +46,29 @@ export const useHandleUpdate = (params: Params) => {
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
+  const adjustGroupSettingsPayload = () => {
+    const adjustedSettings = { ...companyChanges?.settings };
+
+    Object.entries(adjustedSettings).forEach(([property, value]) => {
+      if (Array.isArray(value) && !value.length) {
+        delete adjustedSettings[property];
+      } else if (
+        value &&
+        typeof value === 'object' &&
+        !Object.entries(value).length
+      ) {
+        delete adjustedSettings[property];
+      } else if (typeof value === 'string' && !value) {
+        delete adjustedSettings[property];
+      }
+    });
+
+    return {
+      ...activeGroupSettings,
+      settings: adjustedSettings,
+    };
+  };
+
   return () => {
     if (!isFormBusy) {
       toast.processing();
@@ -57,10 +80,7 @@ export const useHandleUpdate = (params: Params) => {
         endpoint('/api/v1/group_settings/:id', {
           id: id || activeGroupSettings?.id,
         }),
-        groupSettings || {
-          ...activeGroupSettings,
-          settings: companyChanges?.settings,
-        }
+        groupSettings || adjustGroupSettingsPayload()
       )
         .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('updated_group');
