@@ -13,10 +13,7 @@ import { Button, Link, SelectField } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
-import {
-  useBlankCompanyGatewayQuery,
-  useCompanyGatewaysQuery,
-} from '$app/common/queries/company-gateways';
+import { useBlankCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -66,8 +63,6 @@ export function Create() {
   const { documentTitle } = useTitle('add_gateway');
 
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
-
-  const { data: companyGateways } = useCompanyGatewaysQuery();
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
@@ -123,25 +118,10 @@ export function Create() {
   };
 
   useEffect(() => {
-    let existingCompanyGatewaysKeys: string[] = [];
-
-    setFilteredGateways(gateways);
-
-    companyGateways?.data.data.map((gateway: CompanyGateway) => {
-      if (!gateway.is_deleted && gateway.archived_at === 0) {
-        existingCompanyGatewaysKeys = [
-          ...existingCompanyGatewaysKeys,
-          gateway.gateway_key,
-        ];
-      }
-    });
-
-    setFilteredGateways((current) =>
-      current.filter(
-        (gateway) => !existingCompanyGatewaysKeys.includes(gateway.key)
-      )
-    );
-  }, [gateways, companyGateways]);
+    if (gateways) {
+      setFilteredGateways(gateways);
+    }
+  }, [gateways]);
 
   useEffect(() => {
     if (blankCompanyGateway?.data.data && companyGateway === undefined) {
