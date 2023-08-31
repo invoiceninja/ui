@@ -45,7 +45,7 @@ export default function Pdf() {
   }, [data]);
 
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !searchParams.has('delivery_note')) {
       setPdfUrl(url(invoice));
     }
   }, [invoice]);

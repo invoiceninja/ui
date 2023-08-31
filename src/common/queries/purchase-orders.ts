@@ -46,25 +46,46 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
   );
 }
 
+const successMessages = {
+  expense: 'converted_to_expense',
+  email: 'emailed_purchase_orders',
+  mark_sent: 'marked_purchase_orders_as_sent',
+  add_to_inventory: 'added_purchase_orders_to_inventory',
+};
+
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete' | 'expense') => {
+  return (
+    ids: string[],
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'expense'
+      | 'email'
+      | 'mark_sent'
+      | 'add_to_inventory'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/purchase_orders/bulk'), {
       action,
-      ids: [id],
+      ids,
     }).then(() => {
-      action === 'expense'
-        ? toast.success('converted_to_expense')
-        : toast.success(`${action}d_purchase_order`);
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_purchase_order`;
+
+      toast.success(message);
 
       queryClient.invalidateQueries('/api/v1/purchase_orders');
 
-      queryClient.invalidateQueries(
-        route('/api/v1/purchase_orders/:id', { id })
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(
+          route('/api/v1/purchase_orders/:id', { id })
+        )
       );
 
       invalidateQueryValue &&
