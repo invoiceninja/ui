@@ -9,8 +9,6 @@
  */
 
 import { trans } from '$app/common/helpers';
-import { datatablePerPageAtom } from '$app/components/DataTable';
-import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
 import {
   ChevronLeft,
@@ -44,7 +42,6 @@ export function Pagination(props: Props) {
   props = { ...defaultProps, ...props };
 
   const [t] = useTranslation();
-  const [perPage] = useAtom(datatablePerPageAtom);
 
   const goToPage = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= props.totalPages) {
