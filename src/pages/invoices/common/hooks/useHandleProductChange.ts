@@ -34,9 +34,9 @@ export function useHandleProductChange(props: Props) {
       lineItem.cost = product?.price || 0;
     }
 
-    if (!product) {
-      lineItem.notes = '';
-    }
+    // if (!product) {
+    //   lineItem.notes = '';
+    // } // Causes existing line items to be overwritten, even when selecting empty thing.
 
     if (props.type == 'product' && product?.notes && company.fill_products) {
       lineItem.notes = product?.notes;
