@@ -51,7 +51,7 @@ export function Radio(props: Props) {
             />
             <label
               htmlFor={option.id}
-              className="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
+              className="ml-3 block text-sm font-medium cursor-pointer"
             >
               {option.title}
             </label>
