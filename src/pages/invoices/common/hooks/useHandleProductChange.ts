@@ -30,7 +30,7 @@ export function useHandleProductChange(props: Props) {
     lineItem.product_key = product?.product_key || product_key;
 
     if (!product) {
-      return;
+      return props.onChange(index, lineItem);
     }
 
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
