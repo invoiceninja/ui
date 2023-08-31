@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { atom, useAtom } from 'jotai';
+import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 export const $1 = {
   $1: '#182433',
@@ -34,7 +35,7 @@ export const $2 = {
   $9: '#ffffff', // Accent color text
 };
 
-export const colorSchemeAtom = atom($1);
+export const colorSchemeAtom = atomWithStorage('colorScheme', $1);
 
 export function useColorScheme() {
   const [colorScheme] = useAtom(colorSchemeAtom);
