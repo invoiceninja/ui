@@ -31,6 +31,7 @@ import {
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useColorScheme } from '$app/common/colors';
 
 export function Register() {
   useTitle('register');
@@ -99,12 +100,19 @@ export function Register() {
     },
   });
 
+  const colors = useColorScheme();
+
   return (
-    <div className="h-screen md:bg-gray-100">
+    <div className="h-screen">
       <Header />
       <div className="flex flex-col items-center">
-        <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
-          <h2 className="text-2xl">{t('register_label')}</h2>
+        <div
+          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        >
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>
+            {t('register_label')}
+          </h2>
 
           <form onSubmit={form.handleSubmit} className="my-6">
             <section>
@@ -173,11 +181,9 @@ export function Register() {
 
         {
           <>
-            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-              <SignInProviders />
-            </div>
+            <SignInProviders />
 
-            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
               <HostedLinks />
             </div>
           </>
