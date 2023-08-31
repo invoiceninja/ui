@@ -44,7 +44,7 @@ export function Standing(props: Props) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold">{t('balance')}</p>
+                  <p className="font-semibold">{t('outstanding')}</p>
                   <span>
                     {formatMoney(
                       client.balance,
@@ -67,7 +67,7 @@ export function Standing(props: Props) {
 
                 {client.payment_balance > 0 && (
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold">{t('payments')}</p>
+                    <p className="font-semibold">{t('payment_balance')}</p>
                     <span>
                       {formatMoney(
                         client.payment_balance,
