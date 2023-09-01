@@ -17,6 +17,7 @@ import Toggle from '$app/components/forms/Toggle';
 import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
 import { useResolveConfigValue } from './useResolveConfigValue';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export type Field = '' | boolean | Array<string>;
 
@@ -48,6 +49,15 @@ export function useResolveInputField(
           onValueChange={(color) =>
             handleChange(property as keyof Field, color)
           }
+        />
+      );
+    }
+
+    if (property === 'text') {
+      return (
+        <MarkdownEditor
+          value={resolveConfigValue(property)}
+          onChange={(value) => handleChange(property as keyof Field, value)}
         />
       );
     }

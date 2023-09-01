@@ -22,6 +22,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -37,6 +38,8 @@ export default function Expenses() {
   const filters = useExpenseFilters();
 
   const expenseColumns = useAllExpenseColumns();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
@@ -54,6 +57,7 @@ export default function Expenses() {
         linkToEdit="/expenses/:id/edit"
         customActions={actions}
         customFilters={filters}
+        customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={<ImportButton route="/expenses/import" />}
