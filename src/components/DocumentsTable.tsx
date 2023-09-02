@@ -28,6 +28,7 @@ import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmati
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props {
   documents: Document[];
@@ -41,6 +42,7 @@ interface DocumentUrl {
 
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
+  const reactSettings = useReactSettings();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
@@ -120,34 +122,36 @@ export function DocumentsTable(props: Props) {
   };
 
   useEffect(() => {
-    props.documents.forEach(async ({ id, hash }) => {
-      const alreadyExist = documentsUrls.find(
-        ({ documentId }) => documentId === id
-      );
-
-      if (!alreadyExist) {
-        await queryClient.fetchQuery(
-          endpoint('/documents/:hash', { hash }),
-          () =>
-            request(
-              'GET',
-              endpoint('/documents/:hash', { hash }),
-              { headers: defaultHeaders() },
-              { responseType: 'arraybuffer' }
-            ).then((response) => {
-              const blob = new Blob([response.data], {
-                type: response.headers['content-type'],
-              });
-              const url = URL.createObjectURL(blob);
-
-              setDocumentsUrls((currentDocumentUrls) => [
-                ...currentDocumentUrls,
-                { documentId: id, url },
-              ]);
-            })
+    if (reactSettings.show_document_preview) {
+      props.documents.forEach(async ({ id, hash, type }) => {
+        const alreadyExist = documentsUrls.find(
+          ({ documentId }) => documentId === id
         );
-      }
-    });
+
+        if (!alreadyExist && (type === 'png' || type === 'jpg')) {
+          await queryClient.fetchQuery(
+            endpoint('/documents/:hash', { hash }),
+            () =>
+              request(
+                'GET',
+                endpoint('/documents/:hash', { hash }),
+                { headers: defaultHeaders() },
+                { responseType: 'arraybuffer' }
+              ).then((response) => {
+                const blob = new Blob([response.data], {
+                  type: response.headers['content-type'],
+                });
+                const url = URL.createObjectURL(blob);
+
+                setDocumentsUrls((currentDocumentUrls) => [
+                  ...currentDocumentUrls,
+                  { documentId: id, url },
+                ]);
+              })
+          );
+        }
+      });
+    }
   }, [props.documents]);
 
   return (
@@ -180,18 +184,19 @@ export function DocumentsTable(props: Props) {
                     <span>{document.name}</span>
                   </div>
 
-                  {(document.type === 'png' || document.type === 'jpg') && (
-                    <>
-                      {getDocumentUrlById(document.id) ? (
-                        <img
-                          src={getDocumentUrlById(document.id)}
-                          style={{ width: 150, height: 75 }}
-                        />
-                      ) : (
-                        <Spinner />
-                      )}
-                    </>
-                  )}
+                  {reactSettings.show_document_preview &&
+                    (document.type === 'png' || document.type === 'jpg') && (
+                      <>
+                        {getDocumentUrlById(document.id) ? (
+                          <img
+                            src={getDocumentUrlById(document.id)}
+                            style={{ width: 150, height: 75 }}
+                          />
+                        ) : (
+                          <Spinner />
+                        )}
+                      </>
+                    )}
                 </div>
               </Td>
               <Td>{date(document.updated_at, dateFormat)}</Td>

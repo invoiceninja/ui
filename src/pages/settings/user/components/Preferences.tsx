@@ -45,6 +45,18 @@ export function Preferences() {
         />
       </Element>
 
+      <Element leftSide={t('show_document_preview')}>
+        <Toggle
+          checked={reactSettings.show_document_preview}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.show_document_preview',
+              value
+            )
+          }
+        />
+      </Element>
+
       <Element
         leftSide={t('react_notification_link')}
         leftSideHelp={t('react_notification_link_help')}

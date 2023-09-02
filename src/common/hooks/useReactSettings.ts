@@ -21,6 +21,7 @@ export interface ReactSettings {
   react_table_columns?: Record<ReactTableColumns, string[]>;
   react_notification_link: boolean;
   number_precision?: number;
+  show_document_preview?: boolean;
   preferences: {
     dashboard_charts: {
       default_view: 'day' | 'week' | 'month';
@@ -67,6 +68,7 @@ export function useReactSettings() {
   const settings: ReactSettings = {
     show_pdf_preview: true,
     react_notification_link: true,
+    show_document_preview: true,
     // This is legacy fallback for old settings location. If you see this in 2 years, feel free to remove it.
     react_table_columns: {
       ...previousReactTableColumns,
