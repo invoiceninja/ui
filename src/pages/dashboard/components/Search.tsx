@@ -15,10 +15,10 @@ import { useQuery } from 'react-query';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-// import React from 'react';
-// import { SearchRecord } from '$app/common/interfaces/search';
-// import { route } from '$app/common/helpers/route';
-// import { Link } from 'react-router-dom';
+import React from 'react';
+import { SearchRecord } from '$app/common/interfaces/search';
+import { route } from '$app/common/helpers/route';
+import { Link } from 'react-router-dom';
 
 export function Search() {
     const [t] = useTranslation();
@@ -46,7 +46,7 @@ export function Search() {
                 <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
             )}
 
-            {/* <div className="pl-6 pr-4">
+            <div className="pl-6 pr-4">
                 <div
                     className="flex flex-col overflow-y-auto pr-4"
                     style={{ height: '19.9rem' }}
@@ -96,7 +96,7 @@ export function Search() {
                             </React.Fragment>
                         ))}
                 </div>
-            </div> */}
+            </div>
         </Card>
     );
 }
