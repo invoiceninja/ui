@@ -62,25 +62,39 @@ export function useRecurringExpenseQuery(params: Params) {
   );
 }
 
-export function useBulk() {
+const successMessages = {
+  start: 'started_recurring_expense',
+  stop: 'stopped_recurring_expense',
+};
+
+export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'start' | 'stop'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/recurring_expenses/bulk'), {
       action,
-      ids: [id],
+      ids,
     }).then(() => {
-      toast.success(`${action}d_recurring_expense`);
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_recurring_expense`;
+
+      toast.success(message);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_expenses/:id', { id })
+      ids.forEach((id) =>
+        queryClient.invalidateQueries(
+          route('/api/v1/recurring_expenses/:id', { id })
+        )
       );
     });
   };
-}
+};

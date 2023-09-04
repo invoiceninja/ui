@@ -13,10 +13,7 @@ import { Button, Link, SelectField } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
-import {
-  useBlankCompanyGatewayQuery,
-  useCompanyGatewaysQuery,
-} from '$app/common/queries/company-gateways';
+import { useBlankCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +55,7 @@ export const gatewaysDetails = [
   { name: 'checkoutcom', key: '3758e7f7c6f4cecf0f4f348b9a00f456' },
   { name: 'payfast', key: 'd6814fc83f45d2935e7777071e629ef9' },
   { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
+  { name: 'wepay', key: '8fdeed552015b3c7b44ed6c8ebd9e992' },
 ];
 
 export function Create() {
@@ -66,8 +64,6 @@ export function Create() {
   const { documentTitle } = useTitle('add_gateway');
 
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
-
-  const { data: companyGateways } = useCompanyGatewaysQuery();
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
@@ -123,25 +119,10 @@ export function Create() {
   };
 
   useEffect(() => {
-    let existingCompanyGatewaysKeys: string[] = [];
-
-    setFilteredGateways(gateways);
-
-    companyGateways?.data.data.map((gateway: CompanyGateway) => {
-      if (!gateway.is_deleted && gateway.archived_at === 0) {
-        existingCompanyGatewaysKeys = [
-          ...existingCompanyGatewaysKeys,
-          gateway.gateway_key,
-        ];
-      }
-    });
-
-    setFilteredGateways((current) =>
-      current.filter(
-        (gateway) => !existingCompanyGatewaysKeys.includes(gateway.key)
-      )
-    );
-  }, [gateways, companyGateways]);
+    if (gateways) {
+      setFilteredGateways(gateways);
+    }
+  }, [gateways]);
 
   useEffect(() => {
     if (blankCompanyGateway?.data.data && companyGateway === undefined) {

@@ -49,7 +49,7 @@ export function PurchaseOrderStatus(props: Props) {
   }
 
   if (status_id === PurchaseOrderStatusEnum.Received) {
-    return <Badge variant="purple">{t('received')}</Badge>;
+    return <Badge variant="green">{t('received')}</Badge>;
   }
 
   if (isDraft) {
