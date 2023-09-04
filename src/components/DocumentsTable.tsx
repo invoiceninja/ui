@@ -124,8 +124,6 @@ export function DocumentsTable(props: Props) {
 
   useEffect(() => {
     if (reactSettings.show_document_preview) {
-      console.log(documentsUrls);
-
       props.documents.forEach(async ({ id, hash, type }) => {
         const alreadyExist = documentsUrls.find(
           ({ documentId }) => documentId === id
@@ -158,7 +156,7 @@ export function DocumentsTable(props: Props) {
         }
       });
     }
-  }, [props.documents]);
+  }, [reactSettings, props.documents]);
 
   return (
     <>
