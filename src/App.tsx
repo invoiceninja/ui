@@ -19,13 +19,13 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
-import { useColorScheme } from './common/colors';
+import { colorSchemeAtom, useColorScheme } from './common/colors';
 
 export function App() {
   const [t] = useTranslation();
@@ -55,11 +55,11 @@ export function App() {
     ? resolveLanguage(company.settings.language_id)
     : undefined;
 
-  const colors = useColorScheme();
+  const [colorScheme] = useAtom(colorSchemeAtom);
 
   useEffect(() => {
-    document.body.style.backgroundColor = colors.$2;
-  }, [colors.$2]);
+    document.body.style.backgroundColor = colorScheme.$2
+  }, [colorScheme]);
 
   useEffect(() => {
     if (resolvedLanguage?.locale) {
