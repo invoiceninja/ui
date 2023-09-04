@@ -56,7 +56,6 @@ import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
 import { useAtom } from 'jotai';
-import Toggle from '../forms/Toggle';
 
 export interface SaveOption {
   label: string;
