@@ -53,6 +53,8 @@ import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -262,6 +264,11 @@ export function DataTable<T extends object>(props: Props<T>) {
             },
           })
         );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 401) {
+          toast.error(error.response?.data.message);
+        }
       })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);

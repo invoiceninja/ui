@@ -16,6 +16,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { GenericQueryOptions } from './invoices';
 import { Client } from '../interfaces/client';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { route } from '../helpers/route';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
@@ -55,7 +56,7 @@ export function useClientsQuery(props: Props) {
 
 export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
-    ['/api/v1/clients', id],
+    route('/api/v1/clients/:id', { id }),
     () =>
       request('GET', endpoint('/api/v1/clients/:id', { id })).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data

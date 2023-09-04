@@ -13,10 +13,12 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { User } from '$app/common/interfaces/user';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -63,9 +65,13 @@ export function Actions(props: Props) {
         toast.success('removed_user');
         navigate('/settings/users');
       })
-      .catch((error) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
+        }
+
+        if (error.response?.status === 401) {
+          toast.error(error.response?.data.message);
         }
       });
   };
