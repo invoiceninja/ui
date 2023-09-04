@@ -35,7 +35,7 @@ export const $2 = {
   $9: '#ffffff', // Accent color text
 };
 
-export const colorSchemeAtom = atomWithStorage('colorScheme', $1);
+export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
 
 export function useColorScheme() {
   const [colorScheme] = useAtom(colorSchemeAtom);
