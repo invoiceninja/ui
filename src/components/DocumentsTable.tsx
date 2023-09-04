@@ -123,8 +123,6 @@ export function DocumentsTable(props: Props) {
   };
 
   useEffect(() => {
-    console.log('ok');
-
     if (reactSettings.show_document_preview) {
       console.log(documentsUrls);
 
