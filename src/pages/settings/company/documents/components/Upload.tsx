@@ -98,7 +98,7 @@ export function Upload(props: Props) {
             <input {...getInputProps()} />
             <Image className="mx-auto h-12 w-12 text-gray-400" />
             <span className="mt-2 block text-sm font-medium text-gray-900">
-              {isDragActive ? 'drop_file_here' : t('dropzone_default_message')}
+              {isDragActive ? t('drop_file_here') : t('dropzone_default_message')}
             </span>
           </div>
         </div>
