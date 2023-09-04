@@ -114,7 +114,6 @@ export default function Refund() {
             {
               amount: getInvoiceAmount(invoiceItem),
               invoice_id: invoiceItem?.id,
-              credit_id: '',
               id: '',
             },
           ]);
