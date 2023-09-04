@@ -142,17 +142,15 @@ export function DocumentsTable(props: Props) {
             { staleTime: Infinity }
           );
 
-          if (response) {
-            const blob = new Blob([response.data], {
-              type: response.headers['content-type'],
-            });
-            const url = URL.createObjectURL(blob);
+          const blob = new Blob([response.data], {
+            type: response.headers['content-type'],
+          });
+          const url = URL.createObjectURL(blob);
 
-            setDocumentsUrls((currentDocumentUrls) => [
-              ...currentDocumentUrls,
-              { documentId: id, url },
-            ]);
-          }
+          setDocumentsUrls((currentDocumentUrls) => [
+            ...currentDocumentUrls,
+            { documentId: id, url },
+          ]);
         }
       });
     }
