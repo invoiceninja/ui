@@ -47,7 +47,7 @@ export function Preferences() {
 
       <Element leftSide={t('show_document_preview')}>
         <Toggle
-          checked={reactSettings.show_document_preview}
+          checked={Boolean(reactSettings.show_document_preview)}
           onValueChange={(value) =>
             handleChange(
               'company_user.react_settings.show_document_preview',
