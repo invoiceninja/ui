@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -366,7 +366,7 @@ export function Default(props: Props) {
   const saveBtn = useSaveBtn();
   const colors = useColorScheme();
 
-  const [, setColorScheme] = useAtom(colorSchemeAtom);
+  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
   return (
     <div>
@@ -410,11 +410,19 @@ export function Default(props: Props) {
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
               {import.meta.env.DEV && (
-                <Toggle
-                  onValueChange={(value) =>
-                    value ? setColorScheme($2) : setColorScheme($1)
+                <SelectField
+                  value={
+                    JSON.stringify(colorScheme) === JSON.stringify($1)
+                      ? 'dark'
+                      : 'light'
                   }
-                />
+                  onValueChange={(value) =>
+                    value === 'light' ? setColorScheme($2) : setColorScheme($1)
+                  }
+                >
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </SelectField>
               )}
 
               {shouldShowUnlockButton && (
