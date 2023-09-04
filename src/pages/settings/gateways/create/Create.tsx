@@ -55,6 +55,7 @@ export const gatewaysDetails = [
   { name: 'checkoutcom', key: '3758e7f7c6f4cecf0f4f348b9a00f456' },
   { name: 'payfast', key: 'd6814fc83f45d2935e7777071e629ef9' },
   { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
+  { name: 'wepay', key: '8fdeed552015b3c7b44ed6c8ebd9e992' },
 ];
 
 export function Create() {
