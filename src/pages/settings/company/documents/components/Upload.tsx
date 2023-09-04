@@ -22,6 +22,8 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Link } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
 import { MdInfoOutline } from 'react-icons/md';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 
 interface Props {
   endpoint: string;
@@ -36,21 +38,33 @@ export function Upload(props: Props) {
 
   const [formData, setFormData] = useState(new FormData());
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
     onSubmit: () => {
       toast.processing();
+      setErrors(undefined);
 
       request('POST', props.endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      }).then(() => {
-        toast.success('uploaded_document');
+      })
+        .then(() => {
+          toast.success('uploaded_document');
 
-        setFormData(new FormData());
+          setFormData(new FormData());
 
-        props.onSuccess?.();
-      });
+          props.onSuccess?.();
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+
+          setFormData(new FormData());
+        });
     },
   });
 
@@ -102,6 +116,13 @@ export function Upload(props: Props) {
             </span>
           </div>
         </div>
+
+        {errors &&
+          Object.keys(errors.errors).map((key, index) => (
+            <Alert key={index} className="mt-2" type="danger">
+              {errors.errors[key]}
+            </Alert>
+          ))}
       </>
     );
   }
