@@ -29,6 +29,7 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { AxiosResponse } from 'axios';
 
 interface Props {
   documents: Document[];
@@ -122,33 +123,40 @@ export function DocumentsTable(props: Props) {
   };
 
   useEffect(() => {
+    console.log('ok');
+
     if (reactSettings.show_document_preview) {
+      console.log(documentsUrls);
+
       props.documents.forEach(async ({ id, hash, type }) => {
         const alreadyExist = documentsUrls.find(
           ({ documentId }) => documentId === id
         );
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
-          await queryClient.fetchQuery(
-            endpoint('/documents/:hash', { hash }),
+          const response: AxiosResponse = await queryClient.fetchQuery(
+            ['documents', hash],
             () =>
               request(
                 'GET',
                 endpoint('/documents/:hash', { hash }),
                 { headers: defaultHeaders() },
                 { responseType: 'arraybuffer' }
-              ).then((response) => {
-                const blob = new Blob([response.data], {
-                  type: response.headers['content-type'],
-                });
-                const url = URL.createObjectURL(blob);
-
-                setDocumentsUrls((currentDocumentUrls) => [
-                  ...currentDocumentUrls,
-                  { documentId: id, url },
-                ]);
-              })
+              ),
+            { staleTime: Infinity }
           );
+
+          if (response) {
+            const blob = new Blob([response.data], {
+              type: response.headers['content-type'],
+            });
+            const url = URL.createObjectURL(blob);
+
+            setDocumentsUrls((currentDocumentUrls) => [
+              ...currentDocumentUrls,
+              { documentId: id, url },
+            ]);
+          }
         }
       });
     }
