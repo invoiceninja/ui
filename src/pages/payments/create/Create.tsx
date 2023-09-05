@@ -46,17 +46,17 @@ import { paymentAtom } from '../common/atoms';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
-  invoices: PaymentInvoices[];
-  credits: PaymentCredits[];
+  invoices: PaymentInvoice[];
+  credits: PaymentCredit[];
 }
 
-interface PaymentInvoices {
+interface PaymentInvoice {
   _id: string;
   amount: number;
   invoice_id: string;
 }
 
-interface PaymentCredits {
+interface PaymentCredit {
   _id: string;
   amount: number;
   credit_id: string;

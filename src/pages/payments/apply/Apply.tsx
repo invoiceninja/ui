@@ -71,7 +71,7 @@ export default function Apply() {
   const handleInvoiceChange = (id: string, amount: number, number: string) => {
     formik.setFieldValue('invoices', [
       ...formik.values.invoices,
-      { _id: v4(), amount, invoice_id: id, credit: '', number: number },
+      { _id: v4(), amount, credit_id: '', invoice_id: id, number: number },
     ]);
   };
 
