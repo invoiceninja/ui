@@ -69,14 +69,27 @@ export function UserDetails() {
     toast.processing();
     setErrors(undefined);
 
-    const requests = [
-      request(
-        'PUT',
-        endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
-        userState.changes,
-        { headers: { 'X-Api-Password': password } }
-      ),
-    ];
+    const requests = isAdmin
+      ? [
+          request(
+            'PUT',
+            endpoint('/api/v1/users/:id?include=company_user', {
+              id: user!.id,
+            }),
+            userState.changes,
+            { headers: { 'X-Api-Password': password } }
+          ),
+        ]
+      : [
+          request(
+            'PUT',
+            endpoint('/api/v1/company_users/:id/preferences', {
+              id: user!.id,
+            }),
+            userState.changes,
+            { headers: { 'X-Api-Password': password } }
+          ),
+        ];
 
     if (isAdmin) {
       requests.push(
