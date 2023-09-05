@@ -108,8 +108,6 @@ export function App() {
     }
   }, [company]);
 
-  console.log('testing');
-
   return (
     <>
       <div className="App">
