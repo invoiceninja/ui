@@ -18,6 +18,8 @@
 
     <script>
       if ('%VITE_IS_HOSTED%' === 'true') {
+        const facebookPixelId = '%VITE_FACEBOOK_PIXEL_ID%';
+
         const noscriptElement = document.createElement('noscript');
 
         const pixelBody = document.createElement('img');
@@ -25,8 +27,7 @@
         pixelBody.width = '1';
         pixelBody.style.display = 'none';
 
-        pixelBody.src =
-          'https://www.facebook.com/tr?id=1306763533606985&ev=PageView&noscript=1';
+        pixelBody.src = `https://www.facebook.com/tr?id=${facebookPixelId}&ev=PageView&noscript=1`;
 
         noscriptElement.appendChild(pixelBody);
 
@@ -42,6 +43,8 @@
 
     <script>
       if ('%VITE_IS_HOSTED%' === 'true') {
+        const facebookPixelId = '%VITE_FACEBOOK_PIXEL_ID%';
+
         !(function (f, b, e, v, n, t, s) {
           if (f.fbq) return;
           n = f.fbq = function () {
@@ -66,7 +69,7 @@
           'https://connect.facebook.net/en_US/fbevents.js'
         );
 
-        fbq('init', '1306763533606985');
+        fbq('init', facebookPixelId);
         fbq('track', 'PageView');
       }
     </script>
