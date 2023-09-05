@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
@@ -17,12 +18,15 @@ interface Props extends CommonProps {
 }
 
 export function Td(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <td
       width={props.width}
       colSpan={props.colSpan}
       rowSpan={props.rowSpan}
-      className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
+      className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm  ${props.className}`}
+      style={{ color: colors.$3 }}
     >
       {props.children}
     </td>

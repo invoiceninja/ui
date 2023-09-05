@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
@@ -19,13 +20,15 @@ interface Props {
 }
 
 export function InfoCard(props: Props) {
+  const colors = useColorScheme()
+
   return (
     <div
-      style={props.style}
-      className={`px-4 py-5 bg-white shadow rounded overflow-hidden sm:p-6 space-y-2 ${props.className}`}
+      className={`border px-4 py-5 shadow rounded overflow-hidden sm:p-6 space-y-2 ${props.className}`}
+      style={{ backgroundColor: colors.$1, borderColor: colors.$5, ...props.style }}
     >
-      <dd className="text-xl font-medium text-gray-900">{props.title}</dd>
-      <dt className="text-sm text-gray-500 truncate">
+      <dd className="text-xl font-medium">{props.title}</dd>
+      <dt className="text-sm truncate">
         {props.value} {props.children}
       </dt>
     </div>

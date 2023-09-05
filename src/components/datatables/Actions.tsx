@@ -13,6 +13,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 export interface SelectOption {
   value: string;
@@ -71,6 +72,8 @@ export function Actions(props: Props) {
     }
   };
 
+  const colors = useColorScheme();
+
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
       return {
@@ -85,7 +88,7 @@ export function Actions(props: Props) {
       color: data.color,
     }),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    multiValueRemove: (styles, { data }) => ({
+    multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
         color: 'white',
@@ -96,6 +99,22 @@ export function Actions(props: Props) {
       ...base,
       width: 'max-content',
       minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
     }),
   };
 

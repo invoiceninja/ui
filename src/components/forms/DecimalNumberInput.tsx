@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   id?: string;
@@ -42,6 +43,8 @@ export function DecimalNumberInput(props: Props) {
     }
   }, [props.initialValue]);
 
+  const colors = useColorScheme();
+
   return (
     <section>
       {props.currency && (
@@ -50,7 +53,7 @@ export function DecimalNumberInput(props: Props) {
           id={props.id}
           type={'text'}
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
             }
@@ -91,6 +94,7 @@ export function DecimalNumberInput(props: Props) {
                 )
               : null
           }
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
         />
       )}
 

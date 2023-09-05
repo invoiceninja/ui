@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 
@@ -25,6 +26,8 @@ interface Props {
 }
 
 export function Element(props: Props) {
+  const colors = useColorScheme()
+
   return (
     <div
       className={classNames(
@@ -38,9 +41,10 @@ export function Element(props: Props) {
     >
       <dt className="text-sm text-gray-500 flex flex-col">
         <span
-          className={classNames('text-gray-500 font-medium', {
+          className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
           })}
+          style={{ color: colors.$3 }}
         >
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
@@ -59,12 +63,13 @@ export function Element(props: Props) {
       </dt>
       <dd
         className={classNames(
-          'mt-4 text-sm text-gray-900 sm:mt-0 sm:col-span-2',
+          'mt-4 text-sm sm:mt-0 sm:col-span-2',
           {
             'flex flex-col sm:flex-row sm:justify-end':
               props.pushContentToRight,
           }
         )}
+        style={{ color: colors.$3 }}
       >
         {props.children}
       </dd>

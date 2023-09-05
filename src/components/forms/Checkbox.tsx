@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useColorScheme } from '$app/common/colors';
+import { styled } from 'styled-components';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import classNames from 'classnames';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -18,20 +20,28 @@ interface Props extends CommonProps {
   cypressRef?: string;
 }
 
+const Input = styled.input`
+  background-color: ${(props) => props.theme.backgroundColor};
+`;
+
 export function Checkbox(props: Props) {
-  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   return (
     <div className="relative flex items-start">
       <div className="flex items-center h-5">
-        <input
+        <Input
+          theme={{ backgroundColor: colors.$2 }}
           ref={props.innerRef}
           value={props.value}
           id={props.id}
           aria-describedby="comments-description"
           type="checkbox"
-          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent cursor-pointer disabled:opacity-50 ${props.className}`}
-          style={{ color: accentColor }}
+          className={classNames(
+            'h-4 w-4 rounded cursor-pointer disabled:opacity-50',
+            props.className
+          )}
+          style={{ borderColor: colors.$5 }}
           onChange={(event) => {
             props.onChange && props.onChange(event);
             props.onValueChange &&
@@ -45,7 +55,8 @@ export function Checkbox(props: Props) {
       <div className="ml-3 text-sm">
         <label
           htmlFor={props.id}
-          className="font-medium text-gray-700 cursor-pointer"
+          className="font-medium cursor-pointer"
+          style={{ color: colors.$3 }}
         >
           {props.label}
         </label>
