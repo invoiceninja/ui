@@ -289,10 +289,17 @@ export function ComboboxStatic({
                   resource: null,
                 }}
               >
-                <span className="block truncate space-x-1">
-                  <span>{t('Select')}</span>
-                  <q className="font-semibold">{query}</q>
-                </span>
+                {({ active }) => (
+                  <span
+                    className={classNames(
+                      'block truncate space-x-1',
+                      active && 'font-semibold'
+                    )}
+                  >
+                    <span>{t('Select')}</span>
+                    <q className="font-semibold">{query}</q>
+                  </span>
+                )}
               </HeadlessCombobox.Option>
             )}
 
@@ -307,17 +314,17 @@ export function ComboboxStatic({
                   className={() =>
                     classNames(
                       'min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9'
-                      // active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
                     )
                   }
                   style={{ color: colors.$3 }}
                 >
-                  {({ selected }) => (
+                  {({ selected, active }) => (
                     <>
                       <span
                         className={classNames(
                           'block truncate',
-                          selected && 'font-semibold'
+                          selected && 'font-semibold',
+                          active && 'font-semibold'
                         )}
                       >
                         {entry.resource &&
