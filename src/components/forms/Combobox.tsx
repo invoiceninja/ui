@@ -278,6 +278,24 @@ export function ComboboxStatic({
               </ActionButtonStyled>
             )}
 
+            {nullable && query.length > 0 && (
+              <HeadlessCombobox.Option
+                key="combobox-not-found"
+                className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
+                value={{
+                  id: -1,
+                  label: nullable ? query : null,
+                  value: nullable ? query : null,
+                  resource: null,
+                }}
+              >
+                <span className="block truncate space-x-1">
+                  <span>{t('Select')}</span>
+                  <q className="font-semibold">{query}</q>
+                </span>
+              </HeadlessCombobox.Option>
+            )}
+
             {filteredValues.length > 0 &&
               filteredValues.map((entry) => (
                 <HeadlessOptionStyled
@@ -320,30 +338,6 @@ export function ComboboxStatic({
                   )}
                 </HeadlessOptionStyled>
               ))}
-
-            {filteredValues.length === 0 && (
-              <HeadlessCombobox.Option
-                key="combobox-not-found"
-                className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
-                value={{
-                  id: -1,
-                  label: nullable ? query : null,
-                  value: nullable ? query : null,
-                  resource: null,
-                }}
-              >
-                {nullable && query.length > 0 ? (
-                  <span className="block truncate space-x-1">
-                    <span>{t('Select')}</span>
-                    <q className="font-semibold">{query}</q>
-                  </span>
-                ) : (
-                  <span className="block truncate">
-                    {t('no_records_found')}.
-                  </span>
-                )}
-              </HeadlessCombobox.Option>
-            )}
           </HeadlessCombobox.Options>
         )}
       </HeadlessCombobox>
