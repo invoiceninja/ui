@@ -25,7 +25,7 @@ import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
-import { colorSchemeAtom, useColorScheme } from './common/colors';
+import { colorSchemeAtom } from './common/colors';
 
 export function App() {
   const [t] = useTranslation();
