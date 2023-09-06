@@ -31,7 +31,7 @@ import { taskMap } from '$app/common/constants/exports/task-map';
 import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Identifier } from '../../index/Reports';
+import { Identifier } from '../useReports';
 
 export const reportColumn = 10;
 
