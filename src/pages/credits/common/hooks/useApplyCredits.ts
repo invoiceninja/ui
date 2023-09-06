@@ -42,7 +42,6 @@ export const useApplyCredits = () => {
                   _id: v4(),
                   credit_id: credit.id,
                   amount: credit.balance > 0 ? credit.balance : credit.amount,
-                  invoice_id: '',
                 },
               ],
             }
