@@ -48,7 +48,7 @@ export function RecurringInvoices() {
   const variables = [
     '{$counter}',
     '{$year}',
-    '{$date:format}',
+    '{$date:Y-m-d}',
     '{$user_id}',
     '{$user_custom1}',
     '{$user_custom2}',

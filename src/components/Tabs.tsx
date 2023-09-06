@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { MouseEvent, useEffect, useRef } from 'react';
@@ -72,6 +73,8 @@ export function Tabs(props: Props) {
     }
   }, []);
 
+  const colors = useColorScheme()
+
   return (
     <div className={props.className}>
       <div className="sm:hidden">
@@ -93,7 +96,7 @@ export function Tabs(props: Props) {
       </div>
 
       <div className="hidden sm:block">
-        <div className="border-b border-gray-200">
+        <div className="border-b" style={{ borderColor: colors.$5 }}>
           <nav
             ref={tabBar}
             className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
@@ -106,7 +109,7 @@ export function Tabs(props: Props) {
                 onClick={(event) => handleScroll(event)}
                 style={{
                   borderColor: isActive(tab) ? accentColor : 'transparent',
-                  color: isActive(tab) ? accentColor : '#6B7280',
+                  color: isActive(tab) ? accentColor : colors.$3,
                 }}
                 className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                 aria-current={isActive(tab) ? 'page' : undefined}

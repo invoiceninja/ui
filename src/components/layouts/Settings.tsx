@@ -25,6 +25,8 @@ import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useColorScheme } from '$app/common/colors';
+import { styled } from 'styled-components';
 
 interface Props {
   title: string;
@@ -37,6 +39,14 @@ interface Props {
   disableSaveButton?: boolean;
   withoutBackButton?: boolean;
 }
+
+const LinkStyled = styled(Link)`
+  color: ${(props) => props.theme.color};
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
@@ -54,6 +64,8 @@ export function Settings(props: Props) {
   useEffect(() => {
     setErrors(undefined);
   }, [settingPathNameKey]);
+
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -85,7 +97,7 @@ export function Settings(props: Props) {
             </div>
           )}
 
-          <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600">
+          <a className="flex items-center py-4 px-3 text-xs uppercase font-medium">
             <span className="truncate">{t('basic_settings')}</span>
           </a>
 
@@ -109,25 +121,27 @@ export function Settings(props: Props) {
             {basic.map(
               (item) =>
                 item.enabled && (
-                  <Link
+                  <LinkStyled
                     key={item.name}
                     to={item.href}
                     className={classNames(
-                      item.current
-                        ? 'bg-gray-200 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                       'flex items-center px-3 py-2 text-sm font-medium rounded'
                     )}
                     aria-current={item.current ? 'page' : undefined}
+                    theme={{
+                      backgroundColor: item.current ? colors.$5 : '',
+                      color: item.current ? colors.$3 : '',
+                      hoverColor: colors.$5,
+                    }}
                   >
                     <span className="truncate">{item.name}</span>
-                  </Link>
+                  </LinkStyled>
                 )
             )}
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600 mt-8">
+            <a className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8">
               <span className="truncate">{t('advanced_settings')}</span>
             </a>
           )}
@@ -152,20 +166,21 @@ export function Settings(props: Props) {
             {advanced.map((item, index) => (
               <div key={index}>
                 {item.enabled && (
-                  <Link
+                  <LinkStyled
                     key={item.name}
                     to={item.href}
                     className={classNames(
-                      item.current
-                        ? 'bg-gray-200 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                      item.children ? 'rounded-t' : 'rounded',
-                      'flex items-center px-3 py-2 text-sm font-medium'
+                      'flex items-center px-3 py-2 text-sm font-medium rounded'
                     )}
                     aria-current={item.current ? 'page' : undefined}
+                    theme={{
+                      backgroundColor: item.current ? colors.$5 : '',
+                      color: item.current ? colors.$3 : '',
+                      hoverColor: colors.$5,
+                    }}
                   >
                     <span className="truncate">{item.name}</span>
-                  </Link>
+                  </LinkStyled>
                 )}
 
                 {item.children && item.current && (

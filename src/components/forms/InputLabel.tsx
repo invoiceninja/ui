@@ -10,6 +10,7 @@
 
 import React, { ReactNode } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   for?: string;
@@ -17,10 +18,13 @@ interface Props extends CommonProps {
 }
 
 export function InputLabel(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <label
-      className={`text-sm text-gray-500 font-medium block ${props.className}`}
+      className={`text-sm font-medium block ${props.className}`}
       htmlFor={props.for}
+      style={{ color: colors.$3 }}
     >
       {props.children}
     </label>

@@ -52,6 +52,7 @@
     "react-verification-input": "^3.3.0",
     "recharts": "^2.1.16",
     "remove": "^0.1.5",
+    "styled-components": "^6.0.7",
     "tailwind-scrollbar": "^3.0.0",
     "uuid": "^9.0.0"
   },

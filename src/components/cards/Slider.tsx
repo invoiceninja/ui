@@ -14,6 +14,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import { MdClose } from 'react-icons/md';
 import classNames from 'classnames';
 import { Inline } from '../Inline';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   visible: boolean;
@@ -27,6 +28,8 @@ interface Props extends CommonProps {
 }
 
 export function Slider(props: Props) {
+  const colors = useColorScheme()
+
   return (
     <Transition.Root show={props.visible} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={props.onClose}>
@@ -51,14 +54,13 @@ export function Slider(props: Props) {
             >
               <form
                 onSubmit={(event) => event.preventDefault()}
-                className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                className="border flex h-full flex-col divide-y divide-gray-200 shadow-xl"
+                style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
-                  <div className="py-6 px-4 sm:px-6 border-b border-gray-200">
+                  <div className="py-6 px-4 sm:px-6 border-b" style={{ borderColor: colors.$4 }}>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-medium text-gray-900">
-                        {props.title}
-                      </span>
+                      <span className="text-lg font-medium" style={{ color: colors.$3 }}>{props.title}</span>
 
                       <Inline>
                         {props.topRight}
@@ -67,6 +69,7 @@ export function Slider(props: Props) {
                           fontSize={24}
                           className="cursor-pointer"
                           onClick={() => props.onClose()}
+                          color={colors.$3}
                         />
                       </Inline>
                     </div>

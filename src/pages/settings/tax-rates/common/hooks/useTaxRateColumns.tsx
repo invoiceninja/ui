@@ -33,7 +33,7 @@ export const useTaxRateColumns = () => {
     },
     {
       id: 'rate',
-      label: t('rate'),
+      label: t('tax_rate'),
       format: (value) => <span>{value}%</span>,
     },
   ];

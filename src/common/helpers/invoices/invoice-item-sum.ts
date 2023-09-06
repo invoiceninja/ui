@@ -57,7 +57,7 @@ export class InvoiceItemSum {
   }
 
   protected sumLineItem() {
-    this.item.line_total = this.item.cost * this.item.quantity;
+    this.item.line_total = this.item.cost * this.item.quantity + .000000000000004;
 
     return this;
   }
@@ -144,7 +144,9 @@ export class InvoiceItemSum {
   }
 
   protected push() {
-    this.subTotal += this.item.line_total;
+    //why? because dealing with floating point maths hurts. Epsilon does not cover the edge cases, but this does.
+    this.subTotal += parseFloat((this.item.line_total + .000000000000004).toFixed(this.currency.precision));
+    this.subTotal = parseFloat((this.subTotal).toFixed(this.currency.precision));
 
     this.grossSubTotal += this.item.gross_line_total;
 

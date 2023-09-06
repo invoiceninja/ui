@@ -38,6 +38,7 @@ import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   docsLink?: string;
@@ -86,6 +87,8 @@ export function HelpSidebarIcons(props: Props) {
       setCronsNotEnabledModal(false);
     });
   };
+
+  const colors = useColorScheme();
 
   return (
     <>
@@ -203,7 +206,10 @@ export function HelpSidebarIcons(props: Props) {
         </div>
       </Modal>
 
-      <nav className="flex p-2 justify-around text-white border-t border-gray-600">
+      <nav
+        style={{ borderColor: colors.$5 }}
+        className="flex p-2 justify-around text-white border-t"
+      >
         {!isMiniSidebar && (
           <>
             {isSelfHosted() && account && !account.is_scheduler_running && (

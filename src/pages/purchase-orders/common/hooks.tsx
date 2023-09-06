@@ -47,7 +47,6 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { purchaseOrderAtom } from './atoms';
-import { useBulk, useMarkSent } from './queries';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -59,6 +58,7 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -464,7 +464,7 @@ export function useActions() {
     (purchaseOrder) =>
       Boolean(!purchaseOrder.expense_id.length) && (
         <DropdownElement
-          onClick={() => bulk(purchaseOrder.id, 'expense')}
+          onClick={() => bulk([purchaseOrder.id], 'expense')}
           icon={<Icon element={MdSwitchRight} />}
         >
           {t('convert_to_expense')}
@@ -504,7 +504,7 @@ export function useActions() {
       Boolean(!purchaseOrder.archived_at) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(purchaseOrder.id, 'archive')}
+          onClick={() => bulk([purchaseOrder.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -514,7 +514,7 @@ export function useActions() {
       Boolean(purchaseOrder.archived_at) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(purchaseOrder.id, 'restore')}
+          onClick={() => bulk([purchaseOrder.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -524,7 +524,7 @@ export function useActions() {
       !purchaseOrder.is_deleted &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(purchaseOrder.id, 'delete')}
+          onClick={() => bulk([purchaseOrder.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
