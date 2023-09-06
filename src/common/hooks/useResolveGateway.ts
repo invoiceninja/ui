@@ -11,9 +11,9 @@
 import { CompanyGateway } from '../interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '../queries/company-gateways';
 
-export const useResolveGateway = () => {
+export function useResolveGateway() {
   const { data: gateways } = useCompanyGatewaysQuery();
 
   return (id: string) =>
     gateways?.data.data?.find((gateway: CompanyGateway) => gateway.id === id);
-};
+}

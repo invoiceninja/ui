@@ -27,7 +27,7 @@ import { route } from '$app/common/helpers/route';
 import { useConfigureGroupSettings } from './useConfigureGroupSettings';
 import { useBulk } from '$app/common/queries/group-settings';
 
-export const useActions = () => {
+export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -115,4 +115,4 @@ export const useActions = () => {
   ];
 
   return actions;
-};
+}

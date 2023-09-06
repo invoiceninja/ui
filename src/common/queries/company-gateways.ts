@@ -75,7 +75,7 @@ export function useBlankCompanyGatewayQuery() {
   );
 }
 
-export const useBulk = () => {
+export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
@@ -100,4 +100,4 @@ export const useBulk = () => {
       );
     });
   };
-};
+}

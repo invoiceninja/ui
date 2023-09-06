@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import { resetChanges } from '../stores/slices/company-users';
 import { setActiveSettings } from '../stores/slices/settings';
 
-export const useSwitchToCompanySettings = () => {
+export function useSwitchToCompanySettings() {
   const dispatch = useDispatch();
 
   return () => {
@@ -27,4 +27,4 @@ export const useSwitchToCompanySettings = () => {
       })
     );
   };
-};
+}

@@ -27,7 +27,7 @@ import {
 import { useResolveGateway } from '$app/common/hooks/useResolveGateway';
 import frequencies from '$app/common/constants/frequency';
 
-export const useResolvePropertyValue = () => {
+export function useResolvePropertyValue() {
   const [t] = useTranslation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -126,4 +126,4 @@ export const useResolvePropertyValue = () => {
 
     return t(value);
   };
-};
+}

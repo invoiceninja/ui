@@ -10,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 
-export const useResolvePropertyLabel = () => {
+export function useResolvePropertyLabel() {
   const [t] = useTranslation();
 
   const KEYWORD_ALIASES = {
@@ -107,4 +107,4 @@ export const useResolvePropertyLabel = () => {
 
     return t(key);
   };
-};
+}

@@ -10,9 +10,9 @@
 
 import { useStaticsQuery } from '../queries/statics';
 
-export const useResolveDateFormat = () => {
+export function useResolveDateFormat() {
   const { data: statics } = useStaticsQuery();
 
   return (id: string) =>
     statics?.date_formats.find((dateFormat) => dateFormat.id === id);
-};
+}

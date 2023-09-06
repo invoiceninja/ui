@@ -10,8 +10,8 @@
 
 import { useDesignsQuery } from '../queries/designs';
 
-export const useResolveDesign = () => {
+export function useResolveDesign() {
   const { data: designs } = useDesignsQuery();
 
   return (id: string) => designs?.find((design) => design.id === id);
-};
+}

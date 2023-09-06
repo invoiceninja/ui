@@ -13,7 +13,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
-export const useTabs = () => {
+export function useTabs() {
   const [t] = useTranslation();
 
   const { isGroupSettingsActive } = useCurrentSettingsLevel();
@@ -46,4 +46,4 @@ export const useTabs = () => {
   }
 
   return tabs;
-};
+}

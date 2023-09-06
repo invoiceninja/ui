@@ -29,7 +29,7 @@ export const blankGroupSettings: GroupSettings = {
   documents: [],
 };
 
-export const useHandleChange = (params: Params) => {
+export function useHandleChange(params: Params) {
   const { setGroupSettings, setErrors, isCreatePage } = params;
 
   return (
@@ -50,4 +50,4 @@ export const useHandleChange = (params: Params) => {
       );
     }
   };
-};
+}

@@ -10,9 +10,9 @@
 
 import { useStaticsQuery } from '../queries/statics';
 
-export const useResolvePaymentType = () => {
+export function useResolvePaymentType() {
   const { data: statics } = useStaticsQuery();
 
   return (id: string) =>
     statics?.payment_types.find((paymentType) => paymentType.id === id);
-};
+}

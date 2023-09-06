@@ -10,9 +10,9 @@
 
 import { useStaticsQuery } from '../queries/statics';
 
-export const useResolveTimeZone = () => {
+export function useResolveTimeZone() {
   const { data: statics } = useStaticsQuery();
 
   return (id: string) =>
     statics?.timezones.find((timeZone) => timeZone.id === id);
-};
+}

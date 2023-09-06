@@ -11,7 +11,7 @@
 import { SettingsLevel } from '../enums/settings';
 import { useActiveSettingsDetails } from './useActiveSettingsDetails';
 
-export const useCurrentSettingsLevel = () => {
+export function useCurrentSettingsLevel() {
   const activeSettingsDetails = useActiveSettingsDetails();
 
   const isCompanySettingsActive =
@@ -28,4 +28,4 @@ export const useCurrentSettingsLevel = () => {
     isGroupSettingsActive,
     isClientSettingsActive,
   };
-};
+}

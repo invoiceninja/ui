@@ -11,7 +11,7 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../stores/store';
 
-export const useActiveSettingsDetails = () => {
+export function useActiveSettingsDetails() {
   const activeSettings = useSelector(
     (state: RootState) => state.settings.activeSettings
   );
@@ -20,4 +20,4 @@ export const useActiveSettingsDetails = () => {
     name: activeSettings.name,
     level: activeSettings.level,
   };
-};
+}

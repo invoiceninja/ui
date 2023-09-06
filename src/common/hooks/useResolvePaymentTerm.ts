@@ -14,7 +14,7 @@ import { usePaymentTermsQuery } from '../queries/payment-terms';
 interface Params {
   resolveWithNumDays?: boolean;
 }
-export const useResolvePaymentTerm = (params?: Params) => {
+export function useResolvePaymentTerm(params?: Params) {
   const { resolveWithNumDays } = params || {};
 
   const { data: paymentTerms } = usePaymentTermsQuery({});
@@ -30,4 +30,4 @@ export const useResolvePaymentTerm = (params?: Params) => {
     paymentTerms?.data.data.find(
       (paymentTerm: PaymentTerm) => paymentTerm.id === id
     );
-};
+}

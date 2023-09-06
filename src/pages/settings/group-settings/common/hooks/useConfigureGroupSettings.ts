@@ -19,7 +19,7 @@ import { GroupSettings } from '$app/common/interfaces/group-settings';
 interface Params {
   withoutNavigation: boolean;
 }
-export const useConfigureGroupSettings = (params?: Params) => {
+export function useConfigureGroupSettings(params?: Params) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -49,4 +49,4 @@ export const useConfigureGroupSettings = (params?: Params) => {
 
     !withoutNavigation && navigate('/settings/company_details');
   };
-};
+}

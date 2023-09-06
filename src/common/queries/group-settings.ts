@@ -26,7 +26,7 @@ interface Params {
   id: string | undefined;
 }
 
-export const useGroupQuery = (params: Params) => {
+export function useGroupQuery(params: Params) {
   const { id } = params;
 
   return useQuery<GroupSettings>(
@@ -38,9 +38,9 @@ export const useGroupQuery = (params: Params) => {
       ),
     { staleTime: Infinity }
   );
-};
+}
 
-export const useBulk = () => {
+export function useBulk() {
   const queryClient = useQueryClient();
 
   return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
@@ -61,4 +61,4 @@ export const useBulk = () => {
       );
     });
   };
-};
+}

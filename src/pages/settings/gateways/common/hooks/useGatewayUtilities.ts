@@ -19,7 +19,7 @@ interface Params {
   currentGateways: CompanyGateway[];
   setCurrentGateways: Dispatch<SetStateAction<CompanyGateway[]>>;
 }
-export const useGatewayUtilities = (params: Params) => {
+export function useGatewayUtilities(params: Params) {
   const dispatch = useDispatch();
 
   const { currentGateways, setCurrentGateways } = params;
@@ -96,4 +96,4 @@ export const useGatewayUtilities = (params: Params) => {
     handleRemoveGateway,
     handleReset,
   };
-};
+}

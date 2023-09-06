@@ -35,7 +35,7 @@ interface Params {
   isFormBusy?: boolean;
 }
 
-export const useHandleUpdate = (params: Params) => {
+export function useHandleUpdate(params: Params) {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
@@ -122,4 +122,4 @@ export const useHandleUpdate = (params: Params) => {
         .finally(() => setIsFormBusy?.(false));
     }
   };
-};
+}
