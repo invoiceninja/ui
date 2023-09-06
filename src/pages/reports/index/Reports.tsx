@@ -244,7 +244,6 @@ export default function Reports() {
             retry: 10,
             retryDelay: import.meta.env.DEV ? 1000 : 5000,
           })
-          .catch((e: AxiosError) => console.log("Foo", e.code))
           .then((response) => {
             const { columns, ...rows } = response;
 
