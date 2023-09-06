@@ -80,19 +80,28 @@ export function Settings(props: Props) {
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
           {isGroupSettingsActive && (
-            <div className="flex items-center justify-between bg-white border border-gray-200 py-3 rounded space-x-3 px-2">
+            <div
+              className="flex items-center justify-between bg-white border border-gray-200 py-3 rounded space-x-3 px-2"
+              style={{
+                backgroundColor: colors.$1,
+              }}
+            >
               <div className="flex items-center space-x-2 flex-1 min-w-0">
                 <div>
                   <Icon element={FaObjectGroup} size={20} />
                 </div>
 
-                <span className="text-sm truncate">
+                <span className="text-sm truncate dark:text-gray-100">
                   {t('group_settings')}: {activeSettings.name}
                 </span>
               </div>
 
               <div className="cursor-pointer" onClick={switchToCompanySettings}>
-                <Icon element={MdClose} size={20} />
+                <Icon
+                  element={MdClose}
+                  className="dark:text-gray-100"
+                  size={20}
+                />
               </div>
             </div>
           )}
