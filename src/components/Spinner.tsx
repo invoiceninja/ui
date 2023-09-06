@@ -8,13 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
+
 interface Props {
   variant?: 'light' | 'dark';
 }
 
 export function Spinner(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <svg
+      style={{ color: colors.$3 }}
       className={`animate-spin h-5 w-5 ${props.variant ?? 'text-black'}`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

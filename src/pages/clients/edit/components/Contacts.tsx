@@ -20,6 +20,7 @@ import { set } from 'lodash';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   contacts: Partial<ClientContact>[];
@@ -73,10 +74,12 @@ export function Contacts(props: Props) {
     props.setContacts(contacts);
   };
 
+  const colors = useColorScheme()
+
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
       {props.contacts.map((contact, index, row) => (
-        <div key={index} className="pb-4 mb-4 border-b">
+        <div key={index} className="pb-4 mb-4 border-b" style={{ borderColor: colors.$5 }}>
           <Element leftSide={t('first_name')}>
             <InputField
               id={`first_name_${index}`}

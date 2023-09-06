@@ -43,7 +43,6 @@ export function useEnterPayment() {
                   invoice_id: invoice.id,
                   amount:
                     invoice.balance > 0 ? invoice.balance : invoice.amount,
-                  credit_id: '',
                 },
               ],
             }
