@@ -29,40 +29,16 @@ import {
   SortableColumns,
   reportColumn,
 } from '../common/components/SortableColumns';
-import { useReports } from '../common/useReports';
+import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
-import { Preview, PreviewResponse, previewAtom } from '../common/components/Preview';
-
-export type Identifier =
-  | 'activity'
-  | 'client'
-  | 'contact'
-  | 'credit'
-  | 'document'
-  | 'expense'
-  | 'invoice'
-  | 'invoice_item'
-  | 'quote'
-  | 'quote_item'
-  | 'recurring_invoice'
-  | 'payment'
-  | 'product'
-  | 'product_sales'
-  | 'task'
-  | 'vendor'
-  | 'purchase_order'
-  | 'purchase_order_item'
-  | 'profitloss'
-  | 'client_balance_report'
-  | 'client_sales_report'
-  | 'aged_receivable_detailed_report'
-  | 'aged_receivable_summary_report'
-  | 'user_sales_report'
-  | 'tax_summary_report';
-
+import {
+  Preview,
+  PreviewResponse,
+  previewAtom,
+} from '../common/components/Preview';
 interface Range {
   identifier: string;
   label: string;
@@ -79,29 +55,6 @@ const ranges: Range[] = [
   { identifier: 'this_year', label: 'this_year' },
   { identifier: 'custom', label: 'custom' },
 ];
-
-interface Report {
-  identifier: Identifier;
-  label: string;
-  endpoint: string;
-  payload: Payload;
-  custom_columns: string[];
-  allow_custom_column: boolean;
-}
-
-interface Payload {
-  start_date: string;
-  end_date: string;
-  date_key?: string;
-  client_id?: string;
-  date_range: string;
-  report_keys: string[];
-  send_email: boolean;
-  is_income_billed?: boolean;
-  is_expense_billed?: boolean;
-  include_tax?: boolean;
-  status?: string;
-}
 
 export default function Reports() {
   const { documentTitle } = useTitle('reports');
@@ -277,32 +230,30 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request(
-      'POST',
-      endpoint('/api/v1/reports/credits?output=json'),
-      updatedPayload,
-      {}
-    ).then((response) => {
-      const hash = response.data.message as string;
+    request('POST', endpoint(report.preview), updatedPayload, {}).then(
+      (response) => {
+        const hash = response.data.message as string;
 
-      queryClient
-        .fetchQuery<PreviewResponse>({
-          queryKey: ['reports', hash],
-          queryFn: () =>
-            request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
-              (response) => response.data
-            ),
-          retry: 10,
-          retryDelay: import.meta.env.DEV ? 1000 : 5000,
-        })
-        .then((response) => {
-          const { columns, ...rows } = response;
+        queryClient
+          .fetchQuery<PreviewResponse>({
+            queryKey: ['reports', hash],
+            queryFn: () =>
+              request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
+                (response) => response.data
+              ),
+            retry: 10,
+            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+          })
+          .catch((e: AxiosError) => console.log("Foo", e.code))
+          .then((response) => {
+            const { columns, ...rows } = response;
 
-          setPreview({ columns, rows: Object.values(rows) });
+            setPreview({ columns, rows: Object.values(rows) });
 
-          toast.success();
-        });
-    });
+            toast.success();
+          });
+      }
+    );
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
