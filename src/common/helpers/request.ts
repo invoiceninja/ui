@@ -44,6 +44,10 @@ client.interceptors.response.use(
       toast.error('error_title');
     }
 
+    if (error.response?.status === 409) {
+      toast.processing();
+    }
+
     console.error(error);
 
     return Promise.reject(error);
