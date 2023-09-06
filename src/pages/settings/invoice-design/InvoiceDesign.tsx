@@ -9,6 +9,7 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
@@ -19,7 +20,9 @@ export default function InvoiceDesign() {
   const { documentTitle } = useTitle('invoice_design');
   const { t } = useTranslation();
 
-  const tabs: Tab[] = [
+  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+
+  let tabs: Tab[] = [
     { name: t('general_settings'), href: '/settings/invoice_design' },
     {
       name: t('custom_designs'),
@@ -31,6 +34,10 @@ export default function InvoiceDesign() {
       ],
     },
   ];
+
+  if (isGroupSettingsActive) {
+    tabs = tabs.filter((tab) => t(tab.name) !== t('custom_designs'));
+  }
 
   return (
     <Default title={documentTitle}>
