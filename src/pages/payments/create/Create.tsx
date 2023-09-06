@@ -46,15 +46,20 @@ import { paymentAtom } from '../common/atoms';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
-  invoices: Paymentable[];
-  credits: Paymentable[];
+  invoices: PaymentInvoice[];
+  credits: PaymentCredit[];
 }
 
-interface Paymentable {
+interface PaymentInvoice {
+  _id: string;
+  amount: number;
+  invoice_id: string;
+}
+
+interface PaymentCredit {
   _id: string;
   amount: number;
   credit_id: string;
-  invoice_id: string;
 }
 
 export default function Create() {
@@ -129,7 +134,6 @@ export default function Create() {
                     invoice_id: invoice.id,
                     amount:
                       invoice.balance > 0 ? invoice.balance : invoice.amount,
-                    credit_id: '',
                   },
                 ],
               }
@@ -148,7 +152,6 @@ export default function Create() {
                   _id: v4(),
                   credit_id: credit.id,
                   amount: credit.balance > 0 ? credit.balance : credit.amount,
-                  invoice_id: '',
                 },
               ],
             }

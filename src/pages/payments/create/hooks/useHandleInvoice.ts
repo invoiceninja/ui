@@ -33,7 +33,6 @@ export function useHandleInvoice(props: Props) {
               {
                 _id: v4(),
                 amount: invoice.balance > 0 ? invoice.balance : invoice.amount,
-                credit_id: '',
                 invoice_id: invoice.id,
               },
             ],
@@ -46,7 +45,6 @@ export function useHandleInvoice(props: Props) {
       cloned.invoices[index] = {
         _id: v4(),
         amount: invoice.balance > 0 ? invoice.balance : invoice.amount,
-        credit_id: '',
         invoice_id: invoice.id,
       };
 

@@ -34,7 +34,6 @@ export function useHandleCredit(props: Props) {
                 _id: v4(),
                 amount: credit.balance > 0 ? credit.balance : credit.amount,
                 credit_id: credit.id,
-                invoice_id: '',
               },
             ],
           }
@@ -47,7 +46,6 @@ export function useHandleCredit(props: Props) {
         _id: v4(),
         amount: credit.balance > 0 ? credit.balance : credit.amount,
         credit_id: credit.id,
-        invoice_id: '',
       };
 
       setPayment({
