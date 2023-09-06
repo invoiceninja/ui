@@ -14,7 +14,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Document } from '$app/common/interfaces/document.interface';
 import prettyBytes from 'pretty-bytes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
 import { Dropdown } from './dropdown/Dropdown';
@@ -27,14 +27,23 @@ import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useQueryClient } from 'react-query';
+import { Spinner } from './Spinner';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { AxiosResponse } from 'axios';
 
 interface Props {
   documents: Document[];
   onDocumentDelete?: () => unknown;
 }
 
+interface DocumentUrl {
+  documentId: string;
+  url: string;
+}
+
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
+  const reactSettings = useReactSettings();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
@@ -43,9 +52,15 @@ export function DocumentsTable(props: Props) {
 
   const [documentId, setDocumentId] = useState<string>();
 
+  const [documentsUrls, setDocumentsUrls] = useState<DocumentUrl[]>([]);
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const queryClient = useQueryClient();
+
+  const getDocumentUrlById = (id: string) => {
+    return documentsUrls.find(({ documentId }) => documentId === id)?.url;
+  };
 
   const downloadDocument = (doc: Document, inline: boolean) => {
     toast.processing();
@@ -107,6 +122,40 @@ export function DocumentsTable(props: Props) {
       });
   };
 
+  useEffect(() => {
+    if (reactSettings.show_document_preview) {
+      props.documents.forEach(async ({ id, hash, type }) => {
+        const alreadyExist = documentsUrls.find(
+          ({ documentId }) => documentId === id
+        );
+
+        if (!alreadyExist && (type === 'png' || type === 'jpg')) {
+          const response: AxiosResponse = await queryClient.fetchQuery(
+            ['documents', hash],
+            () =>
+              request(
+                'GET',
+                endpoint('/documents/:hash', { hash }),
+                { headers: defaultHeaders() },
+                { responseType: 'arraybuffer' }
+              ),
+            { staleTime: Infinity }
+          );
+
+          const blob = new Blob([response.data], {
+            type: response.headers['content-type'],
+          });
+          const url = URL.createObjectURL(blob);
+
+          setDocumentsUrls((currentDocumentUrls) => [
+            ...currentDocumentUrls,
+            { documentId: id, url },
+          ]);
+        }
+      });
+    }
+  }, [reactSettings, props.documents]);
+
   return (
     <>
       <Table>
@@ -127,10 +176,29 @@ export function DocumentsTable(props: Props) {
 
           {props.documents.map((document, index) => (
             <Tr key={index}>
-              <Td className="truncate">
-                <div className="flex items-center space-x-2">
-                  <FileIcon type={document.type} />
-                  <span>{document.name}</span>
+              <Td>
+                <div
+                  className="flex items-center space-x-10"
+                  style={{ width: 'max-content' }}
+                >
+                  <div className="flex items-center space-x-2">
+                    <FileIcon type={document.type} />
+                    <span>{document.name}</span>
+                  </div>
+
+                  {reactSettings.show_document_preview &&
+                    (document.type === 'png' || document.type === 'jpg') && (
+                      <>
+                        {getDocumentUrlById(document.id) ? (
+                          <img
+                            src={getDocumentUrlById(document.id)}
+                            style={{ width: 150, height: 75 }}
+                          />
+                        ) : (
+                          <Spinner />
+                        )}
+                      </>
+                    )}
                 </div>
               </Td>
               <Td>{date(document.updated_at, dateFormat)}</Td>
