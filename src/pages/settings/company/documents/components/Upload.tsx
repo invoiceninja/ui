@@ -22,6 +22,9 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Link } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
 import { MdInfoOutline } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 
 interface Props {
   endpoint: string;
@@ -36,21 +39,33 @@ export function Upload(props: Props) {
 
   const [formData, setFormData] = useState(new FormData());
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
     onSubmit: () => {
       toast.processing();
+      setErrors(undefined);
 
       request('POST', props.endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      }).then(() => {
-        toast.success('uploaded_document');
+      })
+        .then(() => {
+          toast.success('uploaded_document');
 
-        setFormData(new FormData());
+          setFormData(new FormData());
 
-        props.onSuccess?.();
-      });
+          props.onSuccess?.();
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+
+          setFormData(new FormData());
+        });
     },
   });
 
@@ -66,6 +81,8 @@ export function Upload(props: Props) {
       formik.submitForm();
     },
   });
+
+  const colors = useColorScheme()
 
   if (props.widgetOnly) {
     return (
@@ -97,11 +114,18 @@ export function Upload(props: Props) {
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
             <Image className="mx-auto h-12 w-12 text-gray-400" />
-            <span className="mt-2 block text-sm font-medium text-gray-900">
-              {isDragActive ? 'drop_file_here' : t('dropzone_default_message')}
+            <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3 }}>
+            {isDragActive ? t('drop_file_here') : t('dropzone_default_message')}
             </span>
           </div>
         </div>
+
+        {errors &&
+          Object.keys(errors.errors).map((key, index) => (
+            <Alert key={index} className="mt-2" type="danger">
+              {errors.errors[key]}
+            </Alert>
+          ))}
       </>
     );
   }
@@ -137,7 +161,7 @@ export function Upload(props: Props) {
             <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <input {...getInputProps()} />
               <Image className="mx-auto h-12 w-12 text-gray-400" />
-              <span className="mt-2 block text-sm font-medium text-gray-900">
+              <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3 }}>
                 {isDragActive
                   ? 'drop_file_here'
                   : t('dropzone_default_message')}

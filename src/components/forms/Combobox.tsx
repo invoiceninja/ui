@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
 import { Alert } from '../Alert';
+import { useColorScheme } from '$app/common/colors';
+import { styled } from 'styled-components';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -61,7 +63,19 @@ export interface ComboboxStaticProps<T = any> {
 
 export type Nullable<T> = T | null;
 
-export function ComboboxStatic<T = any>({
+const HeadlessOptionStyled = styled(HeadlessCombobox.Option)`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+const ActionButtonStyled = styled.button`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+export function ComboboxStatic<T =any>({
   inputOptions,
   entries,
   readonly,
@@ -169,6 +183,8 @@ export function ComboboxStatic<T = any>({
     };
   }, [initiallyVisible]);
 
+  const colors = useColorScheme();
+
   return (
     <div className="w-full">
       <HeadlessCombobox
@@ -179,16 +195,22 @@ export function ComboboxStatic<T = any>({
         ref={comboboxRef}
       >
         {inputOptions.label && (
-          <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
+          <HeadlessCombobox.Label
+            className="text-sm font-medium block"
+            style={{ color: colors.$3 }}
+          >
             {inputOptions.label}
           </HeadlessCombobox.Label>
         )}
 
         <div className="relative mt-1">
-          <div className="relative w-full cursor-default overflow-hidden rounded border border-gray-300 bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm">
+          <div
+            className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+            style={{ borderColor: colors.$5 }}
+          >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
-              className="w-full rounded border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??
@@ -196,6 +218,11 @@ export function ComboboxStatic<T = any>({
               }
               onFocus={() => setIsOpen(true)}
               placeholder={inputOptions.placeholder}
+              style={{
+                backgroundColor: colors.$1,
+                borderColor: colors.$5,
+                color: colors.$3,
+              }}
             />
 
             {!readonly && (
@@ -213,15 +240,17 @@ export function ComboboxStatic<T = any>({
               >
                 {onDismiss && selectedValue ? (
                   <X
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5"
                     aria-hidden="true"
                     data-testid="combobox-clear-icon"
+                    style={{ color: colors.$3 }}
                   />
                 ) : (
                   <ChevronDown
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5"
                     aria-hidden="true"
                     data-testid="combobox-chevrondown-icon"
+                    style={{ color: colors.$3 }}
                   />
                 )}
               </HeadlessCombobox.Button>
@@ -232,31 +261,40 @@ export function ComboboxStatic<T = any>({
         {isOpen && (
           <HeadlessCombobox.Options
             static
-            className="absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+            className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
           >
             {action && action.visible && (
-              <button
+              <ActionButtonStyled
+                theme={{
+                  hoverColor: colors.$2,
+                }}
                 data-testid="combobox-action-button"
                 type="button"
                 onClick={action.onClick}
-                className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-gray-100"
+                className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9"
                 tabIndex={-1}
+                style={{ color: colors.$3 }}
               >
                 {action.label}
-              </button>
+              </ActionButtonStyled>
             )}
 
             {filteredValues.length > 0 &&
               filteredValues.map((entry) => (
-                <HeadlessCombobox.Option
+                <HeadlessOptionStyled
+                  theme={{
+                    hoverColor: colors.$2,
+                  }}
                   key={entry.id}
                   value={entry}
-                  className={({ active }) =>
+                  className={() =>
                     classNames(
-                      'min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9',
-                      active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
+                      'min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9'
+                      // active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
                     )
                   }
+                  style={{ color: colors.$3 }}
                 >
                   {({ selected }) => (
                     <>
@@ -273,13 +311,16 @@ export function ComboboxStatic<T = any>({
                       </span>
 
                       {selected && (
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-600">
+                        <span
+                          className="absolute inset-y-0 right-0 flex items-center pr-4"
+                          style={{ color: colors.$3 }}
+                        >
                           <Check className="h-5 w-5" aria-hidden="true" />
                         </span>
                       )}
                     </>
                   )}
-                </HeadlessCombobox.Option>
+                </HeadlessOptionStyled>
               ))}
 
             {filteredValues.length === 0 && (
@@ -390,8 +431,7 @@ export function ComboboxAsync<T = any>({
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
-              searchable:
-                entry[entryOptions.searchable || entryOptions.id],
+              searchable: entry[entryOptions.searchable || entryOptions.id],
             })
           );
 

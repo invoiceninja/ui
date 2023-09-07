@@ -15,6 +15,7 @@ import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -54,6 +55,8 @@ export function InputField(props: Props) {
     return props.type;
   }, [props.type, isInputMasked]);
 
+  const colors = useColorScheme();
+
   return (
     <section>
       {props.label && (
@@ -65,6 +68,7 @@ export function InputField(props: Props) {
 
       <div className="relative">
         <DebounceInput
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, ...props.style }}
           min={props.min}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
@@ -76,7 +80,7 @@ export function InputField(props: Props) {
           id={props.id}
           type={inputType}
           className={classNames(
-            `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            `w-full py-2 px-3 rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
             {
               'border border-gray-300': props.border !== false,
             }

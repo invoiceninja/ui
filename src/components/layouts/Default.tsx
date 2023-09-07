@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -55,6 +55,8 @@ import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Search } from '$app/pages/dashboard/components/Search';
+import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
+import { useAtom } from 'jotai';
 
 export interface SaveOption {
   label: string;
@@ -362,6 +364,9 @@ export function Default(props: Props) {
 
   const { isOwner } = useAdmin();
   const saveBtn = useSaveBtn();
+  const colors = useColorScheme();
+
+  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
   return (
     <div>
@@ -382,10 +387,13 @@ export function Default(props: Props) {
           isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
         } flex flex-col flex-1`}
       >
-        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
+        <div
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          className="sticky top-0 z-10 flex-shrink-0 flex h-16 border-b shadow"
+        >
           <button
             type="button"
-            className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+            className="px-4 border-r border-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -393,7 +401,7 @@ export function Default(props: Props) {
           </button>
           <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h2 className="text-sm md:text-xl">
+              <h2 style={{ color: colors.$3 }} className="text-sm md:text-xl">
                 {props.title}
               </h2>
 
@@ -402,6 +410,22 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+              {import.meta.env.DEV && (
+                <SelectField
+                  value={
+                    JSON.stringify(colorScheme) === JSON.stringify($1)
+                      ? 'dark'
+                      : 'light'
+                  }
+                  onValueChange={(value) =>
+                    value === 'light' ? setColorScheme($2) : setColorScheme($1)
+                  }
+                >
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </SelectField>
+              )}
+
               {shouldShowUnlockButton && (
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
@@ -508,7 +532,10 @@ export function Default(props: Props) {
             </div>
           )}
 
-          <div className="p-4 md:py-8 xl:p-8 dark:text-gray-100">
+          <div
+            style={{ color: colors.$3, backgroundColor: colors.$2 }}
+            className="p-4 md:py-8 xl:p-8 dark:text-gray-100"
+          >
             {props.children}
           </div>
         </main>

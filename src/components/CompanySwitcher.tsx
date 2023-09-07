@@ -29,6 +29,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
+import { useColorScheme } from '$app/common/colors';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -85,6 +86,8 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
+  const colors = useColorScheme();
+
   return (
     <>
       <CompanyCreate
@@ -119,14 +122,15 @@ export function CompanySwitcher() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
+          <Menu.Items
+            style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+            className="border origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg"
+          >
             <div className="py-1">
               <Menu.Item>
                 <DropdownElement>
                   <p className="text-sm">{t('signed_in_as')}</p>
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.email}
-                  </p>
+                  <p className="text-sm font-medium truncate">{user?.email}</p>
                 </DropdownElement>
               </Menu.Item>
             </div>

@@ -132,7 +132,7 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {invoice && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm">{t('status')}</span>
               <InvoiceStatusBadge entity={invoice} />
             </div>
           )}

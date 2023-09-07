@@ -15,6 +15,7 @@ import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
 import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
+import { useColorScheme } from '$app/common/colors';
 
 export interface NavigationItem {
   name: string;
@@ -41,6 +42,7 @@ export function DesktopSidebar(props: Props) {
   );
 
   const logo = useLogo();
+  const colors = useColorScheme();
 
   return (
     <div
@@ -48,8 +50,11 @@ export function DesktopSidebar(props: Props) {
         isMiniSidebar ? 'md:w-16' : 'md:w-64'
       } md:flex-col md:fixed md:inset-y-0`}
     >
-      <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray overflow-y-auto border-r">
-        <div className="flex items-center flex-shrink-0 pl-3 pr-6 bg-ninja-gray h-16 border-b border-gray-600">
+      <div
+        style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
+        className="flex flex-col flex-grow overflow-y-auto border-r"
+      >
+        <div style={{ borderColor: colors.$5 }} className="flex items-center flex-shrink-0 pl-3 pr-6 h-16 border-b">
           {isMiniSidebar ? (
             <img className="w-8" src={logo} alt="Company logo" />
           ) : (
