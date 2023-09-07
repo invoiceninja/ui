@@ -81,7 +81,6 @@ export default function Dashboard() {
             <UpcomingQuotes />
           </div>
         )}
-
       </div>
     </Default>
   );
