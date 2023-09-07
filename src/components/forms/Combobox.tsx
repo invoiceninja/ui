@@ -154,7 +154,7 @@ export function ComboboxStatic({
 
     setIsOpen(false);
 
-    if (comboboxInputRef.current) {
+    if (comboboxInputRef?.current) {
       comboboxInputRef.current.blur();
     }
   }, [selectedValue]);
