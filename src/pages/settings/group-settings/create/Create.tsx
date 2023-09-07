@@ -25,12 +25,12 @@ import { Card } from '$app/components/cards';
 export function Create() {
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('create_group');
+  const { documentTitle } = useTitle('new_group');
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('group_settings'), href: '/settings/group_settings' },
-    { name: t('create_group'), href: '/settings/group_settings/create' },
+    { name: t('new_group'), href: '/settings/group_settings/create' },
   ];
 
   const [groupSettings, setGroupSettings] = useState<GroupSettings>();
@@ -62,7 +62,7 @@ export function Create() {
       disableSaveButton={isFormBusy || !groupSettings}
     >
       {groupSettings && (
-        <Card title={t('create_group')}>
+        <Card title={t('new_group')}>
           <GroupSettingsForm
             groupSettings={groupSettings}
             handleChange={handleChange}
