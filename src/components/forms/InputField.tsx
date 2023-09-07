@@ -36,6 +36,7 @@ interface Props extends CommonProps {
   step?: string;
   maxLength?: number;
   autoComplete?: string;
+  withoutLabelWrapping?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -60,7 +61,12 @@ export function InputField(props: Props) {
   return (
     <section>
       {props.label && (
-        <InputLabel className="mb-2" for={props.id}>
+        <InputLabel
+          className={classNames('mb-2', {
+            'whitespace-nowrap': props.withoutLabelWrapping,
+          })}
+          for={props.id}
+        >
           {props.label}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
@@ -68,7 +74,12 @@ export function InputField(props: Props) {
 
       <div className="relative">
         <DebounceInput
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, ...props.style }}
+          style={{
+            backgroundColor: colors.$1,
+            borderColor: colors.$5,
+            color: colors.$3,
+            ...props.style,
+          }}
           min={props.min}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
