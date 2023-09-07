@@ -286,7 +286,7 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank>
+                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={mapData.mappings[props.entity].available[mapData.mappings[props.entity]?.hints[index]] ?? null}>
                       {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
                           <option value={mapping} key={index}>
