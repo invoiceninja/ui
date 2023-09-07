@@ -8,10 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface SearchRecord {
-    name: string;
-    type: number;
-    id: string;
-    path: string;
+export interface SearchResponse {
+  client_contacts: SearchRecord[];
+  clients: SearchRecord[];
+  invoices: SearchRecord[];
+  settings: SearchRecord[];
+}
 
+export interface SearchRecord {
+  name: string;
+  type: number;
+  id: string;
+  path: string;
 }
