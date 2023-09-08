@@ -12,18 +12,13 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
-import { TabGroup } from '$app/components/TabGroup';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import {
-  Authorization,
-  Customize,
-  Messages,
-  Registration,
-  Settings as SettingsComponent,
-} from './components';
+import { useTabs } from './common/hooks/useTabs';
+import { Tabs } from '$app/components/Tabs';
+import { Outlet } from 'react-router-dom';
 
 export function ClientPortal() {
   useTitle('client_portal');
@@ -43,13 +38,7 @@ export function ClientPortal() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
-  const tabs = [
-    t('settings'),
-    t('authorization'),
-    t('registration'),
-    t('messages'),
-    t('customize'),
-  ];
+  const tabs = useTabs();
 
   return (
     <Settings
@@ -63,27 +52,11 @@ export function ClientPortal() {
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
-      <TabGroup tabs={tabs}>
-        <div>
-          <SettingsComponent />
-        </div>
+      <Tabs tabs={tabs} className="mt-6" />
 
-        <div>
-          <Authorization />
-        </div>
-
-        <div>
-          <Registration />
-        </div>
-
-        <div>
-          <Messages />
-        </div>
-
-        <div>
-          <Customize />
-        </div>
-      </TabGroup>
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }

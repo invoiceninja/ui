@@ -45,7 +45,7 @@ export function Address() {
         <Card title={t('address')}>
           <Element leftSide={t('address1')}>
             <InputField
-              value={companyChanges?.settings?.address1}
+              value={companyChanges?.settings?.address1 || ''}
               onChange={handleChange}
               id="settings.address1"
               errorMessage={errors?.errors['settings.address1']}
@@ -54,7 +54,7 @@ export function Address() {
 
           <Element leftSide={t('address2')}>
             <InputField
-              value={companyChanges?.settings?.address2}
+              value={companyChanges?.settings?.address2 || ''}
               onChange={handleChange}
               id="settings.address2"
               errorMessage={errors?.errors['settings.address2']}
@@ -63,7 +63,7 @@ export function Address() {
 
           <Element leftSide={t('city')}>
             <InputField
-              value={companyChanges?.settings?.city}
+              value={companyChanges?.settings?.city || ''}
               onChange={handleChange}
               id="settings.city"
               errorMessage={errors?.errors['settings.city']}
@@ -72,7 +72,7 @@ export function Address() {
 
           <Element leftSide={t('state')}>
             <InputField
-              value={companyChanges?.settings?.state}
+              value={companyChanges?.settings?.state || ''}
               onChange={handleChange}
               id="settings.state"
               errorMessage={errors?.errors['settings.state']}
@@ -81,7 +81,7 @@ export function Address() {
 
           <Element leftSide={t('postal_code')}>
             <InputField
-              value={companyChanges?.settings?.postal_code}
+              value={companyChanges?.settings?.postal_code || ''}
               onChange={handleChange}
               id="settings.postal_code"
               errorMessage={errors?.errors['settings.postal_code']}
@@ -90,12 +90,12 @@ export function Address() {
 
           <Element leftSide={t('country')}>
             <SelectField
-              value={companyChanges?.settings?.country_id}
+              value={companyChanges?.settings?.country_id || ''}
               onChange={handleChange}
               id="settings.country_id"
               errorMessage={errors?.errors['settings.country_id']}
+              withBlank
             >
-              <option value=""></option>
               {statics?.countries.map((size: { id: string; name: string }) => (
                 <option key={size.id} value={size.id}>
                   {size.name}

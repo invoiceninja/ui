@@ -20,7 +20,9 @@ import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { useAtom, useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
+import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
@@ -37,7 +39,15 @@ export function App() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const switchToCompanySettings = useSwitchToCompanySettings();
+
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+
+  const { isCompanySettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
+
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
 
   const resolveLanguage = useResolveLanguage();
@@ -58,7 +68,7 @@ export function App() {
   const [colorScheme] = useAtom(colorSchemeAtom);
 
   useEffect(() => {
-    document.body.style.backgroundColor = colorScheme.$2
+    document.body.style.backgroundColor = colorScheme.$2;
   }, [colorScheme]);
 
   useEffect(() => {
@@ -108,6 +118,22 @@ export function App() {
       setIsCompanyEditModalOpened(true);
     }
   }, [company]);
+
+  useEffect(() => {
+    if (
+      !location.pathname.startsWith('/settings') &&
+      !isCompanySettingsActive
+    ) {
+      switchToCompanySettings();
+    }
+
+    if (
+      location.pathname.startsWith('/settings/group_settings') &&
+      isGroupSettingsActive
+    ) {
+      navigate('/settings/company_details');
+    }
+  }, [location]);
 
   return (
     <>

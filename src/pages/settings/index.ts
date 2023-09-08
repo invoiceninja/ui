@@ -23,7 +23,7 @@ export * from './account-management';
 export * from './custom-fields';
 export * from './generated-numbers';
 export * from './email-settings/EmailSettings';
-export * from './client-portal/ClientPortal';
+export * from './client-portal';
 export * from './templates-and-reminders/TemplatesAndReminders';
 export * from './bank-accounts';
 export * from './subscriptions/index';
@@ -31,7 +31,7 @@ export * from './schedules';
 export * from './backup-restore';
 export * from './system-logs/SystemLog';
 
-export * from './group-settings/GroupSettings';
+export * from './group-settings/';
 export * from './users';
 export * from './payment-terms';
 export * from './tax-rates';
