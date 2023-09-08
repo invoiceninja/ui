@@ -223,6 +223,8 @@ export default function Create() {
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
                 handleChange('currency_id', client?.settings.currency_id);
+                handleChange('invoices', []);
+                handleChange('credits', []);
               }}
               onClearButtonClick={() => {
                 handleChange('client_id', '');
