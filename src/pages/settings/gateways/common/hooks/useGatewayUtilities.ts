@@ -34,6 +34,8 @@ export function useGatewayUtilities(params: Params) {
     status: 'active',
   });
 
+  console.log(companyChanges?.settings?.company_gateway_ids);
+
   const handleChange = (property: string, value: string) => {
     dispatch(
       updateChanges({
