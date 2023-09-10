@@ -243,20 +243,7 @@ export function DocumentsTable(props: Props) {
                     {t('download')}
                   </DropdownElement>
 
-                  {!document.is_public && (
-                    <DropdownElement
-                      onClick={() => {
-                        setDocumentPublic(document.id).then(() =>
-                          props.onDocumentDelete?.()
-                        );
-                      }}
-                      icon={<Icon element={MdOutlineLockOpen} />}
-                    >
-                      {t('set_public')}
-                    </DropdownElement>
-                  )}
-
-                  {document.is_public && (
+                  {document.is_public ? (
                     <DropdownElement
                       onClick={() => {
                         setDocumentPrivate(document.id).then(() =>
@@ -266,6 +253,17 @@ export function DocumentsTable(props: Props) {
                       icon={<Icon element={MdLockOutline} />}
                     >
                       {t('set_private')}
+                    </DropdownElement>
+                  ) : (
+                    <DropdownElement
+                      onClick={() => {
+                        setDocumentPublic(document.id).then(() =>
+                          props.onDocumentDelete?.()
+                        );
+                      }}
+                      icon={<Icon element={MdOutlineLockOpen} />}
+                    >
+                      {t('set_public')}
                     </DropdownElement>
                   )}
 
