@@ -40,12 +40,15 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export function GatewaysTable() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
   const bulk = useBulk();
+
+  const handleCompanySave = useHandleCompanySave();
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -97,6 +100,18 @@ export function GatewaysTable() {
     return STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
   };
 
+  const handleSaveBulkActionsChanges = (ids: string[]) => {
+    handleChange(
+      'settings.company_gateway_ids',
+      currentGateways
+        .filter(({ id }) => !ids.includes(id))
+        .map(({ id }) => id)
+        .join(',')
+    );
+
+    handleCompanySave();
+  };
+
   useEffect(() => {
     if (gateways) {
       setCurrentGateways(gateways.filter((gateway) => gateway));
@@ -106,7 +121,7 @@ export function GatewaysTable() {
   useEffect(() => {
     if (gateways) {
       const filteredSelectedResources = gateways.filter(
-        (resource: CompanyGateway) => selected.includes(resource.id)
+        (resource: CompanyGateway) => resource && selected.includes(resource.id)
       );
 
       setSelectedResources(filteredSelectedResources);
@@ -119,7 +134,9 @@ export function GatewaysTable() {
         <Dropdown label={t('more_actions')} disabled={!selected.length}>
           <DropdownElement
             onClick={() => {
-              bulk(selected, 'archive');
+              bulk(selected, 'archive').then(() =>
+                handleSaveBulkActionsChanges(selected)
+              );
 
               handleDeselect();
             }}
@@ -130,7 +147,10 @@ export function GatewaysTable() {
 
           <DropdownElement
             onClick={() => {
-              bulk(selected, 'delete');
+              bulk(selected, 'delete').then(() => {
+                console.log('ok2');
+                handleSaveBulkActionsChanges(selected);
+              });
 
               handleDeselect();
             }}
@@ -142,7 +162,9 @@ export function GatewaysTable() {
           {showRestoreBulkAction() && (
             <DropdownElement
               onClick={() => {
-                bulk(selected, 'restore');
+                bulk(selected, 'restore').then(() =>
+                  handleSaveBulkActionsChanges(selected)
+                );
 
                 handleDeselect();
               }}

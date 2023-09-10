@@ -34,8 +34,6 @@ export function useGatewayUtilities(params: Params) {
     status: 'active',
   });
 
-  console.log(companyChanges?.settings?.company_gateway_ids);
-
   const handleChange = (property: string, value: string) => {
     dispatch(
       updateChanges({
@@ -73,6 +71,9 @@ export function useGatewayUtilities(params: Params) {
     }
   };
 
+  console.log(companyChanges?.settings.company_gateway_ids);
+  console.log(companyGatewaysResponse?.data.data);
+
   useEffect(() => {
     if (companyGatewaysResponse) {
       if (companyChanges?.settings.company_gateway_ids) {
@@ -84,6 +85,8 @@ export function useGatewayUtilities(params: Params) {
                 (gateway: CompanyGateway) => gateway.id === id
               )
             );
+
+        console.log(filteredCompanyGateways);
 
         setCurrentSettingGateways(filteredCompanyGateways);
       } else {
