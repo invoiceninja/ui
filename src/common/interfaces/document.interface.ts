@@ -19,6 +19,7 @@ export interface Document {
   width: number;
   is_default: boolean;
   is_deleted: boolean;
+  is_public: boolean;
   name: string;
   preview: string;
   project_id: string;

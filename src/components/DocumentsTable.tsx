@@ -16,7 +16,13 @@ import { Document } from '$app/common/interfaces/document.interface';
 import prettyBytes from 'pretty-bytes';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
+import {
+  MdDelete,
+  MdDownload,
+  MdLockOutline,
+  MdOutlineLockOpen,
+  MdPageview,
+} from 'react-icons/md';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
@@ -30,6 +36,10 @@ import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AxiosResponse } from 'axios';
+import {
+  useSetDocumentPrivate,
+  useSetDocumentPublic,
+} from '$app/common/queries/documents';
 
 interface Props {
   documents: Document[];
@@ -44,6 +54,9 @@ interface DocumentUrl {
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
   const reactSettings = useReactSettings();
+
+  const setDocumentPublic = useSetDocumentPublic();
+  const setDocumentPrivate = useSetDocumentPrivate();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
@@ -184,6 +197,12 @@ export function DocumentsTable(props: Props) {
                   <div className="flex items-center space-x-2">
                     <FileIcon type={document.type} />
                     <span>{document.name}</span>
+
+                    {document.is_public ? (
+                      <Icon element={MdOutlineLockOpen} size={27} />
+                    ) : (
+                      <Icon element={MdLockOutline} size={27} />
+                    )}
                   </div>
 
                   {reactSettings.show_document_preview &&
@@ -223,6 +242,32 @@ export function DocumentsTable(props: Props) {
                   >
                     {t('download')}
                   </DropdownElement>
+
+                  {!document.is_public && (
+                    <DropdownElement
+                      onClick={() => {
+                        setDocumentPublic(document.id).then(() =>
+                          props.onDocumentDelete?.()
+                        );
+                      }}
+                      icon={<Icon element={MdOutlineLockOpen} />}
+                    >
+                      {t('set_public')}
+                    </DropdownElement>
+                  )}
+
+                  {document.is_public && (
+                    <DropdownElement
+                      onClick={() => {
+                        setDocumentPrivate(document.id).then(() =>
+                          props.onDocumentDelete?.()
+                        );
+                      }}
+                      icon={<Icon element={MdLockOutline} />}
+                    >
+                      {t('set_private')}
+                    </DropdownElement>
+                  )}
 
                   <DropdownElement
                     onClick={() => {

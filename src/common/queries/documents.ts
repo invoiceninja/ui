@@ -40,3 +40,23 @@ export const useDocumentsBulk = () => {
     }).then(() => toast.success('exported_data'));
   };
 };
+
+export const useSetDocumentPublic = () => {
+  return async (id: string) => {
+    toast.processing();
+
+    return request('PUT', endpoint('/api/v1/documents/:id', { id }), {
+      is_public: true,
+    }).then(() => toast.success('success'));
+  };
+};
+
+export const useSetDocumentPrivate = () => {
+  return async (id: string) => {
+    toast.processing();
+
+    return request('PUT', endpoint('/api/v1/documents/:id', { id }), {
+      is_public: false,
+    }).then(() => toast.success('success'));
+  };
+};
