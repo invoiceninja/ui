@@ -210,14 +210,15 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                    ] || ''
+                    ] || 0
                   }
                   onValueChange={(value) =>
                     handleChange(
                       `settings.num_days_reminder${reminderIndex}`,
-                      value
+                      value ?? 0
                     )
                   }
+                  type='number'
                 />
               </Element>
 

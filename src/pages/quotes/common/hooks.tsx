@@ -152,14 +152,14 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     setQuote((current) => current && { ...current, line_items: lineItems });
   };
 
-  const handleCreateLineItem = () => {
+  const handleCreateLineItem = (typeId: InvoiceItemType) => {
     setQuote(
       (current) =>
         current && {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            { ...blankLineItem(), type_id: typeId },
           ],
         }
     );
