@@ -23,8 +23,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { Document } from '$app/common/interfaces/document.interface';
 import {
   useDocumentsQuery,
-  useSetDocumentPrivate,
-  useSetDocumentPublic,
+  useSetDocumentVisibility,
 } from '$app/common/queries/documents';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -56,8 +55,7 @@ export function Table() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const reactSettings = useReactSettings();
-  const setDocumentPublic = useSetDocumentPublic();
-  const setDocumentPrivate = useSetDocumentPrivate();
+  const setDocumentVisibility = useSetDocumentVisibility();
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
@@ -224,7 +222,7 @@ export function Table() {
                     {document.is_public ? (
                       <DropdownElement
                         onClick={() => {
-                          setDocumentPrivate(document.id).then(() =>
+                          setDocumentVisibility(document.id, false).then(() =>
                             invalidateDocumentsQuery()
                           );
                         }}
@@ -235,7 +233,7 @@ export function Table() {
                     ) : (
                       <DropdownElement
                         onClick={() => {
-                          setDocumentPublic(document.id).then(() =>
+                          setDocumentVisibility(document.id, true).then(() =>
                             invalidateDocumentsQuery()
                           );
                         }}

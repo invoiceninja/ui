@@ -36,10 +36,7 @@ import { useQueryClient } from 'react-query';
 import { Spinner } from './Spinner';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AxiosResponse } from 'axios';
-import {
-  useSetDocumentPrivate,
-  useSetDocumentPublic,
-} from '$app/common/queries/documents';
+import { useSetDocumentVisibility } from '$app/common/queries/documents';
 
 interface Props {
   documents: Document[];
@@ -55,8 +52,7 @@ export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
   const reactSettings = useReactSettings();
 
-  const setDocumentPublic = useSetDocumentPublic();
-  const setDocumentPrivate = useSetDocumentPrivate();
+  const setDocumentVisibility = useSetDocumentVisibility();
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
@@ -246,7 +242,7 @@ export function DocumentsTable(props: Props) {
                   {document.is_public ? (
                     <DropdownElement
                       onClick={() => {
-                        setDocumentPrivate(document.id).then(() =>
+                        setDocumentVisibility(document.id, false).then(() =>
                           props.onDocumentDelete?.()
                         );
                       }}
@@ -257,7 +253,7 @@ export function DocumentsTable(props: Props) {
                   ) : (
                     <DropdownElement
                       onClick={() => {
-                        setDocumentPublic(document.id).then(() =>
+                        setDocumentVisibility(document.id, true).then(() =>
                           props.onDocumentDelete?.()
                         );
                       }}
