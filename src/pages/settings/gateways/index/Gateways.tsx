@@ -15,5 +15,10 @@ export const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 export function Gateways() {
   const { isGroupSettingsActive } = useCurrentSettingsLevel();
 
-  return <GatewaysTable includeRemoveAction={isGroupSettingsActive} />;
+  return (
+    <GatewaysTable
+      includeRemoveAction={isGroupSettingsActive}
+      includeResetAction={isGroupSettingsActive}
+    />
+  );
 }

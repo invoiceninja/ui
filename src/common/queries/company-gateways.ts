@@ -26,7 +26,7 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { status } = params || {};
 
   return useQuery(
-    '/api/v1/company_gateways',
+    ['/api/v1/company_gateways', params],
     () =>
       request(
         'GET',

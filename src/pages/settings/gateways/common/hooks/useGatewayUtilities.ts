@@ -9,11 +9,14 @@
  */
 
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { updateChanges } from '$app/common/stores/slices/company-users';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { MultiValue, SingleValue } from 'react-select';
 
 interface Params {
   currentGateways: CompanyGateway[];
@@ -21,6 +24,8 @@ interface Params {
 }
 export function useGatewayUtilities(params: Params) {
   const dispatch = useDispatch();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { currentGateways, setCurrentGateways } = params;
 
@@ -30,9 +35,23 @@ export function useGatewayUtilities(params: Params) {
     CompanyGateway[]
   >([]);
 
+  const [status, setStatus] = useState<string>('active');
+
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery({
-    status: 'active',
+    status,
   });
+
+  const onStatusChange = (
+    options:
+      | MultiValue<{ value: string; label: string }>
+      | SingleValue<{ value: string; label: string }>
+  ) => {
+    const values: string[] = [];
+
+    (options as SelectOption[]).map((option) => values.push(option.value));
+
+    setStatus(values.join(','));
+  };
 
   const handleChange = (property: string, value: string) => {
     dispatch(
@@ -74,7 +93,7 @@ export function useGatewayUtilities(params: Params) {
   useEffect(() => {
     if (companyGatewaysResponse) {
       if (companyChanges?.settings.company_gateway_ids) {
-        const filteredCompanyGateways =
+        let filteredCompanyGateways =
           companyChanges.settings.company_gateway_ids
             .split(',')
             .map((id: string) =>
@@ -82,6 +101,24 @@ export function useGatewayUtilities(params: Params) {
                 (gateway: CompanyGateway) => gateway.id === id
               )
             );
+
+        filteredCompanyGateways = filteredCompanyGateways.filter(
+          (companyGateway: CompanyGateway) => companyGateway
+        );
+
+        if (isCompanySettingsActive) {
+          (companyGatewaysResponse.data.data as CompanyGateway[]).forEach(
+            (companyGateway) => {
+              const isAlreadyAdded = filteredCompanyGateways.some(
+                (gateway: CompanyGateway) => gateway.id === companyGateway.id
+              );
+
+              if (!isAlreadyAdded) {
+                filteredCompanyGateways.push(companyGateway);
+              }
+            }
+          );
+        }
 
         setCurrentSettingGateways(filteredCompanyGateways);
       } else {
@@ -95,5 +132,6 @@ export function useGatewayUtilities(params: Params) {
     handleChange,
     handleRemoveGateway,
     handleReset,
+    onStatusChange,
   };
 }

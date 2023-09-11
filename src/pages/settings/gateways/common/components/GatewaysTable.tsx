@@ -42,15 +42,21 @@ import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { SelectOption } from '$app/components/datatables/Actions';
+import Select, { StylesConfig } from 'react-select';
+import { useColorScheme } from '$app/common/colors';
 
 interface Params {
   includeRemoveAction: boolean;
+  includeResetAction: boolean;
 }
 export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { includeRemoveAction } = params;
+  const colors = useColorScheme();
+
+  const { includeRemoveAction, includeResetAction } = params;
 
   const bulk = useBulk();
 
@@ -67,11 +73,16 @@ export function GatewaysTable(params: Params) {
     []
   );
 
-  const { gateways, handleChange, handleRemoveGateway, handleReset } =
-    useGatewayUtilities({
-      currentGateways,
-      setCurrentGateways,
-    });
+  const {
+    gateways,
+    handleChange,
+    handleRemoveGateway,
+    handleReset,
+    onStatusChange,
+  } = useGatewayUtilities({
+    currentGateways,
+    setCurrentGateways,
+  });
 
   const handleDeselect = () => {
     setSelected([]);
@@ -122,6 +133,71 @@ export function GatewaysTable(params: Params) {
     }
   };
 
+  const options: SelectOption[] = [
+    {
+      value: 'active',
+      label: t('active'),
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      value: 'archived',
+      label: t('archived'),
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+    {
+      value: 'deleted',
+      label: t('deleted'),
+      color: 'white',
+      backgroundColor: '#c95f53',
+    },
+  ];
+
+  const customStyles: StylesConfig<SelectOption, true> = {
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
+        borderRadius: '3px',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    multiValueRemove: (styles) => ({
+      ...styles,
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
+    }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
+    }),
+  };
+
   useEffect(() => {
     if (gateways) {
       setCurrentGateways(gateways.filter((gateway) => gateway));
@@ -141,53 +217,66 @@ export function GatewaysTable(params: Params) {
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
-        <Dropdown label={t('more_actions')} disabled={!selected.length}>
-          <DropdownElement
-            onClick={() => {
-              bulk(selected, 'archive').then(() =>
-                handleSaveBulkActionsChanges(selected)
-              );
-
-              handleDeselect();
-            }}
-            icon={<Icon element={MdArchive} />}
-          >
-            {t('archive')}
-          </DropdownElement>
-
-          <DropdownElement
-            onClick={() => {
-              bulk(selected, 'delete').then(() =>
-                handleSaveBulkActionsChanges(selected)
-              );
-
-              handleDeselect();
-            }}
-            icon={<Icon element={MdDelete} />}
-          >
-            {t('delete')}
-          </DropdownElement>
-
-          {showRestoreBulkAction() && (
+        <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
+          <Dropdown label={t('more_actions')} disabled={!selected.length}>
             <DropdownElement
               onClick={() => {
-                bulk(selected, 'restore').then(() =>
+                bulk(selected, 'archive').then(() =>
                   handleSaveBulkActionsChanges(selected)
                 );
 
                 handleDeselect();
               }}
-              icon={<Icon element={MdRestore} />}
+              icon={<Icon element={MdArchive} />}
             >
-              {t('restore')}
+              {t('archive')}
             </DropdownElement>
-          )}
-        </Dropdown>
+
+            <DropdownElement
+              onClick={() => {
+                bulk(selected, 'delete').then(() =>
+                  handleSaveBulkActionsChanges(selected)
+                );
+
+                handleDeselect();
+              }}
+              icon={<Icon element={MdDelete} />}
+            >
+              {t('delete')}
+            </DropdownElement>
+
+            {showRestoreBulkAction() && (
+              <DropdownElement
+                onClick={() => {
+                  bulk(selected, 'restore').then(() =>
+                    handleSaveBulkActionsChanges(selected)
+                  );
+
+                  handleDeselect();
+                }}
+                icon={<Icon element={MdRestore} />}
+              >
+                {t('restore')}
+              </DropdownElement>
+            )}
+          </Dropdown>
+
+          <Select
+            styles={customStyles}
+            defaultValue={options[0]}
+            onChange={(options) => onStatusChange(options)}
+            placeholder={t('status')}
+            options={options}
+            isMulti
+          />
+        </div>
 
         <div className="flex space-x-5">
-          <Button behavior="button" type="secondary" onClick={handleReset}>
-            {t('reset')}
-          </Button>
+          {includeResetAction && (
+            <Button behavior="button" type="secondary" onClick={handleReset}>
+              {t('reset')}
+            </Button>
+          )}
 
           <Button
             behavior="button"
