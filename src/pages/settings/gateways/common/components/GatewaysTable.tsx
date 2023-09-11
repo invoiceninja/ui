@@ -41,12 +41,20 @@ import { useNavigate } from 'react-router-dom';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-export function GatewaysTable() {
+interface Params {
+  includeRemoveAction: boolean;
+}
+export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const { includeRemoveAction } = params;
+
   const bulk = useBulk();
+
+  const companyChanges = useCompanyChanges();
 
   const handleCompanySave = useHandleCompanySave();
 
@@ -101,15 +109,17 @@ export function GatewaysTable() {
   };
 
   const handleSaveBulkActionsChanges = (ids: string[]) => {
-    handleChange(
-      'settings.company_gateway_ids',
-      currentGateways
-        .filter(({ id }) => !ids.includes(id))
-        .map(({ id }) => id)
-        .join(',')
-    );
+    if (companyChanges?.settings.company_gateway_ids) {
+      handleChange(
+        'settings.company_gateway_ids',
+        currentGateways
+          .filter(({ id }) => !ids.includes(id))
+          .map(({ id }) => id)
+          .join(',')
+      );
 
-    handleCompanySave();
+      handleCompanySave();
+    }
   };
 
   useEffect(() => {
@@ -147,10 +157,9 @@ export function GatewaysTable() {
 
           <DropdownElement
             onClick={() => {
-              bulk(selected, 'delete').then(() => {
-                console.log('ok2');
-                handleSaveBulkActionsChanges(selected);
-              });
+              bulk(selected, 'delete').then(() =>
+                handleSaveBulkActionsChanges(selected)
+              );
 
               handleDeselect();
             }}
@@ -255,7 +264,7 @@ export function GatewaysTable() {
                           <EntityStatus entity={gateway} />
                         </Td>
 
-                        <Td width="30%">
+                        <Td width={includeRemoveAction ? '30%' : '35%'}>
                           <div className="flex items-center space-x-2">
                             <Link
                               to={route(
@@ -286,19 +295,21 @@ export function GatewaysTable() {
                           </div>
                         </Td>
 
-                        <Td width="20%">
+                        <Td width={includeRemoveAction ? '20%' : '25%'}>
                           {gateway.test_mode ? <Check size={20} /> : ''}
                         </Td>
 
                         <Td width="25%">
                           <div className="flex items-center space-x-7 py-1">
-                            <Button
-                              behavior="button"
-                              type="minimal"
-                              onClick={() => handleRemoveGateway(gateway.id)}
-                            >
-                              {t('remove')}
-                            </Button>
+                            {includeRemoveAction && (
+                              <Button
+                                behavior="button"
+                                type="minimal"
+                                onClick={() => handleRemoveGateway(gateway.id)}
+                              >
+                                {t('remove')}
+                              </Button>
+                            )}
 
                             <Icon element={MdDragHandle} size={25} />
                           </div>

@@ -43,6 +43,8 @@ export function useHandleCompanySave() {
   const shouldUpdate = useShouldUpdateCompany();
 
   return async (excludeToasters?: boolean) => {
+    console.log(!shouldUpdate(), companyChanges?.settings.company_gateway_ids);
+
     if (!shouldUpdate() && isCompanySettingsActive) {
       return;
     }
