@@ -127,7 +127,13 @@ export const settingsRoutes = (
           element={<Settings.RecurringExpensesGeneratedNumbers />}
         />
       </Route>
-      <Route path="client_portal" element={<Settings.ClientPortal />} />
+      <Route path="client_portal" element={<Settings.ClientPortal />}>
+        <Route path="" element={<Settings.ClientPortalSettings />} />
+        <Route path="authorization" element={<Settings.Authorization />} />
+        <Route path="registration" element={<Settings.Registration />} />
+        <Route path="messages" element={<Settings.Messages />} />
+        <Route path="customize" element={<Settings.Customize />} />
+      </Route>
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"
@@ -139,7 +145,11 @@ export const settingsRoutes = (
         <Route path="create" element={<Settings.CreateBankAccount />} />
         <Route path=":id/edit" element={<Settings.EditBankAccount />} />
       </Route>
-      <Route path="group_settings" element={<Settings.GroupSettings />} />
+      <Route path="group_settings">
+        <Route path="" element={<Settings.GroupSettings />} />
+        <Route path="create" element={<Settings.CreateGroupSettings />} />
+        <Route path=":id/edit" element={<Settings.EditGroupSettings />} />
+      </Route>
       <Route path="subscriptions">
         <Route path="" element={<Settings.Subscriptions />} />
         <Route path="create" element={<Settings.CreateSubscription />} />

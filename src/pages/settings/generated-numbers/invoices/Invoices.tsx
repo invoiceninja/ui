@@ -60,7 +60,7 @@ export function Invoices() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.invoice_number_pattern"
-          value={companyChanges?.settings?.invoice_number_pattern}
+          value={companyChanges?.settings?.invoice_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.invoice_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Invoices() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.invoice_number_counter"
-          value={companyChanges?.settings?.invoice_number_counter}
+          value={companyChanges?.settings?.invoice_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.invoice_number_counter']}
         />

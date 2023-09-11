@@ -61,7 +61,17 @@ export function SortableVariableList(props: Props) {
 
     const companyClone = cloneDeep(company);
 
-    companyClone.settings.pdf_variables?.[props.for].push(selectedOption.value);
+    if (!companyClone.settings.pdf_variables) {
+      set(companyClone, 'settings.pdf_variables', {});
+
+      if (!companyClone.settings?.pdf_variables?.[props.for]) {
+        set(companyClone, `settings.pdf_variables.${props.for}`, []);
+      }
+    }
+
+    companyClone.settings.pdf_variables?.[props.for]?.push(
+      selectedOption.value
+    );
 
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
 

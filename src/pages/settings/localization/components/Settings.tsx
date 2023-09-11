@@ -27,10 +27,13 @@ import { useAtom, useAtomValue } from 'jotai';
 import { hasLanguageChanged } from '../common/atoms';
 import { ChangeEvent } from 'react';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Settings() {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const dispatch = useDispatch();
   const company = useInjectCompanyChanges();
@@ -102,7 +105,9 @@ export function Settings() {
             }
             name="show_currency_code"
             options={currencyFormats}
-            defaultSelected={company?.settings?.show_currency_code.toString()}
+            defaultSelected={
+              company?.settings?.show_currency_code?.toString() ?? 'false'
+            }
           />
         </Element>
 
@@ -155,7 +160,7 @@ export function Settings() {
 
         <Element leftSide={t('military_time')}>
           <Toggle
-            checked={company?.settings?.military_time}
+            checked={Boolean(company?.settings?.military_time)}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({
@@ -168,30 +173,32 @@ export function Settings() {
           />
         </Element>
 
-        <Divider />
+        {isCompanySettingsActive && <Divider />}
 
-        <Element leftSide={t('first_month_of_the_year')}>
-          <SelectField
-            id="first_month_of_year"
-            value={company?.first_month_of_year || ''}
-            onChange={handleChange}
-            errorMessage={errors?.errors['settings.first_month_of_year']}
-          >
-            <option value="">{/*  */}</option>
-            <option value="1">{t('january')}</option>
-            <option value="2">{t('february')}</option>
-            <option value="3">{t('march')}</option>
-            <option value="4">{t('april')}</option>
-            <option value="5">{t('may')}</option>
-            <option value="6">{t('june')}</option>
-            <option value="7">{t('july')}</option>
-            <option value="8">{t('august')}</option>
-            <option value="9">{t('september')}</option>
-            <option value="10">{t('october')}</option>
-            <option value="11">{t('november')}</option>
-            <option value="12">{t('december')}</option>
-          </SelectField>
-        </Element>
+        {isCompanySettingsActive && (
+          <Element leftSide={t('first_month_of_the_year')}>
+            <SelectField
+              id="first_month_of_year"
+              value={company?.first_month_of_year || ''}
+              onChange={handleChange}
+              errorMessage={errors?.errors['settings.first_month_of_year']}
+            >
+              <option value="">{/*  */}</option>
+              <option value="1">{t('january')}</option>
+              <option value="2">{t('february')}</option>
+              <option value="3">{t('march')}</option>
+              <option value="4">{t('april')}</option>
+              <option value="5">{t('may')}</option>
+              <option value="6">{t('june')}</option>
+              <option value="7">{t('july')}</option>
+              <option value="8">{t('august')}</option>
+              <option value="9">{t('september')}</option>
+              <option value="10">{t('october')}</option>
+              <option value="11">{t('november')}</option>
+              <option value="12">{t('december')}</option>
+            </SelectField>
+          </Element>
+        )}
       </Card>
     </>
   );

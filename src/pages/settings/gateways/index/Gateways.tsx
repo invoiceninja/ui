@@ -17,11 +17,15 @@ import { route } from '$app/common/helpers/route';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Tooltip } from '$app/components/Tooltip';
 import { MdWarning } from 'react-icons/md';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { GatewaysTable } from '../common/components/GatewaysTable';
 
+export const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 export function Gateways() {
   const [t] = useTranslation();
 
-  const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
+  const { isCompanySettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
 
   const columns: DataTableColumns<CompanyGateway> = [
     {
@@ -73,14 +77,20 @@ export function Gateways() {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      resource="company_gateway"
-      endpoint="/api/v1/company_gateways?sort=id|desc"
-      bulkRoute="/api/v1/company_gateways/bulk"
-      linkToCreate="/settings/gateways/create"
-      linkToEdit="/settings/gateways/:id/edit"
-      withResourcefulActions
-    />
+    <>
+      {isCompanySettingsActive && (
+        <DataTable
+          columns={columns}
+          resource="company_gateway"
+          endpoint="/api/v1/company_gateways?sort=id|desc"
+          bulkRoute="/api/v1/company_gateways/bulk"
+          linkToCreate="/settings/gateways/create"
+          linkToEdit="/settings/gateways/:id/edit"
+          withResourcefulActions
+        />
+      )}
+
+      {isGroupSettingsActive && <GatewaysTable />}
+    </>
   );
 }

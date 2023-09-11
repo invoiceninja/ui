@@ -35,6 +35,8 @@ import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -150,6 +152,7 @@ export default function Create() {
   }, [quote]);
 
   const save = useCreate({ setErrors });
+  const taskColumns = useTaskColumns()
 
   return (
     <Default
@@ -173,24 +176,56 @@ export default function Create() {
         <QuoteDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {quote && client ? (
-            <ProductsTable
-              type="product"
-              resource={quote}
-              items={quote.line_items.filter(
-                (item) => item.type_id === InvoiceItemType.Product
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
+            <div>
+              {quote && client ? (
+                <ProductsTable
+                  type="product"
+                  resource={quote}
+                  items={quote.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Product
+                  )}
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Product)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
               )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
-          ) : (
-            <Spinner />
-          )}
+            </div>
+
+            <div>
+              {quote && client ? (
+                <ProductsTable
+                  type="task"
+                  resource={quote}
+                  items={quote.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
+                  )}
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Task)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          </TabGroup>
         </div>
 
         <QuoteFooter handleChange={handleChange} errors={errors} />

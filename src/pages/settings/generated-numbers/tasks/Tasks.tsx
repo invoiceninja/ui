@@ -60,7 +60,7 @@ export function Tasks() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.task_number_pattern"
-          value={companyChanges?.settings?.task_number_pattern}
+          value={companyChanges?.settings?.task_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.task_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Tasks() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.task_number_counter"
-          value={companyChanges?.settings?.task_number_counter}
+          value={companyChanges?.settings?.task_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.task_number_counter']}
         />

@@ -19,6 +19,12 @@ import { Default } from './Default';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
+import { Icon } from '../icons/Icon';
+import { MdClose } from 'react-icons/md';
+import { FaObjectGroup } from 'react-icons/fa';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 
@@ -45,6 +51,9 @@ const LinkStyled = styled(Link)`
 export function Settings(props: Props) {
   const [t] = useTranslation();
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+  const activeSettings = useActiveSettingsDetails();
+  const switchToCompanySettings = useSwitchToCompanySettings();
+  const { isGroupSettingsActive } = useCurrentSettingsLevel();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,6 +79,30 @@ export function Settings(props: Props) {
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
+          {isGroupSettingsActive && (
+            <div
+              className="flex items-center justify-between border py-3 rounded space-x-3 px-2"
+              style={{
+                backgroundColor: colors.$1,
+                borderColor: colors.$5,
+              }}
+            >
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                <div>
+                  <Icon element={FaObjectGroup} size={20} />
+                </div>
+
+                <span className="text-sm truncate">
+                  {t('group_settings')}: {activeSettings.name}
+                </span>
+              </div>
+
+              <div className="cursor-pointer" onClick={switchToCompanySettings}>
+                <Icon element={MdClose} size={20} />
+              </div>
+            </div>
+          )}
+
           <a className="flex items-center py-4 px-3 text-xs uppercase font-medium">
             <span className="truncate">{t('basic_settings')}</span>
           </a>

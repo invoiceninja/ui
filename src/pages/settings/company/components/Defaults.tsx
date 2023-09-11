@@ -56,7 +56,7 @@ export function Defaults() {
         <Card title={t('defaults')}>
           <Element leftSide={t('payment_type')}>
             <SelectField
-              value={companyChanges?.settings?.payment_type_id}
+              value={companyChanges?.settings?.payment_type_id || '0'}
               onChange={handleChange}
               id="settings.payment_type_id"
               blankOptionValue="0"
@@ -76,7 +76,7 @@ export function Defaults() {
           {terms && (
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
-                value={companyChanges?.settings?.valid_until}
+                value={companyChanges?.settings?.valid_until || ''}
                 id="settings.valid_until"
                 onChange={handleChange}
                 withBlank
@@ -93,7 +93,9 @@ export function Defaults() {
 
           <Element leftSide={t('expense_payment_type')}>
             <SelectField
-              value={companyChanges?.settings?.default_expense_payment_type_id}
+              value={
+                companyChanges?.settings?.default_expense_payment_type_id || ''
+              }
               onChange={handleChange}
               id="settings.default_expense_payment_type_id"
               blankOptionValue="0"
@@ -115,12 +117,12 @@ export function Defaults() {
           <Divider />
 
           <Element
-            className="mb-3.5"
+            className="mb-3"
             leftSide={t('use_quote_terms')}
             leftSideHelp={t('use_quote_terms_help')}
           >
             <Toggle
-              checked={companyChanges?.use_quote_terms_on_conversion}
+              checked={Boolean(companyChanges?.use_quote_terms_on_conversion)}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({

@@ -61,7 +61,7 @@ export function Payments() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.payment_number_pattern"
-          value={companyChanges?.settings?.payment_number_pattern}
+          value={companyChanges?.settings?.payment_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.payment_number_pattern']}
         />
@@ -69,7 +69,7 @@ export function Payments() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.payment_number_counter"
-          value={companyChanges?.settings?.payment_number_counter}
+          value={companyChanges?.settings?.payment_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.payment_number_counter']}
         />

@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { AxiosResponse } from 'axios';
-import { endpoint } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
@@ -23,6 +22,11 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { endpoint } from '$app/common/helpers';
+import { useAtomValue } from 'jotai';
+import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -30,22 +34,44 @@ export function Logo() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(new FormData());
   const logo = useLogo();
+
+  const { isGroupSettingsActive, isCompanySettingsActive } =
+    useCurrentSettingsLevel();
+
+  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+
+  const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: formData,
     onSubmit: () => {
       toast.processing();
 
-      request(
-        'POST',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      )
+      let endpointRoute = '/api/v1/companies/:id';
+
+      let entityId = company.id;
+
+      if (isGroupSettingsActive && activeGroupSettings) {
+        endpointRoute = '/api/v1/group_settings/:id';
+        entityId = activeGroupSettings.id;
+      }
+
+      request('POST', endpoint(endpointRoute, { id: entityId }), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
         .then((response: AxiosResponse) => {
-          dispatch(
-            updateRecord({ object: 'company', data: response.data.data })
-          );
+          if (isCompanySettingsActive) {
+            dispatch(
+              updateRecord({ object: 'company', data: response.data.data })
+            );
+          }
+
+          if (isGroupSettingsActive) {
+            configureGroupSettings(response.data.data);
+          }
 
           toast.success('uploaded_logo');
         })

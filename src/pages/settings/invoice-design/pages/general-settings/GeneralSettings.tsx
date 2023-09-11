@@ -32,6 +32,7 @@ import { useAtom } from 'jotai';
 import { updatingRecordsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -44,6 +45,8 @@ export interface GeneralSettingsPayload {
 export default function GeneralSettings() {
   const company = useInjectCompanyChanges();
   const onSave = useHandleCompanySave();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const [payload, setPayload] = useState<GeneralSettingsPayload>({
     client_id: '-1',
@@ -92,18 +95,23 @@ export default function GeneralSettings() {
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
           <InvoiceGeneralSettings />
-          <ClientDetails />
-          <CompanyDetails />
-          <CompanyAddress />
-          <InvoiceDetails />
-          <QuoteDetails />
-          <CreditDetails />
-          <VendorDetails />
-          <PurchaseOrderDetails />
-          <ProductColumns />
-          <ProductQuoteColumns />
-          <TaskColumns />
-          <TotalFields />
+
+          {isCompanySettingsActive && (
+            <>
+              <ClientDetails />
+              <CompanyDetails />
+              <CompanyAddress />
+              <InvoiceDetails />
+              <QuoteDetails />
+              <CreditDetails />
+              <VendorDetails />
+              <PurchaseOrderDetails />
+              <ProductColumns />
+              <ProductQuoteColumns />
+              <TaskColumns />
+              <TotalFields />
+            </>
+          )}
         </div>
       </div>
 
