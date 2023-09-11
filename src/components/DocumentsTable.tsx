@@ -46,7 +46,7 @@ interface Props {
   onDocumentDelete?: () => unknown;
 }
 
-interface DocumentUrl {
+export interface DocumentUrl {
   documentId: string;
   url: string;
 }
