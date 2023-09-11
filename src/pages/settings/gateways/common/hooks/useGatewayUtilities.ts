@@ -49,8 +49,6 @@ export function useGatewayUtilities(params: Params) {
       ({ id }) => id !== gatewayId
     );
 
-    console.log(currentGateways, filteredGateways);
-
     setCurrentGateways(filteredGateways);
 
     handleChange(
