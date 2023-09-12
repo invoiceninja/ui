@@ -56,6 +56,10 @@ export function useGenerateActivityElement() {
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
+    if (activity.activity_type_id === 4) {
+      text = text.replace(":user", `${t('recurring_invoice')} :recurring_invoice`);
+    }
+
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
@@ -70,9 +74,20 @@ export function useGenerateActivityElement() {
         >
           {activity?.invoice?.label}
         </Link>
-      ),
-    };
+      ) ?? '',
+    
+      recurring_invoice: (
+        <Link
+          to={route('/recurring_invoices/:id/edit', {
+            id: activity?.recurring_invoice?.hashed_id,
+          })}
+        >
+          {activity?.recurring_invoice?.label}
+        </Link>
+      ) ?? '',
 
+      contact: '',
+    };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
