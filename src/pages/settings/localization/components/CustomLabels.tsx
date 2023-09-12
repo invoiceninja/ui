@@ -103,7 +103,10 @@ export function CustomLabels() {
   const handleSelectChange = (property: string): void => {
     const company = cloneDeep(companyChanges);
 
-    if (company.settings.translations.length <= 1) {
+    if (
+      company.settings.translations?.length <= 1 ||
+      !company.settings.translations
+    ) {
       company.settings.translations = {};
     }
 

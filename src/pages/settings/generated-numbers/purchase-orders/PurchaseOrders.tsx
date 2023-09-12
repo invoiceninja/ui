@@ -47,7 +47,7 @@ export function PurchaseOrders() {
   const variables = [
     '{$counter}',
     '{$year}',
-    '{$date:format}',
+    '{$date:Y-m-d}',
     '{$user_id}',
     '{$user_custom1}',
     '{$user_custom2}',
@@ -60,7 +60,7 @@ export function PurchaseOrders() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.purchase_order_number_pattern"
-          value={companyChanges?.settings?.purchase_order_number_pattern}
+          value={companyChanges?.settings?.purchase_order_number_pattern || ''}
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.purchase_order_number_pattern']
@@ -70,7 +70,7 @@ export function PurchaseOrders() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.purchase_order_number_counter"
-          value={companyChanges?.settings?.purchase_order_number_counter}
+          value={companyChanges?.settings?.purchase_order_number_counter || ''}
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.purchase_order_number_counter']

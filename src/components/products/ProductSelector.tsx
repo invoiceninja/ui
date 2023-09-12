@@ -50,7 +50,7 @@ export function ProductSelector(props: Props) {
           dropdownLabelFn: (product) => (
             <div>
               <p className="font-semibold">{product.product_key}</p>
-              <p className="text-sm text-gray-800 truncate">
+              <p className="text-sm truncate">
                 {product.notes.length > 35
                   ? product.notes.substring(0, 35).concat('...')
                   : product.notes}

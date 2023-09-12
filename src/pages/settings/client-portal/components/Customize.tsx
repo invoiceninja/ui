@@ -29,7 +29,7 @@ export function Customize() {
       <Element leftSide={t('header')}>
         <InputField
           element="textarea"
-          value={company?.settings.portal_custom_head}
+          value={company?.settings.portal_custom_head || ''}
           onValueChange={(value) =>
             handleChange('settings.portal_custom_head', value)
           }
@@ -40,7 +40,7 @@ export function Customize() {
       <Element leftSide={t('footer')}>
         <InputField
           element="textarea"
-          value={company?.settings.portal_custom_footer}
+          value={company?.settings.portal_custom_footer || ''}
           onValueChange={(value) =>
             handleChange('settings.portal_custom_footer', value)
           }
@@ -53,7 +53,7 @@ export function Customize() {
           <Element leftSide={t('custom_css')}>
             <InputField
               element="textarea"
-              value={company?.settings.portal_custom_css}
+              value={company?.settings.portal_custom_css || ''}
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_css', value)
               }
@@ -64,7 +64,7 @@ export function Customize() {
           <Element leftSide={t('custom_javascript')}>
             <InputField
               element="textarea"
-              value={company?.settings.portal_custom_js}
+              value={company?.settings.portal_custom_js || ''}
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_js', value)
               }

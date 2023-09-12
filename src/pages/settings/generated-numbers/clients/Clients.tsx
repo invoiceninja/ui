@@ -47,7 +47,7 @@ export function Clients() {
   const variables = [
     '{$counter}',
     '{$year}',
-    '{$date:format}',
+    '{$date:Y-m-d}',
     '{$user_id}',
     '{$user_custom1}',
     '{$user_custom2}',
@@ -60,7 +60,7 @@ export function Clients() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.client_number_pattern"
-          value={companyChanges?.settings?.client_number_pattern}
+          value={companyChanges?.settings?.client_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.client_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Clients() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.client_number_counter"
-          value={companyChanges?.settings?.client_number_counter}
+          value={companyChanges?.settings?.client_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.client_number_counter']}
         />

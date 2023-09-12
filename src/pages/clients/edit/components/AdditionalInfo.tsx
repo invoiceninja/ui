@@ -237,7 +237,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           </Element>
         </div>
 
-        <div className='-mx-5'>
+        <div className="-mx-5">
           {statics && (
             <Element leftSide={t('size_id')}>
               <SelectField

@@ -23,11 +23,15 @@ import { request } from '$app/common/helpers/request';
 import { useState } from 'react';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { freePlan } from '$app/common/guards/guards/free-plan';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import classNames from 'classnames';
 
 export function Settings() {
   const [t] = useTranslation();
 
   useInjectCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useCompanyChanges();
 
@@ -53,7 +57,7 @@ export function Settings() {
 
   return (
     <Card title={t('settings')}>
-      {isHosted() && (
+      {isHosted() && isCompanySettingsActive && (
         <>
           <Element
             leftSide={t('portal_mode')}
@@ -62,7 +66,7 @@ export function Settings() {
             <SelectField
               disabled={freePlan()}
               id="portal_mode"
-              value={company?.portal_mode}
+              value={company?.portal_mode || 'subdomain'}
               onValueChange={(value) => handleChange('portal_mode', value)}
               errorMessage={errors?.errors.portal_mode}
             >
@@ -78,7 +82,7 @@ export function Settings() {
           {company?.portal_mode === 'subdomain' && (
             <Element leftSide={t('subdomain')}>
               <InputField
-                value={company?.subdomain}
+                value={company?.subdomain || ''}
                 disabled={freePlan()}
                 onValueChange={(value) => checkSubdomain(value)}
                 errorMessage={errors?.errors.subdomain ?? subdomainValidation}
@@ -92,7 +96,7 @@ export function Settings() {
               leftSideHelp="custom domain info"
             >
               <InputField
-                value={company?.portal_domain}
+                value={company?.portal_domain || ''}
                 onValueChange={(value) => handleChange('portal_domain', value)}
                 errorMessage={errors?.errors.portal_domain}
               />
@@ -101,46 +105,51 @@ export function Settings() {
         </>
       )}
 
-      {isSelfHosted() && (
+      {isSelfHosted() && isCompanySettingsActive && (
         <Element leftSide={t('domain_url')}>
           <InputField
-            value={company?.portal_domain}
+            value={company?.portal_domain || ''}
             onValueChange={(value) => handleChange('portal_domain', value)}
             errorMessage={errors?.errors.portal_domain}
           />
         </Element>
       )}
 
+      {isCompanySettingsActive && (
+        <Element
+          leftSide={
+            <span>
+              {t('login')} {t('url')}
+            </span>
+          }
+        >
+          <div className="flex flex-col space-y-1">
+            <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+
+            {isHosted() && company.portal_mode === 'domain' && (
+              <div>
+                <span>{t('app_help_link')}</span>
+                <Link
+                  external
+                  to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
+                >
+                  {t('here')}
+                </Link>
+                .
+              </div>
+            )}
+          </div>
+        </Element>
+      )}
+
+      {isCompanySettingsActive && <Divider />}
+
       <Element
-        leftSide={
-          <span>
-            {t('login')} {t('url')}
-          </span>
-        }
+        className={classNames({ 'mt-4': isCompanySettingsActive })}
+        leftSide={t('client_portal')}
       >
-        <div className="flex flex-col space-y-1">
-          <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
-
-          {isHosted() && company.portal_mode === 'domain' && (
-            <div>
-              <span>{t('app_help_link')}</span>
-              <Link
-                external
-                to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
-              >
-                {t('here')}
-              </Link>
-              .
-            </div>
-          )}
-        </div>
-      </Element>
-
-      <Divider />
-
-      <Element className="mt-4" leftSide={t('client_portal')}>
         <Toggle
-          checked={company?.settings.enable_client_portal}
+          checked={Boolean(company?.settings.enable_client_portal)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal', value)
           }
@@ -152,7 +161,7 @@ export function Settings() {
         leftSideHelp={t('document_upload_help')}
       >
         <Toggle
-          checked={company?.settings.client_portal_enable_uploads}
+          checked={Boolean(company?.settings.client_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.client_portal_enable_uploads', value)
           }
@@ -164,7 +173,7 @@ export function Settings() {
         leftSideHelp={t('vendor_document_upload_help')}
       >
         <Toggle
-          checked={company?.settings.vendor_portal_enable_uploads}
+          checked={Boolean(company?.settings.vendor_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.vendor_portal_enable_uploads', value)
           }
@@ -176,7 +185,9 @@ export function Settings() {
         leftSideHelp={t('accept_purchase_order_number_help')}
       >
         <Toggle
-          checked={company?.settings.accept_client_input_quote_approval}
+          checked={Boolean(
+            company?.settings.accept_client_input_quote_approval
+          )}
           onValueChange={(value) =>
             handleChange('settings.accept_client_input_quote_approval', value)
           }
@@ -195,7 +206,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.client_portal_terms', value)
           }
-          value={company?.settings.client_portal_terms}
+          value={company?.settings.client_portal_terms || ''}
           errorMessage={errors?.errors['settings.client_portal_terms']}
         />
       </Element>
@@ -206,7 +217,7 @@ export function Settings() {
           onValueChange={(value) =>
             handleChange('settings.client_portal_privacy_policy', value)
           }
-          value={company?.settings.client_portal_privacy_policy}
+          value={company?.settings.client_portal_privacy_policy || ''}
           errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>

@@ -153,14 +153,14 @@ export function useRecurringInvoiceUtilities(
     );
   };
 
-  const handleCreateLineItem = () => {
+  const handleCreateLineItem = (typeId: InvoiceItemType) => {
     setRecurringInvoice(
       (recurringInvoice) =>
         recurringInvoice && {
           ...recurringInvoice,
           line_items: [
             ...recurringInvoice.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            { ...blankLineItem(), type_id: typeId },
           ],
         }
     );

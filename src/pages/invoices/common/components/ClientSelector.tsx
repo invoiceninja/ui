@@ -19,6 +19,7 @@ import { ClientSelector as Selector } from '$app/components/clients/ClientSelect
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   readonly?: boolean;
@@ -55,13 +56,14 @@ export function ClientSelector(props: Props) {
   }, [resource?.client_id]);
 
   const hasPermission = useHasPermission();
+  const colors = useColorScheme()
 
   return (
     <>
-      <div className="flex  flex-col justify-between space-y-2">
+      <div className="flex  flex-col justify-between space-y-2" style={{ color: colors.$3 }}>
         {hasPermission('view_client') ? (
           props.textOnly ? (
-            <p className="text-gray-900 text-sm">
+            <p className="text-sm">
               {resource?.client?.display_name}
             </p>
           ) : (
@@ -78,7 +80,7 @@ export function ClientSelector(props: Props) {
             />
           )
         ) : (
-          <p className="text-gray-900 text-sm">
+          <p className="text-sm">
             {resource?.client?.display_name}
           </p>
         )}
@@ -93,7 +95,7 @@ export function ClientSelector(props: Props) {
 
             {hasPermission('view_client') ||
               (hasPermission('edit_client') && (
-                <span className="text-sm text-gray-800">/</span>
+                <span className="text-sm">/</span>
               ))}
 
             {hasPermission('view_client') && (
@@ -127,7 +129,7 @@ export function ClientSelector(props: Props) {
             />
 
             <div>
-              <p className="text-sm text-gray-700">{contact.email}</p>
+              <p className="text-sm" style={{ color: colors.$3 }}>{contact.email}</p>
 
               {resource.invitations.length >= 1 && (
                 <>

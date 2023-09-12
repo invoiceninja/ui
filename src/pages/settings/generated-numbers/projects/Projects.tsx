@@ -47,7 +47,7 @@ export function Projects() {
   const variables = [
     '{$counter}',
     '{$year}',
-    '{$date:format}',
+    '{$date:Y-m-d}',
     '{$user_id}',
     '{$user_custom1}',
     '{$user_custom2}',
@@ -60,7 +60,7 @@ export function Projects() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.project_number_pattern"
-          value={companyChanges?.settings?.project_number_pattern}
+          value={companyChanges?.settings?.project_number_pattern || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.project_number_pattern']}
         />
@@ -68,7 +68,7 @@ export function Projects() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.project_number_counter"
-          value={companyChanges?.settings?.project_number_counter}
+          value={companyChanges?.settings?.project_number_counter || ''}
           onChange={handleChange}
           errorMessage={errors?.errors['settings.project_number_counter']}
         />

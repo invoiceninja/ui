@@ -14,6 +14,7 @@ import { classNames } from '../../common/helpers';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useEffect } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -33,9 +34,11 @@ export default function Toggle(props: Props) {
   }, [props.checked, props.disabled]);
 
   const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   const styles: React.CSSProperties = {
-    backgroundColor: 'rgb(229 231 235)',
+    backgroundColor: colors.$2,
+    borderColor: colors.$4,
   };
 
   if (checked) {
@@ -65,7 +68,7 @@ export default function Toggle(props: Props) {
       </Switch>
       {props.label && (
         <Switch.Label as="span" className="ml-3">
-          <span className="text-sm text-gray-900">{props.label}</span>
+          <span className="text-sm">{props.label}</span>
         </Switch.Label>
       )}
     </Switch.Group>

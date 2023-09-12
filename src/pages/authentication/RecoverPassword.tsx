@@ -23,6 +23,7 @@ import { Link } from '../../components/forms/Link';
 import { Header } from './components/Header';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useColorScheme } from '$app/common/colors';
 
 interface Response {
   message: string;
@@ -59,13 +60,18 @@ export function RecoverPassword() {
     },
   });
 
+  const colors = useColorScheme();
+
   return (
-    <div className="h-screen md:bg-gray-100">
+    <div className="h-screen">
       <Header />
 
       <div className="flex flex-col items-center">
-        <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
-          <h2 className="text-2xl">{t('recover_password')}</h2>
+        <div
+          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        >
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>{t('recover_password')}</h2>
 
           <form onSubmit={form.handleSubmit} className="my-6">
             <InputField

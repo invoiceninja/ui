@@ -19,12 +19,15 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
+import { useAtom, useSetAtom } from 'jotai';
+import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import { colorSchemeAtom } from './common/colors';
 
 export function App() {
   const [t] = useTranslation();
@@ -36,7 +39,15 @@ export function App() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const switchToCompanySettings = useSwitchToCompanySettings();
+
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+
+  const { isCompanySettingsActive, isGroupSettingsActive } =
+    useCurrentSettingsLevel();
+
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
 
   const resolveLanguage = useResolveLanguage();
@@ -54,13 +65,13 @@ export function App() {
     ? resolveLanguage(company.settings.language_id)
     : undefined;
 
+  const [colorScheme] = useAtom(colorSchemeAtom);
+
   useEffect(() => {
-    document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
+    document.body.style.backgroundColor = colorScheme.$2;
+  }, [colorScheme]);
 
-    darkMode
-      ? document.querySelector('html')?.classList.add('dark')
-      : document.querySelector('html')?.classList.remove('dark');
-
+  useEffect(() => {
     if (resolvedLanguage?.locale) {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
         updateDayJSLocale(resolvedLocale);
@@ -107,6 +118,22 @@ export function App() {
       setIsCompanyEditModalOpened(true);
     }
   }, [company]);
+
+  useEffect(() => {
+    if (
+      !location.pathname.startsWith('/settings') &&
+      !isCompanySettingsActive
+    ) {
+      switchToCompanySettings();
+    }
+
+    if (
+      location.pathname.startsWith('/settings/group_settings') &&
+      isGroupSettingsActive
+    ) {
+      navigate('/settings/company_details');
+    }
+  }, [location]);
 
   return (
     <>

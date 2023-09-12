@@ -25,6 +25,7 @@ import {
 import dayjs from 'dayjs';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useColorScheme } from '$app/common/colors';
 
 type Props = {
   data: ChartData;
@@ -204,6 +205,8 @@ export function Chart(props: Props) {
     setChartData(data);
   }, [props]);
 
+  const colors = useColorScheme();
+
   const formatTooltipValues = (number: string) => {
     return formatMoney(
       Number(number) || 0,
@@ -258,7 +261,7 @@ export function Chart(props: Props) {
         <CartesianGrid strokeDasharray="0" vertical={false} />
         <Tooltip formatter={formatTooltipValues} />
 
-        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} />
+        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} stroke={colors.$3} />
         <YAxis
           interval={0}
           tickCount={6}
@@ -267,6 +270,7 @@ export function Chart(props: Props) {
           }
           tick={{ fontSize: 14 }}
           width={yAxisWidth}
+          stroke={colors.$3}
         />
       </LineChart>
     </ResponsiveContainer>
