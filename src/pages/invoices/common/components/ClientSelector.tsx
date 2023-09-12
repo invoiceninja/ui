@@ -61,7 +61,7 @@ export function ClientSelector(props: Props) {
   return (
     <>
       <div className="flex  flex-col justify-between space-y-2" style={{ color: colors.$3 }}>
-        {hasPermission('view_client') ? (
+        {hasPermission('create_invoice') ? (
           props.textOnly ? (
             <p className="text-sm">
               {resource?.client?.display_name}
