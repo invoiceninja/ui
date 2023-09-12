@@ -20,4 +20,5 @@ export interface SearchRecord {
   type: number;
   id: string;
   path: string;
+  heading: string;
 }
