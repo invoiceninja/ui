@@ -223,10 +223,14 @@ export default function Create() {
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
                 handleChange('currency_id', client?.settings.currency_id);
+                handleChange('invoices', []);
+                handleChange('credits', []);
               }}
               onClearButtonClick={() => {
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
+                handleChange('invoices', []);
+                handleChange('credits', []);
               }}
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
@@ -264,7 +268,7 @@ export default function Create() {
             payment.invoices.map((invoice, index) => (
               <Element key={index}>
                 <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-end space-x-2">
                     <ComboboxAsync<Invoice>
                       inputOptions={{
                         value: invoice.invoice_id,
@@ -287,6 +291,13 @@ export default function Create() {
                           ? handleExistingInvoiceChange(entry.resource, index)
                           : null
                       }
+                      exclude={collect(
+                        payment.invoices.filter(
+                          ({ invoice_id }) => invoice_id !== invoice.invoice_id
+                        )
+                      )
+                        .pluck('invoice_id')
+                        .toArray()}
                     />
 
                     <InputField
@@ -299,12 +310,13 @@ export default function Create() {
                       }
                       className="w-full"
                       value={invoice.amount}
+                      withoutLabelWrapping
                     />
 
                     <Button
                       behavior="button"
                       type="minimal"
-                      className="mt-6"
+                      className="self-center mt-6"
                       onClick={() => handleDeletingInvoice(invoice._id)}
                     >
                       <X />
@@ -356,6 +368,7 @@ export default function Create() {
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
                   .toArray()}
+                clearInputAfterSelection
               />
             </Element>
           )}
@@ -367,7 +380,7 @@ export default function Create() {
             payment.credits.map((credit, index) => (
               <Element key={index}>
                 <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-end space-x-2">
                     <ComboboxAsync<Credit>
                       inputOptions={{
                         value: credit.credit_id,
@@ -398,6 +411,13 @@ export default function Create() {
                           ? handleExistingCreditChange(entry.resource, index)
                           : null
                       }
+                      exclude={collect(
+                        payment.credits.filter(
+                          ({ credit_id }) => credit_id !== credit.credit_id
+                        )
+                      )
+                        .pluck('credit_id')
+                        .toArray()}
                     />
 
                     <InputField
@@ -410,12 +430,13 @@ export default function Create() {
                       }
                       className="w-full"
                       value={credit.amount}
+                      withoutLabelWrapping
                     />
 
                     <Button
                       behavior="button"
                       type="minimal"
-                      className="mt-6"
+                      className="self-center mt-6"
                       onClick={() => handleDeletingCredit(credit._id)}
                     >
                       <X />
@@ -465,6 +486,7 @@ export default function Create() {
                   entry.resource ? handleCreditChange(entry.resource) : null
                 }
                 exclude={collect(payment.credits).pluck('credit_id').toArray()}
+                clearInputAfterSelection
               />
             </Element>
           )}
