@@ -40,7 +40,8 @@ export function Details(props: Props) {
     props.setErrors(undefined);
 
     props.setClient(
-      (client) => client && set(client, event.target.id, event.target.value)
+      (client) =>
+        client && set({ ...client }, event.target.id, event.target.value)
     );
   };
 
@@ -83,7 +84,7 @@ export function Details(props: Props) {
         <Element leftSide={t('group')}>
           <SelectField
             id="group_settings_id"
-            defaultValue={props.client?.group_settings_id}
+            value={props.client?.group_settings_id}
             onChange={handleChange}
             errorMessage={props.errors?.errors.group_settings_id}
           >

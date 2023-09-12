@@ -19,6 +19,10 @@ import { useDispatch } from 'react-redux';
 import { Element } from '$app/components/cards';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -27,18 +31,44 @@ export function DeleteLogo() {
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
+  const { isGroupSettingsActive, isCompanySettingsActive } =
+    useCurrentSettingsLevel();
+
+  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+
+  const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: companyChanges,
     onSubmit: () => {
       toast.processing();
 
+      let endpointRoute = '/api/v1/companies/:id';
+
+      let entityId = company.id;
+
+      if (isGroupSettingsActive && activeGroupSettings) {
+        endpointRoute = '/api/v1/group_settings/:id';
+        entityId = activeGroupSettings.id;
+      }
+
       request(
         'PUT',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
+        endpoint(endpointRoute, { id: entityId }),
         formik.values
       ).then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        if (isCompanySettingsActive) {
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
+        }
+
+        if (isGroupSettingsActive) {
+          configureGroupSettings(response.data.data);
+        }
 
         toast.success('removed_logo');
       });

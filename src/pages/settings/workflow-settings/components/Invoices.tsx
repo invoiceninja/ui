@@ -19,11 +19,14 @@ import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -43,24 +46,26 @@ export function Invoices() {
         leftSideHelp={t('auto_email_invoice_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_email_invoice || false}
+          checked={Boolean(companyChanges?.settings?.auto_email_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_email_invoice', value)
           }
         />
       </Element>
 
-      <Element
-        leftSide={t('stop_on_unpaid')}
-        leftSideHelp={t('stop_on_unpaid_help')}
-      >
-        <Toggle
-          checked={companyChanges?.stop_on_unpaid_recurring || false}
-          onChange={(value: boolean) =>
-            handleToggleChange('stop_on_unpaid_recurring', value)
-          }
-        />
-      </Element>
+      {isCompanySettingsActive && (
+        <Element
+          leftSide={t('stop_on_unpaid')}
+          leftSideHelp={t('stop_on_unpaid_help')}
+        >
+          <Toggle
+            checked={Boolean(companyChanges?.stop_on_unpaid_recurring)}
+            onChange={(value: boolean) =>
+              handleToggleChange('stop_on_unpaid_recurring', value)
+            }
+          />
+        </Element>
+      )}
 
       <Divider />
 
@@ -69,7 +74,7 @@ export function Invoices() {
         leftSideHelp={t('auto_archive_invoice_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_archive_invoice || false}
+          checked={Boolean(companyChanges?.settings?.auto_archive_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice', value)
           }
@@ -81,9 +86,9 @@ export function Invoices() {
         leftSideHelp={t('auto_archive_invoice_cancelled_help')}
       >
         <Toggle
-          checked={
-            companyChanges?.settings?.auto_archive_invoice_cancelled || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.auto_archive_invoice_cancelled
+          )}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice_cancelled', value)
           }

@@ -40,3 +40,13 @@ export const useDocumentsBulk = () => {
     }).then(() => toast.success('exported_data'));
   };
 };
+
+export const useSetDocumentVisibility = () => {
+  return async (id: string, visible: boolean) => {
+    toast.processing();
+
+    return request('PUT', endpoint('/api/v1/documents/:id', { id }), {
+      is_public: visible,
+    }).then(() => toast.success('success'));
+  };
+};

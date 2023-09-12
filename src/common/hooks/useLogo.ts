@@ -9,13 +9,19 @@
  */
 
 import companySettings from '$app/common/constants/company-settings';
+import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 
 export function useLogo() {
+  const companyChanges = useCompanyChanges();
   const currentCompany = useCurrentCompany();
 
-  return currentCompany?.settings?.company_logo || companySettings.logo;
+  return (
+    companyChanges?.settings?.company_logo ||
+    currentCompany?.settings?.company_logo ||
+    companySettings.logo
+  );
 }
 
 export function useCompanyName() {

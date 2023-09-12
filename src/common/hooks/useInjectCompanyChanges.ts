@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
+import { useCurrentSettingsLevel } from './useCurrentSettingsLevel';
 
 interface Options {
   overwrite?: boolean;
@@ -25,6 +26,7 @@ export function useInjectCompanyChanges(
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   useEffect(() => {
     if (companyChanges && options?.overwrite === false) {
@@ -35,7 +37,9 @@ export function useInjectCompanyChanges(
       return;
     }
 
-    dispatch(injectInChanges({ object: 'company', data: company }));
+    if (isCompanySettingsActive) {
+      dispatch(injectInChanges({ object: 'company', data: company }));
+    }
   }, [company]);
 
   return companyChanges;

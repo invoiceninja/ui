@@ -36,7 +36,7 @@ export function Quotes() {
         leftSideHelp={t('auto_convert_quote_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_convert_quote || false}
+          checked={Boolean(companyChanges?.settings?.auto_convert_quote)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_convert_quote', value)
           }
@@ -47,7 +47,7 @@ export function Quotes() {
         leftSideHelp={t('auto_archive_quote_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_archive_quote || false}
+          checked={Boolean(companyChanges?.settings?.auto_archive_quote)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_quote', value)
           }

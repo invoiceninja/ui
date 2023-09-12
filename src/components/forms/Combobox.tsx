@@ -112,6 +112,7 @@ export function ComboboxStatic({
   );
 
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const comboboxInputRef = useRef<HTMLInputElement>(null);
 
   useClickAway(comboboxRef, () => {
     setIsOpen(false);
@@ -149,6 +150,12 @@ export function ComboboxStatic({
     if (clearInputAfterSelection) {
       setSelectedValue(null);
       setQuery('');
+    }
+
+    setIsOpen(false);
+
+    if (comboboxInputRef?.current) {
+      comboboxInputRef.current.blur();
     }
   }, [selectedValue]);
 
@@ -209,6 +216,7 @@ export function ComboboxStatic({
           >
             <HeadlessCombobox.Input
               data-testid="combobox-input-field"
+              ref={comboboxInputRef}
               className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
@@ -311,11 +319,8 @@ export function ComboboxStatic({
                   }}
                   key={entry.id}
                   value={entry}
-                  className={() =>
-                    classNames(
-                      'min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9'
-                    )
-                  }
+                  className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
+                  // active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
                   style={{ color: colors.$3 }}
                 >
                   {({ selected, active }) => (
