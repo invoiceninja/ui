@@ -28,7 +28,7 @@ import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTab
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { QuoteDetails } from '../common/components/QuoteDetails';
@@ -37,6 +37,8 @@ import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
 import { useQuoteQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -97,6 +99,9 @@ export default function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
+  const [searchParams] = useSearchParams()
+  const taskColumns = useTaskColumns()
+
   return (
     <Default
       title={documentTitle}
@@ -135,29 +140,56 @@ export default function Edit() {
         <QuoteDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {quote && client ? (
-            <ProductsTable
-              type="product"
-              resource={quote}
-              items={quote.line_items.filter((item) =>
-                [
-                  InvoiceItemType.Product,
-                  InvoiceItemType.UnpaidFee,
-                  InvoiceItemType.PaidFee,
-                  InvoiceItemType.LateFee,
-                ].includes(item.type_id)
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
+            <div>
+              {quote && client ? (
+                <ProductsTable
+                  type="product"
+                  resource={quote}
+                  items={quote.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Product
+                  )}
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Product)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
               )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
-          ) : (
-            <Spinner />
-          )}
+            </div>
+
+            <div>
+              {quote && client ? (
+                <ProductsTable
+                  type="task"
+                  resource={quote}
+                  items={quote.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
+                  )}
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Task)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          </TabGroup>
         </div>
 
         <QuoteFooter handleChange={handleChange} errors={errors} />

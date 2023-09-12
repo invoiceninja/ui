@@ -253,7 +253,8 @@ export function AdditionalInfo(props: ExpenseCardProps) {
               border
               precision={
                 reactSettings?.number_precision &&
-                reactSettings?.number_precision > 0
+                reactSettings?.number_precision > 0 &&
+                reactSettings?.number_precision <= 100
                   ? reactSettings.number_precision
                   : currencySeparators?.precision || 2
               }

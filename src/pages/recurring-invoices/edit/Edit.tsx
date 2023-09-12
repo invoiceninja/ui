@@ -28,7 +28,7 @@ import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTab
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
@@ -45,6 +45,8 @@ import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { Card } from '$app/components/cards';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -144,6 +146,9 @@ export default function Edit() {
     }
   }, [recurringInvoice]);
 
+  const [searchParams] = useSearchParams();
+  const taskColumns = useTaskColumns();
+
   return (
     <Default
       title={documentTitle}
@@ -183,29 +188,61 @@ export default function Edit() {
         <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {recurringInvoice && client ? (
-            <ProductsTable
-              type="product"
-              resource={recurringInvoice}
-              items={recurringInvoice.line_items.filter((item) =>
-                [
-                  InvoiceItemType.Product,
-                  InvoiceItemType.UnpaidFee,
-                  InvoiceItemType.PaidFee,
-                  InvoiceItemType.LateFee,
-                ].includes(item.type_id)
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
+            <div>
+              {recurringInvoice && client ? (
+                <ProductsTable
+                  type="product"
+                  resource={recurringInvoice}
+                  items={recurringInvoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
+                  )}
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Product)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
               )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
-          ) : (
-            <Spinner />
-          )}
+            </div>
+
+            <div>
+              {recurringInvoice && client ? (
+                <ProductsTable
+                  type="task"
+                  resource={recurringInvoice}
+                  items={recurringInvoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
+                  )}
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Task)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          </TabGroup>
         </div>
 
         <InvoiceFooter handleChange={handleChange} errors={errors} />

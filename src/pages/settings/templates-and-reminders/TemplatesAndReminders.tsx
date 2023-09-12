@@ -25,7 +25,6 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
-import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
@@ -35,6 +34,8 @@ import { commonVariables } from './common/constants/variables/common-variables';
 import { paymentVariables } from './common/constants/variables/payment-variables';
 import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -54,8 +55,10 @@ export function TemplatesAndReminders() {
   const company = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
   const handleSave = useHandleCompanySave();
-  const handleCancel = useHandleCancel();
+  const onCancel = useDiscardChanges();
   const user = useCurrentUser();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState('invoice');
@@ -103,8 +106,13 @@ export function TemplatesAndReminders() {
   }, [statics, templateId]);
 
   useEffect(() => {
-    handleChange(`settings.email_subject_${templateId}`, templateBody?.subject);
-    handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+    if (isCompanySettingsActive) {
+      handleChange(
+        `settings.email_subject_${templateId}`,
+        templateBody?.subject
+      );
+      handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+    }
 
     request('POST', endpoint('/api/v1/templates'), {
       body: templateBody?.body,
@@ -124,7 +132,7 @@ export function TemplatesAndReminders() {
       docsLink="en/advanced-settings/#templates_and_reminders"
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      onCancelClick={handleCancel}
+      onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
       withoutBackButton
     >
@@ -152,7 +160,7 @@ export function TemplatesAndReminders() {
         <Element leftSide={t('subject')}>
           <InputField
             id="subject"
-            value={templateBody?.subject}
+            value={templateBody?.subject || ''}
             onValueChange={(value) =>
               setTemplateBody(
                 (current) => current && { ...current, subject: value }
@@ -164,7 +172,7 @@ export function TemplatesAndReminders() {
         <Element leftSide={t('body')}>
           {canChangeEmailTemplate ? (
             <MarkdownEditor
-              value={templateBody?.body}
+              value={templateBody?.body || ''}
               onChange={(value) =>
                 setTemplateBody(
                   (current) => current && { ...current, body: value }
@@ -202,14 +210,15 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || 0
                   }
                   onValueChange={(value) =>
                     handleChange(
                       `settings.num_days_reminder${reminderIndex}`,
-                      value
+                      value ?? 0
                     )
                   }
+                  type='number'
                 />
               </Element>
 
@@ -218,7 +227,7 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || 'disabled'
                   }
                   onValueChange={(value) =>
                     handleChange(
@@ -263,7 +272,7 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || ''
                   }
                   onValueChange={(value) =>
                     handleChange(
@@ -279,7 +288,7 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || ''
                   }
                   onValueChange={(value) =>
                     handleChange(
@@ -294,7 +303,7 @@ export function TemplatesAndReminders() {
             <>
               <Element leftSide={t('send_email')}>
                 <Toggle
-                  checked={company?.settings.enable_reminder_endless || false}
+                  checked={Boolean(company?.settings.enable_reminder_endless)}
                   onValueChange={(value) =>
                     handleChange('settings.enable_reminder_endless', value)
                   }
@@ -303,7 +312,7 @@ export function TemplatesAndReminders() {
 
               <Element leftSide={t('frequency')}>
                 <SelectField
-                  value={company?.settings.endless_reminder_frequency_id}
+                  value={company?.settings.endless_reminder_frequency_id || ''}
                   onValueChange={(value) =>
                     handleChange(
                       'settings.endless_reminder_frequency_id',

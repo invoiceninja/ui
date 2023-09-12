@@ -20,10 +20,10 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
-import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useDropzone } from 'react-dropzone';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { AxiosResponse } from 'axios';
@@ -37,11 +37,14 @@ import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function EmailSettings() {
   useTitle('email_settings');
 
   const [t] = useTranslation();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -56,7 +59,7 @@ export function EmailSettings() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
-  const onCancel = useHandleCancel();
+  const onCancel = useDiscardChanges();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
   const dispatch = useDispatch();
@@ -135,7 +138,7 @@ export function EmailSettings() {
       <Card title={t('settings')}>
         <Element leftSide={t('show_email_footer')}>
           <Toggle
-            checked={company?.settings.show_email_footer}
+            checked={Boolean(company?.settings.show_email_footer)}
             onValueChange={(value) =>
               handleChange('settings.show_email_footer', value)
             }
@@ -144,7 +147,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_pdf')}>
           <Toggle
-            checked={company?.settings.pdf_email_attachment}
+            checked={Boolean(company?.settings.pdf_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.pdf_email_attachment', value)
             }
@@ -153,7 +156,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_documents')}>
           <Toggle
-            checked={company?.settings.document_email_attachment}
+            checked={Boolean(company?.settings.document_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.document_email_attachment', value)
             }
@@ -162,7 +165,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_ubl')}>
           <Toggle
-            checked={company?.settings.ubl_email_attachment}
+            checked={Boolean(company?.settings.ubl_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.ubl_email_attachment', value)
             }
@@ -171,13 +174,13 @@ export function EmailSettings() {
 
         <Element leftSide={t('enable_e_invoice')}>
           <Toggle
-            checked={company?.settings.enable_e_invoice}
+            checked={Boolean(company?.settings.enable_e_invoice)}
             onValueChange={(value) =>
               handleChange('settings.enable_e_invoice', value)
             }
           />
         </Element>
-        {company?.settings.enable_e_invoice ? (
+        {company?.settings.enable_e_invoice && isCompanySettingsActive ? (
           <>
             <Element
               leftSide={t('upload_certificate')}
@@ -230,7 +233,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('email_provider')}>
           <SelectField
-            value={company?.settings.email_sending_method}
+            value={company?.settings.email_sending_method || 'default'}
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
             }
@@ -269,7 +272,7 @@ export function EmailSettings() {
         {company?.settings.email_sending_method === 'client_postmark' && (
           <Element leftSide={t('secret')}>
             <InputField
-              value={company?.settings.postmark_secret}
+              value={company?.settings.postmark_secret || ''}
               onValueChange={(value) =>
                 handleChange('settings.postmark_secret', value)
               }
@@ -282,7 +285,7 @@ export function EmailSettings() {
           <>
             <Element leftSide={t('secret')}>
               <InputField
-                value={company?.settings.mailgun_secret}
+                value={company?.settings.mailgun_secret || ''}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_secret', value)
                 }
@@ -292,7 +295,7 @@ export function EmailSettings() {
 
             <Element leftSide={t('domain')}>
               <InputField
-                value={company?.settings.mailgun_domain}
+                value={company?.settings.mailgun_domain || ''}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_domain', value)
                 }
@@ -302,7 +305,7 @@ export function EmailSettings() {
 
             <Element leftSide={t('endpoint')}>
               <SelectField
-                value={company?.settings.mailgun_endpoint}
+                value={company?.settings.mailgun_endpoint || 'api.mailgun.net'}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_endpoint', value)
                 }
@@ -319,7 +322,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('from_name')}>
           <InputField
-            value={company?.settings.email_from_name}
+            value={company?.settings.email_from_name || ''}
             onValueChange={(value) =>
               handleChange('settings.email_from_name', value)
             }
@@ -329,7 +332,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('reply_to_name')}>
           <InputField
-            value={company?.settings.reply_to_name}
+            value={company?.settings.reply_to_name || ''}
             onValueChange={(value) =>
               handleChange('settings.reply_to_name', value)
             }
@@ -339,7 +342,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('reply_to_email')}>
           <InputField
-            value={company?.settings.reply_to_email}
+            value={company?.settings.reply_to_email || ''}
             onValueChange={(value) =>
               handleChange('settings.reply_to_email', value)
             }
@@ -352,7 +355,7 @@ export function EmailSettings() {
           leftSideHelp={t('comma_sparated_list')}
         >
           <InputField
-            value={company?.settings.bcc_email}
+            value={company?.settings.bcc_email || ''}
             onValueChange={(value) => handleChange('settings.bcc_email', value)}
             errorMessage={errors?.errors['settings.bcc_email']}
           />
@@ -385,7 +388,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('email_design')}>
           <SelectField
-            value={company?.settings.email_style}
+            value={company?.settings.email_style || 'plain'}
             onValueChange={(value) =>
               handleChange('settings.email_style', value)
             }
@@ -402,7 +405,7 @@ export function EmailSettings() {
           <Element leftSide={t('custom')}>
             <InputField
               element="textarea"
-              value={company?.settings.email_style_custom}
+              value={company?.settings.email_style_custom || ''}
               onValueChange={(value) =>
                 value.includes('$body')
                   ? handleChange('settings.email_style_custom', value)
@@ -417,7 +420,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('signature')}>
           <MarkdownEditor
-            value={company?.settings.email_signature}
+            value={company?.settings.email_signature || ''}
             onChange={(value) =>
               handleChange('settings.email_signature', value)
             }

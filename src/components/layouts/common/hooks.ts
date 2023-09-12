@@ -9,6 +9,7 @@
  */
 
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,7 @@ export interface SettingsRoute {
 export function useSettingsRoutes() {
   const [t] = useTranslation();
   const location = useLocation();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { isOwner, isAdmin } = useAdmin();
 
@@ -39,7 +41,7 @@ export function useSettingsRoutes() {
       name: t('user_details'),
       href: '/settings/user_details',
       current: location.pathname.startsWith('/settings/user_details'),
-      enabled: true,
+      enabled: isCompanySettingsActive,
     },
     {
       name: t('localization'),
@@ -63,7 +65,7 @@ export function useSettingsRoutes() {
       name: t('product_settings'),
       href: '/settings/product_settings',
       current: location.pathname.startsWith('/settings/product_settings'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('task_settings'),
@@ -75,7 +77,7 @@ export function useSettingsRoutes() {
       name: t('expense_settings'),
       href: '/settings/expense_settings',
       current: location.pathname.startsWith('/settings/expense_settings'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('workflow_settings'),
@@ -87,13 +89,13 @@ export function useSettingsRoutes() {
       name: t('account_management'),
       href: '/settings/account_management',
       current: location.pathname.startsWith('/settings/account_management'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('backup_restore'),
       href: '/settings/backup_restore',
       current: location.pathname.startsWith('/settings/backup_restore'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
   ];
 
@@ -108,7 +110,7 @@ export function useSettingsRoutes() {
       name: t('custom_fields'),
       href: '/settings/custom_fields',
       current: location.pathname.endsWith('/settings/custom_fields'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('generated_numbers'),
@@ -140,31 +142,37 @@ export function useSettingsRoutes() {
       name: t('bank_accounts'),
       href: '/settings/bank_accounts',
       current: location.pathname.startsWith('/settings/bank_accounts'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+    },
+    {
+      name: t('group_settings'),
+      href: '/settings/group_settings',
+      current: location.pathname.startsWith('/settings/group_settings'),
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('payment_links'),
       href: '/settings/subscriptions',
       current: location.pathname.startsWith('/settings/subscriptions'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('schedules'),
       href: '/settings/schedules',
       current: location.pathname.startsWith('/settings/schedules'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('system_logs'),
       href: '/settings/system_logs',
       current: location.pathname.startsWith('/settings/system_logs'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
   ];
 

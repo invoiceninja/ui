@@ -11,9 +11,11 @@
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { isValidElement, cloneElement, createElement } from 'react';
 import { IconType } from 'react-icons';
+import { Icon as ReactFeatherIcon } from 'react-feather';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
-interface Props {
-  element: IconType;
+interface Props extends CommonProps {
+  element: IconType | ReactFeatherIcon;
   size?: number;
   color?: string;
 }
@@ -27,6 +29,8 @@ export function Icon(props: Props) {
     return cloneElement(iconElement, {
       fontSize: props.size || 18,
       color: props.color || accentColor,
+      className: props.className,
+      onClick: props.onClick,
     });
   }
 

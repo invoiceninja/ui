@@ -28,6 +28,14 @@ export function useHandleProductChange(props: Props) {
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
+
+    if (!product) {
+      // When we deal with inline product key
+      // keep everything but the name.
+
+      return props.onChange(index, lineItem);
+    }
+
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
     if (company.fill_products) {

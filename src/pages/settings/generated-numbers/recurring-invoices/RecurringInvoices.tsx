@@ -61,7 +61,9 @@ export function RecurringInvoices() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.recurring_invoice_number_pattern"
-          value={companyChanges?.settings?.recurring_invoice_number_pattern}
+          value={
+            companyChanges?.settings?.recurring_invoice_number_pattern || ''
+          }
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_pattern']
@@ -71,7 +73,9 @@ export function RecurringInvoices() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.recurring_invoice_number_counter"
-          value={companyChanges?.settings?.recurring_invoice_number_counter}
+          value={
+            companyChanges?.settings?.recurring_invoice_number_counter || ''
+          }
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_counter']

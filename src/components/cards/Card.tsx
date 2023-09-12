@@ -54,6 +54,7 @@ interface Props {
   collapsed?: boolean;
   childrenClassName?: string;
   withoutHeaderBorder?: boolean;
+  topRight?: ReactNode;
 }
 
 export function Card(props: Props) {
@@ -114,6 +115,8 @@ export function Card(props: Props) {
                 )}
               </div>
 
+              {props.topRight}
+
               {typeof props.collapsed !== 'undefined' && isCollapsed && (
                 <ChevronDown />
               )}
@@ -143,7 +146,7 @@ export function Card(props: Props) {
         </div>
 
         {(props.withSaveButton || props.additionalAction) && (
-          <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <div className="border-t px-4 py-5 sm:p-0" style={{ borderColor: colors.$4 }}>
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
@@ -166,13 +169,13 @@ export function Card(props: Props) {
                       disabled={props.disableSubmitButton}
                       disableWithoutIcon={props.disableWithoutIcon}
                     >
-                      {props.saveButtonLabel ?? t('save')}
+                      {props.saveButtonLabel ?? t('save')} 
                     </Button>
 
                     <Dropdown
                       className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                      cardActions
                       disabled={props.disableSubmitButton}
+                      cardActions
                     >
                       {props.additionalSaveOptions.map((action, i) => (
                         <DropdownElement
