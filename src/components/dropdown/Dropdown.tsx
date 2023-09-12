@@ -117,7 +117,7 @@ export function Dropdown(props: Props) {
           disabled={props.disabled}
           onClick={() => setVisible(!visible)}
           className={classNames(
-            `inline-flex border border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
+            `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
             {
               'hover:bg-white hover:border-gray-300': !props.cardActions,
               'hover:opacity-90': props.cardActions,
