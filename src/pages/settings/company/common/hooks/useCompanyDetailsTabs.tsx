@@ -15,7 +15,8 @@ import { useTranslation } from 'react-i18next';
 export function useCompanyDetailsTabs() {
   const { t } = useTranslation();
 
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   let tabs: Tab[] = [
     { name: t('details'), href: '/settings/company_details' },
@@ -38,7 +39,7 @@ export function useCompanyDetailsTabs() {
     },
   ];
 
-  if (isGroupSettingsActive) {
+  if (isGroupSettingsActive || isClientSettingsActive) {
     tabs = tabs.filter(
       (tab) => tab.name !== t('custom_fields') && tab.name !== t('documents')
     );

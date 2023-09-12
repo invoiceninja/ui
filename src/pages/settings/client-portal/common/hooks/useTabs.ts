@@ -16,7 +16,8 @@ import { useTranslation } from 'react-i18next';
 export function useTabs() {
   const [t] = useTranslation();
 
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   let tabs: Tab[] = [
     {
@@ -41,7 +42,7 @@ export function useTabs() {
     },
   ];
 
-  if (isGroupSettingsActive) {
+  if (isGroupSettingsActive || isClientSettingsActive) {
     tabs = tabs.filter((tab) => tab.name !== t('registration'));
   }
 

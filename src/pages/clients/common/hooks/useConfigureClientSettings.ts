@@ -9,17 +9,18 @@
  */
 
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { Client } from '$app/common/interfaces/client';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { useSetAtom } from 'jotai';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { GroupSettings } from '$app/common/interfaces/group-settings';
 
 interface Params {
   withoutNavigation: boolean;
 }
-export function useConfigureGroupSettings(params?: Params) {
+
+export function useConfigureClientSettings(params?: Params) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -27,21 +28,21 @@ export function useConfigureGroupSettings(params?: Params) {
 
   const setActiveSettingsAtom = useSetAtom(activeSettingsAtom);
 
-  return (group: GroupSettings) => {
-    setActiveSettingsAtom(group);
+  return (client: Client) => {
+    setActiveSettingsAtom(client);
 
     dispatch(
       updateChanges({
         object: 'company',
         property: 'settings',
-        value: group.settings,
+        value: client.settings,
       })
     );
 
     dispatch(
       setActiveSettings({
         status: {
-          name: group.name,
+          name: client.display_name,
           level: 'group',
         },
       })

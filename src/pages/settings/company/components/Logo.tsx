@@ -25,7 +25,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { endpoint } from '$app/common/helpers';
 import { useAtomValue } from 'jotai';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 
 export function Logo() {
@@ -38,7 +38,7 @@ export function Logo() {
   const { isGroupSettingsActive, isCompanySettingsActive } =
     useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeGroupSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
     withoutNavigation: true,

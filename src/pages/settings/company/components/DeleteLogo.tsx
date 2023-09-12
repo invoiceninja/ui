@@ -20,7 +20,7 @@ import { Element } from '$app/components/cards';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
@@ -34,7 +34,7 @@ export function DeleteLogo() {
   const { isGroupSettingsActive, isCompanySettingsActive } =
     useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeGroupSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
     withoutNavigation: true,
