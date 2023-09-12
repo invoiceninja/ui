@@ -109,8 +109,8 @@ export function Dropdown(props: Props) {
       >
         <LabelButton
           theme={{
-            backgroundColor: colors.$1,
-            color: colors.$3,
+            backgroundColor: accentColor,
+            color: colors.$9,
             borderColor: colors.$5,
           }}
           type="button"
