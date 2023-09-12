@@ -37,7 +37,6 @@ import {
   MdRestore,
   MdWarning,
 } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
@@ -52,7 +51,6 @@ interface Params {
 }
 export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
   const colors = useColorScheme();
 
@@ -167,7 +165,6 @@ export function GatewaysTable(params: Params) {
       ...styles,
       color: data.color,
     }),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
@@ -248,9 +245,7 @@ export function GatewaysTable(params: Params) {
             {showRestoreBulkAction() && (
               <DropdownElement
                 onClick={() => {
-                  bulk(selected, 'restore').then(() =>
-                    handleSaveBulkActionsChanges(selected)
-                  );
+                  bulk(selected, 'restore');
 
                   handleDeselect();
                 }}
@@ -278,10 +273,7 @@ export function GatewaysTable(params: Params) {
             </Button>
           )}
 
-          <Button
-            behavior="button"
-            onClick={() => navigate('/settings/gateways/create')}
-          >
+          <Button to="/settings/gateways/create">
             {t('new_company_gateway')}
           </Button>
         </div>

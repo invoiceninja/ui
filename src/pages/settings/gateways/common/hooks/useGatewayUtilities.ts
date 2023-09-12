@@ -46,9 +46,7 @@ export function useGatewayUtilities(params: Params) {
       | MultiValue<{ value: string; label: string }>
       | SingleValue<{ value: string; label: string }>
   ) => {
-    const values: string[] = [];
-
-    (options as SelectOption[]).map((option) => values.push(option.value));
+    const values = (options as SelectOption[]).map((option) => option.value);
 
     setStatus(values.join(','));
   };
