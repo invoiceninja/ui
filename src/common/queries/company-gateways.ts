@@ -26,7 +26,7 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
   const { status } = params || {};
 
   return useQuery(
-    '/api/v1/company_gateways',
+    ['/api/v1/company_gateways', params],
     () =>
       request(
         'GET',
@@ -79,10 +79,10 @@ export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
+  return async (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/company_gateways/bulk'), {
+    return request('POST', endpoint('/api/v1/company_gateways/bulk'), {
       action,
       ids,
     }).then(() => {

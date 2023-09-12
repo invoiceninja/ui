@@ -37,15 +37,30 @@ import {
   MdRestore,
   MdWarning,
 } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { SelectOption } from '$app/components/datatables/Actions';
+import Select, { StylesConfig } from 'react-select';
+import { useColorScheme } from '$app/common/colors';
 
-export function GatewaysTable() {
+interface Params {
+  includeRemoveAction: boolean;
+  includeResetAction: boolean;
+}
+export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
-  const navigate = useNavigate();
+
+  const colors = useColorScheme();
+
+  const { includeRemoveAction, includeResetAction } = params;
 
   const bulk = useBulk();
+
+  const companyChanges = useCompanyChanges();
+
+  const handleCompanySave = useHandleCompanySave();
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -56,11 +71,16 @@ export function GatewaysTable() {
     []
   );
 
-  const { gateways, handleChange, handleRemoveGateway, handleReset } =
-    useGatewayUtilities({
-      currentGateways,
-      setCurrentGateways,
-    });
+  const {
+    gateways,
+    handleChange,
+    handleRemoveGateway,
+    handleReset,
+    onStatusChange,
+  } = useGatewayUtilities({
+    currentGateways,
+    setCurrentGateways,
+  });
 
   const handleDeselect = () => {
     setSelected([]);
@@ -97,6 +117,84 @@ export function GatewaysTable() {
     return STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
   };
 
+  const handleSaveBulkActionsChanges = (ids: string[]) => {
+    if (companyChanges?.settings.company_gateway_ids) {
+      handleChange(
+        'settings.company_gateway_ids',
+        currentGateways
+          .filter(({ id }) => !ids.includes(id))
+          .map(({ id }) => id)
+          .join(',')
+      );
+
+      handleCompanySave();
+    }
+  };
+
+  const options: SelectOption[] = [
+    {
+      value: 'active',
+      label: t('active'),
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      value: 'archived',
+      label: t('archived'),
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+    {
+      value: 'deleted',
+      label: t('deleted'),
+      color: 'white',
+      backgroundColor: '#c95f53',
+    },
+  ];
+
+  const customStyles: StylesConfig<SelectOption, true> = {
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
+        borderRadius: '3px',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
+    }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
+    }),
+  };
+
   useEffect(() => {
     if (gateways) {
       setCurrentGateways(gateways.filter((gateway) => gateway));
@@ -106,7 +204,7 @@ export function GatewaysTable() {
   useEffect(() => {
     if (gateways) {
       const filteredSelectedResources = gateways.filter(
-        (resource: CompanyGateway) => selected.includes(resource.id)
+        (resource: CompanyGateway) => resource && selected.includes(resource.id)
       );
 
       setSelectedResources(filteredSelectedResources);
@@ -116,52 +214,66 @@ export function GatewaysTable() {
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
-        <Dropdown label={t('more_actions')} disabled={!selected.length}>
-          <DropdownElement
-            onClick={() => {
-              bulk(selected, 'archive');
-
-              handleDeselect();
-            }}
-            icon={<Icon element={MdArchive} />}
-          >
-            {t('archive')}
-          </DropdownElement>
-
-          <DropdownElement
-            onClick={() => {
-              bulk(selected, 'delete');
-
-              handleDeselect();
-            }}
-            icon={<Icon element={MdDelete} />}
-          >
-            {t('delete')}
-          </DropdownElement>
-
-          {showRestoreBulkAction() && (
+        <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
+          <Dropdown label={t('more_actions')} disabled={!selected.length}>
             <DropdownElement
               onClick={() => {
-                bulk(selected, 'restore');
+                bulk(selected, 'archive').then(() =>
+                  handleSaveBulkActionsChanges(selected)
+                );
 
                 handleDeselect();
               }}
-              icon={<Icon element={MdRestore} />}
+              icon={<Icon element={MdArchive} />}
             >
-              {t('restore')}
+              {t('archive')}
             </DropdownElement>
-          )}
-        </Dropdown>
+
+            <DropdownElement
+              onClick={() => {
+                bulk(selected, 'delete').then(() =>
+                  handleSaveBulkActionsChanges(selected)
+                );
+
+                handleDeselect();
+              }}
+              icon={<Icon element={MdDelete} />}
+            >
+              {t('delete')}
+            </DropdownElement>
+
+            {showRestoreBulkAction() && (
+              <DropdownElement
+                onClick={() => {
+                  bulk(selected, 'restore');
+
+                  handleDeselect();
+                }}
+                icon={<Icon element={MdRestore} />}
+              >
+                {t('restore')}
+              </DropdownElement>
+            )}
+          </Dropdown>
+
+          <Select
+            styles={customStyles}
+            defaultValue={options[0]}
+            onChange={(options) => onStatusChange(options)}
+            placeholder={t('status')}
+            options={options}
+            isMulti
+          />
+        </div>
 
         <div className="flex space-x-5">
-          <Button behavior="button" type="secondary" onClick={handleReset}>
-            {t('reset')}
-          </Button>
+          {includeResetAction && (
+            <Button behavior="button" type="secondary" onClick={handleReset}>
+              {t('reset')}
+            </Button>
+          )}
 
-          <Button
-            behavior="button"
-            onClick={() => navigate('/settings/gateways/create')}
-          >
+          <Button to="/settings/gateways/create">
             {t('new_company_gateway')}
           </Button>
         </div>
@@ -233,7 +345,7 @@ export function GatewaysTable() {
                           <EntityStatus entity={gateway} />
                         </Td>
 
-                        <Td width="30%">
+                        <Td width={includeRemoveAction ? '30%' : '35%'}>
                           <div className="flex items-center space-x-2">
                             <Link
                               to={route(
@@ -264,19 +376,21 @@ export function GatewaysTable() {
                           </div>
                         </Td>
 
-                        <Td width="20%">
+                        <Td width={includeRemoveAction ? '20%' : '25%'}>
                           {gateway.test_mode ? <Check size={20} /> : ''}
                         </Td>
 
                         <Td width="25%">
                           <div className="flex items-center space-x-7 py-1">
-                            <Button
-                              behavior="button"
-                              type="minimal"
-                              onClick={() => handleRemoveGateway(gateway.id)}
-                            >
-                              {t('remove')}
-                            </Button>
+                            {includeRemoveAction && (
+                              <Button
+                                behavior="button"
+                                type="minimal"
+                                onClick={() => handleRemoveGateway(gateway.id)}
+                              >
+                                {t('remove')}
+                              </Button>
+                            )}
 
                             <Icon element={MdDragHandle} size={25} />
                           </div>
