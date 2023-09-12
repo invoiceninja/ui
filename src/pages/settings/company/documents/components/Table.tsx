@@ -21,7 +21,10 @@ import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Document } from '$app/common/interfaces/document.interface';
-import { useDocumentsQuery } from '$app/common/queries/documents';
+import {
+  useDocumentsQuery,
+  useSetDocumentVisibility,
+} from '$app/common/queries/documents';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { FileIcon } from '$app/components/FileIcon';
@@ -29,17 +32,30 @@ import { Icon } from '$app/components/icons/Icon';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Spinner } from '$app/components/Spinner';
 import prettyBytes from 'pretty-bytes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
+import {
+  MdDelete,
+  MdDownload,
+  MdLockOutline,
+  MdOutlineLockOpen,
+  MdPageview,
+} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { toast } from '$app/common/helpers/toast/toast';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import { AxiosResponse } from 'axios';
+import { DocumentUrl } from '$app/components/DocumentsTable';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function Table() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const reactSettings = useReactSettings();
+  const setDocumentVisibility = useSetDocumentVisibility();
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
@@ -49,6 +65,8 @@ export function Table() {
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
 
+  const [documentsUrls, setDocumentsUrls] = useState<DocumentUrl[]>([]);
+
   const { data, isLoading } = useDocumentsQuery({
     perPage,
     currentPage,
@@ -56,6 +74,14 @@ export function Table() {
   });
 
   const queryClient = useQueryClient();
+
+  const getDocumentUrlById = (id: string) => {
+    return documentsUrls.find(({ documentId }) => documentId === id)?.url;
+  };
+
+  const invalidateDocumentsQuery = () => {
+    queryClient.invalidateQueries('/api/v1/documents');
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const destroy = (password: string, isRequired = true) => {
@@ -74,8 +100,42 @@ export function Table() {
           setLastPasswordEntryTime(0);
         }
       })
-      .finally(() => queryClient.invalidateQueries('/api/v1/documents'));
+      .finally(() => invalidateDocumentsQuery());
   };
+
+  useEffect(() => {
+    if (reactSettings.show_document_preview && data) {
+      (data.data.data as Document[]).forEach(async ({ id, hash, type }) => {
+        const alreadyExist = documentsUrls.find(
+          ({ documentId }) => documentId === id
+        );
+
+        if (!alreadyExist && (type === 'png' || type === 'jpg')) {
+          const response: AxiosResponse = await queryClient.fetchQuery(
+            ['documents', hash],
+            () =>
+              request(
+                'GET',
+                endpoint('/documents/:hash', { hash }),
+                { headers: defaultHeaders() },
+                { responseType: 'arraybuffer' }
+              ),
+            { staleTime: Infinity }
+          );
+
+          const blob = new Blob([response.data], {
+            type: response.headers['content-type'],
+          });
+          const url = URL.createObjectURL(blob);
+
+          setDocumentsUrls((currentDocumentUrls) => [
+            ...currentDocumentUrls,
+            { documentId: id, url },
+          ]);
+        }
+      });
+    }
+  }, [reactSettings, data?.data.data]);
 
   return (
     <>
@@ -99,10 +159,35 @@ export function Table() {
           {data &&
             data.data.data.map((document: Document) => (
               <Tr key={document.id}>
-                <Td className="truncate">
-                  <div className="flex items-center space-x-2">
-                    <FileIcon type={document.type} />
-                    <span>{document.name}</span>
+                <Td>
+                  <div
+                    className="flex items-center space-x-10"
+                    style={{ width: 'max-content' }}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <FileIcon type={document.type} />
+                      <span>{document.name}</span>
+
+                      {document.is_public ? (
+                        <Icon element={MdOutlineLockOpen} size={27} />
+                      ) : (
+                        <Icon element={MdLockOutline} size={27} />
+                      )}
+                    </div>
+
+                    {reactSettings.show_document_preview &&
+                      (document.type === 'png' || document.type === 'jpg') && (
+                        <>
+                          {getDocumentUrlById(document.id) ? (
+                            <img
+                              src={getDocumentUrlById(document.id)}
+                              style={{ width: 150, height: 75 }}
+                            />
+                          ) : (
+                            <Spinner />
+                          )}
+                        </>
+                      )}
                   </div>
                 </Td>
                 <Td>{date(document.updated_at, dateFormat)}</Td>
@@ -133,6 +218,30 @@ export function Table() {
                         {t('download')}
                       </a>
                     </DropdownElement>
+
+                    {document.is_public ? (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, false).then(() =>
+                            invalidateDocumentsQuery()
+                          );
+                        }}
+                        icon={<Icon element={MdLockOutline} />}
+                      >
+                        {t('set_private')}
+                      </DropdownElement>
+                    ) : (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, true).then(() =>
+                            invalidateDocumentsQuery()
+                          );
+                        }}
+                        icon={<Icon element={MdOutlineLockOpen} />}
+                      >
+                        {t('set_public')}
+                      </DropdownElement>
+                    )}
 
                     <DropdownElement
                       onClick={() => {
