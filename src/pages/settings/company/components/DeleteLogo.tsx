@@ -23,6 +23,7 @@ import { useAtomValue } from 'jotai';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -31,12 +32,19 @@ export function DeleteLogo() {
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
-  const { isGroupSettingsActive, isCompanySettingsActive } =
-    useCurrentSettingsLevel();
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
   const activeGroupSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
+  const configureClientSettings = useConfigureClientSettings({
     withoutNavigation: true,
   });
 
@@ -50,9 +58,17 @@ export function DeleteLogo() {
 
       let entityId = company.id;
 
-      if (isGroupSettingsActive && activeGroupSettings) {
-        endpointRoute = '/api/v1/group_settings/:id';
-        entityId = activeGroupSettings.id;
+      if (activeGroupSettings) {
+        if (isGroupSettingsActive) {
+          endpointRoute = '/api/v1/group_settings/:id';
+          entityId = activeGroupSettings.id;
+        }
+
+        if (isClientSettingsActive) {
+          endpointRoute =
+            '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents';
+          entityId = activeGroupSettings.id;
+        }
       }
 
       request(
@@ -68,6 +84,10 @@ export function DeleteLogo() {
 
         if (isGroupSettingsActive) {
           configureGroupSettings(response.data.data);
+        }
+
+        if (isClientSettingsActive) {
+          configureClientSettings(response.data.data);
         }
 
         toast.success('removed_logo');

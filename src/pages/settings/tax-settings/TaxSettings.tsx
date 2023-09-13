@@ -46,8 +46,11 @@ export function TaxSettings() {
 
   const calculateTaxesRegion = useCalculateTaxesRegion();
 
-  const { isCompanySettingsActive, isGroupSettingsActive } =
-    useCurrentSettingsLevel();
+  const {
+    isCompanySettingsActive,
+    isGroupSettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -171,7 +174,9 @@ export function TaxSettings() {
         </>
       )}
 
-      {isGroupSettingsActive && <Selector title="tax_settings" />}
+      {(isGroupSettingsActive || isClientSettingsActive) && (
+        <Selector title="tax_settings" />
+      )}
       <TaxRates />
     </Settings>
   );
