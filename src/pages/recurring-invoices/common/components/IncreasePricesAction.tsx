@@ -63,6 +63,7 @@ export const IncreasePricesAction = (props: Props) => {
       >
         <InputField
           label={t('percent')}
+          type="number"
           value={increasingPercent}
           onValueChange={(value) => {
             setIncreasingPercent(Number(value));
