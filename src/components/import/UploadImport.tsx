@@ -135,6 +135,20 @@ export function UploadImport(props: Props) {
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();
+          console.log(response.data);
+
+          console.log(response.data?.mappings[props.entity]?.hints.length);
+
+          response.data?.mappings[props.entity]?.hints.forEach(
+            (mapping: number, index: number) => {
+              console.log(mapping, index);
+              payload.column_map[props.entity].mapping[index] = response.data?.mappings[props.entity].available[mapping];
+              setPayloadData(payload);
+            }
+          );
+          
+          console.log(payload);
+
         }
       );
     },
