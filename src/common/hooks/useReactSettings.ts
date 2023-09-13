@@ -16,27 +16,29 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
+export interface Preferences {
+  dashboard_charts: {
+    default_view: 'day' | 'week' | 'month';
+    range: string;
+    currency: number;
+  };
+  datatables: {
+    clients: {
+      sort: string;
+    };
+  };
+  reports: {
+    columns: Record<string, ClientMapRecord[][]>;
+  };
+}
+
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
   react_notification_link: boolean;
   number_precision?: number;
   show_document_preview?: boolean;
-  preferences: {
-    dashboard_charts: {
-      default_view: 'day' | 'week' | 'month';
-      range: string;
-      currency: number;
-    };
-    datatables: {
-      clients: {
-        sort: string;
-      };
-    };
-    reports: {
-      columns: Record<string, ClientMapRecord[][]>;
-    };
-  };
+  preferences: Preferences;
 }
 
 export type ReactTableColumns =
@@ -53,6 +55,22 @@ export type ReactTableColumns =
   | 'purchaseOrder'
   | 'expense'
   | 'recurringExpense';
+
+export const preferencesDefaults: Preferences = {
+  dashboard_charts: {
+    default_view: 'month',
+    currency: 1,
+    range: 'this_month',
+  },
+  datatables: {
+    clients: {
+      sort: 'id|desc',
+    },
+  },
+  reports: {
+    columns: {},
+  },
+};
 
 export function useReactSettings() {
   const user = useInjectUserChanges();
@@ -73,21 +91,7 @@ export function useReactSettings() {
       ...previousReactTableColumns,
       ...reactSettings.react_table_columns,
     },
-    preferences: {
-      dashboard_charts: {
-        default_view: 'month',
-        currency: 1,
-        range: 'this_month',
-      },
-      datatables: {
-        clients: {
-          sort: 'id|desc',
-        },
-      },
-      reports: {
-        columns: {},
-      },
-    },
+    preferences: preferencesDefaults,
   };
 
   return merge<ReactSettings, ReactSettings>(
