@@ -58,7 +58,13 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
     route('/api/v1/clients/:id', { id }),
     () =>
-      request('GET', endpoint('/api/v1/clients/:id', { id })).then(
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents',
+          { id }
+        )
+      ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
     {
