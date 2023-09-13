@@ -126,7 +126,7 @@ export class InvoiceItemSumInclusive {
     }
 
     // this.item.gross_line_total = this.item.line_total + itemTax;
-
+    this.item.gross_line_total = this.item.line_total
     this.totalTaxes += itemTax;
 
     return this;
@@ -159,17 +159,17 @@ export class InvoiceItemSumInclusive {
   public calculateTaxesWithAmountDiscount() {
     this.taxCollection = collect();
 
-    let itemTax = 0;
-
+    
     this.lineItems
       .filter((item) => item.line_total > 0)
-      .map((item) => {
+      .map((item, index:number) => {
         this.item = item;
+        let itemTax = 0;
 
         const amount =
           this.subTotal > 0
             ? this.item.line_total -
-              this.item.line_total * (this.invoice.discount / this.subTotal)
+            this.invoice.discount * (this.item.line_total / this.subTotal)
             : 0;
 
         const itemTaxRateOneTotal = this.calcInclusiveLineTax(
@@ -220,8 +220,15 @@ export class InvoiceItemSumInclusive {
             itemTaxRateThree
           );
         }
+    
+        this.item.gross_line_total = this.item.line_total;
+        this.item.tax_amount = itemTax;
+
+        this.lineItems[index] = this.item;
+        this.totalTaxes += itemTax;
+
       });
 
-    this.totalTaxes = itemTax;
+    
   }
 }

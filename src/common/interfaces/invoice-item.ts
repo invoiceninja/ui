@@ -34,6 +34,7 @@ export interface InvoiceItem {
   sort_id: number;
   line_total: number;
   gross_line_total: number;
+  tax_amount?: number;
   custom_value1: string;
   custom_value2: string;
   custom_value3: string;
