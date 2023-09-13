@@ -196,9 +196,10 @@ export class InvoiceSumInclusive {
         name: taxName as string,
         total: totalLineTax as number,
       });
+
+      this.totalTaxes += totalLineTax as number;
     });
 
-    this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
   }

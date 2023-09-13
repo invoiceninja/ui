@@ -224,7 +224,7 @@ export class InvoiceItemSum {
         this.item.tax_amount = itemTax;
 
         this.lineItems[index] = this.item;
-        this.totalTaxes = itemTax;
+        // this.totalTaxes += itemTax;
       });
   }
 }
