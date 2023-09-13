@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -30,33 +29,9 @@ export function useUpdateClientSettings() {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
-  const activeGroupSettings = useAtomValue(activeSettingsAtom);
-  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
-
-  const adjustClientPayload = () => {
-    const adjustedSettings = { ...companyChanges?.settings };
-
-    Object.entries(adjustedSettings).forEach(([property, value]) => {
-      if (Array.isArray(value) && !value.length) {
-        delete adjustedSettings[property];
-      } else if (
-        value &&
-        typeof value === 'object' &&
-        !Object.entries(value).length
-      ) {
-        delete adjustedSettings[property];
-      } else if (typeof value === 'string' && !value) {
-        delete adjustedSettings[property];
-      }
-    });
-
-    return {
-      ...activeGroupSettings,
-      settings: adjustedSettings,
-    };
-  };
 
   return () => {
     toast.processing();
@@ -67,17 +42,22 @@ export function useUpdateClientSettings() {
       endpoint(
         '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents',
         {
-          id: activeGroupSettings?.id,
+          id: activeSettings?.id,
         }
       ),
-      adjustClientPayload()
+      {
+        ...activeSettings,
+        settings: companyChanges?.settings,
+      }
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
 
+        queryClient.invalidateQueries('/api/v1/clients');
+
         queryClient.invalidateQueries(
           route('/api/v1/clients/:id', {
-            id: activeGroupSettings?.id,
+            id: activeSettings?.id,
           })
         );
 
@@ -97,9 +77,6 @@ export function useUpdateClientSettings() {
             },
           })
         );
-
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

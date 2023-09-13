@@ -20,7 +20,7 @@ import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
 import { Icon } from '../icons/Icon';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdGroup } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
@@ -90,7 +90,10 @@ export function Settings(props: Props) {
             >
               <div className="flex items-center space-x-2 flex-1 min-w-0">
                 <div>
-                  <Icon element={FaObjectGroup} size={20} />
+                  <Icon
+                    element={isGroupSettingsActive ? FaObjectGroup : MdGroup}
+                    size={20}
+                  />
                 </div>
 
                 <span className="text-sm truncate">

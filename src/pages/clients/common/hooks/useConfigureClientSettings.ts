@@ -31,11 +31,53 @@ export function useConfigureClientSettings(params?: Params) {
   return (client: Client) => {
     setActiveSettingsAtom(client);
 
+    const updatedClientSettings = {
+      currency_id: '1',
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      invoice_terms: '',
+      quote_terms: '',
+      quote_footer: '',
+      credit_terms: '',
+      credit_footer: '',
+      invoice_footer: '',
+      name: '',
+      website: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      postal_code: '',
+      phone: '',
+      email: '',
+      vat_number: '',
+      id_number: '',
+      purchase_order_terms: '',
+      purchase_order_footer: '',
+      qr_iban: '',
+      besr_id: '',
+      ...client.settings,
+    };
+
+    delete updatedClientSettings[
+      'entity' as keyof typeof updatedClientSettings
+    ];
+
+    delete updatedClientSettings[
+      'industry_id' as keyof typeof updatedClientSettings
+    ];
+
+    delete updatedClientSettings[
+      'size_id' as keyof typeof updatedClientSettings
+    ];
+
     dispatch(
       updateChanges({
         object: 'company',
         property: 'settings',
-        value: client.settings,
+        value: updatedClientSettings,
       })
     );
 
@@ -43,7 +85,7 @@ export function useConfigureClientSettings(params?: Params) {
       setActiveSettings({
         status: {
           name: client.display_name,
-          level: 'group',
+          level: 'client',
         },
       })
     );
