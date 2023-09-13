@@ -109,13 +109,14 @@ export function Search() {
       onChange={(value: Entry<SearchRecord>) =>
         value.resource ? navigate(value.resource.path) : null
       }
+      className="w-full"
     >
       <div className="relative mt-2">
         <ComboboxInput
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           placeholder={`${t('search')}... (Ctrl K)`}
-          className="border-transparent focus:border-transparent focus:ring-0"
+          className="border-transparent focus:border-transparent focus:ring-0 w-full"
           onChange={(event) => setQuery(event.target.value)}
           theme={{
             backgroundColor: colors.$1,
