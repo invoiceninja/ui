@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { styled } from 'styled-components';
 import { Combobox } from '@headlessui/react';
+import { useClickAway } from 'react-use';
 
 export function useSearch() {
   const [t] = useTranslation();
@@ -72,8 +73,14 @@ const ComboboxOption = styled(Combobox.Option)`
 export function Search() {
   const [t] = useTranslation();
   const [query, setQuery] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
 
   const data = useSearch();
+  const colors = useColorScheme();
+  const navigate = useNavigate();
+
+  const comboboxRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const filtered =
     query === ''
@@ -81,11 +88,6 @@ export function Search() {
       : data?.filter((record) => {
           return record.searchable.toLowerCase().includes(query.toLowerCase());
         });
-
-  const colors = useColorScheme();
-  const navigate = useNavigate();
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -103,6 +105,14 @@ export function Search() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isVisible === false) {
+      setQuery('');
+    }
+  }, [isVisible]);
+
+  useClickAway(comboboxRef, () => setIsVisible(false));
+
   return (
     <Combobox
       as="div"
@@ -110,6 +120,7 @@ export function Search() {
         value.resource ? navigate(value.resource.path) : null
       }
       className="w-full"
+      ref={comboboxRef}
     >
       <div className="relative mt-2">
         <ComboboxInput
@@ -123,11 +134,18 @@ export function Search() {
             color: colors.$3,
           }}
           ref={inputRef}
+          onFocus={() => setIsVisible(true)}
         />
 
         <Combobox.Options
-          className="absolute border rounded w-96 max-h-72 overflow-y-auto shadow-lg"
+          className={classNames(
+            'absolute border rounded w-96 max-h-72 overflow-y-auto shadow-lg',
+            {
+              hidden: !isVisible,
+            }
+          )}
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          static={true}
         >
           {filtered?.map((entry) => (
             <ComboboxOption
