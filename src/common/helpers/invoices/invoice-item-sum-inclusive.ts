@@ -159,12 +159,12 @@ export class InvoiceItemSumInclusive {
   public calculateTaxesWithAmountDiscount() {
     this.taxCollection = collect();
 
-    let itemTax = 0;
-
+    
     this.lineItems
       .filter((item) => item.line_total > 0)
       .map((item, index:number) => {
         this.item = item;
+        let itemTax = 0;
 
         const amount =
           this.subTotal > 0

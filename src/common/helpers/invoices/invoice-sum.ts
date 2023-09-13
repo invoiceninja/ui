@@ -84,7 +84,7 @@ export class InvoiceSum {
         this.invoice.tax_name1,
         this.invoice.tax_rate1
       );
-
+console.log(this.totalTaxes, tax);
       this.totalTaxes += tax;
 
       this.totalTaxMap.push({
@@ -101,7 +101,7 @@ export class InvoiceSum {
         this.invoice.tax_name2,
         this.invoice.tax_rate2
       );
-
+console.log("a " +this.totalTaxes, tax);
       this.totalTaxes += tax;
 
       this.totalTaxMap.push({
@@ -209,6 +209,8 @@ export class InvoiceSum {
       });
     });
 
+    console.log("b" + this.totalTaxes, this.invoiceItems.totalTaxes);
+
     this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
@@ -249,7 +251,7 @@ export class InvoiceSum {
     );
 
     this.invoice.total_taxes = this.totalTaxes;
-
+console.log(this.invoice);
     return this;
   }
 

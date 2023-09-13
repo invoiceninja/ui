@@ -83,8 +83,6 @@ export class InvoiceItemSum {
       this.item.line_total -
       this.item.line_total * (this.invoice.discount / 100);
 
-    //
-
     const itemTaxRateOneLocal = this.calculateAmountLineTax(
       this.item.tax_rate1,
       amount
@@ -108,8 +106,6 @@ export class InvoiceItemSum {
     if (this.item.tax_name2.length >= 1) {
       this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
     }
-
-    //
 
     const itemTaxRateThreeLocal = this.calculateAmountLineTax(
       this.item.tax_rate3,
@@ -157,6 +153,8 @@ export class InvoiceItemSum {
 
   public calculateTaxesWithAmountDiscount() {
     this.taxCollection = collect();
+
+    this.totalTaxes = 0;
 
     this.lineItems
       .filter((item) => item.line_total > 0)
@@ -224,7 +222,7 @@ export class InvoiceItemSum {
         this.item.tax_amount = itemTax;
 
         this.lineItems[index] = this.item;
-        // this.totalTaxes += itemTax;
+        this.totalTaxes += itemTax;
       });
   }
 }
