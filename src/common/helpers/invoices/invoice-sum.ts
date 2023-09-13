@@ -183,6 +183,7 @@ export class InvoiceSum {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
+      this.invoice.line_items = this.invoiceItems.lineItems
     }
 
     this.taxMap = collect();
