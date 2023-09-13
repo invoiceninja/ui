@@ -9,8 +9,12 @@
  */
 
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import {
+  injectInChanges,
+  updateChanges,
+} from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { useSetAtom } from 'jotai';
 import { useDispatch } from 'react-redux';
@@ -24,12 +28,16 @@ export function useConfigureClientSettings(params?: Params) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const company = useCurrentCompany();
+
   const { withoutNavigation } = params || {};
 
   const setActiveSettingsAtom = useSetAtom(activeSettingsAtom);
 
   return (client: Client) => {
     setActiveSettingsAtom(client);
+
+    dispatch(injectInChanges({ object: 'company', data: company }));
 
     const updatedClientSettings = {
       currency_id: '1',
