@@ -13,8 +13,15 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  preferencesDefaults,
+  useReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { InputField } from '$app/components/forms';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { Divider } from '$app/components/cards/Divider';
+import { Inline } from '$app/components/Inline';
+import { X } from 'react-feather';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -29,6 +36,8 @@ export function Preferences() {
       })
     );
   };
+
+  const { preferences, update } = usePreferences();
 
   return (
     <Card title={t('preferences')}>
@@ -84,6 +93,28 @@ export function Preferences() {
           type="number"
           placeholder={t('number_precision')}
         />
+      </Element>
+
+      <Divider />
+
+      <Element leftSide={`${t('dashboard_charts')}: ${'default_view'}`}>
+        <Inline className="space-x-4">
+          <p className="uppercase">
+            {preferences.dashboard_charts.default_view}
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              update(
+                'preferences.dashboard_charts.default_view',
+                preferencesDefaults.dashboard_charts.default_view
+              )
+            }
+          >
+            <X />
+          </button>
+        </Inline>
       </Element>
     </Card>
   );
