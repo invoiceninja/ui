@@ -294,7 +294,12 @@ export default function Reports() {
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
       navigationTopRight={
-        <Button type="secondary" onClick={handlePreview}>
+        <Button
+          type="secondary"
+          onClick={handlePreview}
+          disabled={!report.supports_previews}
+          disableWithoutIcon
+        >
           {t('preview')}
         </Button>
       }
