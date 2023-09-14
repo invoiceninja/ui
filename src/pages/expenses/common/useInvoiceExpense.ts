@@ -45,7 +45,7 @@ export function useInvoiceExpense() {
   const create = (expense: Expense) => {
     if (data) {
       const invoice: Invoice = { ...data };
-      console.log(expense);
+
       invoice.date = expense.date;
       invoice.client_id = expense.client_id;
       invoice.uses_inclusive_taxes = expense.uses_inclusive_taxes;

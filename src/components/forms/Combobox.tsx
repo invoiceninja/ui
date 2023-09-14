@@ -36,6 +36,7 @@ type EventType = 'internal' | 'external';
 interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
+  placeholder?: string
 }
 
 interface Action {
@@ -74,7 +75,7 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
-export function ComboboxStatic({
+export function ComboboxStatic<T =any>({
   inputOptions,
   entries,
   readonly,
@@ -88,7 +89,7 @@ export function ComboboxStatic({
   entryOptions,
   errorMessage,
   clearInputAfterSelection,
-}: ComboboxStaticProps) {
+}: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
   const [query, setQuery] = useState('');
@@ -224,6 +225,7 @@ export function ComboboxStatic({
                 (entry?.label || '')
               }
               onFocus={() => setIsOpen(true)}
+              placeholder={inputOptions.placeholder}
               style={{
                 backgroundColor: colors.$1,
                 borderColor: colors.$5,
