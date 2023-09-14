@@ -58,7 +58,6 @@ export const useBulkAction = () => {
       }
 
       queryClient.invalidateQueries('/api/v1/quotes');
-      queryClient.invalidateQueries('/api/v1/projects');
 
       ids.forEach((id) =>
         queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
