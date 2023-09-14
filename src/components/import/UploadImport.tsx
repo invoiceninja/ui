@@ -135,20 +135,17 @@ export function UploadImport(props: Props) {
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();
-          console.log(response.data);
 
-          console.log(response.data?.mappings[props.entity]?.hints.length);
-
-          response.data?.mappings[props.entity]?.hints.forEach(
-            (mapping: number, index: number) => {
-              console.log(mapping, index);
-              payload.column_map[props.entity].mapping[index] = response.data?.mappings[props.entity].available[mapping];
-              setPayloadData(payload);
-            }
-          );
+          if (response.data?.mappings[props.entity]?.hints)
+          {
+            response.data?.mappings[props.entity]?.hints.forEach(
+              (mapping: number, index: number) => {
+                payload.column_map[props.entity].mapping[index] = response.data?.mappings[props.entity].available[mapping];
+                setPayloadData(payload);
+              }
+            );
+          }
           
-          console.log(payload);
-
         }
       );
     },
@@ -161,6 +158,15 @@ export function UploadImport(props: Props) {
 
     setFormData(formData);
   };
+
+  const defaultHint = (index: number) => {
+  
+    if(!mapData?.mappings[props.entity]?.hints) return null;
+
+
+    return mapData?.mappings[props.entity].available[mapData.mappings[props.entity]?.hints[index]] ?? null;
+
+  }
 
   const removeFileFromFormData = (fileIndex: number) => {
     const filteredFileList = files.filter((file, index) => fileIndex !== index);
@@ -300,7 +306,7 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={mapData.mappings[props.entity].available[mapData.mappings[props.entity]?.hints[index]] ?? null}>
+                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={defaultHint(index)}>
                       {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
                           <option value={mapping} key={index}>
