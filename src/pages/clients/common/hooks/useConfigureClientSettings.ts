@@ -9,6 +9,7 @@
  */
 
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 import {
@@ -29,6 +30,7 @@ export function useConfigureClientSettings(params?: Params) {
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
+  const companyChanges = useCompanyChanges();
 
   const { withoutNavigation } = params || {};
 
@@ -37,15 +39,22 @@ export function useConfigureClientSettings(params?: Params) {
   return (client: Client) => {
     setActiveSettingsAtom(client);
 
-    dispatch(injectInChanges({ object: 'company', data: company }));
-
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: 'settings',
-        value: client.settings,
-      })
-    );
+    if (!companyChanges) {
+      dispatch(
+        injectInChanges({
+          object: 'company',
+          data: { ...company, settings: client.settings },
+        })
+      );
+    } else {
+      dispatch(
+        updateChanges({
+          object: 'company',
+          property: 'settings',
+          value: client.settings,
+        })
+      );
+    }
 
     dispatch(
       setActiveSettings({
