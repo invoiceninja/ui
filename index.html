@@ -15,31 +15,6 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
-
-    <script>
-      if ('%VITE_IS_HOSTED%' === 'true') {
-        const facebookPixelId = '%VITE_FACEBOOK_PIXEL_ID%';
-
-        const noscriptElement = document.createElement('noscript');
-
-        const pixelBody = document.createElement('img');
-        pixelBody.height = '1';
-        pixelBody.width = '1';
-        pixelBody.style.display = 'none';
-
-        pixelBody.src = `https://www.facebook.com/tr?id=${facebookPixelId}&ev=PageView&noscript=1`;
-
-        noscriptElement.appendChild(pixelBody);
-
-        if (document.body) {
-          document.body.appendChild(noscriptElement);
-        } else {
-          document.addEventListener('DOMContentLoaded', function () {
-            document.body.appendChild(noscriptElement);
-          });
-        }
-      }
-    </script>
   </head>
 
   <body class="h-full">
