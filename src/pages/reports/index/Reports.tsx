@@ -282,7 +282,10 @@ export default function Reports() {
   useEffect(() => {
     return () => {
       queryClient.cancelQueries(['reports']);
+      
       toast.dismiss();
+
+      setPreview(null);
     };
   }, []);
 
