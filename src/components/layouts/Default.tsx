@@ -399,8 +399,8 @@ export function Default(props: Props) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="dark:text-gray-100" />
           </button>
-          <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
-            <div className="flex items-center space-x-4 w-[60%]">
+          <div className="flex-1 px-4 md:px-8 flex items-center">
+            <div className="flex flex-1 items-center space-x-4">
               <h2 style={{ color: colors.$3 }} className="text-sm md:text-lg whitespace-nowrap">
                 {props.title}
               </h2>
