@@ -32,8 +32,9 @@ import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../useReports';
+import { contactMap } from '$app/common/constants/exports/contact-map';
 
-export const reportColumn = 10;
+export const reportColumn = 11;
 
 interface Record {
   trans: string;
@@ -133,6 +134,7 @@ const positions = [
   'task',
   'expense',
   'recurring_invoice',
+  'contact',
 ];
 
 export function SortableColumns({ report, columns }: Props) {
@@ -173,6 +175,7 @@ export function SortableColumns({ report, columns }: Props) {
               ? recurringinvoiceMap.concat(itemMap)
               : recurringinvoiceMap
             : [],
+          columns.includes('contact') ? contactMap : [],
           [],
         ];
 
@@ -255,6 +258,7 @@ export function SortableColumns({ report, columns }: Props) {
           ? recurringinvoiceMap.concat(itemMap)
           : recurringinvoiceMap
         : [],
+      columns.includes('contact') ? contactMap : [],
       [],
     ]);
   };
@@ -440,6 +444,23 @@ export function SortableColumns({ report, columns }: Props) {
                 )}
                 data={data[9]}
                 droppableId="9"
+                isDropDisabled={true}
+              />
+            )}
+
+            {columns.includes('contact') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('contact')}</p>
+
+                    <button type="button" onClick={() => onAddAll(10)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[10]}
+                droppableId="10"
                 isDropDisabled={true}
               />
             )}
