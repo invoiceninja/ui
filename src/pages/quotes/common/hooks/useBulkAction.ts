@@ -15,6 +15,7 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { useNavigate } from 'react-router-dom';
 
 const successMessages = {
   convert_to_invoice: 'converted_quote',
@@ -24,6 +25,7 @@ const successMessages = {
 };
 
 export const useBulkAction = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
@@ -44,7 +46,7 @@ export const useBulkAction = () => {
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids,
-    }).then(() => {
+    }).then((response) => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
         `${action}d_quote`;
@@ -56,6 +58,7 @@ export const useBulkAction = () => {
       }
 
       queryClient.invalidateQueries('/api/v1/quotes');
+      queryClient.invalidateQueries('/api/v1/projects');
 
       ids.forEach((id) =>
         queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
@@ -63,6 +66,12 @@ export const useBulkAction = () => {
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
+
+      if (action === 'convert_to_project') {
+        navigate(
+          route('/projects/:id', { id: response.data.data[0].project_id })
+        );
+      }
     });
   };
 };
