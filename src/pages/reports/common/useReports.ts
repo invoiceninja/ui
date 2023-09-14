@@ -30,6 +30,7 @@ export interface Report {
   custom_columns: string[];
   allow_custom_column: boolean;
   preview: string;
+  supports_previews: boolean;
 }
 
 export type Identifier =
@@ -76,6 +77,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/activities?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'client',
@@ -92,6 +94,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/clients?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'contact',
@@ -108,6 +111,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/contacts?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'credit',
@@ -124,6 +128,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/credits?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'document',
@@ -140,6 +145,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/documents?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'expense',
@@ -156,6 +162,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/expenses?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'invoice',
@@ -173,6 +180,7 @@ export function useReports() {
         status: '',
       },
       preview: '/api/v1/reports/invoices?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'invoice_item',
@@ -189,6 +197,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/invoice_items?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'purchase_order',
@@ -206,6 +215,7 @@ export function useReports() {
         status: '',
       },
       preview: '/api/v1/reports/purchase_orders?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'purchase_order_item',
@@ -222,6 +232,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/purchase_order_items?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'quote',
@@ -238,6 +249,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/quotes?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'quote_item',
@@ -254,6 +266,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/quote_items?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'recurring_invoice',
@@ -270,6 +283,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/recurring_invoices?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'payment',
@@ -286,6 +300,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/payments?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'product',
@@ -302,6 +317,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/products?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'product_sales',
@@ -319,6 +335,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/product_sales?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'task',
@@ -335,6 +352,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/tasks?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'vendor',
@@ -351,6 +369,7 @@ export function useReports() {
         send_email: false,
       },
       preview: '/api/v1/reports/vendors?output=json',
+      supports_previews: true,
     },
     {
       identifier: 'profitloss',
@@ -370,6 +389,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/profitloss?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'aged_receivable_detailed_report',
@@ -389,6 +409,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/ar_detail_report?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'aged_receivable_summary_report',
@@ -408,6 +429,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/ar_summary_report?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'client_balance_report',
@@ -427,6 +449,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/client_balance_report?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'client_sales_report',
@@ -446,6 +469,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/client_sales_report?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'tax_summary_report',
@@ -465,6 +489,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/tax_summary_report?output=json',
+      supports_previews: false,
     },
     {
       identifier: 'user_sales_report',
@@ -484,6 +509,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/user_sales_report?output=json',
+      supports_previews: true,
     },
   ];
   return reports;
