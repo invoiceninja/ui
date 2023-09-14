@@ -65,8 +65,7 @@ export function DeleteLogo() {
         }
 
         if (isClientSettingsActive) {
-          endpointRoute =
-            '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents';
+          endpointRoute = '/api/v1/clients/:id';
           entityId = activeGroupSettings.id;
         }
       }

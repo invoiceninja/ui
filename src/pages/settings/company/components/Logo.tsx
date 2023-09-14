@@ -69,8 +69,7 @@ export function Logo() {
         }
 
         if (isClientSettingsActive) {
-          endpointRoute =
-            '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents';
+          endpointRoute = '/api/v1/clients/:id';
           entityId = activeGroupSettings.id;
         }
       }

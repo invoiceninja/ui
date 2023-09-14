@@ -45,7 +45,7 @@ export function useUpdateClientSettings() {
         !Object.entries(value).length
       ) {
         delete adjustedSettings[property];
-      } else if (typeof value === 'string' && !value) {
+      } else if (typeof value !== 'boolean' && !value) {
         delete adjustedSettings[property];
       }
     });
@@ -62,12 +62,9 @@ export function useUpdateClientSettings() {
 
     request(
       'PUT',
-      endpoint(
-        '/api/v1/clients/:id?include=gateway_tokens,activities,ledger,system_logs,documents',
-        {
-          id: activeSettings?.id,
-        }
-      ),
+      endpoint('/api/v1/clients/:id', {
+        id: activeSettings?.id,
+      }),
       adjustClientSettingsPayload()
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
