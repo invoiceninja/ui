@@ -33,6 +33,29 @@ export function useUpdateClientSettings() {
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
+  const adjustClientSettingsPayload = () => {
+    const adjustedSettings = { ...companyChanges?.settings };
+
+    Object.entries(adjustedSettings).forEach(([property, value]) => {
+      if (Array.isArray(value) && !value.length) {
+        delete adjustedSettings[property];
+      } else if (
+        value &&
+        typeof value === 'object' &&
+        !Object.entries(value).length
+      ) {
+        delete adjustedSettings[property];
+      } else if (typeof value === 'string' && !value) {
+        delete adjustedSettings[property];
+      }
+    });
+
+    return {
+      ...activeSettings,
+      settings: adjustedSettings,
+    };
+  };
+
   return () => {
     toast.processing();
     setErrors(undefined);
@@ -45,10 +68,7 @@ export function useUpdateClientSettings() {
           id: activeSettings?.id,
         }
       ),
-      {
-        ...activeSettings,
-        settings: companyChanges?.settings,
-      }
+      adjustClientSettingsPayload()
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
