@@ -100,8 +100,8 @@ export function useReports() {
       identifier: 'contact',
       label: 'contact',
       endpoint: '/api/v1/reports/contacts',
-      allow_custom_column: false,
-      custom_columns: [],
+      allow_custom_column: true,
+      custom_columns: ['contact'],
       payload: {
         start_date: '',
         end_date: '',
