@@ -38,7 +38,7 @@ export function DeleteLogo() {
     isClientSettingsActive,
   } = useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeSettingsAtom);
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
     withoutNavigation: true,
@@ -58,15 +58,15 @@ export function DeleteLogo() {
 
       let entityId = company.id;
 
-      if (activeGroupSettings) {
+      if (activeSettings) {
         if (isGroupSettingsActive) {
           endpointRoute = '/api/v1/group_settings/:id';
-          entityId = activeGroupSettings.id;
+          entityId = activeSettings.id;
         }
 
         if (isClientSettingsActive) {
           endpointRoute = '/api/v1/clients/:id';
-          entityId = activeGroupSettings.id;
+          entityId = activeSettings.id;
         }
       }
 
