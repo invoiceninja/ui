@@ -29,16 +29,35 @@ export function Vendors() {
   }
 
   return (
-    <Card title={title}>
-      {['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-        <Field
-          key={field}
-          field={field}
-          placeholder={t('vendor_field')}
-          onChange={(value) => handleChange(field, value)}
-          initialValue={company.custom_fields[field]}
-        />
-      ))}
-    </Card>
+    <>
+      <Card title={title}>
+        {['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('vendor_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
+        ))}
+      </Card>
+
+      <Card title={`${t('custom_fields')}: ${t('contacts')}`}>
+        {[
+          'vendor_contact1',
+          'vendor_contact2',
+          'vendor_contact3',
+          'vendor_contact4',
+        ].map((field) => (
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('contact_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+          />
+        ))}
+      </Card>
+    </>
   );
 }

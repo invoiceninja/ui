@@ -26,17 +26,20 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
   vendor: Vendor;
-  setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
+  setVendor: Dispatch<SetStateAction<Vendor | undefined>>;
+  setContacts: Dispatch<SetStateAction<Partial<VendorContact>[]>>;
+  contacts: Partial<VendorContact>[];
   errors: ValidationBag | undefined;
   page?: 'create' | 'edit';
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor, errors, page } = props;
+  const { vendor, setVendor, errors, page, setContacts, contacts } = props;
 
   const company = useCurrentCompany();
 
@@ -45,15 +48,13 @@ export function Form(props: Props) {
   };
 
   const handleContactChange = (
-    property: keyof VendorContact,
-    value: string | boolean,
+    value: string | number | boolean,
+    propertyId: string,
     index: number
   ) => {
-    const contacts = [...vendor.contacts];
+    set(contacts[index], propertyId, value);
 
-    set(contacts[index], property, value);
-
-    handleChange('contacts', contacts);
+    setContacts(contacts);
   };
 
   const handleDelete = (index: number) => {
@@ -249,13 +250,13 @@ export function Form(props: Props) {
 
       <div className="col-span-12 xl:col-span-6 space-y-4">
         <Card title={t('contacts')}>
-          {vendor.contacts.map((contact, index, { length }) => (
+          {contacts.map((contact, index, { length }) => (
             <div key={index}>
               <Element leftSide={t('first_name')}>
                 <InputField
                   value={contact.first_name}
                   onValueChange={(value) =>
-                    handleContactChange('first_name', value, index)
+                    handleContactChange(value, 'first_name', index)
                   }
                   errorMessage={
                     props.errors?.errors[`contacts.${index}.first_name`]
@@ -267,7 +268,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.last_name}
                   onValueChange={(value) =>
-                    handleContactChange('last_name', value, index)
+                    handleContactChange(value, 'last_name', index)
                   }
                   errorMessage={
                     props.errors?.errors[`contacts.${index}.last_name`]
@@ -279,7 +280,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.email}
                   onValueChange={(value) =>
-                    handleContactChange('email', value, index)
+                    handleContactChange(value, 'email', index)
                   }
                   errorMessage={props.errors?.errors[`contacts.${index}.email`]}
                 />
@@ -289,7 +290,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.phone}
                   onValueChange={(value) =>
-                    handleContactChange('phone', value, index)
+                    handleContactChange(value, 'phone', index)
                   }
                   errorMessage={props.errors?.errors[`contacts.${index}.phone`]}
                 />
@@ -299,10 +300,54 @@ export function Form(props: Props) {
                 <Toggle
                   checked={contact.send_email}
                   onChange={(value) =>
-                    handleContactChange('send_email', value, index)
+                    handleContactChange(value, 'send_email', index)
                   }
                 />
               </Element>
+
+              {company?.custom_fields?.vendor_contact1 && (
+                <CustomField
+                  field="vendor_contact1"
+                  defaultValue={contact.custom_value1}
+                  value={company.custom_fields.vendor_contact1}
+                  onValueChange={(value) =>
+                    handleContactChange(value, 'custom_value1', index)
+                  }
+                />
+              )}
+
+              {company?.custom_fields?.vendor_contact2 && (
+                <CustomField
+                  field="vendor_contact2"
+                  defaultValue={contact.custom_value2}
+                  value={company.custom_fields.vendor_contact2}
+                  onValueChange={(value) =>
+                    handleContactChange(value, 'custom_value2', index)
+                  }
+                />
+              )}
+
+              {company?.custom_fields?.vendor_contact3 && (
+                <CustomField
+                  field="vendor_contact3"
+                  defaultValue={contact.custom_value3}
+                  value={company.custom_fields.vendor_contact3}
+                  onValueChange={(value) =>
+                    handleContactChange(value, 'custom_value3', index)
+                  }
+                />
+              )}
+
+              {company?.custom_fields?.vendor_contact4 && (
+                <CustomField
+                  field="vendor_contact4"
+                  defaultValue={contact.custom_value4}
+                  value={company.custom_fields.vendor_contact4}
+                  onValueChange={(value) =>
+                    handleContactChange(value, 'custom_value4', index)
+                  }
+                />
+              )}
 
               <Element>
                 <div className="flex justify-between items-center">
@@ -379,9 +424,7 @@ export function Form(props: Props) {
             </div>
 
             <div>
-              <span className="text-sm">
-                {t('custom_fields')} &nbsp;
-              </span>
+              <span className="text-sm">{t('custom_fields')} &nbsp;</span>
               <Link to="/settings/custom_fields/vendors" className="capitalize">
                 {t('click_here')}
               </Link>
