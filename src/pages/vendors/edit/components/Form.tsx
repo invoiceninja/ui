@@ -58,17 +58,19 @@ export function Form(props: Props) {
   };
 
   const handleDelete = (index: number) => {
-    const contacts = [...vendor.contacts];
+    let currentContacts = [...contacts];
 
-    contacts.splice(index, 1);
+    currentContacts = currentContacts.filter(
+      (_, contactIndex) => index !== contactIndex
+    );
 
-    handleChange('contacts', contacts);
+    setContacts(currentContacts);
   };
 
   const handleCreate = () => {
-    const contacts = [...vendor.contacts];
+    const currentContacts = [...contacts];
 
-    contacts.push({
+    currentContacts.push({
       id: '',
       first_name: '',
       last_name: '',
@@ -87,7 +89,7 @@ export function Form(props: Props) {
       last_login: 0,
     });
 
-    handleChange('contacts', contacts);
+    setContacts(currentContacts);
   };
 
   const languages = useLanguages();
