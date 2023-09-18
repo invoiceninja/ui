@@ -196,10 +196,11 @@ export default function Apply() {
                 value={record.number}
               />
               <InputField
+                type="number"
                 label={t('amount_received')}
                 id={`invoices[${index}].amount`}
                 onChange={formik.handleChange}
-                value={record.amount}
+                value={record.amount || 0}
               />
 
               <Button

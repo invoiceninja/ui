@@ -250,7 +250,8 @@ export default function Create() {
           >
             <InputField
               id="amount"
-              value={payment?.amount}
+              type="number"
+              value={payment?.amount || 0}
               onValueChange={(value) =>
                 handleChange(
                   'amount',
@@ -301,6 +302,7 @@ export default function Create() {
                     />
 
                     <InputField
+                      type="number"
                       label={t('amount_received')}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
@@ -421,6 +423,7 @@ export default function Create() {
                     />
 
                     <InputField
+                      type="number"
                       label={t('amount')}
                       onValueChange={(value) =>
                         handleCreditInputChange(

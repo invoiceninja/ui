@@ -153,10 +153,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name1}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={expense.tax_amount1}
+                value={expense.tax_amount1 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount1', parseFloat(value))
+                  handleChange('tax_amount1', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount1}
               />
@@ -198,10 +199,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name2}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={expense.tax_amount2}
+                value={expense.tax_amount2 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount2', parseFloat(value))
+                  handleChange('tax_amount2', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount2}
               />
@@ -243,10 +245,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name3}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={expense.tax_amount3}
+                value={expense.tax_amount3 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount3', parseFloat(value))
+                  handleChange('tax_amount3', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount3}
               />
@@ -257,7 +260,8 @@ export function Details(props: Props) {
       {expense && (
         <Element leftSide={t('amount')}>
           <InputField
-            value={expense.amount}
+            type="number"
+            value={expense.amount || 0}
             onValueChange={(value) =>
               handleChange('amount', parseFloat(value) || 0)
             }

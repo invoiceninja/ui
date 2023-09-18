@@ -162,10 +162,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name1}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount1}
+                value={recurringExpense.tax_amount1 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount1', parseFloat(value))
+                  handleChange('tax_amount1', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount1}
               />
@@ -207,10 +208,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name2}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount2}
+                value={recurringExpense.tax_amount2 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount2', parseFloat(value))
+                  handleChange('tax_amount2', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount2}
               />
@@ -252,10 +254,11 @@ export function Details(props: Props) {
                 errorMessage={errors?.errors.tax_name3}
               />
               <InputField
+                type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount3}
+                value={recurringExpense.tax_amount3 || 0}
                 onValueChange={(value) =>
-                  handleChange('tax_amount3', parseFloat(value))
+                  handleChange('tax_amount3', parseFloat(value) || 0)
                 }
                 errorMessage={errors?.errors.tax_amount3}
               />
@@ -266,7 +269,8 @@ export function Details(props: Props) {
       {recurringExpense && (
         <Element leftSide={t('amount')}>
           <InputField
-            value={recurringExpense.amount}
+            type="number"
+            value={recurringExpense.amount || 0}
             onValueChange={(value) =>
               handleChange('amount', parseFloat(value) || 0)
             }

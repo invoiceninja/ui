@@ -122,8 +122,11 @@ export function TaskDetails(props: Props) {
 
         <Element leftSide={t('rate')}>
           <InputField
-            value={task.rate}
-            onValueChange={(value) => handleChange('rate', value)}
+            type="number"
+            value={task.rate || 0}
+            onValueChange={(value) =>
+              handleChange('rate', parseFloat(value) || 0)
+            }
             errorMessage={errors?.errors.rate}
           />
         </Element>
@@ -172,9 +175,7 @@ export function TaskDetails(props: Props) {
             </div>
 
             <div>
-              <span className="text-sm">
-                {t('custom_fields')} &nbsp;
-              </span>
+              <span className="text-sm">{t('custom_fields')} &nbsp;</span>
               <Link to="/settings/custom_fields/tasks" className="capitalize">
                 {t('click_here')}
               </Link>

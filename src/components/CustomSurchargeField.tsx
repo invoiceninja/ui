@@ -10,10 +10,16 @@
 
 import { useEffect, useState } from 'react';
 import { Element } from './cards';
-import { Props } from './forms/InputCustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 
+interface Props {
+  defaultValue: any;
+  field: string;
+  type?: string;
+  value: string | number;
+  onValueChange: (value: string | number | boolean) => unknown;
+}
 export function CustomSurchargeField(props: Props) {
   const [label, setLabel] = useState('');
   const company = useCurrentCompany();
