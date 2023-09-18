@@ -282,7 +282,7 @@ export default function Reports() {
   useEffect(() => {
     return () => {
       queryClient.cancelQueries(['reports']);
-      
+
       toast.dismiss();
 
       setPreview(null);
@@ -297,14 +297,11 @@ export default function Reports() {
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
       navigationTopRight={
-        <Button
-          type="secondary"
-          onClick={handlePreview}
-          disabled={!report.supports_previews}
-          disableWithoutIcon
-        >
-          {t('preview')}
-        </Button>
+        report.supports_previews ? (
+          <Button type="secondary" onClick={handlePreview}>
+            {t('preview')}
+          </Button>
+        ) : null
       }
       withoutBackButton
     >
