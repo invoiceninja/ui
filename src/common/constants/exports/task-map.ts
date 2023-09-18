@@ -11,16 +11,16 @@
 import { Record } from "./client-map";
 
 export const taskMap: Record[] = [
-  { trans: 'start_date', value: 'task.start_date' },
-  { trans: 'end_date', value: 'task.end_date' },
-  { trans: 'duration', value: 'task.duration' },
-  { trans: 'rate', value: 'task.rate' },
-  { trans: 'number', value: 'task.number' },
-  { trans: 'description', value: 'task.description' },
-  { trans: 'custom_value1', value: 'task.custom_value1' },
-  { trans: 'custom_value2', value: 'task.custom_value2' },
-  { trans: 'custom_value3', value: 'task.custom_value3' },
-  { trans: 'custom_value4', value: 'task.custom_value4' },
-  { trans: 'status', value: 'task.status_id' },
-  { trans: 'project', value: 'task.project_id' },
+  { trans: 'start_date', value: 'task.start_date', map: 'task' },
+  { trans: 'end_date', value: 'task.end_date', map: 'task' },
+  { trans: 'duration', value: 'task.duration', map: 'task' },
+  { trans: 'rate', value: 'task.rate', map: 'task' },
+  { trans: 'number', value: 'task.number', map: 'task' },
+  { trans: 'description', value: 'task.description', map: 'task' },
+  { trans: 'custom_value1', value: 'task.custom_value1', map: 'task' },
+  { trans: 'custom_value2', value: 'task.custom_value2', map: 'task' },
+  { trans: 'custom_value3', value: 'task.custom_value3', map: 'task' },
+  { trans: 'custom_value4', value: 'task.custom_value4', map: 'task' },
+  { trans: 'status', value: 'task.status_id', map: 'task' },
+  { trans: 'project', value: 'task.project_id', map: 'task' },
 ];
