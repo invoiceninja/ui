@@ -130,7 +130,7 @@ const positions = [
   'expense',
   'recurring_invoice',
   'contact',
-];
+] as const;
 
 export function SortableColumns({ report, columns }: Props) {
   const { preferences, update } = usePreferences();
@@ -143,31 +143,39 @@ export function SortableColumns({ report, columns }: Props) {
           columns.includes('client') ? clientMap : [],
           columns.includes('invoice')
             ? columns.includes('item')
-              ? invoiceMap.concat(itemMap)
+              ? invoiceMap.concat(
+                  itemMap.map((i) => ({ ...i, origin: 'invoice' }))
+                )
               : invoiceMap
             : [],
           columns.includes('credit')
             ? columns.includes('item')
-              ? creditMap.concat(itemMap)
+              ? creditMap.concat(
+                  itemMap.map((i) => ({ ...i, origin: 'credit' }))
+                )
               : creditMap
             : [],
           columns.includes('quote')
             ? columns.includes('item')
-              ? quoteMap.concat(itemMap)
+              ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
               : quoteMap
             : [],
           columns.includes('payment') ? paymentMap : [],
           columns.includes('vendor') ? vendorMap : [],
           columns.includes('purchase_order')
             ? columns.includes('item')
-              ? purchaseorderMap.concat(itemMap)
+              ? purchaseorderMap.concat(
+                  itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+                )
               : purchaseorderMap
             : [],
           columns.includes('task') ? taskMap : [],
           columns.includes('expense') ? expenseMap : [],
           columns.includes('recurring_invoice')
             ? columns.includes('item')
-              ? recurringinvoiceMap.concat(itemMap)
+              ? recurringinvoiceMap.concat(
+                  itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+                )
               : recurringinvoiceMap
             : [],
           columns.includes('contact') ? contactMap : [],
@@ -201,7 +209,7 @@ export function SortableColumns({ report, columns }: Props) {
   };
 
   const onRemove = (record: Record) => {
-    const index = positions.indexOf(record.map);
+    const index = positions.indexOf(record.map as (typeof positions)[number]);
 
     // Remove it from the reports
     const $data = cloneDeep(data);
@@ -221,31 +229,35 @@ export function SortableColumns({ report, columns }: Props) {
       columns.includes('client') ? clientMap : [],
       columns.includes('invoice')
         ? columns.includes('item')
-          ? invoiceMap.concat(itemMap)
+          ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
           : invoiceMap
         : [],
       columns.includes('credit')
         ? columns.includes('item')
-          ? creditMap.concat(itemMap)
+          ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
           : creditMap
         : [],
       columns.includes('quote')
         ? columns.includes('item')
-          ? quoteMap.concat(itemMap)
+          ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
           : quoteMap
         : [],
       columns.includes('payment') ? paymentMap : [],
       columns.includes('vendor') ? vendorMap : [],
       columns.includes('purchase_order')
         ? columns.includes('item')
-          ? purchaseorderMap.concat(itemMap)
+          ? purchaseorderMap.concat(
+              itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+            )
           : purchaseorderMap
         : [],
       columns.includes('task') ? taskMap : [],
       columns.includes('expense') ? expenseMap : [],
       columns.includes('recurring_invoice')
         ? columns.includes('item')
-          ? recurringinvoiceMap.concat(itemMap)
+          ? recurringinvoiceMap.concat(
+              itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+            )
           : recurringinvoiceMap
         : [],
       columns.includes('contact') ? contactMap : [],
