@@ -48,11 +48,11 @@ export function Form(props: Props) {
   };
 
   const handleContactChange = (
-    propertyId: keyof VendorContact,
+    property: keyof VendorContact,
     value: string | number | boolean,
     index: number
   ) => {
-    set(contacts[index], propertyId, value);
+    set(contacts[index], property, value);
 
     setContacts(contacts);
   };
