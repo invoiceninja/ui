@@ -185,7 +185,8 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           <Element leftSide={t('task_rate')}>
             <InputField
               id="settings.default_task_rate"
-              value={client?.settings?.default_task_rate || ''}
+              type="number"
+              value={client?.settings?.default_task_rate ?? 0}
               onValueChange={(value) =>
                 handleSettingsChange('default_task_rate', value)
               }
@@ -280,18 +281,14 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         </div>
 
         <div>
-          <span className="text-sm">
-            {t('custom_fields')} &nbsp;
-          </span>
+          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/clients" className="capitalize">
             {t('click_here')}
           </Link>
         </div>
 
         <div>
-          <span className="text-sm">
-            {t('custom_fields')} &nbsp;
-          </span>
+          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/clients" className="capitalize">
             {t('click_here')}
           </Link>
