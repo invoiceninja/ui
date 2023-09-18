@@ -308,7 +308,7 @@ export function Form(props: Props) {
               {company?.custom_fields?.vendor_contact1 && (
                 <CustomField
                   field="vendor_contact1"
-                  defaultValue={contact.custom_value1}
+                  defaultValue={contact.custom_value1 || ''}
                   value={company.custom_fields.vendor_contact1}
                   onValueChange={(value) =>
                     handleContactChange('custom_value1', value, index)
@@ -319,7 +319,7 @@ export function Form(props: Props) {
               {company?.custom_fields?.vendor_contact2 && (
                 <CustomField
                   field="vendor_contact2"
-                  defaultValue={contact.custom_value2}
+                  defaultValue={contact.custom_value2 || ''}
                   value={company.custom_fields.vendor_contact2}
                   onValueChange={(value) =>
                     handleContactChange('custom_value2', value, index)
@@ -330,7 +330,7 @@ export function Form(props: Props) {
               {company?.custom_fields?.vendor_contact3 && (
                 <CustomField
                   field="vendor_contact3"
-                  defaultValue={contact.custom_value3}
+                  defaultValue={contact.custom_value3 || ''}
                   value={company.custom_fields.vendor_contact3}
                   onValueChange={(value) =>
                     handleContactChange('custom_value3', value, index)
@@ -341,7 +341,7 @@ export function Form(props: Props) {
               {company?.custom_fields?.vendor_contact4 && (
                 <CustomField
                   field="vendor_contact4"
-                  defaultValue={contact.custom_value4}
+                  defaultValue={contact.custom_value4 || ''}
                   value={company.custom_fields.vendor_contact4}
                   onValueChange={(value) =>
                     handleContactChange('custom_value4', value, index)
