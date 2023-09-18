@@ -48,8 +48,8 @@ export function Form(props: Props) {
   };
 
   const handleContactChange = (
+    propertyId: keyof VendorContact,
     value: string | number | boolean,
-    propertyId: string,
     index: number
   ) => {
     set(contacts[index], propertyId, value);
@@ -256,7 +256,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.first_name}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'first_name', index)
+                    handleContactChange('first_name', value, index)
                   }
                   errorMessage={
                     props.errors?.errors[`contacts.${index}.first_name`]
@@ -268,7 +268,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.last_name}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'last_name', index)
+                    handleContactChange('last_name', value, index)
                   }
                   errorMessage={
                     props.errors?.errors[`contacts.${index}.last_name`]
@@ -280,7 +280,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.email}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'email', index)
+                    handleContactChange('email', value, index)
                   }
                   errorMessage={props.errors?.errors[`contacts.${index}.email`]}
                 />
@@ -290,7 +290,7 @@ export function Form(props: Props) {
                 <InputField
                   value={contact.phone}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'phone', index)
+                    handleContactChange('phone', value, index)
                   }
                   errorMessage={props.errors?.errors[`contacts.${index}.phone`]}
                 />
@@ -300,7 +300,7 @@ export function Form(props: Props) {
                 <Toggle
                   checked={contact.send_email}
                   onChange={(value) =>
-                    handleContactChange(value, 'send_email', index)
+                    handleContactChange('send_email', value, index)
                   }
                 />
               </Element>
@@ -311,7 +311,7 @@ export function Form(props: Props) {
                   defaultValue={contact.custom_value1}
                   value={company.custom_fields.vendor_contact1}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'custom_value1', index)
+                    handleContactChange('custom_value1', value, index)
                   }
                 />
               )}
@@ -322,7 +322,7 @@ export function Form(props: Props) {
                   defaultValue={contact.custom_value2}
                   value={company.custom_fields.vendor_contact2}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'custom_value2', index)
+                    handleContactChange('custom_value2', value, index)
                   }
                 />
               )}
@@ -333,7 +333,7 @@ export function Form(props: Props) {
                   defaultValue={contact.custom_value3}
                   value={company.custom_fields.vendor_contact3}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'custom_value3', index)
+                    handleContactChange('custom_value3', value, index)
                   }
                 />
               )}
@@ -344,7 +344,7 @@ export function Form(props: Props) {
                   defaultValue={contact.custom_value4}
                   value={company.custom_fields.vendor_contact4}
                   onValueChange={(value) =>
-                    handleContactChange(value, 'custom_value4', index)
+                    handleContactChange('custom_value4', value, index)
                   }
                 />
               )}
