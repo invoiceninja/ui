@@ -16,7 +16,7 @@ import {
   Draggable,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
-import { clientMap } from '$app/common/constants/exports/client-map';
+import { Record, clientMap } from '$app/common/constants/exports/client-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
@@ -35,11 +35,6 @@ import { Identifier } from '../useReports';
 import { contactMap } from '$app/common/constants/exports/contact-map';
 
 export const reportColumn = 11;
-
-interface Record {
-  trans: string;
-  value: string;
-}
 
 interface ColumnProps {
   title: string | (() => JSX.Element);
@@ -183,6 +178,7 @@ export function SortableColumns({ report, columns }: Props) {
     if (!result.destination) {
       return;
     }
+
     // Create a copy of the data array
     const $data = cloneDeep(data);
 
@@ -205,13 +201,7 @@ export function SortableColumns({ report, columns }: Props) {
   };
 
   const onRemove = (record: Record) => {
-    // Find where's the original
-    const type =
-      record.value.split('.')[0] === 'item'
-        ? 'invoice' // Workaround for items as they're part of invoices.
-        : record.value.split('.')[0];
-
-    const index = positions.indexOf(type);
+    const index = positions.indexOf(record.map);
 
     // Remove it from the reports
     const $data = cloneDeep(data);
