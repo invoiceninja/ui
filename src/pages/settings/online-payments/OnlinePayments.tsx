@@ -253,13 +253,12 @@ export function OnlinePayments() {
         {company?.settings.client_portal_allow_under_payment && (
           <Element leftSide={t('minimum_under_payment_amount')}>
             <InputField
-              value={
-                company?.settings.client_portal_under_payment_minimum || ''
-              }
+              type="number"
+              value={company?.settings.client_portal_under_payment_minimum || 0}
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_portal_under_payment_minimum',
-                  value
+                  parseFloat(value) || 0
                 )
               }
               errorMessage={
@@ -283,11 +282,12 @@ export function OnlinePayments() {
         {company?.settings.client_initiated_payments && (
           <Element leftSide={t('minimum_payment_amount')}>
             <InputField
-              value={company?.settings.client_initiated_payments_minimum || ''}
+              type="number"
+              value={company?.settings.client_initiated_payments_minimum || 0}
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_initiated_payments_minimum',
-                  value
+                  parseFloat(value) || 0
                 )
               }
               errorMessage={
