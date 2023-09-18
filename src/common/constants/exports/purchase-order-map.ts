@@ -7,10 +7,8 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-interface Record {
-  trans: string;
-  value: string;
-}
+
+import { Record } from "./client-map";
 
 export const purchaseorderMap: Record[] = [
   { trans: 'purchase_order_number', value: 'purchase_order.number' },

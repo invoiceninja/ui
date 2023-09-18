@@ -8,10 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface Record {
-  trans: string;
-  value: string;
-}
+import { Record } from "./client-map";
 
 export const contactMap: Record[] = [
   { trans: 'first_name', value: 'contact.first_name' },

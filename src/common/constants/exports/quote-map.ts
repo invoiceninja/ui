@@ -8,10 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Record {
-  trans: string;
-  value: string;
-}
+import { Record } from "./client-map";
 
 export const quoteMap: Record[] = [
   { trans: 'quote_number', value: 'quote.number' },
