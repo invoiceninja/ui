@@ -186,7 +186,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             <InputField
               id="settings.default_task_rate"
               type="number"
-              value={client?.settings?.default_task_rate ?? 0}
+              value={client?.settings?.default_task_rate || 0}
               onValueChange={(value) =>
                 handleSettingsChange('default_task_rate', value)
               }
