@@ -34,6 +34,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -63,6 +64,7 @@ export function UserDetails() {
   const userState = useSelector((state: RootState) => state.user);
 
   const { isAdmin } = useAdmin();
+  const { save } = usePreferences();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
@@ -113,6 +115,8 @@ export function UserDetails() {
           setErrors(error.response.data);
         }
       });
+
+    save({ silent: true });
   };
 
   useEffect(() => {
