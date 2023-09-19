@@ -173,11 +173,11 @@ export function Search$() {
             </ComboboxOption>
           ))}
 
-          {filtered?.length === 0 && (
+          {filtered.count() === 0 && (
             <ComboboxOption
               value={null}
               theme={{ color: colors.$3, hoverColor: colors.$2 }}
-              className="cursor-pointer rounded px-4 py-2 active:font-semibold"
+              className="cursor-not-allowed rounded px-4 py-2 active:font-semibold"
               disabled
             >
               {({ active }) => (
