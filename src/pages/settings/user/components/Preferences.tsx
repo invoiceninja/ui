@@ -22,6 +22,9 @@ import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Divider } from '$app/components/cards/Divider';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
+import { get } from 'lodash';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { ReactNode } from 'react';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -37,7 +40,7 @@ export function Preferences() {
     );
   };
 
-  const { preferences, update } = usePreferences();
+  const resolveCurrency = useResolveCurrency();
 
   return (
     <Card title={t('preferences')}>
@@ -97,25 +100,58 @@ export function Preferences() {
 
       <Divider />
 
-      <Element leftSide={`${t('dashboard_charts')}: ${'default_view'}`}>
-        <Inline className="space-x-4">
-          <p className="uppercase">
-            {preferences.dashboard_charts.default_view}
-          </p>
+      <Preference
+        text={`${t('dashboard_charts')}: ${'default_view'}`}
+        path="dashboard_charts.default_view"
+        format={(value) => <p className="uppercase">{value}</p>}
+      />
 
-          <button
-            type="button"
-            onClick={() =>
-              update(
-                'preferences.dashboard_charts.default_view',
-                preferencesDefaults.dashboard_charts.default_view
-              )
-            }
-          >
-            <X />
-          </button>
-        </Inline>
-      </Element>
+      <Preference
+        text={`${t('dashboard_charts')}: ${'currency'}`}
+        path="dashboard_charts.currency"
+        format={(value) => {
+          const currency = resolveCurrency(value.toString());
+
+          if (currency) {
+            return currency.code;
+          }
+
+          return value;
+        }}
+      />
     </Card>
+  );
+}
+
+interface PreferenceProps {
+  text: string;
+  path: string;
+  format: (value: string | number | boolean) => string | ReactNode;
+}
+
+function Preference({ text, path, format }: PreferenceProps) {
+  const { preferences, update } = usePreferences();
+
+  // if (get(preferences, path) === get(preferencesDefaults, path)) {
+  //   return null;
+  // }
+
+  return (
+    <Element leftSide={text}>
+      <Inline className="space-x-2">
+        <div>{format(get(preferences, path))}</div>
+
+        <button
+          type="button"
+          onClick={() => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            update(`preferences.${path}`, get(preferencesDefaults, path));
+          }}
+        >
+          <X size={18} />
+        </button>
+      </Inline>
+    </Element>
   );
 }
