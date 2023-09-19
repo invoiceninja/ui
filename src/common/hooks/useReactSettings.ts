@@ -11,7 +11,7 @@
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { useInjectUserChanges } from './useInjectUserChanges';
-import { merge } from 'lodash';
+import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
@@ -91,7 +91,7 @@ export function useReactSettings() {
       ...previousReactTableColumns,
       ...reactSettings.react_table_columns,
     },
-    preferences: preferencesDefaults,
+    preferences: cloneDeep(preferencesDefaults),
   };
 
   return merge<ReactSettings, ReactSettings>(
