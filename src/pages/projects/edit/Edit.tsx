@@ -115,7 +115,7 @@ export default function Edit() {
       <Element leftSide={t('task_rate')}>
         <InputField
           type="number"
-          value={project?.task_rate}
+          value={project?.task_rate || 0}
           onValueChange={(value) =>
             handleChange('task_rate', parseFloat(value) || 0)
           }

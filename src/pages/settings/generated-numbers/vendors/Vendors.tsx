@@ -57,7 +57,10 @@ export function Vendors() {
           type="number"
           value={companyChanges?.settings?.vendor_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.vendor_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.vendor_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.vendor_number_counter']}
         />

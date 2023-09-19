@@ -65,7 +65,7 @@ export function RecurringExpenses() {
           onValueChange={(value) =>
             handleChange(
               'settings.recurring_expense_number_counter',
-              Number(value) || 1
+              parseFloat(value) || 1
             )
           }
           errorMessage={

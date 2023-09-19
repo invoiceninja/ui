@@ -57,7 +57,10 @@ export function Expenses() {
           type="number"
           value={companyChanges?.settings?.expense_number_counter || 1}
           onValueChange={(value) =>
-            handleChange('settings.expense_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.expense_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.expense_number_counter']}
         />

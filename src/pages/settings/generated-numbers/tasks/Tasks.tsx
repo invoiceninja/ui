@@ -58,7 +58,7 @@ export function Tasks() {
           type="number"
           value={companyChanges?.settings?.task_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.task_number_counter', Number(value) || 1)
+            handleChange('settings.task_number_counter', parseFloat(value) || 1)
           }
           errorMessage={errors?.errors['settings.task_number_counter']}
         />

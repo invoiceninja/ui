@@ -67,7 +67,7 @@ export function RecurringInvoices() {
           onValueChange={(value) =>
             handleChange(
               'settings.recurring_invoice_number_counter',
-              Number(value) || 1
+              parseFloat(value) || 1
             )
           }
           errorMessage={

@@ -61,7 +61,7 @@ export function PurchaseOrders() {
           onValueChange={(value) =>
             handleChange(
               'settings.purchase_order_number_counter',
-              Number(value) || 1
+              parseFloat(value) || 1
             )
           }
           errorMessage={

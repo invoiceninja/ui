@@ -57,7 +57,10 @@ export function Clients() {
           type="number"
           value={companyChanges?.settings?.client_number_counter || 1}
           onValueChange={(value) =>
-            handleChange('settings.client_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.client_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.client_number_counter']}
         />

@@ -57,7 +57,10 @@ export function Credits() {
           type="number"
           value={companyChanges?.settings?.credit_number_counter || 1}
           onValueChange={(value) =>
-            handleChange('settings.credit_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.credit_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.credit_number_counter']}
         />

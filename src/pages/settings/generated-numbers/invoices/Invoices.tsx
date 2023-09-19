@@ -58,7 +58,10 @@ export function Invoices() {
           type="number"
           value={companyChanges?.settings?.invoice_number_counter || 1}
           onValueChange={(value) =>
-            handleChange('settings.invoice_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.invoice_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.invoice_number_counter']}
         />

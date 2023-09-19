@@ -57,7 +57,10 @@ export function Quotes() {
           type="number"
           value={companyChanges?.settings?.quote_number_counter || 1}
           onValueChange={(value) =>
-            handleChange('settings.quote_number_counter', Number(value) || 1)
+            handleChange(
+              'settings.quote_number_counter',
+              parseFloat(value) || 1
+            )
           }
           errorMessage={errors?.errors['settings.quote_number_counter']}
         />
