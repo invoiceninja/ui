@@ -18,11 +18,12 @@ import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { styled } from 'styled-components';
 import { Combobox } from '@headlessui/react';
 import { useClickAway } from 'react-use';
+import collect from 'collect.js';
 
 export function useSearch() {
   const [t] = useTranslation();
@@ -70,7 +71,7 @@ const ComboboxOption = styled(Combobox.Option)`
   }
 `;
 
-export function Search() {
+export function Search$() {
   const [t] = useTranslation();
   const [query, setQuery] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -82,12 +83,11 @@ export function Search() {
   const comboboxRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const filtered =
-    query === ''
-      ? data
-      : data?.filter((record) => {
-          return record.searchable.toLowerCase().includes(query.toLowerCase());
-        });
+  const filtered = collect(data)
+    .filter((record) =>
+      record.searchable.toLowerCase().includes(query.toLowerCase())
+    )
+    .take(50);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -197,3 +197,5 @@ export function Search() {
     </Combobox>
   );
 }
+
+export const Search = memo(Search$);
