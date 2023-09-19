@@ -36,7 +36,7 @@ export function Gateways(props: Props) {
       ({ id }) => id === gatewayId
     );
 
-    return filteredGateways && filteredGateways[0].label;
+    return filteredGateways && filteredGateways.length >= 1 && filteredGateways[0].label;
   };
 
   useEffect(() => {

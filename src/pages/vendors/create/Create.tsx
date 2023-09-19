@@ -28,6 +28,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { set } from 'lodash';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -54,36 +56,27 @@ export default function Create() {
   const [vendor, setVendor] = useState<Vendor>();
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const [contacts, setContacts] = useState<Partial<VendorContact>[]>([
+    {
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      send_email: false,
+    },
+  ]);
+
   useEffect(() => {
     if (data) {
       setVendor({
         ...data,
         country_id: '',
-        contacts: [
-          {
-            id: '',
-            first_name: '',
-            last_name: '',
-            email: '',
-            send_email: true,
-            created_at: 0,
-            updated_at: 0,
-            archived_at: 0,
-            is_primary: false,
-            phone: '',
-            custom_value1: '',
-            custom_value2: '',
-            custom_value3: '',
-            custom_value4: '',
-            link: '',
-            last_login: 0,
-          },
-        ],
       });
     }
   }, [data]);
 
   const handleSave = () => {
+    set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
     const requests = [request('POST', endpoint('/api/v1/vendors'), vendor)];
@@ -135,7 +128,15 @@ export default function Create() {
       breadcrumbs={pages}
       onSaveClick={vendor && handleSave}
     >
-      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
+      {vendor && (
+        <Form
+          vendor={vendor}
+          setVendor={setVendor}
+          errors={errors}
+          setContacts={setContacts}
+          contacts={contacts}
+        />
+      )}
     </Default>
   );
 }
