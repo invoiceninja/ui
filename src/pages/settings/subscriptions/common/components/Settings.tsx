@@ -65,7 +65,8 @@ export function Settings(props: SubscriptionProps) {
         <Inline>
           <div className="w-full lg:w-1/2">
             <InputField
-              value={subscription.promo_discount}
+              type="number"
+              value={subscription.promo_discount || 0}
               onValueChange={(value) =>
                 handleChange('promo_discount', parseFloat(value) || 0)
               }
