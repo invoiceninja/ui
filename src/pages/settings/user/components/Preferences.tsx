@@ -132,9 +132,9 @@ interface PreferenceProps {
 function Preference({ text, path, format }: PreferenceProps) {
   const { preferences, update } = usePreferences();
 
-  // if (get(preferences, path) === get(preferencesDefaults, path)) {
-  //   return null;
-  // }
+  if (get(preferences, path) === get(preferencesDefaults, path)) {
+    return null;
+  }
 
   return (
     <Element leftSide={text}>
