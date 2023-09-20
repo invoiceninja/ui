@@ -104,8 +104,6 @@ export function Preferences() {
             placeholder={t('number_precision')}
           />
         </Element>
-
-        <Divider />
       </Card>
 
       <Card title={t('dashboard')}>
