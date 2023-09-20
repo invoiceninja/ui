@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 
 interface Props {
-  defaultValue: any;
+  defaultValue: string | number;
   field: string;
   type?: string;
   value: string | number;
