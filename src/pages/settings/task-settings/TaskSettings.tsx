@@ -78,10 +78,9 @@ export function TaskSettings() {
       <Card title={t('settings')}>
         <Element leftSide={t('default_task_rate')}>
           <InputField
-            type="number"
             id="settings.default_task_rate"
             onChange={handleChange}
-            value={companyChanges?.settings?.default_task_rate || 0}
+            value={companyChanges?.settings?.default_task_rate || ''}
             errorMessage={errors?.errors['settings.default_task_rate']}
           />
         </Element>

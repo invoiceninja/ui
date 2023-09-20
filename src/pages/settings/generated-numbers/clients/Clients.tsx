@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
@@ -18,7 +18,9 @@ import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDispatch } from 'react-redux';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 
 export function Clients() {
   const [t] = useTranslation();
@@ -28,7 +30,18 @@ export function Clients() {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const handleChange = useHandleCurrentCompanyChangeProperty();
+  const dispatch = useDispatch();
+
+  useInjectCompanyChanges();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+    );
 
   const variables = [
     '{$counter}',
@@ -45,23 +58,17 @@ export function Clients() {
     <Card title={t('clients')}>
       <Element leftSide={t('number_pattern')}>
         <InputField
+          id="settings.client_number_pattern"
           value={companyChanges?.settings?.client_number_pattern || ''}
-          onValueChange={(value) =>
-            handleChange('settings.client_number_pattern', value)
-          }
+          onChange={handleChange}
           errorMessage={errors?.errors['settings.client_number_pattern']}
         />
       </Element>
       <Element leftSide={t('number_counter')}>
         <InputField
-          type="number"
-          value={companyChanges?.settings?.client_number_counter || 1}
-          onValueChange={(value) =>
-            handleChange(
-              'settings.client_number_counter',
-              parseFloat(value) || 1
-            )
-          }
+          id="settings.client_number_counter"
+          value={companyChanges?.settings?.client_number_counter || '1'}
+          onChange={handleChange}
           errorMessage={errors?.errors['settings.client_number_counter']}
         />
       </Element>

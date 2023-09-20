@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
@@ -18,7 +18,9 @@ import { Divider } from '$app/components/cards/Divider';
 import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDispatch } from 'react-redux';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -29,7 +31,18 @@ export function RecurringInvoices() {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const handleChange = useHandleCurrentCompanyChangeProperty();
+  const dispatch = useDispatch();
+
+  useInjectCompanyChanges();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+    );
 
   const variables = [
     '{$counter}',
@@ -50,9 +63,7 @@ export function RecurringInvoices() {
           value={
             companyChanges?.settings?.recurring_invoice_number_pattern || ''
           }
-          onValueChange={(value) =>
-            handleChange('settings.recurring_invoice_number_pattern', value)
-          }
+          onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_pattern']
           }
@@ -60,16 +71,11 @@ export function RecurringInvoices() {
       </Element>
       <Element leftSide={t('number_counter')}>
         <InputField
-          type="number"
+          id="settings.recurring_invoice_number_counter"
           value={
-            companyChanges?.settings?.recurring_invoice_number_counter || 1
+            companyChanges?.settings?.recurring_invoice_number_counter || ''
           }
-          onValueChange={(value) =>
-            handleChange(
-              'settings.recurring_invoice_number_counter',
-              parseFloat(value) || 1
-            )
-          }
+          onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_counter']
           }

@@ -1013,15 +1013,11 @@ export function GeneralSettings() {
         <div className="w-full inline-flex items-center space-x-2">
           <div className="w-full">
             <InputField
-              type="number"
-              value={company?.settings.company_logo_size
+              value={company.settings.company_logo_size
                 ?.replaceAll('px', '')
                 ?.replaceAll('%', '')}
               onValueChange={(value) =>
-                handleChange(
-                  'company_logo_size',
-                  `${parseFloat(value)}${logoSizeType}`
-                )
+                handleChange('company_logo_size', `${value}${logoSizeType}`)
               }
               errorMessage={errors?.errors['settings.company_logo_size']}
             />

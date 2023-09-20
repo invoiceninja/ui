@@ -273,12 +273,12 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    ] || 0
+                    ]
                   }
                   onValueChange={(value) =>
                     handleChange(
                       `settings.late_fee_amount${reminderIndex}`,
-                      parseFloat(value) || 0
+                      value
                     )
                   }
                 />
@@ -290,12 +290,12 @@ export function TemplatesAndReminders() {
                   value={
                     company?.settings[
                       `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    ] || 0
+                    ]
                   }
                   onValueChange={(value) =>
                     handleChange(
                       `settings.late_fee_percent${reminderIndex}`,
-                      parseFloat(value) || 0
+                      value
                     )
                   }
                 />
