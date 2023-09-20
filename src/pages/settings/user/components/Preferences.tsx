@@ -19,7 +19,6 @@ import {
 } from '$app/common/hooks/useReactSettings';
 import { InputField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Divider } from '$app/components/cards/Divider';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
