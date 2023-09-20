@@ -218,7 +218,7 @@ export function TemplatesAndReminders() {
                       value ?? 0
                     )
                   }
-                  type='number'
+                  type="number"
                 />
               </Element>
 
@@ -269,6 +269,7 @@ export function TemplatesAndReminders() {
 
               <Element leftSide={t('late_fee_amount')}>
                 <InputField
+                  type="number"
                   value={
                     company?.settings[
                       `late_fee_amount${reminderIndex}` as keyof CompanySettings
@@ -277,7 +278,7 @@ export function TemplatesAndReminders() {
                   onValueChange={(value) =>
                     handleChange(
                       `settings.late_fee_amount${reminderIndex}`,
-                      value
+                      parseFloat(value)
                     )
                   }
                 />
@@ -285,6 +286,7 @@ export function TemplatesAndReminders() {
 
               <Element leftSide={t('late_fee_percent')}>
                 <InputField
+                  type="number"
                   value={
                     company?.settings[
                       `late_fee_percent${reminderIndex}` as keyof CompanySettings
@@ -293,7 +295,7 @@ export function TemplatesAndReminders() {
                   onValueChange={(value) =>
                     handleChange(
                       `settings.late_fee_percent${reminderIndex}`,
-                      value
+                      parseFloat(value)
                     )
                   }
                 />
