@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useSetAtom } from 'jotai';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ export function useConfigureGroupSettings(params?: Params) {
 
   const { withoutNavigation } = params || {};
 
-  const setActiveSettingsAtom = useSetAtom(activeGroupSettingsAtom);
+  const setActiveSettingsAtom = useSetAtom(activeSettingsAtom);
 
   return (group: GroupSettings) => {
     setActiveSettingsAtom(group);

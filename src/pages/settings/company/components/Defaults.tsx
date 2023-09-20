@@ -25,11 +25,14 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Divider } from '$app/components/cards/Divider';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const { data: statics } = useStaticsQuery();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -116,26 +119,28 @@ export function Defaults() {
 
           <Divider />
 
-          <Element
-            className="mb-3"
-            leftSide={t('use_quote_terms')}
-            leftSideHelp={t('use_quote_terms_help')}
-          >
-            <Toggle
-              checked={Boolean(companyChanges?.use_quote_terms_on_conversion)}
-              onChange={(value: boolean) =>
-                dispatch(
-                  updateChanges({
-                    object: 'company',
-                    property: 'use_quote_terms_on_conversion',
-                    value,
-                  })
-                )
-              }
-            />
-          </Element>
+          {isCompanySettingsActive && (
+            <Element
+              className="mb-3"
+              leftSide={t('use_quote_terms')}
+              leftSideHelp={t('use_quote_terms_help')}
+            >
+              <Toggle
+                checked={Boolean(companyChanges?.use_quote_terms_on_conversion)}
+                onChange={(value: boolean) =>
+                  dispatch(
+                    updateChanges({
+                      object: 'company',
+                      property: 'use_quote_terms_on_conversion',
+                      value,
+                    })
+                  )
+                }
+              />
+            </Element>
+          )}
 
-          <Divider withoutPadding />
+          {isCompanySettingsActive && <Divider withoutPadding />}
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
             <MarkdownEditor

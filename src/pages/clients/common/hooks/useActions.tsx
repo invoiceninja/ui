@@ -26,9 +26,11 @@ import {
   MdDeleteForever,
   MdPictureAsPdf,
   MdRestore,
+  MdSettings,
 } from 'react-icons/md';
 import { useBulk } from './useBulk';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useConfigureClientSettings } from './useConfigureClientSettings';
 
 interface Params {
   setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -44,6 +46,8 @@ export function useActions(params: Params) {
   const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'client',
   });
+
+  const configureClientSettings = useConfigureClientSettings();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -67,7 +71,16 @@ export function useActions(params: Params) {
     (client) =>
       !client.is_deleted && (
         <DropdownElement
-          to={route('/invoices/create?client=:id', { id: client.id })}
+          onClick={() => configureClientSettings(client)}
+          icon={<Icon element={MdSettings} />}
+        >
+          {t('settings')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          onClick={route('/invoices/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_invoice')}
