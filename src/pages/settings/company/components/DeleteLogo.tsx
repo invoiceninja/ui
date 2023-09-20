@@ -20,9 +20,10 @@ import { Element } from '$app/components/cards';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -31,12 +32,19 @@ export function DeleteLogo() {
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
-  const { isGroupSettingsActive, isCompanySettingsActive } =
-    useCurrentSettingsLevel();
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
+  const configureClientSettings = useConfigureClientSettings({
     withoutNavigation: true,
   });
 
@@ -50,9 +58,16 @@ export function DeleteLogo() {
 
       let entityId = company.id;
 
-      if (isGroupSettingsActive && activeGroupSettings) {
-        endpointRoute = '/api/v1/group_settings/:id';
-        entityId = activeGroupSettings.id;
+      if (activeSettings) {
+        if (isGroupSettingsActive) {
+          endpointRoute = '/api/v1/group_settings/:id';
+          entityId = activeSettings.id;
+        }
+
+        if (isClientSettingsActive) {
+          endpointRoute = '/api/v1/clients/:id';
+          entityId = activeSettings.id;
+        }
       }
 
       request(
@@ -68,6 +83,10 @@ export function DeleteLogo() {
 
         if (isGroupSettingsActive) {
           configureGroupSettings(response.data.data);
+        }
+
+        if (isClientSettingsActive) {
+          configureClientSettings(response.data.data);
         }
 
         toast.success('removed_logo');

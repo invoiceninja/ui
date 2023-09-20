@@ -25,8 +25,9 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { endpoint } from '$app/common/helpers';
 import { useAtomValue } from 'jotai';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -35,12 +36,19 @@ export function Logo() {
   const [formData, setFormData] = useState(new FormData());
   const logo = useLogo();
 
-  const { isGroupSettingsActive, isCompanySettingsActive } =
-    useCurrentSettingsLevel();
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
+  const configureClientSettings = useConfigureClientSettings({
     withoutNavigation: true,
   });
 
@@ -54,9 +62,16 @@ export function Logo() {
 
       let entityId = company.id;
 
-      if (isGroupSettingsActive && activeGroupSettings) {
-        endpointRoute = '/api/v1/group_settings/:id';
-        entityId = activeGroupSettings.id;
+      if (activeSettings) {
+        if (isGroupSettingsActive) {
+          endpointRoute = '/api/v1/group_settings/:id';
+          entityId = activeSettings.id;
+        }
+
+        if (isClientSettingsActive) {
+          endpointRoute = '/api/v1/clients/:id';
+          entityId = activeSettings.id;
+        }
       }
 
       request('POST', endpoint(endpointRoute, { id: entityId }), formData, {
@@ -71,6 +86,10 @@ export function Logo() {
 
           if (isGroupSettingsActive) {
             configureGroupSettings(response.data.data);
+          }
+
+          if (isClientSettingsActive) {
+            configureClientSettings(response.data.data);
           }
 
           toast.success('uploaded_logo');

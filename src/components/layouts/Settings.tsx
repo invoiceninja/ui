@@ -20,7 +20,7 @@ import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
 import { Icon } from '../icons/Icon';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdGroup } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
@@ -53,7 +53,8 @@ export function Settings(props: Props) {
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
   const activeSettings = useActiveSettingsDetails();
   const switchToCompanySettings = useSwitchToCompanySettings();
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ export function Settings(props: Props) {
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
-          {isGroupSettingsActive && (
+          {(isGroupSettingsActive || isClientSettingsActive) && (
             <div
               className="flex items-center justify-between border py-3 rounded space-x-3 px-2"
               style={{
@@ -89,15 +90,29 @@ export function Settings(props: Props) {
             >
               <div className="flex items-center space-x-2 flex-1 min-w-0">
                 <div>
-                  <Icon element={FaObjectGroup} size={20} />
+                  <Icon
+                    element={isGroupSettingsActive ? FaObjectGroup : MdGroup}
+                    size={20}
+                  />
                 </div>
 
                 <span className="text-sm truncate">
-                  {t('group_settings')}: {activeSettings.name}
+                  {isGroupSettingsActive
+                    ? t('group_settings')
+                    : t('client_settings')}
+                  : {activeSettings.name}
                 </span>
               </div>
 
-              <div className="cursor-pointer" onClick={switchToCompanySettings}>
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  switchToCompanySettings();
+
+                  isGroupSettingsActive && navigate('/settings/group_settings');
+                  isClientSettingsActive && navigate('/clients');
+                }}
+              >
                 <Icon element={MdClose} size={20} />
               </div>
             </div>

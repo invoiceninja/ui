@@ -20,7 +20,8 @@ export default function InvoiceDesign() {
   const { documentTitle } = useTitle('invoice_design');
   const { t } = useTranslation();
 
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   let tabs: Tab[] = [
     { name: t('general_settings'), href: '/settings/invoice_design' },
@@ -35,7 +36,7 @@ export default function InvoiceDesign() {
     },
   ];
 
-  if (isGroupSettingsActive) {
+  if (isGroupSettingsActive || isClientSettingsActive) {
     tabs = tabs.filter((tab) => t(tab.name) !== t('custom_designs'));
   }
 

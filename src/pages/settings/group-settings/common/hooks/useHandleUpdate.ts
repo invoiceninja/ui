@@ -9,7 +9,7 @@
  */
 
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -40,7 +40,7 @@ export function useHandleUpdate(params: Params) {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeGroupSettings = useAtomValue(activeSettingsAtom);
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
   const { isGroupSettingsActive } = useCurrentSettingsLevel();
 
