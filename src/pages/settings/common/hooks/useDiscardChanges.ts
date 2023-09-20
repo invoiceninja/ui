@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import {
   resetChanges,
@@ -19,22 +19,25 @@ import { useDispatch } from 'react-redux';
 
 export function useDiscardChanges() {
   const dispatch = useDispatch();
-  const { isCompanySettingsActive, isGroupSettingsActive } =
-    useCurrentSettingsLevel();
+  const {
+    isCompanySettingsActive,
+    isGroupSettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
-  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   return () => {
     if (isCompanySettingsActive) {
       dispatch(resetChanges('company'));
     }
 
-    if (isGroupSettingsActive && activeGroupSettings) {
+    if ((isGroupSettingsActive || isClientSettingsActive) && activeSettings) {
       dispatch(
         updateChanges({
           object: 'company',
           property: 'settings',
-          value: activeGroupSettings.settings,
+          value: activeSettings.settings,
         })
       );
     }

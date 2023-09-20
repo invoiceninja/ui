@@ -147,17 +147,19 @@ export function TaskSettings() {
 
         {isCompanySettingsActive && <Divider />}
 
-        <Element
-          leftSide={t('show_tasks_table')}
-          leftSideHelp={t('show_tasks_table_help')}
-        >
-          <Toggle
-            checked={Boolean(companyChanges?.show_tasks_table)}
-            onChange={(value: boolean) =>
-              handleToggleChange('show_tasks_table', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('show_tasks_table')}
+            leftSideHelp={t('show_tasks_table_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.show_tasks_table)}
+              onChange={(value: boolean) =>
+                handleToggleChange('show_tasks_table', value)
+              }
+            />
+          </Element>
+        )}
 
         {isCompanySettingsActive && (
           <Element
@@ -229,29 +231,33 @@ export function TaskSettings() {
           </Element>
         )}
 
-        <Element
-          leftSide={t('lock_invoiced_tasks')}
-          leftSideHelp={t('lock_invoiced_tasks_help')}
-        >
-          <Toggle
-            checked={Boolean(companyChanges?.invoice_task_lock)}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_lock', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('lock_invoiced_tasks')}
+            leftSideHelp={t('lock_invoiced_tasks_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_lock)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_lock', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('add_documents_to_invoice')}
-          leftSideHelp={t('add_documents_to_invoice_help')}
-        >
-          <Toggle
-            checked={Boolean(companyChanges?.invoice_task_documents)}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_documents', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('add_documents_to_invoice')}
+            leftSideHelp={t('add_documents_to_invoice_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_documents)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_documents', value)
+              }
+            />
+          </Element>
+        )}
 
         <Divider />
 
