@@ -156,9 +156,9 @@ export function CreditFooter(props: Props) {
                 <InputField
                   label={t('exchange_rate')}
                   type="number"
-                  value={credit?.exchange_rate || 1.0}
+                  value={credit?.exchange_rate}
                   onValueChange={(value) =>
-                    handleChange('exchange_rate', parseFloat(value) || 1.0)
+                    handleChange('exchange_rate', parseFloat(value))
                   }
                   errorMessage={errors?.errors.exchange_rate}
                 />
