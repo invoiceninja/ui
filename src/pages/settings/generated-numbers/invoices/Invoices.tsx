@@ -9,18 +9,18 @@
  */
 
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useDispatch } from 'react-redux';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 
 export function Invoices() {
   const [t] = useTranslation();

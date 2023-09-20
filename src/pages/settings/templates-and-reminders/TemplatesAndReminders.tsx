@@ -269,11 +269,10 @@ export function TemplatesAndReminders() {
 
               <Element leftSide={t('late_fee_amount')}>
                 <InputField
-                  type="number"
                   value={
                     company?.settings[
                       `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || ''
                   }
                   onValueChange={(value) =>
                     handleChange(
@@ -286,11 +285,10 @@ export function TemplatesAndReminders() {
 
               <Element leftSide={t('late_fee_percent')}>
                 <InputField
-                  type="number"
                   value={
                     company?.settings[
                       `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    ]
+                    ] || ''
                   }
                   onValueChange={(value) =>
                     handleChange(
