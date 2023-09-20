@@ -13,12 +13,13 @@ import { GatewaysTable } from '../common/components/GatewaysTable';
 
 export const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
 export function Gateways() {
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   return (
     <GatewaysTable
-      includeRemoveAction={isGroupSettingsActive}
-      includeResetAction={isGroupSettingsActive}
+      includeRemoveAction={isGroupSettingsActive || isClientSettingsActive}
+      includeResetAction={isGroupSettingsActive || isClientSettingsActive}
     />
   );
 }

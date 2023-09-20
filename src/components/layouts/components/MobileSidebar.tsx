@@ -14,6 +14,7 @@ import { Fragment } from 'react';
 import { X } from 'react-feather';
 import { NavigationItem } from './DesktopSidebar';
 import { SidebarItem } from './SidebarItem';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   navigation: NavigationItem[];
@@ -22,6 +23,8 @@ interface Props {
 }
 
 export function MobileSidebar(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <Transition.Root show={props.sidebarOpen} as={Fragment}>
       <Dialog
@@ -78,7 +81,7 @@ export function MobileSidebar(props: Props) {
             <div className="flex-1 h-0 overflow-y-auto mt-4">
               <nav className="space-y-1">
                 {props.navigation.map((item, index) => (
-                  <SidebarItem key={index} item={item} />
+                  <SidebarItem key={index} item={item} colors={colors} />
                 ))}
               </nav>
             </div>

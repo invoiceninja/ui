@@ -50,7 +50,6 @@ const numberInputs = [
   'quantity',
   'rate',
   'hours',
-  'tax_amount',
 ];
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -338,6 +337,18 @@ export function useResolveInputField(props: Props) {
             }}
           />
         )
+      );
+    }
+
+    if ('gross_line_total' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
+      );
+    }
+
+    if ('tax_amount' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
       );
     }
 
