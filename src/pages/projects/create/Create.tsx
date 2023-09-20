@@ -169,9 +169,9 @@ export default function Create() {
           <Element leftSide={t('budgeted_hours')}>
             <InputField
               type="number"
-              value={project?.budgeted_hours || 0}
+              value={project?.budgeted_hours}
               onValueChange={(value) =>
-                handleChange('budgeted_hours', parseFloat(value) || 0)
+                handleChange('budgeted_hours', parseFloat(value))
               }
               errorMessage={errors?.errors.budgeted_hours}
             />
@@ -180,9 +180,9 @@ export default function Create() {
           <Element leftSide={t('task_rate')}>
             <InputField
               type="number"
-              value={project?.task_rate || 0}
+              value={project?.task_rate}
               onValueChange={(value) =>
-                handleChange('task_rate', parseFloat(value) || 0)
+                handleChange('task_rate', parseFloat(value))
               }
               errorMessage={errors?.errors.task_rate}
             />

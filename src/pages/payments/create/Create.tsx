@@ -251,7 +251,7 @@ export default function Create() {
             <InputField
               id="amount"
               type="number"
-              value={payment?.amount || 0}
+              value={payment?.amount}
               onValueChange={(value) =>
                 handleChange(
                   'amount',

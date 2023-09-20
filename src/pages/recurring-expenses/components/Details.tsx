@@ -164,9 +164,9 @@ export function Details(props: Props) {
               <InputField
                 type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount1 || 0}
+                value={recurringExpense.tax_amount1}
                 onValueChange={(value) =>
-                  handleChange('tax_amount1', parseFloat(value) || 0)
+                  handleChange('tax_amount1', parseFloat(value))
                 }
                 errorMessage={errors?.errors.tax_amount1}
               />
@@ -210,9 +210,9 @@ export function Details(props: Props) {
               <InputField
                 type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount2 || 0}
+                value={recurringExpense.tax_amount2}
                 onValueChange={(value) =>
-                  handleChange('tax_amount2', parseFloat(value) || 0)
+                  handleChange('tax_amount2', parseFloat(value))
                 }
                 errorMessage={errors?.errors.tax_amount2}
               />
@@ -256,9 +256,9 @@ export function Details(props: Props) {
               <InputField
                 type="number"
                 label={t('tax_amount')}
-                value={recurringExpense.tax_amount3 || 0}
+                value={recurringExpense.tax_amount3}
                 onValueChange={(value) =>
-                  handleChange('tax_amount3', parseFloat(value) || 0)
+                  handleChange('tax_amount3', parseFloat(value))
                 }
                 errorMessage={errors?.errors.tax_amount3}
               />
@@ -270,7 +270,7 @@ export function Details(props: Props) {
         <Element leftSide={t('amount')}>
           <InputField
             type="number"
-            value={recurringExpense.amount || 0}
+            value={recurringExpense.amount}
             onValueChange={(value) =>
               handleChange('amount', parseFloat(value) || 0)
             }

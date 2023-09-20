@@ -158,7 +158,7 @@ export function QuoteFooter(props: Props) {
                   type="number"
                   value={quote?.exchange_rate || 1.0}
                   onValueChange={(value) =>
-                    handleChange('exchange_rate', parseFloat(value) || 1.0)
+                    handleChange('exchange_rate', parseFloat(value))
                   }
                   errorMessage={errors?.errors.exchange_rate}
                 />

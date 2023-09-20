@@ -200,7 +200,7 @@ export default function Apply() {
                 label={t('amount_received')}
                 id={`invoices[${index}].amount`}
                 onChange={formik.handleChange}
-                value={record.amount || 0}
+                value={record.amount}
               />
 
               <Button
