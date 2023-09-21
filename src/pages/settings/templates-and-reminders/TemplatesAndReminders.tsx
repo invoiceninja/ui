@@ -255,6 +255,7 @@ export function TemplatesAndReminders() {
                   <div className="flex space-x-2">
                     {!isCompanySettingsActive && (
                       <PropertyCheckbox
+                        key={`property_checkbox_enable_reminder${reminderIndex}`}
                         propertyKey={
                           `enable_reminder${reminderIndex}` as keyof CompanySettings
                         }
