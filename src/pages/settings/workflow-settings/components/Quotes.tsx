@@ -14,11 +14,15 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Quotes() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const handleToggleChange = (id: string, value: boolean) =>
     dispatch(
@@ -32,10 +36,28 @@ export function Quotes() {
   return (
     <Card title={t('quotes')}>
       <Element
-        leftSide={t('auto_convert_quote')}
-        leftSideHelp={t('auto_convert_quote_help')}
+        leftSide={
+          <div className="flex items-center space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="auto_convert_quote" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('auto_convert_quote')}</span>
+              <span className="text-xs text-gray-500">
+                {t('auto_convert_quote_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.auto_convert_quote ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(companyChanges?.settings?.auto_convert_quote)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_convert_quote', value)
@@ -43,10 +65,28 @@ export function Quotes() {
         />
       </Element>
       <Element
-        leftSide={t('auto_archive_quote')}
-        leftSideHelp={t('auto_archive_quote_help')}
+        leftSide={
+          <div className="flex items-center space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="auto_archive_quote" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('auto_archive_quote')}</span>
+              <span className="text-xs text-gray-500">
+                {t('auto_archive_quote_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.auto_archive_quote ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(companyChanges?.settings?.auto_archive_quote)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_quote', value)

@@ -20,6 +20,7 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -42,10 +43,28 @@ export function Invoices() {
   return (
     <Card title={t('invoices')}>
       <Element
-        leftSide={t('auto_email_invoice')}
-        leftSideHelp={t('auto_email_invoice_help')}
+        leftSide={
+          <div className="flex items-center space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="auto_email_invoice" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('auto_email_invoice')}</span>
+              <span className="text-xs text-gray-500">
+                {t('auto_email_invoice_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.auto_email_invoice ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(companyChanges?.settings?.auto_email_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_email_invoice', value)
@@ -70,10 +89,28 @@ export function Invoices() {
       <Divider />
 
       <Element
-        leftSide={t('auto_archive_invoice')}
-        leftSideHelp={t('auto_archive_invoice_help')}
+        leftSide={
+          <div className="flex items-center space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="auto_archive_invoice" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('auto_archive_invoice')}</span>
+              <span className="text-xs text-gray-500">
+                {t('auto_archive_invoice_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.auto_archive_invoice ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(companyChanges?.settings?.auto_archive_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice', value)
@@ -82,10 +119,28 @@ export function Invoices() {
       </Element>
 
       <Element
-        leftSide={t('auto_archive_invoice_cancelled')}
-        leftSideHelp={t('auto_archive_invoice_cancelled_help')}
+        leftSide={
+          <div className="flex items-center space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="auto_archive_invoice_cancelled" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('auto_archive_invoice_cancelled')}</span>
+              <span className="text-xs text-gray-500">
+                {t('auto_archive_invoice_cancelled_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings
+                ?.auto_archive_invoice_cancelled === 'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(
             companyChanges?.settings?.auto_archive_invoice_cancelled
           )}

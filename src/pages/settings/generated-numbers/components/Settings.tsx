@@ -16,6 +16,8 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export const COUNTER_PADDINGS = [
   '1',
@@ -48,6 +50,8 @@ export const RESECT_COUNTER_FREQUENCIES = [
 
 export function Settings() {
   const [t] = useTranslation();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const companyChanges = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
@@ -99,8 +103,23 @@ export function Settings() {
         />
       </Element>
 
-      <Element leftSide={t('shared_invoice_quote_counter')}>
+      <Element
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="shared_invoice_quote_counter" />
+            )}
+            {t('shared_invoice_quote_counter')}
+          </div>
+        }
+      >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.shared_invoice_quote_counter ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_quote_counter', value)
           }
@@ -110,8 +129,23 @@ export function Settings() {
         />
       </Element>
 
-      <Element leftSide={t('shared_invoice_credit_counter')}>
+      <Element
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="shared_invoice_credit_counter" />
+            )}
+            {t('shared_invoice_credit_counter')}
+          </div>
+        }
+      >
         <Toggle
+          disabled={
+            Boolean(
+              typeof companyChanges?.settings?.shared_invoice_credit_counter ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_credit_counter', value)
           }

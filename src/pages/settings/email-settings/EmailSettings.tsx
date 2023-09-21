@@ -38,6 +38,7 @@ import { companySettingsErrorsAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -136,8 +137,22 @@ export function EmailSettings() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('settings')}>
-        <Element leftSide={t('show_email_footer')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="show_email_footer" />
+              )}
+              {t('show_email_footer')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.show_email_footer === 'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.show_email_footer)}
             onValueChange={(value) =>
               handleChange('settings.show_email_footer', value)
@@ -145,8 +160,22 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element leftSide={t('attach_pdf')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="pdf_email_attachment" />
+              )}
+              {t('attach_pdf')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.pdf_email_attachment === 'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.pdf_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.pdf_email_attachment', value)
@@ -154,8 +183,23 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element leftSide={t('attach_documents')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="document_email_attachment" />
+              )}
+              {t('attach_documents')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.document_email_attachment ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.document_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.document_email_attachment', value)
@@ -163,8 +207,22 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element leftSide={t('attach_ubl')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="ubl_email_attachment" />
+              )}
+              {t('attach_ubl')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.ubl_email_attachment === 'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.ubl_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.ubl_email_attachment', value)
@@ -172,8 +230,22 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element leftSide={t('enable_e_invoice')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="enable_e_invoice" />
+              )}
+              {t('enable_e_invoice')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.enable_e_invoice === 'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.enable_e_invoice)}
             onValueChange={(value) =>
               handleChange('settings.enable_e_invoice', value)

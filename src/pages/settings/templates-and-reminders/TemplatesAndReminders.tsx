@@ -36,6 +36,7 @@ import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -249,8 +250,28 @@ export function TemplatesAndReminders() {
                 </SelectField>
               </Element>
 
-              <Element leftSide={t('send_email')}>
+              <Element
+                leftSide={
+                  <div className="flex space-x-2">
+                    {!isCompanySettingsActive && (
+                      <PropertyCheckbox
+                        propertyKey={
+                          `enable_reminder${reminderIndex}` as keyof CompanySettings
+                        }
+                      />
+                    )}
+                    {t('send_email')}
+                  </div>
+                }
+              >
                 <Toggle
+                  disabled={
+                    Boolean(
+                      typeof company?.settings[
+                        `enable_reminder${reminderIndex}` as keyof CompanySettings
+                      ] === 'undefined'
+                    ) && !isCompanySettingsActive
+                  }
                   checked={
                     Boolean(
                       company?.settings[
@@ -303,8 +324,23 @@ export function TemplatesAndReminders() {
             </>
           ) : (
             <>
-              <Element leftSide={t('send_email')}>
+              <Element
+                leftSide={
+                  <div className="flex space-x-2">
+                    {!isCompanySettingsActive && (
+                      <PropertyCheckbox propertyKey="enable_reminder_endless" />
+                    )}
+                    {t('send_email')}
+                  </div>
+                }
+              >
                 <Toggle
+                  disabled={
+                    Boolean(
+                      typeof company?.settings?.enable_reminder_endless ===
+                        'undefined'
+                    ) && !isCompanySettingsActive
+                  }
                   checked={Boolean(company?.settings.enable_reminder_endless)}
                   onValueChange={(value) =>
                     handleChange('settings.enable_reminder_endless', value)

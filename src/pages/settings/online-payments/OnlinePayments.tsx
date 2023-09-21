@@ -31,6 +31,7 @@ import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -86,8 +87,23 @@ export function OnlinePayments() {
       withoutBackButton
     >
       <Card title={t('settings')}>
-        <Element leftSide={t('auto_bill_standard_invoices')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="auto_bill_standard_invoices" />
+              )}
+              {t('auto_bill_standard_invoices')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.auto_bill_standard_invoices ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings?.auto_bill_standard_invoices)}
             onChange={(value) =>
               handleChangeProperty(
@@ -171,8 +187,23 @@ export function OnlinePayments() {
           </>
         )}
 
-        <Element leftSide={t('manual_payment_email')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="client_manual_payment_notification" />
+              )}
+              {t('manual_payment_email')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.client_manual_payment_notification ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(
               company?.settings.client_manual_payment_notification
             )}
@@ -185,8 +216,23 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('online_payment_email')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="client_online_payment_notification" />
+              )}
+              {t('online_payment_email')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.client_online_payment_notification ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(
               company?.settings.client_online_payment_notification
             )}
@@ -200,10 +246,28 @@ export function OnlinePayments() {
         </Element>
 
         <Element
-          leftSide={t('mark_paid_payment_email')}
-          leftSideHelp={t('mark_paid_payment_email_help')}
+          leftSide={
+            <div className="flex items-center space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="mark_paid_payment_email" />
+              )}
+
+              <div className="flex flex-col">
+                <span>{t('mark_paid_payment_email')}</span>
+                <span className="text-xs text-gray-500">
+                  {t('mark_paid_payment_email_help')}
+                </span>
+              </div>
+            </div>
+          }
         >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.mark_paid_payment_email ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings.mark_paid_payment_email)}
             onChange={(value: boolean) =>
               handleToggleChange('settings.mark_paid_payment_email', value)
@@ -224,8 +288,23 @@ export function OnlinePayments() {
           </Element>
         )}
 
-        <Element leftSide={t('allow_over_payment')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="client_portal_allow_over_payment" />
+              )}
+              {t('allow_over_payment')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.client_portal_allow_over_payment ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             label={t('allow_over_payment_help')}
             id="allow_over_payment"
             checked={Boolean(
@@ -240,8 +319,23 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('allow_under_payment')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="client_portal_allow_under_payment" />
+              )}
+              {t('allow_under_payment')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.client_portal_allow_under_payment ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             label={t('allow_under_payment_help')}
             id="allow_under_payment"
             checked={Boolean(
@@ -275,8 +369,23 @@ export function OnlinePayments() {
           </Element>
         )}
 
-        <Element leftSide={t('client_initiated_payments')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="client_initiated_payments" />
+              )}
+              {t('client_initiated_payments')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.client_initiated_payments ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             label={t('client_initiated_payments_help')}
             id="client_initiated_payments"
             checked={Boolean(company?.settings.client_initiated_payments)}

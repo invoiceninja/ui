@@ -25,6 +25,7 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import classNames from 'classnames';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -146,9 +147,21 @@ export function Settings() {
 
       <Element
         className={classNames({ 'mt-4': isCompanySettingsActive })}
-        leftSide={t('client_portal')}
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="enable_client_portal" />
+            )}
+            {t('client_portal')}
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.enable_client_portal === 'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(company?.settings.enable_client_portal)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal', value)
@@ -157,10 +170,28 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={t('client_document_upload')}
-        leftSideHelp={t('document_upload_help')}
+        leftSide={
+          <div className="flex items-center">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="client_portal_enable_uploads" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('client_document_upload')}</span>
+              <span className="text-xs text-gray-500">
+                {t('document_upload_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.client_portal_enable_uploads ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(company?.settings.client_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.client_portal_enable_uploads', value)
@@ -169,10 +200,28 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={t('vendor_document_upload')}
-        leftSideHelp={t('vendor_document_upload_help')}
+        leftSide={
+          <div className="flex items-center">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="vendor_portal_enable_uploads" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('vendor_document_upload')}</span>
+              <span className="text-xs text-gray-500">
+                {t('vendor_document_upload_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.vendor_portal_enable_uploads ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(company?.settings.vendor_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.vendor_portal_enable_uploads', value)
@@ -181,10 +230,28 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={t('accept_purchase_order_number')}
-        leftSideHelp={t('accept_purchase_order_number_help')}
+        leftSide={
+          <div className="flex items-center">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="accept_client_input_quote_approval" />
+            )}
+
+            <div className="flex flex-col">
+              <span>{t('accept_purchase_order_number')}</span>
+              <span className="text-xs text-gray-500">
+                {t('accept_purchase_order_number_help')}
+              </span>
+            </div>
+          </div>
+        }
       >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.accept_client_input_quote_approval ===
+                'undefined'
+            ) && !isCompanySettingsActive
+          }
           checked={Boolean(
             company?.settings.accept_client_input_quote_approval
           )}

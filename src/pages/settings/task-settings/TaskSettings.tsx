@@ -26,6 +26,7 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -262,8 +263,23 @@ export function TaskSettings() {
 
         <Divider />
 
-        <Element leftSide={t('show_tasks_in_client_portal')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="enable_client_portal_tasks" />
+              )}
+              {t('show_tasks_in_client_portal')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof companyChanges?.settings?.enable_client_portal_tasks ===
+                  'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(
               companyChanges?.settings?.enable_client_portal_tasks
             )}

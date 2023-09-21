@@ -26,6 +26,8 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -769,6 +771,8 @@ export function GeneralSettings() {
   const currentCompany = useCurrentCompany();
   const company = useCompanyChanges();
 
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
@@ -1099,15 +1103,43 @@ export function GeneralSettings() {
 
       <Divider />
 
-      <Element leftSide={t('show_paid_stamp')}>
+      <Element
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="show_paid_stamp" />
+            )}
+            {t('show_paid_stamp')}
+          </div>
+        }
+      >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.show_paid_stamp === 'undefined'
+            ) && !isCompanySettingsActive
+          }
           onValueChange={(value) => handleChange('show_paid_stamp', value)}
           checked={Boolean(company?.settings.show_paid_stamp)}
         />
       </Element>
 
-      <Element leftSide={t('show_shipping_address')}>
+      <Element
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="show_shipping_address" />
+            )}
+            {t('show_shipping_address')}
+          </div>
+        }
+      >
         <Toggle
+          disabled={
+            Boolean(
+              typeof company?.settings?.show_shipping_address === 'undefined'
+            ) && !isCompanySettingsActive
+          }
           onValueChange={(value) =>
             handleChange('show_shipping_address', value)
           }
@@ -1136,8 +1168,21 @@ export function GeneralSettings() {
         />
       </Element>
 
-      <Element leftSide={t('page_numbering')}>
+      <Element
+        leftSide={
+          <div className="flex space-x-2">
+            {!isCompanySettingsActive && (
+              <PropertyCheckbox propertyKey="page_numbering" />
+            )}
+            {t('page_numbering')}
+          </div>
+        }
+      >
         <Toggle
+          disabled={
+            Boolean(typeof company?.settings?.page_numbering === 'undefined') &&
+            !isCompanySettingsActive
+          }
           checked={Boolean(company?.settings?.page_numbering)}
           id="settings.page_numbering"
           onChange={(value) => handleChange('page_numbering', value)}

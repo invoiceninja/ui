@@ -28,6 +28,7 @@ import { hasLanguageChanged } from '../common/atoms';
 import { ChangeEvent } from 'react';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -158,8 +159,22 @@ export function Settings() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('military_time')}>
+        <Element
+          leftSide={
+            <div className="flex space-x-2">
+              {!isCompanySettingsActive && (
+                <PropertyCheckbox propertyKey="military_time" />
+              )}
+              {t('military_time')}
+            </div>
+          }
+        >
           <Toggle
+            disabled={
+              Boolean(
+                typeof company?.settings?.military_time === 'undefined'
+              ) && !isCompanySettingsActive
+            }
             checked={Boolean(company?.settings?.military_time)}
             onChange={(value: boolean) =>
               dispatch(
