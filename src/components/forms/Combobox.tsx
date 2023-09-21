@@ -36,7 +36,7 @@ type EventType = 'internal' | 'external';
 interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
-  placeholder?: string
+  placeholder?: string;
 }
 
 interface Action {
@@ -75,7 +75,7 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
-export function ComboboxStatic<T =any>({
+export function ComboboxStatic<T = any>({
   inputOptions,
   entries,
   readonly,
@@ -143,6 +143,26 @@ export function ComboboxStatic<T =any>({
     }
   };
 
+  const handleBlur = () => {
+    if (comboboxRef.current && comboboxInputRef.current && nullable) {
+      const entry: Entry = {
+        id: -1,
+        label: comboboxInputRef.current.value,
+        value: comboboxInputRef.current.value,
+        resource: null,
+        eventType: 'internal',
+        searchable: comboboxInputRef.current.value,
+      };
+
+      if (
+        comboboxInputRef.current.value !== '' &&
+        comboboxInputRef.current.value.length > 0
+      ) {
+        setSelectedValue(() => ({ ...entry }));
+      }
+    }
+  };
+
   useEffect(() => {
     if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
@@ -200,6 +220,7 @@ export function ComboboxStatic<T =any>({
         onChange={(value) => handleChangeValue(value)}
         disabled={readonly}
         ref={comboboxRef}
+        onBlur={handleBlur}
       >
         {inputOptions.label && (
           <HeadlessCombobox.Label
