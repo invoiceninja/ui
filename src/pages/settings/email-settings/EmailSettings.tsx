@@ -39,20 +39,6 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
-export const E_INVOICE_TYPES = [
-  { key: 'EN16931', value: 'EN16931' },
-  { key: 'XInvoice_2_2', value: 'XInvoice_2_2' },
-  { key: 'XInvoice_2_1', value: 'XInvoice_2_1' },
-  { key: 'XInvoice_2_0', value: 'XInvoice_2_0' },
-  { key: 'XInvoice_1_0', value: 'XInvoice_1_0' },
-  { key: 'XInvoice-Extended', value: 'XInvoice-Extended' },
-  { key: 'XInvoice-BasicWL', value: 'XInvoice-BasicWL' },
-  { key: 'XInvoice-Basic', value: 'XInvoice-Basic' },
-  { key: 'Facturae_3.2', value: 'Facturae_3.2' },
-  { key: 'Facturae_3.2.1', value: 'Facturae_3.2.1' },
-  { key: 'Facturae_3.2.2', value: 'Facturae_3.2.2' },
-];
-
 export function EmailSettings() {
   useTitle('email_settings');
 
@@ -253,11 +239,17 @@ export function EmailSettings() {
                 }
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
-                {E_INVOICE_TYPES.map(({ value }, index) => (
-                  <option key={index} value={value}>
-                    {value}
-                  </option>
-                ))}
+                <option value="EN16931">EN16931</option>
+                <option value="XInvoice_2_2">XInvoice_2_2</option>
+                <option value="XInvoice_2_1">XInvoice_2_1</option>
+                <option value="XInvoice_2_0">XInvoice_2_0</option>
+                <option value="XInvoice_1_0">XInvoice_1_0</option>
+                <option value="XInvoice-Extended">XInvoice-Extended</option>
+                <option value="XInvoice-BasicWL">XInvoice-BasicWL</option>
+                <option value="XInvoice-Basic">XInvoice-Basic</option>
+                <option value="Facturae_3.2">Facturae_3.2</option>
+                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
+                <option value="Facturae_3.2.2">Facturae_3.2.2</option>
               </SelectField>
             </Element>
           </>
