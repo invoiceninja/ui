@@ -89,7 +89,7 @@ export function OnlinePayments() {
       <Card title={t('settings')}>
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="auto_bill_standard_invoices" />
               )}
@@ -189,7 +189,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="client_manual_payment_notification" />
               )}
@@ -218,7 +218,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="client_online_payment_notification" />
               )}
@@ -247,7 +247,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="mark_paid_payment_email" />
               )}
@@ -290,7 +290,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="client_portal_allow_over_payment" />
               )}
@@ -321,7 +321,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="client_portal_allow_under_payment" />
               )}
@@ -371,7 +371,7 @@ export function OnlinePayments() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="client_initiated_payments" />
               )}

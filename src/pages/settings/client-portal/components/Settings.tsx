@@ -148,7 +148,7 @@ export function Settings() {
       <Element
         className={classNames({ 'mt-4': isCompanySettingsActive })}
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="enable_client_portal" />
             )}

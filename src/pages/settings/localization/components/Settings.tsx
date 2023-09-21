@@ -161,7 +161,7 @@ export function Settings() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="military_time" />
               )}

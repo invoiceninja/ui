@@ -252,7 +252,7 @@ export function TemplatesAndReminders() {
 
               <Element
                 leftSide={
-                  <div className="flex space-x-2">
+                  <div className="flex">
                     {!isCompanySettingsActive && (
                       <PropertyCheckbox
                         key={`property_checkbox_enable_reminder${reminderIndex}`}
@@ -327,7 +327,7 @@ export function TemplatesAndReminders() {
             <>
               <Element
                 leftSide={
-                  <div className="flex space-x-2">
+                  <div className="flex">
                     {!isCompanySettingsActive && (
                       <PropertyCheckbox propertyKey="enable_reminder_endless" />
                     )}

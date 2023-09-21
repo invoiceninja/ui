@@ -44,7 +44,7 @@ export function Invoices() {
     <Card title={t('invoices')}>
       <Element
         leftSide={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="auto_email_invoice" />
             )}
@@ -90,7 +90,7 @@ export function Invoices() {
 
       <Element
         leftSide={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="auto_archive_invoice" />
             )}
@@ -120,7 +120,7 @@ export function Invoices() {
 
       <Element
         leftSide={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="auto_archive_invoice_cancelled" />
             )}

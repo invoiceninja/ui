@@ -37,7 +37,7 @@ export function Quotes() {
     <Card title={t('quotes')}>
       <Element
         leftSide={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="auto_convert_quote" />
             )}
@@ -66,7 +66,7 @@ export function Quotes() {
       </Element>
       <Element
         leftSide={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="auto_archive_quote" />
             )}

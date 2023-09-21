@@ -139,7 +139,7 @@ export function EmailSettings() {
       <Card title={t('settings')}>
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="show_email_footer" />
               )}
@@ -162,7 +162,7 @@ export function EmailSettings() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="pdf_email_attachment" />
               )}
@@ -185,7 +185,7 @@ export function EmailSettings() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="document_email_attachment" />
               )}
@@ -209,7 +209,7 @@ export function EmailSettings() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="ubl_email_attachment" />
               )}
@@ -232,7 +232,7 @@ export function EmailSettings() {
 
         <Element
           leftSide={
-            <div className="flex space-x-2">
+            <div className="flex">
               {!isCompanySettingsActive && (
                 <PropertyCheckbox propertyKey="enable_e_invoice" />
               )}

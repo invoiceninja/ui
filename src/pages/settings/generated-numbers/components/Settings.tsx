@@ -105,7 +105,7 @@ export function Settings() {
 
       <Element
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="shared_invoice_quote_counter" />
             )}
@@ -131,7 +131,7 @@ export function Settings() {
 
       <Element
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="shared_invoice_credit_counter" />
             )}

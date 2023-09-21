@@ -1105,7 +1105,7 @@ export function GeneralSettings() {
 
       <Element
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="show_paid_stamp" />
             )}
@@ -1126,7 +1126,7 @@ export function GeneralSettings() {
 
       <Element
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="show_shipping_address" />
             )}
@@ -1170,7 +1170,7 @@ export function GeneralSettings() {
 
       <Element
         leftSide={
-          <div className="flex space-x-2">
+          <div className="flex">
             {!isCompanySettingsActive && (
               <PropertyCheckbox propertyKey="page_numbering" />
             )}
