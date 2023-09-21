@@ -26,7 +26,7 @@ export const dataTableStaleTime = 50;
 export default function Tasks() {
   const { id } = useParams();
   
-  const { data: client, isLoading } = useClientQuery({ id, enabled: true });
+  const { data: client } = useClientQuery({ id, enabled: true });
 
   const columns = useTaskColumns();
 
