@@ -58,7 +58,7 @@ export function useHandleUpdate(params: Params) {
         !Object.entries(value).length
       ) {
         delete adjustedSettings[property];
-      } else if (typeof value === 'string' && !value) {
+      } else if (typeof value !== 'boolean' && !value) {
         delete adjustedSettings[property];
       }
     });
