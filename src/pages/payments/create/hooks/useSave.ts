@@ -51,6 +51,13 @@ export function useSave(
         queryClient.invalidateQueries(route('/api/v1/credits'));
         queryClient.invalidateQueries(route('/api/v1/invoices'));
         queryClient.invalidateQueries(route('/api/v1/clients'));
+        queryClient.invalidateQueries('/api/v1/clients');
+        queryClient.invalidateQueries(route('/api/v1/clients/:id/', { id: payment.client_id}))
+
+        payment?.invoices?.forEach((paymentable: any) => {
+          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: paymentable.invoice_id }));
+        });
+
       });
   };
 }
