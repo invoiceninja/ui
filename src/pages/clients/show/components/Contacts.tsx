@@ -44,6 +44,8 @@ export function Contacts(props: Props) {
                         {contact.first_name} {contact.last_name}
                       </p>
 
+                      <p>{contact.phone}</p>
+
                       <CopyToClipboard text={contact.email} />
                     </div>
                   )
