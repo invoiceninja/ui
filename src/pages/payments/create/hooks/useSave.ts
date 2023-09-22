@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { Payment, Paymentable } from '$app/common/interfaces/payment';
+import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
