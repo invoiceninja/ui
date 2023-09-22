@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { Payment } from '$app/common/interfaces/payment';
+import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -51,6 +51,13 @@ export function useSave(
         queryClient.invalidateQueries(route('/api/v1/credits'));
         queryClient.invalidateQueries(route('/api/v1/invoices'));
         queryClient.invalidateQueries(route('/api/v1/clients'));
+        queryClient.invalidateQueries('/api/v1/clients');
+        queryClient.invalidateQueries(route('/api/v1/clients/:id/', { id: payment.client_id}))
+
+        payment?.invoices?.forEach((paymentable: any) => {
+          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: paymentable.invoice_id }));
+        });
+
       });
   };
 }
