@@ -65,6 +65,19 @@ export default function Apply() {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
           queryClient.invalidateQueries(route('/api/v1/invoices'));
+          queryClient.invalidateQueries(route('/api/v1/clients'));
+          queryClient.invalidateQueries('/api/v1/clients');
+          queryClient.invalidateQueries(route('/api/v1/clients/:id', { id: payment?.client_id }));
+          queryClient.invalidateQueries(route('/api/v1/clients/:id/edit', { id: payment?.client_id }));
+
+          payment?.invoices?.forEach((paymentable: any) => {
+            queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id: paymentable.invoice_id }));
+          });
+
+          payment?.credits?.forEach((paymentable: any) => {
+            queryClient.invalidateQueries(route('/api/v1/credits/:id', { id: paymentable.credit_id }));
+          });
+
         });
     },
   });
