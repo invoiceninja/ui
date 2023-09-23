@@ -26,6 +26,7 @@ interface Props {
   onProductCreated?: (product: Product) => unknown;
   onInputFocus?: () => unknown;
   errorMessage?: string | string[];
+  displayStockQuantity?: boolean;
 }
 
 export function ProductSelector(props: Props) {
@@ -54,13 +55,14 @@ export function ProductSelector(props: Props) {
             <div>
               <div className="flex space-x-1">
                 <p className="font-semibold">{product.product_key}</p>
-                {currentCompany?.track_inventory && (
-                  <p className="text-red-700">{`(In Stock [${
-                    product.in_stock_quantity > 0
-                      ? product.in_stock_quantity
-                      : 'Out of stock'
-                  }])`}</p>
-                )}
+                {currentCompany?.track_inventory &&
+                  props.displayStockQuantity && (
+                    <p className="text-red-700">{`(In Stock [${
+                      product.in_stock_quantity > 0
+                        ? product.in_stock_quantity
+                        : 'Out of stock'
+                    }])`}</p>
+                  )}
               </div>
               <p className="text-sm truncate">
                 {product.notes.length > 35
