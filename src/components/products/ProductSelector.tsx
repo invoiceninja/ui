@@ -57,10 +57,10 @@ export function ProductSelector(props: Props) {
                 <p className="font-semibold">{product.product_key}</p>
                 {currentCompany?.track_inventory &&
                   props.displayStockQuantity && (
-                    <p className="text-red-700">{`(In Stock [${
+                    <p className="text-red-700">{`(${t('in_stock')} [${
                       product.in_stock_quantity > 0
                         ? product.in_stock_quantity
-                        : 'Out of stock'
+                        : t('out_of_stock')
                     }])`}</p>
                   )}
               </div>
