@@ -42,6 +42,7 @@ import {
 import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useLocation } from 'react-router-dom';
 
 const numberInputs = [
   'discount',
@@ -82,6 +83,8 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const location = useLocation();
+
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
@@ -293,7 +296,7 @@ export function useResolveInputField(props: Props) {
           }
           clearButton
           onClearButtonClick={() => handleProductChange(index, '', null)}
-          displayStockQuantity
+          displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
       );
     }
