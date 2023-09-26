@@ -245,13 +245,21 @@ export function Details() {
             </Element>
           )}
 
-          <Element leftSide={t('classification')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="classification"
+                labelElement={<SettingsLabel label={t('classification')} />}
+              />
+            }
+          >
             <SelectField
               id="classification"
               value={companyChanges?.settings?.classification ?? ''}
               onValueChange={(value) =>
                 handleChange('settings.classification', value.toString())
               }
+              disabled={disableSettingsField('classification')}
             >
               <option value=""></option>
               <option value="individual">{t('individual')}</option>
@@ -261,7 +269,6 @@ export function Details() {
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
               <option value="other">{t('other')}</option>
-
             </SelectField>
           </Element>
 
