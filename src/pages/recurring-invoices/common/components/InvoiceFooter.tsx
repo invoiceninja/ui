@@ -123,7 +123,8 @@ export function InvoiceFooter(props: Props) {
 
               <InputField
                 label={t('exchange_rate')}
-                value={recurringInvoice?.exchange_rate || '1.00'}
+                type="number"
+                value={recurringInvoice?.exchange_rate || 1.0}
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value))
                 }

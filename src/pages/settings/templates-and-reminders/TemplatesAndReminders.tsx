@@ -218,7 +218,7 @@ export function TemplatesAndReminders() {
                       value ?? 0
                     )
                   }
-                  type='number'
+                  type="number"
                 />
               </Element>
 
