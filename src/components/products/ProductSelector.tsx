@@ -64,7 +64,7 @@ export function ProductSelector(props: Props) {
                       })}
                     >
                       (
-                      {trans('stock_quantity', {
+                      {trans('stock_quantity_number', {
                         quantity: product.in_stock_quantity,
                       })}
                       )
