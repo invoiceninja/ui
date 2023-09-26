@@ -23,6 +23,7 @@ import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
+import AppleLogin from 'react-apple-login';
 
 export const msal = new PublicClientApplication({
   auth: {
@@ -133,6 +134,8 @@ export function SignInProviders() {
 
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
+
+        <AppleLogin clientId="com.invoiceninja.client" redirectURI="https://invoicing.co/auth/apple" />
 
         {/* 
           eslint-disable-next-line 
