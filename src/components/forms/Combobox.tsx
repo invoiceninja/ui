@@ -21,6 +21,8 @@ import { useClickAway, useDebounce } from 'react-use';
 import { Alert } from '../Alert';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { DebounceInput } from 'react-debounce-input';
+import { InputLabel } from './InputLabel';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -36,7 +38,7 @@ type EventType = 'internal' | 'external';
 interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
-  placeholder?: string
+  placeholder?: string;
 }
 
 interface Action {
@@ -75,7 +77,225 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
-export function ComboboxStatic<T =any>({
+export function Combobox<T = any>({
+  inputOptions,
+  entries,
+  readonly,
+  nullable,
+  initiallyVisible = false,
+  exclude = [],
+  action,
+  onEmptyValues,
+  onChange,
+  onDismiss,
+  entryOptions,
+  errorMessage,
+  clearInputAfterSelection,
+}: ComboboxStaticProps<T>) {
+  const [inputValue, setInputValue] = useState('');
+  const [isOpen, setIsOpen] = useState(initiallyVisible);
+  const [selectedOption, setSelectedOption] = useState<Entry | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  const comboboxRef = useRef<HTMLDivElement>(null);
+
+  let filteredOptions =
+    inputValue === ''
+      ? entries
+      : entries.filter(
+          (entry) =>
+            entry.label?.toLowerCase()?.includes(inputValue?.toLowerCase()) ||
+            entry.value
+              ?.toString()
+              ?.toLowerCase()
+              ?.includes(inputValue?.toLowerCase()) ||
+            entry.searchable.toLowerCase().includes(inputValue?.toLowerCase())
+        );
+
+  filteredOptions = filteredOptions.filter((entry) =>
+    exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
+
+  useEffect(() => {
+    function handleOutsideClick(event) {
+      if (comboboxRef.current && !comboboxRef.current.contains(event.target)) {
+        setIsOpen(false);
+
+        if (
+          inputValue !== '' &&
+          !filteredOptions.some((option) => option.value === inputValue)
+        ) {
+          // If input value is not in options, add and select it
+          const option: Entry = {
+            id: Date.now(),
+            label: inputValue,
+            value: inputValue,
+            resource: null,
+            eventType: 'internal',
+            searchable: inputValue.toLowerCase(),
+          };
+
+          setSelectedOption(option);
+          onChange(option);
+        }
+      }
+    }
+
+    window.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, [inputValue, filteredOptions]);
+
+  useEffect(() => {
+    const entry = entries.find(
+      (entry) =>
+        entry.value === inputOptions.value || entry.label === inputOptions.value
+    );
+
+    entry
+      ? setSelectedOption(entry)
+      : nullable
+      ? setSelectedOption({
+          id: -1,
+          label: inputOptions.value ? inputOptions.value.toString() : '',
+          value: inputOptions.value ? inputOptions.value.toString() : '',
+          resource: null,
+          eventType: 'external',
+          searchable: entryOptions.searchable || entryOptions.value,
+        })
+      : setSelectedOption(null);
+  }, [entries]);
+
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+
+    setInputValue(value);
+    setSelectedOption(null);
+    setIsOpen(true);
+    setHighlightedIndex(-1);
+  };
+
+  const handleOptionClick = (option: Entry) => {
+    setSelectedOption(option);
+    setInputValue(option.label);
+    onChange(option);
+
+    setTimeout(() => setIsOpen(false), 100);
+  };
+
+  const handleKeyDown = (event) => {
+    if (
+      event.key === 'ArrowDown' &&
+      highlightedIndex < filteredOptions.length - 1
+    ) {
+      event.preventDefault();
+      setHighlightedIndex(highlightedIndex + 1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp' && highlightedIndex > 0) {
+      event.preventDefault();
+      setHighlightedIndex(highlightedIndex - 1);
+      return;
+    }
+
+    if (
+      event.key === 'Enter' ||
+      event.key === 'Tab' ||
+      event.key === 'Escape'
+    ) {
+      event.key === 'Tab' && event.preventDefault();
+
+      console.log('Here!');
+      console.log(highlightedIndex);
+
+      setIsOpen(false);
+
+      if (highlightedIndex === -1) {
+        handleOptionClick({
+          id: Date.now(),
+          label: inputValue,
+          value: inputValue,
+          resource: null,
+          eventType: 'internal',
+          searchable: inputValue.toLowerCase(),
+        });
+      } else if (highlightedIndex >= 0) {
+        handleOptionClick(filteredOptions[highlightedIndex]);
+      }
+
+      // Focus next element after Combobox
+    }
+  };
+
+  const colors = useColorScheme();
+
+  return (
+    <div
+      ref={comboboxRef}
+      onBlur={(e) =>
+        e.relatedTarget === null &&
+        handleOptionClick({
+          id: Date.now(),
+          label: inputValue,
+          value: inputValue,
+          resource: null,
+          eventType: 'internal',
+          searchable: inputValue.toLowerCase(),
+        })
+      }
+      className="w-full"
+    >
+      {inputOptions.label ? (
+        <p className="text-sm font-medium block">{inputOptions.label}</p>
+      ) : null}
+
+      <div className="relative mt-1">
+        <div
+          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+          style={{ borderColor: colors.$5 }}
+        >
+          <input
+            type="text"
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsOpen(true)}
+            placeholder={inputOptions.placeholder}
+            disabled={readonly}
+            value={selectedOption ? selectedOption.label : inputValue}
+            className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+          />
+        </div>
+      </div>
+
+      {isOpen && (
+        <ul
+          className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+        >
+          {filteredOptions.map((option, index) => (
+            <li
+              key={option.id}
+              className={classNames(
+                'min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 hover:font-semibold',
+                {
+                  'font-medium': highlightedIndex === index,
+                }
+              )}
+              onClick={() => handleOptionClick(option)}
+            >
+              {option.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export function ComboboxStatic<T = any>({
   inputOptions,
   entries,
   readonly,
@@ -474,20 +694,38 @@ export function ComboboxAsync<T = any>({
   };
 
   return (
-    <ComboboxStatic
-      entries={entries}
-      inputOptions={inputOptions}
-      readonly={readonly}
-      onChange={onChange}
-      onEmptyValues={onEmptyValues}
-      onDismiss={onDismiss}
-      initiallyVisible={initiallyVisible}
-      exclude={exclude}
-      action={action}
-      nullable={nullable}
-      entryOptions={entryOptions}
-      errorMessage={errorMessage}
-      clearInputAfterSelection={clearInputAfterSelection}
-    />
+    <>
+      {/* <ComboboxStatic
+        entries={entries}
+        inputOptions={inputOptions}
+        readonly={readonly}
+        onChange={onChange}
+        onEmptyValues={onEmptyValues}
+        onDismiss={onDismiss}
+        initiallyVisible={initiallyVisible}
+        exclude={exclude}
+        action={action}
+        nullable={nullable}
+        entryOptions={entryOptions}
+        errorMessage={errorMessage}
+        clearInputAfterSelection={clearInputAfterSelection}
+      /> */}
+
+      <Combobox
+        entries={entries}
+        inputOptions={inputOptions}
+        readonly={readonly}
+        onChange={onChange}
+        onEmptyValues={onEmptyValues}
+        onDismiss={onDismiss}
+        initiallyVisible={initiallyVisible}
+        exclude={exclude}
+        action={action}
+        nullable={nullable}
+        entryOptions={entryOptions}
+        errorMessage={errorMessage}
+        clearInputAfterSelection={clearInputAfterSelection}
+      />
+    </>
   );
 }
