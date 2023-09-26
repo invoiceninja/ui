@@ -24,6 +24,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
 import AppleLogin from 'react-apple-login';
+import { v4 } from 'uuid';
 
 export const msal = new PublicClientApplication({
   auth: {
@@ -92,6 +93,12 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
+  const handleApple = (response: any) => {
+    request('POST', endpoint('/api/v1/oauth_login?provider=apple'), {
+      id_token: response.authorization.id_token,
+    }).then((response) => login(response));
+  }
+
   const handleMicrosoft = (token: string) => {
     request('POST', endpoint('/api/v1/oauth_login?provider=microsoft'), {
       accessToken: token,
@@ -135,7 +142,34 @@ export function SignInProviders() {
           <p>Log in with Microsoft</p>
         </SignInProviderButton>
 
-        <AppleLogin clientId="com.invoiceninja.client" redirectURI="https://invoicing.co/auth/apple" />
+        <AppleLogin 
+          clientId="com.invoiceninja.client" 
+          redirectURI="https://app.invoicing.co" 
+          scope='name email'
+          responseType='code id_token'
+          responseMode='form_post' //may not be accurate
+          usePopup={true}
+          nonce={v4()}
+          callback={(response) => {handleApple(response)}}
+        />
+
+{/* 
+payload should look like this.
+{
+     "authorization": {
+       "state": "[STATE]",
+       "code": "[CODE]",
+       "id_token": "[ID_TOKEN]"
+     },
+     "user": {
+       "email": "[EMAIL]",
+       "name": {
+         "firstName": "[FIRST_NAME]",
+         "lastName": "[LAST_NAME]"
+       }
+     }
+} */}
+
 
         {/* 
           eslint-disable-next-line 
