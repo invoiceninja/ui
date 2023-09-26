@@ -39,6 +39,8 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -54,6 +56,8 @@ export function EmailSettings() {
 
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -139,117 +143,86 @@ export function EmailSettings() {
       <Card title={t('settings')}>
         <Element
           leftSide={
-            <div className="flex">
-              {!isCompanySettingsActive && (
-                <PropertyCheckbox propertyKey="show_email_footer" />
-              )}
-              {t('show_email_footer')}
-            </div>
+            <PropertyCheckbox
+              propertyKey="show_email_footer"
+              labelElement={<SettingsLabel label={t('show_email_footer')} />}
+            />
           }
         >
           <Toggle
-            disabled={
-              Boolean(
-                typeof company?.settings?.show_email_footer === 'undefined'
-              ) && !isCompanySettingsActive
-            }
             checked={Boolean(company?.settings.show_email_footer)}
             onValueChange={(value) =>
               handleChange('settings.show_email_footer', value)
             }
+            disabled={disableSettingsField('show_email_footer')}
           />
         </Element>
 
         <Element
           leftSide={
-            <div className="flex">
-              {!isCompanySettingsActive && (
-                <PropertyCheckbox propertyKey="pdf_email_attachment" />
-              )}
-              {t('attach_pdf')}
-            </div>
+            <PropertyCheckbox
+              propertyKey="pdf_email_attachment"
+              labelElement={<SettingsLabel label={t('attach_pdf')} />}
+            />
           }
         >
           <Toggle
-            disabled={
-              Boolean(
-                typeof company?.settings?.pdf_email_attachment === 'undefined'
-              ) && !isCompanySettingsActive
-            }
             checked={Boolean(company?.settings.pdf_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.pdf_email_attachment', value)
             }
+            disabled={disableSettingsField('pdf_email_attachment')}
           />
         </Element>
 
         <Element
           leftSide={
-            <div className="flex">
-              {!isCompanySettingsActive && (
-                <PropertyCheckbox propertyKey="document_email_attachment" />
-              )}
-              {t('attach_documents')}
-            </div>
+            <PropertyCheckbox
+              propertyKey="document_email_attachment"
+              labelElement={<SettingsLabel label={t('attach_documents')} />}
+            />
           }
         >
           <Toggle
-            disabled={
-              Boolean(
-                typeof company?.settings?.document_email_attachment ===
-                  'undefined'
-              ) && !isCompanySettingsActive
-            }
             checked={Boolean(company?.settings.document_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.document_email_attachment', value)
             }
+            disabled={disableSettingsField('document_email_attachment')}
           />
         </Element>
 
         <Element
           leftSide={
-            <div className="flex">
-              {!isCompanySettingsActive && (
-                <PropertyCheckbox propertyKey="ubl_email_attachment" />
-              )}
-              {t('attach_ubl')}
-            </div>
+            <PropertyCheckbox
+              propertyKey="ubl_email_attachment"
+              labelElement={<SettingsLabel label={t('attach_ubl')} />}
+            />
           }
         >
           <Toggle
-            disabled={
-              Boolean(
-                typeof company?.settings?.ubl_email_attachment === 'undefined'
-              ) && !isCompanySettingsActive
-            }
             checked={Boolean(company?.settings.ubl_email_attachment)}
             onValueChange={(value) =>
               handleChange('settings.ubl_email_attachment', value)
             }
+            disabled={disableSettingsField('ubl_email_attachment')}
           />
         </Element>
 
         <Element
           leftSide={
-            <div className="flex">
-              {!isCompanySettingsActive && (
-                <PropertyCheckbox propertyKey="enable_e_invoice" />
-              )}
-              {t('enable_e_invoice')}
-            </div>
+            <PropertyCheckbox
+              propertyKey="enable_e_invoice"
+              labelElement={<SettingsLabel label={t('enable_e_invoice')} />}
+            />
           }
         >
           <Toggle
-            disabled={
-              Boolean(
-                typeof company?.settings?.enable_e_invoice === 'undefined'
-              ) && !isCompanySettingsActive
-            }
             checked={Boolean(company?.settings.enable_e_invoice)}
             onValueChange={(value) =>
               handleChange('settings.enable_e_invoice', value)
             }
+            disabled={disableSettingsField('enable_e_invoice')}
           />
         </Element>
         {company?.settings.enable_e_invoice && isCompanySettingsActive ? (
@@ -303,12 +276,21 @@ export function EmailSettings() {
 
         <Divider />
 
-        <Element leftSide={t('email_provider')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="email_sending_method"
+              labelElement={<SettingsLabel label={t('email_provider')} />}
+              defaultValue="default"
+            />
+          }
+        >
           <SelectField
             value={company?.settings.email_sending_method || 'default'}
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
             }
+            disabled={disableSettingsField('email_sending_method')}
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
             <option defaultChecked value="default">
@@ -325,7 +307,16 @@ export function EmailSettings() {
           company?.settings.email_sending_method === 'microsoft' ||
           company?.settings.email_sending_method === 'gmail') &&
           isHosted() && (
-            <Element leftSide={`Gmail / Microsoft ${t('user')}`}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="gmail_sending_user_id"
+                  labelElement={
+                    <SettingsLabel label={`Gmail / Microsoft ${t('user')}`} />
+                  }
+                />
+              }
+            >
               <UserSelector
                 endpoint="/api/v1/users?sending_users=true"
                 value={company?.settings?.gmail_sending_user_id}
@@ -335,6 +326,7 @@ export function EmailSettings() {
                 onClearButtonClick={() =>
                   handleChange('settings.gmail_sending_user_id', '0')
                 }
+                readonly={disableSettingsField('gmail_sending_user_id')}
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
                 staleTime={1}
               />
@@ -342,12 +334,20 @@ export function EmailSettings() {
           )}
 
         {company?.settings.email_sending_method === 'client_postmark' && (
-          <Element leftSide={t('secret')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="postmark_secret"
+                labelElement={<SettingsLabel label={t('secret')} />}
+              />
+            }
+          >
             <InputField
               value={company?.settings.postmark_secret || ''}
               onValueChange={(value) =>
                 handleChange('settings.postmark_secret', value)
               }
+              disabled={disableSettingsField('postmark_secret')}
               errorMessage={errors?.errors['settings.postmark_secret']}
             />
           </Element>
@@ -355,32 +355,57 @@ export function EmailSettings() {
 
         {company?.settings.email_sending_method === 'client_mailgun' && (
           <>
-            <Element leftSide={t('secret')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="mailgun_secret"
+                  labelElement={<SettingsLabel label={t('secret')} />}
+                />
+              }
+            >
               <InputField
                 value={company?.settings.mailgun_secret || ''}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_secret', value)
                 }
+                disabled={disableSettingsField('mailgun_secret')}
                 errorMessage={errors?.errors['settings.mailgun_secret']}
               />
             </Element>
 
-            <Element leftSide={t('domain')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="mailgun_domain"
+                  labelElement={<SettingsLabel label={t('domain')} />}
+                />
+              }
+            >
               <InputField
                 value={company?.settings.mailgun_domain || ''}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_domain', value)
                 }
+                disabled={disableSettingsField('mailgun_domain')}
                 errorMessage={errors?.errors['settings.mailgun_domain']}
               />
             </Element>
 
-            <Element leftSide={t('endpoint')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="mailgun_endpoint"
+                  labelElement={<SettingsLabel label={t('endpoint')} />}
+                  defaultValue="api.mailgun.net"
+                />
+              }
+            >
               <SelectField
                 value={company?.settings.mailgun_endpoint || 'api.mailgun.net'}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_endpoint', value)
                 }
+                disabled={disableSettingsField('mailgun_endpoint')}
                 errorMessage={errors?.errors['settings.mailgun_endpoint']}
               >
                 <option value="api.mailgun.net" defaultChecked>
@@ -392,48 +417,89 @@ export function EmailSettings() {
           </>
         )}
 
-        <Element leftSide={t('from_name')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="email_from_name"
+              labelElement={<SettingsLabel label={t('from_name')} />}
+            />
+          }
+        >
           <InputField
             value={company?.settings.email_from_name || ''}
             onValueChange={(value) =>
               handleChange('settings.email_from_name', value)
             }
+            disabled={disableSettingsField('email_from_name')}
             errorMessage={errors?.errors['settings.email_from_name']}
           />
         </Element>
 
-        <Element leftSide={t('reply_to_name')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_name"
+              labelElement={<SettingsLabel label={t('reply_to_name')} />}
+            />
+          }
+        >
           <InputField
             value={company?.settings.reply_to_name || ''}
             onValueChange={(value) =>
               handleChange('settings.reply_to_name', value)
             }
+            disabled={disableSettingsField('reply_to_name')}
             errorMessage={errors?.errors['settings.reply_to_name']}
           />
         </Element>
 
-        <Element leftSide={t('reply_to_email')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_email"
+              labelElement={<SettingsLabel label={t('reply_to_email')} />}
+            />
+          }
+        >
           <InputField
             value={company?.settings.reply_to_email || ''}
             onValueChange={(value) =>
               handleChange('settings.reply_to_email', value)
             }
+            disabled={disableSettingsField('reply_to_email')}
             errorMessage={errors?.errors['settings.reply_to_email']}
           />
         </Element>
 
         <Element
-          leftSide={t('bcc_email')}
-          leftSideHelp={t('comma_sparated_list')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="bcc_email"
+              labelElement={
+                <SettingsLabel
+                  label={t('bcc_email')}
+                  helpLabel={t('comma_sparated_list')}
+                />
+              }
+            />
+          }
         >
           <InputField
             value={company?.settings.bcc_email || ''}
             onValueChange={(value) => handleChange('settings.bcc_email', value)}
+            disabled={disableSettingsField('bcc_email')}
             errorMessage={errors?.errors['settings.bcc_email']}
           />
         </Element>
 
-        <Element leftSide={t('send_time')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="entity_send_time"
+              labelElement={<SettingsLabel label={t('send_time')} />}
+            />
+          }
+        >
           <SelectField
             value={company?.settings.entity_send_time}
             onValueChange={(value) =>
@@ -443,6 +509,7 @@ export function EmailSettings() {
               )
             }
             withBlank
+            disabled={disableSettingsField('entity_send_time')}
             errorMessage={errors?.errors['settings.entity_send_time']}
           >
             {[...Array(24).keys()].map((number, index) => (
@@ -458,12 +525,21 @@ export function EmailSettings() {
 
         <Divider />
 
-        <Element leftSide={t('email_design')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="email_style"
+              labelElement={<SettingsLabel label={t('email_design')} />}
+              defaultValue="plain"
+            />
+          }
+        >
           <SelectField
             value={company?.settings.email_style || 'plain'}
             onValueChange={(value) =>
               handleChange('settings.email_style', value)
             }
+            disabled={disableSettingsField('email_style')}
             errorMessage={errors?.errors['settings.email_style']}
           >
             <option value="plain">{t('plain')}</option>
@@ -474,7 +550,14 @@ export function EmailSettings() {
         </Element>
 
         {company?.settings.email_style === 'custom' && (
-          <Element leftSide={t('custom')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="email_style_custom"
+                labelElement={<SettingsLabel label={t('custom')} />}
+              />
+            }
+          >
             <InputField
               element="textarea"
               value={company?.settings.email_style_custom || ''}
@@ -485,17 +568,26 @@ export function EmailSettings() {
                       trans('body_variable_missing', { body: '$body' })
                     )
               }
+              disabled={disableSettingsField('email_style_custom')}
               errorMessage={errors?.errors['settings.email_style_custom']}
             />
           </Element>
         )}
 
-        <Element leftSide={t('signature')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="email_signature"
+              labelElement={<SettingsLabel label={t('signature')} />}
+            />
+          }
+        >
           <MarkdownEditor
             value={company?.settings.email_signature || ''}
             onChange={(value) =>
               handleChange('settings.email_signature', value)
             }
+            disabled={disableSettingsField('email_signature')}
           />
         </Element>
       </Card>

@@ -19,6 +19,9 @@ import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -26,6 +29,8 @@ export function RecurringInvoices() {
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -44,7 +49,14 @@ export function RecurringInvoices() {
 
   return (
     <Card title={t('recurring_invoices')}>
-      <Element leftSide={t('number_pattern')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_invoice_number_pattern"
+            labelElement={<SettingsLabel label={t('number_pattern')} />}
+          />
+        }
+      >
         <InputField
           value={
             companyChanges?.settings?.recurring_invoice_number_pattern || ''
@@ -52,12 +64,20 @@ export function RecurringInvoices() {
           onValueChange={(value) =>
             handleChange('settings.recurring_invoice_number_pattern', value)
           }
+          disabled={disableSettingsField('recurring_invoice_number_pattern')}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_pattern']
           }
         />
       </Element>
-      <Element leftSide={t('number_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_invoice_number_counter"
+            labelElement={<SettingsLabel label={t('number_counter')} />}
+          />
+        }
+      >
         <InputField
           type="number"
           value={
@@ -69,6 +89,7 @@ export function RecurringInvoices() {
               parseFloat(value)
             )
           }
+          disabled={disableSettingsField('recurring_invoice_number_counter')}
           errorMessage={
             errors?.errors['settings.recurring_invoice_number_counter']
           }

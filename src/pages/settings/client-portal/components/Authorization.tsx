@@ -14,104 +14,85 @@ import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Authorization() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const disableSettingsField = useDisableSettingsField();
 
   return (
     <Card title={t('authorization')}>
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="enable_client_portal_password" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('enable_portal_password')}</span>
-              <span className="text-xs text-gray-500">
-                {t('enable_portal_password_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="enable_client_portal_password"
+            labelElement={
+              <SettingsLabel
+                label={t('enable_portal_password')}
+                helpLabel={t('enable_portal_password_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.enable_client_portal_password ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.enable_client_portal_password)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal_password', value)
           }
+          disabled={disableSettingsField('enable_client_portal_password')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="show_accept_invoice_terms" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('show_accept_invoice_terms')}</span>
-              <span className="text-xs text-gray-500">
-                {t('show_accept_invoice_terms_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="show_accept_invoice_terms"
+            labelElement={
+              <SettingsLabel
+                label={t('show_accept_invoice_terms')}
+                helpLabel={t('show_accept_invoice_terms_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.show_accept_invoice_terms ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.show_accept_invoice_terms)}
           onValueChange={(value) =>
             handleChange('settings.show_accept_invoice_terms', value)
           }
+          disabled={disableSettingsField('show_accept_invoice_terms')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="show_accept_quote_terms" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('show_accept_quote_terms')}</span>
-              <span className="text-xs text-gray-500">
-                {t('show_accept_quote_terms_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="show_accept_quote_terms"
+            labelElement={
+              <SettingsLabel
+                label={t('show_accept_quote_terms')}
+                helpLabel={t('show_accept_quote_terms_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.show_accept_quote_terms === 'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.show_accept_quote_terms)}
           onValueChange={(value) =>
             handleChange('settings.show_accept_quote_terms', value)
           }
+          disabled={disableSettingsField('show_accept_quote_terms')}
         />
       </Element>
 
@@ -119,119 +100,93 @@ export function Authorization() {
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="require_invoice_signature" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('require_invoice_signature')}</span>
-              <span className="text-xs text-gray-500">
-                {t('require_invoice_signature_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="require_invoice_signature"
+            labelElement={
+              <SettingsLabel
+                label={t('require_invoice_signature')}
+                helpLabel={t('require_invoice_signature_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.require_invoice_signature ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.require_invoice_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_invoice_signature', value)
           }
+          disabled={disableSettingsField('require_invoice_signature')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="require_quote_signature" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('require_quote_signature')}</span>
-              <span className="text-xs text-gray-500">
-                {t('require_quote_signature_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="require_quote_signature"
+            labelElement={
+              <SettingsLabel
+                label={t('require_quote_signature')}
+                helpLabel={t('require_quote_signature_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.require_quote_signature === 'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.require_quote_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_quote_signature', value)
           }
+          disabled={disableSettingsField('require_quote_signature')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="require_purchase_order_signature" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('require_purchase_order_signature')}</span>
-              <span className="text-xs text-gray-500">
-                {t('require_purchase_order_signature_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="require_purchase_order_signature"
+            labelElement={
+              <SettingsLabel
+                label={t('require_purchase_order_signature')}
+                helpLabel={t('require_purchase_order_signature_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.require_purchase_order_signature ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.require_purchase_order_signature)}
           onValueChange={(value) =>
             handleChange('settings.require_purchase_order_signature', value)
           }
+          disabled={disableSettingsField('require_purchase_order_signature')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="signature_on_pdf" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('signature_on_pdf')}</span>
-              <span className="text-xs text-gray-500">
-                {t('signature_on_pdf_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="signature_on_pdf"
+            labelElement={
+              <SettingsLabel
+                label={t('signature_on_pdf')}
+                helpLabel={t('signature_on_pdf_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.signature_on_pdf === 'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.signature_on_pdf)}
           onValueChange={(value) =>
             handleChange('settings.signature_on_pdf', value)
           }
+          disabled={disableSettingsField('signature_on_pdf')}
         />
       </Element>
     </Card>

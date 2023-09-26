@@ -10,18 +10,25 @@
 
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { Checkbox } from './forms';
 import { cloneDeep } from 'lodash';
 import { Settings } from '$app/common/interfaces/company.interface';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import classNames from 'classnames';
+
+type DefaultValueType = string | boolean | number;
 
 interface Props {
   propertyKey: keyof Settings;
-  defaultValue?: boolean;
+  labelElement: ReactElement;
+  defaultValue?: DefaultValueType;
 }
 
 export function PropertyCheckbox(props: Props) {
-  const { propertyKey, defaultValue = false } = props;
+  const { propertyKey, defaultValue = '' } = props;
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const companyChanges = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
@@ -38,7 +45,8 @@ export function PropertyCheckbox(props: Props) {
     );
 
     if (value) {
-      (updatedCompanySettingsChanges[propertyKey] as boolean) = defaultValue;
+      (updatedCompanySettingsChanges[propertyKey] as DefaultValueType) =
+        defaultValue;
     } else {
       delete updatedCompanySettingsChanges[propertyKey];
     }
@@ -46,12 +54,27 @@ export function PropertyCheckbox(props: Props) {
     handleChange('settings', updatedCompanySettingsChanges);
   };
 
+  useEffect(() => {
+    handleChangeCheckboxValue(checked);
+  }, [checked]);
+
   return (
-    <Checkbox
-      checked={checked}
-      onValueChange={(_, checked) =>
-        handleChangeCheckboxValue(Boolean(checked))
-      }
-    />
+    <div className="flex items-center">
+      {!isCompanySettingsActive && (
+        <Checkbox
+          checked={checked}
+          onValueChange={(_, checked) => setChecked(Boolean(checked))}
+        />
+      )}
+
+      <div
+        className={classNames('cursor-pointer', {
+          'opacity-70': !checked,
+        })}
+        onClick={() => setChecked((current) => !current)}
+      >
+        {props.labelElement}
+      </div>
+    </div>
   );
 }

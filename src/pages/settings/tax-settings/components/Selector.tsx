@@ -21,6 +21,9 @@ import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 interface Props {
   title?: string;
@@ -29,6 +32,8 @@ export function Selector(props: Props) {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { title } = props;
 
@@ -63,11 +68,20 @@ export function Selector(props: Props) {
       {companyChanges?.enabled_tax_rates > 0 && (
         <Card title={title ? t(title) : undefined}>
           {companyChanges?.enabled_tax_rates > 0 && (
-            <Element leftSide={t('default_tax_rate')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="tax_name1"
+                  labelElement={<SettingsLabel label={t('default_tax_rate')} />}
+                  defaultValue="0"
+                />
+              }
+            >
               <SelectField
                 id="settings.tax_rate1"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name1 || '0'}
+                disabled={disableSettingsField('tax_name1')}
                 errorMessage={errors?.errors['settings.tax_rate1']}
               >
                 <option
@@ -91,11 +105,20 @@ export function Selector(props: Props) {
           )}
 
           {companyChanges?.enabled_tax_rates > 1 && (
-            <Element leftSide={t('default_tax_rate')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="tax_name2"
+                  labelElement={<SettingsLabel label={t('default_tax_rate')} />}
+                  defaultValue="0"
+                />
+              }
+            >
               <SelectField
                 id="settings.tax_rate2"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name2 || '0'}
+                disabled={disableSettingsField('tax_name2')}
                 errorMessage={errors?.errors['settings.tax_rate2']}
               >
                 <option
@@ -119,11 +142,20 @@ export function Selector(props: Props) {
           )}
 
           {companyChanges?.enabled_tax_rates > 2 && (
-            <Element leftSide={t('default_tax_rate')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="tax_name3"
+                  labelElement={<SettingsLabel label={t('default_tax_rate')} />}
+                  defaultValue="0"
+                />
+              }
+            >
               <SelectField
                 id="settings.tax_rate3"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name3 || '0'}
+                disabled={disableSettingsField('tax_name3')}
                 errorMessage={errors?.errors['settings.tax_rate3']}
               >
                 <option

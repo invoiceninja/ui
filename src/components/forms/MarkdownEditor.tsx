@@ -18,6 +18,7 @@ interface Props {
   value?: string | undefined;
   onChange: (value: string) => unknown;
   label?: string;
+  disabled?: boolean;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -90,6 +91,7 @@ export function MarkdownEditor(props: Props) {
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
         }}
         onEditorChange={handleChange}
+        disabled={props.disabled}
       />
     </div>
   );

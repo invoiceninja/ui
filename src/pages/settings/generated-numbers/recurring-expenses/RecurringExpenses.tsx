@@ -19,12 +19,17 @@ import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function RecurringExpenses() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -43,7 +48,14 @@ export function RecurringExpenses() {
 
   return (
     <Card title={t('recurring_expenses')}>
-      <Element leftSide={t('number_pattern')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_expense_number_pattern"
+            labelElement={<SettingsLabel label={t('number_pattern')} />}
+          />
+        }
+      >
         <InputField
           value={
             companyChanges?.settings?.recurring_expense_number_pattern || ''
@@ -51,12 +63,20 @@ export function RecurringExpenses() {
           onValueChange={(value) =>
             handleChange('settings.recurring_expense_number_pattern', value)
           }
+          disabled={disableSettingsField('recurring_expense_number_pattern')}
           errorMessage={
             errors?.errors['settings.recurring_expense_number_pattern']
           }
         />
       </Element>
-      <Element leftSide={t('number_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="recurring_expense_number_counter"
+            labelElement={<SettingsLabel label={t('number_counter')} />}
+          />
+        }
+      >
         <InputField
           type="number"
           value={
@@ -68,6 +88,7 @@ export function RecurringExpenses() {
               parseFloat(value)
             )
           }
+          disabled={disableSettingsField('recurring_expense_number_counter')}
           errorMessage={
             errors?.errors['settings.recurring_expense_number_counter']
           }

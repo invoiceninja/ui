@@ -21,11 +21,15 @@ import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 
 export function Invoices() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -44,31 +48,24 @@ export function Invoices() {
     <Card title={t('invoices')}>
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="auto_email_invoice" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('auto_email_invoice')}</span>
-              <span className="text-xs text-gray-500">
-                {t('auto_email_invoice_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="auto_email_invoice"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_email_invoice')}
+                helpLabel={t('auto_email_invoice_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof companyChanges?.settings?.auto_email_invoice ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(companyChanges?.settings?.auto_email_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_email_invoice', value)
           }
+          disabled={disableSettingsField('auto_email_invoice')}
         />
       </Element>
 
@@ -90,74 +87,69 @@ export function Invoices() {
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="auto_archive_invoice" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('auto_archive_invoice')}</span>
-              <span className="text-xs text-gray-500">
-                {t('auto_archive_invoice_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="auto_archive_invoice"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_archive_invoice')}
+                helpLabel={t('auto_archive_invoice_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof companyChanges?.settings?.auto_archive_invoice ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(companyChanges?.settings?.auto_archive_invoice)}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice', value)
           }
+          disabled={disableSettingsField('auto_archive_invoice')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="auto_archive_invoice_cancelled" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('auto_archive_invoice_cancelled')}</span>
-              <span className="text-xs text-gray-500">
-                {t('auto_archive_invoice_cancelled_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="auto_archive_invoice_cancelled"
+            labelElement={
+              <SettingsLabel
+                label={t('auto_archive_invoice_cancelled')}
+                helpLabel={t('auto_archive_invoice_cancelled_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof companyChanges?.settings
-                ?.auto_archive_invoice_cancelled === 'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(
             companyChanges?.settings?.auto_archive_invoice_cancelled
           )}
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice_cancelled', value)
           }
+          disabled={disableSettingsField('auto_archive_invoice_cancelled')}
         />
       </Element>
 
       <Divider />
 
-      <Element leftSide={t('lock_invoices')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="lock_invoices"
+            labelElement={<SettingsLabel label={t('lock_invoices')} />}
+            defaultValue="off"
+          />
+        }
+      >
         <SelectField
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             handleToggleChange('settings.lock_invoices', event.target.value)
           }
           value={companyChanges?.settings?.lock_invoices || 'off'}
+          disabled={disableSettingsField('lock_invoices')}
           errorMessage={errors?.errors['settings.lock_invoices']}
         >
           <option value="off">{t('off')}</option>

@@ -19,12 +19,17 @@ import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 
 export function Clients() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -43,22 +48,38 @@ export function Clients() {
 
   return (
     <Card title={t('clients')}>
-      <Element leftSide={t('number_pattern')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="client_number_pattern"
+            labelElement={<SettingsLabel label={t('number_pattern')} />}
+          />
+        }
+      >
         <InputField
           value={companyChanges?.settings?.client_number_pattern || ''}
           onValueChange={(value) =>
             handleChange('settings.client_number_pattern', value)
           }
+          disabled={disableSettingsField('client_number_pattern')}
           errorMessage={errors?.errors['settings.client_number_pattern']}
         />
       </Element>
-      <Element leftSide={t('number_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="client_number_counter"
+            labelElement={<SettingsLabel label={t('number_counter')} />}
+          />
+        }
+      >
         <InputField
           type="number"
           value={companyChanges?.settings?.client_number_counter || ''}
           onValueChange={(value) =>
             handleChange('settings.client_number_counter', parseFloat(value))
           }
+          disabled={disableSettingsField('client_number_counter')}
           errorMessage={errors?.errors['settings.client_number_counter']}
         />
       </Element>

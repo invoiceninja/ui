@@ -26,6 +26,8 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import classNames from 'classnames';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -35,6 +37,8 @@ export function Settings() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const company = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -148,116 +152,90 @@ export function Settings() {
       <Element
         className={classNames({ 'mt-4': isCompanySettingsActive })}
         leftSide={
-          <div className="flex">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="enable_client_portal" />
-            )}
-            {t('client_portal')}
-          </div>
+          <PropertyCheckbox
+            propertyKey="enable_client_portal"
+            labelElement={<SettingsLabel label={t('client_portal')} />}
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.enable_client_portal === 'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.enable_client_portal)}
           onValueChange={(value) =>
             handleChange('settings.enable_client_portal', value)
           }
+          disabled={disableSettingsField('enable_client_portal')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="client_portal_enable_uploads" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('client_document_upload')}</span>
-              <span className="text-xs text-gray-500">
-                {t('document_upload_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="client_portal_enable_uploads"
+            labelElement={
+              <SettingsLabel
+                label={t('client_document_upload')}
+                helpLabel={t('document_upload_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.client_portal_enable_uploads ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.client_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.client_portal_enable_uploads', value)
           }
+          disabled={disableSettingsField('client_portal_enable_uploads')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="vendor_portal_enable_uploads" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('vendor_document_upload')}</span>
-              <span className="text-xs text-gray-500">
-                {t('vendor_document_upload_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="vendor_portal_enable_uploads"
+            labelElement={
+              <SettingsLabel
+                label={t('vendor_document_upload')}
+                helpLabel={t('vendor_document_upload_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.vendor_portal_enable_uploads ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(company?.settings.vendor_portal_enable_uploads)}
           onValueChange={(value) =>
             handleChange('settings.vendor_portal_enable_uploads', value)
           }
+          disabled={disableSettingsField('vendor_portal_enable_uploads')}
         />
       </Element>
 
       <Element
         leftSide={
-          <div className="flex items-center">
-            {!isCompanySettingsActive && (
-              <PropertyCheckbox propertyKey="accept_client_input_quote_approval" />
-            )}
-
-            <div className="flex flex-col">
-              <span>{t('accept_purchase_order_number')}</span>
-              <span className="text-xs text-gray-500">
-                {t('accept_purchase_order_number_help')}
-              </span>
-            </div>
-          </div>
+          <PropertyCheckbox
+            propertyKey="accept_client_input_quote_approval"
+            labelElement={
+              <SettingsLabel
+                label={t('accept_purchase_order_number')}
+                helpLabel={t('accept_purchase_order_number_help')}
+              />
+            }
+            defaultValue={false}
+          />
         }
       >
         <Toggle
-          disabled={
-            Boolean(
-              typeof company?.settings?.accept_client_input_quote_approval ===
-                'undefined'
-            ) && !isCompanySettingsActive
-          }
           checked={Boolean(
             company?.settings.accept_client_input_quote_approval
           )}
           onValueChange={(value) =>
             handleChange('settings.accept_client_input_quote_approval', value)
           }
+          disabled={disableSettingsField('accept_client_input_quote_approval')}
         />
       </Element>
 
@@ -267,24 +245,41 @@ export function Settings() {
 
       <Divider />
 
-      <Element className="mt-4" leftSide={t('terms_of_service')}>
+      <Element
+        className="mt-4"
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="client_portal_terms"
+            labelElement={<SettingsLabel label={t('terms_of_service')} />}
+          />
+        }
+      >
         <InputField
           element="textarea"
           onValueChange={(value) =>
             handleChange('settings.client_portal_terms', value)
           }
           value={company?.settings.client_portal_terms || ''}
+          disabled={disableSettingsField('client_portal_terms')}
           errorMessage={errors?.errors['settings.client_portal_terms']}
         />
       </Element>
 
-      <Element leftSide={t('privacy_policy')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="client_portal_privacy_policy"
+            labelElement={<SettingsLabel label={t('privacy_policy')} />}
+          />
+        }
+      >
         <InputField
           element="textarea"
           onValueChange={(value) =>
             handleChange('settings.client_portal_privacy_policy', value)
           }
           value={company?.settings.client_portal_privacy_policy || ''}
+          disabled={disableSettingsField('client_portal_privacy_policy')}
           errorMessage={errors?.errors['settings.client_portal_privacy_policy']}
         />
       </Element>

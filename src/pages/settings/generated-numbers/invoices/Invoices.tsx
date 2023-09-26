@@ -19,6 +19,9 @@ import { LinkToVariables } from '../common/components/LinkToVariables';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -26,6 +29,8 @@ export function Invoices() {
   const [pattern, setPattern] = useState<string>('');
 
   const companyChanges = useCompanyChanges();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -44,22 +49,38 @@ export function Invoices() {
 
   return (
     <Card title={t('invoices')}>
-      <Element leftSide={t('number_pattern')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="invoice_number_pattern"
+            labelElement={<SettingsLabel label={t('number_pattern')} />}
+          />
+        }
+      >
         <InputField
           value={companyChanges?.settings?.invoice_number_pattern || ''}
           onValueChange={(value) =>
             handleChange('settings.invoice_number_pattern', value)
           }
+          disabled={disableSettingsField('invoice_number_pattern')}
           errorMessage={errors?.errors['settings.invoice_number_pattern']}
         />
       </Element>
-      <Element leftSide={t('number_counter')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="invoice_number_counter"
+            labelElement={<SettingsLabel label={t('number_counter')} />}
+          />
+        }
+      >
         <InputField
           type="number"
           value={companyChanges?.settings?.invoice_number_counter || ''}
           onValueChange={(value) =>
             handleChange('settings.invoice_number_counter', parseFloat(value))
           }
+          disabled={disableSettingsField('invoice_number_counter')}
           errorMessage={errors?.errors['settings.invoice_number_counter']}
         />
       </Element>
