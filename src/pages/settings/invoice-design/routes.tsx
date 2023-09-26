@@ -18,8 +18,14 @@ const GeneralSettings = lazy(
 const CustomDesigns = lazy(
   () => import('./pages/custom-designs/CustomDesigns')
 );
+const TemplateDesigns = lazy(
+  () => import('./pages/template-designs/TemplateDesigns')
+);
 const Edit = lazy(() => import('./pages/custom-designs/pages/edit/Edit'));
 const Create = lazy(() => import('./pages/custom-designs/pages/create/Create'));
+
+const CreateTemplate = lazy(() => import('./pages/template-designs/pages/create/Create'));
+const EditTemplate = lazy(() => import('./pages/template-designs/pages/edit/Edit'));
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
@@ -27,5 +33,8 @@ export const invoiceDesignRoutes = (
     <Route path="custom_designs" element={<CustomDesigns />} />
     <Route path="custom_designs/:id/edit" element={<Edit />} />
     <Route path="custom_designs/create" element={<Create />} />
+    <Route path="template_designs" element={<TemplateDesigns />} />
+    <Route path="template_designs/:id/edit" element={<EditTemplate />} />
+    <Route path="template_designs/create" element={<CreateTemplate />} />
   </Route>
 );

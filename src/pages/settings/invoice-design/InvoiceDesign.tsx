@@ -34,6 +34,15 @@ export default function InvoiceDesign() {
           route('/settings/invoice_design/custom_designs/:id/edit', params),
       ],
     },
+    {
+      name: t('templates'),
+      href: '/settings/invoice_design/template_designs',
+      matcher: [
+        () => '/settings/invoice_design/template_designs/create',
+        (params) =>
+          route('/settings/invoice_design/template_designs/:id/edit', params),
+      ],
+    },
   ];
 
   if (isGroupSettingsActive || isClientSettingsActive) {

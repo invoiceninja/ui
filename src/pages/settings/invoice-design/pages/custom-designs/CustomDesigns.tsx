@@ -15,7 +15,7 @@ import { Inline } from '$app/components/Inline';
 export default function CustomDesigns() {
   return (
     <DataTable
-      endpoint="/api/v1/designs?custom=true"
+      endpoint="/api/v1/designs?custom=true&template=false"
       columns={[
         {
           id: 'name',
