@@ -14,8 +14,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { Alert } from '../Alert';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import classNames from 'classnames';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -57,11 +58,17 @@ export function ProductSelector(props: Props) {
                 <p className="font-semibold">{product.product_key}</p>
                 {currentCompany?.track_inventory &&
                   props.displayStockQuantity && (
-                    <p className="text-red-700">{`(${t('in_stock')} [${
-                      product.in_stock_quantity > 0
-                        ? product.in_stock_quantity
-                        : t('out_of_stock')
-                    }])`}</p>
+                    <p
+                      className={classNames({
+                        'text-red-700': product.in_stock_quantity <= 0,
+                      })}
+                    >
+                      (
+                      {trans('stock_quantity', {
+                        quantity: product.in_stock_quantity,
+                      })}
+                      )
+                    </p>
                   )}
               </div>
               <p className="text-sm truncate">
