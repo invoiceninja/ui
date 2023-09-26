@@ -233,9 +233,6 @@ export function TemplatesAndReminders() {
                       value ?? 0
                     )
                   }
-                  disabled={disableSettingsField(
-                    `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                  )}
                   type="number"
                 />
               </Element>

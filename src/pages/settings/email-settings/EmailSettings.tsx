@@ -225,51 +225,77 @@ export function EmailSettings() {
             disabled={disableSettingsField('enable_e_invoice')}
           />
         </Element>
-        {company?.settings.enable_e_invoice && isCompanySettingsActive ? (
+        {company?.settings.enable_e_invoice ? (
           <>
-            <Element
-              leftSide={t('upload_certificate')}
-              leftSideHelp={
-                company?.has_e_invoice_certificate
-                  ? t('certificate_set')
-                  : t('certificate_not_set')
-              }
-            >
-              <div
-                {...getRootProps()}
-                className="flex flex-col md:flex-row md:items-center"
+            {isCompanySettingsActive && (
+              <Element
+                leftSide={t('upload_certificate')}
+                leftSideHelp={
+                  company?.has_e_invoice_certificate
+                    ? t('certificate_set')
+                    : t('certificate_not_set')
+                }
               >
-                <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  <input {...getInputProps()} />
-                  <Image className="mx-auto h-12 w-12 text-gray-400" />
-                  <span className="mt-2 block text-sm font-medium text-gray-900">
-                    {isDragActive
-                      ? 'drop_your_logo_here'
-                      : t('dropzone_default_message')}
-                  </span>
+                <div
+                  {...getRootProps()}
+                  className="flex flex-col md:flex-row md:items-center"
+                >
+                  <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <input {...getInputProps()} />
+                    <Image className="mx-auto h-12 w-12 text-gray-400" />
+                    <span className="mt-2 block text-sm font-medium text-gray-900">
+                      {isDragActive
+                        ? 'drop_your_logo_here'
+                        : t('dropzone_default_message')}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Element>
+              </Element>
+            )}
 
-            <Element
-              leftSide={t('certificate_passphrase')}
-              leftSideHelp={
-                company?.has_e_invoice_certificate_passphrase
-                  ? t('passphrase_set')
-                  : t('passphrase_not_set')
-              }
-            >
-              <InputField
-                value=""
-                id="password"
-                type="password"
+            {isCompanySettingsActive && (
+              <Element
+                leftSide={t('certificate_passphrase')}
+                leftSideHelp={
+                  company?.has_e_invoice_certificate_passphrase
+                    ? t('passphrase_set')
+                    : t('passphrase_not_set')
+                }
+              >
+                <InputField
+                  value=""
+                  id="password"
+                  type="password"
+                  onValueChange={(value) =>
+                    handleChange('has_e_invoice_certificate_passphrase', value)
+                  }
+                  errorMessage={
+                    errors?.errors.has_e_invoice_certificate_passphrase
+                  }
+                />
+              </Element>
+            )}
+
+            <Element leftSide={t('e_invoice_type')}>
+              <SelectField
+                value={company?.settings.e_invoice_type || 'EN16931'}
                 onValueChange={(value) =>
-                  handleChange('has_e_invoice_certificate_passphrase', value)
+                  handleChange('settings.e_invoice_type', value)
                 }
-                errorMessage={
-                  errors?.errors.has_e_invoice_certificate_passphrase
-                }
-              />
+                errorMessage={errors?.errors['settings.e_invoice_type']}
+              >
+                <option value="EN16931">EN16931</option>
+                <option value="XInvoice_2_2">XInvoice_2_2</option>
+                <option value="XInvoice_2_1">XInvoice_2_1</option>
+                <option value="XInvoice_2_0">XInvoice_2_0</option>
+                <option value="XInvoice_1_0">XInvoice_1_0</option>
+                <option value="XInvoice-Extended">XInvoice-Extended</option>
+                <option value="XInvoice-BasicWL">XInvoice-BasicWL</option>
+                <option value="XInvoice-Basic">XInvoice-Basic</option>
+                <option value="Facturae_3.2">Facturae_3.2</option>
+                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
+                <option value="Facturae_3.2.2">Facturae_3.2.2</option>
+              </SelectField>
             </Element>
           </>
         ) : null}

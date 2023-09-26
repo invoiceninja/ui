@@ -36,6 +36,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdInventory,
   MdMarkEmailRead,
   MdPageview,
   MdPictureAsPdf,
@@ -468,6 +469,15 @@ export function useActions() {
           icon={<Icon element={MdSwitchRight} />}
         >
           {t('convert_to_expense')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      purchaseOrder.status_id === PurchaseOrderStatus.Accepted && (
+        <DropdownElement
+          onClick={() => bulk([purchaseOrder.id], 'add_to_inventory')}
+          icon={<Icon element={MdInventory} />}
+        >
+          {t('add_to_inventory')}
         </DropdownElement>
       ),
     (purchaseOrder) =>
