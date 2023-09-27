@@ -78,10 +78,13 @@ export function PropertyCheckbox(props: Props) {
       )}
 
       <div
-        className={classNames('cursor-pointer', {
+        className={classNames({
           'opacity-70': !checked,
+          'cursor-pointer': !isCompanySettingsActive,
         })}
-        onClick={() => setChecked((current) => !current)}
+        onClick={() =>
+          !isCompanySettingsActive && setChecked((current) => !current)
+        }
       >
         {props.labelElement}
       </div>
