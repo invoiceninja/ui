@@ -145,6 +145,7 @@ export function Address() {
               value={companyChanges?.settings?.country_id || ''}
               onChange={handleChange}
               id="settings.country_id"
+              disabled={disableSettingsField('country_id')}
               errorMessage={errors?.errors['settings.country_id']}
               withBlank
             >
