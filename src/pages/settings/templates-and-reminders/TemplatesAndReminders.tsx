@@ -273,6 +273,9 @@ export function TemplatesAndReminders() {
                       value ?? 0
                     )
                   }
+                  disabled={disableSettingsField(
+                    `num_days_reminder${reminderIndex}` as keyof CompanySettings
+                  )}
                   type="number"
                 />
               </Element>
@@ -321,7 +324,7 @@ export function TemplatesAndReminders() {
                 leftSide={
                   <PropertyCheckbox
                     propertyKey={
-                      `property_checkbox_enable_reminder${reminderIndex}` as keyof CompanySettings
+                      `enable_reminder${reminderIndex}` as keyof CompanySettings
                     }
                     labelElement={<SettingsLabel label={t('send_email')} />}
                     defaultValue={false}
