@@ -23,10 +23,11 @@ interface Props {
   noExternalPadding?: boolean;
   withoutItemsCenter?: boolean;
   withoutWrappingLeftSide?: boolean;
+  disableLabels?: boolean;
 }
 
 export function Element(props: Props) {
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <div
@@ -39,7 +40,11 @@ export function Element(props: Props) {
       )}
       onClick={props.onClick}
     >
-      <dt className="text-sm text-gray-500 flex flex-col">
+      <dt
+        className={classNames('text-sm text-gray-500 flex flex-col', {
+          'opacity-75': props.disableLabels,
+        })}
+      >
         <span
           className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
@@ -62,13 +67,9 @@ export function Element(props: Props) {
           ))}
       </dt>
       <dd
-        className={classNames(
-          'mt-4 text-sm sm:mt-0 sm:col-span-2',
-          {
-            'flex flex-col sm:flex-row sm:justify-end':
-              props.pushContentToRight,
-          }
-        )}
+        className={classNames('mt-4 text-sm sm:mt-0 sm:col-span-2', {
+          'flex flex-col sm:flex-row sm:justify-end': props.pushContentToRight,
+        })}
         style={{ color: colors.$3 }}
       >
         {props.children}

@@ -39,6 +39,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { cloneDeep } from 'lodash';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -63,13 +64,21 @@ export function TemplatesAndReminders() {
 
   const disableSettingsField = useDisableSettingsField();
 
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const { data: statics } = useStaticsQuery();
-  const [templateId, setTemplateId] = useState('invoice');
+  const [templateId, setTemplateId] = useState(
+    isCompanySettingsActive ? 'invoice' : ''
+  );
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
+
+  const [fieldsEnabled, setFieldsEnabled] = useState<boolean>(
+    isCompanySettingsActive
+  );
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -93,7 +102,7 @@ export function TemplatesAndReminders() {
   };
 
   useEffect(() => {
-    if (statics?.templates && company) {
+    if (statics?.templates && company && templateId) {
       if (REMINDERS.includes(templateId)) {
         setReminderIndex(REMINDERS.indexOf(templateId) + 1);
       } else {
@@ -128,16 +137,21 @@ export function TemplatesAndReminders() {
   }, [statics, templateId]);
 
   useEffect(() => {
-    handleChange(`settings.email_subject_${templateId}`, templateBody?.subject);
-    handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+    if (templateId) {
+      handleChange(
+        `settings.email_subject_${templateId}`,
+        templateBody?.subject
+      );
+      handleChange(`settings.email_template_${templateId}`, templateBody?.body);
 
-    request('POST', endpoint('/api/v1/templates'), {
-      body: templateBody?.body,
-      subject: templateBody?.subject,
-      entity: '',
-      entity_id: '',
-      template: `email_template_${templateId}`,
-    }).then((response) => setPreview(response.data));
+      request('POST', endpoint('/api/v1/templates'), {
+        body: templateBody?.body,
+        subject: templateBody?.subject,
+        entity: '',
+        entity_id: '',
+        template: `email_template_${templateId}`,
+      }).then((response) => setPreview(response.data));
+    }
   }, [templateBody]);
 
   const variables =
@@ -156,24 +170,26 @@ export function TemplatesAndReminders() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('edit')}>
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey={
-                `email_template_${templateId}` as keyof CompanySettings
-              }
-              labelElement={<SettingsLabel label={t('template')} />}
-              defaultValue={templateId}
-              defaultChecked
+        {!isCompanySettingsActive && (
+          <div className="pl-6">
+            <Toggle
+              checked={fieldsEnabled}
+              onValueChange={(value) => {
+                setFieldsEnabled(value);
+                handleChangeTemplate(value ? 'invoice' : '');
+              }}
             />
-          }
-        >
+          </div>
+        )}
+
+        <Element leftSide={t('template')} disableLabels={!fieldsEnabled}>
           <SelectField
             value={templateId}
-            onValueChange={(value) => handleChangeTemplate(value)}
-            disabled={disableSettingsField(
-              `email_template_${templateId}` as keyof CompanySettings
-            )}
+            onValueChange={(value) => {
+              isCompanySettingsActive && handleChangeTemplate(value);
+              !isCompanySettingsActive && setTemplateId(value);
+            }}
+            disabled={!fieldsEnabled}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
@@ -188,18 +204,7 @@ export function TemplatesAndReminders() {
           </SelectField>
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey={
-                `email_subject_${templateId}` as keyof CompanySettings
-              }
-              labelElement={<SettingsLabel label={t('subject')} />}
-              defaultValue={templateId}
-              defaultChecked
-            />
-          }
-        >
+        <Element leftSide={t('subject')} disableLabels={!fieldsEnabled}>
           <InputField
             id="subject"
             value={templateBody?.subject || ''}
@@ -208,13 +213,11 @@ export function TemplatesAndReminders() {
                 (current) => current && { ...current, subject: value }
               )
             }
-            disabled={disableSettingsField(
-              `email_subject_${templateId}` as keyof CompanySettings
-            )}
+            disabled={!fieldsEnabled}
           />
         </Element>
 
-        <Element leftSide={t('body')}>
+        <Element leftSide={t('body')} disableLabels={!fieldsEnabled}>
           {canChangeEmailTemplate ? (
             <MarkdownEditor
               value={templateBody?.body || ''}
@@ -223,6 +226,7 @@ export function TemplatesAndReminders() {
                   (current) => current && { ...current, body: value }
                 )
               }
+              disabled={!fieldsEnabled}
             />
           ) : (
             <div className="flex flex-col items-start">
