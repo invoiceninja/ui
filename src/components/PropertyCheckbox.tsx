@@ -62,6 +62,12 @@ export function PropertyCheckbox(props: Props) {
     handleChangeCheckboxValue(checked);
   }, [checked]);
 
+  useEffect(() => {
+    if (companyChanges?.settings[propertyKey] && !checked) {
+      handleChangeCheckboxValue(true);
+    }
+  }, [companyChanges?.settings[propertyKey]]);
+
   return (
     <div className="flex items-center">
       {!isCompanySettingsActive && (

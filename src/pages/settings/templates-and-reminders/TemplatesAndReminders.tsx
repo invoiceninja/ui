@@ -188,7 +188,18 @@ export function TemplatesAndReminders() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('subject')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey={
+                `email_subject_${templateId}` as keyof CompanySettings
+              }
+              labelElement={<SettingsLabel label={t('subject')} />}
+              defaultValue={templateId}
+              defaultChecked
+            />
+          }
+        >
           <InputField
             id="subject"
             value={templateBody?.subject || ''}
@@ -197,6 +208,9 @@ export function TemplatesAndReminders() {
                 (current) => current && { ...current, subject: value }
               )
             }
+            disabled={disableSettingsField(
+              `email_subject_${templateId}` as keyof CompanySettings
+            )}
           />
         </Element>
 
