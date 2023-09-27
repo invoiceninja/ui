@@ -55,6 +55,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -105,6 +106,7 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
+  onBulkSuccess?: (resource: T[]) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -250,8 +252,12 @@ export function DataTable<T extends object>(props: Props<T>) {
       action,
       ids: id ? [id] : Array.from(selected),
     })
-      .then(() => {
+      .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${action}d_${props.resource}`);
+
+        console.log(response);
+
+        props.onBulkSuccess?.(response.data.data);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
