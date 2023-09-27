@@ -22,7 +22,6 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { Settings } from '../edit/components/Settings';
 import { Body } from '../edit/components/Body';
 
 export interface PreviewPayload {
@@ -89,8 +88,7 @@ export default function Edit() {
         <div className="flex flex-col lg:flex-row gap-4">
             <div className="w-full lg:w-1/2 overflow-y-auto">
                 <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-                    <Settings errors={errors} />
-                    <Body />
+                    <Body errors={errors} />
                 </div>
             </div>
 

@@ -28,7 +28,7 @@ export default function TemplateDesigns() {
                     ),
                 },
             ]}
-            resource="design"
+            resource="proposal_template"
             linkToCreate="/settings/invoice_design/template_designs/create"
             bulkRoute="/api/v1/designs/bulk"
             linkToEdit="/settings/invoice_design/template_designs/:id/edit"

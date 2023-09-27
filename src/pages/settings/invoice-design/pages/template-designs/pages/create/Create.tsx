@@ -32,6 +32,9 @@ export default function Create() {
 
     const queryClient = useQueryClient();
 
+    const baseTemplate = "<html>\n\t<head>\n\t</head>\n\t<body>\n\t\t<ninja>\n\n\t\t</ninja>\n\t</body>\n</html>\n";
+    ;
+
     const [design, setDesign] = useState<Design | null>(null);
     const [errors, setErrors] = useState<ValidationBag | null>(null);
 
@@ -42,7 +45,7 @@ export default function Create() {
             design: {
                     ...current.design,
                     header: " ",
-                    body: "<ninja></ninja>",
+                    body: baseTemplate,
                     footer: " ",
                     includes: " ",
                 },
@@ -92,7 +95,7 @@ export default function Create() {
 
     return (
         <Container>
-            <Card title={t('new_design')}>
+            <Card title={t('new_proposal_template')}>
                 <Element leftSide={t('name')}>
                     <InputField
                         value={design?.name}
