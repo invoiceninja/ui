@@ -35,10 +35,10 @@ import { paymentVariables } from './common/constants/variables/payment-variables
 import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { cloneDeep } from 'lodash';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -63,8 +63,6 @@ export function TemplatesAndReminders() {
 
   const disableSettingsField = useDisableSettingsField();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
-
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState('invoice');
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
@@ -74,6 +72,25 @@ export function TemplatesAndReminders() {
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
+
+  const handleChangeTemplate = (currentTemplateId: string) => {
+    const updatedCompanySettingsChanges: CompanySettings | undefined =
+      cloneDeep(company?.settings);
+
+    if (updatedCompanySettingsChanges) {
+      delete updatedCompanySettingsChanges[
+        `email_subject_${templateId}` as keyof typeof updatedCompanySettingsChanges
+      ];
+
+      delete updatedCompanySettingsChanges[
+        `email_template_${templateId}` as keyof typeof updatedCompanySettingsChanges
+      ];
+
+      setTemplateId(currentTemplateId);
+
+      handleChange('settings', updatedCompanySettingsChanges);
+    }
+  };
 
   useEffect(() => {
     if (statics?.templates && company) {
@@ -111,13 +128,8 @@ export function TemplatesAndReminders() {
   }, [statics, templateId]);
 
   useEffect(() => {
-    if (isCompanySettingsActive) {
-      handleChange(
-        `settings.email_subject_${templateId}`,
-        templateBody?.subject
-      );
-      handleChange(`settings.email_template_${templateId}`, templateBody?.body);
-    }
+    handleChange(`settings.email_subject_${templateId}`, templateBody?.subject);
+    handleChange(`settings.email_template_${templateId}`, templateBody?.body);
 
     request('POST', endpoint('/api/v1/templates'), {
       body: templateBody?.body,
@@ -144,10 +156,24 @@ export function TemplatesAndReminders() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('edit')}>
-        <Element leftSide={t('template')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey={
+                `email_template_${templateId}` as keyof CompanySettings
+              }
+              labelElement={<SettingsLabel label={t('template')} />}
+              defaultValue={templateId}
+              defaultChecked
+            />
+          }
+        >
           <SelectField
             value={templateId}
-            onValueChange={(value) => setTemplateId(value)}
+            onValueChange={(value) => handleChangeTemplate(value)}
+            disabled={disableSettingsField(
+              `email_template_${templateId}` as keyof CompanySettings
+            )}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (

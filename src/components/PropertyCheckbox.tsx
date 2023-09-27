@@ -23,10 +23,11 @@ interface Props {
   propertyKey: keyof Settings;
   labelElement: ReactElement;
   defaultValue?: DefaultValueType;
+  defaultChecked?: boolean;
 }
 
 export function PropertyCheckbox(props: Props) {
-  const { propertyKey, defaultValue = '' } = props;
+  const { propertyKey, defaultValue = '', defaultChecked } = props;
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -34,24 +35,27 @@ export function PropertyCheckbox(props: Props) {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const [checked, setChecked] = useState<boolean>(
-    Boolean(typeof companyChanges?.settings[propertyKey] !== 'undefined')
+    Boolean(typeof companyChanges?.settings[propertyKey] !== 'undefined') ||
+      Boolean(defaultChecked)
   );
 
   const handleChangeCheckboxValue = (value: boolean) => {
     setChecked(value);
 
-    const updatedCompanySettingsChanges: Settings = cloneDeep(
-      companyChanges.settings
+    const updatedCompanySettingsChanges: Settings | undefined = cloneDeep(
+      companyChanges?.settings
     );
 
-    if (value) {
-      (updatedCompanySettingsChanges[propertyKey] as DefaultValueType) =
-        defaultValue;
-    } else {
-      delete updatedCompanySettingsChanges[propertyKey];
-    }
+    if (updatedCompanySettingsChanges) {
+      if (value) {
+        (updatedCompanySettingsChanges[propertyKey] as DefaultValueType) =
+          defaultValue;
+      } else {
+        delete updatedCompanySettingsChanges[propertyKey];
+      }
 
-    handleChange('settings', updatedCompanySettingsChanges);
+      handleChange('settings', updatedCompanySettingsChanges);
+    }
   };
 
   useEffect(() => {
