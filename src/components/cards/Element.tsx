@@ -23,7 +23,7 @@ interface Props {
   noExternalPadding?: boolean;
   withoutItemsCenter?: boolean;
   withoutWrappingLeftSide?: boolean;
-  disableLabels?: boolean;
+  disabledLabels?: boolean;
 }
 
 export function Element(props: Props) {
@@ -42,7 +42,7 @@ export function Element(props: Props) {
     >
       <dt
         className={classNames('text-sm text-gray-500 flex flex-col', {
-          'opacity-75': props.disableLabels,
+          'opacity-75': props.disabledLabels,
         })}
       >
         <span

@@ -182,7 +182,7 @@ export function TemplatesAndReminders() {
           </div>
         )}
 
-        <Element leftSide={t('template')} disableLabels={!fieldsEnabled}>
+        <Element leftSide={t('template')} disabledLabels={!fieldsEnabled}>
           <SelectField
             value={templateId}
             onValueChange={(value) => {
@@ -204,7 +204,7 @@ export function TemplatesAndReminders() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('subject')} disableLabels={!fieldsEnabled}>
+        <Element leftSide={t('subject')} disabledLabels={!fieldsEnabled}>
           <InputField
             id="subject"
             value={templateBody?.subject || ''}
@@ -217,7 +217,7 @@ export function TemplatesAndReminders() {
           />
         </Element>
 
-        <Element leftSide={t('body')} disableLabels={!fieldsEnabled}>
+        <Element leftSide={t('body')} disabledLabels={!fieldsEnabled}>
           {canChangeEmailTemplate ? (
             <MarkdownEditor
               value={templateBody?.body || ''}
