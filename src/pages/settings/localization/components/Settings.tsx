@@ -71,6 +71,7 @@ export function Settings() {
             <PropertyCheckbox
               propertyKey="currency_id"
               labelElement={<SettingsLabel label={t('currency')} />}
+              defaultValue="1"
             />
           }
         >
