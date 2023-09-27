@@ -186,8 +186,8 @@ export function TemplatesAndReminders() {
           <SelectField
             value={templateId}
             onValueChange={(value) => {
-              isCompanySettingsActive && handleChangeTemplate(value);
-              !isCompanySettingsActive && setTemplateId(value);
+              !isCompanySettingsActive && handleChangeTemplate(value);
+              isCompanySettingsActive && setTemplateId(value);
             }}
             disabled={!fieldsEnabled}
           >

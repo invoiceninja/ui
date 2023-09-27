@@ -23,11 +23,10 @@ interface Props {
   propertyKey: keyof Settings;
   labelElement: ReactElement;
   defaultValue?: DefaultValueType;
-  defaultChecked?: boolean;
 }
 
 export function PropertyCheckbox(props: Props) {
-  const { propertyKey, defaultValue = '', defaultChecked } = props;
+  const { propertyKey, defaultValue = '' } = props;
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -35,8 +34,7 @@ export function PropertyCheckbox(props: Props) {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const [checked, setChecked] = useState<boolean>(
-    Boolean(typeof companyChanges?.settings[propertyKey] !== 'undefined') ||
-      Boolean(defaultChecked)
+    Boolean(typeof companyChanges?.settings[propertyKey] !== 'undefined')
   );
 
   const handleChangeCheckboxValue = (value: boolean) => {
@@ -47,10 +45,12 @@ export function PropertyCheckbox(props: Props) {
     );
 
     if (updatedCompanySettingsChanges) {
-      if (value) {
+      if (value && !Object.hasOwn(companyChanges?.settings, propertyKey)) {
         (updatedCompanySettingsChanges[propertyKey] as DefaultValueType) =
           defaultValue;
-      } else {
+      }
+
+      if (!value && Object.hasOwn(companyChanges?.settings, propertyKey)) {
         delete updatedCompanySettingsChanges[propertyKey];
       }
 
@@ -63,10 +63,10 @@ export function PropertyCheckbox(props: Props) {
   }, [checked]);
 
   useEffect(() => {
-    if (companyChanges?.settings[propertyKey] && !checked) {
+    if (Object.hasOwn(companyChanges?.settings, propertyKey)) {
       handleChangeCheckboxValue(true);
     }
-  }, [companyChanges?.settings[propertyKey]]);
+  }, [propertyKey]);
 
   return (
     <div className="flex items-center">
