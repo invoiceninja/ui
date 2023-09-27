@@ -178,6 +178,10 @@ export function Combobox<T = any>({
   };
 
   const handleOptionClick = (option: Entry) => {
+    if (selectedOption && selectedOption.value === option.value) {
+      return;
+    }
+
     setSelectedOption(option);
     setInputValue(option.label);
     onChange(option);
@@ -206,10 +210,7 @@ export function Combobox<T = any>({
       event.key === 'Tab' ||
       event.key === 'Escape'
     ) {
-      event.key === 'Tab' && event.preventDefault();
-
-      console.log('Here!');
-      console.log(highlightedIndex);
+      // event.key === 'Tab' && event.preventDefault();
 
       setIsOpen(false);
 
@@ -233,21 +234,7 @@ export function Combobox<T = any>({
   const colors = useColorScheme();
 
   return (
-    <div
-      ref={comboboxRef}
-      onBlur={(e) =>
-        e.relatedTarget === null &&
-        handleOptionClick({
-          id: Date.now(),
-          label: inputValue,
-          value: inputValue,
-          resource: null,
-          eventType: 'internal',
-          searchable: inputValue.toLowerCase(),
-        })
-      }
-      className="w-full"
-    >
+    <div ref={comboboxRef} className="w-full">
       {inputOptions.label ? (
         <p className="text-sm font-medium block">{inputOptions.label}</p>
       ) : null}
