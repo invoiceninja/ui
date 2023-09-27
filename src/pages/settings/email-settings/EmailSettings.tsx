@@ -276,12 +276,21 @@ export function EmailSettings() {
               </Element>
             )}
 
-            <Element leftSide={t('e_invoice_type')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="e_invoice_type"
+                  labelElement={<SettingsLabel label={t('e_invoice_type')} />}
+                  defaultValue="EN16931"
+                />
+              }
+            >
               <SelectField
                 value={company?.settings.e_invoice_type || 'EN16931'}
                 onValueChange={(value) =>
                   handleChange('settings.e_invoice_type', value)
                 }
+                disabled={disableSettingsField('e_invoice_type')}
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
                 <option value="EN16931">EN16931</option>
