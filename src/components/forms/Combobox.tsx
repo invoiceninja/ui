@@ -83,7 +83,8 @@ export function Combobox<T = any>({
   initiallyVisible = false,
   exclude = [],
   action,
-  onEmptyValues,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  onEmptyValues, // @ts-ignore
   onChange,
   onDismiss,
   entryOptions,
@@ -281,6 +282,38 @@ export function Combobox<T = any>({
               color: colors.$3,
             }}
           />
+
+          {!readonly && (
+            <button
+              type="button"
+              onClick={(e) => {
+                if (onDismiss) {
+                  e.preventDefault();
+
+                  setIsOpen(false);
+
+                  return onDismiss();
+                }
+              }}
+              className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+            >
+              {onDismiss && selectedOption ? (
+                <X
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-clear-icon"
+                  style={{ color: colors.$3 }}
+                />
+              ) : (
+                <ChevronDown
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-chevrondown-icon"
+                  style={{ color: colors.$3 }}
+                />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
