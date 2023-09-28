@@ -768,24 +768,8 @@ export function ComboboxAsync<T = any>({
     });
   };
 
-  return (
-    <>
-      {/* <ComboboxStatic
-        entries={entries}
-        inputOptions={inputOptions}
-        readonly={readonly}
-        onChange={onChange}
-        onEmptyValues={onEmptyValues}
-        onDismiss={onDismiss}
-        initiallyVisible={initiallyVisible}
-        exclude={exclude}
-        action={action}
-        nullable={nullable}
-        entryOptions={entryOptions}
-        errorMessage={errorMessage}
-        clearInputAfterSelection={clearInputAfterSelection}
-      /> */}
-
+  if (endpoint.pathname.startsWith('/api/v1/products')) {
+    return (
       <Combobox
         entries={entries}
         inputOptions={inputOptions}
@@ -801,6 +785,24 @@ export function ComboboxAsync<T = any>({
         errorMessage={errorMessage}
         clearInputAfterSelection={clearInputAfterSelection}
       />
-    </>
+    );
+  }
+
+  return (
+    <ComboboxStatic
+      entries={entries}
+      inputOptions={inputOptions}
+      readonly={readonly}
+      onChange={onChange}
+      onEmptyValues={onEmptyValues}
+      onDismiss={onDismiss}
+      initiallyVisible={initiallyVisible}
+      exclude={exclude}
+      action={action}
+      nullable={nullable}
+      entryOptions={entryOptions}
+      errorMessage={errorMessage}
+      clearInputAfterSelection={clearInputAfterSelection}
+    />
   );
 }
