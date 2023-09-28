@@ -280,10 +280,12 @@ export function Combobox<T = any>({
               borderColor: colors.$5,
               color: colors.$3,
             }}
+            tabIndex={-1}
           />
 
           {!readonly && (
             <button
+              tabIndex={-1}
               type="button"
               onClick={(e) => {
                 if (onDismiss) {
