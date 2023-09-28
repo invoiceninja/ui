@@ -355,6 +355,12 @@ export function Combobox<T = any>({
           ))}
         </ul>
       )}
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
     </div>
   );
 }
