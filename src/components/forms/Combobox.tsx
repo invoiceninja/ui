@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -125,8 +125,6 @@ export function Combobox<T = any>({
     );
 
     if (entry >= 0) {
-      console.log(selectedOption);
-
       setSelectedOption(entries[entry]);
       setHighlightedIndex(entry);
 
@@ -147,9 +145,7 @@ export function Combobox<T = any>({
     }
   }, [entries]);
 
-  const handleInputChange = (event) => {
-    const value = event.target.value;
-
+  const handleInputChange = (value: string) => {
     setInputValue(value);
     setSelectedOption(null);
     setIsOpen(true);
@@ -173,7 +169,7 @@ export function Combobox<T = any>({
     setTimeout(() => setIsOpen(false), 100);
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (
       event.key === 'ArrowDown' &&
       highlightedIndex < filteredOptions.length - 1
@@ -271,7 +267,7 @@ export function Combobox<T = any>({
         >
           <input
             type="text"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
             placeholder={inputOptions.placeholder}
