@@ -46,6 +46,7 @@ import Select, { StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Settings } from '$app/common/interfaces/company.interface';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 interface Params {
   includeRemoveAction: boolean;
@@ -55,6 +56,8 @@ export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -118,13 +121,13 @@ export function GatewaysTable(params: Params) {
     return STRIPE_CONNECT === gateway.gateway_key && !gatewayConfig.account_id;
   };
 
-  const handleSaveBulkActionsChanges = async (ids: string[]) => {
+  const handleSaveBulkActionsChanges = (ids: string[]) => {
     if (companyChanges?.settings.company_gateway_ids) {
       const numberOfGateways: number = (
         companyChanges?.settings as Settings
       ).company_gateway_ids.split(',').length;
 
-      if (numberOfGateways > 1) {
+      if (numberOfGateways > 1 || isCompanySettingsActive) {
         handleChange(
           'settings.company_gateway_ids',
           currentGateways
