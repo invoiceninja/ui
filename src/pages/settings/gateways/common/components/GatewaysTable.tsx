@@ -238,9 +238,9 @@ export function GatewaysTable(params: Params) {
           <Dropdown label={t('more_actions')} disabled={!selected.length}>
             <DropdownElement
               onClick={() => {
-                bulk(selected, 'archive').then(() => {
-                  handleSaveBulkActionsChanges(selected);
-                });
+                bulk(selected, 'archive').then(() =>
+                  handleSaveBulkActionsChanges(selected)
+                );
 
                 handleDeselect();
               }}
