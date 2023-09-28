@@ -76,39 +76,10 @@ export function TemplatesAndReminders() {
 
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
 
-  const [fieldsEnabled, setFieldsEnabled] = useState<boolean>(
-    isCompanySettingsActive
-  );
-
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
-  const handleChangeTemplate = (currentTemplateId: string) => {
-    const updatedCompanySettingsChanges: CompanySettings | undefined =
-      cloneDeep(company?.settings);
-
-    if (updatedCompanySettingsChanges) {
-      delete updatedCompanySettingsChanges[
-        `email_subject_${templateId}` as keyof typeof updatedCompanySettingsChanges
-      ];
-
-      delete updatedCompanySettingsChanges[
-        `email_template_${templateId}` as keyof typeof updatedCompanySettingsChanges
-      ];
-
-      setTemplateId(currentTemplateId);
-
-      handleChange('settings', updatedCompanySettingsChanges);
-    }
-  };
-
-  useEffect(() => {
+  const handleSetTemplateBody = () => {
     if (statics?.templates && company && templateId) {
-      if (REMINDERS.includes(templateId)) {
-        setReminderIndex(REMINDERS.indexOf(templateId) + 1);
-      } else {
-        setReminderIndex(-1);
-      }
-
       const existing = {
         subject: company.settings[
           `email_subject_${templateId}` as keyof CompanySettings
@@ -134,10 +105,22 @@ export function TemplatesAndReminders() {
         setTemplateBody({ ...template });
       }
     }
+  };
+
+  useEffect(() => {
+    if (statics?.templates && company && templateId) {
+      if (REMINDERS.includes(templateId)) {
+        setReminderIndex(REMINDERS.indexOf(templateId) + 1);
+      } else {
+        setReminderIndex(-1);
+      }
+
+      handleSetTemplateBody();
+    }
   }, [statics, templateId]);
 
   useEffect(() => {
-    if (templateId) {
+    if (templateId && templateBody) {
       handleChange(
         `settings.email_subject_${templateId}`,
         templateBody?.subject
@@ -170,26 +153,54 @@ export function TemplatesAndReminders() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('edit')}>
-        {!isCompanySettingsActive && (
-          <div className="pl-6">
-            <Toggle
-              checked={fieldsEnabled}
-              onValueChange={(value) => {
-                setFieldsEnabled(value);
-                handleChangeTemplate(value ? 'invoice' : '');
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              checked={Boolean(
+                company?.settings[
+                  `email_template_${
+                    templateId || 'invoice'
+                  }` as keyof CompanySettings
+                ]
+              )}
+              propertyKey={
+                `email_template_${
+                  templateId || 'invoice'
+                }` as keyof CompanySettings
+              }
+              labelElement={<SettingsLabel label={t('template')} />}
+              defaultValue={templateId || 'invoice'}
+              onCheckboxChange={(value) => {
+                if (!value) {
+                  const updatedCompanySettingsChanges:
+                    | CompanySettings
+                    | undefined = cloneDeep(company?.settings);
+
+                  if (updatedCompanySettingsChanges) {
+                    delete updatedCompanySettingsChanges[
+                      `email_subject_${templateId}` as keyof typeof updatedCompanySettingsChanges
+                    ];
+
+                    handleChange('settings', updatedCompanySettingsChanges);
+                  }
+
+                  setTemplateBody(undefined);
+                }
+
+                if (value && !templateId) {
+                  setTemplateId('invoice');
+                }
+
+                if (value && templateId) {
+                  handleSetTemplateBody();
+                }
               }}
             />
-          </div>
-        )}
-
-        <Element leftSide={t('template')} disabledLabels={!fieldsEnabled}>
+          }
+        >
           <SelectField
             value={templateId}
-            onValueChange={(value) => {
-              !isCompanySettingsActive && handleChangeTemplate(value);
-              isCompanySettingsActive && setTemplateId(value);
-            }}
-            disabled={!fieldsEnabled}
+            onValueChange={(value) => setTemplateId(value)}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
@@ -204,7 +215,24 @@ export function TemplatesAndReminders() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('subject')} disabledLabels={!fieldsEnabled}>
+        {/*{!isCompanySettingsActive && (
+          <div className="pl-6">
+            <Toggle
+              checked={fieldsEnabled}
+              onValueChange={(value) => {
+                setFieldsEnabled(value);
+                handleChangeTemplate(value ? 'invoice' : '');
+              }}
+            />
+          </div>
+            )}*/}
+
+        <Element
+          leftSide={t('subject')}
+          disabledLabels={disableSettingsField(
+            `email_template_${templateId}` as keyof CompanySettings
+          )}
+        >
           <InputField
             id="subject"
             value={templateBody?.subject || ''}
@@ -213,11 +241,18 @@ export function TemplatesAndReminders() {
                 (current) => current && { ...current, subject: value }
               )
             }
-            disabled={!fieldsEnabled}
+            disabled={disableSettingsField(
+              `email_template_${templateId}` as keyof CompanySettings
+            )}
           />
         </Element>
 
-        <Element leftSide={t('body')} disabledLabels={!fieldsEnabled}>
+        <Element
+          leftSide={t('body')}
+          disabledLabels={disableSettingsField(
+            `email_template_${templateId}` as keyof CompanySettings
+          )}
+        >
           {canChangeEmailTemplate ? (
             <MarkdownEditor
               value={templateBody?.body || ''}
@@ -226,7 +261,9 @@ export function TemplatesAndReminders() {
                   (current) => current && { ...current, body: value }
                 )
               }
-              disabled={!fieldsEnabled}
+              disabled={disableSettingsField(
+                `email_template_${templateId}` as keyof CompanySettings
+              )}
             />
           ) : (
             <div className="flex flex-col items-start">
@@ -249,226 +286,232 @@ export function TemplatesAndReminders() {
         </Element>
       </Card>
 
-      {(REMINDERS.includes(templateId) ||
-        templateId === 'reminder_endless') && (
-        <Card>
-          {REMINDERS.includes(templateId) ? (
-            <>
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey={
-                      `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                    }
-                    labelElement={<SettingsLabel label={t('days')} />}
-                    defaultValue={0}
-                  />
-                }
-              >
-                <InputField
-                  value={
-                    company?.settings[
-                      `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                    ] || 0
+      {(REMINDERS.includes(templateId) || templateId === 'reminder_endless') &&
+        !disableSettingsField(
+          `email_template_${templateId}` as keyof CompanySettings
+        ) && (
+          <Card>
+            {REMINDERS.includes(templateId) ? (
+              <>
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey={
+                        `num_days_reminder${reminderIndex}` as keyof CompanySettings
+                      }
+                      labelElement={<SettingsLabel label={t('days')} />}
+                      defaultValue={0}
+                    />
                   }
-                  onValueChange={(value) =>
-                    handleChange(
-                      `settings.num_days_reminder${reminderIndex}`,
-                      value ?? 0
-                    )
-                  }
-                  disabled={disableSettingsField(
-                    `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                  )}
-                  type="number"
-                />
-              </Element>
-
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey={
-                      `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                    }
-                    labelElement={<SettingsLabel label={t('schedule')} />}
-                    defaultValue="disabled"
-                  />
-                }
-              >
-                <SelectField
-                  value={
-                    company?.settings[
-                      `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                    ] || 'disabled'
-                  }
-                  onValueChange={(value) =>
-                    handleChange(
-                      `settings.schedule_reminder${reminderIndex}`,
-                      value
-                    )
-                  }
-                  disabled={disableSettingsField(
-                    `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                  )}
                 >
-                  <option value="disabled" defaultChecked>
-                    {t('disabled')}
-                  </option>
-                  <option value="after_invoice_date">
-                    {t('after_invoice_date')}
-                  </option>
-                  <option value="before_due_date">
-                    {t('before_due_date')}
-                  </option>
-                  <option value="after_due_date">{t('after_due_date')}</option>
-                </SelectField>
-              </Element>
-
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey={
-                      `enable_reminder${reminderIndex}` as keyof CompanySettings
-                    }
-                    labelElement={<SettingsLabel label={t('send_email')} />}
-                    defaultValue={false}
-                  />
-                }
-              >
-                <Toggle
-                  checked={
-                    Boolean(
+                  <InputField
+                    value={
                       company?.settings[
-                        `enable_reminder${reminderIndex}` as keyof CompanySettings
-                      ]
-                    ) || false
-                  }
-                  onValueChange={(value) =>
-                    handleChange(
-                      `settings.enable_reminder${reminderIndex}`,
-                      value
-                    )
-                  }
-                  disabled={disableSettingsField(
-                    `enable_reminder${reminderIndex}` as keyof CompanySettings
-                  )}
-                />
-              </Element>
+                        `num_days_reminder${reminderIndex}` as keyof CompanySettings
+                      ] || 0
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        `settings.num_days_reminder${reminderIndex}`,
+                        value ?? 0
+                      )
+                    }
+                    disabled={disableSettingsField(
+                      `num_days_reminder${reminderIndex}` as keyof CompanySettings
+                    )}
+                    type="number"
+                  />
+                </Element>
 
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey={
-                      `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    }
-                    labelElement={
-                      <SettingsLabel label={t('late_fee_amount')} />
-                    }
-                  />
-                }
-              >
-                <InputField
-                  type="number"
-                  value={
-                    company?.settings[
-                      `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    ] || ''
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey={
+                        `schedule_reminder${reminderIndex}` as keyof CompanySettings
+                      }
+                      labelElement={<SettingsLabel label={t('schedule')} />}
+                      defaultValue="disabled"
+                    />
                   }
-                  onValueChange={(value) =>
-                    handleChange(
-                      `settings.late_fee_amount${reminderIndex}`,
-                      parseFloat(value)
-                    )
-                  }
-                  disabled={disableSettingsField(
-                    `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                  )}
-                />
-              </Element>
-
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey={
-                      `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    }
-                    labelElement={
-                      <SettingsLabel label={t('late_fee_percent')} />
-                    }
-                  />
-                }
-              >
-                <InputField
-                  type="number"
-                  value={
-                    company?.settings[
-                      `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    ] || ''
-                  }
-                  onValueChange={(value) =>
-                    handleChange(
-                      `settings.late_fee_percent${reminderIndex}`,
-                      parseFloat(value)
-                    )
-                  }
-                  disabled={disableSettingsField(
-                    `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                  )}
-                />
-              </Element>
-            </>
-          ) : (
-            <>
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey="enable_reminder_endless"
-                    labelElement={<SettingsLabel label={t('send_email')} />}
-                    defaultValue={false}
-                  />
-                }
-              >
-                <Toggle
-                  checked={Boolean(company?.settings.enable_reminder_endless)}
-                  onValueChange={(value) =>
-                    handleChange('settings.enable_reminder_endless', value)
-                  }
-                  disabled={disableSettingsField('enable_reminder_endless')}
-                />
-              </Element>
-
-              <Element
-                leftSide={
-                  <PropertyCheckbox
-                    propertyKey="endless_reminder_frequency_id"
-                    labelElement={<SettingsLabel label={t('frequency')} />}
-                  />
-                }
-              >
-                <SelectField
-                  value={company?.settings.endless_reminder_frequency_id || ''}
-                  onValueChange={(value) =>
-                    handleChange(
-                      'settings.endless_reminder_frequency_id',
-                      value
-                    )
-                  }
-                  withBlank
-                  disabled={disableSettingsField(
-                    'endless_reminder_frequency_id'
-                  )}
                 >
-                  {Object.keys(frequencies).map((frequency, index) => (
-                    <option key={index} value={frequency}>
-                      {t(frequencies[frequency as keyof typeof frequencies])}
+                  <SelectField
+                    value={
+                      company?.settings[
+                        `schedule_reminder${reminderIndex}` as keyof CompanySettings
+                      ] || 'disabled'
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        `settings.schedule_reminder${reminderIndex}`,
+                        value
+                      )
+                    }
+                    disabled={disableSettingsField(
+                      `schedule_reminder${reminderIndex}` as keyof CompanySettings
+                    )}
+                  >
+                    <option value="disabled" defaultChecked>
+                      {t('disabled')}
                     </option>
-                  ))}
-                </SelectField>
-              </Element>
-            </>
-          )}
-        </Card>
-      )}
+                    <option value="after_invoice_date">
+                      {t('after_invoice_date')}
+                    </option>
+                    <option value="before_due_date">
+                      {t('before_due_date')}
+                    </option>
+                    <option value="after_due_date">
+                      {t('after_due_date')}
+                    </option>
+                  </SelectField>
+                </Element>
+
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey={
+                        `enable_reminder${reminderIndex}` as keyof CompanySettings
+                      }
+                      labelElement={<SettingsLabel label={t('send_email')} />}
+                      defaultValue={false}
+                    />
+                  }
+                >
+                  <Toggle
+                    checked={
+                      Boolean(
+                        company?.settings[
+                          `enable_reminder${reminderIndex}` as keyof CompanySettings
+                        ]
+                      ) || false
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        `settings.enable_reminder${reminderIndex}`,
+                        value
+                      )
+                    }
+                    disabled={disableSettingsField(
+                      `enable_reminder${reminderIndex}` as keyof CompanySettings
+                    )}
+                  />
+                </Element>
+
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey={
+                        `late_fee_amount${reminderIndex}` as keyof CompanySettings
+                      }
+                      labelElement={
+                        <SettingsLabel label={t('late_fee_amount')} />
+                      }
+                    />
+                  }
+                >
+                  <InputField
+                    type="number"
+                    value={
+                      company?.settings[
+                        `late_fee_amount${reminderIndex}` as keyof CompanySettings
+                      ] || ''
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        `settings.late_fee_amount${reminderIndex}`,
+                        parseFloat(value)
+                      )
+                    }
+                    disabled={disableSettingsField(
+                      `late_fee_amount${reminderIndex}` as keyof CompanySettings
+                    )}
+                  />
+                </Element>
+
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey={
+                        `late_fee_percent${reminderIndex}` as keyof CompanySettings
+                      }
+                      labelElement={
+                        <SettingsLabel label={t('late_fee_percent')} />
+                      }
+                    />
+                  }
+                >
+                  <InputField
+                    type="number"
+                    value={
+                      company?.settings[
+                        `late_fee_percent${reminderIndex}` as keyof CompanySettings
+                      ] || ''
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        `settings.late_fee_percent${reminderIndex}`,
+                        parseFloat(value)
+                      )
+                    }
+                    disabled={disableSettingsField(
+                      `late_fee_percent${reminderIndex}` as keyof CompanySettings
+                    )}
+                  />
+                </Element>
+              </>
+            ) : (
+              <>
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey="enable_reminder_endless"
+                      labelElement={<SettingsLabel label={t('send_email')} />}
+                      defaultValue={false}
+                    />
+                  }
+                >
+                  <Toggle
+                    checked={Boolean(company?.settings.enable_reminder_endless)}
+                    onValueChange={(value) =>
+                      handleChange('settings.enable_reminder_endless', value)
+                    }
+                    disabled={disableSettingsField('enable_reminder_endless')}
+                  />
+                </Element>
+
+                <Element
+                  leftSide={
+                    <PropertyCheckbox
+                      propertyKey="endless_reminder_frequency_id"
+                      labelElement={<SettingsLabel label={t('frequency')} />}
+                    />
+                  }
+                >
+                  <SelectField
+                    value={
+                      company?.settings.endless_reminder_frequency_id || ''
+                    }
+                    onValueChange={(value) =>
+                      handleChange(
+                        'settings.endless_reminder_frequency_id',
+                        value
+                      )
+                    }
+                    withBlank
+                    disabled={disableSettingsField(
+                      'endless_reminder_frequency_id'
+                    )}
+                  >
+                    {Object.keys(frequencies).map((frequency, index) => (
+                      <option key={index} value={frequency}>
+                        {t(frequencies[frequency as keyof typeof frequencies])}
+                      </option>
+                    ))}
+                  </SelectField>
+                </Element>
+              </>
+            )}
+          </Card>
+        )}
 
       {preview && (
         <Card className="scale-y-100" title={preview.subject}>

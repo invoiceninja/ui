@@ -23,10 +23,12 @@ interface Props {
   propertyKey: keyof Settings;
   labelElement: ReactElement;
   defaultValue?: DefaultValueType;
+  onCheckboxChange?: (value: boolean) => void;
+  checked?: boolean;
 }
 
 export function PropertyCheckbox(props: Props) {
-  const { propertyKey, defaultValue = '' } = props;
+  const { propertyKey, defaultValue = '', onCheckboxChange } = props;
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -68,12 +70,22 @@ export function PropertyCheckbox(props: Props) {
     }
   }, [propertyKey]);
 
+  useEffect(() => {
+    if (typeof props.checked === 'boolean') {
+      setChecked(props.checked);
+    }
+  }, [props.checked]);
+
   return (
     <div className="flex items-center">
       {!isCompanySettingsActive && (
         <Checkbox
           checked={checked}
-          onValueChange={(_, checked) => setChecked(Boolean(checked))}
+          onValueChange={(_, checked) => {
+            setChecked(Boolean(checked));
+
+            onCheckboxChange?.(Boolean(checked));
+          }}
         />
       )}
 
@@ -82,9 +94,10 @@ export function PropertyCheckbox(props: Props) {
           'opacity-70': !checked,
           'cursor-pointer': !isCompanySettingsActive,
         })}
-        onClick={() =>
-          !isCompanySettingsActive && setChecked((current) => !current)
-        }
+        onClick={() => {
+          !isCompanySettingsActive && setChecked((current) => !current);
+          !isCompanySettingsActive && onCheckboxChange?.(Boolean(!checked));
+        }}
       >
         {props.labelElement}
       </div>
