@@ -75,6 +75,13 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
+const LiStyled = styled.li`
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 export function Combobox<T = any>({
   inputOptions,
   entries,
@@ -181,6 +188,7 @@ export function Combobox<T = any>({
 
     if (event.key === 'ArrowUp' && highlightedIndex > 0) {
       event.preventDefault();
+
       setHighlightedIndex(highlightedIndex - 1);
 
       return;
@@ -264,6 +272,20 @@ export function Combobox<T = any>({
     600,
     [inputValue, filteredOptions]
   );
+
+  useEffect(() => {
+    const element = document.querySelector(
+      `[data-combobox-element-id="${highlightedIndex}"]`
+    );
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+      });
+    }
+  }, [highlightedIndex]);
 
   const colors = useColorScheme();
 
@@ -356,7 +378,11 @@ export function Combobox<T = any>({
           )}
 
           {filteredOptions.map((option, index) => (
-            <li
+            <LiStyled
+              theme={{
+                backgroundColor:
+                  highlightedIndex === index ? colors.$2 : colors.$1,
+              }}
               key={option.id}
               className={classNames(
                 'min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 hover:font-semibold',
@@ -365,12 +391,14 @@ export function Combobox<T = any>({
                 }
               )}
               onClick={() => handleOptionClick(option)}
+              data-combobox-element-id={index}
+              tabIndex={-1}
             >
               {option.resource &&
               typeof entryOptions.dropdownLabelFn !== 'undefined'
                 ? entryOptions.dropdownLabelFn(option.resource)
                 : option.label}
-            </li>
+            </LiStyled>
           ))}
         </ul>
       )}
