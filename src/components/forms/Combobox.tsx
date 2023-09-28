@@ -88,6 +88,7 @@ export function Combobox<T = any>({
   entryOptions,
   errorMessage,
   clearInputAfterSelection,
+  onEmptyValues,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -250,6 +251,20 @@ export function Combobox<T = any>({
     onChange(option);
   });
 
+  useDebounce(
+    () => {
+      if (inputValue === '' && filteredOptions.length > 0) {
+        return onEmptyValues(inputValue);
+      }
+
+      if (filteredOptions.length <= 3) {
+        return onEmptyValues(inputValue);
+      }
+    },
+    600,
+    [inputValue, filteredOptions]
+  );
+
   const colors = useColorScheme();
 
   return (
@@ -270,7 +285,7 @@ export function Combobox<T = any>({
             onFocus={() => setIsOpen(true)}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
-            value={
+            defaultValue={
               selectedOption ? selectedOption.label : inputValue?.toString()
             }
             className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
