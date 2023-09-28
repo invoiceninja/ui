@@ -349,7 +349,10 @@ export function Combobox<T = any>({
               )}
               onClick={() => handleOptionClick(option)}
             >
-              {option.label}
+              {option.resource &&
+              typeof entryOptions.dropdownLabelFn !== 'undefined'
+                ? entryOptions.dropdownLabelFn(option.resource)
+                : option.label}
             </li>
           ))}
         </ul>
