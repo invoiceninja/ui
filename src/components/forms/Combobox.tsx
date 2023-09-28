@@ -275,16 +275,37 @@ export function Combobox<T = any>({
             }
             className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
             ref={inputRef}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+              color: colors.$3,
+            }}
           />
         </div>
       </div>
 
-      {isOpen && filteredOptions.length > 0 && (
+      {isOpen && (
         <ul
           className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
           tabIndex={-1}
         >
+          {action && action.visible && (
+            <ActionButtonStyled
+              theme={{
+                hoverColor: colors.$2,
+              }}
+              data-testid="combobox-action-button"
+              type="button"
+              onClick={action.onClick}
+              className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9"
+              tabIndex={-1}
+              style={{ color: colors.$3 }}
+            >
+              {action.label}
+            </ActionButtonStyled>
+          )}
+
           {filteredOptions.map((option, index) => (
             <li
               key={option.id}
