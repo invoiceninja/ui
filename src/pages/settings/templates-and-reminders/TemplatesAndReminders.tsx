@@ -62,8 +62,6 @@ export function TemplatesAndReminders() {
   const onCancel = useDiscardChanges();
   const user = useCurrentUser();
 
-  console.log(company?.settings);
-
   const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
