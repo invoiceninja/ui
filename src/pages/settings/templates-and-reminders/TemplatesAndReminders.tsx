@@ -117,7 +117,20 @@ export function TemplatesAndReminders() {
         setReminderIndex(-1);
       }
 
-      handleSetTemplateBody();
+      if (
+        isCompanySettingsActive ||
+        (company?.settings[
+          `email_template_${templateId}` as keyof CompanySettings
+        ] &&
+          !isCompanySettingsActive) ||
+        (templateId === 'invoice' &&
+          !company?.settings[
+            `email_template_${templateId}` as keyof CompanySettings
+          ] &&
+          !isCompanySettingsActive)
+      ) {
+        handleSetTemplateBody();
+      }
     }
   }, [statics, templateId]);
 
@@ -202,7 +215,10 @@ export function TemplatesAndReminders() {
         >
           <SelectField
             value={templateId}
-            onValueChange={(value) => setTemplateId(value)}
+            onValueChange={(value) => {
+              setTemplateId(value);
+              !isCompanySettingsActive && setTemplateBody(undefined);
+            }}
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
