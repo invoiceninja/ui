@@ -165,6 +165,11 @@ export function Combobox<T = any>({
     setInputValue(option.label);
     onChange(option);
 
+    if (clearInputAfterSelection) {
+      setInputValue('');
+      setSelectedOption(null);
+    }
+
     setTimeout(() => setIsOpen(false), 100);
   };
 
