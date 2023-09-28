@@ -83,8 +83,6 @@ export function Combobox<T = any>({
   initiallyVisible = false,
   exclude = [],
   action,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  onEmptyValues, // @ts-ignore
   onChange,
   onDismiss,
   entryOptions,
