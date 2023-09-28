@@ -24,8 +24,8 @@ export function TaxRates() {
 
   const onBulkActionsSuccess = (action: 'archive' | 'delete' | 'restore') => {
     if (action === 'archive' || action === 'delete') {
-      request('POST', endpoint('/api/v1/refresh')).then((data) => {
-        dispatch(updateCompanyUsers(data.data.data));
+      request('POST', endpoint('/api/v1/refresh')).then((response) => {
+        dispatch(updateCompanyUsers(response.data.data));
         dispatch(resetChanges('company'));
       });
     }
