@@ -18,12 +18,12 @@ import { useQueryClient } from 'react-query';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();

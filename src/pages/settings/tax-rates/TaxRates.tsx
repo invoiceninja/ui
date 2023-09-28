@@ -22,11 +22,13 @@ export function TaxRates() {
   const dispatch = useDispatch();
   const columns = useTaxRateColumns();
 
-  const onBulkActionsSuccess = () => {
-    request('POST', endpoint('/api/v1/refresh')).then((data) => {
-      dispatch(updateCompanyUsers(data.data.data));
-      dispatch(resetChanges('company'));
-    });
+  const onBulkActionsSuccess = (action: 'archive' | 'delete' | 'restore') => {
+    if (action === 'archive' || action === 'delete') {
+      request('POST', endpoint('/api/v1/refresh')).then((data) => {
+        dispatch(updateCompanyUsers(data.data.data));
+        dispatch(resetChanges('company'));
+      });
+    }
   };
 
   return (
@@ -38,7 +40,7 @@ export function TaxRates() {
       linkToCreate="/settings/tax_rates/create"
       linkToEdit="/settings/tax_rates/:id/edit"
       withResourcefulActions
-      onBulkActionSuccess={onBulkActionsSuccess}
+      onBulkActionSuccess={(_, action) => onBulkActionsSuccess(action)}
     />
   );
 }

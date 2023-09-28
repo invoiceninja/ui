@@ -106,7 +106,10 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
-  onBulkActionSuccess?: (resource: T[]) => void;
+  onBulkActionSuccess?: (
+    resource: T[],
+    action: 'archive' | 'delete' | 'restore'
+  ) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -255,9 +258,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${action}d_${props.resource}`);
 
-        console.log(response);
-
-        props.onBulkActionSuccess?.(response.data.data);
+        props.onBulkActionSuccess?.(response.data.data, action);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
