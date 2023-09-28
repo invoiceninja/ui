@@ -83,10 +83,10 @@ export function Table() {
     queryClient.invalidateQueries('/api/v1/documents');
   };
 
-  const downloadDocument = (doc: Document, inline: boolean) => {
+  const downloadDocument = async (doc: Document, inline: boolean) => {
     toast.processing();
 
-    queryClient.fetchQuery(
+    const response: AxiosResponse = await queryClient.fetchQuery(
       endpoint('/documents/:hash', { hash: doc.hash }),
       () =>
         request(
@@ -94,32 +94,33 @@ export function Table() {
           endpoint('/documents/:hash', { hash: doc.hash }),
           { headers: defaultHeaders() },
           { responseType: 'arraybuffer' }
-        ).then((response) => {
-          const blob = new Blob([response.data], {
-            type: response.headers['content-type'],
-          });
-          const url = URL.createObjectURL(blob);
-
-          if (inline) {
-            window.open(url);
-            return;
-          }
-
-          const link = document.createElement('a');
-
-          link.download = doc.name;
-          link.href = url;
-          link.target = '_blank';
-
-          document.body.appendChild(link);
-
-          link.click();
-
-          document.body.removeChild(link);
-
-          toast.dismiss();
-        })
+        ),
+      { staleTime: Infinity }
     );
+
+    toast.dismiss();
+
+    const blob = new Blob([response.data], {
+      type: response.headers['content-type'],
+    });
+    const url = URL.createObjectURL(blob);
+
+    if (inline) {
+      window.open(url);
+      return;
+    }
+
+    const link = document.createElement('a');
+
+    link.download = doc.name;
+    link.href = url;
+    link.target = '_blank';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
