@@ -68,10 +68,14 @@ export function useGatewayUtilities(params: Params) {
 
     setCurrentGateways(filteredGateways);
 
-    handleChange(
-      'settings.company_gateway_ids',
-      filteredGateways.map(({ id }) => id).join(',')
-    );
+    if (filteredGateways.length) {
+      handleChange(
+        'settings.company_gateway_ids',
+        filteredGateways.map(({ id }) => id).join(',')
+      );
+    } else {
+      handleChange('settings.company_gateway_ids', '0');
+    }
   };
 
   const handleReset = () => {
