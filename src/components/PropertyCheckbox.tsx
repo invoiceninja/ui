@@ -65,7 +65,7 @@ export function PropertyCheckbox(props: Props) {
   }, [checked]);
 
   useEffect(() => {
-    if (Object.hasOwn(companyChanges?.settings, propertyKey)) {
+    if (companyChanges && Object.hasOwn(companyChanges.settings, propertyKey)) {
       handleChangeCheckboxValue(true);
     }
   }, [propertyKey]);
@@ -91,7 +91,7 @@ export function PropertyCheckbox(props: Props) {
 
       <div
         className={classNames({
-          'opacity-70': !checked,
+          'opacity-70': !checked && !isCompanySettingsActive,
           'cursor-pointer': !isCompanySettingsActive,
         })}
         onClick={() => {

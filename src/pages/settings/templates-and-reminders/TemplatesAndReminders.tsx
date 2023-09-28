@@ -62,13 +62,17 @@ export function TemplatesAndReminders() {
   const onCancel = useDiscardChanges();
   const user = useCurrentUser();
 
+  console.log(company?.settings);
+
   const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState(
-    isCompanySettingsActive ? 'invoice' : ''
+    isCompanySettingsActive || company?.settings.email_template_invoice
+      ? 'invoice'
+      : ''
   );
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
