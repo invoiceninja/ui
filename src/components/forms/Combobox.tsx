@@ -275,7 +275,7 @@ export function Combobox<T = any>({
 
   useEffect(() => {
     const element = document.querySelector(
-      `[data-combobox-element-id="${highlightedIndex}"]`
+      `[data-combobox-element-id="${highlightedIndex + 1}"]`
     );
 
     if (element) {
