@@ -10,10 +10,7 @@
 
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import {
-  injectInChanges,
-  updateRecord,
-} from '$app/common/stores/slices/company-users';
+import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -26,12 +23,12 @@ import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const companyChanges = useCompanyChanges();
+  const companyChanges = useInjectCompanyChanges();
 
   const handleUpdateGroupSettings = useHandleUpdate({});
 
@@ -52,8 +49,6 @@ export function useHandleCompanySave() {
   const shouldUpdate = useShouldUpdateCompany();
 
   return async (excludeToasters?: boolean) => {
-    console.log('okicccc');
-
     if (!shouldUpdate() && isCompanySettingsActive) {
       return;
     }
@@ -73,8 +68,6 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
-    console.log(companyChanges?.settings);
-
     return request(
       'PUT',
       endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
@@ -82,12 +75,6 @@ export function useHandleCompanySave() {
     )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        console.log(response.data.data.settings);
-
-        dispatch(
-          injectInChanges({ object: 'company', data: response.data.data })
-        );
 
         !adjustedExcludeToaster && toast.dismiss();
 

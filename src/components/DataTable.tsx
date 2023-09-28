@@ -106,7 +106,7 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
-  onBulkSuccess?: (resource: T[]) => void;
+  onBulkActionSuccess?: (resource: T[]) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -257,7 +257,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
         console.log(response);
 
-        props.onBulkSuccess?.(response.data.data);
+        props.onBulkActionSuccess?.(response.data.data);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
