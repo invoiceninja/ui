@@ -44,8 +44,13 @@ export function MarkdownEditor(props: Props) {
 
   const colors = useColorScheme();
 
+  console.log('Smart paste', enterprisePlan());
+
   return (
     <div className="space-y-4">
+      <p>Hello?</p>
+      <p>Smart paste: {JSON.stringify(enterprisePlan())}</p>
+
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
       <Editor
@@ -89,7 +94,7 @@ export function MarkdownEditor(props: Props) {
               : '/tinymce_6.4.2/tinymce/content.css',
           body_class: 'h-screen',
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
-          smart_paste: enterprisePlan()
+          paste_data_images: enterprisePlan(),
         }}
         onEditorChange={handleChange}
       />
