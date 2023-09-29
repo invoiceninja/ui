@@ -208,7 +208,7 @@ export function useProductColumns() {
     },
     {
       column: 'stock_quantity',
-      id: 'quantity',
+      id: 'in_stock_quantity',
       label: t('stock_quantity'),
     },
     {

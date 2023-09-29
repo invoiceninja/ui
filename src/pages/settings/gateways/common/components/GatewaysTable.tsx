@@ -44,6 +44,9 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { SelectOption } from '$app/components/datatables/Actions';
 import Select, { StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 interface Params {
   includeRemoveAction: boolean;
@@ -53,6 +56,10 @@ export function GatewaysTable(params: Params) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { includeRemoveAction, includeResetAction } = params;
 
@@ -66,21 +73,18 @@ export function GatewaysTable(params: Params) {
 
   const [currentGateways, setCurrentGateways] = useState<CompanyGateway[]>([]);
 
+  const [updateCompany, setUpdateCompany] = useState<boolean>(false);
+
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<CompanyGateway[]>(
     []
   );
 
-  const {
-    gateways,
-    handleChange,
-    handleRemoveGateway,
-    handleReset,
-    onStatusChange,
-  } = useGatewayUtilities({
-    currentGateways,
-    setCurrentGateways,
-  });
+  const { gateways, handleRemoveGateway, handleReset, onStatusChange } =
+    useGatewayUtilities({
+      currentGateways,
+      setCurrentGateways,
+    });
 
   const handleDeselect = () => {
     setSelected([]);
@@ -119,15 +123,23 @@ export function GatewaysTable(params: Params) {
 
   const handleSaveBulkActionsChanges = (ids: string[]) => {
     if (companyChanges?.settings.company_gateway_ids) {
-      handleChange(
-        'settings.company_gateway_ids',
-        currentGateways
-          .filter(({ id }) => !ids.includes(id))
-          .map(({ id }) => id)
-          .join(',')
-      );
+      const numberOfGateways: number = (
+        companyChanges?.settings as Settings
+      ).company_gateway_ids.split(',').length;
 
-      handleCompanySave();
+      if (numberOfGateways > 1 || isCompanySettingsActive) {
+        handleChange(
+          'settings.company_gateway_ids',
+          currentGateways
+            .filter(({ id }) => !ids.includes(id))
+            .map(({ id }) => id)
+            .join(',')
+        );
+      } else {
+        handleChange('settings.company_gateway_ids', '0');
+      }
+
+      setUpdateCompany(true);
     }
   };
 
@@ -194,6 +206,14 @@ export function GatewaysTable(params: Params) {
       },
     }),
   };
+
+  useEffect(() => {
+    if (updateCompany) {
+      handleCompanySave(updateCompany);
+
+      setUpdateCompany(false);
+    }
+  }, [updateCompany]);
 
   useEffect(() => {
     if (gateways) {

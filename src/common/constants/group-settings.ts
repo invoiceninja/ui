@@ -198,6 +198,7 @@ export const GroupSectionProperties = {
     'email_style_custom',
     'email_signature',
     'enable_e_invoice',
+    'e_invoice_type',
   ],
   templates_and_reminders: [
     'endless_reminder_frequency_id',

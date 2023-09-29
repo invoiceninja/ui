@@ -35,12 +35,10 @@ export function Tr(props: Props) {
       }
       ref={innerRef}
       {...otherProps}
-      className={classNames(
-        `${props.className}`,
-        {
-          'cursor-pointer': onClick,
-        }
-      )}
+      className={classNames(`${props.className}`, {
+        'cursor-pointer': onClick,
+      })}
+      tabIndex={props.tabIndex}
     >
       {props.children}
     </tr>

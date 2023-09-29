@@ -162,6 +162,23 @@ export function Form(props: Props) {
             />
           </Element>
 
+          <Element leftSide={t('classification')}>
+            <SelectField
+              id="classification"
+              defaultValue={vendor.classification ?? ''}
+              onValueChange={(value) => handleChange('classification', value)}
+            >
+              <option value=""></option>
+              <option value="individual">{t('individual')}</option>
+              <option value="business">{t('business')}</option>
+              <option value="partnership">{t('partnership')}</option>
+              <option value="trust">{t('trust')}</option>
+              <option value="charity">{t('charity')}</option>
+              <option value="government">{t('government')}</option>
+
+            </SelectField>
+          </Element>
+
           {company?.custom_fields?.vendor1 && (
             <CustomField
               field="contact1"
