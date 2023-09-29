@@ -108,7 +108,7 @@ export function ProductsTable(props: Props) {
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
               {resource?.[relationType] ? (
-                items.map((lineItem) => (
+                items.map((lineItem, index) => (
                   <Draggable
                     key={getLineItemIndex(lineItem)}
                     draggableId={getLineItemIndex(lineItem).toString()}
@@ -120,6 +120,7 @@ export function ProductsTable(props: Props) {
                         {...provided.dragHandleProps}
                         innerRef={provided.innerRef}
                         key={getLineItemIndex(lineItem)}
+                        tabIndex={index + 1}
                       >
                         {columns.map((column, columnIndex, { length }) => (
                           <Td
