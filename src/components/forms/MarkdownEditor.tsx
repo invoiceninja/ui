@@ -44,13 +44,8 @@ export function MarkdownEditor(props: Props) {
 
   const colors = useColorScheme();
 
-  console.log('Smart paste', enterprisePlan());
-
   return (
     <div className="space-y-4">
-      <p>Hello?</p>
-      <p>Smart paste: {JSON.stringify(enterprisePlan())}</p>
-
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
       <Editor
