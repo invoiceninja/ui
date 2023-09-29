@@ -13,6 +13,7 @@ import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 interface Props {
   value?: string | undefined;
@@ -88,6 +89,7 @@ export function MarkdownEditor(props: Props) {
               : '/tinymce_6.4.2/tinymce/content.css',
           body_class: 'h-screen',
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
+          smart_paste: enterprisePlan()
         }}
         onEditorChange={handleChange}
       />
