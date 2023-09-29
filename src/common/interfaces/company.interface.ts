@@ -222,7 +222,7 @@ export interface Settings {
   enable_reminder1: boolean;
   enable_reminder2: boolean;
   enable_reminder3: boolean;
-  enable_reminder_endless: boolean;
+  enable_reminder_endless?: boolean;
   num_days_reminder1: number;
   num_days_reminder2: number;
   num_days_reminder3: number;
@@ -236,7 +236,7 @@ export interface Settings {
   late_fee_percent1: number;
   late_fee_percent2: number;
   late_fee_percent3: number;
-  endless_reminder_frequency_id: string;
+  endless_reminder_frequency_id?: string;
   late_fee_endless_amount: number;
   late_fee_endless_percent: number;
   client_online_payment_notification: boolean;

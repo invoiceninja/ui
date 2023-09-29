@@ -78,6 +78,8 @@ export function TemplatesAndReminders() {
 
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
 
+  const [isInitial, setIsInitial] = useState<boolean>(true);
+
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const handleSetTemplateBody = () => {
@@ -109,6 +111,132 @@ export function TemplatesAndReminders() {
     }
   };
 
+  const handleSetReminderDetails = (currentReminderIndex?: number) => {
+    const updatedCompanySettings = cloneDeep(company?.settings);
+
+    if (updatedCompanySettings) {
+      if (currentReminderIndex) {
+        (updatedCompanySettings[
+          `num_days_reminder${currentReminderIndex}` as keyof CompanySettings
+        ] as number) = 0;
+
+        (updatedCompanySettings[
+          `schedule_reminder${currentReminderIndex}` as keyof CompanySettings
+        ] as string) = 'disabled';
+
+        (updatedCompanySettings[
+          `enable_reminder${currentReminderIndex}` as keyof CompanySettings
+        ] as boolean) = false;
+
+        (updatedCompanySettings[
+          `late_fee_amount${currentReminderIndex}` as keyof CompanySettings
+        ] as number) = 0;
+
+        (updatedCompanySettings[
+          `late_fee_percent${currentReminderIndex}` as keyof CompanySettings
+        ] as number) = 0;
+      } else {
+        updatedCompanySettings.enable_reminder_endless = false;
+        updatedCompanySettings.endless_reminder_frequency_id = '';
+      }
+
+      handleChange('settings', updatedCompanySettings);
+    }
+  };
+
+  const handleRemoveReminderDetails = (
+    currentReminderIndex: number,
+    updateSettings?: CompanySettings
+  ) => {
+    const updatedCompanySettings = cloneDeep(
+      updateSettings || company?.settings
+    );
+
+    if (updatedCompanySettings) {
+      if (currentReminderIndex) {
+        delete updatedCompanySettings[
+          `num_days_reminder${currentReminderIndex}` as keyof CompanySettings
+        ];
+
+        delete updatedCompanySettings[
+          `schedule_reminder${currentReminderIndex}` as keyof CompanySettings
+        ];
+
+        delete updatedCompanySettings[
+          `enable_reminder${currentReminderIndex}` as keyof CompanySettings
+        ];
+
+        delete updatedCompanySettings[
+          `late_fee_amount${currentReminderIndex}` as keyof CompanySettings
+        ];
+
+        delete updatedCompanySettings[
+          `late_fee_percent${currentReminderIndex}` as keyof CompanySettings
+        ];
+      } else {
+        delete updatedCompanySettings.enable_reminder_endless;
+        delete updatedCompanySettings.endless_reminder_frequency_id;
+      }
+
+      handleChange('settings', updatedCompanySettings);
+    }
+  };
+
+  const handleChangingCheckbox = (value: boolean) => {
+    if (!value) {
+      const updatedCompanySettingsChanges: CompanySettings | undefined =
+        cloneDeep(company?.settings);
+
+      if (updatedCompanySettingsChanges) {
+        const currentReminder =
+          reminderIndex > -1 ? `reminder${reminderIndex}` : '';
+
+        delete updatedCompanySettingsChanges[
+          `email_subject_${
+            currentReminder || templateId
+          }` as keyof typeof updatedCompanySettingsChanges
+        ];
+
+        if (
+          REMINDERS.includes(templateId) ||
+          templateId === 'reminder_endless'
+        ) {
+          handleRemoveReminderDetails(
+            REMINDERS.indexOf(templateId) + 1,
+            updatedCompanySettingsChanges
+          );
+        } else {
+          handleChange('settings', updatedCompanySettingsChanges);
+        }
+      }
+
+      setTemplateBody(undefined);
+    }
+
+    if (value && !templateId) {
+      setTemplateId('invoice');
+    }
+
+    if (value && templateId) {
+      handleSetTemplateBody();
+
+      if (
+        disableSettingsField(
+          `email_template_${templateId}` as keyof CompanySettings
+        )
+      ) {
+        handleSetReminderDetails(REMINDERS.indexOf(templateId) + 1);
+      }
+
+      if (
+        templateId === 'reminder_endless' &&
+        disableSettingsField('email_template_reminder_endless')
+      ) {
+        handleSetReminderDetails();
+      }
+    }
+  };
+
   useEffect(() => {
     if (statics?.templates && company && templateId) {
       if (REMINDERS.includes(templateId)) {
@@ -127,10 +255,13 @@ export function TemplatesAndReminders() {
           !company?.settings[
             `email_template_${templateId}` as keyof CompanySettings
           ] &&
-          !isCompanySettingsActive)
+          !isCompanySettingsActive &&
+          isInitial)
       ) {
         handleSetTemplateBody();
       }
+
+      isInitial && setIsInitial(false);
     }
   }, [statics, templateId]);
 
@@ -185,31 +316,7 @@ export function TemplatesAndReminders() {
               }
               labelElement={<SettingsLabel label={t('template')} />}
               defaultValue={templateId || 'invoice'}
-              onCheckboxChange={(value) => {
-                if (!value) {
-                  const updatedCompanySettingsChanges:
-                    | CompanySettings
-                    | undefined = cloneDeep(company?.settings);
-
-                  if (updatedCompanySettingsChanges) {
-                    delete updatedCompanySettingsChanges[
-                      `email_subject_${templateId}` as keyof typeof updatedCompanySettingsChanges
-                    ];
-
-                    handleChange('settings', updatedCompanySettingsChanges);
-                  }
-
-                  setTemplateBody(undefined);
-                }
-
-                if (value && !templateId) {
-                  setTemplateId('invoice');
-                }
-
-                if (value && templateId) {
-                  handleSetTemplateBody();
-                }
-              }}
+              onCheckboxChange={(value) => handleChangingCheckbox(value)}
             />
           }
         >
@@ -232,18 +339,6 @@ export function TemplatesAndReminders() {
             <option value="custom3">{t('third_custom')}</option>
           </SelectField>
         </Element>
-
-        {/*{!isCompanySettingsActive && (
-          <div className="pl-6">
-            <Toggle
-              checked={fieldsEnabled}
-              onValueChange={(value) => {
-                setFieldsEnabled(value);
-                handleChangeTemplate(value ? 'invoice' : '');
-              }}
-            />
-          </div>
-            )}*/}
 
         <Element
           leftSide={t('subject')}
@@ -311,17 +406,7 @@ export function TemplatesAndReminders() {
           <Card>
             {REMINDERS.includes(templateId) ? (
               <>
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey={
-                        `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                      }
-                      labelElement={<SettingsLabel label={t('days')} />}
-                      defaultValue={0}
-                    />
-                  }
-                >
+                <Element leftSide={t('days')}>
                   <InputField
                     value={
                       company?.settings[
@@ -334,24 +419,11 @@ export function TemplatesAndReminders() {
                         value ?? 0
                       )
                     }
-                    disabled={disableSettingsField(
-                      `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                    )}
                     type="number"
                   />
                 </Element>
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey={
-                        `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                      }
-                      labelElement={<SettingsLabel label={t('schedule')} />}
-                      defaultValue="disabled"
-                    />
-                  }
-                >
+                <Element leftSide={t('schedule')}>
                   <SelectField
                     value={
                       company?.settings[
@@ -364,9 +436,6 @@ export function TemplatesAndReminders() {
                         value
                       )
                     }
-                    disabled={disableSettingsField(
-                      `schedule_reminder${reminderIndex}` as keyof CompanySettings
-                    )}
                   >
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
@@ -383,17 +452,7 @@ export function TemplatesAndReminders() {
                   </SelectField>
                 </Element>
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey={
-                        `enable_reminder${reminderIndex}` as keyof CompanySettings
-                      }
-                      labelElement={<SettingsLabel label={t('send_email')} />}
-                      defaultValue={false}
-                    />
-                  }
-                >
+                <Element leftSide={t('send_email')}>
                   <Toggle
                     checked={
                       Boolean(
@@ -408,24 +467,10 @@ export function TemplatesAndReminders() {
                         value
                       )
                     }
-                    disabled={disableSettingsField(
-                      `enable_reminder${reminderIndex}` as keyof CompanySettings
-                    )}
                   />
                 </Element>
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey={
-                        `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                      }
-                      labelElement={
-                        <SettingsLabel label={t('late_fee_amount')} />
-                      }
-                    />
-                  }
-                >
+                <Element leftSide={t('late_fee_amount')}>
                   <InputField
                     type="number"
                     value={
@@ -439,24 +484,10 @@ export function TemplatesAndReminders() {
                         parseFloat(value)
                       )
                     }
-                    disabled={disableSettingsField(
-                      `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                    )}
                   />
                 </Element>
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey={
-                        `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                      }
-                      labelElement={
-                        <SettingsLabel label={t('late_fee_percent')} />
-                      }
-                    />
-                  }
-                >
+                <Element leftSide={t('late_fee_percent')}>
                   <InputField
                     type="number"
                     value={
@@ -470,40 +501,21 @@ export function TemplatesAndReminders() {
                         parseFloat(value)
                       )
                     }
-                    disabled={disableSettingsField(
-                      `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                    )}
                   />
                 </Element>
               </>
             ) : (
               <>
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey="enable_reminder_endless"
-                      labelElement={<SettingsLabel label={t('send_email')} />}
-                      defaultValue={false}
-                    />
-                  }
-                >
+                <Element leftSide={t('send_email')}>
                   <Toggle
                     checked={Boolean(company?.settings.enable_reminder_endless)}
                     onValueChange={(value) =>
                       handleChange('settings.enable_reminder_endless', value)
                     }
-                    disabled={disableSettingsField('enable_reminder_endless')}
                   />
                 </Element>
 
-                <Element
-                  leftSide={
-                    <PropertyCheckbox
-                      propertyKey="endless_reminder_frequency_id"
-                      labelElement={<SettingsLabel label={t('frequency')} />}
-                    />
-                  }
-                >
+                <Element leftSide={t('frequency')}>
                   <SelectField
                     value={
                       company?.settings.endless_reminder_frequency_id || ''
@@ -515,9 +527,6 @@ export function TemplatesAndReminders() {
                       )
                     }
                     withBlank
-                    disabled={disableSettingsField(
-                      'endless_reminder_frequency_id'
-                    )}
                   >
                     {Object.keys(frequencies).map((frequency, index) => (
                       <option key={index} value={frequency}>
