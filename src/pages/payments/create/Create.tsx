@@ -286,6 +286,7 @@ export default function Create() {
                         label: 'number',
                         id: 'id',
                         value: 'id',
+                        searchable: 'number',
                       }}
                       onChange={(entry) =>
                         entry.resource
@@ -392,7 +393,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/credits?client_id=${payment.client_id}`
+                            `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -478,6 +479,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
+                  searchable: 'number',
                   dropdownLabelFn: (credit) =>
                     `${t('credit')} #${credit.number} - ${t(
                       'balance'
