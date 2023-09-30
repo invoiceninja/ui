@@ -223,7 +223,8 @@ export function TemplatesAndReminders() {
       if (
         disableSettingsField(
           `email_template_${templateId}` as keyof CompanySettings
-        )
+        ) &&
+        REMINDERS.includes(templateId)
       ) {
         handleSetReminderDetails(REMINDERS.indexOf(templateId) + 1);
       }
@@ -245,16 +246,16 @@ export function TemplatesAndReminders() {
         setReminderIndex(-1);
       }
 
+      const template =
+        company?.settings[
+          `email_template_${templateId}` as keyof CompanySettings
+        ];
+
       if (
         isCompanySettingsActive ||
-        (company?.settings[
-          `email_template_${templateId}` as keyof CompanySettings
-        ] &&
-          !isCompanySettingsActive) ||
+        (template && !isCompanySettingsActive) ||
         (templateId === 'invoice' &&
-          !company?.settings[
-            `email_template_${templateId}` as keyof CompanySettings
-          ] &&
+          !template &&
           !isCompanySettingsActive &&
           isInitial)
       ) {
