@@ -278,7 +278,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/invoices?payable=${payment.client_id}&per_page=500`
+                            `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -345,7 +345,7 @@ export default function Create() {
               <ComboboxAsync<Invoice>
                 endpoint={
                   new URL(
-                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=500`)
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
                   )
                 }
                 inputOptions={{
@@ -355,6 +355,7 @@ export default function Create() {
                   id: 'id',
                   value: 'id',
                   label: 'name',
+                  searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
@@ -399,6 +400,7 @@ export default function Create() {
                         id: 'id',
                         value: 'id',
                         label: 'number',
+                        searchable: 'number',
                         dropdownLabelFn: (credit) =>
                           `${t('credit')} #${credit.number} - ${t(
                             'balance'
