@@ -100,10 +100,11 @@ export function TemplatesAndReminders() {
           subject:
             company.settings[
               `email_subject_${templateId}` as keyof CompanySettings
-            ],
-          body: company.settings[
-            `email_template_${templateId}` as keyof CompanySettings
-          ],
+            ] || '',
+          body:
+            company.settings[
+              `email_template_${templateId}` as keyof CompanySettings
+            ] || '',
         };
 
         setTemplateBody({ ...template });
@@ -304,11 +305,11 @@ export function TemplatesAndReminders() {
           leftSide={
             <PropertyCheckbox
               checked={Boolean(
-                company?.settings[
+                typeof company?.settings[
                   `email_template_${
                     templateId || 'invoice'
                   }` as keyof CompanySettings
-                ]
+                ] !== 'undefined'
               )}
               propertyKey={
                 `email_template_${
