@@ -61,7 +61,7 @@ export function Table() {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
-  const [document, setDocument] = useState('');
+  const [documentId, setDocumentId] = useState('');
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
 
@@ -83,13 +83,53 @@ export function Table() {
     queryClient.invalidateQueries('/api/v1/documents');
   };
 
+  const downloadDocument = async (doc: Document, inline: boolean) => {
+    toast.processing();
+
+    const response: AxiosResponse = await queryClient.fetchQuery(
+      endpoint('/documents/:hash', { hash: doc.hash }),
+      () =>
+        request(
+          'GET',
+          endpoint('/documents/:hash', { hash: doc.hash }),
+          { headers: defaultHeaders() },
+          { responseType: 'arraybuffer' }
+        ),
+      { staleTime: Infinity }
+    );
+
+    toast.dismiss();
+
+    const blob = new Blob([response.data], {
+      type: response.headers['content-type'],
+    });
+    const url = URL.createObjectURL(blob);
+
+    if (inline) {
+      window.open(url);
+      return;
+    }
+
+    const link = document.createElement('a');
+
+    link.download = doc.name;
+    link.href = url;
+    link.target = '_blank';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const destroy = (password: string, isRequired = true) => {
     toast.processing();
 
     request(
       'delete',
-      endpoint('/api/v1/documents/:id', { id: document }),
+      endpoint('/api/v1/documents/:id', { id: documentId }),
       {},
       { headers: { 'X-Api-Password': password } }
     )
@@ -195,28 +235,22 @@ export function Table() {
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
                   <Dropdown label={t('more_actions')}>
-                    <DropdownElement icon={<Icon element={MdPageview} />}>
-                      <a
-                        target="_blank"
-                        className="block w-full"
-                        href={endpoint('/documents/:hash?inline=true', {
-                          hash: document.hash,
-                        })}
-                        rel="noreferrer"
-                      >
-                        {t('view')}
-                      </a>
+                    <DropdownElement
+                      onClick={() => {
+                        downloadDocument(document, true);
+                      }}
+                      icon={<Icon element={MdPageview} />}
+                    >
+                      {t('view')}
                     </DropdownElement>
 
-                    <DropdownElement icon={<Icon element={MdDownload} />}>
-                      <a
-                        className="block w-full"
-                        href={endpoint('/documents/:hash', {
-                          hash: document.hash,
-                        })}
-                      >
-                        {t('download')}
-                      </a>
+                    <DropdownElement
+                      onClick={() => {
+                        downloadDocument(document, false);
+                      }}
+                      icon={<Icon element={MdDownload} />}
+                    >
+                      {t('download')}
                     </DropdownElement>
 
                     {document.is_public ? (
@@ -245,7 +279,7 @@ export function Table() {
 
                     <DropdownElement
                       onClick={() => {
-                        setDocument(document.id);
+                        setDocumentId(document.id);
                         setPasswordConfirmModalOpen(true);
                       }}
                       icon={<Icon element={MdDelete} />}
