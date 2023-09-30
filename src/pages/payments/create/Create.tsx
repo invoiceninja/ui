@@ -278,7 +278,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/invoices?payable=${payment.client_id}`
+                            `/api/v1/invoices?payable=${payment.client_id}&per_page=500`
                           )
                         )
                       }
@@ -345,7 +345,7 @@ export default function Create() {
               <ComboboxAsync<Invoice>
                 endpoint={
                   new URL(
-                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=500`)
                   )
                 }
                 inputOptions={{
