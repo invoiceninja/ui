@@ -33,29 +33,6 @@ export function useUpdateClientSettings() {
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
-  const adjustClientSettingsPayload = () => {
-    const adjustedSettings = { ...companyChanges?.settings };
-
-    Object.entries(adjustedSettings).forEach(([property, value]) => {
-      if (Array.isArray(value) && !value.length) {
-        delete adjustedSettings[property];
-      } else if (
-        value &&
-        typeof value === 'object' &&
-        !Object.entries(value).length
-      ) {
-        delete adjustedSettings[property];
-      } else if (typeof value !== 'boolean' && !value) {
-        delete adjustedSettings[property];
-      }
-    });
-
-    return {
-      ...activeSettings,
-      settings: adjustedSettings,
-    };
-  };
-
   return () => {
     toast.processing();
     setErrors(undefined);
@@ -65,7 +42,10 @@ export function useUpdateClientSettings() {
       endpoint('/api/v1/clients/:id', {
         id: activeSettings?.id,
       }),
-      adjustClientSettingsPayload()
+      {
+        ...activeSettings,
+        settings: companyChanges?.settings,
+      }
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
