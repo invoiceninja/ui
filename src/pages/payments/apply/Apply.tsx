@@ -182,7 +182,8 @@ export default function Apply() {
             exclude={collect(formik.values.invoices)
               .pluck('invoice_id')
               .toArray()}
-          />
+            clearInputAfterSelection
+            />
         ) : null}
 
         {errors?.errors.invoices && (
