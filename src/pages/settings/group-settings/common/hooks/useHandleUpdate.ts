@@ -23,6 +23,7 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
@@ -46,6 +47,39 @@ export function useHandleUpdate(params: Params) {
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
+  const adjustPayload = () => {
+    const adjustedPayload = cloneDeep(companyChanges?.settings);
+
+    if (
+      adjustedPayload.email_template_custom1 ||
+      adjustedPayload.email_subject_custom1
+    ) {
+      delete adjustedPayload.email_template_custom1;
+      delete adjustedPayload.email_subject_custom1;
+    }
+
+    if (
+      adjustedPayload.email_template_custom2 ||
+      adjustedPayload.email_subject_custom2
+    ) {
+      delete adjustedPayload.email_template_custom2;
+      delete adjustedPayload.email_subject_custom2;
+    }
+
+    if (
+      adjustedPayload.email_template_custom3 ||
+      adjustedPayload.email_subject_custom3
+    ) {
+      delete adjustedPayload.email_template_custom3;
+      delete adjustedPayload.email_subject_custom3;
+    }
+
+    return {
+      ...activeGroupSettings,
+      settings: adjustedPayload,
+    };
+  };
+
   return () => {
     if (!isFormBusy) {
       toast.processing();
@@ -57,10 +91,7 @@ export function useHandleUpdate(params: Params) {
         endpoint('/api/v1/group_settings/:id', {
           id: id || activeGroupSettings?.id,
         }),
-        groupSettings || {
-          ...activeGroupSettings,
-          settings: companyChanges?.settings,
-        }
+        groupSettings || adjustPayload()
       )
         .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('updated_group');

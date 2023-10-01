@@ -22,6 +22,7 @@ import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
 import { AxiosError } from 'axios';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 
@@ -33,6 +34,39 @@ export function useUpdateClientSettings() {
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
+  const adjustPayload = () => {
+    const adjustedPayload = cloneDeep(companyChanges?.settings);
+
+    if (
+      adjustedPayload.email_template_custom1 ||
+      adjustedPayload.email_subject_custom1
+    ) {
+      delete adjustedPayload.email_template_custom1;
+      delete adjustedPayload.email_subject_custom1;
+    }
+
+    if (
+      adjustedPayload.email_template_custom2 ||
+      adjustedPayload.email_subject_custom2
+    ) {
+      delete adjustedPayload.email_template_custom2;
+      delete adjustedPayload.email_subject_custom2;
+    }
+
+    if (
+      adjustedPayload.email_template_custom3 ||
+      adjustedPayload.email_subject_custom3
+    ) {
+      delete adjustedPayload.email_template_custom3;
+      delete adjustedPayload.email_subject_custom3;
+    }
+
+    return {
+      ...activeSettings,
+      settings: adjustedPayload,
+    };
+  };
+
   return () => {
     toast.processing();
     setErrors(undefined);
@@ -42,10 +76,7 @@ export function useUpdateClientSettings() {
       endpoint('/api/v1/clients/:id', {
         id: activeSettings?.id,
       }),
-      {
-        ...activeSettings,
-        settings: companyChanges?.settings,
-      }
+      adjustPayload()
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
