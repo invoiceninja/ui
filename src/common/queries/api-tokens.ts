@@ -36,7 +36,7 @@ export function useApiTokensQuery(params: Params) {
 }
 
 export function useApiTokenQuery(params: { id: string | undefined }) {
-  const { isOwner } = useAdmin();
+  const { isOwner, isAdmin } = useAdmin();
 
   return useQuery<ApiToken>(
     route('/api/v1/tokens/:id', { id: params.id }),
@@ -45,7 +45,7 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<ApiToken>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isOwner }
+    { staleTime: Infinity, enabled: isOwner || isAdmin }
   );
 }
 
