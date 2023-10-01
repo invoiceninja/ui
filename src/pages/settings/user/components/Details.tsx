@@ -40,11 +40,6 @@ export function Details() {
 
   const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
 
-  const handleLanguageChange = (value: string) => {
-    setHasLanguageIdChanged(true);
-    handleChange("language_id", value);
-  };
-
   const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
@@ -52,6 +47,11 @@ export function Details() {
         value: value,
       })
     );
+  };
+
+  const handleLanguageChange = (value: string) => {
+    setHasLanguageIdChanged(true);
+    handleChange("language_id", value);
   };
 
   return (
