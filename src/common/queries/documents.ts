@@ -19,10 +19,8 @@ export function useDocumentsQuery(params: Params) {
     request(
       'GET',
       endpoint(
-        '/api/v1/documents?per_page=:perPage&page=:currentPage&company_documents=:companyDocuments',
+        '/api/v1/documents?per_page=500&company_documents=:companyDocuments',
         {
-          perPage: params.perPage,
-          currentPage: params.currentPage,
           companyDocuments: params.companyDocuments ?? 'false',
         }
       )

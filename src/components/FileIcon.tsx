@@ -10,17 +10,23 @@
 
 import { File, Jpg, Pdf, Png, Svg } from './icons';
 
-export function FileIcon(props: { type: string }) {
+interface Props {
+  type: string;
+  height?: number;
+}
+export function FileIcon(props: Props) {
   const supported = ['jpg', 'svg', 'png', 'pdf'];
+
+  const { height } = props;
 
   return (
     <>
-      {props.type === 'jpg' && <Jpg height={26} />}
-      {props.type === 'svg' && <Svg height={26} />}
-      {props.type === 'png' && <Png height={26} />}
-      {props.type === 'pdf' && <Pdf height={26} />}
+      {props.type === 'jpg' && <Jpg height={height || 26} />}
+      {props.type === 'svg' && <Svg height={height || 26} />}
+      {props.type === 'png' && <Png height={height || 26} />}
+      {props.type === 'pdf' && <Pdf height={height || 26} />}
 
-      {!supported.includes(props.type) && <File height={26} />}
+      {!supported.includes(props.type) && <File height={height || 26} />}
     </>
   );
 }

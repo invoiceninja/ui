@@ -29,6 +29,7 @@ import { useColorScheme } from '$app/common/colors';
 interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
+  labelPadding?: 'small';
 }
 
 const LabelButton = styled.button`
@@ -117,10 +118,12 @@ export function Dropdown(props: Props) {
           disabled={props.disabled}
           onClick={() => setVisible(!visible)}
           className={classNames(
-            `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
+            `border inline-flex items-center space-x-2 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
             {
               'hover:bg-white hover:border-gray-300': !props.cardActions,
               'hover:opacity-90': props.cardActions,
+              'px-3 py-1.5': props.labelPadding === 'small',
+              'px-4 py-2': typeof props.labelPadding === 'undefined',
             }
           )}
           style={{

@@ -28,7 +28,6 @@ import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
-import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { defaultHeaders } from '$app/common/queries/common/headers';
@@ -173,221 +172,143 @@ export function DocumentsTable(props: Props) {
     <>
       <Divider />
 
-      <div className="grid grid-cols-2 lg:grid-cols-2 mt-4 gap-4">
+      <div className="grid grid-cols-12 mt-4 gap-4">
         {props.documents.map((document, index) => (
           <div
             key={index}
-            className="flex flex-col border rounded pb-2 space-y-4"
+            className="col-span-12 lg:col-span-6 border rounded"
             style={{ borderColor: colors.$5 }}
           >
-            {reactSettings.show_document_preview &&
-              (document.type === 'png' || document.type === 'jpg') && (
+            <div
+              className="cursor-pointer hover:opacity-60 border-b"
+              onClick={() => downloadDocument(document, true)}
+              style={{ borderColor: colors.$5 }}
+            >
+              {reactSettings.show_document_preview &&
+              (document.type === 'png' || document.type === 'jpg') ? (
                 <>
                   {getDocumentUrlById(document.id) ? (
                     <img
                       src={getDocumentUrlById(document.id)}
-                      style={{ width: '100%', height: 150 }}
+                      style={{ width: '100%', height: 200 }}
                     />
                   ) : (
-                    <Spinner />
+                    <div
+                      className="flex justify-center items-center"
+                      style={{ width: '100%', height: 200 }}
+                    >
+                      <Spinner />
+                    </div>
                   )}
                 </>
+              ) : (
+                <div
+                  className="flex justify-center items-center"
+                  style={{ width: '100%', height: 200 }}
+                >
+                  <FileIcon type={document.type} height={36} />
+                </div>
               )}
+            </div>
 
-            <div className="flex flex-1">
-              <div className="flex flex-1 flex-col space-y-5">
-                <div className="flex flex-1 justify-between items-center px-2">
-                  <div className="flex items-center space-x-2">
+            <div
+              className="flex flex-1 flex-col space-y-5 py-4"
+              style={{ backgroundColor: colors.$1 }}
+            >
+              <div className="flex flex-1 justify-between items-center px-2 space-x-1">
+                <div className="flex items-center space-x-2 min-w-0">
+                  {(document.type === 'png' || document.type === 'jpg') && (
                     <FileIcon type={document.type} />
+                  )}
 
-                    <span className="font-bold text-sm">{document.name}</span>
-                  </div>
-
-                  <div>
-                    {document.is_public ? (
-                      <Icon element={MdOutlineLockOpen} size={27} />
-                    ) : (
-                      <Icon element={MdLockOutline} size={27} />
-                    )}
-                  </div>
+                  <span className="flex-1 font-bold truncate">
+                    {document.name}
+                  </span>
                 </div>
 
-                <div className="flex justify-between items-center px-2">
-                  <div className="flex flex-col text-xs text-gray-500">
-                    <span>{date(document.updated_at, dateFormat)}</span>
-                    <span>{prettyBytes(document.size)}</span>
-                  </div>
-
-                  <Dropdown label={t('more_actions')}>
-                    <DropdownElement
-                      onClick={() => {
-                        downloadDocument(document, true);
-                      }}
-                      icon={<Icon element={MdPageview} />}
-                    >
-                      {t('view')}
-                    </DropdownElement>
-
-                    <DropdownElement
-                      onClick={() => {
-                        downloadDocument(document, false);
-                      }}
-                      icon={<Icon element={MdDownload} />}
-                    >
-                      {t('download')}
-                    </DropdownElement>
-
-                    {document.is_public ? (
-                      <DropdownElement
-                        onClick={() => {
-                          setDocumentVisibility(document.id, false).then(() =>
-                            props.onDocumentDelete?.()
-                          );
-                        }}
-                        icon={<Icon element={MdLockOutline} />}
-                      >
-                        {t('set_private')}
-                      </DropdownElement>
-                    ) : (
-                      <DropdownElement
-                        onClick={() => {
-                          setDocumentVisibility(document.id, true).then(() =>
-                            props.onDocumentDelete?.()
-                          );
-                        }}
-                        icon={<Icon element={MdOutlineLockOpen} />}
-                      >
-                        {t('set_public')}
-                      </DropdownElement>
-                    )}
-
-                    <DropdownElement
-                      onClick={() => {
-                        setDocumentId(document.id);
-                        setIsPasswordConfirmModalOpen(true);
-                      }}
-                      icon={<Icon element={MdDelete} />}
-                    >
-                      {t('delete')}
-                    </DropdownElement>
-                  </Dropdown>
+                <div>
+                  {document.is_public ? (
+                    <Icon element={MdOutlineLockOpen} size={27} />
+                  ) : (
+                    <Icon element={MdLockOutline} size={27} />
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Table>
-        <Thead>
-          <Th>{t('name')}</Th>
-          <Th>{t('date')}</Th>
-          <Th>{t('type')}</Th>
-          <Th>{t('size')}</Th>
-          <Th>{/* Placeholder for actions */}</Th>
-        </Thead>
 
-        <Tbody>
-          {!props.documents.length && (
-            <Tr>
-              <Td colSpan={5}>{t('no_records_found')}</Td>
-            </Tr>
-          )}
-
-          {props.documents.map((document, index) => (
-            <Tr key={index}>
-              <Td>
-                <div
-                  className="flex items-center space-x-10"
-                  style={{ width: 'max-content' }}
-                >
-                  <div className="flex items-center space-x-2">
-                    <FileIcon type={document.type} />
-                    <span>{document.name}</span>
-
-                    {document.is_public ? (
-                      <Icon element={MdOutlineLockOpen} size={27} />
-                    ) : (
-                      <Icon element={MdLockOutline} size={27} />
-                    )}
-                  </div>
-
-                  {reactSettings.show_document_preview &&
-                    (document.type === 'png' || document.type === 'jpg') && (
-                      <>
-                        {getDocumentUrlById(document.id) ? (
-                          <img
-                            src={getDocumentUrlById(document.id)}
-                            style={{ width: 150, height: 75 }}
-                          />
-                        ) : (
-                          <Spinner />
-                        )}
-                      </>
-                    )}
+              <div className="flex justify-between items-start px-2">
+                <div className="flex flex-col text-xs text-gray-500">
+                  <span>{date(document.updated_at, dateFormat)}</span>
+                  <span>{prettyBytes(document.size)}</span>
                 </div>
-              </Td>
-              <Td>{date(document.updated_at, dateFormat)}</Td>
-              <Td>{document.type}</Td>
-              <Td>{prettyBytes(document.size)}</Td>
-              <Td>
-                <Dropdown label={t('more_actions')}>
+
+                <Dropdown
+                  label={t('more_actions')}
+                  className="text-xs"
+                  labelPadding="small"
+                >
                   <DropdownElement
+                    className="text-xs"
                     onClick={() => {
                       downloadDocument(document, true);
                     }}
-                    icon={<Icon element={MdPageview} />}
+                    icon={<Icon element={MdPageview} size={16} />}
                   >
                     {t('view')}
                   </DropdownElement>
 
                   <DropdownElement
+                    className="text-xs"
                     onClick={() => {
                       downloadDocument(document, false);
                     }}
-                    icon={<Icon element={MdDownload} />}
+                    icon={<Icon element={MdDownload} size={16} />}
                   >
                     {t('download')}
                   </DropdownElement>
 
                   {document.is_public ? (
                     <DropdownElement
+                      className="text-xs"
                       onClick={() => {
                         setDocumentVisibility(document.id, false).then(() =>
                           props.onDocumentDelete?.()
                         );
                       }}
-                      icon={<Icon element={MdLockOutline} />}
+                      icon={<Icon element={MdLockOutline} size={16} />}
                     >
                       {t('set_private')}
                     </DropdownElement>
                   ) : (
                     <DropdownElement
+                      className="text-xs"
                       onClick={() => {
                         setDocumentVisibility(document.id, true).then(() =>
                           props.onDocumentDelete?.()
                         );
                       }}
-                      icon={<Icon element={MdOutlineLockOpen} />}
+                      icon={<Icon element={MdOutlineLockOpen} size={16} />}
                     >
                       {t('set_public')}
                     </DropdownElement>
                   )}
 
                   <DropdownElement
+                    className="text-xs"
                     onClick={() => {
                       setDocumentId(document.id);
                       setIsPasswordConfirmModalOpen(true);
                     }}
-                    icon={<Icon element={MdDelete} />}
+                    icon={<Icon element={MdDelete} size={16} />}
                   >
                     {t('delete')}
                   </DropdownElement>
                 </Dropdown>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
