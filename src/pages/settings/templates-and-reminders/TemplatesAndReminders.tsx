@@ -418,7 +418,7 @@ export function TemplatesAndReminders() {
                     onValueChange={(value) =>
                       handleChange(
                         `settings.num_days_reminder${reminderIndex}`,
-                        value ?? 0
+                        parseFloat(value) || 0
                       )
                     }
                     type="number"
