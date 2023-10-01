@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -36,7 +36,7 @@ type EventType = 'internal' | 'external';
 interface InputOptions {
   value: string | number | boolean | null;
   label?: string;
-  placeholder?: string
+  placeholder?: string;
 }
 
 interface Action {
@@ -75,7 +75,344 @@ const ActionButtonStyled = styled.button`
   }
 `;
 
-export function ComboboxStatic<T =any>({
+const LiStyled = styled.li`
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+export function Combobox<T = any>({
+  inputOptions,
+  entries,
+  readonly,
+  nullable,
+  initiallyVisible = false,
+  exclude = [],
+  action,
+  onChange,
+  onDismiss,
+  entryOptions,
+  errorMessage,
+  clearInputAfterSelection,
+  onEmptyValues,
+}: ComboboxStaticProps<T>) {
+  const [inputValue, setInputValue] = useState(
+    String(inputOptions.value ?? '')
+  );
+  const [isOpen, setIsOpen] = useState(initiallyVisible);
+  const [selectedOption, setSelectedOption] = useState<Entry | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  const comboboxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  let filteredOptions =
+    inputValue === ''
+      ? entries
+      : entries.filter(
+          (entry) =>
+            entry.label?.toLowerCase()?.includes(inputValue?.toLowerCase()) ||
+            entry.value
+              ?.toString()
+              ?.toLowerCase()
+              ?.includes(inputValue?.toLowerCase()) ||
+            entry.searchable.toLowerCase().includes(inputValue?.toLowerCase())
+        );
+
+  filteredOptions = filteredOptions.filter((entry) =>
+    exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
+
+  useEffect(() => {
+    const entry = entries.findIndex(
+      (entry) =>
+        entry.value === inputOptions.value || entry.label === inputOptions.value
+    );
+
+    if (entry >= 0) {
+      setSelectedOption(entries[entry]);
+      setHighlightedIndex(entry);
+
+      return;
+    }
+
+    if (nullable) {
+      setSelectedOption({
+        id: -1,
+        label: inputOptions.value ? inputOptions.value.toString() : '',
+        value: inputOptions.value ? inputOptions.value.toString() : '',
+        resource: null,
+        eventType: 'internal',
+        searchable: entryOptions.searchable || entryOptions.value,
+      });
+
+      return;
+    }
+  }, [entries]);
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    setSelectedOption(null);
+    setIsOpen(true);
+    setHighlightedIndex(-1);
+  };
+
+  const handleOptionClick = (option: Entry) => {
+    if (selectedOption && selectedOption.value === option.value) {
+      return;
+    }
+
+    setSelectedOption(option);
+    setInputValue(option.label);
+    onChange(option);
+
+    if (clearInputAfterSelection) {
+      setInputValue('');
+      setSelectedOption(null);
+    }
+
+    setTimeout(() => setIsOpen(false), 100);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (
+      event.key === 'ArrowDown' &&
+      highlightedIndex < filteredOptions.length - 1
+    ) {
+      event.preventDefault();
+      setHighlightedIndex(highlightedIndex + 1);
+
+      return;
+    }
+
+    if (event.key === 'ArrowUp' && highlightedIndex > 0) {
+      event.preventDefault();
+
+      setHighlightedIndex(highlightedIndex - 1);
+
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      setIsOpen(false);
+
+      if (highlightedIndex >= 0) {
+        handleOptionClick(filteredOptions[highlightedIndex]);
+
+        return;
+      }
+
+      if (highlightedIndex === -1 && nullable) {
+        handleOptionClick({
+          id: Date.now(),
+          label: inputValue,
+          value: inputValue,
+          resource: null,
+          eventType: 'internal',
+          searchable: inputValue.toLowerCase(),
+        });
+      }
+
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+
+      return;
+    }
+
+    if (event.key === 'Tab' && nullable) {
+      setIsOpen(false);
+
+      handleOptionClick({
+        id: Date.now(),
+        label: inputValue,
+        value: inputValue,
+        resource: null,
+        eventType: 'internal',
+        searchable: inputValue.toLowerCase(),
+      });
+
+      return;
+    }
+  };
+
+  useClickAway(comboboxRef, () => {
+    setIsOpen(false);
+
+    if (selectedOption && selectedOption.value) {
+      return;
+    }
+
+    const option: Entry = {
+      id: Date.now(),
+      label: inputValue,
+      value: inputValue,
+      resource: null,
+      eventType: 'internal',
+      searchable: inputValue.toLowerCase(),
+    };
+
+    handleOptionClick(option);
+    onChange(option);
+  });
+
+  useDebounce(
+    () => {
+      if (inputValue === '' && filteredOptions.length > 0) {
+        return onEmptyValues(inputValue);
+      }
+
+      if (filteredOptions.length <= 3) {
+        return onEmptyValues(inputValue);
+      }
+    },
+    600,
+    [inputValue, filteredOptions]
+  );
+
+  useEffect(() => {
+    const element = document.querySelector(
+      `[data-combobox-element-id="${highlightedIndex + 1}"]`
+    );
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+      });
+    }
+  }, [highlightedIndex]);
+
+  const colors = useColorScheme();
+
+  return (
+    <div ref={comboboxRef} className="w-full" tabIndex={-1}>
+      {inputOptions.label ? (
+        <p className="text-sm font-medium block">{inputOptions.label}</p>
+      ) : null}
+
+      <div className="relative mt-1">
+        <div
+          className="relative w-full cursor-default overflow-hidden rounded border text-left sm:text-sm"
+          style={{ borderColor: colors.$5 }}
+        >
+          <input
+            type="text"
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsOpen(true)}
+            placeholder={inputOptions.placeholder}
+            disabled={readonly}
+            defaultValue={
+              selectedOption ? selectedOption.label : inputValue?.toString()
+            }
+            className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
+            ref={inputRef}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$5,
+              color: colors.$3,
+            }}
+            tabIndex={-1}
+          />
+
+          {!readonly && (
+            <button
+              tabIndex={-1}
+              type="button"
+              onClick={(e) => {
+                if (onDismiss) {
+                  e.preventDefault();
+
+                  setIsOpen(false);
+
+                  return onDismiss();
+                }
+              }}
+              className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+            >
+              {onDismiss && selectedOption ? (
+                <X
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-clear-icon"
+                  style={{ color: colors.$3 }}
+                />
+              ) : (
+                <ChevronDown
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  data-testid="combobox-chevrondown-icon"
+                  style={{ color: colors.$3 }}
+                />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isOpen && (
+        <ul
+          className="border absolute z-10 mt-1 max-h-60 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
+          tabIndex={-1}
+        >
+          {action && action.visible && (
+            <ActionButtonStyled
+              theme={{
+                hoverColor: colors.$2,
+              }}
+              data-testid="combobox-action-button"
+              type="button"
+              onClick={action.onClick}
+              className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9"
+              tabIndex={-1}
+              style={{ color: colors.$3 }}
+            >
+              {action.label}
+            </ActionButtonStyled>
+          )}
+
+          {filteredOptions.map((option, index) => (
+            <LiStyled
+              theme={{
+                backgroundColor:
+                  highlightedIndex === index ? colors.$2 : colors.$1,
+              }}
+              key={option.id}
+              className={classNames(
+                'min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 hover:font-semibold',
+                {
+                  'font-medium': highlightedIndex === index,
+                }
+              )}
+              onClick={() => handleOptionClick(option)}
+              data-combobox-element-id={index}
+              tabIndex={-1}
+            >
+              {option.resource &&
+              typeof entryOptions.dropdownLabelFn !== 'undefined'
+                ? entryOptions.dropdownLabelFn(option.resource)
+                : option.label}
+            </LiStyled>
+          ))}
+        </ul>
+      )}
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
+    </div>
+  );
+}
+
+export function ComboboxStatic<T = any>({
   inputOptions,
   entries,
   readonly,
@@ -472,6 +809,26 @@ export function ComboboxAsync<T = any>({
       return new URL(current.href);
     });
   };
+
+  if (endpoint.pathname.startsWith('/api/v1/products')) {
+    return (
+      <Combobox
+        entries={entries}
+        inputOptions={inputOptions}
+        readonly={readonly}
+        onChange={onChange}
+        onEmptyValues={onEmptyValues}
+        onDismiss={onDismiss}
+        initiallyVisible={initiallyVisible}
+        exclude={exclude}
+        action={action}
+        nullable={nullable}
+        entryOptions={entryOptions}
+        errorMessage={errorMessage}
+        clearInputAfterSelection={clearInputAfterSelection}
+      />
+    );
+  }
 
   return (
     <ComboboxStatic

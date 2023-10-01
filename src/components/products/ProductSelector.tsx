@@ -14,7 +14,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { Alert } from '../Alert';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import classNames from 'classnames';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -25,11 +27,14 @@ interface Props {
   onProductCreated?: (product: Product) => unknown;
   onInputFocus?: () => unknown;
   errorMessage?: string | string[];
+  displayStockQuantity?: boolean;
 }
 
 export function ProductSelector(props: Props) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const currentCompany = useCurrentCompany();
 
   return (
     <>
@@ -49,7 +54,23 @@ export function ProductSelector(props: Props) {
           searchable: 'notes',
           dropdownLabelFn: (product) => (
             <div>
-              <p className="font-semibold">{product.product_key}</p>
+              <div className="flex space-x-1">
+                <p className="font-semibold">{product.product_key}</p>
+                {currentCompany?.track_inventory &&
+                  props.displayStockQuantity && (
+                    <p
+                      className={classNames({
+                        'text-red-700': product.in_stock_quantity <= 0,
+                      })}
+                    >
+                      (
+                      {trans('stock_quantity_number', {
+                        quantity: product.in_stock_quantity,
+                      })}
+                      )
+                    </p>
+                  )}
+              </div>
               <p className="text-sm truncate">
                 {product.notes.length > 35
                   ? product.notes.substring(0, 35).concat('...')

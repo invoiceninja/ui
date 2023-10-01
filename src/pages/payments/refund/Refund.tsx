@@ -220,6 +220,7 @@ export default function Refund() {
                   <div className="flex items-center space-x-2">
                     <InputField
                       id={`invoices[${index}].amount`}
+                      type="number"
                       value={
                         invoiceItem?.paid_to_date >
                         payment?.amount - payment?.refunded

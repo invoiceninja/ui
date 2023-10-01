@@ -33,6 +33,7 @@ export const vendorMap: Record[] = [
   { trans: 'vat_number', value: 'vendor.vat_number' },
   { trans: 'website', value: 'vendor.website' },
   { trans: 'currency', value: 'vendor.currency' },
+  { trans: 'classification', value: 'vendor.classification' },
   { trans: 'first_name', value: 'vendor_contact.first_name' },
   { trans: 'last_name', value: 'vendor_contact.last_name' },
   { trans: 'contact_phone', value: 'vendor_contact.phone' },
