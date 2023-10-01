@@ -19,7 +19,6 @@ interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
-  padding?: 'small';
 }
 
 const Button = styled.button`
@@ -51,8 +50,7 @@ export function DropdownElement(props: Props) {
           {
             'flex items-center': props.icon,
           },
-          `w-full text-left z-50 block px-4 py-2 text-sm text-gray-700 rounded-lg ${props.className}`,
-          {}
+          `w-full text-left z-50 block px-4 py-2 text-sm text-gray-700 rounded-lg ${props.className}`
         )}
       >
         {props.icon}

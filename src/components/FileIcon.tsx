@@ -17,16 +17,16 @@ interface Props {
 export function FileIcon(props: Props) {
   const supported = ['jpg', 'svg', 'png', 'pdf'];
 
-  const { height } = props;
+  const { height, type } = props;
 
   return (
     <>
-      {props.type === 'jpg' && <Jpg height={height || 26} />}
-      {props.type === 'svg' && <Svg height={height || 26} />}
-      {props.type === 'png' && <Png height={height || 26} />}
-      {props.type === 'pdf' && <Pdf height={height || 26} />}
+      {type === 'jpg' && <Jpg height={height || 26} />}
+      {type === 'svg' && <Svg height={height || 26} />}
+      {type === 'png' && <Png height={height || 26} />}
+      {type === 'pdf' && <Pdf height={height || 26} />}
 
-      {!supported.includes(props.type) && <File height={height || 26} />}
+      {!supported.includes(type) && <File height={height || 26} />}
     </>
   );
 }
