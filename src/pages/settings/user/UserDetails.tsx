@@ -32,8 +32,10 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { useQueryClient } from 'react-query';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -49,9 +51,15 @@ export function UserDetails() {
     { name: t('user_details'), href: '/settings/user_details' },
   ];
 
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
+  
   const user = useCurrentUser();
 
   const dispatch = useDispatch();
+
+  const queryClient = useQueryClient();
 
   const company = useInjectCompanyChanges();
 
@@ -101,7 +109,13 @@ export function UserDetails() {
           dispatch(
             updateRecord({ object: 'company', data: response[1].data.data })
           );
-      })
+
+        if (hasLanguageChanged) {
+          queryClient.invalidateQueries('/api/v1/statics');
+          setHasLanguageIdChanged(false);
+        }
+
+       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');

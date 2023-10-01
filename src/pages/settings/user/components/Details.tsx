@@ -18,7 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
+import { InputField, SelectField } from '../../../../components/forms';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { useAtom } from 'jotai';
+import { hasLanguageChanged } from '../../localization/common/atoms';
 
 export function Details() {
   const [t] = useTranslation();
@@ -32,6 +35,15 @@ export function Details() {
   const company = useCurrentCompany();
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
+
+  const languages = useLanguages();
+
+  const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
+
+  const handleLanguageChange = (value: string) => {
+    setHasLanguageIdChanged(true);
+    handleChange("language_id", value);
+  };
 
   const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
@@ -78,6 +90,21 @@ export function Details() {
               errorMessage={(errors?.errors?.phone ?? [])[0]}
             />
           </Element>
+
+          <Element leftSide={t('language')}>
+            <SelectField
+              withBlank={true}
+              value={userChanges?.language_id}
+              onValueChange={(value) => handleLanguageChange(value)}
+              errorMessage={errors?.errors?.language_id}
+            >
+              {languages?.map((language, index) => (
+                <option key={index} value={language?.id}>
+                  {language?.name}
+                </option>
+              ))}
+            </SelectField>
+            </Element>
 
           {company?.custom_fields?.user1 && (
             <CustomField
