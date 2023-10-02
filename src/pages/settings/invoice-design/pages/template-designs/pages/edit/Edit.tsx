@@ -21,7 +21,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
 import { Body } from '../edit/components/Body';
 
 export interface PreviewPayload {
@@ -43,8 +42,6 @@ export default function Edit() {
 
     const { id } = useParams();
     const { data } = useDesignQuery({ id, enabled: true });
-
-    const [errors, setErrors] = useState<ValidationBag>();
 
     useEffect(() => {
         if (data) {
