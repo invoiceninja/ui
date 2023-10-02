@@ -9,6 +9,7 @@
  */
 
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { defaultSettings } from '$app/common/constants/blank-company-settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -35,35 +36,42 @@ export function useUpdateClientSettings() {
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
   const adjustPayload = () => {
-    const adjustedPayload = cloneDeep(companyChanges?.settings);
+    const adjustedSettings = cloneDeep(companyChanges?.settings);
 
     if (
-      !adjustedPayload.email_template_custom1 ||
-      !adjustedPayload.email_subject_custom1
+      !adjustedSettings.email_template_custom1 ||
+      !adjustedSettings.email_subject_custom1
     ) {
-      delete adjustedPayload.email_template_custom1;
-      delete adjustedPayload.email_subject_custom1;
+      delete adjustedSettings.email_template_custom1;
+      delete adjustedSettings.email_subject_custom1;
     }
 
     if (
-      !adjustedPayload.email_template_custom2 ||
-      !adjustedPayload.email_subject_custom2
+      !adjustedSettings.email_template_custom2 ||
+      !adjustedSettings.email_subject_custom2
     ) {
-      delete adjustedPayload.email_template_custom2;
-      delete adjustedPayload.email_subject_custom2;
+      delete adjustedSettings.email_template_custom2;
+      delete adjustedSettings.email_subject_custom2;
     }
 
     if (
-      !adjustedPayload.email_template_custom3 ||
-      !adjustedPayload.email_subject_custom3
+      !adjustedSettings.email_template_custom3 ||
+      !adjustedSettings.email_subject_custom3
     ) {
-      delete adjustedPayload.email_template_custom3;
-      delete adjustedPayload.email_subject_custom3;
+      delete adjustedSettings.email_template_custom3;
+      delete adjustedSettings.email_subject_custom3;
     }
+
+    Object.entries(adjustedSettings).forEach(([property, value]) => {
+      if (value === null) {
+        adjustedSettings[property] =
+          defaultSettings[property as keyof typeof defaultSettings];
+      }
+    });
 
     return {
       ...activeSettings,
-      settings: adjustedPayload,
+      settings: adjustedSettings,
     };
   };
 
