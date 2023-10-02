@@ -382,7 +382,7 @@ export function OnlinePayments() {
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_portal_under_payment_minimum',
-                  parseFloat(value)
+                  parseFloat(value) || 0
                 )
               }
               disabled={disableSettingsField(
