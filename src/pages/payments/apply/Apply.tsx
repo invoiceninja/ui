@@ -149,7 +149,7 @@ export default function Apply() {
           <ComboboxAsync<Invoice>
             endpoint={
               new URL(
-                endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
               )
             }
             inputOptions={{
@@ -159,6 +159,7 @@ export default function Apply() {
               id: 'id',
               value: 'id',
               label: 'name',
+              searchable: 'number',
               dropdownLabelFn: (invoice) =>
                 `${t('invoice_number_short')}${invoice.number} - ${t(
                   'balance'
@@ -181,7 +182,8 @@ export default function Apply() {
             exclude={collect(formik.values.invoices)
               .pluck('invoice_id')
               .toArray()}
-          />
+            clearInputAfterSelection
+            />
         ) : null}
 
         {errors?.errors.invoices && (
