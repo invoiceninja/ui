@@ -19,9 +19,6 @@ export function useDesignUtilities() {
         property: keyof Design,
         value: string | number | Parts
     ) => {
-
-        console.log("Ddss");
-        
         if (payload && payload.design) {
             setPayload({
                 ...payload,
