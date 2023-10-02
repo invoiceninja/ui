@@ -42,6 +42,7 @@ export default function Edit() {
 
     const { id } = useParams();
     const { data } = useDesignQuery({ id, enabled: true });
+    const [errors, setErrors] = useState<ValidationBag>();
 
     useEffect(() => {
         if (data) {
