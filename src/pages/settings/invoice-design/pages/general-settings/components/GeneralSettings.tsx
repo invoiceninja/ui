@@ -1126,7 +1126,7 @@ export function GeneralSettings() {
               onValueChange={(value) =>
                 handleChange(
                   'company_logo_size',
-                  `${parseFloat(value)}${logoSizeType}`
+                  `${parseFloat(value) || 0}${logoSizeType}`
                 )
               }
               disabled={disableSettingsField('company_logo_size')}

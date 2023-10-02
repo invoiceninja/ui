@@ -77,7 +77,10 @@ export function Quotes() {
           type="number"
           value={companyChanges?.settings?.quote_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.quote_number_counter', parseFloat(value))
+            handleChange(
+              'settings.quote_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('quote_number_counter')}
           errorMessage={errors?.errors['settings.quote_number_counter']}

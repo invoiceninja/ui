@@ -77,7 +77,10 @@ export function Credits() {
           type="number"
           value={companyChanges?.settings?.credit_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.credit_number_counter', parseFloat(value))
+            handleChange(
+              'settings.credit_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('credit_number_counter')}
           errorMessage={errors?.errors['settings.credit_number_counter']}

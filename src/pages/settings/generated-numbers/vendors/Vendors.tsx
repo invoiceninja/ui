@@ -77,7 +77,10 @@ export function Vendors() {
           type="number"
           value={companyChanges?.settings?.vendor_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.vendor_number_counter', parseFloat(value))
+            handleChange(
+              'settings.vendor_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('vendor_number_counter')}
           errorMessage={errors?.errors['settings.vendor_number_counter']}

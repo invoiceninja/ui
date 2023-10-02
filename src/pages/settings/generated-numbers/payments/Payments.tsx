@@ -78,7 +78,10 @@ export function Payments() {
           type="number"
           value={companyChanges?.settings?.payment_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.payment_number_counter', parseFloat(value))
+            handleChange(
+              'settings.payment_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('payment_number_counter')}
           errorMessage={errors?.errors['settings.payment_number_counter']}

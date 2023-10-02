@@ -86,7 +86,7 @@ export function RecurringInvoices() {
           onValueChange={(value) =>
             handleChange(
               'settings.recurring_invoice_number_counter',
-              parseFloat(value)
+              parseFloat(value) || 0
             )
           }
           disabled={disableSettingsField('recurring_invoice_number_counter')}

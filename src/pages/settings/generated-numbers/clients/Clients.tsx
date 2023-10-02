@@ -77,7 +77,10 @@ export function Clients() {
           type="number"
           value={companyChanges?.settings?.client_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.client_number_counter', parseFloat(value))
+            handleChange(
+              'settings.client_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('client_number_counter')}
           errorMessage={errors?.errors['settings.client_number_counter']}

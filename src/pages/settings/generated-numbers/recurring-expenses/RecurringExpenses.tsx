@@ -85,7 +85,7 @@ export function RecurringExpenses() {
           onValueChange={(value) =>
             handleChange(
               'settings.recurring_expense_number_counter',
-              parseFloat(value)
+              parseFloat(value) || 0
             )
           }
           disabled={disableSettingsField('recurring_expense_number_counter')}

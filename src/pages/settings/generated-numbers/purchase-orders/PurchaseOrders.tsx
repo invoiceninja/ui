@@ -81,7 +81,7 @@ export function PurchaseOrders() {
           onValueChange={(value) =>
             handleChange(
               'settings.purchase_order_number_counter',
-              parseFloat(value)
+              parseFloat(value) || 0
             )
           }
           disabled={disableSettingsField('purchase_order_number_counter')}

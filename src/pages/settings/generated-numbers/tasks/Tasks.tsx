@@ -77,7 +77,7 @@ export function Tasks() {
           type="number"
           value={companyChanges?.settings?.task_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.task_number_counter', parseFloat(value))
+            handleChange('settings.task_number_counter', parseFloat(value) || 0)
           }
           disabled={disableSettingsField('task_number_counter')}
           errorMessage={errors?.errors['settings.task_number_counter']}

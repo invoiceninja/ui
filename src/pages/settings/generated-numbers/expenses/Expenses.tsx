@@ -77,7 +77,10 @@ export function Expenses() {
           type="number"
           value={companyChanges?.settings?.expense_number_counter || ''}
           onValueChange={(value) =>
-            handleChange('settings.expense_number_counter', parseFloat(value))
+            handleChange(
+              'settings.expense_number_counter',
+              parseFloat(value) || 0
+            )
           }
           disabled={disableSettingsField('expense_number_counter')}
           errorMessage={errors?.errors['settings.expense_number_counter']}
