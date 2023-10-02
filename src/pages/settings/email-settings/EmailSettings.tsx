@@ -536,7 +536,7 @@ export function EmailSettings() {
           }
         >
           <SelectField
-            value={company?.settings.entity_send_time}
+            value={company?.settings.entity_send_time || ''}
             onValueChange={(value) =>
               handleChange(
                 'settings.entity_send_time',
