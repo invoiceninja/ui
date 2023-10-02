@@ -91,7 +91,7 @@ export function PropertyCheckbox(props: Props) {
 
       <div
         className={classNames({
-          'opacity-70': !checked && !isCompanySettingsActive,
+          'opacity-75': !checked && !isCompanySettingsActive,
           'cursor-pointer': !isCompanySettingsActive,
         })}
         onClick={() => {

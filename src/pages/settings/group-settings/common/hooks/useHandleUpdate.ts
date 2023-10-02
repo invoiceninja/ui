@@ -51,24 +51,24 @@ export function useHandleUpdate(params: Params) {
     const adjustedPayload = cloneDeep(companyChanges?.settings);
 
     if (
-      adjustedPayload.email_template_custom1 ||
-      adjustedPayload.email_subject_custom1
+      !adjustedPayload.email_template_custom1 ||
+      !adjustedPayload.email_subject_custom1
     ) {
       delete adjustedPayload.email_template_custom1;
       delete adjustedPayload.email_subject_custom1;
     }
 
     if (
-      adjustedPayload.email_template_custom2 ||
-      adjustedPayload.email_subject_custom2
+      !adjustedPayload.email_template_custom2 ||
+      !adjustedPayload.email_subject_custom2
     ) {
       delete adjustedPayload.email_template_custom2;
       delete adjustedPayload.email_subject_custom2;
     }
 
     if (
-      adjustedPayload.email_template_custom3 ||
-      adjustedPayload.email_subject_custom3
+      !adjustedPayload.email_template_custom3 ||
+      !adjustedPayload.email_subject_custom3
     ) {
       delete adjustedPayload.email_template_custom3;
       delete adjustedPayload.email_subject_custom3;
