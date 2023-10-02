@@ -1120,7 +1120,7 @@ export function GeneralSettings() {
           <div className="w-full">
             <InputField
               type="number"
-              value={company?.settings.company_logo_size
+              value={(company?.settings.company_logo_size || '')
                 ?.replaceAll('px', '')
                 ?.replaceAll('%', '')}
               onValueChange={(value) =>

@@ -185,7 +185,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.invoice_terms}
+              value={companyChanges?.settings?.invoice_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -209,7 +209,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.invoice_footer}
+              value={companyChanges?.settings?.invoice_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -233,7 +233,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.quote_terms}
+              value={companyChanges?.settings?.quote_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -257,7 +257,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.quote_footer}
+              value={companyChanges?.settings?.quote_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -281,7 +281,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.credit_terms}
+              value={companyChanges?.settings?.credit_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -305,7 +305,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.credit_footer}
+              value={companyChanges?.settings?.credit_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -331,7 +331,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.purchase_order_terms}
+              value={companyChanges?.settings?.purchase_order_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -357,7 +357,7 @@ export function Defaults() {
             }
           >
             <MarkdownEditor
-              value={companyChanges?.settings?.purchase_order_footer}
+              value={companyChanges?.settings?.purchase_order_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
