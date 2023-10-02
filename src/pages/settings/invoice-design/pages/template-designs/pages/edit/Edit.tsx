@@ -72,12 +72,6 @@ export default function Edit() {
                         queryClient.invalidateQueries(route('/api/v1/designs/:id', { id }));
 
                         toast.success('updated_design');
-                    })
-                    .catch((error: AxiosError<ValidationBag>) => {
-                        if (error.response?.status === 422) {
-                            setErrors(error.response.data);
-                            toast.dismiss();
-                        }
                     });
             },
         },
