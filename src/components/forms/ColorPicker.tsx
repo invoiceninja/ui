@@ -51,8 +51,10 @@ export function ColorPicker(props: Props) {
 
       <div
         style={{ backgroundColor: color }}
-        className={classNames('w-16 h-6 cursor-pointer shadow rounded-md', {
-          'opacity-75': props.disabled,
+        className={classNames('w-16 h-6 shadow rounded-md', {
+          'opacity-75 cursor-not-allowed': props.disabled,
+          'cursor-pointer':
+            typeof props.disabled === 'undefined' || !props.disabled,
         })}
         onClick={() =>
           (!props.disabled || typeof props.disabled === 'undefined') &&

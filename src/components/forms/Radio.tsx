@@ -53,12 +53,11 @@ export function Radio(props: Props) {
             />
             <label
               htmlFor={option.id}
-              className={classNames(
-                'ml-3 block text-sm font-medium cursor-pointer',
-                {
-                  'opacity-75': props.disabled,
-                }
-              )}
+              className={classNames('ml-3 block text-sm font-medium', {
+                'opacity-75 cursor-not-allowed': props.disabled,
+                'cursor-pointer':
+                  typeof props.disabled === 'undefined' || !props.disabled,
+              })}
             >
               {option.title}
             </label>
