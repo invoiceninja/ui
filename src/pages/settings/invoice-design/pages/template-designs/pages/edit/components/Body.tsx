@@ -17,45 +17,58 @@ import { Card, Element } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { InputField } from '$app/components/forms';
+import { Checkbox, InputField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
 
 interface Props {
-    errors: ValidationBag | undefined;
+  errors: ValidationBag | undefined;
 }
 
 export function Body(props: Props) {
-    const [payload] = useAtom(payloadAtom);
-    const [value, setValue] = useState(payload.design?.design.body);
+  const [payload] = useAtom(payloadAtom);
+  const [value, setValue] = useState(payload.design?.design.body);
 
-    const { t } = useTranslation();
-    const { handleBlockChange } = useDesignUtilities();
-    const { errors } = props;
-    const { handlePropertyChange } = useDesignUtilities();
+  const { t } = useTranslation();
+  const { handleBlockChange } = useDesignUtilities();
+  const { errors } = props;
+  const { handlePropertyChange, handleResourceChange } = useDesignUtilities();
 
-    useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
+  useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
-    return (
-        <Card title={t('template')} padding="small">
-            <Element leftSide={t('name')}>
-                <InputField
-                    value={payload.design?.name}
-                    onValueChange={(value) => handlePropertyChange('name', value)}
-                    errorMessage={errors?.errors.name}
-                />
-            </Element>
-            <Divider />
-            <Editor
-                height="100rem"
-                defaultLanguage="html"
-                value={payload.design?.design.body}
-                options={{
-                    minimap: {
-                        enabled: false,
-                    },
-                }}
-                onChange={(markup) => markup && setValue(markup)}
-            />
-        </Card>
-    );
+  return (
+    <Card title={t('template')} padding="small">
+      <Element leftSide={t('name')}>
+        <InputField
+          value={payload.design?.name}
+          onValueChange={(value) => handlePropertyChange('name', value)}
+          errorMessage={errors?.errors.name}
+        />
+      </Element>
+
+      <Element leftSide={t('resource')}>
+        <Checkbox
+          label={t('invoice')}
+          value="invoice"
+          onValueChange={(value, checked) =>
+            handleResourceChange(value, Boolean(checked))
+          }
+          checked={payload.design?.entities.includes('invoice')}
+        />
+      </Element>
+
+      <Divider />
+
+      <Editor
+        height="100rem"
+        defaultLanguage="html"
+        value={payload.design?.design.body}
+        options={{
+          minimap: {
+            enabled: false,
+          },
+        }}
+        onChange={(markup) => markup && setValue(markup)}
+      />
+    </Card>
+  );
 }
