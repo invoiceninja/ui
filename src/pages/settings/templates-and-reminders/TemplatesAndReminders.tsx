@@ -209,9 +209,9 @@ export function TemplatesAndReminders() {
         } else {
           handleChange('settings', updatedCompanySettingsChanges);
         }
-      }
 
-      setTemplateBody(undefined);
+        setTemplateBody(undefined);
+      }
     }
 
     if (value && !templateId) {

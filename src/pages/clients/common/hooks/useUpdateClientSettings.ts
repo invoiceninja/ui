@@ -38,36 +38,38 @@ export function useUpdateClientSettings() {
   const adjustPayload = () => {
     const adjustedSettings = cloneDeep(companyChanges?.settings);
 
-    if (
-      !adjustedSettings.email_template_custom1 ||
-      !adjustedSettings.email_subject_custom1
-    ) {
-      delete adjustedSettings.email_template_custom1;
-      delete adjustedSettings.email_subject_custom1;
-    }
-
-    if (
-      !adjustedSettings.email_template_custom2 ||
-      !adjustedSettings.email_subject_custom2
-    ) {
-      delete adjustedSettings.email_template_custom2;
-      delete adjustedSettings.email_subject_custom2;
-    }
-
-    if (
-      !adjustedSettings.email_template_custom3 ||
-      !adjustedSettings.email_subject_custom3
-    ) {
-      delete adjustedSettings.email_template_custom3;
-      delete adjustedSettings.email_subject_custom3;
-    }
-
-    Object.entries(adjustedSettings).forEach(([property, value]) => {
-      if (value === null) {
-        adjustedSettings[property] =
-          defaultSettings[property as keyof typeof defaultSettings];
+    if (adjustedSettings) {
+      if (
+        !adjustedSettings.email_template_custom1 ||
+        !adjustedSettings.email_subject_custom1
+      ) {
+        delete adjustedSettings.email_template_custom1;
+        delete adjustedSettings.email_subject_custom1;
       }
-    });
+
+      if (
+        !adjustedSettings.email_template_custom2 ||
+        !adjustedSettings.email_subject_custom2
+      ) {
+        delete adjustedSettings.email_template_custom2;
+        delete adjustedSettings.email_subject_custom2;
+      }
+
+      if (
+        !adjustedSettings.email_template_custom3 ||
+        !adjustedSettings.email_subject_custom3
+      ) {
+        delete adjustedSettings.email_template_custom3;
+        delete adjustedSettings.email_subject_custom3;
+      }
+
+      Object.entries(adjustedSettings).forEach(([property, value]) => {
+        if (value === null) {
+          adjustedSettings[property] =
+            defaultSettings[property as keyof typeof defaultSettings];
+        }
+      });
+    }
 
     return {
       ...activeSettings,
