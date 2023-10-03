@@ -20,6 +20,9 @@ import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { atom, useAtom } from 'jotai';
+
+const invoiceAtom = atom<Invoice | null>(null)
 
 export default function Pdf() {
   const { id } = useParams();
@@ -28,7 +31,7 @@ export default function Pdf() {
   const [t] = useTranslation();
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
-  const [invoice, setInvoice] = useState<Invoice>();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const [deliveryNote, setDeliveryNote] = useState<boolean>(false);
 
@@ -51,6 +54,10 @@ export default function Pdf() {
       setPdfUrl(url(invoice));
     }
   }, [invoice]);
+
+  useEffect(() => {
+    return () => setInvoice(null);
+  }, [])
 
   const onLink = (url: string) => setBlobUrl(url);
 
@@ -92,7 +99,7 @@ function DeliveryNoteDesignSelector() {
 
   return (
     <ComboboxAsync
-      endpoint={new URL(endpoint('/api/v1/designs?entity=invoice'))}
+      endpoint={new URL(endpoint('/api/v1/designs?template=true&entity=invoice'))}
       inputOptions={{
         value: '',
         label: '',
