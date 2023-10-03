@@ -13,43 +13,66 @@ import { payloadAtom } from '../Edit';
 import { Design, Parts } from '$app/common/interfaces/design';
 
 export function useDesignUtilities() {
-    const [payload, setPayload] = useAtom(payloadAtom);
+  const [payload, setPayload] = useAtom(payloadAtom);
 
-    const handlePropertyChange = (
-        property: keyof Design,
-        value: string | number | Parts
-    ) => {
+  const handlePropertyChange = (
+    property: keyof Design,
+    value: string | number | Parts
+  ) => {
+    console.log('Ddss');
 
-        console.log("Ddss");
-        
-        if (payload && payload.design) {
-            setPayload({
-                ...payload,
-                design: { ...payload.design, [property]: value },
-            });
-        }
-    };
+    if (payload && payload.design) {
+      setPayload({
+        ...payload,
+        design: { ...payload.design, [property]: value },
+      });
+    }
+  };
 
-    const handleBlockChange = (
-        property: keyof Design['design'],
-        value: string
-        ) => {
-        
-            console.log("Dd");
+  const handleBlockChange = (
+    property: keyof Design['design'],
+    value: string
+  ) => {
+    console.log('Dd');
 
-        if (payload && payload.design) {
-            setPayload({
-                ...payload,
-                design: {
-                    ...payload.design,
-                    design: { ...payload.design.design, [property]: value },
-                },
-            });
-        }
-    };
+    if (payload && payload.design) {
+      setPayload({
+        ...payload,
+        design: {
+          ...payload.design,
+          design: { ...payload.design.design, [property]: value },
+        },
+      });
+    }
+  };
 
-    return {
-        handlePropertyChange,
-        handleBlockChange,
-    };
+  const handleResourceChange = (value: string, checked: boolean) => {
+    if (!payload.design) {
+      return;
+    }
+
+    const entities =
+      payload.design.entities.length > 1
+        ? payload.design.entities.split(',') || ([] as string[])
+        : [];
+
+    const filtered = entities.filter((e) => e !== value);
+
+    if (checked) {
+      filtered.push(value);
+    }
+
+    if (payload && payload.design) {
+      setPayload({
+        ...payload,
+        design: { ...payload.design, entities: filtered.join(',') },
+      });
+    }
+  };
+
+  return {
+    handlePropertyChange,
+    handleBlockChange,
+    handleResourceChange,
+  };
 }
