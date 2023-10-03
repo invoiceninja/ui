@@ -115,7 +115,6 @@ export const useCustomBulkActions = () => {
     selectedInvoices: Invoice[],
     setSelected?: Dispatch<SetStateAction<string[]>>
   ) => {
-    console.log(selectedInvoices);
     const invoiceIds = getDocumentsIds(selectedInvoices);
 
     documentsBulk(invoiceIds, 'download');
