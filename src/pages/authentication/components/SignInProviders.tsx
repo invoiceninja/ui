@@ -144,7 +144,7 @@ export function SignInProviders() {
 
         <AppleLogin 
           clientId="com.invoiceninja.client" 
-          redirectURI="https://beta.invoicing.co/" 
+          redirectURI="https://invoicing.co/auth/apple" 
           scope='name email'
           responseType='code id_token'
           responseMode='form_post' //may not be accurate
