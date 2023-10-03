@@ -36,7 +36,11 @@ export function Body(props: Props) {
   useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
   return (
-    <Card title={t('template')} padding="small">
+    <Card
+      title={t('template')}
+      padding="small"
+      onFormSubmit={(e) => e.preventDefault()}
+    >
       <Element leftSide={t('name')}>
         <InputField
           value={payload.design?.name}
