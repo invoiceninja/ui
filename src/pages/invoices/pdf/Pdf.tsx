@@ -18,6 +18,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
+import { endpoint } from '$app/common/helpers';
 
 export default function Pdf() {
   const { id } = useParams();
@@ -70,6 +72,7 @@ export default function Pdf() {
           />
         )
       }
+      topRight={deliveryNote ? <DeliveryNoteDesignSelector /> : null}
     >
       {pdfUrl ? (
         <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />
@@ -77,5 +80,26 @@ export default function Pdf() {
         <Spinner />
       )}
     </Default>
+  );
+}
+
+function DeliveryNoteDesignSelector() {
+  const [t] = useTranslation();
+
+  // Todo: Decide between "Save" or "Auto save" for saving the delivey note design
+  // Filter out designs on API based on "entity" in the url
+  // Implement on change for delivery note.
+
+  return (
+    <ComboboxAsync
+      endpoint={new URL(endpoint('/api/v1/designs?entity=invoice'))}
+      inputOptions={{
+        value: '',
+        label: '',
+        placeholder: t('select_design') ?? '',
+      }}
+      entryOptions={{ id: 'id', label: 'name', value: 'id' }}
+      onChange={(entry) => console.log(entry)}
+    />
   );
 }
