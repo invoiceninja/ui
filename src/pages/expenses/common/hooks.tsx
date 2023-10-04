@@ -47,6 +47,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useInvoiceExpense } from './useInvoiceExpense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { AddToInvoiceAction } from './components/AddToInvoiceAction';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -211,7 +212,10 @@ export function useAllExpenseColumns() {
 
 export function useExpenseColumns() {
   const { t } = useTranslation();
+  const accentColor = useAccentColor();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const navigate = useNavigate();
 
   const formatMoney = useFormatMoney();
 
@@ -237,11 +241,26 @@ export function useExpenseColumns() {
       id: 'id',
       label: t('status'),
       format: (value, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-          <span className="inline-flex items-center space-x-4">
-            <ExpenseStatus entity={expense} />
-          </span>
-        </Link>
+        <div className="flex items-center space-x-2">
+          <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+            <span className="inline-flex items-center space-x-4">
+              <ExpenseStatus entity={expense} />
+            </span>
+          </Link>
+
+          {expense.invoice_id && (
+            <MdTextSnippet
+              className="cursor-pointer"
+              fontSize={19}
+              color={accentColor}
+              onClick={() =>
+                navigate(
+                  route('/invoices/:id/edit', { id: expense.invoice_id })
+                )
+              }
+            />
+          )}
+        </div>
       ),
     },
     {
