@@ -32,6 +32,8 @@ import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 import { useReverseInvoice } from './useReverseInvoice';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/helpers/templates';
+import { useState } from 'react';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -98,6 +100,8 @@ export const useCustomBulkActions = () => {
         archived_at
     );
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     (selectedIds) => <SendEmailBulkAction invoiceIds={selectedIds} />,
@@ -189,6 +193,26 @@ export const useCustomBulkActions = () => {
           {t('cancel_invoice')}
         </DropdownElement>
       ),
+    (_, selectedInvoices) => (
+      <>
+        {selectedInvoices ? (
+          <ChangeTemplateModal<Invoice>
+            entity="invoice"
+            entities={selectedInvoices}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdCancel} />}
+        >
+          {t('change_template')}
+        </DropdownElement>
+      </>
+    ),
   ];
 
   return customBulkActions;
