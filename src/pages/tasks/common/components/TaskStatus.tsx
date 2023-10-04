@@ -18,6 +18,9 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import { useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
+import { TaskStatusesDropdown } from './TaskStatusesDropdown';
 
 interface Props {
   entity: Task;
@@ -26,10 +29,19 @@ interface Props {
 export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
+  const ref = useRef(null);
+
   const adjustColorDarkness = useAdjustColorDarkness();
 
   const { invoice_id, archived_at, is_deleted, time_log, status } =
     props.entity;
+
+  const [visibleDropdown, setVisibleDropdown] = useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  useClickAway(ref, () => {
+    visibleDropdown && setVisibleDropdown(false);
+  });
 
   const isRunning = () => {
     const timeLogs = parseTimeLog(time_log);
@@ -56,16 +68,45 @@ export function TaskStatus(props: Props) {
     const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
     return (
-      <StatusBadge
-        for={{}}
-        code={status.name}
-        style={{
-          color: adjustColorDarkness(hex, darknessAmount),
-          backgroundColor: status.color,
-        }}
-      />
+      <div ref={ref}>
+        <StatusBadge
+          for={{}}
+          code={status.name}
+          style={{
+            color: adjustColorDarkness(hex, darknessAmount),
+            backgroundColor: status.color,
+          }}
+          onClick={() =>
+            !isFormBusy && setVisibleDropdown((current) => !current)
+          }
+        />
+
+        <TaskStatusesDropdown
+          visible={visibleDropdown}
+          isFormBusy={isFormBusy}
+          setIsFormBusy={setIsFormBusy}
+          task={props.entity}
+          setVisible={setVisibleDropdown}
+        />
+      </div>
     );
   }
 
-  return <StatusBadge for={{}} code="logged" />;
+  return (
+    <div ref={ref}>
+      <StatusBadge
+        for={{}}
+        code="logged"
+        onClick={() => !isFormBusy && setVisibleDropdown((current) => !current)}
+      />
+
+      <TaskStatusesDropdown
+        visible={visibleDropdown}
+        isFormBusy={isFormBusy}
+        setIsFormBusy={setIsFormBusy}
+        task={props.entity}
+        setVisible={setVisibleDropdown}
+      />
+    </div>
+  );
 }

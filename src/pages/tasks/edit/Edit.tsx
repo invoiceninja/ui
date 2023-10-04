@@ -8,26 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Task } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
-import { isOverlapping } from '../common/helpers/is-overlapping';
-import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
+import { useUpdateTask } from '../common/hooks/useUpdateTask';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
@@ -39,8 +32,7 @@ export default function Edit() {
   const [task, setTask] = useState<Task>();
 
   const [errors, setErrors] = useState<ValidationBag>();
-
-  const queryClient = useQueryClient();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const actions = useActions();
 
@@ -54,35 +46,12 @@ export default function Edit() {
     setTask((current) => current && { ...current, [property]: value });
   };
 
-  const saveCompany = useHandleCompanySave();
-
-  const handleSave = async (task: Task) => {
-    toast.processing();
-
-    await saveCompany(true);
-
-    if (isOverlapping(task)) {
-      return toast.error('task_errors');
-    }
-
-    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
-      .then(() => {
-        toast.success('updated_task');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
-        }
-      })
-      .finally(() =>
-        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }))
-      );
-  };
+  const handleSave = useUpdateTask({ isFormBusy, setIsFormBusy, setErrors });
 
   return (
     <Default
       title={documentTitle}
+      disableSaveButton={isFormBusy}
       onSaveClick={() => task && handleSave(task)}
       navigationTopRight={
         task && (
