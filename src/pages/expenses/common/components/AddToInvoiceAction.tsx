@@ -147,7 +147,7 @@ export function AddToInvoiceAction(props: Props) {
         <div className="flex flex-col space-y-1">
           {invoices.map((invoice) => (
             <Div
-              theme={{ hoverColor: colors.$2 }}
+              theme={{ hoverColor: colors.$5 }}
               key={invoice.id}
               onClick={() => handleAddToInvoice(invoice)}
               className="flex items-center justify-between cursor-pointer rounded py-1 px-2"
