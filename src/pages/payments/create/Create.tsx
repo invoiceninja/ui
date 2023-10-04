@@ -172,6 +172,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
+          currency_id: current.client?.settings.currency_id
           // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
@@ -202,6 +203,8 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
+
+    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);
@@ -513,7 +516,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              value={payment?.type_id}
+              defaultValue={company?.settings?.payment_type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -599,7 +602,11 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                handleChange('exchange_currency_id', '');
+                if(!value)
+                  handleChange('exchange_currency_id', '');
+                else
+                  handleChange('exchange_currency_id', '1')
+
                 handleChange('exchange_rate', 1);
               }}
             />
@@ -608,9 +615,9 @@ export default function Create() {
           {convertCurrency && payment && (
             <ConvertCurrency
               exchangeRate={payment.exchange_rate.toString() || '1'}
-              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id}
               currencyId={payment.currency_id || '1'}
-              amount={payment?.amount}
+              amount={collect(payment?.invoices).sum('amount') as number + payment?.amount ?? 0}
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
                 handleChange('exchange_currency_id', exchangeCurrencyId);
