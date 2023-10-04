@@ -137,8 +137,6 @@ export function AddToInvoiceAction(props: Props) {
     }
   }, [visibleModal]);
 
-  useEffect(() => {});
-
   return (
     <>
       <Modal
