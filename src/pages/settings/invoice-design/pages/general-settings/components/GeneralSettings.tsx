@@ -962,6 +962,58 @@ export function GeneralSettings() {
         </div>
       </Element>
 
+      {/* --------- */}
+
+      <Element leftSide={t('delivery_note_design')}>
+          <SelectField
+            id="settings.delivery_note_design_id"
+            value={company?.settings?.delivery_note_design_id || 'VolejRejNm'}
+            // onValueChange={(value) =>
+              // handleChange('delivery_note_design_id', value)
+            // }
+            errorMessage={errors?.errors['settings.delivery_note_design_id']}
+          >
+          </SelectField>
+      </Element>
+
+      <Element leftSide={t('statement_design')}>
+          <SelectField
+            id="settings.statement_design_id"
+            value={company?.settings?.statement_design_id || 'VolejRejNm'}
+            // onValueChange={(value) =>
+              // handleChange('statement_design_id', value)
+            // }
+            errorMessage={errors?.errors['settings.statement_design_id']}
+          >
+          </SelectField>
+      </Element>
+
+      <Element leftSide={t('payment_receipt_design')}>
+          <SelectField
+            id="settings.payment_receipt_design_id"
+            value={company?.settings?.payment_receipt_design_id || 'VolejRejNm'}
+            // onValueChange={(value) =>
+              // handleChange('payment_receipt_design_id', value)
+            // }
+            errorMessage={errors?.errors['settings.payment_receipt_design_id']}
+          >
+          </SelectField>
+      </Element>
+
+      <Element leftSide={t('payment_refund_design')}>
+          <SelectField
+            id="settings.payment_refund_design_id"
+            value={company?.settings?.payment_refund_design_id || 'VolejRejNm'}
+            // onValueChange={(value) =>
+              // handleChange('payment_refund_design_id', value)
+            // }
+            errorMessage={errors?.errors['settings.payment_refund_design_id']}
+          >
+          </SelectField>
+      </Element>
+
+      {/* --------- */}
+
       <Element leftSide={t('page_layout')}>
         <SelectField
           id="settings.page_layout"
