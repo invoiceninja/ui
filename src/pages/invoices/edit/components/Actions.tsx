@@ -54,6 +54,8 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+import { useState } from 'react';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/helpers/templates';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -192,6 +194,9 @@ export function useActions(params?: Params) {
 
     navigate('/purchase_orders/create?action=clone');
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
+
 
   return [
     (invoice: Invoice) =>
@@ -365,6 +370,24 @@ export function useActions(params?: Params) {
       >
         {t('clone_to_purchase_order')}
       </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <>
+        <ChangeTemplateModal<Invoice>
+          entity="invoice"
+          entities={[invoice]}
+          visible={changeTemplateVisible}
+          setVisible={setChangeTemplateVisible}
+          labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        />
+        )
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdCancel} />}
+        >
+          {t('change_template')}
+        </DropdownElement>
+      </>
     ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) && (
