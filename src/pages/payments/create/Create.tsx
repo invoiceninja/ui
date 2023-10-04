@@ -172,6 +172,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
+          currency_id: current.client?.settings.currency_id
           // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
@@ -513,7 +514,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              value={payment?.type_id}
+              defaultValue={company?.settings?.payment_type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -610,7 +611,7 @@ export default function Create() {
               exchangeRate={payment.exchange_rate.toString() || '1'}
               exchangeCurrencyId={payment.exchange_currency_id || '1'}
               currencyId={payment.currency_id || '1'}
-              amount={payment?.amount}
+              amount={collect(payment?.invoices).sum('amount') as number + payment?.amount ?? 0}
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
                 handleChange('exchange_currency_id', exchangeCurrencyId);

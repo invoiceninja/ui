@@ -175,7 +175,7 @@ export default function Edit() {
         />
       </Element>
 
-      {convertCurrency && payment && (
+      {convertCurrency && (
         <ConvertCurrency
           exchangeRate={payment.exchange_rate.toString() || '1'}
           exchangeCurrencyId={payment.exchange_currency_id || '1'}

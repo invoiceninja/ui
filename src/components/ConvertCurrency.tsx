@@ -56,11 +56,12 @@ export function ConvertCurrency(props: Props) {
             props.onExchangeRateChange(parseFloat(value))
           }
           value={props.exchangeRate}
+          type="number"
         />
       </Element>
 
       <Element leftSide={t('converted_amount')}>
-        <InputField value={props.amount * parseFloat(props.exchangeRate)} />
+        <InputField value={props.amount * parseFloat(props.exchangeRate)} type="number"/>
       </Element>
     </>
   );
