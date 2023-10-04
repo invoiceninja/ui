@@ -40,7 +40,7 @@ export default function Edit() {
 
   const { setPayment, payment, errors } = context;
 
-  const [convertCurrency, setConvertCurrency] = useState(Boolean(payment?.exchange_currency_id) ? true : false);
+  const [convertCurrency, setConvertCurrency] = useState(Boolean(payment?.exchange_currency_id));
 
   const company = useCurrentCompany();
 
