@@ -203,6 +203,8 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
+
+    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);
@@ -600,7 +602,11 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                handleChange('exchange_currency_id', '');
+                if(!value)
+                  handleChange('exchange_currency_id', '');
+                else
+                  handleChange('exchange_currency_id', '1')
+
                 handleChange('exchange_rate', 1);
               }}
             />
@@ -609,7 +615,7 @@ export default function Create() {
           {convertCurrency && payment && (
             <ConvertCurrency
               exchangeRate={payment.exchange_rate.toString() || '1'}
-              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id}
               currencyId={payment.currency_id || '1'}
               amount={collect(payment?.invoices).sum('amount') as number + payment?.amount ?? 0}
               onChange={(exchangeRate, exchangeCurrencyId) => {
