@@ -32,9 +32,13 @@ import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 import { useReverseInvoice } from './useReverseInvoice';
+import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Dispatch, SetStateAction } from 'react';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
+
+  const documentsBulk = useDocumentsBulk();
 
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
@@ -44,6 +48,14 @@ export const useCustomBulkActions = () => {
   const bulk = useBulk();
 
   const reverseInvoice = useReverseInvoice();
+
+  const getDocumentsIds = (invoices: Invoice[]) => {
+    return invoices.flatMap(({ documents }) => documents.map(({ id }) => id));
+  };
+
+  const shouldShowDownloadDocuments = (invoices: Invoice[]) => {
+    return invoices.every(({ is_deleted }) => !is_deleted);
+  };
 
   const showAutoBillAction = (invoices: Invoice[]) => {
     return !invoices.some((invoice) => !isInvoiceAutoBillable(invoice));
@@ -97,6 +109,16 @@ export const useCustomBulkActions = () => {
         is_deleted ||
         archived_at
     );
+  };
+
+  const handleDownloadDocuments = (
+    selectedInvoices: Invoice[],
+    setSelected?: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const invoiceIds = getDocumentsIds(selectedInvoices);
+
+    documentsBulk(invoiceIds, 'download');
+    setSelected?.([]);
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
@@ -157,18 +179,20 @@ export const useCustomBulkActions = () => {
           {t('mark_paid')}
         </DropdownElement>
       ),
-    (selectedIds, selectedInvoices) => (
-      <DropdownElement
-        onClick={() =>
-          selectedInvoices && shouldDownloadDocuments(selectedInvoices)
-            ? bulk(selectedIds, 'download')
-            : toast.error('no_documents_to_download')
-        }
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('documents')}
-      </DropdownElement>
-    ),
+    (_, selectedInvoices, setSelected) =>
+      selectedInvoices &&
+      shouldShowDownloadDocuments(selectedInvoices) && (
+        <DropdownElement
+          onClick={() =>
+            shouldDownloadDocuments(selectedInvoices)
+              ? handleDownloadDocuments(selectedInvoices, setSelected)
+              : toast.error('no_documents_to_download')
+          }
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('documents')}
+        </DropdownElement>
+      ),
     (_, selectedInvoices) =>
       selectedInvoices &&
       showReverseOption(selectedInvoices) && (
