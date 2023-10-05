@@ -140,6 +140,15 @@ export default function Create() {
             }
             checked={design?.entities.includes('invoice')}
           />
+
+          <Checkbox
+            label={t('payment')}
+            value="payment"
+            onValueChange={(value, checked) =>
+              handleResourceChange(value, Boolean(checked))
+            }
+            checked={design?.entities.includes('payment')}
+          />
         </Element>
       </Card>
     </Container>
