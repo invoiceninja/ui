@@ -61,6 +61,8 @@ export function ChangeTemplateModal<T = any>({
 
     toast.success();
 
+    return;
+
     request('POST', `/api/v1/:entity/templates`, {
       ids: ids,
       entity,
