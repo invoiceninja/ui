@@ -34,6 +34,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -43,6 +44,8 @@ export function UserDetails() {
   const tabs = useUserDetailsTabs();
 
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const [checkVerification, setCheckVerification] = useState<boolean>(false);
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -93,6 +96,10 @@ export function UserDetails() {
       .then((response) => {
         toast.success('updated_settings');
 
+        if (response[0].data.data.phone !== user?.phone) {
+          setCheckVerification(true);
+        }
+
         dispatch(updateUser(response[0].data.data));
 
         window.dispatchEvent(new CustomEvent('user.updated'));
@@ -120,25 +127,32 @@ export function UserDetails() {
   }, [user]);
 
   return (
-    <Settings
-      onSaveClick={() => setPasswordConfirmModalOpen(true)}
-      onCancelClick={() => dispatch(resetChanges())}
-      title={t('user_details')}
-      breadcrumbs={pages}
-      docsLink="en/basic-settings/#user_details"
-      withoutBackButton
-    >
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={onSave}
+    <>
+      <Settings
+        onSaveClick={() => setPasswordConfirmModalOpen(true)}
+        onCancelClick={() => dispatch(resetChanges())}
+        title={t('user_details')}
+        breadcrumbs={pages}
+        docsLink="en/basic-settings/#user_details"
+        withoutBackButton
+      >
+        <PasswordConfirmation
+          show={isPasswordConfirmModalOpen}
+          onClose={setPasswordConfirmModalOpen}
+          onSave={onSave}
+        />
+
+        <Tabs tabs={tabs} className="mt-6" />
+
+        <div className="my-4">
+          <Outlet context={errors} />
+        </div>
+      </Settings>
+
+      <TwoFactorAuthenticationModals
+        checkVerification={checkVerification}
+        setCheckVerification={setCheckVerification}
       />
-
-      <Tabs tabs={tabs} className="mt-6" />
-
-      <div className="my-4">
-        <Outlet context={errors} />
-      </div>
-    </Settings>
+    </>
   );
 }
