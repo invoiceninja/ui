@@ -154,7 +154,7 @@ export function CustomTemplateSelector({
   });
 
   return (
-    <SelectField {...props}>
+    <SelectField withBlank {...props}>
       {designs?.map((design, i) => (
         <option key={i} value={design.id}>
           {design.name}
