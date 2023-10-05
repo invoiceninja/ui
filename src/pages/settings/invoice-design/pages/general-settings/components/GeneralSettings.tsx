@@ -26,6 +26,7 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { CustomTemplateSelector } from '../../custom-designs/helpers/templates';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -965,54 +966,50 @@ export function GeneralSettings() {
       {/* --------- */}
 
       <Element leftSide={t('delivery_note_design')}>
-          <SelectField
-            id="settings.delivery_note_design_id"
-            value={company?.settings?.delivery_note_design_id || 'VolejRejNm'}
-            // onValueChange={(value) =>
-              // handleChange('delivery_note_design_id', value)
-            // }
-            errorMessage={errors?.errors['settings.delivery_note_design_id']}
-          >
-          </SelectField>
+        <CustomTemplateSelector
+          entity="invoice"
+          id="settings.delivery_note_design_id"
+          value={company?.settings?.delivery_note_design_id || 'VolejRejNm'}
+          errorMessage={errors?.errors['settings.delivery_note_design_id']}
+          onValueChange={(value) =>
+            handleChange('delivery_note_design_id', value)
+          }
+        />
       </Element>
 
       <Element leftSide={t('statement_design')}>
-          <SelectField
-            id="settings.statement_design_id"
-            value={company?.settings?.statement_design_id || 'VolejRejNm'}
-            // onValueChange={(value) =>
-              // handleChange('statement_design_id', value)
-            // }
-            errorMessage={errors?.errors['settings.statement_design_id']}
-          >
-          </SelectField>
+        <CustomTemplateSelector
+          entity="invoice"
+          id="settings.statement_design_id"
+          value={company?.settings?.statement_design_id || 'VolejRejNm'}
+          errorMessage={errors?.errors['settings.statement_design_id']}
+          onValueChange={(value) => handleChange('statement_design_id', value)}
+        />
       </Element>
 
       <Element leftSide={t('payment_receipt_design')}>
-          <SelectField
-            id="settings.payment_receipt_design_id"
-            value={company?.settings?.payment_receipt_design_id || 'VolejRejNm'}
-            // onValueChange={(value) =>
-              // handleChange('payment_receipt_design_id', value)
-            // }
-            errorMessage={errors?.errors['settings.payment_receipt_design_id']}
-          >
-          </SelectField>
+        <CustomTemplateSelector
+          entity="payment"
+          id="settings.payment_receipt_design_id"
+          value={company?.settings?.payment_receipt_design_id || 'VolejRejNm'}
+          errorMessage={errors?.errors['settings.payment_receipt_design_id']}
+          onValueChange={(value) =>
+            handleChange('payment_receipt_design_id', value)
+          }
+        />
       </Element>
 
       <Element leftSide={t('payment_refund_design')}>
-          <SelectField
-            id="settings.payment_refund_design_id"
-            value={company?.settings?.payment_refund_design_id || 'VolejRejNm'}
-            // onValueChange={(value) =>
-              // handleChange('payment_refund_design_id', value)
-            // }
-            errorMessage={errors?.errors['settings.payment_refund_design_id']}
-          >
-          </SelectField>
+        <CustomTemplateSelector
+          entity="payment"
+          id="settings.payment_refund_design_id"
+          value={company?.settings?.payment_refund_design_id || 'VolejRejNm'}
+          errorMessage={errors?.errors['settings.payment_refund_design_id']}
+          onValueChange={(value) =>
+            handleChange('payment_refund_design_id', value)
+          }
+        />
       </Element>
-
-      {/* --------- */}
 
       <Element leftSide={t('page_layout')}>
         <SelectField
