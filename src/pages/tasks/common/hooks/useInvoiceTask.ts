@@ -170,7 +170,7 @@ export function useInvoiceTask() {
 
         if (parsed.length) {
           item.notes =
-            projectName + '### ' + task?.description + ' ' + parsed.join(' ');
+            projectName + task?.description + ' ' + parsed.join(' ');
         }
 
         if (typeof invoice.line_items === 'string') {
