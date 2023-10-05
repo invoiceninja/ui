@@ -20,6 +20,7 @@ import collect from 'collect.js';
 import { atom } from 'jotai';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 
 export const changeTemplateModalAtom = atom<boolean>(false);
 
@@ -42,6 +43,8 @@ export function ChangeTemplateModal<T = any>({
   const [designId, setDesignId] = useState<string | null>(null);
   const [sendEmail, setSendEmail] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const $changeTemplate = () => {
     const ids = collect(entities).pluck('id').toArray();
 
@@ -58,12 +61,30 @@ export function ChangeTemplateModal<T = any>({
 
     toast.success();
 
-    return;
-
     request('POST', `/api/v1/:entity/templates`, {
       ids: ids,
       entity,
-    }).then(() => toast.success());
+    }).then((response) => {
+      if (response.status === 200) {
+        return toast.success();
+      }
+
+      const hash = response.data.message as string;
+
+      queryClient
+        .fetchQuery({
+          queryKey: ['reports', hash],
+          queryFn: () =>
+            request('POST', endpoint(`/api/v1/:entity/templates/${hash}`)).then(
+              (response) => response.data
+            ),
+          retry: 10,
+          retryDelay: import.meta.env.DEV ? 1000 : 5000,
+        })
+        .then(() => {
+          toast.success();
+        });
+    });
   };
 
   return (
