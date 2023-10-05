@@ -172,6 +172,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
+          currency_id: current.client?.settings.currency_id
           // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
@@ -202,6 +203,8 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
+
+    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);
@@ -278,7 +281,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/invoices?payable=${payment.client_id}`
+                            `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -286,6 +289,7 @@ export default function Create() {
                         label: 'number',
                         id: 'id',
                         value: 'id',
+                        searchable: 'number',
                       }}
                       onChange={(entry) =>
                         entry.resource
@@ -345,7 +349,7 @@ export default function Create() {
               <ComboboxAsync<Invoice>
                 endpoint={
                   new URL(
-                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
                   )
                 }
                 inputOptions={{
@@ -355,6 +359,7 @@ export default function Create() {
                   id: 'id',
                   value: 'id',
                   label: 'name',
+                  searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
@@ -391,7 +396,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/credits?client_id=${payment.client_id}`
+                            `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -399,6 +404,7 @@ export default function Create() {
                         id: 'id',
                         value: 'id',
                         label: 'number',
+                        searchable: 'number',
                         dropdownLabelFn: (credit) =>
                           `${t('credit')} #${credit.number} - ${t(
                             'balance'
@@ -476,6 +482,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
+                  searchable: 'number',
                   dropdownLabelFn: (credit) =>
                     `${t('credit')} #${credit.number} - ${t(
                       'balance'
@@ -509,7 +516,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              value={payment?.type_id}
+              defaultValue={company?.settings?.payment_type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -595,7 +602,11 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                handleChange('exchange_currency_id', '');
+                if(!value)
+                  handleChange('exchange_currency_id', '');
+                else
+                  handleChange('exchange_currency_id', '1')
+
                 handleChange('exchange_rate', 1);
               }}
             />
@@ -604,9 +615,9 @@ export default function Create() {
           {convertCurrency && payment && (
             <ConvertCurrency
               exchangeRate={payment.exchange_rate.toString() || '1'}
-              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id}
               currencyId={payment.currency_id || '1'}
-              amount={payment?.amount}
+              amount={collect(payment?.invoices).sum('amount') as number + payment?.amount ?? 0}
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
                 handleChange('exchange_currency_id', exchangeCurrencyId);
