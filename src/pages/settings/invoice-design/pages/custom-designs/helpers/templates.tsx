@@ -14,7 +14,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Design } from '$app/common/interfaces/design';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
-import { Button, SelectField } from '$app/components/forms';
+import { Button, SelectField, SelectProps } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import Toggle from '$app/components/forms/Toggle';
 import collect from 'collect.js';
@@ -134,16 +134,13 @@ export function ChangeTemplateModal<T = any>({
   );
 }
 
-interface CustomTemplateSelectorProps {
+interface CustomTemplateSelectorProps extends SelectProps {
   entity: string;
-  value: string;
-  onValueChange: (value: string) => void;
 }
 
 export function CustomTemplateSelector({
   entity,
-  value,
-  onValueChange,
+  ...props
 }: CustomTemplateSelectorProps) {
   const { t } = useTranslation();
   const { data: designs } = useQuery<Design[]>({
@@ -157,12 +154,7 @@ export function CustomTemplateSelector({
   });
 
   return (
-    <SelectField
-      value={value}
-      onValueChange={onValueChange}
-      label={t('design')}
-      withBlank
-    >
+    <SelectField {...props}>
       {designs?.map((design, i) => (
         <option key={i} value={design.id}>
           {design.name}
