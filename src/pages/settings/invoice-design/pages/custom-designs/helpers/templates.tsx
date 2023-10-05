@@ -11,16 +11,17 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { Design } from '$app/common/interfaces/design';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
-import { Button } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import Toggle from '$app/components/forms/Toggle';
 import collect from 'collect.js';
 import { atom } from 'jotai';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 
 export const changeTemplateModalAtom = atom<boolean>(false);
 
@@ -130,5 +131,43 @@ export function ChangeTemplateModal<T = any>({
         {t('generate_template')}
       </Button>
     </Modal>
+  );
+}
+
+interface CustomTemplateSelectorProps {
+  entity: string;
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+export function CustomTemplateSelector({
+  entity,
+  value,
+  onValueChange,
+}: CustomTemplateSelectorProps) {
+  const { t } = useTranslation();
+  const { data: designs } = useQuery<Design[]>({
+    queryKey: ['designs', entity],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(`/api/v1/designs?template=true&entity=${entity}`)
+      ).then((response) => response.data.data),
+    staleTime: Infinity,
+  });
+
+  return (
+    <SelectField
+      value={value}
+      onValueChange={onValueChange}
+      label={t('design')}
+      withBlank
+    >
+      {designs?.map((design, i) => (
+        <option key={i} value={design.id}>
+          {design.name}
+        </option>
+      ))}
+    </SelectField>
   );
 }
