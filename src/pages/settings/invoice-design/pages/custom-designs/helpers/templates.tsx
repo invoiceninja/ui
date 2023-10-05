@@ -60,7 +60,12 @@ export function ChangeTemplateModal<T = any>({
   };
 
   return (
-    <Modal title={t('change_template')} visible={visible} onClose={setVisible}>
+    <Modal
+      title={t('change_template')}
+      visible={visible}
+      onClose={setVisible}
+      size="regular"
+    >
       <Element leftSide={t('design')} noExternalPadding>
         <ComboboxAsync
           endpoint={
@@ -86,7 +91,7 @@ export function ChangeTemplateModal<T = any>({
       </ul>
 
       <Button behavior="button" onClick={$changeTemplate}>
-        {t('run_template')}
+        {t('generate_template')}
       </Button>
     </Modal>
   );
