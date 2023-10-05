@@ -89,19 +89,22 @@ export function EmailSettings() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length === 0) {
-      toast.error('invalid_file');
-      return;
-    }
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) {
+        toast.error('invalid_file');
+        return;
+      }
 
-    formData.append('e_invoice_certificate', acceptedFiles[0]);
-    formData.append('_method', 'PUT');
+      formData.append('e_invoice_certificate', acceptedFiles[0]);
+      formData.append('_method', 'PUT');
 
-    setFormData(formData);
+      setFormData(formData);
 
-    formik.submitForm();
-  }, []);
+      formik.submitForm();
+    },
+    [formData]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
