@@ -116,32 +116,30 @@ export default function Edit() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  const actions = useActions();
+  const actions = useActions({ excludeCommonActions: true });
   const save = useHandleSave(setErrors);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => invoice && save(invoice)}
-      disableSaveButton={
-        invoice &&
-        (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
-      }
       navigationTopRight={
         invoice && (
-          <>
-            <Button
-              className="flex space-x-2"
-              behavior="button"
-              onClick={() =>
-                navigate(route('/invoices/:id/email', { id: invoice.id }))
-              }
-            >
-              <Icon element={MdSend} color={colors.$1} />
-              <span>{t('email_invoice')}</span>
-            </Button>
-
+          <ResourceActions
+            resource={invoice}
+            actions={actions}
+            onSaveClick={() => invoice && save(invoice)}
+            disableSaveButton={
+              invoice &&
+              (invoice.status_id === InvoiceStatus.Cancelled ||
+                invoice.is_deleted)
+            }
+          />
+        )
+      }
+      topRight={
+        invoice && (
+          <div className="flex space-x-3">
             {invoice.status_id === InvoiceStatus.Draft &&
               !invoice.is_deleted && (
                 <Button
@@ -154,12 +152,17 @@ export default function Edit() {
                 </Button>
               )}
 
-            <ResourceActions
-              label={t('more_actions')}
-              resource={invoice}
-              actions={actions}
-            />
-          </>
+            <Button
+              className="flex space-x-2"
+              behavior="button"
+              onClick={() =>
+                navigate(route('/invoices/:id/email', { id: invoice.id }))
+              }
+            >
+              <Icon element={MdSend} color={colors.$1} />
+              <span>{t('email_invoice')}</span>
+            </Button>
+          </div>
         )
       }
     >
