@@ -15,6 +15,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import {
   MdCancel,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -207,9 +208,9 @@ export const useCustomBulkActions = () => {
 
         <DropdownElement
           onClick={() => setChangeTemplateVisible(true)}
-          icon={<Icon element={MdCancel} />}
+          icon={<Icon element={MdDesignServices} />}
         >
-          {t('change_template')}
+          {t('run_template')}
         </DropdownElement>
       </>
     ),

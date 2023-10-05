@@ -34,6 +34,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdMarkEmailRead,
@@ -380,12 +381,12 @@ export function useActions(params?: Params) {
           setVisible={setChangeTemplateVisible}
           labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
         />
-        )
+
         <DropdownElement
           onClick={() => setChangeTemplateVisible(true)}
-          icon={<Icon element={MdCancel} />}
+          icon={<Icon element={MdDesignServices} />}
         >
-          {t('change_template')}
+          {t('run_template')}
         </DropdownElement>
       </>
     ),

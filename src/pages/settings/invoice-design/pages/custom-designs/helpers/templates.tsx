@@ -86,7 +86,7 @@ export function ChangeTemplateModal<T = any>({
       </ul>
 
       <Button behavior="button" onClick={$changeTemplate}>
-        {t('change_template')}
+        {t('run_template')}
       </Button>
     </Modal>
   );
