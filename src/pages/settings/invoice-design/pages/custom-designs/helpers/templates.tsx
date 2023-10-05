@@ -15,6 +15,7 @@ import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
+import Toggle from '$app/components/forms/Toggle';
 import collect from 'collect.js';
 import { atom } from 'jotai';
 import { ReactNode, useState } from 'react';
@@ -39,6 +40,7 @@ export function ChangeTemplateModal<T = any>({
 }: Props<T>) {
   const [t] = useTranslation();
   const [designId, setDesignId] = useState<string | null>(null);
+  const [sendEmail, setSendEmail] = useState(false);
 
   const $changeTemplate = () => {
     const ids = collect(entities).pluck('id').toArray();
@@ -46,7 +48,12 @@ export function ChangeTemplateModal<T = any>({
     toast.processing();
 
     alert(
-      `Applying template ${designId} to ${JSON.stringify(ids)} - ${entity}`
+      JSON.stringify({
+        ids,
+        entity,
+        design_id: designId,
+        send_email: sendEmail,
+      })
     );
 
     toast.success();
@@ -64,7 +71,7 @@ export function ChangeTemplateModal<T = any>({
       title={t('change_template')}
       visible={visible}
       onClose={setVisible}
-      size="regular"
+      size="small"
     >
       <Element leftSide={t('design')} noExternalPadding>
         <ComboboxAsync
@@ -89,6 +96,12 @@ export function ChangeTemplateModal<T = any>({
           <li key={i}>{labelFn(entity)}</li>
         ))}
       </ul>
+
+      <Toggle
+        label={t('send_email')}
+        checked={sendEmail}
+        onChange={setSendEmail}
+      />
 
       <Button behavior="button" onClick={$changeTemplate}>
         {t('generate_template')}
