@@ -98,7 +98,8 @@ export function Preview() {
 
     copy.rows = copy.rows.filter((sub) =>
       sub.some((item) => {
-        if (item.id !== column) {
+
+        if (item.identifier !== column) {
           return false;
         }
 
