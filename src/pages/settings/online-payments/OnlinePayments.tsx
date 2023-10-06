@@ -30,11 +30,14 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   useTitle('online_payments');
 
@@ -85,7 +88,7 @@ export function OnlinePayments() {
       <Card title={t('settings')}>
         <Element leftSide={t('auto_bill_standard_invoices')}>
           <Toggle
-            checked={company?.settings?.auto_bill_standard_invoices || false}
+            checked={Boolean(company?.settings?.auto_bill_standard_invoices)}
             onChange={(value) =>
               handleChangeProperty(
                 'settings.auto_bill_standard_invoices',
@@ -146,7 +149,7 @@ export function OnlinePayments() {
           <>
             <Element leftSide={t('payment_terms')}>
               <SelectField
-                value={company?.settings?.payment_terms}
+                value={company?.settings?.payment_terms || ''}
                 id="settings.payment_terms"
                 onChange={handleChange}
                 errorMessage={errors?.errors['settings.payment_terms']}
@@ -208,24 +211,26 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('enable_applying_payments')}>
-          <Toggle
-            label={t('enable_applying_payments_help')}
-            id="allow_over_payment"
-            checked={company?.enable_applying_payments || false}
-            onChange={(value) =>
-              handleChangeProperty('enable_applying_payments', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element leftSide={t('enable_applying_payments')}>
+            <Toggle
+              label={t('enable_applying_payments_help')}
+              id="allow_over_payment"
+              checked={Boolean(company?.enable_applying_payments)}
+              onChange={(value) =>
+                handleChangeProperty('enable_applying_payments', value)
+              }
+            />
+          </Element>
+        )}
 
         <Element leftSide={t('allow_over_payment')}>
           <Toggle
             label={t('allow_over_payment_help')}
             id="allow_over_payment"
-            checked={
-              company?.settings.client_portal_allow_over_payment || false
-            }
+            checked={Boolean(
+              company?.settings.client_portal_allow_over_payment
+            )}
             onChange={(value) =>
               handleChangeProperty(
                 'settings.client_portal_allow_over_payment',
@@ -239,9 +244,9 @@ export function OnlinePayments() {
           <Toggle
             label={t('allow_under_payment_help')}
             id="allow_under_payment"
-            checked={
-              company?.settings.client_portal_allow_under_payment || false
-            }
+            checked={Boolean(
+              company?.settings.client_portal_allow_under_payment
+            )}
             onChange={(value) =>
               handleChangeProperty(
                 'settings.client_portal_allow_under_payment',
@@ -253,7 +258,9 @@ export function OnlinePayments() {
         {company?.settings.client_portal_allow_under_payment && (
           <Element leftSide={t('minimum_under_payment_amount')}>
             <InputField
-              value={company?.settings.client_portal_under_payment_minimum}
+              value={
+                company?.settings.client_portal_under_payment_minimum || ''
+              }
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_portal_under_payment_minimum',
@@ -271,7 +278,7 @@ export function OnlinePayments() {
           <Toggle
             label={t('client_initiated_payments_help')}
             id="client_initiated_payments"
-            checked={company?.settings.client_initiated_payments || false}
+            checked={Boolean(company?.settings.client_initiated_payments)}
             onChange={(value) =>
               handleChangeProperty('settings.client_initiated_payments', value)
             }
@@ -281,7 +288,7 @@ export function OnlinePayments() {
         {company?.settings.client_initiated_payments && (
           <Element leftSide={t('minimum_payment_amount')}>
             <InputField
-              value={company?.settings.client_initiated_payments_minimum}
+              value={company?.settings.client_initiated_payments_minimum || ''}
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_initiated_payments_minimum',

@@ -28,7 +28,7 @@ export class InvoiceItemSum {
   constructor(
     protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
-  ) {}
+  ) { }
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -57,7 +57,7 @@ export class InvoiceItemSum {
   }
 
   protected sumLineItem() {
-    this.item.line_total = this.item.cost * this.item.quantity;
+    this.item.line_total = this.item.cost * this.item.quantity + .000000000000004;
 
     return this;
   }
@@ -83,8 +83,6 @@ export class InvoiceItemSum {
       this.item.line_total -
       this.item.line_total * (this.invoice.discount / 100);
 
-    //
-
     const itemTaxRateOneLocal = this.calculateAmountLineTax(
       this.item.tax_rate1,
       amount
@@ -108,8 +106,6 @@ export class InvoiceItemSum {
     if (this.item.tax_name2.length >= 1) {
       this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
     }
-
-    //
 
     const itemTaxRateThreeLocal = this.calculateAmountLineTax(
       this.item.tax_rate3,
@@ -144,7 +140,9 @@ export class InvoiceItemSum {
   }
 
   protected push() {
-    this.subTotal += this.item.line_total;
+    //why? because dealing with floating point maths hurts. Epsilon does not cover the edge cases, but this does.
+    this.subTotal += parseFloat((this.item.line_total + .000000000000004).toFixed(this.currency.precision));
+    this.subTotal = parseFloat((this.subTotal).toFixed(this.currency.precision));
 
     this.grossSubTotal += this.item.gross_line_total;
 
@@ -156,69 +154,78 @@ export class InvoiceItemSum {
   public calculateTaxesWithAmountDiscount() {
     this.taxCollection = collect();
 
-    let itemTax = 0;
+    this.totalTaxes = 0;
 
     this.lineItems
-      .filter((item) => item.line_total > 0)
-      .map((item) => {
+      // .filter((item) => item.line_total > 0)
+      .map((item, index: number) => {
+
+        let itemTax = 0;
         this.item = item;
 
-        const amount =
-          this.subTotal > 0
-            ? this.item.line_total -
-              this.item.line_total * (this.invoice.discount / this.subTotal)
-            : 0;
+        if (item.line_total > 0) {
 
-        const itemTaxRateOneTotal = this.calculateAmountLineTax(
-          this.item.tax_rate1,
-          amount
-        );
+          const amount =
+            this.subTotal > 0
+              ? this.item.line_total -
+              this.invoice.discount * (this.item.line_total / this.subTotal)
+              : 0;
 
-        itemTax += itemTaxRateOneTotal;
-
-        if (itemTaxRateOneTotal !== 0) {
-          this.groupTax(
-            this.item.tax_name1,
+          const itemTaxRateOneTotal = this.calculateAmountLineTax(
             this.item.tax_rate1,
-            itemTaxRateOneTotal
+            amount
           );
-        }
 
-        //
+          itemTax += itemTaxRateOneTotal;
 
-        const itemTaxRateTwoTotal = this.calculateAmountLineTax(
-          this.item.tax_rate2,
-          amount
-        );
+          if (itemTaxRateOneTotal !== 0) {
+            this.groupTax(
+              this.item.tax_name1,
+              this.item.tax_rate1,
+              itemTaxRateOneTotal
+            );
+          }
 
-        itemTax += itemTaxRateTwoTotal;
+          //
 
-        if (itemTaxRateTwoTotal !== 0) {
-          this.groupTax(
-            this.item.tax_name2,
+          const itemTaxRateTwoTotal = this.calculateAmountLineTax(
             this.item.tax_rate2,
-            itemTaxRateTwoTotal
+            amount
           );
-        }
 
-        //
+          itemTax += itemTaxRateTwoTotal;
 
-        const itemTaxRateThree = this.calculateAmountLineTax(
-          this.item.tax_rate3,
-          amount
-        );
+          if (itemTaxRateTwoTotal !== 0) {
+            this.groupTax(
+              this.item.tax_name2,
+              this.item.tax_rate2,
+              itemTaxRateTwoTotal
+            );
+          }
 
-        itemTax += itemTaxRateThree;
+          //
 
-        if (itemTaxRateThree !== 0) {
-          this.groupTax(
-            this.item.tax_name3,
+          const itemTaxRateThree = this.calculateAmountLineTax(
             this.item.tax_rate3,
-            itemTaxRateThree
+            amount
           );
-        }
-      });
 
-    this.totalTaxes = itemTax;
+          itemTax += itemTaxRateThree;
+
+          if (itemTaxRateThree !== 0) {
+            this.groupTax(
+              this.item.tax_name3,
+              this.item.tax_rate3,
+              itemTaxRateThree
+            );
+          }
+
+          this.item.gross_line_total = this.item.line_total + itemTax;
+          this.item.tax_amount = itemTax;
+        }
+
+        this.lineItems[index] = this.item;
+        this.totalTaxes += itemTax;
+      });
   }
 }

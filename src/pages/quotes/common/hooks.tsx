@@ -87,6 +87,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -152,14 +153,14 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     setQuote((current) => current && { ...current, line_items: lineItems });
   };
 
-  const handleCreateLineItem = () => {
+  const handleCreateLineItem = (typeId: InvoiceItemType) => {
     setQuote(
       (current) =>
         current && {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            { ...blankLineItem(), type_id: typeId },
           ],
         }
     );
@@ -457,11 +458,15 @@ export function useActions() {
     (quote) =>
       quote.status_id !== QuoteStatus.Converted && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'convert_to_invoice')}
+          onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
         >
           {t('convert_to_invoice')}
         </DropdownElement>
+      ),
+    (quote) =>
+      !quote.project_id && (
+        <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
     () => <Divider withoutPadding />,
     (quote) => (
@@ -509,7 +514,7 @@ export function useActions() {
       isEditPage &&
       quote.archived_at === 0 && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'archive')}
+          onClick={() => bulk([quote.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -519,7 +524,7 @@ export function useActions() {
       isEditPage &&
       quote.archived_at > 0 && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'restore')}
+          onClick={() => bulk([quote.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -529,7 +534,7 @@ export function useActions() {
       isEditPage &&
       !quote?.is_deleted && (
         <DropdownElement
-          onClick={() => bulk(quote.id, 'delete')}
+          onClick={() => bulk([quote.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

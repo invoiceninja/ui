@@ -10,6 +10,7 @@
 
 import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props extends CommonProps {
   isLoading?: boolean;
@@ -18,9 +19,13 @@ interface Props extends CommonProps {
 
 export function Tr(props: Props) {
   const { onClick, innerRef, ...otherProps } = props;
+  const colors = useColorScheme();
 
   return (
     <tr
+      style={{
+        backgroundColor: colors.$1,
+      }}
       onClick={(event) =>
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -30,12 +35,10 @@ export function Tr(props: Props) {
       }
       ref={innerRef}
       {...otherProps}
-      className={classNames(
-        `bg-white dark:bg-gray-800 hover:bg-gray-50 ${props.className}`,
-        {
-          'cursor-pointer': onClick,
-        }
-      )}
+      className={classNames(`${props.className}`, {
+        'cursor-pointer': onClick,
+      })}
+      tabIndex={props.tabIndex}
     >
       {props.children}
     </tr>

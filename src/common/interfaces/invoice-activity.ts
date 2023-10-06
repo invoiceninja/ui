@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+
 export interface InvoiceActivity {
   user: Client;
   invoice: Client;
@@ -18,6 +19,7 @@ export interface InvoiceActivity {
   notes: string;
   created_at: number;
   ip: string;
+  recurring_invoice?: Client
 }
 
 export interface Client {

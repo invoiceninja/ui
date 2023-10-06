@@ -8,13 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useCompanyDetailsTabs() {
   const { t } = useTranslation();
 
-  const tabs: Tab[] = [
+  const { isGroupSettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
+
+  let tabs: Tab[] = [
     { name: t('details'), href: '/settings/company_details' },
     { name: t('address'), href: '/settings/company_details/address' },
     {
@@ -34,6 +38,12 @@ export function useCompanyDetailsTabs() {
       href: '/settings/company_details/custom_fields',
     },
   ];
+
+  if (isGroupSettingsActive || isClientSettingsActive) {
+    tabs = tabs.filter(
+      (tab) => tab.name !== t('custom_fields') && tab.name !== t('documents')
+    );
+  }
 
   return tabs;
 }

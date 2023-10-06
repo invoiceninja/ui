@@ -29,6 +29,7 @@ import { useLogin } from './common/hooks';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
+import { useColorScheme } from '$app/common/colors';
 
 export function Login() {
   useTitle('login');
@@ -76,12 +77,14 @@ export function Login() {
     },
   });
 
+  const colors = useColorScheme();
+
   return (
-    <div className="h-screen md:bg-gray-100">
+    <div className="h-screen">
       <Header />
       <div className="flex flex-col items-center">
-        <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
-          <h2 className="text-2xl">{t('login')}</h2>
+        <div className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border" style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}>
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>{t('login')}</h2>
 
           <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField
@@ -161,7 +164,7 @@ export function Login() {
           <>
             <SignInProviders />
 
-            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
               <HostedLinks />
             </div>
           </>

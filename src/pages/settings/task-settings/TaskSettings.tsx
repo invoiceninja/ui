@@ -25,6 +25,7 @@ import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -36,6 +37,8 @@ export function TaskSettings() {
 
   useTitle('task_settings');
   useInjectCompanyChanges();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
@@ -82,161 +85,187 @@ export function TaskSettings() {
           />
         </Element>
 
-        <Element
-          leftSide={t('auto_start_tasks')}
-          leftSideHelp={t('auto_start_tasks_help')}
-        >
-          <Toggle
-            checked={companyChanges?.auto_start_tasks || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('auto_start_tasks', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('auto_start_tasks')}
+            leftSideHelp={t('auto_start_tasks_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.auto_start_tasks)}
+              onChange={(value: boolean) =>
+                handleToggleChange('auto_start_tasks', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('show_task_end_date')}
-          leftSideHelp={t('show_task_end_date_help')}
-        >
-          <Toggle
-            checked={companyChanges?.show_task_end_date || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('show_task_end_date', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('show_task_end_date')}
+            leftSideHelp={t('show_task_end_date_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.show_task_end_date)}
+              onChange={(value: boolean) =>
+                handleToggleChange('show_task_end_date', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('show_task_item_description')}
-          leftSideHelp={t('show_task_item_description_help')}
-        >
-          <Toggle
-            checked={
-              companyChanges?.settings.show_task_item_description || false
-            }
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.show_task_item_description', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('show_task_item_description')}
+            leftSideHelp={t('show_task_item_description_help')}
+          >
+            <Toggle
+              checked={Boolean(
+                companyChanges?.settings.show_task_item_description
+              )}
+              onChange={(value: boolean) =>
+                handleToggleChange('settings.show_task_item_description', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('allow_billable_task_items')}
-          leftSideHelp={t('allow_billable_task_items_help')}
-        >
-          <Toggle
-            checked={
-              companyChanges?.settings.allow_billable_task_items || false
-            }
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.allow_billable_task_items', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('allow_billable_task_items')}
+            leftSideHelp={t('allow_billable_task_items_help')}
+          >
+            <Toggle
+              checked={Boolean(
+                companyChanges?.settings.allow_billable_task_items
+              )}
+              onChange={(value: boolean) =>
+                handleToggleChange('settings.allow_billable_task_items', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Divider />
+        {isCompanySettingsActive && <Divider />}
 
-        <Element
-          leftSide={t('show_tasks_table')}
-          leftSideHelp={t('show_tasks_table_help')}
-        >
-          <Toggle
-            checked={companyChanges?.show_tasks_table || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('show_tasks_table', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('show_tasks_table')}
+            leftSideHelp={t('show_tasks_table_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.show_tasks_table)}
+              onChange={(value: boolean) =>
+                handleToggleChange('show_tasks_table', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('invoice_task_datelog')}
-          leftSideHelp={t('invoice_task_datelog_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_datelog || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_datelog', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('invoice_task_datelog')}
+            leftSideHelp={t('invoice_task_datelog_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_datelog)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_datelog', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('invoice_task_timelog')}
-          leftSideHelp={t('invoice_task_timelog_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_timelog || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_timelog', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('invoice_task_timelog')}
+            leftSideHelp={t('invoice_task_timelog_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_timelog)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_timelog', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('invoice_task_hours')}
-          leftSideHelp={t('invoice_task_hours_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_hours || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_hours', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('invoice_task_hours')}
+            leftSideHelp={t('invoice_task_hours_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_hours)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_hours', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('invoice_task_project')}
-          leftSideHelp={t('invoice_task_project_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_project || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_project', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('invoice_task_project')}
+            leftSideHelp={t('invoice_task_project_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_project)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_project', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('invoice_task_item_description')}
-          leftSideHelp={t('invoice_task_item_description_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_item_description || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_item_description', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('invoice_task_item_description')}
+            leftSideHelp={t('invoice_task_item_description_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_item_description)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_item_description', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('lock_invoiced_tasks')}
-          leftSideHelp={t('lock_invoiced_tasks_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_lock || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_lock', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('lock_invoiced_tasks')}
+            leftSideHelp={t('lock_invoiced_tasks_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_lock)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_lock', value)
+              }
+            />
+          </Element>
+        )}
 
-        <Element
-          leftSide={t('add_documents_to_invoice')}
-          leftSideHelp={t('add_documents_to_invoice_help')}
-        >
-          <Toggle
-            checked={companyChanges?.invoice_task_documents || false}
-            onChange={(value: boolean) =>
-              handleToggleChange('invoice_task_documents', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element
+            leftSide={t('add_documents_to_invoice')}
+            leftSideHelp={t('add_documents_to_invoice_help')}
+          >
+            <Toggle
+              checked={Boolean(companyChanges?.invoice_task_documents)}
+              onChange={(value: boolean) =>
+                handleToggleChange('invoice_task_documents', value)
+              }
+            />
+          </Element>
+        )}
 
         <Divider />
 
         <Element leftSide={t('show_tasks_in_client_portal')}>
           <Toggle
-            checked={companyChanges?.settings?.enable_client_portal_tasks}
+            checked={Boolean(
+              companyChanges?.settings?.enable_client_portal_tasks
+            )}
             onChange={(value: boolean) =>
               handleToggleChange('settings.enable_client_portal_tasks', value)
             }
@@ -252,7 +281,10 @@ export function TaskSettings() {
                 ? false
                 : true
             }
-            value={companyChanges?.settings?.show_all_tasks_client_portal.toString()}
+            value={
+              companyChanges?.settings?.show_all_tasks_client_portal?.toString() ||
+              'invoiced'
+            }
             errorMessage={
               errors?.errors['settings.show_all_tasks_client_portal']
             }
@@ -264,7 +296,7 @@ export function TaskSettings() {
         </Element>
       </Card>
 
-      <TaskStatuses />
+      {isCompanySettingsActive && <TaskStatuses />}
     </Settings>
   );
 }

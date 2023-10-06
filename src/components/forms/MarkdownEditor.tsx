@@ -12,6 +12,7 @@ import { InputLabel } from '$app/components/forms/InputLabel';
 import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   value?: string | undefined;
@@ -39,6 +40,8 @@ export function MarkdownEditor(props: Props) {
     setValue(input || '');
     delayedQuery(input || '');
   };
+
+  const colors = useColorScheme();
 
   return (
     <div className="space-y-4">
@@ -79,8 +82,13 @@ export function MarkdownEditor(props: Props) {
           content_style:
             'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           contextmenu: '',
-          content_css: '/tinymce_6.4.2/tinymce/content.css',
+          content_css:
+            colors.$0 === 'dark'
+              ? 'dark'
+              : '/tinymce_6.4.2/tinymce/content.css',
           body_class: 'h-screen',
+          skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
+          paste_data_images: false,
         }}
         onEditorChange={handleChange}
       />

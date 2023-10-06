@@ -24,6 +24,7 @@ import { Element } from '$app/components/cards/Element';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown, ChevronUp } from 'react-feather';
+import { useColorScheme } from '$app/common/colors';
 
 export interface ButtonOption {
   text: string;
@@ -53,6 +54,7 @@ interface Props {
   collapsed?: boolean;
   childrenClassName?: string;
   withoutHeaderBorder?: boolean;
+  topRight?: ReactNode;
 }
 
 export function Card(props: Props) {
@@ -62,13 +64,20 @@ export function Card(props: Props) {
 
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
+  const colors = useColorScheme();
+
   return (
     <div
       className={classNames(
-        `bg-white shadow rounded overflow-visible ${props.className}`,
+        `border shadow rounded overflow-visible ${props.className}`,
         { 'overflow-y-auto': props.withScrollableBody }
       )}
-      style={props.style}
+      style={{
+        ...props.style,
+        backgroundColor: colors.$1,
+        color: colors.$3,
+        borderColor: colors.$4,
+      }}
     >
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
@@ -77,12 +86,13 @@ export function Card(props: Props) {
               'bg-white sticky top-0': props.withScrollableBody,
               'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
-              'border-b border-gray-200': !props.withoutHeaderBorder,
+              'border-b': !props.withoutHeaderBorder,
             })}
             onClick={() =>
               typeof props.collapsed !== 'undefined' &&
               setIsCollpased(!isCollapsed)
             }
+            style={{ borderColor: colors.$4 }}
           >
             <div
               className={classNames('flex items-center justify-between', {
@@ -92,7 +102,7 @@ export function Card(props: Props) {
             >
               <div>
                 <h3
-                  className={classNames('leading-6 font-medium text-gray-900', {
+                  className={classNames('leading-6 font-medium', {
                     'text-lg': padding == 'regular',
                     'text-md': padding == 'small',
                   })}
@@ -101,11 +111,11 @@ export function Card(props: Props) {
                 </h3>
 
                 {props.description && (
-                  <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                    {props.description}
-                  </p>
+                  <p className="mt-1 max-w-2xl text-sm">{props.description}</p>
                 )}
               </div>
+
+              {props.topRight}
 
               {typeof props.collapsed !== 'undefined' && isCollapsed && (
                 <ChevronDown />
@@ -136,7 +146,7 @@ export function Card(props: Props) {
         </div>
 
         {(props.withSaveButton || props.additionalAction) && (
-          <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <div className="border-t px-4 py-5 sm:p-0" style={{ borderColor: colors.$4 }}>
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
@@ -159,13 +169,13 @@ export function Card(props: Props) {
                       disabled={props.disableSubmitButton}
                       disableWithoutIcon={props.disableWithoutIcon}
                     >
-                      {props.saveButtonLabel ?? t('save')}
+                      {props.saveButtonLabel ?? t('save')} 
                     </Button>
 
                     <Dropdown
                       className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                      cardActions
                       disabled={props.disableSubmitButton}
+                      cardActions
                     >
                       {props.additionalSaveOptions.map((action, i) => (
                         <DropdownElement

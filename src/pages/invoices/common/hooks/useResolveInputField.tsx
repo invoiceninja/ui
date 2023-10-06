@@ -42,6 +42,7 @@ import {
 import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useLocation } from 'react-router-dom';
 
 const numberInputs = [
   'discount',
@@ -50,7 +51,6 @@ const numberInputs = [
   'quantity',
   'rate',
   'hours',
-  'tax_amount',
 ];
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -83,6 +83,8 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const location = useLocation();
+
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
@@ -294,6 +296,7 @@ export function useResolveInputField(props: Props) {
           }
           clearButton
           onClearButtonClick={() => handleProductChange(index, '', null)}
+          displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
       );
     }
@@ -320,7 +323,8 @@ export function useResolveInputField(props: Props) {
               property === 'quantity'
                 ? 6
                 : reactSettings?.number_precision &&
-                  reactSettings?.number_precision > 0
+                  reactSettings?.number_precision > 0 &&
+                  reactSettings?.number_precision <= 100
                 ? reactSettings.number_precision
                 : inputCurrencySeparators?.precision || 2
             }
@@ -340,6 +344,18 @@ export function useResolveInputField(props: Props) {
       );
     }
 
+    if ('gross_line_total' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
+      );
+    }
+
+    if ('tax_amount' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
+      );
+    }
+
     if (taxInputs.includes(property)) {
       return showTaxRateSelector(property as 'tax_rate1', index);
     }
@@ -351,6 +367,31 @@ export function useResolveInputField(props: Props) {
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
       const field = property.replace(
         'product',
+        'custom_value'
+      ) as keyof InvoiceItem;
+
+      return company.custom_fields?.[property] ? (
+        <CustomField
+          field={property}
+          defaultValue={resource?.line_items[index][field]}
+          value={company.custom_fields?.[property]}
+          onValueChange={(value) => onChange(field, value, index)}
+          fieldOnly
+        />
+      ) : (
+        <InputField
+          id={property}
+          value={resource?.line_items[index][property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(property, event.target.value, index)
+          }
+        />
+      );
+    }
+
+    if (['task1', 'task2', 'task3', 'task4'].includes(property)) {
+      const field = property.replace(
+        'task',
         'custom_value'
       ) as keyof InvoiceItem;
 

@@ -15,6 +15,15 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
 import { t } from 'i18next';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+
+const Div = styled.div`
+  border-color: ${(props) => props.theme.borderColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -22,6 +31,12 @@ export function useGenerateActivityElement() {
   const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
+    if (activity.activity_type_id === 4) {
+
+      text = text.replace(":user", `${t('recurring_invoice')} :recurring_invoice`);
+
+    }
+    
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
@@ -132,8 +147,13 @@ export function useGenerateActivityElement() {
     return text;
   };
 
+  const colors = useColorScheme();
+
   return (activity: ActivityRecord) => (
-    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0 hover:bg-gray-50">
+    <Div
+      theme={{ borderColor: colors.$4,  hoverColor: colors.$2 }}
+      className="flex flex-col py-2 border border-t-0 border-x-0 last:border-b-0"
+    >
       <div className="flex flex-col">
         <span className="text-sm">{generate(activity)}</span>
 
@@ -146,6 +166,6 @@ export function useGenerateActivityElement() {
           <span className="text-gray-500 text-sm">{activity.notes}</span>
         </div>
       </div>
-    </div>
+    </Div>
   );
 }

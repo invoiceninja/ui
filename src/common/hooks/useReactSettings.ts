@@ -21,6 +21,7 @@ export interface ReactSettings {
   react_table_columns?: Record<ReactTableColumns, string[]>;
   react_notification_link: boolean;
   number_precision?: number;
+  show_document_preview?: boolean;
   preferences: {
     dashboard_charts: {
       default_view: 'day' | 'week' | 'month';

@@ -32,7 +32,7 @@ export function CustomFields() {
             ['company1', 'company2', 'company3', 'company4'].map((field) => (
               <Field
                 key={field}
-                initialValue={company.custom_fields[field]}
+                initialValue={company.custom_fields[field] || ''}
                 field={field}
                 placeholder={t('company_field')}
                 onChange={(value) => handleCustomFieldChange(field, value)}

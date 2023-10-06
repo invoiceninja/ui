@@ -53,6 +53,9 @@ import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -103,6 +106,10 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
   linkToCreateGuards?: Guard[];
+  onBulkActionSuccess?: (
+    resource: T[],
+    action: 'archive' | 'delete' | 'restore'
+  ) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -248,8 +255,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       action,
       ids: id ? [id] : Array.from(selected),
     })
-      .then(() => {
+      .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${action}d_${props.resource}`);
+
+        props.onBulkActionSuccess?.(response.data.data, action);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
@@ -262,6 +271,11 @@ export function DataTable<T extends object>(props: Props<T>) {
             },
           })
         );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 401) {
+          toast.error(error.response?.data.message);
+        }
       })
       .finally(() => {
         queryClient.invalidateQueries([props.endpoint]);

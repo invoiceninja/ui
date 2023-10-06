@@ -21,11 +21,24 @@ import { companySettingsErrorsAtom } from '../atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
+import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
+
+  const handleUpdateGroupSettings = useHandleUpdate({});
+
+  const updateClientSettings = useUpdateClientSettings();
+
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
   const [, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -36,8 +49,16 @@ export function useHandleCompanySave() {
   const shouldUpdate = useShouldUpdateCompany();
 
   return async (excludeToasters?: boolean) => {
-    if (!shouldUpdate()) {
+    if (!shouldUpdate() && isCompanySettingsActive) {
       return;
+    }
+
+    if (isGroupSettingsActive) {
+      return handleUpdateGroupSettings();
+    }
+
+    if (isClientSettingsActive) {
+      return updateClientSettings();
     }
 
     const adjustedExcludeToaster =

@@ -19,6 +19,7 @@ import {
   useRecurringExpenseColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -35,6 +36,8 @@ export default function RecurringExpenses() {
 
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <Default
       title={t('recurring_expenses')}
@@ -50,6 +53,7 @@ export default function RecurringExpenses() {
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
         customActions={actions}
+        customBulkActions={customBulkActions}
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker

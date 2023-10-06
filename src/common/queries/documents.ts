@@ -34,9 +34,19 @@ export const useDocumentsBulk = () => {
   return (ids: string[], action: 'download') => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/documents?per_page=100'), {
+    request('POST', endpoint('/api/v1/documents/bulk?per_page=100'), {
       action,
       ids,
     }).then(() => toast.success('exported_data'));
+  };
+};
+
+export const useSetDocumentVisibility = () => {
+  return async (id: string, visible: boolean) => {
+    toast.processing();
+
+    return request('PUT', endpoint('/api/v1/documents/:id', { id }), {
+      is_public: visible,
+    }).then(() => toast.success('success'));
   };
 };

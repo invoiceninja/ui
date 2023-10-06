@@ -10,6 +10,13 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+type SettingsLevel = 'company' | 'group' | 'client';
+
+interface ActiveSettings {
+  name: string;
+  level: SettingsLevel;
+}
+
 interface SettingsState {
   colors: {
     primary: string;
@@ -17,6 +24,7 @@ interface SettingsState {
   };
   darkMode: boolean;
   isMiniSidebar: boolean;
+  activeSettings: ActiveSettings;
 }
 
 const initialState: SettingsState = {
@@ -25,6 +33,10 @@ const initialState: SettingsState = {
   },
   darkMode: false,
   isMiniSidebar: false,
+  activeSettings: {
+    name: '',
+    level: 'company',
+  },
 };
 
 export const settingsSlice = createSlice({
@@ -40,8 +52,18 @@ export const settingsSlice = createSlice({
     setIsMiniSidebar: (state, action: PayloadAction<{ status: boolean }>) => {
       state.isMiniSidebar = action.payload.status;
     },
+    setActiveSettings: (
+      state,
+      action: PayloadAction<{ status: ActiveSettings }>
+    ) => {
+      state.activeSettings = action.payload.status;
+    },
   },
 });
 
-export const { updatePrimaryColor, setDarkMode, setIsMiniSidebar } =
-  settingsSlice.actions;
+export const {
+  updatePrimaryColor,
+  setDarkMode,
+  setIsMiniSidebar,
+  setActiveSettings,
+} = settingsSlice.actions;

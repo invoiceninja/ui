@@ -19,6 +19,11 @@ import { useDispatch } from 'react-redux';
 import { Element } from '$app/components/cards';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -27,18 +32,62 @@ export function DeleteLogo() {
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
+
+  const activeSettings = useAtomValue(activeSettingsAtom);
+
+  const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
+  const configureClientSettings = useConfigureClientSettings({
+    withoutNavigation: true,
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: companyChanges,
     onSubmit: () => {
       toast.processing();
 
+      let endpointRoute = '/api/v1/companies/:id';
+
+      let entityId = company.id;
+
+      if (activeSettings) {
+        if (isGroupSettingsActive) {
+          endpointRoute = '/api/v1/group_settings/:id';
+          entityId = activeSettings.id;
+        }
+
+        if (isClientSettingsActive) {
+          endpointRoute = '/api/v1/clients/:id';
+          entityId = activeSettings.id;
+        }
+      }
+
       request(
         'PUT',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
+        endpoint(endpointRoute, { id: entityId }),
         formik.values
       ).then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        if (isCompanySettingsActive) {
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
+        }
+
+        if (isGroupSettingsActive) {
+          configureGroupSettings(response.data.data);
+        }
+
+        if (isClientSettingsActive) {
+          configureClientSettings(response.data.data);
+        }
 
         toast.success('removed_logo');
       });

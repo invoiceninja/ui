@@ -21,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { set } from 'lodash';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -38,31 +40,21 @@ export function CreateVendorForm(props: Props) {
   const [vendor, setVendor] = useState<Vendor>();
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const [contacts, setContacts] = useState<Partial<VendorContact>[]>([
+    {
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      send_email: false,
+    },
+  ]);
+
   useEffect(() => {
     if (data) {
       setVendor({
         ...data,
         country_id: '',
-        contacts: [
-          {
-            id: '',
-            first_name: '',
-            last_name: '',
-            email: '',
-            send_email: true,
-            created_at: 0,
-            updated_at: 0,
-            archived_at: 0,
-            is_primary: false,
-            phone: '',
-            custom_value1: '',
-            custom_value2: '',
-            custom_value3: '',
-            custom_value4: '',
-            link: '',
-            last_login: 0
-          },
-        ],
       });
     }
   }, [data]);
@@ -70,6 +62,7 @@ export function CreateVendorForm(props: Props) {
   const saveCompany = useHandleCompanySave();
 
   const handleSave = async () => {
+    set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
     await saveCompany(true);
@@ -109,7 +102,15 @@ export function CreateVendorForm(props: Props) {
 
   return (
     <>
-      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
+      {vendor && (
+        <Form
+          vendor={vendor}
+          setVendor={setVendor}
+          errors={errors}
+          setContacts={setContacts}
+          contacts={contacts}
+        />
+      )}
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button onClick={handleSave}>{t('save')}</Button>

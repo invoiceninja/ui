@@ -38,6 +38,8 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdNotStarted, MdSend } from 'react-icons/md';
 import dayjs from 'dayjs';
 import { Card } from '$app/components/cards';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
@@ -170,6 +172,8 @@ export default function Create() {
     },
   ];
 
+  const taskColumns = useTaskColumns();
+
   return (
     <Default
       title={documentTitle}
@@ -193,31 +197,62 @@ export default function Create() {
         <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {recurringInvoice && client ? (
-            <ProductsTable
-              type="product"
-              resource={recurringInvoice}
-              items={recurringInvoice.line_items.filter((item) =>
-                [
-                  InvoiceItemType.Product,
-                  InvoiceItemType.UnpaidFee,
-                  InvoiceItemType.PaidFee,
-                  InvoiceItemType.LateFee,
-                ].includes(item.type_id)
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
+            <div>
+              {recurringInvoice && client ? (
+                <ProductsTable
+                  type="product"
+                  resource={recurringInvoice}
+                  items={recurringInvoice.line_items.filter((item) =>
+                    [
+                      InvoiceItemType.Product,
+                      InvoiceItemType.UnpaidFee,
+                      InvoiceItemType.PaidFee,
+                      InvoiceItemType.LateFee,
+                    ].includes(item.type_id)
+                  )}
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Product)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
               )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
-          ) : (
-            <Spinner />
-          )}
-        </div>
+            </div>
 
+            <div>
+              {recurringInvoice && client ? (
+                <ProductsTable
+                  type="task"
+                  resource={recurringInvoice}
+                  items={recurringInvoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
+                  )}
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Task)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          </TabGroup>
+        </div>
         <InvoiceFooter handleChange={handleChange} errors={errors} />
 
         {recurringInvoice && (

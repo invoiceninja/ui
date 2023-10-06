@@ -809,10 +809,10 @@ export function GeneralSettings() {
   };
 
   useEffect(() => {
-    if (company?.settings) {
-      const value = company?.settings.company_logo_size
-        .replaceAll('%', '')
-        .replaceAll('px', '');
+    if (company?.settings && company?.settings.company_logo_size) {
+      const value = company.settings.company_logo_size
+        ?.replaceAll('%', '')
+        ?.replaceAll('px', '');
 
       handleChange('company_logo_size', `${value}${logoSizeType}`);
     }
@@ -1013,9 +1013,9 @@ export function GeneralSettings() {
         <div className="w-full inline-flex items-center space-x-2">
           <div className="w-full">
             <InputField
-              value={company?.settings.company_logo_size
-                .replaceAll('px', '')
-                .replaceAll('%', '')}
+              value={company.settings.company_logo_size
+                ?.replaceAll('px', '')
+                ?.replaceAll('%', '')}
               onValueChange={(value) =>
                 handleChange('company_logo_size', `${value}${logoSizeType}`)
               }
@@ -1070,14 +1070,26 @@ export function GeneralSettings() {
       <Element leftSide={t('primary_color')}>
         <ColorPicker
           value={company?.settings?.primary_color || colors.primary}
-          onValueChange={(value) => handleChange('primary_color', value)}
+          onValueChange={(value) => {
+            const currentColor = company?.settings?.primary_color;
+
+            if ((!currentColor && value !== colors.primary) || currentColor) {
+              handleChange('primary_color', value);
+            }
+          }}
         />
       </Element>
 
       <Element leftSide={t('secondary_color')}>
         <ColorPicker
           value={company?.settings?.secondary_color || colors.secondary}
-          onValueChange={(value) => handleChange('secondary_color', value)}
+          onValueChange={(value) => {
+            const currentColor = company?.settings?.secondary_color;
+
+            if ((!currentColor && value !== colors.secondary) || currentColor) {
+              handleChange('secondary_color', value);
+            }
+          }}
         />
       </Element>
 
@@ -1086,7 +1098,7 @@ export function GeneralSettings() {
       <Element leftSide={t('show_paid_stamp')}>
         <Toggle
           onValueChange={(value) => handleChange('show_paid_stamp', value)}
-          checked={company?.settings.show_paid_stamp}
+          checked={Boolean(company?.settings.show_paid_stamp)}
         />
       </Element>
 
@@ -1095,7 +1107,7 @@ export function GeneralSettings() {
           onValueChange={(value) =>
             handleChange('show_shipping_address', value)
           }
-          checked={company?.settings.show_shipping_address}
+          checked={Boolean(company?.settings.show_shipping_address)}
         />
       </Element>
 
@@ -1114,13 +1126,15 @@ export function GeneralSettings() {
               value === 'true' ? true : false
             )
           }
-          defaultSelected={company?.settings?.hide_empty_columns_on_pdf?.toString()}
+          defaultSelected={
+            company?.settings?.hide_empty_columns_on_pdf?.toString() ?? 'false'
+          }
         />
       </Element>
 
       <Element leftSide={t('page_numbering')}>
         <Toggle
-          checked={company?.settings?.page_numbering}
+          checked={Boolean(company?.settings?.page_numbering)}
           id="settings.page_numbering"
           onChange={(value) => handleChange('page_numbering', value)}
         />
@@ -1130,7 +1144,7 @@ export function GeneralSettings() {
         <SelectField
           id="settings.page_numbering_alignment"
           disabled={company?.settings?.page_numbering ? false : true}
-          value={company?.settings?.page_numbering_alignment?.toString()}
+          value={company?.settings?.page_numbering_alignment?.toString() || 'C'}
           onValueChange={(value) =>
             handleChange('page_numbering_alignment', value)
           }

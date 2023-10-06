@@ -47,7 +47,7 @@ export function RecurringExpenses() {
   const variables = [
     '{$counter}',
     '{$year}',
-    '{$date:format}',
+    '{$date:Y-m-d}',
     '{$user_id}',
     '{$user_custom1}',
     '{$user_custom2}',
@@ -60,7 +60,9 @@ export function RecurringExpenses() {
       <Element leftSide={t('number_pattern')}>
         <InputField
           id="settings.recurring_expense_number_pattern"
-          value={companyChanges?.settings?.recurring_expense_number_pattern}
+          value={
+            companyChanges?.settings?.recurring_expense_number_pattern || ''
+          }
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_expense_number_pattern']
@@ -70,7 +72,9 @@ export function RecurringExpenses() {
       <Element leftSide={t('number_counter')}>
         <InputField
           id="settings.recurring_expense_number_counter"
-          value={companyChanges?.settings?.recurring_expense_number_counter}
+          value={
+            companyChanges?.settings?.recurring_expense_number_counter || ''
+          }
           onChange={handleChange}
           errorMessage={
             errors?.errors['settings.recurring_expense_number_counter']

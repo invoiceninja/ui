@@ -13,13 +13,23 @@ import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { NavigationItem } from './DesktopSidebar';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+
+const Div = styled.div`
+  background-color: ${(props) => props.theme.color};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 
 interface Props {
   item: NavigationItem;
+  colors: ReturnType<typeof useColorScheme>;
 }
 
 export function SidebarItem(props: Props) {
-  const { item } = props;
+  const { item, colors } = props;
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
@@ -30,13 +40,17 @@ export function SidebarItem(props: Props) {
   }
 
   return (
-    <div
+    <Div
+      theme={{
+        color: item.current ? colors.$8 : 'transparent',
+        hoverColor: colors.$8,
+      }}
       key={item.name}
       className={classNames(
         'flex items-center justify-between group px-4 text-sm font-medium',
         item.current
-          ? 'text-white border-l-4 border-transparent bg-ninja-gray-lighter'
-          : 'text-gray-300 hover:text-white border-l-4 border-transparent hover:bg-ninja-gray-lighter'
+          ? 'text-white border-l-4 border-transparent'
+          : 'text-gray-300 border-l-4 border-transparent'
       )}
     >
       <Link to={item.href} className="w-full">
@@ -63,6 +77,6 @@ export function SidebarItem(props: Props) {
           <item.rightButton.icon className="h-5 w-5" />
         </Link>
       )}
-    </div>
+    </Div>
   );
 }

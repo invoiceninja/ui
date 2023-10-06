@@ -46,15 +46,20 @@ import { paymentAtom } from '../common/atoms';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
-  invoices: Paymentable[];
-  credits: Paymentable[];
+  invoices: PaymentInvoice[];
+  credits: PaymentCredit[];
 }
 
-interface Paymentable {
+interface PaymentInvoice {
+  _id: string;
+  amount: number;
+  invoice_id: string;
+}
+
+interface PaymentCredit {
   _id: string;
   amount: number;
   credit_id: string;
-  invoice_id: string;
 }
 
 export default function Create() {
@@ -86,7 +91,10 @@ export default function Create() {
     setPayment((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'enter') {
+      if (
+        searchParams.get('action') !== 'enter' &&
+        searchParams.get('action') !== 'apply'
+      ) {
         value = undefined;
       }
 
@@ -126,7 +134,6 @@ export default function Create() {
                     invoice_id: invoice.id,
                     amount:
                       invoice.balance > 0 ? invoice.balance : invoice.amount,
-                    credit_id: '',
                   },
                 ],
               }
@@ -145,7 +152,6 @@ export default function Create() {
                   _id: v4(),
                   credit_id: credit.id,
                   amount: credit.balance > 0 ? credit.balance : credit.amount,
-                  invoice_id: '',
                 },
               ],
             }
@@ -166,6 +172,7 @@ export default function Create() {
       (current) =>
         current && {
           ...current,
+          currency_id: current.client?.settings.currency_id
           // amount: collect(payment?.invoices).sum('amount') as number,
         }
     );
@@ -196,6 +203,8 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
+
+    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);
@@ -217,17 +226,22 @@ export default function Create() {
               onChange={(client) => {
                 handleChange('client_id', client?.id as string);
                 handleChange('currency_id', client?.settings.currency_id);
+                handleChange('invoices', []);
+                handleChange('credits', []);
               }}
               onClearButtonClick={() => {
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
+                handleChange('invoices', []);
+                handleChange('credits', []);
               }}
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
               readonly={
                 searchParams.has('invoice') ||
-                searchParams.get('action') === 'enter'
+                searchParams.get('action') === 'enter' ||
+                searchParams.get('action') === 'apply'
               }
               initiallyVisible={!payment?.client_id}
             />
@@ -239,6 +253,7 @@ export default function Create() {
           >
             <InputField
               id="amount"
+              type="number"
               value={payment?.amount}
               onValueChange={(value) =>
                 handleChange(
@@ -257,7 +272,7 @@ export default function Create() {
             payment.invoices.map((invoice, index) => (
               <Element key={index}>
                 <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-end space-x-2">
                     <ComboboxAsync<Invoice>
                       inputOptions={{
                         value: invoice.invoice_id,
@@ -266,7 +281,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/invoices?payable=${payment.client_id}`
+                            `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -274,15 +289,24 @@ export default function Create() {
                         label: 'number',
                         id: 'id',
                         value: 'id',
+                        searchable: 'number',
                       }}
                       onChange={(entry) =>
                         entry.resource
                           ? handleExistingInvoiceChange(entry.resource, index)
                           : null
                       }
+                      exclude={collect(
+                        payment.invoices.filter(
+                          ({ invoice_id }) => invoice_id !== invoice.invoice_id
+                        )
+                      )
+                        .pluck('invoice_id')
+                        .toArray()}
                     />
 
                     <InputField
+                      type="number"
                       label={t('amount_received')}
                       onValueChange={(value) =>
                         handleInvoiceInputChange(
@@ -292,12 +316,13 @@ export default function Create() {
                       }
                       className="w-full"
                       value={invoice.amount}
+                      withoutLabelWrapping
                     />
 
                     <Button
                       behavior="button"
                       type="minimal"
-                      className="mt-6"
+                      className="self-center mt-6"
                       onClick={() => handleDeletingInvoice(invoice._id)}
                     >
                       <X />
@@ -324,7 +349,7 @@ export default function Create() {
               <ComboboxAsync<Invoice>
                 endpoint={
                   new URL(
-                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}`)
+                    endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
                   )
                 }
                 inputOptions={{
@@ -334,6 +359,7 @@ export default function Create() {
                   id: 'id',
                   value: 'id',
                   label: 'name',
+                  searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
                       'balance'
@@ -349,6 +375,7 @@ export default function Create() {
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
                   .toArray()}
+                clearInputAfterSelection
               />
             </Element>
           )}
@@ -360,7 +387,7 @@ export default function Create() {
             payment.credits.map((credit, index) => (
               <Element key={index}>
                 <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-end space-x-2">
                     <ComboboxAsync<Credit>
                       inputOptions={{
                         value: credit.credit_id,
@@ -369,7 +396,7 @@ export default function Create() {
                       endpoint={
                         new URL(
                           endpoint(
-                            `/api/v1/credits?client_id=${payment.client_id}`
+                            `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
                           )
                         )
                       }
@@ -377,6 +404,7 @@ export default function Create() {
                         id: 'id',
                         value: 'id',
                         label: 'number',
+                        searchable: 'number',
                         dropdownLabelFn: (credit) =>
                           `${t('credit')} #${credit.number} - ${t(
                             'balance'
@@ -391,9 +419,17 @@ export default function Create() {
                           ? handleExistingCreditChange(entry.resource, index)
                           : null
                       }
+                      exclude={collect(
+                        payment.credits.filter(
+                          ({ credit_id }) => credit_id !== credit.credit_id
+                        )
+                      )
+                        .pluck('credit_id')
+                        .toArray()}
                     />
 
                     <InputField
+                      type="number"
                       label={t('amount')}
                       onValueChange={(value) =>
                         handleCreditInputChange(
@@ -403,12 +439,13 @@ export default function Create() {
                       }
                       className="w-full"
                       value={credit.amount}
+                      withoutLabelWrapping
                     />
 
                     <Button
                       behavior="button"
                       type="minimal"
-                      className="mt-6"
+                      className="self-center mt-6"
                       onClick={() => handleDeletingCredit(credit._id)}
                     >
                       <X />
@@ -445,6 +482,7 @@ export default function Create() {
                   id: 'id',
                   label: 'number',
                   value: 'id',
+                  searchable: 'number',
                   dropdownLabelFn: (credit) =>
                     `${t('credit')} #${credit.number} - ${t(
                       'balance'
@@ -458,6 +496,7 @@ export default function Create() {
                   entry.resource ? handleCreditChange(entry.resource) : null
                 }
                 exclude={collect(payment.credits).pluck('credit_id').toArray()}
+                clearInputAfterSelection
               />
             </Element>
           )}
@@ -477,7 +516,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              value={payment?.type_id}
+              defaultValue={company?.settings?.payment_type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -563,7 +602,11 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                handleChange('exchange_currency_id', '');
+                if(!value)
+                  handleChange('exchange_currency_id', '');
+                else
+                  handleChange('exchange_currency_id', '1')
+
                 handleChange('exchange_rate', 1);
               }}
             />
@@ -572,9 +615,9 @@ export default function Create() {
           {convertCurrency && payment && (
             <ConvertCurrency
               exchangeRate={payment.exchange_rate.toString() || '1'}
-              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id}
               currencyId={payment.currency_id || '1'}
-              amount={payment?.amount}
+              amount={collect(payment?.invoices).sum('amount') as number + payment?.amount ?? 0}
               onChange={(exchangeRate, exchangeCurrencyId) => {
                 handleChange('exchange_rate', exchangeRate);
                 handleChange('exchange_currency_id', exchangeCurrencyId);

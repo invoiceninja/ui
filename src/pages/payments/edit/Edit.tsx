@@ -40,7 +40,7 @@ export default function Edit() {
 
   const { setPayment, payment, errors } = context;
 
-  const [convertCurrency, setConvertCurrency] = useState(false);
+  const [convertCurrency, setConvertCurrency] = useState(Boolean(payment?.exchange_currency_id));
 
   const company = useCurrentCompany();
 
@@ -169,13 +169,16 @@ export default function Edit() {
           onChange={(value) => {
             setConvertCurrency(value);
 
-            handleChange('exchange_currency_id', '');
-            handleChange('exchange_rate', 1);
+            if(!value){
+              handleChange('exchange_currency_id', '');
+              handleChange('exchange_rate', 1);
+            }
+
           }}
         />
       </Element>
 
-      {convertCurrency && payment && (
+      {payment && (Boolean(payment?.exchange_currency_id) || convertCurrency) && (
         <ConvertCurrency
           exchangeRate={payment.exchange_rate.toString() || '1'}
           exchangeCurrencyId={payment.exchange_currency_id || '1'}

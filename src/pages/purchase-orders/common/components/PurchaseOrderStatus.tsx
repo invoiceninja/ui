@@ -40,28 +40,28 @@ export function PurchaseOrderStatus(props: Props) {
     return <Badge variant="orange">{t('archived')}</Badge>;
   }
 
-  if (isViewed && !isCancelled && !isAccepted) {
-    return <Badge variant="yellow">{t('viewed')}</Badge>;
+  if (isCancelled) {
+    return <Badge variant="black">{t('cancelled')}</Badge>;
+  }
+
+  if (status_id === PurchaseOrderStatusEnum.Received) {
+    return <Badge variant="green">{t('received')}</Badge>;
   }
 
   if (isAccepted) {
     return <Badge variant="dark-blue">{t('accepted')}</Badge>;
   }
 
-  if (status_id === PurchaseOrderStatusEnum.Received) {
-    return <Badge variant="purple">{t('received')}</Badge>;
+  if (isSent) {
+    return <Badge variant="light-blue">{t('sent')}</Badge>;
   }
 
   if (isDraft) {
     return <Badge variant="generic">{t('draft')}</Badge>;
   }
 
-  if (isCancelled) {
-    return <Badge variant="black">{t('cancelled')}</Badge>;
-  }
-
-  if (isSent) {
-    return <Badge variant="light-blue">{t('sent')}</Badge>;
+  if (isViewed && !isCancelled && !isAccepted) {
+    return <Badge variant="yellow">{t('viewed')}</Badge>;
   }
 
   return <></>;

@@ -17,6 +17,35 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 
+export const COUNTER_PADDINGS = [
+  '1',
+  '01',
+  '001',
+  '0001',
+  '00001',
+  '000001',
+  '0000001',
+  '00000001',
+  '000000001',
+  '0000000001',
+];
+
+export const RESECT_COUNTER_FREQUENCIES = [
+  'never',
+  'freq_daily',
+  'freq_weekly',
+  'freq_two_weeks',
+  'freq_four_weeks',
+  'freq_monthly',
+  'freq_two_months',
+  'freq_three_months',
+  'freq_four_months',
+  'freq_six_months',
+  'freq_annually',
+  'freq_two_years',
+  'freq_three_years',
+];
+
 export function Settings() {
   const [t] = useTranslation();
 
@@ -30,29 +59,26 @@ export function Settings() {
       <Element leftSide={t('number_padding')}>
         <SelectField
           id="settings.counter_padding"
-          value={companyChanges?.settings?.counter_padding}
+          value={companyChanges?.settings?.counter_padding || '1'}
           onValueChange={(value) =>
             handleChange('settings.counter_padding', value)
           }
           errorMessage={errors?.errors['settings.counter_padding']}
         >
-          <option value="1">1</option>
-          <option value="2">01</option>
-          <option value="3">001</option>
-          <option value="4">0001</option>
-          <option value="5">00001</option>
-          <option value="6">000001</option>
-          <option value="7">0000001</option>
-          <option value="8">00000001</option>
-          <option value="9">000000001</option>
-          <option value="10">0000000001</option>
+          {COUNTER_PADDINGS.map((value, index) => (
+            <option key={index} value={index + 1}>
+              {value}
+            </option>
+          ))}
         </SelectField>
       </Element>
 
       <Element leftSide={t('generate_number')}>
         <SelectField
           id="settings.counter_number_applied"
-          value={companyChanges?.settings?.counter_number_applied}
+          value={
+            companyChanges?.settings?.counter_number_applied || 'when_saved'
+          }
           onValueChange={(value) =>
             handleChange('settings.counter_number_applied', value)
           }
@@ -65,7 +91,7 @@ export function Settings() {
 
       <Element leftSide={t('recurring_prefix')}>
         <InputField
-          value={companyChanges?.settings?.recurring_number_prefix}
+          value={companyChanges?.settings?.recurring_number_prefix || ''}
           onValueChange={(value) =>
             handleChange('settings.recurring_number_prefix', value)
           }
@@ -78,9 +104,9 @@ export function Settings() {
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_quote_counter', value)
           }
-          checked={
-            companyChanges?.settings?.shared_invoice_quote_counter || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.shared_invoice_quote_counter
+          )}
         />
       </Element>
 
@@ -89,33 +115,25 @@ export function Settings() {
           onChange={(value: boolean) =>
             handleChange('settings.shared_invoice_credit_counter', value)
           }
-          checked={
-            companyChanges?.settings?.shared_invoice_credit_counter || false
-          }
+          checked={Boolean(
+            companyChanges?.settings?.shared_invoice_credit_counter
+          )}
         />
       </Element>
 
       <Element leftSide={t('reset_counter')}>
         <SelectField
-          value={companyChanges?.settings?.reset_counter_frequency_id}
+          value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
           onValueChange={(value) =>
             handleChange('settings.reset_counter_frequency_id', parseInt(value))
           }
           errorMessage={errors?.errors['settings.reset_counter_frequency_id']}
         >
-          <option value="0">{t('never')}</option>
-          <option value="1">{t('freq_daily')}</option>
-          <option value="2">{t('freq_weekly')}</option>
-          <option value="3">{t('freq_two_weeks')}</option>
-          <option value="4">{t('freq_four_weeks')}</option>
-          <option value="5">{t('freq_monthly')}</option>
-          <option value="6">{t('freq_two_months')}</option>
-          <option value="7">{t('freq_three_months')}</option>
-          <option value="8">{t('freq_four_months')}</option>
-          <option value="9">{t('freq_six_months')}</option>
-          <option value="10">{t('freq_annually')}</option>
-          <option value="11">{t('freq_two_years')}</option>
-          <option value="12">{t('freq_three_years')}</option>
+          {RESECT_COUNTER_FREQUENCIES.map((value, index) => (
+            <option key={index} value={index}>
+              {t(value)}
+            </option>
+          ))}
         </SelectField>
       </Element>
 

@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { AxiosResponse } from 'axios';
-import { endpoint } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
@@ -23,6 +22,12 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { endpoint } from '$app/common/helpers';
+import { useAtomValue } from 'jotai';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -30,22 +35,62 @@ export function Logo() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(new FormData());
   const logo = useLogo();
+
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
+
+  const activeSettings = useAtomValue(activeSettingsAtom);
+
+  const configureGroupSettings = useConfigureGroupSettings({
+    withoutNavigation: true,
+  });
+
+  const configureClientSettings = useConfigureClientSettings({
+    withoutNavigation: true,
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: formData,
     onSubmit: () => {
       toast.processing();
 
-      request(
-        'POST',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      )
+      let endpointRoute = '/api/v1/companies/:id';
+
+      let entityId = company.id;
+
+      if (activeSettings) {
+        if (isGroupSettingsActive) {
+          endpointRoute = '/api/v1/group_settings/:id';
+          entityId = activeSettings.id;
+        }
+
+        if (isClientSettingsActive) {
+          endpointRoute = '/api/v1/clients/:id';
+          entityId = activeSettings.id;
+        }
+      }
+
+      request('POST', endpoint(endpointRoute, { id: entityId }), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
         .then((response: AxiosResponse) => {
-          dispatch(
-            updateRecord({ object: 'company', data: response.data.data })
-          );
+          if (isCompanySettingsActive) {
+            dispatch(
+              updateRecord({ object: 'company', data: response.data.data })
+            );
+          }
+
+          if (isGroupSettingsActive) {
+            configureGroupSettings(response.data.data);
+          }
+
+          if (isClientSettingsActive) {
+            configureClientSettings(response.data.data);
+          }
 
           toast.success('uploaded_logo');
         })
@@ -53,14 +98,17 @@ export function Logo() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    formData.append('company_logo', acceptedFiles[0]);
-    formData.append('_method', 'PUT');
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      formData.append('company_logo', acceptedFiles[0]);
+      formData.append('_method', 'PUT');
 
-    setFormData(formData);
+      setFormData(formData);
 
-    formik.submitForm();
-  }, []);
+      formik.submitForm();
+    },
+    [formData]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -93,7 +141,7 @@ export function Logo() {
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
             <Image className="mx-auto h-12 w-12 text-gray-400" />
-            <span className="mt-2 block text-sm font-medium text-gray-900">
+            <span className="mt-2 block text-sm font-medium">
               {isDragActive
                 ? 'drop_your_logo_here'
                 : t('dropzone_default_message')}

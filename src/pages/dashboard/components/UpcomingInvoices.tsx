@@ -67,7 +67,6 @@ export function UpcomingInvoices() {
       title={t('upcoming_invoices')}
       className="h-96 relative"
       withoutBodyPadding
-      withoutHeaderBorder
     >
       <div className="pl-6 pr-4">
         <DataTable

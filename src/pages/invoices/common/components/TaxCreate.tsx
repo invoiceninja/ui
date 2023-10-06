@@ -80,7 +80,7 @@ export function TaxCreate(props: Props) {
       <InputField
         type="text"
         id="rate"
-        label={t('rate')}
+        label={t('tax_rate')}
         errorMessage={errors?.errors?.rate}
         onChange={formik.handleChange}
         required
