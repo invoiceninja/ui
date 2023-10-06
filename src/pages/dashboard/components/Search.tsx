@@ -84,8 +84,11 @@ export function Search$() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const filtered = collect(data)
-    .filter((record) =>
-      record.searchable.toLowerCase().includes(query.toLowerCase())
+    .filter(
+      (record) =>
+        record.searchable.toLowerCase().includes(query.toLowerCase()) ||
+        record.label.toLowerCase().includes(query.toLowerCase()) ||
+        record.value.toString().toLowerCase().includes(query.toLowerCase())
     )
     .take(50);
 
