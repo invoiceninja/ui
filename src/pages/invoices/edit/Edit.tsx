@@ -16,7 +16,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBulk, useInvoiceQuery } from '$app/common/queries/invoices';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -26,7 +26,7 @@ import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
@@ -42,21 +42,12 @@ import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { MdMarkEmailRead, MdSend } from 'react-icons/md';
-import { useColorScheme } from '$app/common/colors';
+import { CommonActions } from './components/CommonActions';
 
 export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-
-  const navigate = useNavigate();
-
-  const colors = useColorScheme();
-
-  const bulk = useBulk();
 
   const reactSettings = useReactSettings();
 
@@ -137,34 +128,7 @@ export default function Edit() {
           />
         )
       }
-      topRight={
-        invoice && (
-          <div className="flex space-x-3">
-            {invoice.status_id === InvoiceStatus.Draft &&
-              !invoice.is_deleted && (
-                <Button
-                  className="flex space-x-2"
-                  behavior="button"
-                  onClick={() => bulk([invoice.id], 'mark_sent')}
-                >
-                  <Icon element={MdMarkEmailRead} color={colors.$1} />
-                  <span>{t('mark_sent')}</span>
-                </Button>
-              )}
-
-            <Button
-              className="flex space-x-2"
-              behavior="button"
-              onClick={() =>
-                navigate(route('/invoices/:id/email', { id: invoice.id }))
-              }
-            >
-              <Icon element={MdSend} color={colors.$1} />
-              <span>{t('email_invoice')}</span>
-            </Button>
-          </div>
-        )
-      }
+      topRight={invoice && <CommonActions invoice={invoice} />}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

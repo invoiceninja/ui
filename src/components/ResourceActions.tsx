@@ -43,7 +43,7 @@ export function ResourceActions(props: Props) {
           </Button>
 
           <Dropdown
-            className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+            className="rounded-bl-none rounded-tl-none h-full border-l-1 border-y-0 border-r-0"
             cardActions
             disabled={disableSaveButton}
           >
