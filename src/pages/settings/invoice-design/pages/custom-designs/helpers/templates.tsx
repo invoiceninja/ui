@@ -29,6 +29,7 @@ interface Props<T = any> {
   entity: string;
   entities: T[];
   visible: boolean;
+  bulkUrl: string;
   setVisible: (visible: boolean) => void;
   labelFn: (entity: T) => string | ReactNode;
 }
@@ -37,11 +38,12 @@ export function ChangeTemplateModal<T = any>({
   entity,
   entities,
   visible,
+  bulkUrl,
   setVisible,
   labelFn,
 }: Props<T>) {
   const [t] = useTranslation();
-  const [designId, setDesignId] = useState<string | null>(null);
+  const [templateId, setTemplateId] = useState<string | null>(null);
   const [sendEmail, setSendEmail] = useState(false);
 
   const queryClient = useQueryClient();
@@ -55,36 +57,36 @@ export function ChangeTemplateModal<T = any>({
       JSON.stringify({
         ids,
         entity,
-        design_id: designId,
+        design_id: templateId,
         send_email: sendEmail,
       })
     );
 
     toast.success();
 
-    return;
-
-    request('POST', `/api/v1/:entity/templates`, {
+    request('POST', endpoint(bulkUrl), {
       ids: ids,
       entity,
+      template_id: templateId,
+      send_email: sendEmail,
+      action: 'template',
     }).then((response) => {
-      if (response.status === 200) {
-        return toast.success();
-      }
-
       const hash = response.data.message as string;
 
       queryClient
         .fetchQuery({
           queryKey: ['reports', hash],
           queryFn: () =>
-            request('POST', endpoint(`/api/v1/:entity/templates/${hash}`)).then(
-              (response) => response.data
-            ),
+            request(
+              'POST',
+              endpoint(`/api/v1/templates/preview/${hash}`)
+            ).then((response) => response.data),
           retry: 10,
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
-        .then(() => {
+        .then((data) => {
+          console.log("Data", data);
+
           toast.success();
         });
     });
@@ -103,12 +105,12 @@ export function ChangeTemplateModal<T = any>({
             new URL(endpoint(`/api/v1/designs?template=true&entity=${entity}`))
           }
           inputOptions={{
-            value: designId ?? '',
+            value: templateId ?? '',
             label: '',
           }}
           entryOptions={{ id: 'id', label: 'name', value: 'id' }}
           onChange={(entry) =>
-            entry.resource ? setDesignId(entry.resource.id) : null
+            entry.resource ? setTemplateId(entry.resource.id) : null
           }
         />
       </Element>

@@ -380,6 +380,7 @@ export function useActions(params?: Params) {
           visible={changeTemplateVisible}
           setVisible={setChangeTemplateVisible}
           labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+          bulkUrl='/api/v1/invoices/bulk'
         />
 
         <DropdownElement

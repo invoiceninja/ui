@@ -115,7 +115,7 @@ export const useCustomBulkActions = () => {
   };
 
   const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
-  
+
   const handleDownloadDocuments = (
     selectedInvoices: Invoice[],
     setSelected?: Dispatch<SetStateAction<string[]>>
@@ -227,6 +227,7 @@ export const useCustomBulkActions = () => {
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+            bulkUrl="/api/v1/invoices/bulk"
           />
         ) : null}
 
