@@ -937,7 +937,19 @@ export function useQuoteFilters() {
       label: t('expired'),
       value: 'expired',
       color: 'white',
+      backgroundColor: '#DC2626',
+    },
+    {
+      label: t('upcoming'),
+      value: 'upcoming',
+      color: 'white',
       backgroundColor: '#e6b05c',
+    },
+    {
+      label: t('converted'),
+      value: 'converted',
+      color: 'white',
+      backgroundColor: '#22C55E',
     },
   ];
 
