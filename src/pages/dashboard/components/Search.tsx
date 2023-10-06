@@ -90,7 +90,7 @@ export function Search$() {
         record.label.toLowerCase().includes(query.toLowerCase()) ||
         record.value.toString().toLowerCase().includes(query.toLowerCase())
     )
-    .take(50);
+    .take(100);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
