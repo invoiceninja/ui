@@ -98,14 +98,17 @@ export function Logo() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    formData.append('company_logo', acceptedFiles[0]);
-    formData.append('_method', 'PUT');
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      formData.append('company_logo', acceptedFiles[0]);
+      formData.append('_method', 'PUT');
 
-    setFormData(formData);
+      setFormData(formData);
 
-    formik.submitForm();
-  }, []);
+      formik.submitForm();
+    },
+    [formData]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
