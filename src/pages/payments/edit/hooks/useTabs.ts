@@ -47,13 +47,14 @@ export function useTabs(params: Params) {
     },
   ];
 
-  if (payment && payment.amount - payment.applied > 0 && !payment.is_deleted) {
-    console.log('ok');
-    tabs = tabs.filter(({ name }) => name !== t('apply'));
-  }
+  if (payment) {
+    if (!(payment.amount - payment.applied > 0 && !payment.is_deleted)) {
+      tabs = tabs.filter(({ name }) => name !== t('apply'));
+    }
 
-  if (payment && payment.amount !== payment.refunded && !payment.is_deleted) {
-    tabs = tabs.filter(({ name }) => name !== t('refund'));
+    if (!(payment.amount !== payment.refunded && !payment.is_deleted)) {
+      tabs = tabs.filter(({ name }) => name !== t('refund'));
+    }
   }
 
   return tabs;
