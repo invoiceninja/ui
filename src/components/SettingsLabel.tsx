@@ -29,8 +29,9 @@ export function SettingsLabel(props: Props) {
       </span>
       {helpLabel && (
         <span
-          className="text-xs text-gray-500"
+          className="text-xs"
           dangerouslySetInnerHTML={{ __html: helpLabel }}
+          style={{ color: colors.$3, opacity: 0.8 }}
         ></span>
       )}
     </div>

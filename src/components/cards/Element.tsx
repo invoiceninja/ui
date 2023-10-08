@@ -41,9 +41,10 @@ export function Element(props: Props) {
       onClick={props.onClick}
     >
       <dt
-        className={classNames('text-sm text-gray-500 flex flex-col', {
+        className={classNames('text-sm flex flex-col', {
           'opacity-75': props.disabledLabels,
         })}
+        style={{ color: colors.$3 }}
       >
         <span
           className={classNames('font-medium', {
@@ -59,10 +60,11 @@ export function Element(props: Props) {
             props.leftSideHelp
           ) : (
             <span
-              className="text-xs text-gray-500"
+              className="text-xs"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
+              style={{ color: colors.$3, opacity: 0.8 }}
             ></span>
           ))}
       </dt>
