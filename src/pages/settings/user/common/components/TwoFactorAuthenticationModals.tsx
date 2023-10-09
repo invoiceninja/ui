@@ -103,7 +103,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
     request('POST', endpoint('/api/v1/sms_reset'), {
       email: user!.email,
     }).then(() => {
-      toast.success('check_phone_code');
+      toast.success('code_was_sent');
     });
   };
 
