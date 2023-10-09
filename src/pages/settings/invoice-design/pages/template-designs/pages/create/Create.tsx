@@ -20,6 +20,7 @@ import { Container } from '$app/components/Container';
 import { Card, Element } from '$app/components/cards';
 import { Checkbox, InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import Editor from '@monaco-editor/react';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +48,10 @@ export default function Create() {
           design: {
             ...current.design,
             header: ' ',
-            body: baseTemplate,
+            body:
+              current.design.body.length > 0
+                ? current.design.body
+                : baseTemplate,
             footer: ' ',
             includes: ' ',
           },
@@ -150,6 +154,22 @@ export default function Create() {
             checked={design?.entities.includes('payment')}
           />
         </Element>
+      </Card>
+
+      <Card title={t('import')} withContainer collapsed>
+        <Editor
+          height="20rem"
+          defaultLanguage="html"
+          value={design?.design.body}
+          options={{
+            minimap: {
+              enabled: false,
+            },
+          }}
+          onChange={(value) => value && setDesign(
+            (c) => c && { ...c, design: { ...c.design, body: value } }
+          )}
+        />
       </Card>
     </Container>
   );
