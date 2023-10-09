@@ -18,12 +18,14 @@ import { Button, SelectField, SelectProps } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import Toggle from '$app/components/forms/Toggle';
 import collect from 'collect.js';
-import { atom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
 
 export const changeTemplateModalAtom = atom<boolean>(false);
+export const templatePdfUrlAtom = atom<string | null>(null);
 
 interface Props<T = any> {
   entity: string;
@@ -45,11 +47,14 @@ export function ChangeTemplateModal<T = any>({
   const [t] = useTranslation();
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [sendEmail, setSendEmail] = useState(false);
+  const [pdfUrl, setPdfUrl] = useAtom(templatePdfUrlAtom);
 
   const queryClient = useQueryClient();
 
   const changeTemplate = () => {
     const ids = collect(entities).pluck('id').toArray();
+
+    setPdfUrl(null);
 
     toast.processing();
 
@@ -80,7 +85,10 @@ export function ChangeTemplateModal<T = any>({
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
         .then((data) => {
-          console.log('Data', data);
+          const file = new Blob([data], { type: 'application/pdf' });
+          const fileUrl = URL.createObjectURL(file);
+
+          setPdfUrl(fileUrl);
 
           toast.success();
         });
@@ -127,6 +135,12 @@ export function ChangeTemplateModal<T = any>({
       <Button behavior="button" onClick={changeTemplate}>
         {t('generate_template')}
       </Button>
+
+      {pdfUrl ? (
+        <Link to="/settings/invoice_design/template_designs/pdf">
+          {t('success')}! {t('view_pdf')}
+        </Link>
+      ) : null}
     </Modal>
   );
 }

@@ -26,6 +26,7 @@ const Create = lazy(() => import('./pages/custom-designs/pages/create/Create'));
 
 const CreateTemplate = lazy(() => import('./pages/template-designs/pages/create/Create'));
 const EditTemplate = lazy(() => import('./pages/template-designs/pages/edit/Edit'));
+const PdfTemplate = lazy(() => import('./pages/template-designs/pages/pdf/Pdf'));
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
@@ -36,5 +37,6 @@ export const invoiceDesignRoutes = (
     <Route path="template_designs" element={<TemplateDesigns />} />
     <Route path="template_designs/:id/edit" element={<EditTemplate />} />
     <Route path="template_designs/create" element={<CreateTemplate />} />
+    <Route path="template_designs/pdf" element={<PdfTemplate />} />
   </Route>
 );
