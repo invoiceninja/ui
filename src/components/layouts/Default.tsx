@@ -56,7 +56,6 @@ import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
 import { useAtom } from 'jotai';
-import { Search } from '$app/pages/dashboard/components/Search';
 
 export interface SaveOption {
   label: string;
@@ -406,7 +405,7 @@ export function Default(props: Props) {
               </h2>
 
               <QuickCreatePopover />
-              <Search />
+              {/* <Search /> */}
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
