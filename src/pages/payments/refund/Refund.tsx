@@ -29,10 +29,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 export default function Refund() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
+
+  const formatMoney = useFormatMoney();
 
   const { data: companyGateway } = useCompanyGatewayQuery({
     id: payment?.company_gateway_id,
@@ -99,6 +102,20 @@ export default function Refund() {
         ? payment.amount - payment.refunded
         : invoiceItem?.paid_to_date;
     }
+  };
+
+  const getInvoiceLabel = (invoice: Invoice) => {
+    const paymentable = payment?.paymentables.find(
+      ({ invoice_id }) => invoice_id === invoice.id
+    );
+
+    return paymentable
+      ? `${t('invoice')} #${invoice.number} - ${t('refundable')} ${formatMoney(
+          paymentable.amount - paymentable.refunded,
+          payment?.client?.country_id,
+          payment?.client?.settings.currency_id
+        )}`
+      : '';
   };
 
   useEffect(() => {
@@ -189,7 +206,7 @@ export default function Refund() {
           {payment?.invoices &&
             payment?.invoices.map((invoice: Invoice, index: number) => (
               <option key={index} value={invoice.id}>
-                {invoice.number}
+                {getInvoiceLabel(invoice)}
               </option>
             ))}
         </SelectField>
