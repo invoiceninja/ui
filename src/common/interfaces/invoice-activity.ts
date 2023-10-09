@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClientContact } from "./client-contact";
-
 
 export interface InvoiceActivity {
   user: Client;
