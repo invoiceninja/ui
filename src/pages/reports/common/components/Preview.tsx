@@ -8,11 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField, Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BiSortAlt2 } from 'react-icons/bi';
 
 export const previewAtom = atom<Preview | null>(null);
@@ -88,6 +89,7 @@ export function Preview() {
   const preview = usePreview();
   const [filtered, setFiltered] = useState<Preview | null>(null);
   const [sorts, setSorts] = useState<Record<string, string>>();
+  const [t] = useTranslation();
 
   if (!preview) {
     return null;
@@ -98,7 +100,6 @@ export function Preview() {
 
     copy.rows = copy.rows.filter((sub) =>
       sub.some((item) => {
-
         if (item.identifier !== column) {
           return false;
         }
@@ -152,9 +153,54 @@ export function Preview() {
 
   const data = filtered?.rows || preview.rows;
 
+  const downloadCsv = () => {
+    const rows = [
+      preview.columns.map((column) => column.display_value).join(','),
+    ];
+
+    const data = filtered ? filtered.rows : preview.rows;
+
+    data.map((row) => {
+      rows.push(
+        row
+          .map((cell) => {
+            if (cell.display_value.toString() === 'true') {
+              return 'Yes';
+            }
+
+            if (cell.display_value.toString() === 'false') {
+              return 'No';
+            }
+
+            return cell.display_value;
+          })
+          .join(',')
+      );
+    });
+
+    const csv = rows.join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    const link = document.createElement('a');
+
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'example.csv');
+
+    link.click();
+  };
+
   if (preview) {
     return (
-      <div id="preview-table">
+      <div id="preview-table my-4">
+        <div className="flex justify-end">
+          <Button behavior="button" onClick={downloadCsv}>
+            {t('download')} {t('csv_file')}
+          </Button>
+        </div>
+
         <Table>
           <Thead>
             {preview.columns.map((column, i) => (
