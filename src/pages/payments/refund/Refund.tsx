@@ -110,11 +110,11 @@ export default function Refund() {
     );
 
     return paymentable
-      ? `${t('invoice')} #${invoice.number} - ${t('refundable')} ${formatMoney(
+      ? `${t('invoice')} #${invoice.number} - ${t('refundable')} (${formatMoney(
           paymentable.amount - paymentable.refunded,
           payment?.client?.country_id,
           payment?.client?.settings.currency_id
-        )}`
+        )})`
       : '';
   };
 
