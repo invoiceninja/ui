@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -29,6 +31,8 @@ interface Context {
 
 export default function Edit() {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const { id } = useParams();
 
@@ -140,6 +144,50 @@ export default function Edit() {
           errorMessage={errors?.errors.private_notes}
         />
       </Element>
+
+      {project && company?.custom_fields?.project1 && (
+        <CustomField
+          field="project1"
+          defaultValue={project.custom_value1 || ''}
+          value={company.custom_fields.project1}
+          onValueChange={(value) =>
+            handleChange('custom_value1', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project2 && (
+        <CustomField
+          field="project2"
+          defaultValue={project.custom_value2 || ''}
+          value={company.custom_fields.project2}
+          onValueChange={(value) =>
+            handleChange('custom_value2', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project3 && (
+        <CustomField
+          field="project3"
+          defaultValue={project.custom_value3 || ''}
+          value={company.custom_fields.project3}
+          onValueChange={(value) =>
+            handleChange('custom_value3', value.toString())
+          }
+        />
+      )}
+
+      {project && company?.custom_fields?.project4 && (
+        <CustomField
+          field="project4"
+          defaultValue={project.custom_value4 || ''}
+          value={company.custom_fields.project4}
+          onValueChange={(value) =>
+            handleChange('custom_value4', value.toString())
+          }
+        />
+      )}
     </Card>
   );
 }
