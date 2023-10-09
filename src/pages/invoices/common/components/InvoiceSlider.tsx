@@ -57,7 +57,10 @@ export function useGenerateActivityElement() {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     if (activity.activity_type_id === 4) {
-      text = text.replace(":user", `${t('recurring_invoice')} :recurring_invoice`);
+      text = text.replace(
+        ':user',
+        `${t('recurring_invoice')} :recurring_invoice`
+      );
     }
 
     const replacements = {
@@ -68,23 +71,27 @@ export function useGenerateActivityElement() {
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
-        >
-          {activity?.invoice?.label}
-        </Link>
-      ) ?? '',
-    
-      recurring_invoice: (
-        <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity?.recurring_invoice?.hashed_id,
-          })}
-        >
-          {activity?.recurring_invoice?.label}
-        </Link>
-      ) ?? '',
+      invoice:
+        (
+          <Link
+            to={route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
+            })}
+          >
+            {activity?.invoice?.label}
+          </Link>
+        ) ?? '',
+
+      recurring_invoice:
+        (
+          <Link
+            to={route('/recurring_invoices/:id/edit', {
+              id: activity?.recurring_invoice?.hashed_id,
+            })}
+          >
+            {activity?.recurring_invoice?.label}
+          </Link>
+        ) ?? '',
 
       contact: '',
     };
@@ -123,6 +130,16 @@ export function InvoiceSlider() {
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data: emailHistory } = useQuery({
+    queryKey: ['/api/v1/invoices', invoice?.id, 'payments'],
+    queryFn: () =>
+      request('POST', endpoint(`emails/${invoice?.id}`)).then(
+        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
+      ),
+    staleTime: Infinity,
   });
 
   //duplicate not needed
@@ -175,7 +192,7 @@ export function InvoiceSlider() {
       withoutActionContainer
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity')]}
+        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
         width="full"
       >
         <div className="space-y-2">
@@ -375,6 +392,8 @@ export function InvoiceSlider() {
             </NonClickableElement>
           ))}
         </div>
+
+        <div></div>
       </TabGroup>
     </Slider>
   );
