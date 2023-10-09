@@ -140,6 +140,10 @@ function Preference({ text, path, format }: PreferenceProps) {
   const { preferences, update } = usePreferences();
   const { t } = useTranslation();
 
+  if (get(preferencesDefaults, path) === get(preferences, path)) {
+    return null;
+  }
+
   return (
     <Element leftSide={text}>
       <Inline className="space-x-2">
