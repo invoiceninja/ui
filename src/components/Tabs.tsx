@@ -67,9 +67,9 @@ export function Tabs(props: Props) {
         ({ href }) => href === location.pathname
       );
 
-      if (!doesDefaultUrlExist) {
-        navigate(props.tabs[0].href);
-      }
+      // if (!doesDefaultUrlExist) {
+      //   navigate(props.tabs[0].href);
+      // }
     }
   }, []);
 
