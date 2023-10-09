@@ -11,7 +11,7 @@
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { updateChanges } from '$app/common/stores/slices/user';
 import {
   preferencesDefaults,
@@ -22,7 +22,6 @@ import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { ReactNode } from 'react';
 
 export function Preferences() {
@@ -38,8 +37,6 @@ export function Preferences() {
       })
     );
   };
-
-  const resolveCurrency = useResolveCurrency();
 
   return (
     <div className="space-y-4">
@@ -105,66 +102,78 @@ export function Preferences() {
         </Element>
       </Card>
 
-      <Card title={t('dashboard')}>
-        <Preference
-          text={t('default_view')}
-          path="dashboard_charts.default_view"
-          format={(value) => <p className="uppercase">{value}</p>}
-        />
+      <PreferenceCard
+        title={`${t('dashboard')} ${t('charts')}`}
+        path="dashboard_charts"
+      >
+        <Preference path="dashboard_charts.default_view" />
+        <Preference path="dashboard_charts.currency" />
+        <Preference path="dashboard_charts.range" />
+      </PreferenceCard>
 
-        <Preference
-          text={t('currency')}
-          path="dashboard_charts.currency"
-          format={(value) => {
-            const currency = resolveCurrency(value.toString());
+      <PreferenceCard title={t('datatable')} path="datatables">
+        <Preference path="datatables.clients.sort" />
+      </PreferenceCard>
 
-            if (currency) {
-              return currency.code;
-            }
-
-            return value;
-          }}
-        />
-      </Card>
+      <PreferenceCard title={t('reports')} path="reports">
+        <Preference path="reports.columns" />
+      </PreferenceCard>
     </div>
   );
 }
 
-interface PreferenceProps {
-  text: string;
+interface PreferenceCardProps {
+  title: string;
+  children: ReactNode;
   path: string;
-  format: (value: string | number | boolean) => string | ReactNode;
 }
 
-function Preference({ text, path, format }: PreferenceProps) {
+function PreferenceCard({ title, children, path }: PreferenceCardProps) {
+  const { preferences } = usePreferences();
+
+  if (
+    JSON.stringify(get(preferencesDefaults, path)) ===
+    JSON.stringify(get(preferences, path))
+  ) {
+    return null;
+  }
+
+  return <Card title={title}>{children}</Card>;
+}
+
+interface PreferenceProps {
+  path: string;
+}
+
+function Preference({ path }: PreferenceProps) {
   const { preferences, update } = usePreferences();
   const { t } = useTranslation();
+
+  const translations = {
+    'dashboard_charts.default_view': `${t('default')} ${t('view')}`,
+    'dashboard_charts.currency': t('currency'),
+    'dashboard_charts.range': t('range'),
+    'datatables.clients.sort': `${t('clients')} ${t('sort')}`,
+    'reports.columns': t('columns'),
+  } as const;
 
   if (get(preferencesDefaults, path) === get(preferences, path)) {
     return null;
   }
 
   return (
-    <Element leftSide={text}>
+    <ClickableElement
+      onClick={() =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        update(`preferences.${path}`, get(preferencesDefaults, path))
+      }
+    >
       <Inline className="space-x-2">
-        <div>{format(get(preferences, path))}</div>
+        <div>{translations[path as keyof typeof translations]}</div>
 
-        {get(preferencesDefaults, path) === get(preferences, path) ? (
-          <small>({t('default')})</small>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              update(`preferences.${path}`, get(preferencesDefaults, path));
-            }}
-            aria-label="Reset to default"
-          >
-            <X size={18} />
-          </button>
-        )}
+        <X size={18} />
       </Inline>
-    </Element>
+    </ClickableElement>
   );
 }
