@@ -48,21 +48,10 @@ export function ChangeTemplateModal<T = any>({
 
   const queryClient = useQueryClient();
 
-  const $changeTemplate = () => {
+  const changeTemplate = () => {
     const ids = collect(entities).pluck('id').toArray();
 
     toast.processing();
-
-    alert(
-      JSON.stringify({
-        ids,
-        entity,
-        design_id: templateId,
-        send_email: sendEmail,
-      })
-    );
-
-    toast.success();
 
     request('POST', endpoint(bulkUrl), {
       ids: ids,
@@ -73,19 +62,25 @@ export function ChangeTemplateModal<T = any>({
     }).then((response) => {
       const hash = response.data.message as string;
 
+      if (sendEmail) {
+        setVisible(false);
+        toast.success();
+
+        return;
+      }
+
       queryClient
         .fetchQuery({
           queryKey: ['reports', hash],
           queryFn: () =>
-            request(
-              'POST',
-              endpoint(`/api/v1/templates/preview/${hash}`)
-            ).then((response) => response.data),
+            request('POST', endpoint(`/api/v1/templates/preview/${hash}`)).then(
+              (response) => response.data
+            ),
           retry: 10,
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
         .then((data) => {
-          console.log("Data", data);
+          console.log('Data', data);
 
           toast.success();
         });
@@ -129,7 +124,7 @@ export function ChangeTemplateModal<T = any>({
         onChange={setSendEmail}
       />
 
-      <Button behavior="button" onClick={$changeTemplate}>
+      <Button behavior="button" onClick={changeTemplate}>
         {t('generate_template')}
       </Button>
     </Modal>
