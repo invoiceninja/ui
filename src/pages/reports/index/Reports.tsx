@@ -309,7 +309,10 @@ export default function Reports() {
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
             <SelectField
-              onValueChange={(value) => handleReportChange(value as Identifier)}
+              onValueChange={(value) => {
+                handleReportChange(value as Identifier);
+                setPreview(null);
+              }}
               value={report.identifier}
             >
               {reports.map((report, i) => (
