@@ -31,6 +31,9 @@ interface Props {
 export function TwoFactorAuthenticationModals(props: Props) {
   const [t] = useTranslation();
 
+  const allowTwoFactorAuthentication =
+    import.meta.env.VITE_FEATURE_2FA === 'true';
+
   const user = useCurrentUser();
   const dispatch = useDispatch();
 
@@ -144,7 +147,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
   };
 
   useEffect(() => {
-    if (checkVerification) {
+    if (checkVerification && allowTwoFactorAuthentication) {
       checkPhoneNumberVerification();
     }
   }, [checkVerification]);
