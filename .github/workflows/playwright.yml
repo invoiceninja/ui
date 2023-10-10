@@ -123,6 +123,7 @@ jobs:
       run: |
         cd invoiceninja
         php artisan ninja:react
+        cd ..
         cd ui
         npx playwright install
         npx playwright test --workers=1
