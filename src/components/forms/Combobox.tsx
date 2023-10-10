@@ -31,7 +31,7 @@ export interface Entry<T = any> {
   searchable: string;
 }
 
-type EventType = 'internal' | 'external';
+export type EventType = 'internal' | 'external';
 
 interface InputOptions {
   value: string | number | boolean | null;
@@ -55,7 +55,7 @@ export interface ComboboxStaticProps<T = any> {
   exclude?: (string | number | boolean)[];
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
-  onEmptyValues: (query: string) => unknown;
+  onEmptyValues?: (query: string) => unknown;
   onDismiss?: () => unknown;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
@@ -261,11 +261,11 @@ export function Combobox<T = any>({
 
   useDebounce(
     () => {
-      if (inputValue === '' && filteredOptions.length > 0) {
+      if (inputValue === '' && filteredOptions.length > 0 && onEmptyValues) {
         return onEmptyValues(inputValue);
       }
 
-      if (filteredOptions.length <= 3) {
+      if (filteredOptions.length <= 3 && onEmptyValues) {
         return onEmptyValues(inputValue);
       }
     },
@@ -412,6 +412,15 @@ export function Combobox<T = any>({
   );
 }
 
+export const emptyComboboxEntry: Entry<any> = {
+  id: -1,
+  eventType: 'internal',
+  label: '',
+  resource: null,
+  searchable: '',
+  value: '',
+};
+
 export function ComboboxStatic<T = any>({
   inputOptions,
   entries,
@@ -458,11 +467,11 @@ export function ComboboxStatic<T = any>({
 
   useDebounce(
     () => {
-      if (query === '' && filteredValues.length > 0) {
+      if (query === '' && filteredValues.length > 0 && onEmptyValues) {
         return onEmptyValues(query);
       }
 
-      if (filteredValues.length <= 3) {
+      if (filteredValues.length <= 3 && onEmptyValues) {
         return onEmptyValues(query);
       }
     },
