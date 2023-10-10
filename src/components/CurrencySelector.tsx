@@ -9,25 +9,36 @@
  */
 
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
+import { Currency } from '$app/common/interfaces/currency';
 import { GenericSelectorProps } from './CountrySelector';
-import { SelectField } from './forms';
+import { ComboboxStatic, Entry, emptyComboboxEntry } from './forms/Combobox';
 
 export function CurrencySelector(props: GenericSelectorProps) {
   const currencies = useCurrencies();
 
+  const entries: Entry<Currency>[] = currencies.map((c) => ({
+    id: c.id,
+    label: c.name,
+    value: c.id,
+    resource: c,
+    eventType: 'external',
+    searchable: `${c.name} (${c.code})`,
+  }));
+
   return (
-    <SelectField
-      value={props.value}
-      onValueChange={props.onChange}
-      label={props.label}
-      errorMessage={props.errorMessage}
-      withBlank
-    >
-      {currencies.map((currency, index) => (
-        <option key={index} value={currency.id}>
-          {currency.name}
-        </option>
-      ))}
-    </SelectField>
+    <ComboboxStatic<Currency>
+      inputOptions={{
+        value: props.value.toString(),
+        label: props.label ?? '',
+      }}
+      entries={[emptyComboboxEntry, ...entries]}
+      entryOptions={{
+        id: 'id',
+        label: 'name',
+        value: 'id',
+        dropdownLabelFn: (c) => `${c.name} (${c.code})`,
+      }}
+      onChange={(entry) => props.onChange(entry.id.toString())}
+    />
   );
 }
