@@ -126,4 +126,4 @@ jobs:
         cd ..
         cd ui
         npx playwright install
-        npx playwright test --workers=1
+        npx playwright test --workers=1 --reporter=list
