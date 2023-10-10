@@ -86,15 +86,13 @@ jobs:
         cd invoiceninja
         composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
         composer install
-
-    - name: Copy .env
-      run: |
         cp .env.ci .env
 
     - name: Prepare Laravel Application
       env:
         REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
       run: |
+        cd invoiceninja
         php artisan key:generate
         php artisan config:clear
         php artisan ninja:post-update
@@ -109,7 +107,7 @@ jobs:
       run: |
         git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
         cd ui
-        git checkout main
+        git checkout develop
         npm i
         npm run build
         
