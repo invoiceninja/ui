@@ -38,7 +38,7 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
-      
+
     services:
       mariadb:
         image: mariadb:10.6
@@ -118,10 +118,10 @@ jobs:
         mkdir -p ../public/tinymce_6.4.2/tinymce/js/
         cp -r node_modules/tinymce ../public/tinymce_6.4.2/tinymce/js/
         cd ..
-        php artisan ninja:react
 
     - name: Run Playwright
       run: |
+        php artisan ninja:react
         cd ui
         npx playwright install
         npx playwright test --workers=1
