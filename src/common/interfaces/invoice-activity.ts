@@ -12,6 +12,7 @@
 export interface InvoiceActivity {
   user: Client;
   invoice: Client;
+  contact: Client;
   client: Client;
   activity_type_id: number;
   id: string;
