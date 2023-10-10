@@ -67,11 +67,13 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
 interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
+  excludeCommonActions?: boolean;
 }
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const { showEditAction, showCommonBulkAction } = params || {};
+  const { showEditAction, showCommonBulkAction, excludeCommonActions } =
+    params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -204,14 +206,15 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={route('/invoices/:id/email', { id: invoice.id })}
-        icon={<Icon element={MdSend} />}
-      >
-        {t('email_invoice')}
-      </DropdownElement>
-    ),
+    (invoice: Invoice) =>
+      !excludeCommonActions && (
+        <DropdownElement
+          to={route('/invoices/:id/email', { id: invoice.id })}
+          icon={<Icon element={MdSend} />}
+        >
+          {t('email_invoice')}
+        </DropdownElement>
+      ),
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/pdf', { id: invoice.id })}
@@ -255,6 +258,7 @@ export function useActions(params?: Params) {
       </DropdownElement>
     ),
     (invoice: Invoice) =>
+      !excludeCommonActions &&
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (
         <DropdownElement
