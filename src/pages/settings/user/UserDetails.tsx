@@ -99,7 +99,7 @@ export function UserDetails() {
         if (
           response[0].data.data.phone !== user?.phone &&
           user?.google_2fa_secret &&
-          !user?.verified_phone_number
+          !response[0].data.data.verified_phone_number
         ) {
           setCheckVerification(true);
         }
