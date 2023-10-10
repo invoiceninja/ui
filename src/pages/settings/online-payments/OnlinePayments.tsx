@@ -30,11 +30,14 @@ import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   useTitle('online_payments');
 
@@ -208,16 +211,18 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('enable_applying_payments')}>
-          <Toggle
-            label={t('enable_applying_payments_help')}
-            id="allow_over_payment"
-            checked={Boolean(company?.enable_applying_payments)}
-            onChange={(value) =>
-              handleChangeProperty('enable_applying_payments', value)
-            }
-          />
-        </Element>
+        {isCompanySettingsActive && (
+          <Element leftSide={t('enable_applying_payments')}>
+            <Toggle
+              label={t('enable_applying_payments_help')}
+              id="allow_over_payment"
+              checked={Boolean(company?.enable_applying_payments)}
+              onChange={(value) =>
+                handleChangeProperty('enable_applying_payments', value)
+              }
+            />
+          </Element>
+        )}
 
         <Element leftSide={t('allow_over_payment')}>
           <Toggle

@@ -10,21 +10,57 @@
 
 import { Fragment, ReactNode } from 'react';
 import { Dropdown } from './dropdown/Dropdown';
+import { Button } from './forms';
+import { useTranslation } from 'react-i18next';
 
 export type Action<T = unknown> = (resource: T) => ReactNode;
 
 interface Props {
   resource: unknown;
-  label: string;
+  label?: string | null;
   actions: Action<any>[];
+  onSaveClick?: () => void;
+  disableSaveButton?: boolean;
 }
 
 export function ResourceActions(props: Props) {
+  const [t] = useTranslation();
+
+  const { onSaveClick, disableSaveButton, label } = props;
+
   return (
-    <Dropdown label={props.label}>
-      {props.actions.map((action, index) => (
-        <Fragment key={index}>{action(props.resource)}</Fragment>
-      ))}
-    </Dropdown>
+    <>
+      {onSaveClick && (
+        <div className="flex">
+          <Button
+            behavior="button"
+            className="rounded-br-none rounded-tr-none px-3"
+            onClick={onSaveClick}
+            disabled={disableSaveButton}
+            disableWithoutIcon
+          >
+            {t('save')}
+          </Button>
+
+          <Dropdown
+            className="rounded-bl-none rounded-tl-none h-full border-l-1 border-y-0 border-r-0"
+            cardActions
+            disabled={disableSaveButton}
+          >
+            {props.actions.map((action, index) => (
+              <Fragment key={index}>{action(props.resource)}</Fragment>
+            ))}
+          </Dropdown>
+        </div>
+      )}
+
+      {!onSaveClick && label && (
+        <Dropdown label={props.label}>
+          {props.actions.map((action, index) => (
+            <Fragment key={index}>{action(props.resource)}</Fragment>
+          ))}
+        </Dropdown>
+      )}
+    </>
   );
 }

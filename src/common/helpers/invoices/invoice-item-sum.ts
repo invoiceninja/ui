@@ -28,7 +28,7 @@ export class InvoiceItemSum {
   constructor(
     protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
-  ) {}
+  ) { }
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -157,69 +157,72 @@ export class InvoiceItemSum {
     this.totalTaxes = 0;
 
     this.lineItems
-      .filter((item) => item.line_total > 0)
+      // .filter((item) => item.line_total > 0)
       .map((item, index: number) => {
 
         let itemTax = 0;
         this.item = item;
 
-        const amount =
-          this.subTotal > 0
-            ? this.item.line_total -
-            this.invoice.discount * (this.item.line_total / this.subTotal)
-            : 0;
+        if (item.line_total > 0) {
 
-        const itemTaxRateOneTotal = this.calculateAmountLineTax(
-          this.item.tax_rate1,
-          amount
-        );
+          const amount =
+            this.subTotal > 0
+              ? this.item.line_total -
+              this.invoice.discount * (this.item.line_total / this.subTotal)
+              : 0;
 
-        itemTax += itemTaxRateOneTotal;
-
-        if (itemTaxRateOneTotal !== 0) {
-          this.groupTax(
-            this.item.tax_name1,
+          const itemTaxRateOneTotal = this.calculateAmountLineTax(
             this.item.tax_rate1,
-            itemTaxRateOneTotal
+            amount
           );
-        }
 
-        //
+          itemTax += itemTaxRateOneTotal;
 
-        const itemTaxRateTwoTotal = this.calculateAmountLineTax(
-          this.item.tax_rate2,
-          amount
-        );
+          if (itemTaxRateOneTotal !== 0) {
+            this.groupTax(
+              this.item.tax_name1,
+              this.item.tax_rate1,
+              itemTaxRateOneTotal
+            );
+          }
 
-        itemTax += itemTaxRateTwoTotal;
+          //
 
-        if (itemTaxRateTwoTotal !== 0) {
-          this.groupTax(
-            this.item.tax_name2,
+          const itemTaxRateTwoTotal = this.calculateAmountLineTax(
             this.item.tax_rate2,
-            itemTaxRateTwoTotal
+            amount
           );
-        }
 
-        //
+          itemTax += itemTaxRateTwoTotal;
 
-        const itemTaxRateThree = this.calculateAmountLineTax(
-          this.item.tax_rate3,
-          amount
-        );
+          if (itemTaxRateTwoTotal !== 0) {
+            this.groupTax(
+              this.item.tax_name2,
+              this.item.tax_rate2,
+              itemTaxRateTwoTotal
+            );
+          }
 
-        itemTax += itemTaxRateThree;
+          //
 
-        if (itemTaxRateThree !== 0) {
-          this.groupTax(
-            this.item.tax_name3,
+          const itemTaxRateThree = this.calculateAmountLineTax(
             this.item.tax_rate3,
-            itemTaxRateThree
+            amount
           );
-        }
 
-        this.item.gross_line_total = this.item.line_total + itemTax;
-        this.item.tax_amount = itemTax;
+          itemTax += itemTaxRateThree;
+
+          if (itemTaxRateThree !== 0) {
+            this.groupTax(
+              this.item.tax_name3,
+              this.item.tax_rate3,
+              itemTaxRateThree
+            );
+          }
+
+          this.item.gross_line_total = this.item.line_total + itemTax;
+          this.item.tax_amount = itemTax;
+        }
 
         this.lineItems[index] = this.item;
         this.totalTaxes += itemTax;

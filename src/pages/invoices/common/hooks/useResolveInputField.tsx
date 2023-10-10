@@ -42,6 +42,7 @@ import {
 import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useLocation } from 'react-router-dom';
 
 const numberInputs = [
   'discount',
@@ -50,7 +51,6 @@ const numberInputs = [
   'quantity',
   'rate',
   'hours',
-  'tax_amount',
 ];
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -83,6 +83,8 @@ export const isLineItemEmpty = (lineItem: InvoiceItem) => {
 };
 
 export function useResolveInputField(props: Props) {
+  const location = useLocation();
+
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
@@ -294,6 +296,7 @@ export function useResolveInputField(props: Props) {
           }
           clearButton
           onClearButtonClick={() => handleProductChange(index, '', null)}
+          displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
       );
     }
@@ -338,6 +341,18 @@ export function useResolveInputField(props: Props) {
             }}
           />
         )
+      );
+    }
+
+    if ('gross_line_total' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
+      );
+    }
+
+    if ('tax_amount' === property) {
+      return formatMoney(
+        (resource?.line_items[index][property] ?? 0) as number
       );
     }
 

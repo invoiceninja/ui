@@ -155,7 +155,8 @@ export function QuoteFooter(props: Props) {
               <div className="space-y-2">
                 <InputField
                   label={t('exchange_rate')}
-                  value={quote?.exchange_rate || '1.00'}
+                  type="number"
+                  value={quote?.exchange_rate || 1.0}
                   onValueChange={(value) =>
                     handleChange('exchange_rate', parseFloat(value))
                   }
@@ -177,9 +178,7 @@ export function QuoteFooter(props: Props) {
         </div>
 
         <div>
-          <span className="text-sm">
-            {t('custom_fields')} &nbsp;
-          </span>
+          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
             {t('click_here')}
           </Link>

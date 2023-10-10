@@ -25,10 +25,11 @@ const Div = styled.div`
 
 interface Props {
   item: NavigationItem;
+  colors: ReturnType<typeof useColorScheme>;
 }
 
 export function SidebarItem(props: Props) {
-  const { item } = props;
+  const { item, colors } = props;
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
@@ -37,8 +38,6 @@ export function SidebarItem(props: Props) {
   if (!item.visible) {
     return <></>;
   }
-
-  const colors = useColorScheme();
 
   return (
     <Div

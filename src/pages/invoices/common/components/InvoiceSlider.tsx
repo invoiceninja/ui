@@ -86,7 +86,14 @@ export function useGenerateActivityElement() {
         </Link>
       ) ?? '',
 
-      contact: '',
+      contact: (
+        <Link
+          to={route('/clients/:id/edit', { id: activity?.contact?.hashed_id })}
+        >
+          {activity?.contact?.label}
+        </Link>
+      
+      ) ?? '' ,
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

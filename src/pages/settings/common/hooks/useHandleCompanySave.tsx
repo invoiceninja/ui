@@ -23,6 +23,7 @@ import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/setting
 import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
+import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
@@ -31,8 +32,13 @@ export function useHandleCompanySave() {
 
   const handleUpdateGroupSettings = useHandleUpdate({});
 
-  const { isGroupSettingsActive, isCompanySettingsActive } =
-    useCurrentSettingsLevel();
+  const updateClientSettings = useUpdateClientSettings();
+
+  const {
+    isGroupSettingsActive,
+    isCompanySettingsActive,
+    isClientSettingsActive,
+  } = useCurrentSettingsLevel();
 
   const [, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -49,6 +55,10 @@ export function useHandleCompanySave() {
 
     if (isGroupSettingsActive) {
       return handleUpdateGroupSettings();
+    }
+
+    if (isClientSettingsActive) {
+      return updateClientSettings();
     }
 
     const adjustedExcludeToaster =

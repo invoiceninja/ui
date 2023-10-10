@@ -87,6 +87,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -462,6 +463,10 @@ export function useActions() {
         >
           {t('convert_to_invoice')}
         </DropdownElement>
+      ),
+    (quote) =>
+      !quote.project_id && (
+        <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
     () => <Divider withoutPadding />,
     (quote) => (
@@ -932,7 +937,19 @@ export function useQuoteFilters() {
       label: t('expired'),
       value: 'expired',
       color: 'white',
+      backgroundColor: '#DC2626',
+    },
+    {
+      label: t('upcoming'),
+      value: 'upcoming',
+      color: 'white',
       backgroundColor: '#e6b05c',
+    },
+    {
+      label: t('converted'),
+      value: 'converted',
+      color: 'white',
+      backgroundColor: '#22C55E',
     },
   ];
 

@@ -27,6 +27,8 @@ import { Form } from './components/Form';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { cloneDeep, set } from 'lodash';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -40,6 +42,8 @@ export default function Edit() {
 
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const [contacts, setContacts] = useState<Partial<VendorContact>[]>([]);
+
   const queryClient = useQueryClient();
 
   const actions = useActions();
@@ -52,12 +56,15 @@ export default function Edit() {
   useEffect(() => {
     if (data) {
       setVendor({ ...data });
+
+      setContacts(cloneDeep(data.contacts));
     }
   }, [data]);
 
   const saveCompany = useHandleCompanySave();
 
   const onSave = async () => {
+    set(vendor as Vendor, 'contacts', contacts);
     toast.processing();
 
     await saveCompany(true);
@@ -97,6 +104,8 @@ export default function Edit() {
           vendor={vendor}
           setVendor={setVendor}
           errors={errors}
+          contacts={contacts}
+          setContacts={setContacts}
           page="edit"
         />
       )}

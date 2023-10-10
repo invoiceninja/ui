@@ -41,4 +41,5 @@ export interface Vendor {
   contacts: VendorContact[];
   documents: any[];
   language_id: string;
+  classification: string;
 }

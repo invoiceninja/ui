@@ -81,4 +81,5 @@ export interface Client extends Timestamps {
   is_tax_exempt: boolean;
   routing_id: string;
   tax_info?: TaxInfo;
+  classification: string;
 }

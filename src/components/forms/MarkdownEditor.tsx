@@ -88,6 +88,7 @@ export function MarkdownEditor(props: Props) {
               : '/tinymce_6.4.2/tinymce/content.css',
           body_class: 'h-screen',
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
+          paste_data_images: false,
         }}
         onEditorChange={handleChange}
       />

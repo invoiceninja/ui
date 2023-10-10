@@ -112,6 +112,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <InputField
                 label={t('exchange_rate')}
+                type="number"
                 value={purchaseOrder.exchange_rate || 1.0}
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value) || 1.0)
