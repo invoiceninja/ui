@@ -9,7 +9,8 @@
  */
 
 import { useCountries } from '$app/common/hooks/useCountries';
-import { SelectField } from './forms';
+import { Country } from '$app/common/interfaces/country';
+import { ComboboxStatic, Entry, emptyComboboxEntry } from './forms/Combobox';
 
 export interface GenericSelectorProps<T = string> {
   value: T;
@@ -21,19 +22,29 @@ export interface GenericSelectorProps<T = string> {
 export function CountrySelector(props: GenericSelectorProps) {
   const countries = useCountries();
 
+  const entries: Entry<Country>[] = countries.map((c) => ({
+    id: c.id,
+    label: c.name,
+    value: c.id,
+    resource: c,
+    eventType: 'external',
+    searchable: `${c.name} (${c.iso_3166_3})`,
+  }));
+
   return (
-    <SelectField
-      onValueChange={props.onChange}
-      value={props.value}
-      label={props.label}
-      errorMessage={props.errorMessage}
-      withBlank
-    >
-      {countries.map((country, index) => (
-        <option key={index} value={country.id}>
-          {country.name}
-        </option>
-      ))}
-    </SelectField>
+    <ComboboxStatic<Country>
+      inputOptions={{
+        value: props.value.toString(),
+        label: props.label ?? '',
+      }}
+      entries={[emptyComboboxEntry, ...entries]}
+      entryOptions={{
+        id: 'id',
+        label: 'name',
+        value: 'id',
+        dropdownLabelFn: (c) => `${c.name} (${c.iso_3166_3})`,
+      }}
+      onChange={(entry) => props.onChange(entry.id.toString())}
+    />
   );
 }
