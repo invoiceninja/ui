@@ -38,7 +38,7 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
-
+      
     services:
       mariadb:
         image: mariadb:10.6
