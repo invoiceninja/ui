@@ -64,7 +64,6 @@ export default function Refund() {
       invoices: [],
     },
     onSubmit: (values) => {
-      console.log('submited');
       toast.processing();
       setErrors(undefined);
 
