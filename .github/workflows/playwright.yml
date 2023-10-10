@@ -121,6 +121,7 @@ jobs:
 
     - name: Run Playwright
       run: |
+        cd invoiceninja
         php artisan ninja:react
         cd ui
         npx playwright install
