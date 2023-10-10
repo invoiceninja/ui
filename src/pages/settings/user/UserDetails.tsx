@@ -96,7 +96,11 @@ export function UserDetails() {
       .then((response) => {
         toast.success('updated_settings');
 
-        if (response[0].data.data.phone !== user?.phone) {
+        if (
+          response[0].data.data.phone !== user?.phone &&
+          user?.google_2fa_secret &&
+          !user?.verified_phone_number
+        ) {
           setCheckVerification(true);
         }
 
@@ -152,6 +156,7 @@ export function UserDetails() {
       <TwoFactorAuthenticationModals
         checkVerification={checkVerification}
         setCheckVerification={setCheckVerification}
+        checkOnlyPhoneNumberVerification
       />
     </>
   );

@@ -27,6 +27,7 @@ interface Props {
   setCheckVerification: Dispatch<SetStateAction<boolean>>;
   isDisableModalOpen?: boolean;
   setIsDisableModalOpen?: Dispatch<SetStateAction<boolean>>;
+  checkOnlyPhoneNumberVerification?: boolean;
 }
 export function TwoFactorAuthenticationModals(props: Props) {
   const [t] = useTranslation();
@@ -42,6 +43,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
     setCheckVerification,
     isDisableModalOpen,
     setIsDisableModalOpen,
+    checkOnlyPhoneNumberVerification,
   } = props;
 
   const [isEnableModalOpen, setIsEnableModalOpen] = useState<boolean>(false);
@@ -123,9 +125,11 @@ export function TwoFactorAuthenticationModals(props: Props) {
 
       setIsSmsModalOpen(false);
 
-      requestQrCode();
+      if (!checkOnlyPhoneNumberVerification) {
+        requestQrCode();
 
-      setIsEnableModalOpen(true);
+        setIsEnableModalOpen(true);
+      }
     });
   };
 
