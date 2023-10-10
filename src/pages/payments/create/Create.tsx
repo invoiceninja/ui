@@ -104,6 +104,7 @@ export default function Create() {
           invoices: [],
           credits: [],
           client_id: '',
+          type_id: company?.settings?.payment_type_id ?? '',
         };
       }
 
@@ -516,7 +517,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={company?.settings?.payment_type_id}
+              value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -602,7 +603,7 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                if(!value)
+                if (!value)
                   handleChange('exchange_currency_id', '');
                 else
                   handleChange('exchange_currency_id', '1')

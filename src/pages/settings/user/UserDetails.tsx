@@ -34,6 +34,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 
 export function UserDetails() {
@@ -66,6 +67,7 @@ export function UserDetails() {
   const userState = useSelector((state: RootState) => state.user);
 
   const { isAdmin } = useAdmin();
+  const { save } = usePreferences();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
@@ -96,7 +98,11 @@ export function UserDetails() {
       .then((response) => {
         toast.success('updated_settings');
 
-        if (response[0].data.data.phone !== user?.phone) {
+        if (
+          response[0].data.data.phone !== user?.phone &&
+          user?.google_2fa_secret &&
+          !response[0].data.data.verified_phone_number
+        ) {
           setCheckVerification(true);
         }
 
@@ -120,6 +126,8 @@ export function UserDetails() {
           setErrors(error.response.data);
         }
       });
+
+    save({ silent: true });
   };
 
   useEffect(() => {
@@ -152,6 +160,7 @@ export function UserDetails() {
       <TwoFactorAuthenticationModals
         checkVerification={checkVerification}
         setCheckVerification={setCheckVerification}
+        checkOnlyPhoneNumberVerification
       />
     </>
   );
