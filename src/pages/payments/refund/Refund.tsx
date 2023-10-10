@@ -21,7 +21,7 @@ import { Alert } from '$app/components/Alert';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -29,6 +29,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
+import collect from 'collect.js';
 
 export default function Refund() {
   const { id } = useParams();
@@ -143,6 +144,14 @@ export default function Refund() {
     }
   }, [companyGateway]);
 
+  const refundableInvoices = () => {
+    const $invoices = collect(formik?.values.invoices).pluck('invoice_id');
+
+    return payment?.invoices?.filter(
+      (invoice: Invoice) => !$invoices.contains(invoice.id)
+    );
+  };
+
   return (
     <Card
       title={t('refund_payment')}
@@ -175,7 +184,7 @@ export default function Refund() {
 
       <Element leftSide={t('invoices')}>
         <SelectField
-          onChange={(event: any) => {
+          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
             if (
               formik.values.invoices.filter(
                 (invoice: { invoice_id: string }) =>
@@ -183,15 +192,15 @@ export default function Refund() {
               ).length < 1
             )
               setInvoices([...invoices, event.target.value]);
+            event.target.value = '';
           }}
+          withBlank
         >
-          <option value=""></option>
-          {payment?.invoices &&
-            payment?.invoices.map((invoice: Invoice, index: number) => (
-              <option key={index} value={invoice.id}>
-                {invoice.number}
-              </option>
-            ))}
+          {refundableInvoices()?.map((invoice: Invoice, index: number) => (
+            <option key={index} value={invoice.id}>
+              {invoice.number}
+            </option>
+          ))}
         </SelectField>
 
         {errors?.errors.invoices && (
