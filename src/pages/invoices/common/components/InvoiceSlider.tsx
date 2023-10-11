@@ -25,7 +25,7 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -44,6 +44,7 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
+import { useEffect } from 'react';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -93,14 +94,16 @@ export function useGenerateActivityElement() {
           </Link>
         ) ?? '',
 
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', { id: activity?.contact?.hashed_id })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      
-      ) ?? '' ,
+      contact:
+        (
+          <Link
+            to={route('/clients/:id/edit', {
+              id: activity?.contact?.hashed_id,
+            })}
+          >
+            {activity?.contact?.label}
+          </Link>
+        ) ?? '',
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -116,6 +119,8 @@ export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -139,15 +144,31 @@ export function InvoiceSlider() {
     enabled: invoice !== null && isVisible,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: emailHistory } = useQuery({
-    queryKey: ['/api/v1/invoices', invoice?.id, 'payments'],
-    queryFn: () =>
-      request('POST', endpoint(`emails/${invoice?.id}`)).then(
-        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
-      ),
-    staleTime: Infinity,
-  });
+  const fetchEmailHistory = async () => {
+    const response: AxiosResponse = await queryClient.fetchQuery(
+      ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+      () =>
+        request(
+          'POST',
+          endpoint('/api/v1/emails/entityHistory', { id: invoice?.id }),
+          {
+            entity: 'invoice',
+            entity_id: invoice?.id,
+          }
+        ).then(
+          (response: GenericSingleResourceResponse<Invoice>) => response.data
+        ),
+      { staleTime: Infinity }
+    );
+
+    console.log(response);
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      fetchEmailHistory();
+    }
+  }, [invoice]);
 
   //duplicate not needed
   // const { data: activities } = useQuery({
