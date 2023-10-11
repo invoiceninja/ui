@@ -18,11 +18,16 @@ import { styled } from 'styled-components';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import CommonProps from '$app/common/interfaces/common-props.interface';
+import { Icon } from './icons/Icon';
+import { MdTextSnippet } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
+import { useNavigate } from 'react-router-dom';
 
 interface Props extends CommonProps {
   emailRecord: EmailRecordType;
   index: number;
   withBottomBorder?: boolean;
+  withEntityNavigationIcon?: boolean;
 }
 
 const Div = styled.div`
@@ -39,11 +44,13 @@ const EventDiv = styled.div`
 
 export function EmailRecord(props: Props) {
   const [t] = useTranslation();
+  const navigate = useNavigate();
   const colors = useColorScheme();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { emailRecord, index, withBottomBorder } = props;
+  const { emailRecord, index, withBottomBorder, withEntityNavigationIcon } =
+    props;
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(
     !index ? false : true
@@ -71,9 +78,29 @@ export function EmailRecord(props: Props) {
         }
       >
         <div className="flex flex-col flex-1 min-w-0 space-y-2 pr-5">
-          <span className="text-sm font-medium truncate">
-            {emailRecord.subject}
-          </span>
+          <div className="flex items-center space-x-3">
+            <span className="text-sm font-medium truncate">
+              {emailRecord.subject}
+            </span>
+
+            {withEntityNavigationIcon && (
+              <div>
+                <Icon
+                  className="cursor-pointer"
+                  element={MdTextSnippet}
+                  size={20}
+                  onClick={() =>
+                    navigate(
+                      route(`/:entity/:id/edit`, {
+                        id: emailRecord.entity_id,
+                        entity: `${emailRecord.entity}s`,
+                      })
+                    )
+                  }
+                />
+              </div>
+            )}
+          </div>
 
           <span className="text-sm truncate">
             {t('to')}: {emailRecord.recipients}
@@ -101,16 +128,13 @@ export function EmailRecord(props: Props) {
             theme={{ hoverColor: colors.$2 }}
           >
             <div className="flex justify-between space-x-2">
-              <span className="text-sm font-medium">{event.recipient}</span>
-              <span className="text-sm">{date(event.date, dateFormat)}</span>
-            </div>
-
-            <div className="flex justify-between truncate">
               <span className="text-sm truncate">
                 {t('status')}: {event.status}
               </span>
-              <span className="text-sm">{date(event.date, 'h:mm:ss A')}</span>
+              <span className="text-sm">{date(event.date, dateFormat)}</span>
             </div>
+
+            <span className="text-sm truncate">{event.delivery_message}</span>
           </EventDiv>
         ))}
       </div>

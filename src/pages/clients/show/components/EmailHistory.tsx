@@ -59,6 +59,7 @@ export function EmailHistory() {
                     emailRecord={emailRecord}
                     index={index}
                     withBottomBorder
+                    withEntityNavigationIcon
                   />
                 )
             )}
