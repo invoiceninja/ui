@@ -26,11 +26,16 @@ import { Divider } from '$app/components/cards/Divider';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const { data: statics } = useStaticsQuery();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -57,12 +62,20 @@ export function Defaults() {
     <>
       {companyChanges?.settings && (
         <Card title={t('defaults')}>
-          <Element leftSide={t('payment_type')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="payment_type_id"
+                labelElement={<SettingsLabel label={t('payment_type')} />}
+              />
+            }
+          >
             <SelectField
               value={companyChanges?.settings?.payment_type_id || '0'}
               onChange={handleChange}
               id="settings.payment_type_id"
               blankOptionValue="0"
+              disabled={disableSettingsField('payment_type_id')}
               withBlank
               errorMessage={errors?.errors['settings.payment_type_id']}
             >
@@ -77,11 +90,21 @@ export function Defaults() {
           </Element>
 
           {terms && (
-            <Element leftSide={t('quote_valid_until')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="valid_until"
+                  labelElement={
+                    <SettingsLabel label={t('quote_valid_until')} />
+                  }
+                />
+              }
+            >
               <SelectField
                 value={companyChanges?.settings?.valid_until || ''}
                 id="settings.valid_until"
                 onChange={handleChange}
+                disabled={disableSettingsField('valid_until')}
                 withBlank
                 errorMessage={errors?.errors['settings.valid_until']}
               >
@@ -94,12 +117,22 @@ export function Defaults() {
             </Element>
           )}
 
-          <Element leftSide={t('expense_payment_type')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="default_expense_payment_type_id"
+                labelElement={
+                  <SettingsLabel label={t('expense_payment_type')} />
+                }
+              />
+            }
+          >
             <SelectField
               value={
                 companyChanges?.settings?.default_expense_payment_type_id || ''
               }
               onChange={handleChange}
+              disabled={disableSettingsField('default_expense_payment_type_id')}
               id="settings.default_expense_payment_type_id"
               blankOptionValue="0"
               withBlank
@@ -142,9 +175,17 @@ export function Defaults() {
 
           {isCompanySettingsActive && <Divider withoutPadding />}
 
-          <Element className="mt-4" leftSide={t('invoice_terms')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="invoice_terms"
+                labelElement={<SettingsLabel label={t('invoice_terms')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.invoice_terms}
+              value={companyChanges?.settings?.invoice_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -154,12 +195,21 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('invoice_terms')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('invoice_footer')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="invoice_footer"
+                labelElement={<SettingsLabel label={t('invoice_footer')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.invoice_footer}
+              value={companyChanges?.settings?.invoice_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -169,12 +219,21 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('invoice_footer')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('quote_terms')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="quote_terms"
+                labelElement={<SettingsLabel label={t('quote_terms')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.quote_terms}
+              value={companyChanges?.settings?.quote_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -184,12 +243,21 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('quote_terms')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('quote_footer')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="quote_footer"
+                labelElement={<SettingsLabel label={t('quote_footer')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.quote_footer}
+              value={companyChanges?.settings?.quote_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -199,12 +267,21 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('quote_footer')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('credit_terms')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="credit_terms"
+                labelElement={<SettingsLabel label={t('credit_terms')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.credit_terms}
+              value={companyChanges?.settings?.credit_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -214,12 +291,21 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('credit_terms')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('credit_footer')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="credit_footer"
+                labelElement={<SettingsLabel label={t('credit_footer')} />}
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.credit_footer}
+              value={companyChanges?.settings?.credit_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -229,12 +315,23 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('credit_footer')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('purchase_order_terms')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="purchase_order_terms"
+                labelElement={
+                  <SettingsLabel label={t('purchase_order_terms')} />
+                }
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.purchase_order_terms}
+              value={companyChanges?.settings?.purchase_order_terms || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -244,12 +341,23 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('purchase_order_terms')}
             />
           </Element>
 
-          <Element className="mt-4" leftSide={t('purchase_order_footer')}>
+          <Element
+            className="mt-4"
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="purchase_order_footer"
+                labelElement={
+                  <SettingsLabel label={t('purchase_order_footer')} />
+                }
+              />
+            }
+          >
             <MarkdownEditor
-              value={companyChanges?.settings?.purchase_order_footer}
+              value={companyChanges?.settings?.purchase_order_footer || ''}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -259,6 +367,7 @@ export function Defaults() {
                   })
                 )
               }
+              disabled={disableSettingsField('purchase_order_footer')}
             />
           </Element>
         </Card>
