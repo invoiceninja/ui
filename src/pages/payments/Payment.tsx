@@ -16,12 +16,13 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks/useActions';
 import { useSave } from './edit/hooks/useSave';
+import { useTabs } from './edit/hooks/useTabs';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -42,20 +43,7 @@ export default function Payment() {
     },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/payments/:id/edit', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/payments/:id/documents', { id }),
-    },
-    {
-      name: t('custom_fields'),
-      href: route('/payments/:id/payment_fields', { id }),
-    },
-  ];
+  const tabs = useTabs({ payment: paymentValue });
 
   const onSave = useSave(setErrors);
 
