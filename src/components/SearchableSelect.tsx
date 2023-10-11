@@ -14,7 +14,9 @@ import { v4 } from 'uuid';
 
 interface Props {
   children: ReactNode;
-  value: string | number | boolean;
+  value: any;
+  errorMessage?: string[] | string;
+  disabled?: boolean;
   onValueChange: (value: string | number | boolean) => void;
 }
 
@@ -22,7 +24,7 @@ const isOptionElement = (child: ReactNode): child is React.ReactElement => {
   return React.isValidElement(child) && child.type === 'option';
 };
 
-export function SearchableSelect({ children, value, onValueChange }: Props) {
+export function SearchableSelect({ children, value, errorMessage, disabled, onValueChange }: Props) {
   const valid = React.Children.toArray(children).every(isOptionElement);
 
   if (valid === false) {
@@ -55,6 +57,8 @@ export function SearchableSelect({ children, value, onValueChange }: Props) {
         value: 'value',
       }}
       onChange={(entry) => onValueChange(entry.value)}
+      errorMessage={errorMessage}
+      readonly={disabled}
     />
   );
 }
