@@ -20,9 +20,6 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
-    console.log(error.request.responseURL);
-    console.log(error.response);
-
     if (error.response?.status === 403) {
       const url = new URL(error.request.responseURL);
 
