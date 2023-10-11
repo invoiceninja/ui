@@ -30,6 +30,7 @@ import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegi
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -93,8 +94,7 @@ export function TaxSettings() {
         <>
           <Card title={t('tax_settings')}>
             <Element leftSide={t('invoice_tax_rates')}>
-              <SelectField
-                id="enabled_tax_rates"
+              <SearchableSelect
                 onChange={handleChange}
                 value={companyChanges?.enabled_tax_rates || 0}
                 errorMessage={errors?.errors.enabled_tax_rates}
@@ -103,12 +103,11 @@ export function TaxSettings() {
                 <option value="1">{t('one_tax_rate')}</option>
                 <option value="2">{t('two_tax_rates')}</option>
                 <option value="3">{t('three_tax_rates')}</option>
-              </SelectField>
+              </SearchableSelect>
             </Element>
 
             <Element leftSide={t('line_item_tax_rates')}>
-              <SelectField
-                id="enabled_item_tax_rates"
+              <SearchableSelect
                 onChange={handleChange}
                 value={companyChanges?.enabled_item_tax_rates || 0}
                 errorMessage={errors?.errors.enabled_item_tax_rates}
@@ -117,12 +116,11 @@ export function TaxSettings() {
                 <option value="1">{t('one_tax_rate')}</option>
                 <option value="2">{t('two_tax_rates')}</option>
                 <option value="3">{t('three_tax_rates')}</option>
-              </SelectField>
+              </SearchableSelect>
             </Element>
 
             <Element leftSide={t('expense_tax_rates')}>
-              <SelectField
-                id="enabled_expense_tax_rates"
+              <SearchableSelect
                 onChange={handleChange}
                 value={companyChanges?.enabled_expense_tax_rates || 0}
                 errorMessage={errors?.errors.enabled_expense_tax_rates}
@@ -131,7 +129,7 @@ export function TaxSettings() {
                 <option value="1">{t('one_tax_rate')}</option>
                 <option value="2">{t('two_tax_rates')}</option>
                 <option value="3">{t('three_tax_rates')}</option>
-              </SelectField>
+              </SearchableSelect>
             </Element>
 
             <Element leftSide={t('inclusive_taxes')}>

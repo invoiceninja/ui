@@ -17,6 +17,7 @@ import frequencies from '$app/common/constants/frequency';
 import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   schedule: Schedule;
@@ -41,14 +42,14 @@ export function ScheduleForm(props: Props) {
   return (
     <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
       <Element leftSide={t('template')} required>
-        <SelectField
+        <SearchableSelect
           value={schedule.template}
           onValueChange={(value) => handleChange('template', value)}
           errorMessage={errors?.errors.template}
         >
           <option value="email_statement">{t('email_statement')}</option>
           <option value="email_record">{t('email_record')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('next_run')} required>
@@ -62,7 +63,7 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_STATEMENT && (
         <Element leftSide={t('frequency')}>
-          <SelectField
+          <SearchableSelect
             value={schedule.frequency_id}
             onValueChange={(value) => handleChange('frequency_id', value)}
             errorMessage={errors?.errors.frequency_id}
@@ -72,13 +73,13 @@ export function ScheduleForm(props: Props) {
                 {t(frequencies[frequency as keyof typeof frequencies])}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
 
       {schedule.template === Templates.EMAIL_STATEMENT && (
         <Element leftSide={t('remaining_cycles')}>
-          <SelectField
+          <SearchableSelect
             value={schedule.remaining_cycles}
             onValueChange={(value) =>
               handleChange('remaining_cycles', parseInt(value))
@@ -91,7 +92,7 @@ export function ScheduleForm(props: Props) {
                 {number}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
 

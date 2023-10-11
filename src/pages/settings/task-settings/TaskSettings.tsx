@@ -26,6 +26,7 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -273,8 +274,7 @@ export function TaskSettings() {
         </Element>
 
         <Element leftSide={t('tasks_shown_in_portal')}>
-          <SelectField
-            id="settings.show_all_tasks_client_portal"
+          <SearchableSelect
             onChange={handleChange}
             disabled={
               companyChanges?.settings?.enable_client_portal_tasks
@@ -292,7 +292,7 @@ export function TaskSettings() {
             <option value="invoiced">{t('invoiced')}</option>
             <option value="uninvoiced">{t('uninvoiced')}</option>
             <option value="all">{t('all')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
       </Card>
 

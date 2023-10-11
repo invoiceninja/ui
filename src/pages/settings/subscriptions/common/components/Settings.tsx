@@ -16,6 +16,7 @@ import { InputField, SelectField } from '$app/components/forms';
 import { Inline } from '$app/components/Inline';
 import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
@@ -25,7 +26,7 @@ export function Settings(props: SubscriptionProps) {
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('frequency')}>
-        <SelectField
+        <SearchableSelect
           value={subscription.frequency_id}
           errorMessage={errors?.errors.frequency_id}
           onValueChange={(value) => handleChange('frequency_id', value)}
@@ -36,11 +37,11 @@ export function Settings(props: SubscriptionProps) {
               {t(frequencies[frequency as keyof typeof frequencies])}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('auto_bill')}>
-        <SelectField
+        <SearchableSelect
           value={subscription.auto_bill}
           onValueChange={(value) => handleChange('auto_bill', value)}
           errorMessage={errors?.errors.auto_bill}
@@ -50,7 +51,7 @@ export function Settings(props: SubscriptionProps) {
           <option value="optout">{t('optout')}</option>
           <option value="optin">{t('optin')}</option>
           <option value="off">{t('disabled')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('promo_code')}>
@@ -74,7 +75,7 @@ export function Settings(props: SubscriptionProps) {
           </div>
 
           <div className="w-full lg:w-1/2">
-            <SelectField
+            <SearchableSelect
               value={subscription.is_amount_discount.toString()}
               onValueChange={(value) =>
                 handleChange('is_amount_discount', JSON.parse(value))
@@ -83,7 +84,7 @@ export function Settings(props: SubscriptionProps) {
             >
               <option value="true">{t('amount')}</option>
               <option value="false">{t('percent')}</option>
-            </SelectField>
+            </SearchableSelect>
           </div>
         </Inline>
       </Element>

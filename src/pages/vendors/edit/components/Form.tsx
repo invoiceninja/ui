@@ -27,6 +27,7 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction } from 'react';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   vendor: Vendor;
@@ -163,9 +164,8 @@ export function Form(props: Props) {
           </Element>
 
           <Element leftSide={t('classification')}>
-            <SelectField
-              id="classification"
-              defaultValue={vendor.classification ?? ''}
+            <SearchableSelect
+              value={vendor.classification ?? ''}
               onValueChange={(value) => handleChange('classification', value)}
             >
               <option value=""></option>
@@ -176,7 +176,7 @@ export function Form(props: Props) {
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
 
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           {company?.custom_fields?.vendor1 && (
@@ -412,20 +412,20 @@ export function Form(props: Props) {
 
               {languages.length > 1 && (
                 <Element leftSide={t('language')} noExternalPadding>
-                  <SelectField
+                  <SearchableSelect
                     value={vendor.language_id}
                     onValueChange={(value) =>
                       handleChange('language_id', value)
                     }
                     errorMessage={errors?.errors.language_id}
-                    withBlank
                   >
+                    <option value=""></option>
                     {languages.map((language, index) => (
                       <option key={index} value={language.id}>
                         {language.name}
                       </option>
                     ))}
-                  </SelectField>
+                  </SearchableSelect>
                 </Element>
               )}
 

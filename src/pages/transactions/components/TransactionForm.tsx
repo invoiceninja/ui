@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { EntityStatus } from './EntityStatus';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   transaction: Transaction;
@@ -49,7 +50,7 @@ export function TransactionForm(props: Props) {
       )}
 
       <Element required leftSide={t('type')}>
-        <SelectField
+        <SearchableSelect
           value={
             props.transaction.base_type === ApiTransactionType.Credit
               ? TransactionType.Deposit
@@ -70,7 +71,7 @@ export function TransactionForm(props: Props) {
               {t(transactionType)}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('date')}>
@@ -98,7 +99,7 @@ export function TransactionForm(props: Props) {
       </Element>
 
       <Element required leftSide={t('currency')}>
-        <SelectField
+        <SearchableSelect
           value={props.transaction.currency_id}
           onValueChange={(value) => props.handleChange('currency_id', value)}
           errorMessage={props.errors?.errors.currency_id}
@@ -108,7 +109,7 @@ export function TransactionForm(props: Props) {
               {t(name)}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element required leftSide={t('bank_account')}>

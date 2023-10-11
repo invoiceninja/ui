@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdClose } from 'react-icons/md';
 import { SubscriptionProps } from './Overview';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Webhook(props: SubscriptionProps) {
   const [t] = useTranslation();
@@ -78,7 +79,7 @@ export function Webhook(props: SubscriptionProps) {
       </Element>
 
       <Element leftSide={t('rest_method')}>
-        <SelectField
+        <SearchableSelect
           value={subscription.webhook_configuration.post_purchase_rest_method}
           onValueChange={(value) =>
             handleChange(
@@ -93,7 +94,7 @@ export function Webhook(props: SubscriptionProps) {
           <option defaultChecked></option>
           <option value="post">{t('post')}</option>
           <option value="put">{t('put')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('add_header')}>

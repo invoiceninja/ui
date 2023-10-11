@@ -16,6 +16,7 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function EURegions() {
   const [t] = useTranslation();
@@ -56,9 +57,7 @@ export function EURegions() {
       <Element leftSide="Europe" key="EU">
         <div className="grid grid-cols-5 gap-4">
           <div className="col-span-4">
-            <SelectField
-              id="tax_data.regions.EU.tax_all_subregions"
-              className=""
+            <SearchableSelect
               value={companyChanges.tax_data.regions.EU.tax_all_subregions}
               onValueChange={(value) =>
                 handleChangeAndUpdateView(
@@ -71,7 +70,7 @@ export function EURegions() {
               <option value="false">
                 {t('tax_selected')} - [ {countSelected} {t('selected')} ]
               </option>
-            </SelectField>
+            </SearchableSelect>
           </div>
 
           {!companyChanges.tax_data.regions.EU.tax_all_subregions && (

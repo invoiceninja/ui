@@ -21,6 +21,7 @@ import { atom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   schedule: Schedule;
@@ -78,7 +79,7 @@ export function EmailStatement(props: Props) {
   return (
     <>
       <Element leftSide={t('date_range')}>
-        <SelectField
+        <SearchableSelect
           value={schedule.parameters.date_range}
           onValueChange={(value) =>
             handleChange('parameters.date_range' as keyof Schedule, value)
@@ -95,11 +96,11 @@ export function EmailStatement(props: Props) {
           <option value="this_year">{t('this_year')}</option>
           <option value="last_year">{t('last_year')}</option>
           <option value="all_time">{t('all_time')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('status')}>
-        <SelectField
+        <SearchableSelect
           value={schedule.parameters.status}
           onValueChange={(value) =>
             handleChange('parameters.status' as keyof Schedule, value)
@@ -109,7 +110,7 @@ export function EmailStatement(props: Props) {
           <option value="all">{t('all')}</option>
           <option value="paid">{t('paid')}</option>
           <option value="unpaid">{t('unpaid')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('show_aging_table')}>

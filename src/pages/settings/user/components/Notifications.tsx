@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '$app/components/forms';
 import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -105,20 +106,20 @@ export function Notifications() {
   return (
     <Card title={t('notifications')}>
       <Element className="mb-4" leftSide={t('all_events')}>
-        <SelectField
+        <SearchableSelect
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
         >
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
           <option value="custom">{t('custom')}</option>
-        </SelectField>
+        </SearchableSelect >
       </Element>
 
       <div className="flex flex-col border-t border-gray-200 pt-4">
         {options.map((notification, index) => (
           <Element key={index} className="mt-0" leftSide={notification.label}>
-            <SelectField
+            <SearchableSelect
               value={getNotificationValueByKey(notification.key)}
               onValueChange={(value) =>
                 handleNotificationChange(notification.key, value)
@@ -132,7 +133,7 @@ export function Notifications() {
                 {t('owned_by_user')}
               </option>
               <option value="none">{t('none')}</option>
-            </SelectField>
+            </SearchableSelect>
           </Element>
         ))}
       </div>

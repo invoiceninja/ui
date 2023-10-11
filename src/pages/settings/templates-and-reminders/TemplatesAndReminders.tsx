@@ -36,6 +36,7 @@ import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -140,7 +141,7 @@ export function TemplatesAndReminders() {
 
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>
-          <SelectField
+          <SearchableSelect
             value={templateId}
             onValueChange={(value) => setTemplateId(value)}
           >
@@ -154,7 +155,7 @@ export function TemplatesAndReminders() {
             <option value="custom1">{t('first_custom')}</option>
             <option value="custom2">{t('second_custom')}</option>
             <option value="custom3">{t('third_custom')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('subject')}>
@@ -223,7 +224,7 @@ export function TemplatesAndReminders() {
               </Element>
 
               <Element leftSide={t('schedule')}>
-                <SelectField
+                <SearchableSelect
                   value={
                     company?.settings[
                       `schedule_reminder${reminderIndex}` as keyof CompanySettings
@@ -246,7 +247,7 @@ export function TemplatesAndReminders() {
                     {t('before_due_date')}
                   </option>
                   <option value="after_due_date">{t('after_due_date')}</option>
-                </SelectField>
+                </SearchableSelect>
               </Element>
 
               <Element leftSide={t('send_email')}>
@@ -311,7 +312,7 @@ export function TemplatesAndReminders() {
               </Element>
 
               <Element leftSide={t('frequency')}>
-                <SelectField
+                <SearchableSelect
                   value={company?.settings.endless_reminder_frequency_id || ''}
                   onValueChange={(value) =>
                     handleChange(
@@ -319,14 +320,14 @@ export function TemplatesAndReminders() {
                       value
                     )
                   }
-                  withBlank
                 >
+                  <option value=""></option>
                   {Object.keys(frequencies).map((frequency, index) => (
                     <option key={index} value={frequency}>
                       {t(frequencies[frequency as keyof typeof frequencies])}
                     </option>
                   ))}
-                </SelectField>
+                </SearchableSelect>
               </Element>
             </>
           )}

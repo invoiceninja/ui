@@ -21,6 +21,7 @@ import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   title?: string;
@@ -64,8 +65,7 @@ export function Selector(props: Props) {
         <Card title={title ? t(title) : undefined}>
           {companyChanges?.enabled_tax_rates > 0 && (
             <Element leftSide={t('default_tax_rate')}>
-              <SelectField
-                id="settings.tax_rate1"
+              <SearchableSelect
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name1 || '0'}
                 errorMessage={errors?.errors['settings.tax_rate1']}
@@ -86,14 +86,13 @@ export function Selector(props: Props) {
                       {taxRate.rate}% — {taxRate.name}
                     </option>
                   ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {companyChanges?.enabled_tax_rates > 1 && (
             <Element leftSide={t('default_tax_rate')}>
-              <SelectField
-                id="settings.tax_rate2"
+              <SearchableSelect
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name2 || '0'}
                 errorMessage={errors?.errors['settings.tax_rate2']}
@@ -114,13 +113,13 @@ export function Selector(props: Props) {
                       {taxRate.rate}% — {taxRate.name}
                     </option>
                   ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {companyChanges?.enabled_tax_rates > 2 && (
             <Element leftSide={t('default_tax_rate')}>
-              <SelectField
+              <SearchableSelect
                 id="settings.tax_rate3"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name3 || '0'}
@@ -142,7 +141,7 @@ export function Selector(props: Props) {
                       {taxRate.rate}% — {taxRate.name}
                     </option>
                   ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
         </Card>

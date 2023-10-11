@@ -18,6 +18,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { route } from '$app/common/helpers/route';
 import { BsBox } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   type:
@@ -111,17 +112,17 @@ export function MultipleProductSelector(props: Props) {
   return (
     <>
       {props.products && (
-        <SelectField
+        <SearchableSelect
           onValueChange={(value) => setSelectedProductId(value)}
           value={selectedProductId}
-          withBlank
         >
+          <option value=""></option>
           {props.products.map((product, index) => (
             <option key={index} value={product.id}>
               {getOptionLabelText(product)}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       )}
 
       <div className="flex justify-center">

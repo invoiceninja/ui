@@ -20,6 +20,7 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -98,9 +99,9 @@ export function Invoices() {
       <Divider />
 
       <Element leftSide={t('lock_invoices')}>
-        <SelectField
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            handleToggleChange('settings.lock_invoices', event.target.value)
+        <SearchableSelect
+          onValueChange={(value) =>
+            handleToggleChange('settings.lock_invoices', value)
           }
           value={companyChanges?.settings?.lock_invoices || 'off'}
           errorMessage={errors?.errors['settings.lock_invoices']}
@@ -108,7 +109,7 @@ export function Invoices() {
           <option value="off">{t('off')}</option>
           <option value="when_sent">{t('when_sent')}</option>
           <option value="when_paid">{t('when_paid')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
     </Card>
   );

@@ -16,6 +16,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
@@ -47,7 +48,7 @@ export function EmailRecord(props: Props) {
   return (
     <>
       <Element leftSide={t('type')}>
-        <SelectField
+        <SearchableSelect
           value={schedule.parameters.entity}
           onValueChange={(value) =>
             handleChange('parameters.entity' as keyof Schedule, value)
@@ -60,7 +61,7 @@ export function EmailRecord(props: Props) {
           <option value="quote">{t('quote')}</option>
           <option value="credit">{t('credit')}</option>
           <option value="purchase_order">{t('purchase_order')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       {schedule.parameters.entity === 'invoice' && (

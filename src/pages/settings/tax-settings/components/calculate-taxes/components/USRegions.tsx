@@ -16,6 +16,7 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function USRegions() {
   const [t] = useTranslation();
@@ -56,7 +57,7 @@ export function USRegions() {
       <Element leftSide={t('united_states')} key="US">
         <div className="grid grid-cols-5 gap-4">
           <div className="col-span-4">
-            <SelectField
+            <SearchableSelect
               id="tax_data.regions.US.tax_all_subregions"
               className=""
               value={companyChanges.tax_data.regions.US.tax_all_subregions}
@@ -71,7 +72,7 @@ export function USRegions() {
               <option value="false">
                 {t('tax_selected')} - [ {countSelected} {t('selected')} ]
               </option>
-            </SelectField>
+            </SearchableSelect>
           </div>
 
           {!companyChanges.tax_data.regions.US.tax_all_subregions && (

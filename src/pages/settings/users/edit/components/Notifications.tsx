@@ -13,6 +13,7 @@ import { SelectField } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   user: User;
@@ -139,22 +140,22 @@ export function Notifications(props: Props) {
       <Element>{t('email')}</Element>
 
       <Element leftSide={t('all_events')}>
-        <SelectField
-          withBlank
+        <SearchableSelect
           value={defaultNotificationValue()}
           onValueChange={(value) =>
             handleNotificationChange('all_events', value)
           }
         >
+          <option value=""></option>
           <option value="all_notifications">{t('all_records')}</option>
           <option value="all_user_notifications">{t('owned_by_user')}</option>
           <option value="">{t('custom')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       {notifications.map((notification, index) => (
         <Element key={index} leftSide={t(notification.label)}>
-          <SelectField
+          <SearchableSelect
             value={notificationValue(notification.id)}
             disabled={isNotificationSelectDisabled()}
             onValueChange={(value) =>
@@ -166,7 +167,7 @@ export function Notifications(props: Props) {
               {t('owned_by_user')}
             </option>
             <option value={`${notification.id}_none`}>{t('none')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
       ))}
     </Card>
