@@ -29,10 +29,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
 
 export default function Refund() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
+
+  const formatMoney = useFormatMoney();
 
   const { data: companyGateway } = useCompanyGatewayQuery({
     id: payment?.company_gateway_id,
@@ -94,11 +98,25 @@ export default function Refund() {
   });
 
   const getInvoiceAmount = (invoiceItem: Invoice) => {
-    if (payment) {
-      return invoiceItem?.paid_to_date > payment.amount - payment.refunded
-        ? payment.amount - payment.refunded
-        : invoiceItem?.paid_to_date;
-    }
+    const paymentable = payment?.paymentables.find(
+      ({ invoice_id }) => invoice_id === invoiceItem.id
+    );
+
+    return paymentable ? paymentable.amount - paymentable.refunded : 0;
+  };
+
+  const getInvoiceLabel = (invoice: Invoice) => {
+    const paymentable = payment?.paymentables.find(
+      ({ invoice_id }) => invoice_id === invoice.id
+    );
+
+    return paymentable
+      ? `${t('invoice')} #${invoice.number} - ${t('refundable')} (${formatMoney(
+          paymentable.amount - paymentable.refunded,
+          payment?.client?.country_id,
+          payment?.client?.settings.currency_id
+        )})`
+      : '';
   };
 
   useEffect(() => {
@@ -143,14 +161,16 @@ export default function Refund() {
     }
   }, [companyGateway]);
 
+  useSaveBtn(
+    {
+      onClick: () => formik.handleSubmit(),
+      disableSaveButton: formik.isSubmitting || !formik.values.invoices.length,
+    },
+    [formik.values, formik.isSubmitting]
+  );
+
   return (
-    <Card
-      title={t('refund_payment')}
-      disableSubmitButton={formik.isSubmitting}
-      onFormSubmit={formik.handleSubmit}
-      withSaveButton
-      saveButtonLabel={t('refund')}
-    >
+    <Card title={t('refund_payment')}>
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.number} />
       </Element>
@@ -189,7 +209,7 @@ export default function Refund() {
           {payment?.invoices &&
             payment?.invoices.map((invoice: Invoice, index: number) => (
               <option key={index} value={invoice.id}>
-                {invoice.number}
+                {getInvoiceLabel(invoice)}
               </option>
             ))}
         </SelectField>
@@ -221,12 +241,7 @@ export default function Refund() {
                     <InputField
                       id={`invoices[${index}].amount`}
                       type="number"
-                      value={
-                        invoiceItem?.paid_to_date >
-                        payment?.amount - payment?.refunded
-                          ? payment?.amount - payment?.refunded
-                          : invoiceItem?.paid_to_date
-                      }
+                      value={(formik.values.invoices[index] as Invoice).amount}
                       onChange={formik.handleChange}
                       errorMessage={
                         errors?.errors[`invoices.${[index]}.invoice_id`]
