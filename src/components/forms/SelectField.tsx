@@ -43,13 +43,18 @@ export function SelectField(props: Props) {
         }}
         id={props.id}
         className={classNames(
-          `w-full py-2 rounded text-sm border ${props.className}`
+          `w-full py-2 rounded text-sm border disabled:cursor-not-allowed ${props.className}`
         )}
         defaultValue={props.defaultValue}
         value={props.value}
         ref={props.innerRef}
         disabled={props.disabled}
-        style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, ...props.style }}
+        style={{
+          backgroundColor: colors.$1,
+          borderColor: colors.$5,
+          color: colors.$3,
+          ...props.style,
+        }}
       >
         {props.withBlank && (
           <option value={props.blankOptionValue ?? ''}></option>

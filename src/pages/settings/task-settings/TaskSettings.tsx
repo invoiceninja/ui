@@ -26,9 +26,14 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function TaskSettings() {
   const [t] = useTranslation();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -76,11 +81,20 @@ export function TaskSettings() {
       withoutBackButton
     >
       <Card title={t('settings')}>
-        <Element leftSide={t('default_task_rate')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="default_task_rate"
+              labelElement={<SettingsLabel label={t('default_task_rate')} />}
+            />
+          }
+        >
           <InputField
+            type="number"
             id="settings.default_task_rate"
             onChange={handleChange}
             value={companyChanges?.settings?.default_task_rate || ''}
+            disabled={disableSettingsField('default_task_rate')}
             errorMessage={errors?.errors['settings.default_task_rate']}
           />
         </Element>
@@ -261,7 +275,17 @@ export function TaskSettings() {
 
         <Divider />
 
-        <Element leftSide={t('show_tasks_in_client_portal')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_client_portal_tasks"
+              labelElement={
+                <SettingsLabel label={t('show_tasks_in_client_portal')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(
               companyChanges?.settings?.enable_client_portal_tasks
@@ -269,17 +293,27 @@ export function TaskSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('settings.enable_client_portal_tasks', value)
             }
+            disabled={disableSettingsField('enable_client_portal_tasks')}
           />
         </Element>
 
-        <Element leftSide={t('tasks_shown_in_portal')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="show_all_tasks_client_portal"
+              labelElement={
+                <SettingsLabel label={t('tasks_shown_in_portal')} />
+              }
+              defaultValue="invoiced"
+            />
+          }
+        >
           <SelectField
             id="settings.show_all_tasks_client_portal"
             onChange={handleChange}
             disabled={
-              companyChanges?.settings?.enable_client_portal_tasks
-                ? false
-                : true
+              Boolean(!companyChanges?.settings?.enable_client_portal_tasks) ||
+              disableSettingsField('show_all_tasks_client_portal')
             }
             value={
               companyChanges?.settings?.show_all_tasks_client_portal?.toString() ||

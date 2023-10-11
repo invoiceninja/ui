@@ -28,7 +28,6 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
-import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
 import { Clients } from './components/Clients';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -127,13 +126,6 @@ export function Edit() {
                 />
               </div>
             </Card>
-          )}
-
-          {groupSettings && (
-            <GroupSettingsProperties
-              groupSettings={groupSettings}
-              handleChange={handleChange}
-            />
           )}
         </div>
 

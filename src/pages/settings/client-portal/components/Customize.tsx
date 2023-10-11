@@ -16,58 +16,95 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Customize() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
+  const disableSettingsField = useDisableSettingsField();
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
     <Card title={t('customize')}>
-      <Element leftSide={t('header')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="portal_custom_head"
+            labelElement={<SettingsLabel label={t('header')} />}
+          />
+        }
+      >
         <InputField
           element="textarea"
           value={company?.settings.portal_custom_head || ''}
           onValueChange={(value) =>
             handleChange('settings.portal_custom_head', value)
           }
+          disabled={disableSettingsField('portal_custom_head')}
           errorMessage={errors?.errors['settings.portal_custom_head']}
         />
       </Element>
 
-      <Element leftSide={t('footer')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="portal_custom_footer"
+            labelElement={<SettingsLabel label={t('footer')} />}
+          />
+        }
+      >
         <InputField
           element="textarea"
           value={company?.settings.portal_custom_footer || ''}
           onValueChange={(value) =>
             handleChange('settings.portal_custom_footer', value)
           }
+          disabled={disableSettingsField('portal_custom_footer')}
           errorMessage={errors?.errors['settings.portal_custom_footer']}
         />
       </Element>
 
       {isSelfHosted() && (
         <>
-          <Element leftSide={t('custom_css')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="portal_custom_css"
+                labelElement={<SettingsLabel label={t('custom_css')} />}
+              />
+            }
+          >
             <InputField
               element="textarea"
               value={company?.settings.portal_custom_css || ''}
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_css', value)
               }
+              disabled={disableSettingsField('portal_custom_css')}
               errorMessage={errors?.errors['settings.portal_custom_css']}
             />
           </Element>
 
-          <Element leftSide={t('custom_javascript')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="portal_custom_js"
+                labelElement={<SettingsLabel label={t('custom_javascript')} />}
+              />
+            }
+          >
             <InputField
               element="textarea"
               value={company?.settings.portal_custom_js || ''}
               onValueChange={(value) =>
                 handleChange('settings.portal_custom_js', value)
               }
+              disabled={disableSettingsField('portal_custom_js')}
               errorMessage={errors?.errors['settings.portal_custom_js']}
             />
           </Element>
