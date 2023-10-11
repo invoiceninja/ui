@@ -17,7 +17,7 @@ interface Props {
   value: any;
   errorMessage?: string[] | string;
   disabled?: boolean;
-  onValueChange: (value: string | number | boolean) => void;
+  onValueChange: (value: string) => void;
 }
 
 const isOptionElement = (child: ReactNode): child is React.ReactElement => {
@@ -56,7 +56,7 @@ export function SearchableSelect({ children, value, errorMessage, disabled, onVa
         label: 'label',
         value: 'value',
       }}
-      onChange={(entry) => onValueChange(entry.value)}
+      onChange={(entry) => onValueChange(entry.value.toString())}
       errorMessage={errorMessage}
       readonly={disabled}
     />
