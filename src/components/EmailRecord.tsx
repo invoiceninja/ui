@@ -22,7 +22,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 interface Props extends CommonProps {
   emailRecord: EmailRecordType;
   index: number;
-  withBorder?: boolean;
+  withBottomBorder?: boolean;
 }
 
 const Div = styled.div`
@@ -43,7 +43,7 @@ export function EmailRecord(props: Props) {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { emailRecord, index, withBorder } = props;
+  const { emailRecord, index, withBottomBorder } = props;
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(
     !index ? false : true
@@ -52,7 +52,7 @@ export function EmailRecord(props: Props) {
   return (
     <div
       className={classNames('flex flex-col', {
-        'border-b': withBorder,
+        'border-b': withBottomBorder,
       })}
       style={{ borderColor: colors.$5 }}
     >

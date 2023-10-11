@@ -50,6 +50,7 @@ export function EmailHistory() {
         <div className="col-span-12 lg:col-span-5 xl:col-span-4">
           <InfoCard
             title={t('email_history')}
+            className="max-h-96 overflow-y-auto"
             value={emailRecords.map(
               (emailRecord, index) =>
                 emailRecord && (
@@ -57,11 +58,10 @@ export function EmailHistory() {
                     key={index}
                     emailRecord={emailRecord}
                     index={index}
-                    withBorder
+                    withBottomBorder
                   />
                 )
             )}
-            className="max-h-96 overflow-y-auto"
           />
         </div>
       )}

@@ -152,14 +152,10 @@ export function InvoiceSlider() {
     const response = await queryClient.fetchQuery(
       ['/api/v1/invoices', invoice?.id, 'emailHistory'],
       () =>
-        request(
-          'POST',
-          endpoint('/api/v1/emails/entityHistory', { id: invoice?.id }),
-          {
-            entity: 'invoice',
-            entity_id: invoice?.id,
-          }
-        ).then((response) => response.data),
+        request('POST', endpoint('/api/v1/emails/entityHistory'), {
+          entity: 'invoice',
+          entity_id: invoice?.id,
+        }).then((response) => response.data),
       { staleTime: Infinity }
     );
 
@@ -423,17 +419,15 @@ export function InvoiceSlider() {
           ))}
         </div>
 
-        <div>
-          <div className="flex flex-col">
-            {emailRecords.map((emailRecord, index) => (
-              <EmailRecord
-                key={index}
-                className="py-4"
-                emailRecord={emailRecord}
-                index={index}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col">
+          {emailRecords.map((emailRecord, index) => (
+            <EmailRecord
+              key={index}
+              className="py-4"
+              emailRecord={emailRecord}
+              index={index}
+            />
+          ))}
         </div>
       </TabGroup>
     </Slider>
