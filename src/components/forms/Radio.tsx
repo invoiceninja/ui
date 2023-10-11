@@ -11,6 +11,7 @@
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ChangeEvent } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import classNames from 'classnames';
 
 interface Props extends CommonProps {
   options: {
@@ -42,16 +43,21 @@ export function Radio(props: Props) {
               value={option.value}
               onClick={props.onClick}
               onChange={() => {}}
+              disabled={props.disabled}
               id={option.id}
               name={props.name}
               type="radio"
               checked={option.value === props.defaultSelected}
-              className="focus:ring-gray-500 h-4 w-4 border-gray-300"
+              className="focus:ring-gray-500 h-4 w-4 border-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
               style={{ color: accentColor }}
             />
             <label
               htmlFor={option.id}
-              className="ml-3 block text-sm font-medium cursor-pointer"
+              className={classNames('ml-3 block text-sm font-medium', {
+                'opacity-75 cursor-not-allowed': props.disabled,
+                'cursor-pointer':
+                  typeof props.disabled === 'undefined' || !props.disabled,
+              })}
             >
               {option.title}
             </label>

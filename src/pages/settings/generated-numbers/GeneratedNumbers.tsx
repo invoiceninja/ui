@@ -18,6 +18,7 @@ import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useGeneratedNumbersTabs } from './common/hooks/useGeneratedNumbersTabs';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export function GeneratedNumbers() {
   useTitle('generated_numbers');
@@ -28,6 +29,8 @@ export function GeneratedNumbers() {
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
   ];
+
+  useInjectCompanyChanges();
 
   const tabs = useGeneratedNumbersTabs();
 

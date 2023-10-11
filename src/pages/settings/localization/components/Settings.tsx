@@ -28,10 +28,15 @@ import { hasLanguageChanged } from '../common/atoms';
 import { ChangeEvent } from 'react';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function Settings() {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -61,11 +66,20 @@ export function Settings() {
   return (
     <>
       <Card title={t('settings')}>
-        <Element leftSide={t('currency')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="currency_id"
+              labelElement={<SettingsLabel label={t('currency')} />}
+              defaultValue="1"
+            />
+          }
+        >
           <SelectField
             value={company?.settings?.currency_id || ''}
             id="settings.currency_id"
             onChange={handleChange}
+            disabled={disableSettingsField('currency_id')}
             errorMessage={errors?.errors['settings.currency_id']}
           >
             <option value=""></option>
@@ -92,7 +106,15 @@ export function Settings() {
           />
         </Element> */}
 
-        <Element leftSide={t('currency_format')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="show_currency_code"
+              labelElement={<SettingsLabel label={t('currency_format')} />}
+              defaultValue="false"
+            />
+          }
+        >
           <Radio
             onValueChange={(value) =>
               dispatch(
@@ -108,15 +130,25 @@ export function Settings() {
             defaultSelected={
               company?.settings?.show_currency_code?.toString() ?? 'false'
             }
+            disabled={disableSettingsField('show_currency_code')}
           />
         </Element>
 
         {!isDemo() && (
-          <Element leftSide={t('language')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="language_id"
+                labelElement={<SettingsLabel label={t('language')} />}
+                defaultValue="1"
+              />
+            }
+          >
             <SelectField
               onChange={handleLanguageChange}
               id="settings.language_id"
               value={company?.settings?.language_id || '1'}
+              disabled={disableSettingsField('language_id')}
               errorMessage={errors?.errors['settings.language_id']}
             >
               {statics?.languages.map((language: Language) => (
@@ -128,11 +160,20 @@ export function Settings() {
           </Element>
         )}
 
-        <Element leftSide={t('timezone')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="timezone_id"
+              labelElement={<SettingsLabel label={t('timezone')} />}
+              defaultValue="1"
+            />
+          }
+        >
           <SelectField
             onChange={handleChange}
             id="settings.timezone_id"
             value={company?.settings?.timezone_id || '1'}
+            disabled={disableSettingsField('timezone_id')}
             errorMessage={errors?.errors['settings.timezone_id']}
           >
             {statics?.timezones.map((timezone: Timezone) => (
@@ -143,11 +184,20 @@ export function Settings() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('date_format')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="date_format_id"
+              labelElement={<SettingsLabel label={t('date_format')} />}
+              defaultValue="1"
+            />
+          }
+        >
           <SelectField
             onChange={handleChange}
             id="settings.date_format_id"
             value={company?.settings?.date_format_id || '1'}
+            disabled={disableSettingsField('date_format_id')}
             errorMessage={errors?.errors['settings.date_format_id']}
           >
             {statics?.date_formats.map((dateFormat: DateFormat) => (
@@ -158,7 +208,15 @@ export function Settings() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('military_time')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="military_time"
+              labelElement={<SettingsLabel label={t('military_time')} />}
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(company?.settings?.military_time)}
             onChange={(value: boolean) =>
@@ -170,6 +228,7 @@ export function Settings() {
                 })
               )
             }
+            disabled={disableSettingsField('military_time')}
           />
         </Element>
 
