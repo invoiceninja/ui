@@ -44,7 +44,9 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { EmailRecord } from '$app/components/EmailRecord';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -120,6 +122,8 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
+
   const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
@@ -145,7 +149,7 @@ export function InvoiceSlider() {
   });
 
   const fetchEmailHistory = async () => {
-    const response: AxiosResponse = await queryClient.fetchQuery(
+    const response = await queryClient.fetchQuery(
       ['/api/v1/invoices', invoice?.id, 'emailHistory'],
       () =>
         request(
@@ -155,13 +159,11 @@ export function InvoiceSlider() {
             entity: 'invoice',
             entity_id: invoice?.id,
           }
-        ).then(
-          (response: GenericSingleResourceResponse<Invoice>) => response.data
-        ),
+        ).then((response) => response.data),
       { staleTime: Infinity }
     );
 
-    console.log(response);
+    setEmailRecords(response);
   };
 
   useEffect(() => {
@@ -421,7 +423,18 @@ export function InvoiceSlider() {
           ))}
         </div>
 
-        <div></div>
+        <div>
+          <div className="flex flex-col">
+            {emailRecords.map((emailRecord, index) => (
+              <EmailRecord
+                key={index}
+                className="py-4"
+                emailRecord={emailRecord}
+                index={index}
+              />
+            ))}
+          </div>
+        </div>
       </TabGroup>
     </Slider>
   );
