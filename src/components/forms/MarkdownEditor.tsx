@@ -18,6 +18,7 @@ interface Props {
   value?: string | undefined;
   onChange: (value: string) => unknown;
   label?: string;
+  disabled?: boolean;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -91,6 +92,7 @@ export function MarkdownEditor(props: Props) {
           paste_data_images: false,
         }}
         onEditorChange={handleChange}
+        disabled={props.disabled}
       />
     </div>
   );

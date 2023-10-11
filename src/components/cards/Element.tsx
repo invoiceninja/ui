@@ -23,10 +23,11 @@ interface Props {
   noExternalPadding?: boolean;
   withoutItemsCenter?: boolean;
   withoutWrappingLeftSide?: boolean;
+  disabledLabels?: boolean;
 }
 
 export function Element(props: Props) {
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <div
@@ -39,7 +40,12 @@ export function Element(props: Props) {
       )}
       onClick={props.onClick}
     >
-      <dt className="text-sm text-gray-500 flex flex-col">
+      <dt
+        className={classNames('text-sm flex flex-col', {
+          'opacity-75': props.disabledLabels,
+        })}
+        style={{ color: colors.$3 }}
+      >
         <span
           className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
@@ -54,21 +60,18 @@ export function Element(props: Props) {
             props.leftSideHelp
           ) : (
             <span
-              className="text-xs text-gray-500"
+              className="text-xs"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
+              style={{ color: colors.$3, opacity: 0.8 }}
             ></span>
           ))}
       </dt>
       <dd
-        className={classNames(
-          'mt-4 text-sm sm:mt-0 sm:col-span-2',
-          {
-            'flex flex-col sm:flex-row sm:justify-end':
-              props.pushContentToRight,
-          }
-        )}
+        className={classNames('mt-4 text-sm sm:mt-0 sm:col-span-2', {
+          'flex flex-col sm:flex-row sm:justify-end': props.pushContentToRight,
+        })}
         style={{ color: colors.$3 }}
       >
         {props.children}
