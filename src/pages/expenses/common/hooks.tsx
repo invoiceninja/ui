@@ -233,7 +233,8 @@ export function useExpenseColumns() {
       column: 'category',
       id: 'category_id',
       label: t('category'),
-      format: (_, expense) => expense && <ExpenseCategory expense={expense} />,
+      format: (_, expense) =>
+        expense?.category && <ExpenseCategory expense={expense} />,
     },
     {
       column: 'status',
