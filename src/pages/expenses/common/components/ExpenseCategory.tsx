@@ -8,13 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { StatusBadge } from '$app/components/StatusBadge';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
+import { useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { Expense } from '$app/common/interfaces/expense';
-import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import Tippy from '@tippyjs/react/headless';
 import { Dispatch, SetStateAction } from 'react';
+import { useSave } from '../../edit/hooks/useSave';
 
 interface DropdownProps {
   visible: boolean;
@@ -23,15 +31,16 @@ interface DropdownProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
   expense: Expense;
 }
-export function ExpenseCategoriesDropdown(props: DropdownProps) {
+function ExpenseCategoriesDropdown(props: DropdownProps) {
   const colors = useColorScheme();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { visible, isFormBusy, setIsFormBusy, expense, setVisible } = props;
 
   const { data: expenseCategories } = useExpenseCategoriesQuery({
     status: ['active'],
   });
+
+  const save = useSave({ isFormBusy, setIsFormBusy });
 
   return (
     <Tippy
@@ -54,6 +63,7 @@ export function ExpenseCategoriesDropdown(props: DropdownProps) {
                   key={index}
                   onClick={() => {
                     setVisible(false);
+                    save({ ...expense, category_id: expenseCategory.id });
                   }}
                 >
                   {expenseCategory.name}
@@ -70,11 +80,45 @@ export function ExpenseCategoriesDropdown(props: DropdownProps) {
 }
 
 interface Props {
-  expenseCategory: ExpenseCategoryType;
+  expense: Expense;
 }
 
 export function ExpenseCategory(props: Props) {
-  const { expenseCategory } = props;
+  const ref = useRef(null);
+  const { expense } = props;
 
-  return <div>{expenseCategory.name}</div>;
+  const adjustColorDarkness = useAdjustColorDarkness();
+
+  const [visibleDropdown, setVisibleDropdown] = useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  useClickAway(ref, () => {
+    visibleDropdown && setVisibleDropdown(false);
+  });
+
+  const { red, green, blue, hex } = hexToRGB(expense.category?.color || '');
+
+  const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
+  return (
+    <div ref={ref}>
+      <StatusBadge
+        for={{}}
+        code={expense.category?.name || ''}
+        style={{
+          color: adjustColorDarkness(hex, darknessAmount),
+          backgroundColor: expense.category?.color,
+        }}
+        onClick={() => !isFormBusy && setVisibleDropdown(true)}
+      />
+
+      <ExpenseCategoriesDropdown
+        visible={visibleDropdown}
+        isFormBusy={isFormBusy}
+        setIsFormBusy={setIsFormBusy}
+        expense={expense}
+        setVisible={setVisibleDropdown}
+      />
+    </div>
+  );
 }
