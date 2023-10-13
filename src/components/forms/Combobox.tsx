@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { CSSProperties, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -59,6 +59,8 @@ export interface ComboboxStaticProps<T = any> {
   onDismiss?: () => unknown;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  className?: string,
+  style?: CSSProperties;
 }
 
 export type Nullable<T> = T | null;
@@ -435,6 +437,8 @@ export function ComboboxStatic<T = any>({
   entryOptions,
   errorMessage,
   clearInputAfterSelection,
+  className,
+  style
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -539,7 +543,7 @@ export function ComboboxStatic<T = any>({
   const colors = useColorScheme();
 
   return (
-    <div className="w-full">
+    <div className={classNames('w-full', className)} style={style}>
       <HeadlessCombobox
         as="div"
         value={selectedValue}

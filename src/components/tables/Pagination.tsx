@@ -54,7 +54,7 @@ export function Pagination(props: Props) {
   return (
     <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
       <div className="flex justify-center md:justify-start items-center space-x-4">
-        <div className="flex items-center space-x-2 flex-wrap">
+        <div className="flex flex-row items-center space-x-2">
           <SearchableSelect value="" onValueChange={(value) => props.onRowsChange(value)}>
             <option value="10">10</option>
             <option value="50">50</option>
@@ -62,8 +62,7 @@ export function Pagination(props: Props) {
           </SearchableSelect>
 
           <label
-            htmlFor="location"
-            className="block text-sm font-medium"
+            className="text-sm font-medium"
             style={{ color: colors.$3 }}
           >
             {t('rows')}

@@ -62,19 +62,17 @@ export function SearchableSelect({
   );
 
   return (
-    <div className={className} style={style}>
-      <ComboboxStatic
-        entries={entries as Entry[]}
-        inputOptions={{ value, label: label ?? undefined }}
-        entryOptions={{
-          id: 'id',
-          label: 'label',
-          value: 'value',
-        }}
-        onChange={(entry) => onValueChange(entry.value.toString())}
-        errorMessage={errorMessage}
-        readonly={disabled}
-      />
-    </div>
+    <ComboboxStatic
+      entries={entries as Entry[]}
+      inputOptions={{ value, label: label ?? undefined }}
+      entryOptions={{
+        id: 'id',
+        label: 'label',
+        value: 'value',
+      }}
+      onChange={(entry) => onValueChange(entry.value.toString())}
+      errorMessage={errorMessage}
+      readonly={disabled}
+    />
   );
 }
