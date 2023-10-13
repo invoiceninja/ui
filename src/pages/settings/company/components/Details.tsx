@@ -175,7 +175,6 @@ export function Details() {
 
           <Element leftSide={t('classification')}>
             <SearchableSelect
-              id="classification"
               value={companyChanges?.settings?.classification ?? ''}
               onValueChange={(value) =>
                 handleChange('settings.classification', value.toString())

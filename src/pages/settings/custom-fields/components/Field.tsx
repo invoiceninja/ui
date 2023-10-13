@@ -12,8 +12,7 @@ import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisable
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
-import { SearchableSelect } from '$app/components/SearchableSelect';
+import { InputField, SelectField } from '../../../../components/forms';
 
 export enum AvailableTypes {
   SingleLineText = 'single_line_text',
@@ -102,7 +101,7 @@ export function Field(props: Props) {
           />
         }
       >
-        <SearchableSelect
+        <SelectField
           innerRef={dropdownTypeRef}
           onChange={(event: ChangeEvent<HTMLSelectElement>) => {
             setDropdownType(event.target.value as AvailableTypes);
@@ -115,7 +114,7 @@ export function Field(props: Props) {
           <option value="switch">{t('switch')}</option>
           <option value="dropdown">{t('dropdown')}</option>
           <option value="date">{t('date')}</option>
-        </SearchableSelect>
+        </SelectField>
       </Element>
 
       {dropdownType === AvailableTypes.Dropdown && (

@@ -13,7 +13,6 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaskStatuses } from '..';
@@ -27,6 +26,7 @@ import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -46,14 +46,7 @@ export function TaskSettings() {
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+  const handleChange = useHandleCurrentCompanyChangeProperty()
 
   const handleToggleChange = (id: string, value: boolean) =>
     dispatch(
@@ -275,7 +268,7 @@ export function TaskSettings() {
 
         <Element leftSide={t('tasks_shown_in_portal')}>
           <SearchableSelect
-            onChange={handleChange}
+            onValueChange={(v)  =>  handleChange('settings.show_all_tasks_client_portal', v)}
             disabled={
               companyChanges?.settings?.enable_client_portal_tasks
                 ? false

@@ -58,7 +58,6 @@ export function USRegions() {
         <div className="grid grid-cols-5 gap-4">
           <div className="col-span-4">
             <SearchableSelect
-              id="tax_data.regions.US.tax_all_subregions"
               className=""
               value={companyChanges.tax_data.regions.US.tax_all_subregions}
               onValueChange={(value) =>
