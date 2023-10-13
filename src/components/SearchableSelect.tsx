@@ -73,6 +73,8 @@ export function SearchableSelect({
       onChange={(entry) => onValueChange(entry.value.toString())}
       errorMessage={errorMessage}
       readonly={disabled}
+      className={className}
+      style={style}
     />
   );
 }

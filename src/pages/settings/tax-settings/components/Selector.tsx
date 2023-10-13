@@ -20,7 +20,6 @@ import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { SearchableSelect } from '$app/components/SearchableSelect';
 import { SelectField } from '$app/components/forms';
 
 interface Props {
