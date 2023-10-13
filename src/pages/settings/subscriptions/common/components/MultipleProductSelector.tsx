@@ -10,7 +10,7 @@
 
 import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
-import { Link, SelectField } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';

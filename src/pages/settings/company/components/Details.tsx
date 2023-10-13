@@ -15,12 +15,12 @@ import { Card } from '$app/components/cards/Card';
 import { Element } from '$app/components/cards/Element';
 import { CustomField } from '$app/components/CustomField';
 import { InputField } from '$app/components/forms/InputField';
-import { SelectField } from '$app/components/forms/SelectField';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Details() {
   const [t] = useTranslation();
@@ -132,12 +132,12 @@ export function Details() {
               </Element>
             </>
           ) : (
-            ''
+            null
           )}
 
           {isCompanySettingsActive && (
             <Element leftSide={t('size_id')}>
-              <SelectField
+              <SearchableSelect
                 value={companyChanges?.size_id || '1'}
                 onValueChange={(value) =>
                   handleChange('size_id', value.toString())
@@ -149,13 +149,13 @@ export function Details() {
                     {size.name}
                   </option>
                 ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {isCompanySettingsActive && (
             <Element leftSide={t('industry_id')}>
-              <SelectField
+              <SearchableSelect
                 value={companyChanges?.industry_id || '1'}
                 onValueChange={(value) =>
                   handleChange('industry_id', value.toString())
@@ -169,12 +169,12 @@ export function Details() {
                     </option>
                   )
                 )}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           <Element leftSide={t('classification')}>
-            <SelectField
+            <SearchableSelect
               id="classification"
               value={companyChanges?.settings?.classification ?? ''}
               onValueChange={(value) =>
@@ -190,7 +190,7 @@ export function Details() {
               <option value="government">{t('government')}</option>
               <option value="other">{t('other')}</option>
 
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           {companyChanges?.custom_fields?.company1 && (

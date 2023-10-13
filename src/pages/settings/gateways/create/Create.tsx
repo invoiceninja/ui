@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, Link, SelectField } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
@@ -30,6 +30,7 @@ import {
   availableGatewayLogos,
   GatewayTypeIcon,
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 const gatewaysStyles = [
   { name: 'paypal_express', width: 110 },
@@ -196,18 +197,18 @@ export function Create() {
       >
         <Card title={t('add_gateway')}>
           <Element leftSide={t('provider')}>
-            <SelectField
+            <SearchableSelect
               onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
               errorMessage={errors?.errors.gateway_key}
-              withBlank
             >
+              <option value=""></option>
               {filteredGateways.map((gateway, index) => (
                 <option value={gateway.id} key={index}>
                   {gateway.name}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </Element>
         </Card>
 

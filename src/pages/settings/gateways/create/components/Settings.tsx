@@ -19,7 +19,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway, Option } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   gateway: Gateway;
@@ -102,7 +103,7 @@ export function Settings(props: Props) {
 
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('capture_card')}>
-          <SelectField
+          <SearchableSelect
             value={props.companyGateway.token_billing || 'off'}
             onValueChange={(value) => handleChange('token_billing', value)}
             errorMessage={props.errors?.errors.token_billing}
@@ -111,7 +112,7 @@ export function Settings(props: Props) {
             <option value="optout">{t('auto_bill_help_optout')}</option>
             <option value="optin">{t('auto_bill_help_optin')}</option>
             <option value="off">{t('off')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
 

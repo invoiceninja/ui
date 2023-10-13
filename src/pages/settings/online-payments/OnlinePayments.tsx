@@ -15,11 +15,10 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { InputField, Link, SelectField } from '../../../components/forms';
+import { InputField, Link } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
-  useHandleCurrentCompanyChange,
   useHandleCurrentCompanyChangeProperty,
 } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
@@ -31,6 +30,7 @@ import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -54,7 +54,6 @@ export function OnlinePayments() {
 
   const company = useInjectCompanyChanges();
 
-  const handleChange = useHandleCurrentCompanyChange();
   const handleChangeProperty = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
@@ -99,10 +98,9 @@ export function OnlinePayments() {
         </Element>
 
         <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
-          <SelectField
+          <SearchableSelect
             value={company?.settings.auto_bill || 'off'}
-            onChange={handleChange}
-            id="settings.auto_bill"
+            onValueChange={(v) => handleChangeProperty('settings.auto_bill', v)}
             errorMessage={errors?.errors['settings.auto_bill']}
           >
             <option value="always">
@@ -117,41 +115,38 @@ export function OnlinePayments() {
             <option value="off">
               {t('disabled')} ({t('auto_bill_help_off')})
             </option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('auto_bill_on')}>
-          <SelectField
-            id="settings.auto_bill_date"
+          <SearchableSelect
             value={company?.settings.auto_bill_date || 'on_send_date'}
-            onChange={handleChange}
+            onValueChange={(v) => handleChangeProperty('settings.auto_bill_date', v)}
             errorMessage={errors?.errors['settings.auto_bill_date']}
           >
             <option value="on_send_date">{t('send_date')}</option>
             <option value="on_due_date">{t('due_date')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('use_available_credits')}>
-          <SelectField
+          <SearchableSelect
             value={company?.settings.use_credits_payment || 'off'}
-            id="settings.use_credits_payment"
-            onChange={handleChange}
+            onValueChange={(v) => handleChangeProperty('settings.use_credits_payment', v)}
             errorMessage={errors?.errors['settings.use_credits_payment']}
           >
             <option value="always">{t('enabled')}</option>
             <option value="option">{t('show_option')}</option>
             <option value="off">{t('off')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         {paymentTerms && (
           <>
             <Element leftSide={t('payment_terms')}>
-              <SelectField
+              <SearchableSelect
                 value={company?.settings?.payment_terms || ''}
-                id="settings.payment_terms"
-                onChange={handleChange}
+                onValueChange={(v) => handleChangeProperty('settings.payment_terms', v)}
                 errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
@@ -160,7 +155,7 @@ export function OnlinePayments() {
                     {type.name}
                   </option>
                 ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
 
             <Element className="py-0 sm:py-0">

@@ -10,12 +10,13 @@
 
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export const COUNTER_PADDINGS = [
   '1',
@@ -57,8 +58,7 @@ export function Settings() {
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('number_padding')}>
-        <SelectField
-          id="settings.counter_padding"
+        <SearchableSelect
           value={companyChanges?.settings?.counter_padding || '1'}
           onValueChange={(value) =>
             handleChange('settings.counter_padding', value)
@@ -70,12 +70,11 @@ export function Settings() {
               {value}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('generate_number')}>
-        <SelectField
-          id="settings.counter_number_applied"
+        <SearchableSelect
           value={
             companyChanges?.settings?.counter_number_applied || 'when_saved'
           }
@@ -86,7 +85,7 @@ export function Settings() {
         >
           <option value="when_saved">{t('when_saved')}</option>
           <option value="when_sent">{t('when_sent')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('recurring_prefix')}>
@@ -122,7 +121,7 @@ export function Settings() {
       </Element>
 
       <Element leftSide={t('reset_counter')}>
-        <SelectField
+        <SearchableSelect
           value={companyChanges?.settings?.reset_counter_frequency_id || '0'}
           onValueChange={(value) =>
             handleChange('settings.reset_counter_frequency_id', parseInt(value))
@@ -134,7 +133,7 @@ export function Settings() {
               {t(value)}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       {companyChanges?.settings &&

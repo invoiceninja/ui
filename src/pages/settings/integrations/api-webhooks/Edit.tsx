@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -31,6 +31,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { useActions } from './common/useActions';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -194,7 +195,7 @@ export function Edit() {
         </Element>
 
         <Element leftSide={t('event_type')}>
-          <SelectField
+          <SearchableSelect
             value={apiWebHook?.event_id}
             onValueChange={(value) => handleChange('event_id', value)}
             errorMessage={errors?.errors.event_id}
@@ -204,18 +205,18 @@ export function Edit() {
                 {event.label}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('method')}>
-          <SelectField
+          <SearchableSelect
             value={apiWebHook?.rest_method}
             onValueChange={(value) => handleChange('rest_method', value)}
             errorMessage={errors?.errors.rest_method}
           >
             <option value="post">POST</option>
             <option value="put">PUT</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('add_header')}>

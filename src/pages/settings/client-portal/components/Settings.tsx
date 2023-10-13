@@ -15,7 +15,7 @@ import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { InputField, Link, SelectField } from '../../../../components/forms';
+import { InputField, Link } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
@@ -25,6 +25,7 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import classNames from 'classnames';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -63,9 +64,8 @@ export function Settings() {
             leftSide={t('portal_mode')}
             leftSideHelp={t('subdomain_guide')}
           >
-            <SelectField
+            <SearchableSelect
               disabled={freePlan()}
-              id="portal_mode"
               value={company?.portal_mode || 'subdomain'}
               onValueChange={(value) => handleChange('portal_mode', value)}
               errorMessage={errors?.errors.portal_mode}
@@ -76,7 +76,7 @@ export function Settings() {
               <option value="domain" key="domain">
                 {t('domain')}
               </option>
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           {company?.portal_mode === 'subdomain' && (

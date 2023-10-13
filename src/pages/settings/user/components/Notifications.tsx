@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { SelectField } from '$app/components/forms';
 import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
 import { SearchableSelect } from '$app/components/SearchableSelect';
 

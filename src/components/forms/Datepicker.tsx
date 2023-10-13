@@ -31,8 +31,8 @@ import dayjs from 'dayjs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date as formatDate } from '$app/common/helpers';
 import { Button } from './Button';
-import { SelectField } from './SelectField';
 import { atom, useAtomValue } from 'jotai';
+import { SearchableSelect } from '../SearchableSelect';
 
 interface Props extends CommonProps {
   required?: boolean;
@@ -211,7 +211,7 @@ export function DatePicker(props: Props) {
 
         <div className="flex justify-between items-center px-2">
           <div className="flex space-x-1">
-            <SelectField
+            <SearchableSelect
               className="text-xs"
               value={currentDate.getMonth()}
               onValueChange={(value) => changeMonth(parseInt(value))}
@@ -222,9 +222,9 @@ export function DatePicker(props: Props) {
                   {t(label)}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
 
-            <SelectField
+            <SearchableSelect
               className="text-xs"
               value={currentDate.getFullYear()}
               onValueChange={(value) => changeYear(parseInt(value))}
@@ -235,7 +235,7 @@ export function DatePicker(props: Props) {
                   {year}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </div>
 
           <div className="flex space-x-1">

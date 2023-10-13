@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from './forms';
 import { GenericSelectorProps } from './CountrySelector';
 import { euCountries } from '$app/common/constants/eu-countries';
+import { SearchableSelect } from './SearchableSelect';
 
 export function EUCountrySelector(props: GenericSelectorProps) {
   return (
-    <SelectField
+    <SearchableSelect
       value={props.value}
       onValueChange={props.onChange}
       label={props.label}
-      withBlank
     >
+      <option value=""></option>
       {Object.entries(euCountries).map((state, index) => (
         <option key={index} value={state[0]}>
           {state[1]}
         </option>
       ))}
-    </SelectField>
+    </SearchableSelect>
   );
 }

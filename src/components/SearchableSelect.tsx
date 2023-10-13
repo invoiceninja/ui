@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode, isValidElement } from 'react';
+import React, { CSSProperties, ReactNode, isValidElement } from 'react';
 import { ComboboxStatic, Entry } from './forms/Combobox';
 import { v4 } from 'uuid';
 
@@ -18,13 +18,25 @@ interface Props {
   errorMessage?: string[] | string;
   disabled?: boolean;
   onValueChange: (value: string) => void;
+  className?: string;
+  style?: CSSProperties;
+  label?: string | null;
 }
 
 const isOptionElement = (child: ReactNode): child is React.ReactElement => {
   return React.isValidElement(child) && child.type === 'option';
 };
 
-export function SearchableSelect({ children, value, errorMessage, disabled, onValueChange }: Props) {
+export function SearchableSelect({
+  children,
+  value,
+  errorMessage,
+  disabled,
+  onValueChange,
+  className = '',
+  style,
+  label,
+}: Props) {
   const valid = React.Children.toArray(children).every(isOptionElement);
 
   if (valid === false) {
@@ -39,7 +51,9 @@ export function SearchableSelect({ children, value, errorMessage, disabled, onVa
       isValidElement(child) &&
       ({
         id: v4(),
-        label: child.props.children,
+        label: Array.isArray(child.props.children)
+          ? child.props.children.join('')
+          : child.props.children,
         value: child.props.value,
         resource: null,
         eventType: 'external',
@@ -48,17 +62,19 @@ export function SearchableSelect({ children, value, errorMessage, disabled, onVa
   );
 
   return (
-    <ComboboxStatic
-      entries={entries as Entry[]}
-      inputOptions={{ value }}
-      entryOptions={{
-        id: 'id',
-        label: 'label',
-        value: 'value',
-      }}
-      onChange={(entry) => onValueChange(entry.value.toString())}
-      errorMessage={errorMessage}
-      readonly={disabled}
-    />
+    <div className={className} style={style}>
+      <ComboboxStatic
+        entries={entries as Entry[]}
+        inputOptions={{ value, label: label ?? undefined }}
+        entryOptions={{
+          id: 'id',
+          label: 'label',
+          value: 'value',
+        }}
+        onChange={(entry) => onValueChange(entry.value.toString())}
+        errorMessage={errorMessage}
+        readonly={disabled}
+      />
+    </div>
   );
 }

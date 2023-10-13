@@ -9,7 +9,6 @@
  */
 
 import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Client } from '$app/common/interfaces/client';
 import { Parameters, Schedule } from '$app/common/interfaces/schedule';

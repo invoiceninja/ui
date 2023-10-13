@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -31,6 +31,7 @@ import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export type MailerResourceType =
   | 'invoice'
@@ -121,8 +122,8 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           </Element>
 
           <Element leftSide={t('template')}>
-            <SelectField
-              defaultValue={templateId}
+            <SearchableSelect
+              value={templateId}
               onValueChange={(value) => handleTemplateChange(value)}
               errorMessage={errors?.errors.template}
             >
@@ -151,7 +152,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
                   {company?.settings.email_subject_custom3}
                 </option>
               )}
-            </SelectField>
+            </SearchableSelect>
           </Element>
         </Card>
 

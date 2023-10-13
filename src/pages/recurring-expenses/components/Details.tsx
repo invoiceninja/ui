@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -25,6 +25,7 @@ import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -301,7 +302,7 @@ export function Details(props: Props) {
       )}
 
       <Element leftSide={t('frequency')}>
-        <SelectField
+        <SearchableSelect
           value={recurringExpense?.frequency_id}
           onValueChange={(value) => handleChange('frequency_id', value)}
           errorMessage={errors?.errors.frequency_id}
@@ -313,7 +314,7 @@ export function Details(props: Props) {
               {t(frequencies[frequency])}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('start_date')}>
@@ -331,7 +332,7 @@ export function Details(props: Props) {
       </Element>
 
       <Element leftSide={t('remaining_cycles')}>
-        <SelectField
+        <SearchableSelect
           value={recurringExpense?.remaining_cycles}
           onValueChange={(value) =>
             handleChange('remaining_cycles', parseInt(value))
@@ -344,7 +345,7 @@ export function Details(props: Props) {
               {number}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
     </Card>
   );

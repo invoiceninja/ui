@@ -9,9 +9,10 @@
  */
 
 import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { InputField, SelectField } from '.';
+import { useEffect, useState } from 'react';
+import { InputField } from '.';
 import Toggle from './Toggle';
+import { SearchableSelect } from '../SearchableSelect';
 
 export interface Props {
   defaultValue: any;
@@ -72,11 +73,9 @@ export function InputCustomField(props: Props) {
       )}
 
       {!Object.values(AvailableTypes).includes(type as AvailableTypes) && (
-        <SelectField
-          defaultValue={props.defaultValue || ''}
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            props.onValueChange(event.target.value)
-          }
+        <SearchableSelect
+          value={props.defaultValue || ''}
+          onValueChange={(v) => props.onValueChange(v)}
         >
           <option value=""></option>
           {type.split(',').map((option, index) => (
@@ -84,7 +83,7 @@ export function InputCustomField(props: Props) {
               {option}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       )}
     </>
   );

@@ -9,12 +9,12 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { arrayMoveImmutable } from 'array-move';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { cloneDeep, set } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -24,6 +24,7 @@ import {
 import { Menu, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   defaultVariables: { value: string; label: string }[];
@@ -52,10 +53,8 @@ export function SortableVariableList(props: Props) {
     return defaultVariables.find((field) => field.value === key);
   };
 
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const selectedOption = event.target.options[event.target.selectedIndex];
-
-    if (selectedOption.value === '') {
+  const handleSelectChange = (value: string): void => {
+    if (value === '') {
       return;
     }
 
@@ -70,12 +69,10 @@ export function SortableVariableList(props: Props) {
     }
 
     companyClone.settings.pdf_variables?.[props.for]?.push(
-      selectedOption.value
+      value
     );
 
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
-
-    event.target.value = '';
   };
 
   const remove = (property: string) => {
@@ -107,7 +104,7 @@ export function SortableVariableList(props: Props) {
   return (
     <>
       <Element leftSide={t('fields')}>
-        <SelectField onChange={handleSelectChange}>
+        <SearchableSelect onValueChange={handleSelectChange} value="">
           <option></option>
 
           {defaultVariablesFiltered.map((option, index) => (
@@ -115,7 +112,7 @@ export function SortableVariableList(props: Props) {
               {option.label}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('variables')}>

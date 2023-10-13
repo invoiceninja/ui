@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
@@ -29,6 +29,7 @@ import {
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useColorScheme } from '$app/common/colors';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -190,7 +191,7 @@ export function Totals() {
       <div className="flex justify-end">
         <div className="flex space-x-2">
           {currencies && (
-            <SelectField
+            <SearchableSelect
               value={currency.toString()}
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.currency', parseInt(value))
@@ -201,7 +202,7 @@ export function Totals() {
                   {currency.label}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           )}
 
           <div className="flex space-x-2">
@@ -249,7 +250,7 @@ export function Totals() {
           </div>
 
           <Preferences>
-            <SelectField
+            <SearchableSelect
               label={t('currency')}
               value={settings.preferences.dashboard_charts.currency}
               onValueChange={(value) =>
@@ -261,9 +262,9 @@ export function Totals() {
                   {currency.label}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
 
-            <SelectField
+            <SearchableSelect
               label={t('range')}
               value={settings.preferences.dashboard_charts.default_view}
               onValueChange={(value) =>
@@ -276,9 +277,9 @@ export function Totals() {
               <option value="day">{t('day')}</option>
               <option value="week">{t('week')}</option>
               <option value="month">{t('month')}</option>
-            </SelectField>
+            </SearchableSelect>
 
-            <SelectField
+            <SearchableSelect
               label={t('date_range')}
               value={settings.preferences.dashboard_charts.range}
               onValueChange={(value) =>
@@ -294,7 +295,7 @@ export function Totals() {
               <option value="this_year">{t('this_year')}</option>
               <option value="last_year">{t('last_year')}</option>
               <option value={'last365_days'}>{`${t('last365_days')}`}</option>
-            </SelectField>
+            </SearchableSelect>
           </Preferences>
         </div>
       </div>

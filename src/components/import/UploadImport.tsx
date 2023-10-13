@@ -11,17 +11,18 @@
 import { toast } from '$app/common/helpers/toast/toast';
 import { Card, Element } from '$app/components/cards';
 import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import Toggle from '$app/components/forms/Toggle';
 import { MdClose } from 'react-icons/md';
 import { BankAccountSelector } from '$app/pages/transactions/components/BankAccountSelector';
+import { SearchableSelect } from '../SearchableSelect';
 
 interface Props {
   entity: string;
@@ -57,9 +58,8 @@ export function UploadImport(props: Props) {
     column_map: { [props.entity]: { mapping: {} } },
   });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    payload.column_map[props.entity].mapping[event.target.id] =
-      event.target.value;
+  const handleChange = (index: number, value: string) => {
+    payload.column_map[props.entity].mapping[index] = value;
     setPayloadData(payload);
   };
 
@@ -136,16 +136,15 @@ export function UploadImport(props: Props) {
           props.onSuccess;
           toast.dismiss();
 
-          if (response.data?.mappings[props.entity]?.hints)
-          {
+          if (response.data?.mappings[props.entity]?.hints) {
             response.data?.mappings[props.entity]?.hints.forEach(
               (mapping: number, index: number) => {
-                payload.column_map[props.entity].mapping[index] = response.data?.mappings[props.entity].available[mapping];
+                payload.column_map[props.entity].mapping[index] =
+                  response.data?.mappings[props.entity].available[mapping];
                 setPayloadData(payload);
               }
             );
           }
-          
         }
       );
     },
@@ -160,13 +159,14 @@ export function UploadImport(props: Props) {
   };
 
   const defaultHint = (index: number) => {
-  
-    if(!mapData?.mappings[props.entity]?.hints) return null;
+    if (!mapData?.mappings[props.entity]?.hints) return null;
 
-
-    return mapData?.mappings[props.entity].available[mapData.mappings[props.entity]?.hints[index]] ?? null;
-
-  }
+    return (
+      mapData?.mappings[props.entity].available[
+        mapData.mappings[props.entity]?.hints[index]
+      ] ?? null
+    );
+  };
 
   const removeFileFromFormData = (fileIndex: number) => {
     const filteredFileList = files.filter((file, index) => fileIndex !== index);
@@ -306,7 +306,11 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={defaultHint(index)}>
+                    <SearchableSelect
+                      onValueChange={(value) => handleChange(index, value)}
+                      value={defaultHint(index)}
+                    >
+                      <option value=""></option>
                       {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
                           <option value={mapping} key={index}>
@@ -314,7 +318,7 @@ export function UploadImport(props: Props) {
                           </option>
                         )
                       )}
-                    </SelectField>
+                    </SearchableSelect>
                   </Td>
                 </Tr>
               )

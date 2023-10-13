@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import collect from 'collect.js';
 import paymentType from '$app/common/constants/payment-type';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
@@ -43,6 +43,7 @@ import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -515,19 +516,18 @@ export default function Create() {
           </Element>
 
           <Element leftSide={t('payment_type')}>
-            <SelectField
-              id="type_id"
+            <SearchableSelect
               value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
-              withBlank
             >
+              <option value=""></option>
               {Object.entries(paymentType).map(([id, type], index) => (
                 <option value={id} key={index}>
                   {t(type)}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           <Element leftSide={t('transaction_reference')}>

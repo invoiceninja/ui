@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
 import { Card, Element } from '../../../components/cards';
-import { SelectField } from '../../../components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';

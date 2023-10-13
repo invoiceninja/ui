@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { endpoint, isHosted, trans } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
@@ -38,6 +38,7 @@ import { companySettingsErrorsAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -235,7 +236,7 @@ export function EmailSettings() {
             )}
 
             <Element leftSide={t('e_invoice_type')}>
-              <SelectField
+              <SearchableSelect
                 value={company?.settings.e_invoice_type || 'EN16931'}
                 onValueChange={(value) =>
                   handleChange('settings.e_invoice_type', value)
@@ -253,7 +254,7 @@ export function EmailSettings() {
                 <option value="Facturae_3.2">Facturae_3.2</option>
                 <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
-              </SelectField>
+              </SearchableSelect>
             </Element>
           </>
         ) : null}
@@ -261,7 +262,7 @@ export function EmailSettings() {
         <Divider />
 
         <Element leftSide={t('email_provider')}>
-          <SelectField
+          <SearchableSelect
             value={company?.settings.email_sending_method || 'default'}
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
@@ -275,7 +276,7 @@ export function EmailSettings() {
             {isHosted() && <option value="office365">Microsoft</option>}
             <option value="client_postmark">Postmark</option>
             <option value="client_mailgun">Mailgun</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         {(company?.settings.email_sending_method === 'office365' ||
@@ -333,7 +334,7 @@ export function EmailSettings() {
             </Element>
 
             <Element leftSide={t('endpoint')}>
-              <SelectField
+              <SearchableSelect
                 value={company?.settings.mailgun_endpoint || 'api.mailgun.net'}
                 onValueChange={(value) =>
                   handleChange('settings.mailgun_endpoint', value)
@@ -344,7 +345,7 @@ export function EmailSettings() {
                   api.mailgun.net
                 </option>
                 <option value="api.eu.mailgun.net">api.eu.mailgun.net</option>
-              </SelectField>
+              </SearchableSelect>
             </Element>
           </>
         )}
@@ -391,7 +392,7 @@ export function EmailSettings() {
         </Element>
 
         <Element leftSide={t('send_time')}>
-          <SelectField
+          <SearchableSelect
             value={company?.settings.entity_send_time}
             onValueChange={(value) =>
               handleChange(
@@ -399,9 +400,9 @@ export function EmailSettings() {
                 value.length > 0 ? value : 6
               )
             }
-            withBlank
             errorMessage={errors?.errors['settings.entity_send_time']}
           >
+            <option value=""></option>
             {[...Array(24).keys()].map((number, index) => (
               <option key={index} value={number + 1}>
                 {dayjs()
@@ -410,13 +411,13 @@ export function EmailSettings() {
                   .format('h:ss A')}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Divider />
 
         <Element leftSide={t('email_design')}>
-          <SelectField
+          <SearchableSelect
             value={company?.settings.email_style || 'plain'}
             onValueChange={(value) =>
               handleChange('settings.email_style', value)
@@ -427,7 +428,7 @@ export function EmailSettings() {
             <option value="light">{t('light')}</option>
             <option value="dark">{t('dark')}</option>
             <option value="custom">{t('custom')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         {company?.settings.email_style === 'custom' && (

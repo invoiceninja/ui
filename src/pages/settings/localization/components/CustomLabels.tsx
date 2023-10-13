@@ -25,8 +25,8 @@ import {
   Button,
   InputField,
   Link,
-  SelectField,
 } from '../../../../components/forms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function CustomLabels() {
   const [t] = useTranslation();
@@ -173,11 +173,9 @@ export function CustomLabels() {
       >
         <Element
           leftSide={
-            <SelectField
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleSelectChange(event.target.value)
-              }
-              defaultValue=""
+            <SearchableSelect
+              value=""
+              onValueChange={(v) => handleSelectChange(v)}
             >
               <option value=""></option>
               {defaultLabelsFiltered.map((label) => (
@@ -185,7 +183,7 @@ export function CustomLabels() {
                   {label.translation}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           }
         >
           <Button

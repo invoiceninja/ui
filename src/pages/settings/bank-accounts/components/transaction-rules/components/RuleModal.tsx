@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { defaultRule } from '$app/common/constants/rules';
 import {
   Rule,
@@ -19,6 +19,7 @@ import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleChange } from '../hooks/useHandleChange';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   visible: boolean;
@@ -114,8 +115,7 @@ export function RuleModal(props: Props) {
       visible={visible}
       onClose={() => setVisible(false)}
     >
-      <SelectField
-        required
+      <SearchableSelect
         label={t('field')}
         value={rule?.search_key}
         onValueChange={(value) => handleChangeRuleField(value)}
@@ -124,10 +124,9 @@ export function RuleModal(props: Props) {
           {t('description')}
         </option>
         <option value="amount">{t('amount')}</option>
-      </SelectField>
+      </SearchableSelect>
 
-      <SelectField
-        required
+      <SearchableSelect
         label={t('operator')}
         value={rule?.operator}
         onValueChange={(value) => handleChangeRule('operator', value)}
@@ -140,7 +139,7 @@ export function RuleModal(props: Props) {
               </option>
             )
           )}
-      </SelectField>
+      </SearchableSelect>
 
       <InputField
         required

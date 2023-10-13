@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { useState } from 'react';

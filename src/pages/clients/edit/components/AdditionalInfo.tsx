@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
+import { InputField, Link } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
@@ -28,6 +28,7 @@ import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   client: Client | undefined;
@@ -100,55 +101,52 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
-              <SelectField
-                id="settings.currency_id"
-                defaultValue={client?.settings?.currency_id || ''}
+              <SearchableSelect
+                value={client?.settings?.currency_id || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('currency_id', value)
                 }
-                withBlank
                 errorMessage={errors?.errors['settings.currency_id']}
               >
+                <option value=""></option>
                 {currencies.map((currency, index) => (
                   <option key={index} value={currency.id}>
                     {currency.name}
                   </option>
                 ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {languages.length > 1 && (
             <Element leftSide={t('language')}>
-              <SelectField
-                id="settings.language_id"
-                defaultValue={client?.settings?.language_id || ''}
+              <SearchableSelect
+                value={client?.settings?.language_id || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('language_id', value)
                 }
                 errorMessage={errors?.errors['settings.language_id']}
-                withBlank
               >
+                <option value=""></option>
                 {languages.map((language, index) => (
                   <option key={index} value={language.id}>
                     {language.name}
                   </option>
                 ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {paymentTerms && (
             <Element leftSide={t('payment_terms')}>
-              <SelectField
-                id="settings.payment_terms"
-                defaultValue={client?.settings?.payment_terms || ''}
+              <SearchableSelect
+                value={client?.settings?.payment_terms || ''}
                 errorMessage={errors?.errors['settings.payment_terms']}
                 onValueChange={(value) =>
                   handleSettingsChange('payment_terms', value)
                 }
-                withBlank
               >
+                <option value=""></option>
                 {paymentTerms.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
@@ -156,21 +154,20 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                     </option>
                   )
                 )}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {paymentTerms && (
             <Element leftSide={t('quote_valid_until')}>
-              <SelectField
-                id="settings.valid_until"
-                defaultValue={client?.settings?.valid_until || ''}
+              <SearchableSelect
+                value={client?.settings?.valid_until || ''}
                 onValueChange={(value) =>
                   handleSettingsChange('valid_until', value)
                 }
                 errorMessage={errors?.errors['settings.valid_until']}
-                withBlank
               >
+                <option value=""></option>
                 {paymentTerms.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
@@ -178,7 +175,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                     </option>
                   )
                 )}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
@@ -195,9 +192,8 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           </Element>
 
           <Element leftSide={t('send_reminders')}>
-            <SelectField
-              id="settings.send_reminders"
-              defaultValue={
+            <SearchableSelect
+              value={
                 client?.settings?.send_reminders === true
                   ? 'enabled'
                   : client?.settings?.send_reminders === false
@@ -213,12 +209,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                   value === 'enabled' ? true : value === '' ? '' : false
                 )
               }
-              withBlank
               errorMessage={errors?.errors['settings.send_reminders']}
             >
+              <option value=""></option>
               <option value="enabled">{t('enabled')}</option>
               <option value="disabled">{t('disabled')}</option>
-            </SelectField>
+            </SearchableSelect>
           </Element>
         </div>
 
@@ -241,13 +237,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         <div className="-mx-5">
           {statics && (
             <Element leftSide={t('size_id')}>
-              <SelectField
-                id="size_id"
-                defaultValue={client?.size_id || ''}
+              <SearchableSelect
+                value={client?.size_id || ''}
                 onValueChange={(value) => handleChange('size_id', value)}
                 errorMessage={errors?.errors.size_id}
-                withBlank
               >
+                <option value=""></option>
                 {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
                     <option key={index} value={size.id}>
@@ -255,19 +250,18 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                     </option>
                   )
                 )}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           {statics && (
             <Element leftSide={t('industry')}>
-              <SelectField
-                id="industry_id"
-                defaultValue={client?.industry_id || ''}
+              <SearchableSelect
+                value={client?.industry_id || ''}
                 errorMessage={errors?.errors.industry_id}
                 onValueChange={(value) => handleChange('industry_id', value)}
-                withBlank
               >
+                <option value=""></option>
                 {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (
                     <option key={index} value={size.id}>
@@ -275,7 +269,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                     </option>
                   )
                 )}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
         </div>

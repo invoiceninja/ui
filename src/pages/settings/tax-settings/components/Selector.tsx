@@ -9,7 +9,6 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';

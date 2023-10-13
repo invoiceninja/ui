@@ -9,13 +9,14 @@
  */
 
 import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { useCountries } from '$app/common/hooks/useCountries';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   client: Client | undefined;
@@ -30,11 +31,11 @@ export function BillingAddress(props: Props) {
 
   const { errors, setClient, setErrors } = props;
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (property: string, value: string) => {
     setErrors(undefined);
 
     setClient(
-      (client) => client && set(client, event.target.id, event.target.value)
+      (client) => client && set(client, property, value)
     );
   };
 
@@ -44,7 +45,7 @@ export function BillingAddress(props: Props) {
         <InputField
           id="address1"
           value={props.client?.address1}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('address1', v)}
           errorMessage={errors?.errors.address1}
         />
       </Element>
@@ -53,8 +54,8 @@ export function BillingAddress(props: Props) {
         <InputField
           id="address2"
           value={props.client?.address2}
-          onChange={handleChange}
           errorMessage={errors?.errors.address2}
+          onValueChange={(v) => handleChange('address2', v)}
         />
       </Element>
 
@@ -62,7 +63,7 @@ export function BillingAddress(props: Props) {
         <InputField
           id="city"
           value={props.client?.city}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('city', v)}
           errorMessage={errors?.errors.city}
         />
       </Element>
@@ -71,7 +72,7 @@ export function BillingAddress(props: Props) {
         <InputField
           id="state"
           value={props.client?.state}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('state', v)}
           errorMessage={errors?.errors.state}
         />
       </Element>
@@ -80,18 +81,17 @@ export function BillingAddress(props: Props) {
         <InputField
           id="postal_code"
           value={props.client?.postal_code}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('postal_code', v)}
           errorMessage={errors?.errors.postal_code}
         />
       </Element>
 
       {countries.length > 1 && (
         <Element leftSide={t('country')}>
-          <SelectField
-            id="country_id"
-            defaultValue={props.client?.country_id}
-            onChange={handleChange}
+          <SearchableSelect
+            value={props.client?.country_id}
             errorMessage={errors?.errors.country_id}
+            onValueChange={(v) => handleChange('country_id', v)}
           >
             <option value=""></option>
 
@@ -100,7 +100,7 @@ export function BillingAddress(props: Props) {
                 {country.name}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
     </>

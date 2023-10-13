@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -18,6 +18,7 @@ import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
 import { useResolveConfigValue } from './useResolveConfigValue';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export type Field = '' | boolean | Array<string>;
 
@@ -105,10 +106,8 @@ export function useResolveInputField(
 
     if (typeof value === 'object') {
       return (
-        <SelectField
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChange(property as keyof Field, event.target.value)
-          }
+        <SearchableSelect
+          onValueChange={(v) => handleChange(property as keyof Field, v)}
           value={resolveConfigValue(property)}
           errorMessage={errors?.errors[property]}
         >
@@ -117,7 +116,7 @@ export function useResolveInputField(
               {option}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       );
     }
   };

@@ -9,20 +9,19 @@
  */
 
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { RootState } from '$app/common/stores/store';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
+import { InputField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function Address() {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
-  const dispatch = useDispatch();
 
   const companyChanges = useSelector(
     (state: RootState) => state.companyUsers.changes.company
@@ -30,14 +29,8 @@ export function Address() {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+
+      const handleChange = useHandleCurrentCompanyChangeProperty()
 
   return (
     <>
@@ -46,7 +39,7 @@ export function Address() {
           <Element leftSide={t('address1')}>
             <InputField
               value={companyChanges?.settings?.address1 || ''}
-              onChange={handleChange}
+              onValueChange={(v) => handleChange('settings.address1', v)}
               id="settings.address1"
               errorMessage={errors?.errors['settings.address1']}
             />
@@ -55,7 +48,7 @@ export function Address() {
           <Element leftSide={t('address2')}>
             <InputField
               value={companyChanges?.settings?.address2 || ''}
-              onChange={handleChange}
+              onValueChange={(v) => handleChange('settings.address2', v)}
               id="settings.address2"
               errorMessage={errors?.errors['settings.address2']}
             />
@@ -64,7 +57,7 @@ export function Address() {
           <Element leftSide={t('city')}>
             <InputField
               value={companyChanges?.settings?.city || ''}
-              onChange={handleChange}
+              onValueChange={(v) => handleChange('settings.city', v)}
               id="settings.city"
               errorMessage={errors?.errors['settings.city']}
             />
@@ -73,7 +66,7 @@ export function Address() {
           <Element leftSide={t('state')}>
             <InputField
               value={companyChanges?.settings?.state || ''}
-              onChange={handleChange}
+              onValueChange={(v) => handleChange('settings.state', v)}
               id="settings.state"
               errorMessage={errors?.errors['settings.state']}
             />
@@ -82,26 +75,25 @@ export function Address() {
           <Element leftSide={t('postal_code')}>
             <InputField
               value={companyChanges?.settings?.postal_code || ''}
-              onChange={handleChange}
+              onValueChange={(v) => handleChange('settings.postal_code', v)}
               id="settings.postal_code"
               errorMessage={errors?.errors['settings.postal_code']}
             />
           </Element>
 
           <Element leftSide={t('country')}>
-            <SelectField
+            <SearchableSelect
               value={companyChanges?.settings?.country_id || ''}
-              onChange={handleChange}
-              id="settings.country_id"
+              onValueChange={(v) => handleChange('settings.country_id', v)}
               errorMessage={errors?.errors['settings.country_id']}
-              withBlank
             >
+              <option value=""></option>
               {statics?.countries.map((size: { id: string; name: string }) => (
                 <option key={size.id} value={size.id}>
                   {size.name}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </Element>
         </Card>
       )}

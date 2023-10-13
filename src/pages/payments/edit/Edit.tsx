@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -24,6 +24,7 @@ import { useOutletContext } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -81,13 +82,12 @@ export default function Edit() {
       </Element>
 
       <Element leftSide={t('payment_type')}>
-        <SelectField
-          id="type_id"
+        <SearchableSelect
           value={payment?.type_id}
           onValueChange={(value) => handleChange('type_id', value)}
           errorMessage={errors?.errors.type_id}
-          withBlank
         >
+          <option value=""></option>
           {Object.entries(paymentType).map((value: any, index: any) => {
             return (
               <option key={index} value={String(value[0])}>
@@ -95,7 +95,7 @@ export default function Edit() {
               </option>
             );
           })}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('transaction_reference')}>

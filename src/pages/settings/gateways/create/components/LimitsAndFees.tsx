@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
@@ -18,10 +18,11 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   gateway: Gateway;
@@ -53,10 +54,6 @@ export function LimitsAndFees(props: Props) {
       : setCurrentGatewayTypeId(undefined);
   }, [props.companyGateway]);
 
-  const handlePaymentTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setCurrentGatewayTypeId(event.target.value);
-  };
-
   const handleEntryChange = (
     field: keyof FeesAndLimitsEntry,
     value: string | number | boolean
@@ -69,9 +66,10 @@ export function LimitsAndFees(props: Props) {
   return (
     <Card title={t('limits_and_fees')}>
       <Element leftSide={t('payment_type')}>
-        <SelectField
-          onChange={handlePaymentTypeChange}
+        <SearchableSelect
+          onValueChange={(v) => setCurrentGatewayTypeId(v)}
           errorMessage={props.errors?.errors.gatewayTypeId}
+          value=""
         >
           {Object.entries(props.companyGateway.fees_and_limits)
             .filter(([, entry]) => entry.is_enabled)
@@ -80,7 +78,7 @@ export function LimitsAndFees(props: Props) {
                 {resolveGatewayTypeTranslation(gatewayTypeId)}
               </option>
             ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       {currentGatewayTypeId && (

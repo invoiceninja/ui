@@ -14,7 +14,6 @@ import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
-import { SelectField } from '../forms';
 import { Default } from './Default';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
@@ -27,6 +26,7 @@ import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompany
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { SearchableSelect } from '../SearchableSelect';
 
 interface Props {
   title: string;
@@ -122,12 +122,12 @@ export function Settings(props: Props) {
             <span className="truncate">{t('basic_settings')}</span>
           </a>
 
-          <SelectField
+          <SearchableSelect
             className="lg:hidden"
             value={location.pathname}
             onValueChange={(value) => navigate(value)}
-            withBlank
           >
+            <option value=""></option>
             {basic.map(
               (item) =>
                 item.enabled && (
@@ -136,7 +136,7 @@ export function Settings(props: Props) {
                   </option>
                 )
             )}
-          </SelectField>
+          </SearchableSelect>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
             {basic.map(
@@ -167,11 +167,10 @@ export function Settings(props: Props) {
             </a>
           )}
 
-          <SelectField
+          <SearchableSelect
             className="lg:hidden"
             value={location.pathname}
             onValueChange={(value) => navigate(value)}
-            withBlank
           >
             {advanced.map(
               (item) =>
@@ -181,7 +180,7 @@ export function Settings(props: Props) {
                   </option>
                 )
             )}
-          </SelectField>
+          </SearchableSelect>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
             {advanced.map((item, index) => (

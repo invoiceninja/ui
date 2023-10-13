@@ -14,7 +14,7 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
-import { SelectField } from '$app/components/forms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Field {
   key: string;
@@ -131,7 +131,7 @@ export function Registration() {
 
       {fields.map((field) => (
         <Element key={field.field} leftSide={field.label}>
-          <SelectField
+          <SearchableSelect
             value={getFieldValue(field.field)}
             onValueChange={(value) =>
               handleChangeFieldValue(field.field, value)
@@ -142,7 +142,7 @@ export function Registration() {
             </option>
             <option value="optional">{t('optional')}</option>
             <option value="required">{t('required')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
       ))}
     </Card>

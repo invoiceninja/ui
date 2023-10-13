@@ -20,7 +20,7 @@ import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, SelectField } from './forms';
+import { Button } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
 import { MdDragHandle, MdClose } from 'react-icons/md';
@@ -36,6 +36,7 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { SearchableSelect } from './SearchableSelect';
 
 interface Props {
   columns: string[];
@@ -140,18 +141,18 @@ export function DataTableColumnsPicker(props: Props) {
         visible={isModalVisible}
         onClose={setIsModalVisible}
       >
-        <SelectField
+        <SearchableSelect
           label={t('add_column')}
           onValueChange={handleSelectChange}
           value=""
-          withBlank
         >
+          <option value=""></option>
           {filteredColumns.map((column, index) => (
             <option key={index} value={column}>
               {t(column)}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
 
         <div className="max-h-64 overflow-y-auto">
           <DragDropContext onDragEnd={onDragEnd}>

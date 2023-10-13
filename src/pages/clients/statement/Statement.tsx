@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
@@ -31,6 +31,7 @@ import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
 import { useClientQuery } from '$app/common/queries/clients';
 import { Client } from '$app/common/interfaces/client';
 import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 dayjs.extend(quarter);
 
@@ -247,7 +248,7 @@ export default function Statement() {
     >
       <div className="grid grid-cols-12 space-y-4 xl:space-y-0 xl:gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <SelectField
+          <SearchableSelect
             label={t('date_range')}
             value={selectRange}
             onValueChange={handleSelectRangeChange}
@@ -257,7 +258,7 @@ export default function Statement() {
                 {t(date.id)}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
 
           {selectRange === 'custom' && (
             <InputField
@@ -285,7 +286,7 @@ export default function Statement() {
         </Card>
 
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <SelectField
+          <SearchableSelect
             label={t('status')}
             value={statement.status}
             onValueChange={(value) =>
@@ -298,7 +299,7 @@ export default function Statement() {
             <option value="all">{t('all')}</option>
             <option value="paid">{t('paid')}</option>
             <option value="unpaid">{t('unpaid')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Card>
 
         <Card className="col-span-12 xl:col-span-4 h-max">

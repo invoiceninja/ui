@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -29,6 +29,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export default function Refund() {
   const { id } = useParams();
@@ -174,16 +175,17 @@ export default function Refund() {
       </Element>
 
       <Element leftSide={t('invoices')}>
-        <SelectField
-          onChange={(event: any) => {
+        <SearchableSelect
+          onValueChange={(v) => {
             if (
               formik.values.invoices.filter(
                 (invoice: { invoice_id: string }) =>
-                  invoice.invoice_id == event.target.value
+                  invoice.invoice_id == v
               ).length < 1
             )
-              setInvoices([...invoices, event.target.value]);
+              setInvoices([...invoices, v]);
           }}
+          value=""
         >
           <option value=""></option>
           {payment?.invoices &&
@@ -192,7 +194,7 @@ export default function Refund() {
                 {invoice.number}
               </option>
             ))}
-        </SelectField>
+        </SearchableSelect>
 
         {errors?.errors.invoices && (
           <div className="py-2">

@@ -12,7 +12,8 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { getExchangeRate } from '$app/pages/payments/common/helpers/resolve-exchange-rate';
 import { useTranslation } from 'react-i18next';
 import { Element } from './cards';
-import { InputField, SelectField } from './forms';
+import { InputField } from './forms';
+import { SearchableSelect } from './SearchableSelect';
 
 interface Props {
   amount: number;
@@ -37,8 +38,7 @@ export function ConvertCurrency(props: Props) {
   return (
     <>
       <Element leftSide={t('currency')}>
-        <SelectField
-          withBlank
+        <SearchableSelect
           value={props.exchangeCurrencyId}
           onValueChange={handleChange}
         >
@@ -47,7 +47,7 @@ export function ConvertCurrency(props: Props) {
               {element.name}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('exchange_rate')}>

@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Inline } from '$app/components/Inline';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -124,7 +125,7 @@ export function Details(props: PurchaseOrderCardProps) {
             </div>
 
             <div className="w-full lg:w-1/2">
-              <SelectField
+              <SearchableSelect
                 value={purchaseOrder.is_amount_discount.toString()}
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
@@ -133,7 +134,7 @@ export function Details(props: PurchaseOrderCardProps) {
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
-              </SelectField>
+              </SearchableSelect>
             </div>
           </Inline>
         </Element>

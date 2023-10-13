@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { User } from '$app/common/interfaces/user';
 import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
@@ -17,12 +17,13 @@ import { useUsersQuery } from '$app/common/queries/users';
 import { useTranslation } from 'react-i18next';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
@@ -36,12 +37,12 @@ export function Details(props: Props) {
   const { data: users } = useUsersQuery();
   const { data: groupSettings } = useGroupSettingsQuery();
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (property: string, value: string) => {
     props.setErrors(undefined);
 
     props.setClient(
       (client) =>
-        client && set({ ...client }, event.target.id, event.target.value)
+        client && set({ ...client }, property, value)
     );
   };
 
@@ -66,7 +67,7 @@ export function Details(props: Props) {
         <InputField
           id="name"
           value={props.client?.name}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('name', v)}
           errorMessage={props.errors?.errors.name}
         />
       </Element>
@@ -75,18 +76,17 @@ export function Details(props: Props) {
         <InputField
           id="number"
           value={props.client?.number}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('number', v)}
           errorMessage={props.errors?.errors.number}
         />
       </Element>
 
       {groupSettings && (
         <Element leftSide={t('group')}>
-          <SelectField
-            id="group_settings_id"
+          <SearchableSelect
             value={props.client?.group_settings_id}
-            onChange={handleChange}
             errorMessage={props.errors?.errors.group_settings_id}
+            onValueChange={(v) => handleChange('group_settings_id', v)}
           >
             <option value=""></option>
             {groupSettings.data.data.map(
@@ -96,16 +96,15 @@ export function Details(props: Props) {
                 </option>
               )
             )}
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
 
       {users && (
         <Element leftSide={t('user')}>
-          <SelectField
-            id="assigned_user_id"
-            onChange={handleChange}
-            defaultValue={props.client?.assigned_user_id}
+          <SearchableSelect
+            onValueChange={(v) => handleChange('assigned_user_id', v)}
+            value={props.client?.assigned_user_id}
             errorMessage={props.errors?.errors.assigned_user_id}
           >
             <option value=""></option>
@@ -114,7 +113,7 @@ export function Details(props: Props) {
                 {user.first_name} {user.last_name}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
       )}
 
@@ -122,7 +121,7 @@ export function Details(props: Props) {
         <InputField
           id="id_number"
           value={props.client?.id_number}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('id_number', v)}
           errorMessage={props.errors?.errors.id_number}
         />
       </Element>
@@ -131,7 +130,7 @@ export function Details(props: Props) {
         <InputField
           id="vat_number"
           value={props.client?.vat_number}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('vat_number', v)}
           errorMessage={props.errors?.errors.vat_number}
         />
       </Element>
@@ -140,7 +139,7 @@ export function Details(props: Props) {
         <InputField
           id="website"
           value={props.client?.website}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('website', v)}
           errorMessage={props.errors?.errors.website}
         />
       </Element>
@@ -149,7 +148,7 @@ export function Details(props: Props) {
         <InputField
           id="phone"
           value={props.client?.phone}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('phone', v)}
           errorMessage={props.errors?.errors.phone}
         />
       </Element>
@@ -158,7 +157,7 @@ export function Details(props: Props) {
         <InputField
           id="routing_id"
           value={props.client?.routing_id}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('routing_id', v)}
           errorMessage={props.errors?.errors.routing_id}
         />
       </Element>
@@ -184,10 +183,9 @@ export function Details(props: Props) {
       </Element>
 
       <Element leftSide={t('classification')}>
-        <SelectField
-          id="classification"
-          defaultValue={props.client?.classification ?? ''}
-          onChange={handleChange}
+        <SearchableSelect
+          value={props.client?.classification ?? ''}
+          onValueChange={(v) => handleChange('classification', v)}
         >
           <option value=""></option>
           <option value="individual">{t('individual')}</option>
@@ -197,8 +195,7 @@ export function Details(props: Props) {
           <option value="charity">{t('charity')}</option>
           <option value="government">{t('government')}</option>
           <option value="other">{t('other')}</option>
-
-        </SelectField>
+        </SearchableSelect>
       </Element>
     
       {company?.custom_fields?.client1 && (

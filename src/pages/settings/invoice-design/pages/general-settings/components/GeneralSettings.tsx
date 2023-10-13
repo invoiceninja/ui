@@ -19,13 +19,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
 import { Card, Element } from '$app/components/cards';
-import { InputField, Radio, SelectField } from '$app/components/forms';
+import { InputField, Radio } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -826,8 +827,7 @@ export function GeneralSettings() {
     <Card title={t('general_settings')} padding="small" collapsed={false}>
       <Element leftSide={t('invoice_design')}>
         <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.invoice_design_id"
+          <SearchableSelect
             value={company?.settings?.invoice_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('invoice_design_id', value)}
             errorMessage={errors?.errors['settings.invoice_design_id']}
@@ -838,7 +838,7 @@ export function GeneralSettings() {
                   {design.name}
                 </option>
               ))}
-          </SelectField>
+          </SearchableSelect>
 
           {isDesignChanged('invoice_design_id') && (
             <div className="flex space-x-10">
@@ -860,8 +860,7 @@ export function GeneralSettings() {
 
       <Element leftSide={t('quote_design')}>
         <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.quote_design_id"
+          <SearchableSelect
             value={company?.settings?.quote_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('quote_design_id', value)}
             errorMessage={errors?.errors['settings.quote_design_id']}
@@ -872,7 +871,7 @@ export function GeneralSettings() {
                   {design.name}
                 </option>
               ))}
-          </SelectField>
+          </SearchableSelect>
 
           {isDesignChanged('quote_design_id') && (
             <div className="flex space-x-10">
@@ -894,8 +893,7 @@ export function GeneralSettings() {
 
       <Element leftSide={t('credit_design')}>
         <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.credit_design_id"
+          <SearchableSelect
             value={company?.settings?.credit_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('credit_design_id', value)}
             errorMessage={errors?.errors['settings.credit_design_id']}
@@ -906,7 +904,7 @@ export function GeneralSettings() {
                   {design.name}
                 </option>
               ))}
-          </SelectField>
+          </SearchableSelect>
 
           {isDesignChanged('credit_design_id') && (
             <div className="flex space-x-10">
@@ -928,8 +926,7 @@ export function GeneralSettings() {
 
       <Element leftSide={t('purchase_order_design')}>
         <div className="flex flex-col space-y-3">
-          <SelectField
-            id="settings.purchase_order_design_id"
+          <SearchableSelect
             value={company?.settings?.purchase_order_design_id || 'VolejRejNm'}
             onValueChange={(value) =>
               handleChange('purchase_order_design_id', value)
@@ -942,7 +939,7 @@ export function GeneralSettings() {
                   {design.name}
                 </option>
               ))}
-          </SelectField>
+          </SearchableSelect>
 
           {isDesignChanged('purchase_order_design_id') && (
             <div className="flex space-x-10">
@@ -963,20 +960,18 @@ export function GeneralSettings() {
       </Element>
 
       <Element leftSide={t('page_layout')}>
-        <SelectField
-          id="settings.page_layout"
+        <SearchableSelect
           value={company?.settings?.page_layout || 'portrait'}
           onValueChange={(value) => handleChange('page_layout', value)}
           errorMessage={errors?.errors['settings.page_layout']}
         >
           <option value="portrait">{t('portrait')}</option>
           <option value="landscape">{t('landscape')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('page_size')}>
-        <SelectField
-          id="settings.page_size"
+        <SearchableSelect
           value={company?.settings?.page_size || 'A4'}
           onValueChange={(value) => handleChange('page_size', value)}
           errorMessage={errors?.errors['settings.page_size']}
@@ -991,12 +986,11 @@ export function GeneralSettings() {
           <option value="letter">Letter</option>
           <option value="legal">Legal</option>
           <option value="ledger">Ledger</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('font_size')}>
-        <SelectField
-          id="settings.font_size"
+        <SearchableSelect
           value={company?.settings?.font_size || 16}
           onValueChange={(value) => handleChange('font_size', parseInt(value))}
           errorMessage={errors?.errors['settings.font_size']}
@@ -1006,7 +1000,7 @@ export function GeneralSettings() {
               {number}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('logo_size')}>
@@ -1024,13 +1018,13 @@ export function GeneralSettings() {
           </div>
 
           <div className="w-1/3">
-            <SelectField
+            <SearchableSelect
               value={logoSizeType}
               onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
             >
               <option value="%">{t('percent')}</option>
               <option value="px">{t('pixels')}</option>
-            </SelectField>
+            </SearchableSelect>
           </div>
         </div>
       </Element>
@@ -1038,8 +1032,7 @@ export function GeneralSettings() {
       <Divider />
 
       <Element leftSide={t('primary_font')}>
-        <SelectField
-          id="settings.primary_font"
+        <SearchableSelect
           value={company?.settings?.primary_font || 'roboto'}
           onValueChange={(value) => handleChange('primary_font', value)}
           errorMessage={errors?.errors['settings.primary_font']}
@@ -1049,12 +1042,11 @@ export function GeneralSettings() {
               {font.label}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('secondary_font')}>
-        <SelectField
-          id="settings.secondary_font"
+        <SearchableSelect
           value={company?.settings?.secondary_font || 'roboto'}
           onValueChange={(value) => handleChange('secondary_font', value)}
           errorMessage={errors?.errors['settings.secondary_font']}
@@ -1064,7 +1056,7 @@ export function GeneralSettings() {
               {font.label}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('primary_color')}>
@@ -1141,8 +1133,7 @@ export function GeneralSettings() {
       </Element>
 
       <Element leftSide={t('page_numbering_alignment')}>
-        <SelectField
-          id="settings.page_numbering_alignment"
+        <SearchableSelect
           disabled={company?.settings?.page_numbering ? false : true}
           value={company?.settings?.page_numbering_alignment?.toString() || 'C'}
           onValueChange={(value) =>
@@ -1153,7 +1144,7 @@ export function GeneralSettings() {
           <option value="C">{t('center')}</option>
           <option value="R">{t('right')}</option>
           <option value="L">{t('left')}</option>
-        </SelectField>
+        </SearchableSelect>
       </Element>
     </Card>
   );

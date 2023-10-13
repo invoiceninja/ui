@@ -9,7 +9,6 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';

@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -56,6 +56,7 @@ import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
 import { useAtom } from 'jotai';
+import { SearchableSelect } from '../SearchableSelect';
 
 export interface SaveOption {
   label: string;
@@ -410,7 +411,7 @@ export function Default(props: Props) {
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
               {import.meta.env.DEV && (
-                <SelectField
+                <SearchableSelect
                   value={
                     JSON.stringify(colorScheme) === JSON.stringify($1)
                       ? 'dark'
@@ -422,7 +423,7 @@ export function Default(props: Props) {
                 >
                   <option value="dark">Dark</option>
                   <option value="light">Light</option>
-                </SelectField>
+                </SearchableSelect>
               )}
 
               {shouldShowUnlockButton && (

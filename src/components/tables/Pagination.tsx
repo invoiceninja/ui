@@ -19,7 +19,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
-import { SelectField } from '../forms';
+import { SearchableSelect } from '../SearchableSelect';
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -55,11 +55,11 @@ export function Pagination(props: Props) {
     <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
       <div className="flex justify-center md:justify-start items-center space-x-4">
         <div className="flex items-center space-x-2 flex-wrap">
-          <SelectField onValueChange={(value) => props.onRowsChange(value)}>
+          <SearchableSelect value="" onValueChange={(value) => props.onRowsChange(value)}>
             <option value="10">10</option>
-            <option>50</option>
-            <option>100</option>
-          </SelectField>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </SearchableSelect>
 
           <label
             htmlFor="location"

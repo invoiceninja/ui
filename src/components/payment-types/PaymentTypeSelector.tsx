@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from '$app/components/forms';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { GenericSelectorProps } from '$app/components/CountrySelector';
+import { SearchableSelect } from '../SearchableSelect';
 
 export function PaymentTypeSelector(props: GenericSelectorProps) {
   const statics = useStaticsQuery();
 
   return (
-    <SelectField
+    <SearchableSelect
       value={props.value}
       onValueChange={props.onChange}
-      withBlank
       errorMessage={props.errorMessage}
     >
+      <option value=""></option>
       {statics.data?.payment_types.map((type, index) => (
         <option key={index} value={type.id}>
           {type.name}
         </option>
       ))}
-    </SelectField>
+    </SearchableSelect>
   );
 }

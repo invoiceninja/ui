@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -32,6 +32,7 @@ import {
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export type Identifier =
   | 'activity'
@@ -283,7 +284,7 @@ export default function Reports() {
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
-            <SelectField
+            <SearchableSelect
               onValueChange={(value) => handleReportChange(value as Identifier)}
               value={report.identifier}
             >
@@ -292,7 +293,7 @@ export default function Reports() {
                   {t(report.label)}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           <Element leftSide={t('send_email')}>
@@ -349,7 +350,7 @@ export default function Reports() {
 
         <Card className="col-span-6 h-max">
           <Element leftSide={t('range')}>
-            <SelectField
+            <SearchableSelect
               onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
             >
@@ -358,7 +359,7 @@ export default function Reports() {
                   {t(range.label)}
                 </option>
               ))}
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           {report.payload.date_range === 'custom' && (

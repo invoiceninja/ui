@@ -12,7 +12,7 @@ import { Card, Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionProps } from './Overview';
 import frequencies from '$app/common/constants/frequency';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { Inline } from '$app/components/Inline';
 import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';

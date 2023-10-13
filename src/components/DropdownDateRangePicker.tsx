@@ -15,9 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { ConfigProvider, DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { SelectField } from './forms';
 import { atom, useAtomValue } from 'jotai';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { SearchableSelect } from './SearchableSelect';
 
 type Props = {
   value?: string;
@@ -63,7 +63,8 @@ export function DropdownDateRangePicker(props: Props) {
   return (
     <div className="flex justify-end items-center">
       <Calendar style={{ color: accentColor }} className="mx-2" />
-      <SelectField
+      
+      <SearchableSelect
         value={props.value}
         className={
           'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
@@ -88,7 +89,8 @@ export function DropdownDateRangePicker(props: Props) {
         <option value="last_year">{t('last_year')}</option>
         <option value={'last365_days'}>{`${t('last365_days')}`}</option>
         <option value={'custom'}>{`${t('custom')}`}</option>
-      </SelectField>
+      </SearchableSelect>
+
       {isModalVisible && (
         <div className="flex flex-row space-x-2">
           <ConfigProvider locale={antdLocale?.default}>

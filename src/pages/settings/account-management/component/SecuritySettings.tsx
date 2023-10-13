@@ -11,14 +11,14 @@
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { route } from '$app/common/helpers/route';
 import { Card, Element } from '../../../../components/cards';
-import { SelectField } from '../../../../components/forms';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
+import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function SecuritySettings() {
   const [t] = useTranslation();
@@ -58,15 +58,6 @@ export function SecuritySettings() {
     },
   ];
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
-
   const handleToggleChange = (id: string, value: boolean) =>
     dispatch(
       updateChanges({
@@ -76,28 +67,28 @@ export function SecuritySettings() {
       })
     );
 
+  const handleChange = useHandleCurrentCompanyChangeProperty()
+
   return (
     <Card title={t('security_settings')}>
       <Element leftSide={t('password_timeout')}>
-        <SelectField
-          id="default_password_timeout"
+        <SearchableSelect
           value={companyChanges?.default_password_timeout}
-          onChange={handleChange}
           errorMessage={errors?.errors.default_password_timeout}
+          onValueChange={(v) => handleChange('default_password_timeout', v)}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('web_session_timeout')}>
-        <SelectField
-          id="session_timeout"
+        <SearchableSelect
           value={companyChanges?.session_timeout}
-          onChange={handleChange}
+          onValueChange={(v) => handleChange('session_timeout', v)}
           errorMessage={errors?.errors.session_timeout}
         >
           {options.map((option) => (
@@ -105,7 +96,7 @@ export function SecuritySettings() {
               {option.label}
             </option>
           ))}
-        </SelectField>
+        </SearchableSelect>
       </Element>
 
       <Element leftSide={t('require_password_with_social_login')}>

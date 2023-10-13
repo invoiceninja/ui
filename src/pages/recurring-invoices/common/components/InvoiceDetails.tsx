@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ import { useAtom } from 'jotai';
 import { recurringInvoiceAtom } from '../atoms';
 import dayjs from 'dayjs';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -37,7 +38,7 @@ export function InvoiceDetails(props: Props) {
     <>
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
         <Element leftSide={t('frequency')}>
-          <SelectField
+          <SearchableSelect
             value={recurringInvoice?.frequency_id}
             onValueChange={(value) => handleChange('frequency_id', value)}
             errorMessage={props.errors?.errors.frequency_id}
@@ -49,7 +50,7 @@ export function InvoiceDetails(props: Props) {
                 {t(frequencies[frequency])}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('start_date')}>
@@ -63,7 +64,7 @@ export function InvoiceDetails(props: Props) {
         </Element>
 
         <Element leftSide={t('remaining_cycles')}>
-          <SelectField
+          <SearchableSelect
             value={recurringInvoice?.remaining_cycles}
             onValueChange={(value) =>
               handleChange('remaining_cycles', parseInt(value))
@@ -76,11 +77,11 @@ export function InvoiceDetails(props: Props) {
                 {number}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element leftSide={t('due_date')}>
-          <SelectField
+          <SearchableSelect
             value={recurringInvoice?.due_date_days}
             onValueChange={(value) => handleChange('due_date_days', value)}
             errorMessage={props.errors?.errors.due_date_days}
@@ -91,7 +92,7 @@ export function InvoiceDetails(props: Props) {
                 {t('day')} {number + 1}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         {recurringInvoice && company?.custom_fields?.invoice1 && (
@@ -150,7 +151,7 @@ export function InvoiceDetails(props: Props) {
             </div>
 
             <div className="w-full lg:w-1/2">
-              <SelectField
+              <SearchableSelect
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
@@ -159,13 +160,13 @@ export function InvoiceDetails(props: Props) {
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
-              </SelectField>
+              </SearchableSelect>
             </div>
           </div>
         </Element>
 
         <Element leftSide={t('auto_bill')}>
-          <SelectField
+          <SearchableSelect
             value={recurringInvoice?.auto_bill || false}
             onValueChange={(value) => handleChange('auto_bill', value)}
             errorMessage={props.errors?.errors.auto_bill}
@@ -174,7 +175,7 @@ export function InvoiceDetails(props: Props) {
             <option value="optout">{t('optout')}</option>
             <option value="optin">{t('optin')}</option>
             <option value="off">{t('disabled')}</option>
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         {recurringInvoice && company?.custom_fields?.invoice3 && (

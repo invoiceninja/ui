@@ -10,11 +10,9 @@
 
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { ChangeEvent } from 'react';
 import { endpoint } from '$app/common/helpers';
 import { useQuery } from 'react-query';
 import { RootState } from '$app/common/stores/store';
@@ -26,6 +24,8 @@ import { Divider } from '$app/components/cards/Divider';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { SearchableSelect } from '$app/components/SearchableSelect';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -44,28 +44,19 @@ export function Defaults() {
     (state: RootState) => state.companyUsers.changes.company
   );
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   return (
     <>
       {companyChanges?.settings && (
         <Card title={t('defaults')}>
           <Element leftSide={t('payment_type')}>
-            <SelectField
+            <SearchableSelect
               value={companyChanges?.settings?.payment_type_id || '0'}
-              onChange={handleChange}
-              id="settings.payment_type_id"
-              blankOptionValue="0"
-              withBlank
+              onValueChange={(v) => handleChange('settings.payment_type_id', v)}
               errorMessage={errors?.errors['settings.payment_type_id']}
             >
+              <option value="0"></option>
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
@@ -73,40 +64,37 @@ export function Defaults() {
                   </option>
                 )
               )}
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           {terms && (
             <Element leftSide={t('quote_valid_until')}>
-              <SelectField
+              <SearchableSelect
                 value={companyChanges?.settings?.valid_until || ''}
-                id="settings.valid_until"
-                onChange={handleChange}
-                withBlank
+                onValueChange={(v) => handleChange('settings.valid_until', v)}
                 errorMessage={errors?.errors['settings.valid_until']}
               >
+                <option value=""></option>
                 {terms.data.data.map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days}>
                     {type.name}
                   </option>
                 ))}
-              </SelectField>
+              </SearchableSelect>
             </Element>
           )}
 
           <Element leftSide={t('expense_payment_type')}>
-            <SelectField
+            <SearchableSelect
               value={
                 companyChanges?.settings?.default_expense_payment_type_id || ''
               }
-              onChange={handleChange}
-              id="settings.default_expense_payment_type_id"
-              blankOptionValue="0"
-              withBlank
+              onValueChange={(v) => handleChange('settings.default_expense_payment_type_id', v)}
               errorMessage={
                 errors?.errors['settings.default_expense_payment_type_id']
               }
             >
+              <option value="0"></option>
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
@@ -114,7 +102,7 @@ export function Defaults() {
                   </option>
                 )
               )}
-            </SelectField>
+            </SearchableSelect>
           </Element>
 
           <Divider />

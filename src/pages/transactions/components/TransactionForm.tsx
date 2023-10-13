@@ -9,7 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { transactionTypes } from '$app/common/constants/transactions';
 import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import {

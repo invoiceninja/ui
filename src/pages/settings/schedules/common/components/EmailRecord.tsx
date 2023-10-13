@@ -18,7 +18,6 @@ import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { SearchableSelect } from '$app/components/SearchableSelect';
 import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { useTranslation } from 'react-i18next';
 
