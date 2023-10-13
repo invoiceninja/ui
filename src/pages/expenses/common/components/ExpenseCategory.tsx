@@ -23,6 +23,9 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import Tippy from '@tippyjs/react/headless';
 import { Dispatch, SetStateAction } from 'react';
 import { useSave } from '../../edit/hooks/useSave';
+import { useTranslation } from 'react-i18next';
+import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
+import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
 
 interface DropdownProps {
   visible: boolean;
@@ -32,9 +35,14 @@ interface DropdownProps {
   expense: Expense;
 }
 function ExpenseCategoriesDropdown(props: DropdownProps) {
+  const [t] = useTranslation();
   const colors = useColorScheme();
 
+  const adjustColorDarkness = useAdjustColorDarkness();
+
   const { visible, isFormBusy, setIsFormBusy, expense, setVisible } = props;
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { data: expenseCategories } = useExpenseCategoriesQuery({
     status: ['active'],
@@ -42,40 +50,78 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
 
   const save = useSave({ isFormBusy, setIsFormBusy });
 
+  const { red, green, blue, hex } = hexToRGB(
+    expense.category?.color || '#FFFFFF'
+  );
+
+  const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
+
   return (
-    <Tippy
-      placement="bottom"
-      interactive={true}
-      render={() => (
-        <div
-          className="border box rounded-md shadow-lg focus:outline-none"
-          style={{
-            backgroundColor: colors.$1,
-            borderColor: colors.$4,
-            minWidth: '12rem',
-            maxWidth: '14.7rem',
-          }}
-        >
-          {expenseCategories?.map(
-            (expenseCategory, index) =>
-              expenseCategory.id !== expense.category_id && (
-                <DropdownElement
-                  key={index}
-                  onClick={() => {
-                    setVisible(false);
-                    save({ ...expense, category_id: expenseCategory.id });
-                  }}
-                >
-                  {expenseCategory.name}
-                </DropdownElement>
-              )
-          )}
+    <>
+      <Tippy
+        placement="bottom"
+        interactive={true}
+        render={() => (
+          <div
+            className="border box rounded-md shadow-lg focus:outline-none"
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+              minWidth: '15rem',
+              maxWidth: '20rem',
+            }}
+          >
+            <DropdownElement
+              className="font-medium text-center py-3"
+              onClick={() => {
+                setIsModalOpen(true);
+                setVisible(false);
+              }}
+            >
+              {t('new_expense_category')}
+            </DropdownElement>
+
+            <div className="flex flex-col max-h-80 overflow-y-auto">
+              {expenseCategories?.map(
+                (expenseCategory, index) =>
+                  expenseCategory.id !== expense.category_id && (
+                    <DropdownElement
+                      key={index}
+                      onClick={() => {
+                        setVisible(false);
+                        save({ ...expense, category_id: expenseCategory.id });
+                      }}
+                    >
+                      {expenseCategory.name}
+                    </DropdownElement>
+                  )
+              )}
+            </div>
+          </div>
+        )}
+        visible={visible}
+      >
+        <div>
+          <StatusBadge
+            for={{}}
+            code={expense.category?.name || (t('uncategorized') as string)}
+            style={{
+              color: adjustColorDarkness(hex, darknessAmount),
+              backgroundColor: expense.category?.color || '',
+            }}
+            onClick={() => !isFormBusy && setVisible(true)}
+          />
         </div>
-      )}
-      visible={visible}
-    >
-      <div></div>
-    </Tippy>
+      </Tippy>
+
+      <CreateExpenseCategoryModal
+        visible={isModalOpen}
+        setVisible={setIsModalOpen}
+        onCreatedCategory={(category: ExpenseCategoryType) =>
+          save({ ...expense, category_id: category.id })
+        }
+      />
+    </>
   );
 }
 
@@ -87,8 +133,6 @@ export function ExpenseCategory(props: Props) {
   const ref = useRef(null);
   const { expense } = props;
 
-  const adjustColorDarkness = useAdjustColorDarkness();
-
   const [visibleDropdown, setVisibleDropdown] = useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
@@ -96,22 +140,8 @@ export function ExpenseCategory(props: Props) {
     visibleDropdown && setVisibleDropdown(false);
   });
 
-  const { red, green, blue, hex } = hexToRGB(expense.category?.color || '');
-
-  const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
-
   return (
     <div ref={ref}>
-      <StatusBadge
-        for={{}}
-        code={expense.category?.name || ''}
-        style={{
-          color: adjustColorDarkness(hex, darknessAmount),
-          backgroundColor: expense.category?.color,
-        }}
-        onClick={() => !isFormBusy && setVisibleDropdown(true)}
-      />
-
       <ExpenseCategoriesDropdown
         visible={visibleDropdown}
         isFormBusy={isFormBusy}
