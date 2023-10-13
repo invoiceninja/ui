@@ -34,6 +34,7 @@ interface DropdownProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
   expense: Expense;
 }
+
 function ExpenseCategoriesDropdown(props: DropdownProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -50,9 +51,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
 
   const save = useSave({ isFormBusy, setIsFormBusy });
 
-  const { red, green, blue, hex } = hexToRGB(
-    expense.category?.color || '#FFFFFF'
-  );
+  const { red, green, blue, hex } = hexToRGB(expense.category?.color || '');
 
   const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
