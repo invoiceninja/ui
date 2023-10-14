@@ -1277,6 +1277,25 @@ export function GeneralSettings() {
         />
       </Element>
 
+      <Element
+        leftSideHelp={t('invoice_embed_documents_help')}
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="embed_documents"
+            labelElement={<SettingsLabel label={t('invoice_embed_documents')} />}
+            defaultValue={false}
+          />
+        }
+      >
+        <Toggle
+          onValueChange={(value) =>
+            handleChange('embed_documents', value)
+          }
+          checked={Boolean(company?.settings.embed_documents)}
+          disabled={disableSettingsField('embed_documents')}
+        />
+      </Element>
+
       <Divider />
 
       <Element
