@@ -156,7 +156,10 @@ export function TaxSettings() {
                 <>
                   <Divider />
 
-                  <Element leftSide={t('calculate_taxes')}>
+                  <Element
+                    leftSide={t('calculate_taxes')}
+                  leftSideHelp={t('calculate_taxes_help')}
+                    >
                     <Toggle
                       checked={Boolean(companyChanges?.calculate_taxes)}
                       onChange={(value: boolean) =>
