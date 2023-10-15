@@ -13,6 +13,8 @@ import { InputField } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CustomField } from '$app/components/CustomField';
 
 interface Props {
   user: User;
@@ -24,10 +26,12 @@ export function Details(props: Props) {
   const [t] = useTranslation();
   const { user, setUser } = props;
 
-  const onChange = (field: keyof User, value: unknown) => {
+  const onChange = (field: keyof User, value: string | number | boolean) => {
     setUser((user) => user && { ...user, [field]: value });
   };
 
+  const company = useCurrentCompany();
+  
   return (
     <Card title={t('details')}>
       <Element leftSide={t('first_name')} required>
@@ -62,6 +66,63 @@ export function Details(props: Props) {
           errorMessage={props.errors?.errors.phone}
         />
       </Element>
+
+      {company?.custom_fields?.user1 && (
+        <CustomField
+          field="user1"
+          defaultValue={user.custom_value1}
+          value={company.custom_fields.user1}
+          onValueChange={(value) =>
+            onChange(
+              'custom_value1',
+              String(value)
+            )
+          }
+        />
+      )}
+
+      {company?.custom_fields?.user2 && (
+        <CustomField
+          field="user2"
+          defaultValue={user.custom_value2}
+          value={company.custom_fields.user2}
+          onValueChange={(value) =>
+            onChange(
+              'custom_value2',
+              String(value)
+            )
+          }
+        />
+      )}
+
+      {company?.custom_fields?.user3 && (
+        <CustomField
+          field="user3"
+          defaultValue={user.custom_value3}
+          value={company.custom_fields.user3}
+          onValueChange={(value) =>
+            onChange(
+              'custom_value3',
+              String(value)
+            )
+          }
+        />
+      )}
+
+      {company?.custom_fields?.user4 && (
+        <CustomField
+          field="user4"
+          defaultValue={user.custom_value4}
+          value={company.custom_fields.user4}
+          onValueChange={(value) =>
+            onChange(
+              'custom_value4',
+              String(value)
+            )
+          }
+        />
+      )}
+      
     </Card>
   );
 }
