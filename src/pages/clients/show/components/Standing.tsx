@@ -11,7 +11,10 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
+import { Element } from '$app/components/cards';
+import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
+import { MdLockOutline } from 'react-icons/md';
 
 interface Props {
   client: Client;
@@ -31,17 +34,20 @@ export function Standing(props: Props) {
           <InfoCard
             title={t('standing')}
             value={
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">{t('paid_to_date')}</p>
-                  <span>
-                    {formatMoney(
-                      client.paid_to_date,
-                      client.country_id,
-                      client.settings.currency_id
-                    )}
-                  </span>
-                </div>
+              <>
+                <Element
+                  leftSide={
+                    <span className="font-bold">{t('paid_to_date')}</span>
+                  }
+                  pushContentToRight
+                  noExternalPadding
+                >
+                  {formatMoney(
+                    client.paid_to_date,
+                    client.country_id,
+                    client.settings.currency_id
+                  )}
+                </Element>
 
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{t('outstanding')}</p>
@@ -77,7 +83,19 @@ export function Standing(props: Props) {
                     </span>
                   </div>
                 )}
-              </div>
+
+                <div className="flex items-center space-x-1">
+                  <div>
+                    <Icon element={MdLockOutline} size={24} />
+                  </div>
+
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: `${client.private_notes}`,
+                    }}
+                  />
+                </div>
+              </>
             }
             className="h-full"
           />

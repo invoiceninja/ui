@@ -45,6 +45,12 @@ export function Address(props: Props) {
                 </p>
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
+
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: `${client.public_notes}`,
+                  }}
+                />
               </>
             }
             className="h-full"
