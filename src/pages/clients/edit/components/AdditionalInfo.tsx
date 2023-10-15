@@ -29,6 +29,7 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 interface Props {
   client: Client | undefined;
@@ -112,21 +113,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
           {languages.length > 1 && (
             <Element leftSide={t('language')}>
-              <SelectField
-                id="settings.language_id"
-                defaultValue={client?.settings?.language_id || ''}
-                onValueChange={(value) =>
-                  handleSettingsChange('language_id', value)
-                }
+              <LanguageSelector
+                value={client?.settings?.language_id || ''}
+                onChange={(v) => handleSettingsChange('language_id', v)}
                 errorMessage={errors?.errors['settings.language_id']}
-                withBlank
-              >
-                {languages.map((language, index) => (
-                  <option key={index} value={language.id}>
-                    {language.name}
-                  </option>
-                ))}
-              </SelectField>
+                dismissable
+              />
             </Element>
           )}
 

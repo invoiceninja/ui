@@ -35,6 +35,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -53,11 +54,6 @@ export function Settings() {
   const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
 
   const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
-
-  const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setHasLanguageIdChanged(true);
-    handleChange(event);
-  };
 
   const currencyFormats = [
     {
@@ -141,19 +137,15 @@ export function Settings() {
               />
             }
           >
-            <SelectField
-              onChange={handleLanguageChange}
-              id="settings.language_id"
-              value={company?.settings?.language_id || '1'}
+            <LanguageSelector
+              onChange={(v) => {
+                setHasLanguageIdChanged(true);
+                handlePropertyChange('settings.language_id', v);
+              }}
+              value={company?.settings?.language_id || ''}
               disabled={disableSettingsField('language_id')}
               errorMessage={errors?.errors['settings.language_id']}
-            >
-              {statics?.languages.map((language: Language) => (
-                <option value={language.id} key={language.id}>
-                  {language.name}
-                </option>
-              ))}
-            </SelectField>
+            />
           </Element>
         )}
 

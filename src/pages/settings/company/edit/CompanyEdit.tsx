@@ -28,6 +28,7 @@ import {
   useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 interface Props {
   isModalOpen: boolean;
@@ -36,8 +37,6 @@ interface Props {
 
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
-
-  const languages = useLanguages();
 
   const currentCompany = useCurrentCompany();
 
@@ -183,18 +182,12 @@ export function CompanyEdit(props: Props) {
         />
       )}
 
-      <SelectField
+      <LanguageSelector
         label={t('language')}
         value={company?.language_id}
-        onValueChange={(value) => handleChange('language_id', value)}
+        onChange={(v) => handleChange('language_id', v)}
         errorMessage={errors?.errors?.language_id}
-      >
-        {languages?.map((language, index) => (
-          <option key={index} value={language?.id}>
-            {language?.name}
-          </option>
-        ))}
-      </SelectField>
+      />
 
       <CurrencySelector
         label={t('currency')}
