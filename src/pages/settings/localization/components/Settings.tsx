@@ -36,6 +36,7 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -158,19 +159,18 @@ export function Settings() {
             />
           }
         >
-          <SelectField
-            onChange={handleChange}
-            id="settings.timezone_id"
+          <SearchableSelect
             value={company?.settings?.timezone_id || '1'}
             disabled={disableSettingsField('timezone_id')}
             errorMessage={errors?.errors['settings.timezone_id']}
+            onValueChange={(v) => handlePropertyChange('settings.timezone_id', v)}
           >
             {statics?.timezones.map((timezone: Timezone) => (
               <option value={timezone.id} key={timezone.id}>
                 {timezone.name}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element
