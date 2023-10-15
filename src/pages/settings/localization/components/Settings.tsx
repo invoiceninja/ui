@@ -11,7 +11,6 @@
 import { isDemo } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { DateFormat } from '$app/common/interfaces/date-format';
-import { Language } from '$app/common/interfaces/language';
 import { Timezone } from '$app/common/interfaces/timezone';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
@@ -28,7 +27,6 @@ import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtom, useAtomValue } from 'jotai';
 import { hasLanguageChanged } from '../common/atoms';
-import { ChangeEvent } from 'react';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';

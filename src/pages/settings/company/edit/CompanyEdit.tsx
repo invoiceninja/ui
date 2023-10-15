@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useLanguages } from '$app/common/hooks/useLanguages';
 import { CompanyInput } from '$app/common/interfaces/company.interface';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CurrencySelector } from '$app/components/CurrencySelector';
