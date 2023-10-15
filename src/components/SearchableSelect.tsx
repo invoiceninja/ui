@@ -19,6 +19,7 @@ interface Props {
   disabled?: boolean;
   onValueChange: (value: string) => void;
   label?: string | null;
+  dismissable?: boolean;
 }
 
 const isOptionElement = (child: ReactNode): child is React.ReactElement => {
@@ -32,6 +33,7 @@ export function SearchableSelect({
   disabled,
   onValueChange,
   label,
+  dismissable,
 }: Props) {
   const valid = React.Children.toArray(children).every(isOptionElement);
 
@@ -57,6 +59,8 @@ export function SearchableSelect({
       } as Entry<any>)
   );
 
+  console.log("Dismissable", dismissable)
+
   return (
     <ComboboxStatic
       entries={entries as Entry[]}
@@ -69,6 +73,8 @@ export function SearchableSelect({
       onChange={(entry) => onValueChange(entry.value.toString())}
       errorMessage={errorMessage}
       readonly={disabled}
+      onEmptyValues={() => null}
+      onDismiss={dismissable ? () => onValueChange('') : undefined}
     />
   );
 }

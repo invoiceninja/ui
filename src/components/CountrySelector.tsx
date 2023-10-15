@@ -9,31 +9,32 @@
  */
 
 import { useCountries } from '$app/common/hooks/useCountries';
-import { SelectField } from './forms';
+import { SearchableSelect } from './SearchableSelect';
 
 export interface GenericSelectorProps<T = string> {
   value: T;
   label?: string | null;
   onChange: (id: string) => unknown;
   errorMessage?: string | string[];
+  dismissable?: boolean;
 }
 
 export function CountrySelector(props: GenericSelectorProps) {
   const countries = useCountries();
 
   return (
-    <SelectField
+    <SearchableSelect
       onValueChange={props.onChange}
       value={props.value}
       label={props.label}
       errorMessage={props.errorMessage}
-      withBlank
+      dismissable={props.dismissable}
     >
       {countries.map((country, index) => (
         <option key={index} value={country.id}>
           {country.name}
         </option>
       ))}
-    </SelectField>
+    </SearchableSelect>
   );
 }

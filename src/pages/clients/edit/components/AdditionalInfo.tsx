@@ -28,6 +28,7 @@ import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface Props {
   client: Client | undefined;
@@ -100,21 +101,12 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
-              <SelectField
-                id="settings.currency_id"
-                defaultValue={client?.settings?.currency_id || ''}
-                onValueChange={(value) =>
-                  handleSettingsChange('currency_id', value)
-                }
-                withBlank
+              <CurrencySelector
+                value={client?.settings.currency_id || ''}
+                onChange={(v) => handleSettingsChange('currency_id', v)}
                 errorMessage={errors?.errors['settings.currency_id']}
-              >
-                {currencies.map((currency, index) => (
-                  <option key={index} value={currency.id}>
-                    {currency.name}
-                  </option>
-                ))}
-              </SelectField>
+                dismissable
+              />
             </Element>
           )}
 
