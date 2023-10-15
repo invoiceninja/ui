@@ -18,7 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
+import { InputField, SelectField } from '../../../../components/forms';
+import { useLanguages } from '$app/common/hooks/useLanguages';
 
 export function Details() {
   const [t] = useTranslation();
@@ -41,6 +42,8 @@ export function Details() {
       })
     );
   };
+
+  const languages = useLanguages();
 
   return (
     <>
@@ -70,6 +73,24 @@ export function Details() {
               errorMessage={(errors?.errors?.email ?? [])[0]}
             />
           </Element>
+
+          {languages.length > 1 && (
+            <Element leftSide={t('language')}>
+              <SelectField
+                id="language_id"
+                defaultValue={user?.language_id || ''}
+                onValueChange={(value) => handleChange('language_id', value)}
+                errorMessage={(errors?.errors?.language_id ?? [])[0]}
+                withBlank
+              >
+                {languages.map((language, index) => (
+                  <option key={index} value={language.id}>
+                    {language.name}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
+          )}
 
           <Element leftSide={t('phone')}>
             <InputField
