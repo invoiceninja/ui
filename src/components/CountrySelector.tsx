@@ -17,6 +17,7 @@ export interface GenericSelectorProps<T = string> {
   onChange: (id: string) => unknown;
   errorMessage?: string | string[];
   dismissable?: boolean;
+  disabled?: boolean;
 }
 
 export function CountrySelector(props: GenericSelectorProps) {
@@ -29,6 +30,7 @@ export function CountrySelector(props: GenericSelectorProps) {
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
+      disabled={props.disabled}
     >
       {countries.map((country, index) => (
         <option key={index} value={country.id}>

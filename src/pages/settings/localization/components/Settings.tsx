@@ -17,7 +17,10 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import dayjs from 'dayjs';
-import { useHandleCurrentCompanyChange } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import {
+  useHandleCurrentCompanyChange,
+  useHandleCurrentCompanyChangeProperty,
+} from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -31,6 +34,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -46,6 +50,7 @@ export function Settings() {
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = useHandleCurrentCompanyChange();
+  const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
 
   const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
 
@@ -75,20 +80,12 @@ export function Settings() {
             />
           }
         >
-          <SelectField
-            value={company?.settings?.currency_id || ''}
-            id="settings.currency_id"
-            onChange={handleChange}
+          <CurrencySelector
+            value={company?.settings.currency_id || ''}
+            onChange={(v) => handlePropertyChange('settings.currency_id', v)}
             disabled={disableSettingsField('currency_id')}
             errorMessage={errors?.errors['settings.currency_id']}
-          >
-            <option value=""></option>
-            {statics?.currencies.map((currency) => (
-              <option value={currency.id} key={currency.id}>
-                {currency.name}
-              </option>
-            ))}
-          </SelectField>
+          />
         </Element>
 
         {/* <Element leftSide={t('decimal_comma')}>
