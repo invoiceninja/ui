@@ -227,8 +227,9 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
-
+        
         <Element
+          leftSideHelp={t('manual_payment_email_help')}
           leftSide={
             <PropertyCheckbox
               propertyKey="client_manual_payment_notification"
@@ -254,6 +255,7 @@ export function OnlinePayments() {
         </Element>
 
         <Element
+          leftSideHelp={t('online_payment_email_help')}
           leftSide={
             <PropertyCheckbox
               propertyKey="client_online_payment_notification"
