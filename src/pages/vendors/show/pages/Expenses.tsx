@@ -32,7 +32,7 @@ export default function Expenses() {
     <DataTable
       resource="expense"
       endpoint={route(
-        '/api/v1/expenses?include=client,vendor&vendor_id=:id&sort=id|desc',
+        '/api/v1/expenses?include=client,vendor,category&vendor_id=:id&sort=id|desc',
         {
           id,
         }
