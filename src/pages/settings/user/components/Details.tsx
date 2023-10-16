@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 export function Details() {
   const [t] = useTranslation();
@@ -68,6 +69,15 @@ export function Details() {
               type="email"
               onValueChange={(value) => handleChange('email', value)}
               errorMessage={(errors?.errors?.email ?? [])[0]}
+            />
+          </Element>
+
+          <Element leftSide={t('language')}>
+            <LanguageSelector
+              value={user?.language_id || ''}
+              onChange={(v) => handleChange('language_id', v)}
+              errorMessage={(errors?.errors?.language_id ?? [])[0]}
+              dismissable
             />
           </Element>
 
