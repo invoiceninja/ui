@@ -108,10 +108,6 @@ export function App() {
     window.addEventListener('navigate.invalid.page', () =>
       navigate('/not_found')
     );
-
-    window.addEventListener('live_preview_patch', () => {
-      toast.dismiss();
-    });
   }, []);
 
   useEffect(() => {

@@ -29,8 +29,6 @@ client.interceptors.response.use(
       if (!url.pathname.includes('/api/v1/live_preview')) {
         window.location.reload();
         localStorage.clear();
-
-        window.dispatchEvent(new CustomEvent('live_preview_patch'));
       }
     }
 
