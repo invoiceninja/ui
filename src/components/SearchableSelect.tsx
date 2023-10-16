@@ -9,11 +9,13 @@
  */
 
 import React, { ReactNode, isValidElement } from 'react';
-import { ComboboxStatic, Entry } from './forms/Combobox';
+import { Entry } from './forms/Combobox';
 import { v4 } from 'uuid';
-import Select from 'react-select';
+import Select, { StylesConfig } from 'react-select';
 import { InputLabel } from './forms';
 import { Alert } from './Alert';
+import { useColorScheme } from '$app/common/colors';
+import { SelectOption } from './datatables/Actions';
 
 interface Props {
   children: ReactNode;
@@ -74,43 +76,63 @@ export function SearchableSelect({
   );
 
   const selected = entries?.find((entry) => entry.value === value);
+  const colors = useColorScheme();
+
+  const customStyles: StylesConfig<SelectOption, false> = {
+    input: (styles) => ({
+      ...styles,
+      color: colors.$3,
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: colors.$3,
+    }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base, { isSelected, isFocused }) => ({
+      ...base,
+      color: colors.$3,
+      backgroundColor: (isSelected || isFocused) ? colors.$7 : colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
+    }),
+  };
 
   return (
-    <>
-      <ComboboxStatic
-        entries={entries as Entry[]}
-        inputOptions={{ value, label: label ?? undefined }}
-        entryOptions={{
-          id: 'id',
-          label: 'label',
-          value: 'value',
-        }}
-        onChange={(entry) => onValueChange(entry.value.toString())}
-        errorMessage={errorMessage}
-        readonly={disabled}
-        onEmptyValues={() => null}
-        onDismiss={dismissable ? () => onValueChange('') : undefined}
+    <div className="space-y-2">
+      {label ? <InputLabel>{label}</InputLabel> : null}
+
+      <Select
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options={$entries}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        value={selected}
+        onChange={(v) => onValueChange(v?.value as string)}
+        isDisabled={disabled}
+        isClearable={dismissable}
+        styles={customStyles}
       />
 
-      <div className="space-y-2">
-        {label ? <InputLabel>{label}</InputLabel> : null}
-
-        <Select
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          options={$entries}
-          value={selected}
-          onChange={(v) => onValueChange(v?.value as string)}
-          isDisabled={disabled}
-          isClearable={dismissable}
-        />
-
-        {errorMessage && (
-          <Alert className="mt-2" type="danger">
-            {errorMessage}
-          </Alert>
-        )}
-      </div>
-    </>
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
+    </div>
   );
 }
