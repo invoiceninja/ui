@@ -11,6 +11,9 @@
 import React, { ReactNode, isValidElement } from 'react';
 import { ComboboxStatic, Entry } from './forms/Combobox';
 import { v4 } from 'uuid';
+import Select from 'react-select';
+import { InputLabel } from './forms';
+import { Alert } from './Alert';
 
 interface Props {
   children: ReactNode;
@@ -59,22 +62,55 @@ export function SearchableSelect({
       } as Entry<any>)
   );
 
-  console.log("Dismissable", dismissable)
+  const $entries = React.Children.map(
+    children,
+    (child) =>
+      isValidElement(child) && {
+        label: Array.isArray(child.props.children)
+          ? child.props.children.join('')
+          : child.props.children,
+        value: child.props.value,
+      }
+  );
+
+  const selected = entries?.find((entry) => entry.value === value);
 
   return (
-    <ComboboxStatic
-      entries={entries as Entry[]}
-      inputOptions={{ value, label: label ?? undefined }}
-      entryOptions={{
-        id: 'id',
-        label: 'label',
-        value: 'value',
-      }}
-      onChange={(entry) => onValueChange(entry.value.toString())}
-      errorMessage={errorMessage}
-      readonly={disabled}
-      onEmptyValues={() => null}
-      onDismiss={dismissable ? () => onValueChange('') : undefined}
-    />
+    <>
+      <ComboboxStatic
+        entries={entries as Entry[]}
+        inputOptions={{ value, label: label ?? undefined }}
+        entryOptions={{
+          id: 'id',
+          label: 'label',
+          value: 'value',
+        }}
+        onChange={(entry) => onValueChange(entry.value.toString())}
+        errorMessage={errorMessage}
+        readonly={disabled}
+        onEmptyValues={() => null}
+        onDismiss={dismissable ? () => onValueChange('') : undefined}
+      />
+
+      <div className="space-y-2">
+        {label ? <InputLabel>{label}</InputLabel> : null}
+
+        <Select
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          options={$entries}
+          value={selected}
+          onChange={(v) => onValueChange(v?.value as string)}
+          isDisabled={disabled}
+          isClearable={dismissable}
+        />
+
+        {errorMessage && (
+          <Alert className="mt-2" type="danger">
+            {errorMessage}
+          </Alert>
+        )}
+      </div>
+    </>
   );
 }
