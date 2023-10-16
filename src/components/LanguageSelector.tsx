@@ -8,33 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCountries } from '$app/common/hooks/useCountries';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { GenericSelectorProps } from './CountrySelector';
 import { SearchableSelect } from './SearchableSelect';
 
-export interface GenericSelectorProps<T = string> {
-  value: T;
-  label?: string | null;
-  onChange: (id: string) => unknown;
-  errorMessage?: string | string[];
-  dismissable?: boolean;
-  disabled?: boolean;
-}
-
-export function CountrySelector(props: GenericSelectorProps) {
-  const countries = useCountries();
+export function LanguageSelector(props: GenericSelectorProps) {
+  const languages = useLanguages();
 
   return (
     <SearchableSelect
-      onValueChange={props.onChange}
       value={props.value}
+      onValueChange={props.onChange}
       label={props.label}
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
-      disabled={props.disabled}
     >
-      {countries.map((country, index) => (
-        <option key={index} value={country.id}>
-          {country.name}
+      {languages.map((language, index) => (
+        <option key={index} value={language.id}>
+          {language.name}
         </option>
       ))}
     </SearchableSelect>

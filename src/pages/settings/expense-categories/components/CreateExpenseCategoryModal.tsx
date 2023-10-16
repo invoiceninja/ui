@@ -78,6 +78,12 @@ export function CreateExpenseCategoryModal(props: Props) {
             props.onCreatedCategory(response.data.data);
           }
 
+          blankExpenseCategory &&
+            setExpenseCategory({
+              ...blankExpenseCategory,
+              color: accentColor,
+            });
+
           props.setVisible(false);
         })
         .catch((error: AxiosError<ValidationBag>) => {

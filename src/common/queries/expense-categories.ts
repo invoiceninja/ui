@@ -29,12 +29,13 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter',
+          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter&status=:status',
           {
             perPage: params.perPage ?? '100',
             currentPage: params.currentPage ?? '1',
             sort: params.sort ?? 'id|asc',
             filter: params.filter ?? '',
+            status: params.status?.join(',') ?? '',
           }
         )
       ).then(
