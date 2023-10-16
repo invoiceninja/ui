@@ -132,7 +132,12 @@ export function ChangeTemplateModal<T = any>({
         onChange={setSendEmail}
       />
 
-      <Button behavior="button" onClick={changeTemplate}>
+      <Button
+        behavior="button"
+        onClick={changeTemplate}
+        disabled={!templateId}
+        disableWithoutIcon
+      >
         {t('generate_template')}
       </Button>
 
