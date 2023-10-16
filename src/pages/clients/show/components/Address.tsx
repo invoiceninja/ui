@@ -47,9 +47,8 @@ export function Address(props: Props) {
                 <p>{resolveCountry(client.country_id)?.name}</p>
 
                 <span
-                  dangerouslySetInnerHTML={{
-                    __html: `${client.public_notes}`,
-                  }}
+                  className="whitespace-normal"
+                  dangerouslySetInnerHTML={{ __html: client.public_notes }}
                 />
               </>
             }
