@@ -18,6 +18,7 @@ import {
   useLocation,
   useNavigate,
   useParams,
+  useSearchParams,
 } from 'react-router-dom';
 
 interface Props {
@@ -33,6 +34,7 @@ export function Tabs(props: Props) {
   const accentColor = useAccentColor();
   const location = useLocation();
   const params = useParams();
+  const [searchParams] = useSearchParams()
 
   const navigate = useNavigate();
 
@@ -67,9 +69,13 @@ export function Tabs(props: Props) {
         ({ href }) => href === location.pathname
       );
 
-      // if (!doesDefaultUrlExist) {
-      //   navigate(props.tabs[0].href);
-      // }
+      if (searchParams.get('redirect') === 'false') {
+        return;
+      }
+
+      if (!doesDefaultUrlExist) {
+        navigate(props.tabs[0].href);
+      }
     }
   }, []);
 
