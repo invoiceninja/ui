@@ -17,12 +17,14 @@ import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { InputField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
+import { $1, $2, colorSchemeAtom } from '$app/common/colors';
+import { useAtom } from 'jotai';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -37,6 +39,8 @@ export function Preferences() {
       })
     );
   };
+
+  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
   return (
     <div className="space-y-4">
@@ -99,6 +103,22 @@ export function Preferences() {
             type="number"
             placeholder={t('number_precision')}
           />
+        </Element>
+
+        <Element leftSide={t('light_dark_mode')}>
+          <SelectField
+            value={
+              JSON.stringify(colorScheme) === JSON.stringify($1)
+                ? 'dark'
+                : 'light'
+            }
+            onValueChange={(value) =>
+              value === 'light' ? setColorScheme($2) : setColorScheme($1)
+            }
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </SelectField>
         </Element>
       </Card>
 
