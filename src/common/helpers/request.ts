@@ -29,6 +29,7 @@ client.interceptors.response.use(
       if (!url.pathname.includes('/api/v1/live_preview')) {
         window.location.reload();
         localStorage.clear();
+        toast.dismiss();
       }
     }
 
