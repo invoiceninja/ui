@@ -29,6 +29,7 @@ import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
+import { toast } from './common/helpers/toast/toast';
 
 export function App() {
   const [t] = useTranslation();
@@ -107,6 +108,10 @@ export function App() {
     window.addEventListener('navigate.invalid.page', () =>
       navigate('/not_found')
     );
+
+    window.addEventListener('live_preview_patch', () => {
+      toast.dismiss();
+    });
   }, []);
 
   useEffect(() => {
