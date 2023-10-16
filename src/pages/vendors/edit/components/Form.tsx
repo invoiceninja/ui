@@ -27,6 +27,7 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction } from 'react';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 interface Props {
   vendor: Vendor;
@@ -175,7 +176,6 @@ export function Form(props: Props) {
               <option value="trust">{t('trust')}</option>
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
-
             </SelectField>
           </Element>
 
@@ -412,20 +412,12 @@ export function Form(props: Props) {
 
               {languages.length > 1 && (
                 <Element leftSide={t('language')} noExternalPadding>
-                  <SelectField
+                  <LanguageSelector
                     value={vendor.language_id}
-                    onValueChange={(value) =>
-                      handleChange('language_id', value)
-                    }
+                    onChange={(v) => handleChange('language_id', v)}
                     errorMessage={errors?.errors.language_id}
-                    withBlank
-                  >
-                    {languages.map((language, index) => (
-                      <option key={index} value={language.id}>
-                        {language.name}
-                      </option>
-                    ))}
-                  </SelectField>
+                    dismissable
+                  />
                 </Element>
               )}
 
