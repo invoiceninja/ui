@@ -137,7 +137,7 @@ export function ChangeTemplateModal<T = any>({
       </Button>
 
       {pdfUrl ? (
-        <Link to="/settings/invoice_design/template_designs/pdf">
+        <Link to="/settings/invoice_design/template_designs/pdf?redirect=false">
           {t('success')}! {t('view_pdf')}
         </Link>
       ) : null}

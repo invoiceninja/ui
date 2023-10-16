@@ -34,7 +34,7 @@ export function Tabs(props: Props) {
   const accentColor = useAccentColor();
   const location = useLocation();
   const params = useParams();
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
@@ -79,7 +79,7 @@ export function Tabs(props: Props) {
     }
   }, []);
 
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <div className={props.className}>
