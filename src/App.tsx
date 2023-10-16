@@ -29,7 +29,6 @@ import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
-import { toast } from './common/helpers/toast/toast';
 
 export function App() {
   const [t] = useTranslation();
