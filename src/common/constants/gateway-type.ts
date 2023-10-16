@@ -33,4 +33,5 @@ export default {
   [GatewayType.BECS]: 'becs',
   [GatewayType.InstantBankPay]: 'instant_bank_pay',
   [GatewayType.FPX]: 'fpx',
+  [GatewayType.VENMO]: 'payment_type_Venmo',
 };

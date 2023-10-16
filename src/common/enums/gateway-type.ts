@@ -31,4 +31,5 @@ export const enum GatewayType {
   BECS = '20',
   InstantBankPay = '21',
   FPX = '22',
+  VENMO = '25',
 }
