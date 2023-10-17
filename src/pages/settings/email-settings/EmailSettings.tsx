@@ -41,7 +41,6 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { Alert } from '$app/components/Alert';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function EmailSettings() {
@@ -62,8 +61,6 @@ export function EmailSettings() {
   const disableSettingsField = useDisableSettingsField();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
-
-  console.log(errors);
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -264,12 +261,6 @@ export function EmailSettings() {
                     </span>
                   </div>
                 </div>
-
-                {errors?.errors.e_invoice_certificate && (
-                  <Alert className="mt-2" type="danger">
-                    {errors?.errors.e_invoice_certificate}
-                  </Alert>
-                )}
               </Element>
             )}
 
