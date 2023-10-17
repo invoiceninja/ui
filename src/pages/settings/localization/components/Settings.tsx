@@ -11,13 +11,15 @@
 import { isDemo } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { DateFormat } from '$app/common/interfaces/date-format';
-import { Language } from '$app/common/interfaces/language';
 import { Timezone } from '$app/common/interfaces/timezone';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import dayjs from 'dayjs';
-import { useHandleCurrentCompanyChange } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import {
+  useHandleCurrentCompanyChange,
+  useHandleCurrentCompanyChangeProperty,
+} from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -25,12 +27,14 @@ import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useAtom, useAtomValue } from 'jotai';
 import { hasLanguageChanged } from '../common/atoms';
-import { ChangeEvent } from 'react';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { SearchableSelect } from '$app/components/SearchableSelect';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -46,13 +50,9 @@ export function Settings() {
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const handleChange = useHandleCurrentCompanyChange();
+  const handlePropertyChange = useHandleCurrentCompanyChangeProperty();
 
   const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
-
-  const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setHasLanguageIdChanged(true);
-    handleChange(event);
-  };
 
   const currencyFormats = [
     {
@@ -75,20 +75,12 @@ export function Settings() {
             />
           }
         >
-          <SelectField
-            value={company?.settings?.currency_id || ''}
-            id="settings.currency_id"
-            onChange={handleChange}
+          <CurrencySelector
+            value={company?.settings.currency_id || ''}
+            onChange={(v) => handlePropertyChange('settings.currency_id', v)}
             disabled={disableSettingsField('currency_id')}
             errorMessage={errors?.errors['settings.currency_id']}
-          >
-            <option value=""></option>
-            {statics?.currencies.map((currency) => (
-              <option value={currency.id} key={currency.id}>
-                {currency.name}
-              </option>
-            ))}
-          </SelectField>
+          />
         </Element>
 
         {/* <Element leftSide={t('decimal_comma')}>
@@ -144,19 +136,15 @@ export function Settings() {
               />
             }
           >
-            <SelectField
-              onChange={handleLanguageChange}
-              id="settings.language_id"
-              value={company?.settings?.language_id || '1'}
+            <LanguageSelector
+              onChange={(v) => {
+                setHasLanguageIdChanged(true);
+                handlePropertyChange('settings.language_id', v);
+              }}
+              value={company?.settings?.language_id || ''}
               disabled={disableSettingsField('language_id')}
               errorMessage={errors?.errors['settings.language_id']}
-            >
-              {statics?.languages.map((language: Language) => (
-                <option value={language.id} key={language.id}>
-                  {language.name}
-                </option>
-              ))}
-            </SelectField>
+            />
           </Element>
         )}
 
@@ -169,19 +157,18 @@ export function Settings() {
             />
           }
         >
-          <SelectField
-            onChange={handleChange}
-            id="settings.timezone_id"
+          <SearchableSelect
             value={company?.settings?.timezone_id || '1'}
             disabled={disableSettingsField('timezone_id')}
             errorMessage={errors?.errors['settings.timezone_id']}
+            onValueChange={(v) => handlePropertyChange('settings.timezone_id', v)}
           >
             {statics?.timezones.map((timezone: Timezone) => (
               <option value={timezone.id} key={timezone.id}>
                 {timezone.name}
               </option>
             ))}
-          </SelectField>
+          </SearchableSelect>
         </Element>
 
         <Element

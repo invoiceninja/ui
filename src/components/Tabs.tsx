@@ -18,6 +18,7 @@ import {
   useLocation,
   useNavigate,
   useParams,
+  useSearchParams,
 } from 'react-router-dom';
 
 interface Props {
@@ -61,11 +62,17 @@ export function Tabs(props: Props) {
     });
   };
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
     if (props.tabs.length && !props.disableBackupNavigation) {
       const doesDefaultUrlExist = props.tabs.some(
         ({ href }) => href === location.pathname
       );
+
+      if (searchParams.get('redirect') === 'false') {
+        return;
+      }
 
       if (!doesDefaultUrlExist) {
         navigate(props.tabs[0].href);
@@ -73,7 +80,7 @@ export function Tabs(props: Props) {
     }
   }, []);
 
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <div className={props.className}>

@@ -246,6 +246,10 @@ export function Combobox<T = any>({
       return;
     }
 
+    if (inputValue === '') {
+      return;
+    }
+
     const option: Entry = {
       id: Date.now(),
       label: inputValue,

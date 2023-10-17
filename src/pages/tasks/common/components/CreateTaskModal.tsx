@@ -78,11 +78,11 @@ export function CreateTaskModal(props: Props) {
 
           queryClient.invalidateQueries('/api/v1/tasks');
 
-          queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+          queryClient.invalidateQueries('/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true');
 
           queryClient.invalidateQueries(
             task.project_id &&
-              route('/api/v1/tasks?project_tasks=:project_id&per_page=1000', {
+            route('/api/v1/tasks?project_tasks=:project_id&per_page=1000&status=active&without_deleted_clients=true', {
                 project_id: task.project_id,
               })
           );
