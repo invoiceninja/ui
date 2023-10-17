@@ -478,32 +478,44 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
-                onClick={() =>
-                  props.onTableRowClick
-                    ? props.onTableRowClick(resource)
-                    : document.getElementById(resource.id)?.click()
-                }
               >
                 {!props.withoutActions && (
-                  <Td>
+                  <Td
+                    className="cursor-pointer"
+                    onClick={() =>
+                      selected.includes(resource.id)
+                        ? setSelected((current) =>
+                            current.filter((v) => v !== resource.id)
+                          )
+                        : setSelected((current) => [...current, resource.id])
+                    }
+                  >
                     <Checkbox
                       checked={selected.includes(resource.id)}
                       className="child-checkbox"
                       value={resource.id}
                       id={resource.id}
-                      onValueChange={(value) =>
-                        selected.includes(value)
-                          ? setSelected((current) =>
-                              current.filter((v) => v !== value)
-                            )
-                          : setSelected((current) => [...current, value])
-                      }
                     />
                   </Td>
                 )}
 
                 {props.columns.map((column, index) => (
-                  <Td key={index} className={styleOptions?.tdClassName}>
+                  <Td
+                    key={index}
+                    className={classNames(
+                      {
+                        'cursor-pointer': index < 3,
+                      },
+                      styleOptions?.tdClassName
+                    )}
+                    onClick={() => {
+                      if (index < 3) {
+                        props.onTableRowClick
+                          ? props.onTableRowClick(resource)
+                          : document.getElementById(resource.id)?.click();
+                      }
+                    }}
+                  >
                     {column.format
                       ? column.format(resource[column.id], resource)
                       : resource[column.id]}
