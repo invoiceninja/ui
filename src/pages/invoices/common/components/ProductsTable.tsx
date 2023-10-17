@@ -9,7 +9,7 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { Plus, Trash2 } from 'react-feather';
+import { AlignJustify, Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   isLineItemEmpty,
@@ -25,6 +25,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Fragment } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { atom, useSetAtom } from 'jotai';
+import classNames from 'classnames';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -127,11 +128,21 @@ export function ProductsTable(props: Props) {
                             width={resolveColumnWidth(column)}
                             key={columnIndex}
                           >
-                            {length - 1 !== columnIndex &&
-                              resolveInputField(
-                                column,
-                                getLineItemIndex(lineItem)
-                              )}
+                            {length - 1 !== columnIndex && (
+                              <div
+                                className={classNames({
+                                  'flex justify-between items-center space-x-3':
+                                    columnIndex === 0,
+                                })}
+                              >
+                                {columnIndex === 0 ? <AlignJustify size={18} /> : null}
+
+                                {resolveInputField(
+                                  column,
+                                  getLineItemIndex(lineItem)
+                                )}
+                              </div>
+                            )}
 
                             {length - 1 === columnIndex && (
                               <div className="flex justify-between items-center">
