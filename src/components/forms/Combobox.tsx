@@ -339,7 +339,9 @@ export function Combobox<T = any>({
               }}
               className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
             >
-              {onDismiss && selectedOption ? (
+              {onDismiss &&
+              selectedOption &&
+              selectedOption.eventType !== 'internal' ? (
                 <X
                   className="h-5 w-5"
                   aria-hidden="true"
