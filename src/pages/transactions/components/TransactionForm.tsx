@@ -20,9 +20,9 @@ import { BankAccountSelector } from '../components/BankAccountSelector';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
-import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { EntityStatus } from './EntityStatus';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface Props {
   transaction: Transaction;
@@ -37,8 +37,6 @@ interface Props {
 
 export function TransactionForm(props: Props) {
   const [t] = useTranslation();
-
-  const currencies = useCurrencies();
 
   return (
     <>
@@ -98,17 +96,11 @@ export function TransactionForm(props: Props) {
       </Element>
 
       <Element required leftSide={t('currency')}>
-        <SelectField
+        <CurrencySelector
           value={props.transaction.currency_id}
-          onValueChange={(value) => props.handleChange('currency_id', value)}
+          onChange={(v) => props.handleChange('currency_id', v)}
           errorMessage={props.errors?.errors.currency_id}
-        >
-          {currencies?.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {t(name)}
-            </option>
-          ))}
-        </SelectField>
+        />
       </Element>
 
       <Element required leftSide={t('bank_account')}>

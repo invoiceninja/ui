@@ -20,7 +20,7 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
-    if (error.response?.status === 403) {
+    if (error.response?.status === 403 || error.response?.status === 400) {
       const url = new URL(error.request.responseURL);
 
       // Temporary solution. If you see this in few months,
@@ -41,6 +41,7 @@ client.interceptors.response.use(
       error.response.status !== 401 &&
       error.response.status !== 412 &&
       error.response.status !== 422 &&
+      error.response.status !== 400 && // Temporary solution. If you see this in few months, please delete (live previews).
       error.response.status > 399 &&
       error.response.status < 500
     ) {

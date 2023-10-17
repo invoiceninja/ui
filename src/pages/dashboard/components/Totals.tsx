@@ -29,6 +29,7 @@ import {
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useColorScheme } from '$app/common/colors';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -249,19 +250,13 @@ export function Totals() {
           </div>
 
           <Preferences>
-            <SelectField
+            <CurrencySelector
               label={t('currency')}
-              value={settings.preferences.dashboard_charts.currency}
-              onValueChange={(value) =>
-                update('preferences.dashboard_charts.currency', parseInt(value))
+              value={settings.preferences.dashboard_charts.currency.toString()}
+              onChange={(v) =>
+                update('preferences.dashboard_charts.currency', parseInt(v))
               }
-            >
-              {currencies.map((currency) => (
-                <option key={currency.value} value={currency.value}>
-                  {currency.label}
-                </option>
-              ))}
-            </SelectField>
+            />
 
             <SelectField
               label={t('range')}
