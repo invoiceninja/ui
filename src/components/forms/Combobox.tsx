@@ -716,7 +716,7 @@ interface EntryOptions<T = any> {
 }
 
 export interface ComboboxAsyncProps<T> {
-  endpoint: URL;
+  endpoint: string;
   inputOptions: InputOptions;
   entryOptions: EntryOptions<T>;
   readonly?: boolean;
@@ -754,20 +754,22 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
-  const { data, refetch } = useQuery(
-    [url.pathname, url.searchParams.toString()],
+  const { data } = useQuery(
+    [url],
     () => {
+      const $url = new URL(url);
+
       if (sortBy) {
-        url.searchParams.set('sort', sortBy);
+        $url.searchParams.set('sort', sortBy);
       }
 
-      url.searchParams.set('status', 'active');
+      $url.searchParams.set('status', 'active');
 
       if (inputOptions.value && !disableWithQueryParameter) {
-        url.searchParams.set('with', inputOptions.value.toString());
+        $url.searchParams.set('with', inputOptions.value.toString());
       }
 
-      return request('GET', url.href).then(
+      return request('GET', $url.href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -801,20 +803,17 @@ export function ComboboxAsync<T = any>({
     return () => setEntries([]);
   }, []);
 
-  useEffect(() => {
-    setUrl(() => new URL(endpoint.href));
-    refetch();
-  }, [endpoint.href]);
-
   const onEmptyValues = (query: string) => {
-    setUrl((current) => {
-      current.searchParams.set('filter', query);
+    setUrl((c) => {
+      const url = new URL(c);
 
-      return new URL(current.href);
+      url.searchParams.set('filter', query);
+
+      return url.href;
     });
   };
 
-  if (endpoint.pathname.startsWith('/api/v1/products')) {
+  if (url.includes('/api/v1/products')) {
     return (
       <Combobox
         entries={entries}
