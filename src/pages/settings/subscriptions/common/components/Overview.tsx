@@ -51,7 +51,7 @@ export function Overview(props: OverviewSubscriptionProps) {
 
       <Element leftSide={t('group')}>
         <ComboboxAsync<GroupSettings>
-          endpoint={new URL(endpoint('/api/v1/group_settings?status=active'))}
+          endpoint={endpoint('/api/v1/group_settings?status=active')}
           onChange={(value: Entry<GroupSettings>) =>
             value.resource && handleChange('group_id', value.resource.id)
           }
