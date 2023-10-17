@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
@@ -22,6 +23,8 @@ interface Props {
 
 export function SmsVerificationModal(props: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const digitFieldsBox = useRef<HTMLDivElement>(null);
 
@@ -94,10 +97,12 @@ export function SmsVerificationModal(props: Props) {
           {digitFields.map((field, index) => (
             <InputField
               key={field}
-              className="text-center border-gray-800 text-xl"
+              className="text-center text-xl"
               maxLength={1}
+              debounceTimeout={50}
               value={code[index]}
               onValueChange={(value) => handleChangeValue(value, index)}
+              style={{ borderColor: colors.$5 }}
             />
           ))}
         </div>
