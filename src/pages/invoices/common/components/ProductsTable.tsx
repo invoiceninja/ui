@@ -210,6 +210,8 @@ export function ProductsTable(props: Props) {
               ) : (
                 <Fragment />
               )}
+
+              {provided.placeholder}
             </Tbody>
           )}
         </Droppable>
