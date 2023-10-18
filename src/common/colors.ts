@@ -12,6 +12,7 @@ import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 export const $1 = {
+  name: 'invoiceninja.dark',
   $0: 'dark',
   $1: '#182433',
   $2: '#151f2c',
@@ -25,6 +26,7 @@ export const $1 = {
 };
 
 export const $2 = {
+  name: 'invoiceninja.light',
   $0: 'light',
   $1: '#ffffff', // Primary background
   $2: '#f7f7f7', // Secondary background
