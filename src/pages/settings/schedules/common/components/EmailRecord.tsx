@@ -67,7 +67,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('invoice')}>
           <ComboboxAsync<Invoice>
             endpoint={
-              new URL(endpoint('/api/v1/invoices?include=client&status=active'))
+              endpoint('/api/v1/invoices?include=client&status=active')
             }
             onChange={(invoice: Entry<Invoice>) =>
               invoice.resource &&
@@ -99,7 +99,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('quote')}>
           <ComboboxAsync<Quote>
             endpoint={
-              new URL(endpoint('/api/v1/quotes?include=client&status=active'))
+              endpoint('/api/v1/quotes?include=client&status=active')
             }
             onChange={(quote: Entry<Quote>) =>
               quote.resource &&
@@ -130,7 +130,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('credit')}>
           <ComboboxAsync<Credit>
             endpoint={
-              new URL(endpoint('/api/v1/credits?include=client&status=active'))
+              endpoint('/api/v1/credits?include=client&status=active')
             }
             onChange={(credit: Entry<Credit>) =>
               credit.resource &&
@@ -162,9 +162,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('purchase_order')}>
           <ComboboxAsync<PurchaseOrder>
             endpoint={
-              new URL(
                 endpoint('/api/v1/purchase_orders?include=vendor&status=active')
-              )
             }
             onChange={(value: Entry<PurchaseOrder>) =>
               value.resource &&

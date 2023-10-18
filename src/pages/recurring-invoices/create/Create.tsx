@@ -125,6 +125,9 @@ export default function Create() {
         _recurringInvoice.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 
+        _recurringInvoice.auto_bill =
+          company?.settings?.auto_bill ?? 'off';
+
         value = _recurringInvoice;
       }
 

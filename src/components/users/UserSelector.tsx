@@ -32,7 +32,7 @@ export function UserSelector(props: UserSelectorProps) {
         value: props.value ?? null,
       }}
       endpoint={
-        new URL(endpoint(props.endpoint || '/api/v1/users?status=active'))
+        endpoint(props.endpoint || '/api/v1/users?status=active')
       }
       entryOptions={{
         id: 'id',

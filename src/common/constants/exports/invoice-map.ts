@@ -42,4 +42,5 @@ export const invoiceMap: Record[] = [
   { trans: 'tax_amount', value: 'invoice.total_taxes' },
   { trans: 'assigned_user', value: 'invoice.assigned_user_id' },
   { trans: 'user', value: 'invoice.user_id' },
+  { trans: 'recurring_invoice', value: 'invoice.recurring_id' },
 ];
