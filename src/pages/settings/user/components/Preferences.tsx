@@ -17,7 +17,7 @@ import {
   preferencesDefaults,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField } from '$app/components/forms';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
@@ -105,20 +105,11 @@ export function Preferences() {
           />
         </Element>
 
-        <Element leftSide={t('light_dark_mode')}>
-          <SelectField
-            value={
-              JSON.stringify(colorScheme) === JSON.stringify($1)
-                ? 'dark'
-                : 'light'
-            }
-            onValueChange={(value) =>
-              value === 'light' ? setColorScheme($2) : setColorScheme($1)
-            }
-          >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </SelectField>
+        <Element leftSide={t('dark_mode')}>
+          <Toggle
+            checked={JSON.stringify(colorScheme) === JSON.stringify($1)}
+            onChange={(v) => v ? setColorScheme($1) : setColorScheme($2)}
+          />
         </Element>
       </Card>
 
