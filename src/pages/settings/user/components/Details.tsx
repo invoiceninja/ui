@@ -74,7 +74,7 @@ export function Details() {
 
           <Element leftSide={t('language')}>
             <LanguageSelector
-              value={user?.language_id || ''}
+              value={userChanges?.language_id || ''}
               onChange={(v) => handleChange('language_id', v)}
               errorMessage={(errors?.errors?.language_id ?? [])[0]}
               dismissable
