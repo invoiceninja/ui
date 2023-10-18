@@ -84,7 +84,10 @@ export function SmsVerificationModal(props: Props) {
     <Modal
       title={t('sms_code')}
       visible={props.visible}
-      onClose={() => props.setVisible(false)}
+      onClose={() => {
+        props.setVisible(false);
+        setCode(initialCodeValue);
+      }}
     >
       <div>
         <div className="flex justify-end mb-1">
