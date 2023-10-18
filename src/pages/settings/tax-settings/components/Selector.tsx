@@ -50,7 +50,7 @@ export function Selector(props: Props) {
       updateChanges({
         object: 'company',
         property: event.target.id,
-        value: option.dataset.rate,
+        value: parseFloat(option.dataset.rate || '0'),
       })
     );
 
