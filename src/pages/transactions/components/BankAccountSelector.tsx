@@ -34,7 +34,7 @@ export function BankAccountSelector(props: BankAccountSelectorProps) {
       />
 
       <ComboboxAsync<BankAccount>
-        endpoint={new URL(endpoint('/api/v1/bank_integrations?status=active'))}
+        endpoint={endpoint('/api/v1/bank_integrations?status=active')}
         onChange={(bankAccount: Entry<BankAccount>) =>
           bankAccount.resource && props.onChange(bankAccount.resource)
         }

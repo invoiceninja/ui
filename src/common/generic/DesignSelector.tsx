@@ -93,7 +93,7 @@ export function DesignSelector(props: Props) {
 
         <ComboboxAsync<Design>
           endpoint={
-            new URL(endpoint('/api/v1/designs?per_page=500&status=active'))
+            endpoint('/api/v1/designs?per_page=500&status=active')
           }
           onChange={(design: Entry<Design>) =>
             setDesign(
@@ -134,7 +134,7 @@ export function DesignSelector(props: Props) {
       </Modal>
 
       <ComboboxAsync<Design>
-        endpoint={new URL(endpoint('/api/v1/designs?status=active'))}
+        endpoint={endpoint('/api/v1/designs?status=active')}
         onChange={(design: Entry<Design>) =>
           design.resource && props.onChange(design.resource)
         }
