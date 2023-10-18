@@ -45,7 +45,7 @@ export function ProductSelector(props: Props) {
       />
 
       <ComboboxAsync<Product>
-        endpoint={new URL(endpoint('/api/v1/products?per_page=800'))}
+        endpoint={endpoint('/api/v1/products?per_page=800')}
         inputOptions={{ value: props.defaultValue ?? null }}
         entryOptions={{
           id: 'id',

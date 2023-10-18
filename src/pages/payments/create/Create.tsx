@@ -280,11 +280,9 @@ export default function Create() {
                         label: t('invoice') ?? '',
                       }}
                       endpoint={
-                        new URL(
                           endpoint(
                             `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
                           )
-                        )
                       }
                       entryOptions={{
                         label: 'number',
@@ -349,9 +347,7 @@ export default function Create() {
             <Element leftSide={t('invoices')}>
               <ComboboxAsync<Invoice>
                 endpoint={
-                  new URL(
                     endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
-                  )
                 }
                 inputOptions={{
                   value: 'id',
@@ -395,11 +391,9 @@ export default function Create() {
                         label: t('credit') ?? '',
                       }}
                       endpoint={
-                        new URL(
                           endpoint(
                             `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
                           )
-                        )
                       }
                       entryOptions={{
                         id: 'id',
@@ -472,9 +466,7 @@ export default function Create() {
             <Element leftSide={t('credits')}>
               <ComboboxAsync<Credit>
                 endpoint={
-                  new URL(
                     endpoint(`/api/v1/credits?client_id=${payment.client_id}`)
-                  )
                 }
                 inputOptions={{
                   value: null,

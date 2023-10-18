@@ -155,11 +155,9 @@ export default function Apply() {
         {payment?.client_id ? (
           <ComboboxAsync<Invoice>
             endpoint={
-              new URL(
                 endpoint(
                   `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
                 )
-              )
             }
             inputOptions={{
               value: 'id',
