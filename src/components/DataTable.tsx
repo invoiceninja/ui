@@ -56,6 +56,7 @@ import collect from 'collect.js';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useLocation } from 'react-router-dom';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -80,6 +81,15 @@ interface StyleOptions {
   thClassName?: string;
   tdClassName?: string;
   addRowSeparator?: boolean;
+}
+
+interface TablePreference {
+  filter?: string;
+  customFilter?: string[];
+  currentPage?: number;
+  sort?: string;
+  status?: string[];
+  sortedBy?: string;
 }
 
 interface Props<T> extends CommonProps {
@@ -114,10 +124,15 @@ interface Props<T> extends CommonProps {
 
 type ResourceAction<T> = (resource: T) => ReactElement;
 
-export const datatablePerPageAtom = atomWithStorage('perPage', '100');
+export const datatablePerPageAtom = atomWithStorage<string>('perPage', '100');
+
+const dataTableFilterPreferencesAtom = atomWithStorage<
+  Record<string, TablePreference>
+>('dataTablePreferences', {});
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+  const location = useLocation();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -125,6 +140,18 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
+
+  const tableKey = useMemo(() => `${location.pathname}/${props.resource}`, []);
+
+  const [dataTableFilterPreferences, setDataTableFilterPreferences] = useAtom(
+    dataTableFilterPreferencesAtom
+  );
+
+  const getPreference = (filterKey: keyof TablePreference) => {
+    return dataTableFilterPreferences && dataTableFilterPreferences[tableKey]
+      ? dataTableFilterPreferences[tableKey][filterKey]
+      : '';
+  };
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
   setInvalidationQueryAtom(apiEndpoint.pathname);
@@ -135,15 +162,18 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
-  const [sort, setSort] = useState(
+  const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
+
+  const [isInitialConfiguration, setIsInitialConfiguration] =
+    useState<boolean>(true);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -188,6 +218,39 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, []);
 
   useEffect(() => {
+    if (!isInitialConfiguration) {
+      setFilter((getPreference('filter') as string) || '');
+      if ((getPreference('customFilter') as string[]).length) {
+        setCustomFilter(getPreference('customFilter') as string[]);
+      } else {
+        setCustomFilter(['all']);
+      }
+      setCurrentPage((getPreference('currentPage') as number) || 1);
+      setSort(
+        apiEndpoint.searchParams.get('sort') ||
+          (getPreference('sort') as string) ||
+          'id|asc'
+      );
+      setSortedBy((getPreference('sortedBy') as string) || undefined);
+      setStatus((getPreference('status') as string[]) || ['active']);
+    }
+  }, [isInitialConfiguration]);
+
+  useEffect(() => {
+    if (!isInitialConfiguration) {
+      setDataTableFilterPreferences((currentPreferences) => ({
+        ...currentPreferences,
+        [tableKey]: {
+          filter,
+          currentPage,
+          customFilter,
+          sort,
+          sortedBy,
+          status,
+        },
+      }));
+    }
+
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
@@ -198,6 +261,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
+
+    isInitialConfiguration && setIsInitialConfiguration(false);
 
     return () => {
       isProduction() && setInvalidationQueryAtom(undefined);
@@ -241,6 +306,28 @@ export function DataTable<T extends object>(props: Props<T>) {
       backgroundColor: '#c95f53',
     },
   ];
+
+  const defaultOptions = useMemo(() => {
+    if (!isInitialConfiguration) {
+      return (
+        options.filter(({ value }) =>
+          ((getPreference('status') as string[]) || ['active']).includes(value)
+        ) || [options[0]]
+      );
+    }
+  }, [isInitialConfiguration]);
+
+  const defaultCustomFilterOptions = useMemo(() => {
+    if (!isInitialConfiguration && props.customFilters) {
+      return (
+        props.customFilters.filter(({ value }) =>
+          ((getPreference('customFilter') as string[]) || ['all']).includes(
+            value
+          )
+        ) || [props.customFilters[0]]
+      );
+    }
+  }, [isInitialConfiguration]);
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(
@@ -307,10 +394,12 @@ export function DataTable<T extends object>(props: Props<T>) {
     <>
       {!props.withoutActions && (
         <Actions
+          filter={filter}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}
-          defaultOption={options[0]}
+          defaultOptions={defaultOptions}
+          defaultCustomFilterOptions={defaultCustomFilterOptions}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
