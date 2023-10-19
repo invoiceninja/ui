@@ -122,7 +122,13 @@ export function SearchableSelect({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         value={selected}
-        onChange={(v) => onValueChange(v?.value as string)}
+        onChange={(v) =>  {
+          if (v === null) {
+            return onValueChange('');
+          }
+
+          return onValueChange(v.value as string);
+        }}
         isDisabled={disabled}
         isClearable={dismissable}
         styles={customStyles}
