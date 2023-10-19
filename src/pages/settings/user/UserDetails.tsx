@@ -32,10 +32,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
+import { useQueryClient } from 'react-query';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -53,6 +55,11 @@ export function UserDetails() {
     { name: t('user_details'), href: '/settings/user_details' },
   ];
 
+
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
+  
   const user = useCurrentUser();
 
   const dispatch = useDispatch();
@@ -68,6 +75,7 @@ export function UserDetails() {
 
   const { isAdmin } = useAdmin();
   const { save } = usePreferences();
+  const queryClient = useQueryClient();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
@@ -97,6 +105,11 @@ export function UserDetails() {
       .all(requests)
       .then((response) => {
         toast.success('updated_settings');
+
+        if (hasLanguageChanged) {
+          queryClient.invalidateQueries('/api/v1/statics');
+          setHasLanguageIdChanged(false);
+        }
 
         if (
           response[0].data.data.phone !== user?.phone &&
