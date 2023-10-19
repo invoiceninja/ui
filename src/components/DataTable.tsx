@@ -226,13 +226,13 @@ export function DataTable<T extends object>(props: Props<T>) {
         setCustomFilter(['all']);
       }
       setCurrentPage((getPreference('currentPage') as number) || 1);
-      setSort(
-        apiEndpoint.searchParams.get('sort') ||
-          (getPreference('sort') as string) ||
-          'id|asc'
-      );
+      setSort((getPreference('sort') as string) || 'id|asc');
       setSortedBy((getPreference('sortedBy') as string) || undefined);
-      setStatus((getPreference('status') as string[]) || ['active']);
+      if ((getPreference('status') as string[]).length) {
+        setStatus(getPreference('status') as string[]);
+      } else {
+        setStatus(['active']);
+      }
     }
   }, [isInitialConfiguration]);
 
@@ -309,21 +309,27 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const defaultOptions = useMemo(() => {
     if (!isInitialConfiguration) {
+      const currentStatuses = (getPreference('status') as string[]).length
+        ? (getPreference('status') as string[])
+        : ['active'];
+
       return (
-        options.filter(({ value }) =>
-          ((getPreference('status') as string[]) || ['active']).includes(value)
-        ) || [options[0]]
+        options.filter(({ value }) => currentStatuses.includes(value)) || [
+          options[0],
+        ]
       );
     }
   }, [isInitialConfiguration]);
 
   const defaultCustomFilterOptions = useMemo(() => {
     if (!isInitialConfiguration && props.customFilters) {
+      const currentStatuses = (getPreference('customFilter') as string[]).length
+        ? (getPreference('customFilter') as string[])
+        : ['all'];
+
       return (
         props.customFilters.filter(({ value }) =>
-          ((getPreference('customFilter') as string[]) || ['all']).includes(
-            value
-          )
+          currentStatuses.includes(value)
         ) || [props.customFilters[0]]
       );
     }
