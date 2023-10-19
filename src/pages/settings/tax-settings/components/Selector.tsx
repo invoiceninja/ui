@@ -76,9 +76,7 @@ export function Selector(props: Props) {
                   onCheckboxChange={(value) => {
                     if (value) {
                       handlePropertyChange('settings.tax_rate1', 0);
-                    }
-
-                    if (!value) {
+                    } else {
                       handleRemoveProperty('tax_rate1');
                     }
                   }}
@@ -121,9 +119,7 @@ export function Selector(props: Props) {
                   onCheckboxChange={(value) => {
                     if (value) {
                       handlePropertyChange('settings.tax_rate2', 0);
-                    }
-
-                    if (!value) {
+                    } else {
                       handleRemoveProperty('tax_rate2');
                     }
                   }}
@@ -166,9 +162,7 @@ export function Selector(props: Props) {
                   onCheckboxChange={(value) => {
                     if (value) {
                       handlePropertyChange('settings.tax_rate3', 0);
-                    }
-
-                    if (!value) {
+                    } else {
                       handleRemoveProperty('tax_rate3');
                     }
                   }}
