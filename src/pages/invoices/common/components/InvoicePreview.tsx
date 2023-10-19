@@ -74,7 +74,6 @@ export function InvoicePreview(props: Props) {
     setRender(isIntersecting);
   }, [props.resource]);
 
-  
   if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
       <InvoiceViewer
@@ -125,6 +124,7 @@ export function InvoicePreview(props: Props) {
             )}
             resource={props.resource}
             method="POST"
+            enabled={isIntersecting}
           />
         ) : null}
       </div>

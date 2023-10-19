@@ -247,6 +247,7 @@ export default function Edit() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              initiallyVisible={false}
             />
           )}
         </div>
