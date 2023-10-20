@@ -19,6 +19,7 @@ interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
+  behavior?: 'button';
 }
 
 const Button = styled.button`
@@ -38,7 +39,7 @@ const StyledLink = styled(Link)`
 export function DropdownElement(props: Props) {
   const colors = useColorScheme();
 
-  if (props.to) {
+  if (props.to && props.behavior !== 'button') {
     return (
       <StyledLink
         theme={{

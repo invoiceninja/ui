@@ -206,15 +206,21 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
-    (invoice: Invoice) =>
-      !excludeCommonActions && (
-        <DropdownElement
-          to={route('/invoices/:id/email', { id: invoice.id })}
-          icon={<Icon element={MdSend} />}
-        >
-          {t('email_invoice')}
-        </DropdownElement>
-      ),
+    (invoice: Invoice) => {
+      return (
+        <div>
+          {!excludeCommonActions && (
+            <DropdownElement
+              to={route('/invoices/:id/email', { id: invoice.id })}
+              icon={<Icon element={MdSend} />}
+            >
+              {t('email_invoice')}
+            </DropdownElement>
+          )}
+        </div>
+      );
+    },
+
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/pdf', { id: invoice.id })}
