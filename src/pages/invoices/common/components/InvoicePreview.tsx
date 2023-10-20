@@ -69,13 +69,13 @@ export function InvoicePreview(props: Props) {
     });
 
     if (divRef.current) {
-      observer.observe(divRef.current);
+      observer.observe(divRef.current!);
     }
 
     return () => {
       observer.disconnect();
     };
-  }, [divRef]);
+  }, [divRef.current]);
 
   useEffect(() => {
     if (!props.observable) {
@@ -87,13 +87,17 @@ export function InvoicePreview(props: Props) {
 
   if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
-      <InvoiceViewer
-        link={previewEndpoint(endpoint, {
-          entity: props.entity,
-        })}
-        resource={props.resource}
-        method="POST"
-      />
+      <div ref={divRef}>
+        {render ? (
+          <InvoiceViewer
+            link={previewEndpoint(endpoint, {
+              entity: props.entity,
+            })}
+            resource={props.resource}
+            method="POST"
+          />
+        ) : null}
+      </div>
     );
   }
 
