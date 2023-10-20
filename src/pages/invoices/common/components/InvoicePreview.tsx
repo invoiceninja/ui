@@ -68,7 +68,9 @@ export function InvoicePreview(props: Props) {
       );
     });
 
-    observer.observe(divRef.current!);
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
 
     return () => {
       observer.disconnect();
