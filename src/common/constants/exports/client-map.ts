@@ -15,6 +15,7 @@ export interface Record {
 
 export const clientMap: Record[] = [
   { trans: 'name', value: 'client.name' },
+  { trans: 'name', value: 'client.number' },
   { trans: 'user', value: 'client.user' },
   { trans: 'assigned_user', value: 'client.assigned_user' },
   { trans: 'balance', value: 'client.balance' },
