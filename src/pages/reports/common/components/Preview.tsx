@@ -136,8 +136,8 @@ export function Preview() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     copy.rows = copy.rows.sort((first, second) => {
-      const a = first.find((cell) => cell.id === column);
-      const b = second.find((cell) => cell.id === column);
+      const a = first.find((cell) => cell.identifier === column);
+      const b = second.find((cell) => cell.identifier === column);
 
       if (a && b) {
         if (value === 'asc') {
