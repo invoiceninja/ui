@@ -39,6 +39,7 @@ interface Props {
     | '/api/v1/live_preview?entity=:entity'
     | '/api/v1/live_preview/purchase_order?entity=:entity';
   initiallyVisible?: boolean;
+  observable?: boolean;
 }
 
 export function InvoicePreview(props: Props) {
@@ -49,6 +50,10 @@ export function InvoicePreview(props: Props) {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!props.observable) {
+      return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(
         (entry) => {
@@ -71,6 +76,10 @@ export function InvoicePreview(props: Props) {
   }, [divRef]);
 
   useEffect(() => {
+    if (!props.observable) {
+      return;
+    }
+
     setRender(isIntersecting);
   }, [props.resource]);
 
@@ -122,9 +131,9 @@ export function InvoicePreview(props: Props) {
                 id: props.resource?.id,
               }
             )}
-            resource={props.resource}
             method="POST"
-            enabled={isIntersecting}
+            resource={props.resource}
+            enabled={props.observable ? isIntersecting : true}
           />
         ) : null}
       </div>
