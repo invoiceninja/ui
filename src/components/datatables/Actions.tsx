@@ -36,7 +36,7 @@ interface Props extends CommonProps {
   customFilterPlaceholder?: string;
   beforeFilter?: ReactNode;
   defaultCustomFilterOptions?: SelectOption[];
-  filter?: string;
+  filter: string;
 }
 
 export function Actions(props: Props) {

@@ -84,12 +84,12 @@ interface StyleOptions {
 }
 
 interface TablePreference {
-  filter?: string;
-  customFilter?: string[];
-  currentPage?: number;
-  sort?: string;
-  status?: string[];
-  sortedBy?: string;
+  filter: string;
+  customFilter: string[];
+  currentPage: number;
+  sort: string;
+  status: string[];
+  sortedBy: string | undefined;
 }
 
 interface Props<T> extends CommonProps {
@@ -141,7 +141,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
-  const tableKey = useMemo(() => `${location.pathname}/${props.resource}`, []);
+  const tableKey = useMemo(() => `${location.pathname}${props.endpoint}`, []);
 
   const [dataTableFilterPreferences, setDataTableFilterPreferences] = useAtom(
     dataTableFilterPreferencesAtom
@@ -309,8 +309,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const defaultOptions = useMemo(() => {
     if (!isInitialConfiguration) {
-      const currentStatuses = (getPreference('status') as string[]).length
-        ? (getPreference('status') as string[])
+      const preferenceStatuses = getPreference('status') as string[];
+
+      const currentStatuses = preferenceStatuses.length
+        ? preferenceStatuses
         : ['active'];
 
       return (
@@ -323,8 +325,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const defaultCustomFilterOptions = useMemo(() => {
     if (!isInitialConfiguration && props.customFilters) {
-      const currentStatuses = (getPreference('customFilter') as string[]).length
-        ? (getPreference('customFilter') as string[])
+      const preferenceCustomFilters = getPreference('customFilter') as string[];
+
+      const currentStatuses = preferenceCustomFilters.length
+        ? preferenceCustomFilters
         : ['all'];
 
       return (
@@ -395,6 +399,12 @@ export function DataTable<T extends object>(props: Props<T>) {
       setSelectedResources(filteredSelectedResources);
     }
   }, [selected]);
+
+  useEffect(() => {
+    if (data && !data.data.data.length) {
+      setCurrentPage(1);
+    }
+  }, [data]);
 
   return (
     <>
