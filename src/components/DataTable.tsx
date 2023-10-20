@@ -148,7 +148,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const getPreference = (filterKey: keyof TablePreference) => {
-    return dataTableFilterPreferences && dataTableFilterPreferences[tableKey]
+    return dataTableFilterPreferences[tableKey]
       ? dataTableFilterPreferences[tableKey][filterKey]
       : '';
   };
