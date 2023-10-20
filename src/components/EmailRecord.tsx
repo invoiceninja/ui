@@ -134,7 +134,7 @@ export function EmailRecord(props: Props) {
               <span className="text-sm">{date(event.date, dateFormat)}</span>
             </div>
 
-            <span className="text-sm truncate">{event.delivery_message}</span>
+            <span className="text-sm truncate">{event.recipient}</span>
           </EventDiv>
         ))}
       </div>
