@@ -107,7 +107,7 @@ export default function Edit() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  const actions = useActions({ excludeCommonActions: true });
+  const actions = useActions({ dropdown: true });
   const save = useHandleSave(setErrors);
 
   return (
