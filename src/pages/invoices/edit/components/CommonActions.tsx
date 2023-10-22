@@ -11,22 +11,14 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { CommonActionsPreferenceModal } from '$app/components/CommonActionsPreferenceModal';
 import { Icon } from '$app/components/icons/Icon';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { MdSettings } from 'react-icons/md';
-
 import { useActions } from './Actions';
-import {
-  useAllCommonActions,
-  useDefaultCommonActions,
-} from '$app/common/hooks/useCommonActions';
 
 interface Props {
   invoice: Invoice;
 }
 export function CommonActions(props: Props) {
-  const allCommonActions = useAllCommonActions();
-  const defaultCommonActions = useDefaultCommonActions();
-
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
     useState<boolean>(false);
 
@@ -51,8 +43,6 @@ export function CommonActions(props: Props) {
 
       <CommonActionsPreferenceModal
         entity="invoice"
-        allCommonActions={allCommonActions}
-        defaultCommonActions={defaultCommonActions}
         visible={isPreferenceModalOpen}
         setVisible={setIsPreferenceModalOpen}
       />

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { Modal } from './Modal';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from './icons/Icon';
 import { MdClose } from 'react-icons/md';
 import { SearchableSelect } from './SearchableSelect';
+import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
 
 export interface CommonAction {
   value: string;
@@ -27,8 +28,6 @@ export type Entity = 'invoice';
 
 interface Props {
   entity: Entity;
-  defaultCommonActions: Record<Entity, CommonAction[]>;
-  allCommonActions: Record<Entity, CommonAction[]>;
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
@@ -40,6 +39,8 @@ export const commonActionsPreferencesAtom = atomWithStorage<
 export function CommonActionsPreferenceModal(props: Props) {
   const [t] = useTranslation();
 
+  const commonActions = useAllCommonActions();
+
   const [commonActionsAtom, setCommonActionsAtom] = useAtom(
     commonActionsPreferencesAtom
   );
@@ -50,7 +51,9 @@ export function CommonActionsPreferenceModal(props: Props) {
 
   const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
 
-  const { entity, allCommonActions, visible, setVisible } = props;
+  const { entity, visible, setVisible } = props;
+
+  const allCommonActions = useMemo(() => commonActions[entity], []);
 
   const [selectedAction, setSelectedAction] = useState<string>('');
 
@@ -80,7 +83,7 @@ export function CommonActionsPreferenceModal(props: Props) {
 
   useEffect(() => {
     if (selectedAction) {
-      const commonAction = allCommonActions[entity].find(
+      const commonAction = allCommonActions.find(
         ({ value }) => selectedAction === value
       );
 
@@ -104,7 +107,7 @@ export function CommonActionsPreferenceModal(props: Props) {
   useEffect(() => {
     if (commonActionsPreferences && commonActionsPreferences[entity]) {
       setAvailableActions(
-        allCommonActions[entity].filter(
+        allCommonActions.filter(
           ({ value }) =>
             !commonActionsPreferences[entity].some(
               (action) => action.value === value
@@ -112,13 +115,13 @@ export function CommonActionsPreferenceModal(props: Props) {
         )
       );
     } else {
-      setAvailableActions(allCommonActions[entity]);
+      setAvailableActions(allCommonActions);
     }
   }, [commonActionsPreferences]);
 
   return (
     <Modal
-      title={`${t(entity)} ${t('actions')} ${t('preferences')}`}
+      title={`${t(`${entity}s`)} ${t('actions')} ${t('preferences')}`}
       visible={visible}
       onClose={() => {
         setVisible(false);

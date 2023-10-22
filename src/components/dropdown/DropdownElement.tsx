@@ -74,7 +74,6 @@ export function DropdownElement(props: Props) {
         onClick={() => {
           props.to && navigate(props.to);
           !props.to && props.onClick?.(event);
-          props.setVisible?.(false);
         }}
       >
         {props.icon}
