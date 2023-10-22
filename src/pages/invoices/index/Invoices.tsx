@@ -43,7 +43,7 @@ export default function Invoices() {
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
-  const actions = useActions({ dropdown: true });
+  const actions = useActions();
 
   const filters = useInvoiceFilters();
 

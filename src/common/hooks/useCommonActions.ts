@@ -23,7 +23,7 @@ export function useAllCommonActions() {
       { value: 'view_pdf', label: t('view_pdf') },
       { value: 'print_pdf', label: t('print_pdf') },
       { value: 'schedule', label: t('schedule') },
-      { value: 'delivery_note', label: `${t('delivery_note')} ${t('pdf')}}` },
+      { value: 'delivery_note', label: `${t('delivery_note')} ${t('pdf')}` },
       { value: 'download', label: t('download') },
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'mark_paid', label: t('mark_paid') },

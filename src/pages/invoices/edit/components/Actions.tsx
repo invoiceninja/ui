@@ -73,7 +73,11 @@ interface Params {
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const { showEditAction, showCommonBulkAction, dropdown } = params || {};
+  const {
+    showEditAction,
+    showCommonBulkAction,
+    dropdown = true,
+  } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -84,6 +88,7 @@ export function useActions(params?: Params) {
 
   const showActionByPreferences = useShowActionByPreferences({
     commonActionsSection: Boolean(!dropdown),
+    entity: 'invoice',
   });
 
   const bulk = useBulk();
@@ -478,9 +483,9 @@ export function useActions(params?: Params) {
       (isEditPage || Boolean(showCommonBulkAction)) &&
       dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      (isEditPage || Boolean(showCommonBulkAction) || dropdown) &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at === 0 &&
-      showActionByPreferences('invoice', 'archive') && (
+      (showActionByPreferences('invoice', 'archive') || dropdown) && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'archive')}
@@ -492,10 +497,10 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      (isEditPage || Boolean(showCommonBulkAction) || dropdown) &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled &&
-      showActionByPreferences('invoice', 'restore') && (
+      (showActionByPreferences('invoice', 'restore') || dropdown) && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'restore')}
@@ -507,9 +512,9 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      (isEditPage || Boolean(showCommonBulkAction) || dropdown) &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !invoice.is_deleted &&
-      showActionByPreferences('invoice', 'delete') && (
+      (showActionByPreferences('invoice', 'delete') || dropdown) && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'delete')}

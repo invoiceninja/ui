@@ -14,19 +14,23 @@ import {
 } from '$app/components/CommonActionsPreferenceModal';
 import { useAtomValue } from 'jotai';
 import { useDefaultCommonActions } from './useCommonActions';
+import { useEntityPageIdentifier } from './useEntityPageIdentifier';
 
 interface Params {
-  commonActionsSection?: boolean;
+  commonActionsSection: boolean;
+  entity: 'invoice';
 }
 export function useShowActionByPreferences(params: Params) {
   const commonActionsPreferences = useAtomValue(commonActionsPreferencesAtom);
 
-  const { commonActionsSection } = params;
+  const { commonActionsSection, entity } = params;
+
+  const { isEditPage } = useEntityPageIdentifier({ entity });
 
   const defaultCommonActions = useDefaultCommonActions();
 
   return (entity: Entity, actionKey: string) => {
-    if (!commonActionsSection && !commonActionsPreferences?.[entity]) {
+    if (!isEditPage) {
       return true;
     }
 
@@ -50,6 +54,12 @@ export function useShowActionByPreferences(params: Params) {
 
     if (commonActionsPreferences && commonActionsSection) {
       return commonActionsPreferences[entity]?.some(
+        ({ value }) => value === actionKey
+      );
+    }
+
+    if (!commonActionsPreferences?.[entity] && !commonActionsSection) {
+      return !defaultCommonActions[entity]?.some(
         ({ value }) => value === actionKey
       );
     }

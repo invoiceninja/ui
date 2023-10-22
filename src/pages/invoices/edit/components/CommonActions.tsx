@@ -30,7 +30,7 @@ export function CommonActions(props: Props) {
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
     useState<boolean>(false);
 
-  const actions = useActions();
+  const actions = useActions({ dropdown: false });
 
   const { invoice } = props;
 

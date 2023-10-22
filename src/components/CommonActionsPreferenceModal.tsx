@@ -12,10 +12,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Modal } from './Modal';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { Icon } from './icons/Icon';
 import { MdClose } from 'react-icons/md';
+import { SearchableSelect } from './SearchableSelect';
 
 export interface CommonAction {
   value: string;
@@ -46,6 +47,8 @@ export function CommonActionsPreferenceModal(props: Props) {
   const [commonActionsPreferences, setCommonActionsPreferences] = useState<
     Record<Entity, CommonAction[]> | undefined
   >(commonActionsAtom);
+
+  const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
 
   const { entity, allCommonActions, visible, setVisible } = props;
 
@@ -98,65 +101,84 @@ export function CommonActionsPreferenceModal(props: Props) {
     }
   }, [selectedAction]);
 
+  useEffect(() => {
+    if (commonActionsPreferences && commonActionsPreferences[entity]) {
+      setAvailableActions(
+        allCommonActions[entity].filter(
+          ({ value }) =>
+            !commonActionsPreferences[entity].some(
+              (action) => action.value === value
+            )
+        )
+      );
+    } else {
+      setAvailableActions(allCommonActions[entity]);
+    }
+  }, [commonActionsPreferences]);
+
   return (
-    <>
-      <Modal
-        title={`${t(entity)} ${t('actions')} ${t('preferences')}`}
-        visible={visible}
-        onClose={() => setVisible(false)}
-      >
-        <div className="flex flex-col space-y-4">
-          <SelectField
-            value={selectedAction}
-            onValueChange={(value) => setSelectedAction(value)}
-            label={t('actions')}
-            withBlank
-            disabled={commonActionsPreferences?.[entity].length === 3}
-          >
-            {allCommonActions[entity].map(
-              ({ label, value }) =>
-                isActionSelectable(value) && (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                )
-            )}
-          </SelectField>
+    <Modal
+      title={`${t(entity)} ${t('actions')} ${t('preferences')}`}
+      visible={visible}
+      onClose={() => {
+        setVisible(false);
+        setCommonActionsPreferences(commonActionsAtom);
+      }}
+      overflowVisible
+    >
+      <div className="flex flex-col space-y-4">
+        <SearchableSelect
+          value={selectedAction}
+          onValueChange={(value) => setSelectedAction(value)}
+          label={t('actions')}
+          disabled={commonActionsPreferences?.[entity].length === 3}
+          clearAfterSelection
+        >
+          {availableActions.map(({ label, value }) => (
+            <option
+              key={value}
+              value={value}
+              disabled={!isActionSelectable(value)}
+            >
+              {label}
+            </option>
+          ))}
+        </SearchableSelect>
 
-          {Boolean(commonActionsPreferences?.[entity].length) && (
-            <span>
-              {t('selected')} {t('actions')}
-            </span>
-          )}
+        {Boolean(commonActionsPreferences?.[entity].length) && (
+          <span className="font-medium">
+            {t('selected')} {t('actions')}:
+          </span>
+        )}
 
-          {Boolean(commonActionsPreferences?.[entity].length) && (
-            <div className="flex flex-col space-y-3">
-              {commonActionsPreferences?.[entity].map(({ value, label }) => (
-                <div key={value} className="flex justify-between">
-                  <span className="font-medium">{label}</span>
+        {Boolean(commonActionsPreferences?.[entity].length) && (
+          <div className="flex flex-col space-y-3">
+            {commonActionsPreferences?.[entity].map(({ value, label }) => (
+              <div key={value} className="flex justify-between">
+                <span className="font-medium">{label}</span>
 
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdClose}
-                      size={25}
-                      onClick={() => handleRemoveAction(value)}
-                    />
-                  </div>
+                <div>
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdClose}
+                    size={25}
+                    onClick={() => handleRemoveAction(value)}
+                  />
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
 
-          <Button
-            onClick={() => {
-              setCommonActionsAtom(commonActionsPreferences);
-            }}
-          >
-            {t('save')}
-          </Button>
-        </div>
-      </Modal>
-    </>
+        <Button
+          onClick={() => {
+            setCommonActionsAtom(commonActionsPreferences);
+            setVisible(false);
+          }}
+        >
+          {t('save')}
+        </Button>
+      </div>
+    </Modal>
   );
 }
