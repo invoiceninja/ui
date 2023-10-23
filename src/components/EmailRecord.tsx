@@ -146,13 +146,14 @@ export function EmailRecord(props: Props) {
 
             <div className="flex space-x-2 justify-between">
               <span className="text-sm truncate">{event.delivery_message}</span>
+
               {event.bounce_id && (
                 <Button
                   behavior="button"
                   type="minimal"
                   onClick={() => handleReactivateEmail(event.bounce_id)}
                 >
-                  {t('unblock')}
+                  {t('reactivate')}
                 </Button>
               )}
             </div>
