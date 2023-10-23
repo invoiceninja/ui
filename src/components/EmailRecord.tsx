@@ -55,8 +55,6 @@ export function EmailRecord(props: Props) {
   const { emailRecord, index, withBottomBorder, withEntityNavigationIcon } =
     props;
 
-  console.log(emailRecord);
-
   const [isCollapsed, setIsCollapsed] = useState<boolean>(
     !index ? false : true
   );
