@@ -43,7 +43,6 @@ import {
   MdRefresh,
   MdRestore,
   MdSchedule,
-  MdSend,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -54,6 +53,7 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -207,14 +207,7 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      !excludeCommonActions && (
-        <DropdownElement
-          to={route('/invoices/:id/email', { id: invoice.id })}
-          icon={<Icon element={MdSend} />}
-        >
-          {t('email_invoice')}
-        </DropdownElement>
-      ),
+      !excludeCommonActions && <EmailInvoiceAction invoice={invoice} />,
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/pdf', { id: invoice.id })}
