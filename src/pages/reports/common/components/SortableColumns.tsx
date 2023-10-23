@@ -73,7 +73,7 @@ export function Column({
             {...provided.droppableProps}
           >
             <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
-              {data.map((record: Record, i: number) => (
+              {data && data.map((record: Record, i: number) => (
                 <Draggable
                   key={record.value}
                   index={i}
