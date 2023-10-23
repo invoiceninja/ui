@@ -132,55 +132,60 @@ const positions = [
   'contact',
 ] as const;
 
-export function SortableColumns({ report, columns }: Props) {
-  const { preferences, update } = usePreferences();
+export function useColumns({ report, columns }: Props) {
+  const { preferences } = usePreferences();
+
+  const defaultColumns = [
+    columns.includes('client') ? clientMap : [],
+    columns.includes('invoice')
+      ? columns.includes('item')
+        ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
+        : invoiceMap
+      : [],
+    columns.includes('credit')
+      ? columns.includes('item')
+        ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+        : creditMap
+      : [],
+    columns.includes('quote')
+      ? columns.includes('item')
+        ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+        : quoteMap
+      : [],
+    columns.includes('payment') ? paymentMap : [],
+    columns.includes('vendor') ? vendorMap : [],
+    columns.includes('purchase_order')
+      ? columns.includes('item')
+        ? purchaseorderMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+          )
+        : purchaseorderMap
+      : [],
+    columns.includes('task') ? taskMap : [],
+    columns.includes('expense') ? expenseMap : [],
+    columns.includes('recurring_invoice')
+      ? columns.includes('item')
+        ? recurringinvoiceMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+          )
+        : recurringinvoiceMap
+      : [],
+    columns.includes('contact') ? contactMap : [],
+    [],
+  ];
 
   const data =
     report in preferences.reports.columns &&
     preferences.reports.columns[report as Identifier].length !== 0
       ? preferences.reports.columns[report]
-      : [
-          columns.includes('client') ? clientMap : [],
-          columns.includes('invoice')
-            ? columns.includes('item')
-              ? invoiceMap.concat(
-                  itemMap.map((i) => ({ ...i, origin: 'invoice' }))
-                )
-              : invoiceMap
-            : [],
-          columns.includes('credit')
-            ? columns.includes('item')
-              ? creditMap.concat(
-                  itemMap.map((i) => ({ ...i, origin: 'credit' }))
-                )
-              : creditMap
-            : [],
-          columns.includes('quote')
-            ? columns.includes('item')
-              ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
-              : quoteMap
-            : [],
-          columns.includes('payment') ? paymentMap : [],
-          columns.includes('vendor') ? vendorMap : [],
-          columns.includes('purchase_order')
-            ? columns.includes('item')
-              ? purchaseorderMap.concat(
-                  itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
-                )
-              : purchaseorderMap
-            : [],
-          columns.includes('task') ? taskMap : [],
-          columns.includes('expense') ? expenseMap : [],
-          columns.includes('recurring_invoice')
-            ? columns.includes('item')
-              ? recurringinvoiceMap.concat(
-                  itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
-                )
-              : recurringinvoiceMap
-            : [],
-          columns.includes('contact') ? contactMap : [],
-          [],
-        ];
+      : defaultColumns;
+
+  return { data, defaultColumns };
+}
+
+export function SortableColumns({ report, columns }: Props) {
+  const { update } = usePreferences();
+  const { data, defaultColumns } = useColumns({ report, columns });
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -225,44 +230,7 @@ export function SortableColumns({ report, columns }: Props) {
   };
 
   const onRemoveAll = () => {
-    update(`preferences.reports.columns.${report}`, [
-      columns.includes('client') ? clientMap : [],
-      columns.includes('invoice')
-        ? columns.includes('item')
-          ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
-          : invoiceMap
-        : [],
-      columns.includes('credit')
-        ? columns.includes('item')
-          ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
-          : creditMap
-        : [],
-      columns.includes('quote')
-        ? columns.includes('item')
-          ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
-          : quoteMap
-        : [],
-      columns.includes('payment') ? paymentMap : [],
-      columns.includes('vendor') ? vendorMap : [],
-      columns.includes('purchase_order')
-        ? columns.includes('item')
-          ? purchaseorderMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
-            )
-          : purchaseorderMap
-        : [],
-      columns.includes('task') ? taskMap : [],
-      columns.includes('expense') ? expenseMap : [],
-      columns.includes('recurring_invoice')
-        ? columns.includes('item')
-          ? recurringinvoiceMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
-            )
-          : recurringinvoiceMap
-        : [],
-      columns.includes('contact') ? contactMap : [],
-      [],
-    ]);
+    update(`preferences.reports.columns.${report}`, defaultColumns);
   };
 
   const onAddAll = (index: number) => {
