@@ -24,6 +24,7 @@ interface Props {
   withoutItemsCenter?: boolean;
   withoutWrappingLeftSide?: boolean;
   disabledLabels?: boolean;
+  noVerticalPadding?: boolean;
 }
 
 export function Element(props: Props) {
@@ -32,9 +33,10 @@ export function Element(props: Props) {
   return (
     <div
       className={classNames(
-        `py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row ${props.className}`,
+        `sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row ${props.className}`,
         {
           'px-5 sm:px-6': !props.noExternalPadding,
+          'py-4 sm:py-3': !props.noVerticalPadding,
           'lg:items-center': !props.withoutItemsCenter,
         }
       )}

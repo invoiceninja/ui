@@ -21,6 +21,8 @@ import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import Toggle from '$app/components/forms/Toggle';
+import { useAtom } from 'jotai';
+import { hasLanguageChanged } from '../../localization/common/atoms';
 
 export function Details() {
   const [t] = useTranslation();
@@ -32,6 +34,8 @@ export function Details() {
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
+
+  const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
@@ -75,8 +79,11 @@ export function Details() {
 
           <Element leftSide={t('language')}>
             <LanguageSelector
-              value={user?.language_id || ''}
-              onChange={(v) => handleChange('language_id', v)}
+              value={userChanges?.language_id || ''}
+              onChange={(v) => {
+                setHasLanguageIdChanged(true);
+                handleChange('language_id', v);
+              }}
               errorMessage={(errors?.errors?.language_id ?? [])[0]}
               dismissable
             />

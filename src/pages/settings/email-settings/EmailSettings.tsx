@@ -26,14 +26,14 @@ import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandle
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useDropzone } from 'react-dropzone';
 import { updateRecord } from '$app/common/stores/slices/company-users';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Image } from 'react-feather';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -41,6 +41,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -59,7 +60,7 @@ export function EmailSettings() {
 
   const disableSettingsField = useDisableSettingsField();
 
-  const errors = useAtomValue(companySettingsErrorsAtom);
+  const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -76,6 +77,8 @@ export function EmailSettings() {
     onSubmit: () => {
       toast.processing();
 
+      setErrors(undefined);
+
       request(
         'POST',
         endpoint('/api/v1/companies/:id', { id: currentCompany.id }),
@@ -89,7 +92,12 @@ export function EmailSettings() {
 
           toast.success('uploaded_document');
         })
-
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
+        })
         .finally(() => setFormData(new FormData()));
     },
   });

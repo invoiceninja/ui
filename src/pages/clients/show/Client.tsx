@@ -30,6 +30,7 @@ import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { Button } from '$app/components/forms';
 import { useTabs } from './hooks/useTabs';
+import { EmailHistory } from './components/EmailHistory';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -94,6 +95,8 @@ export default function Client() {
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}
+
+            <EmailHistory />
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />

@@ -290,6 +290,8 @@ export default function Create() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>
