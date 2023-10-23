@@ -57,14 +57,6 @@ export function CommonActionsPreferenceModal(props: Props) {
 
   const [selectedAction, setSelectedAction] = useState<string>('');
 
-  const isActionSelectable = (actionKey: string) => {
-    if (!commonActionsPreferences) return true;
-
-    return !commonActionsPreferences[entity].some(
-      ({ value }) => value === actionKey
-    );
-  };
-
   const handleRemoveAction = (actionKey: string) => {
     const filteredCommonActions = commonActionsPreferences?.[entity].filter(
       ({ value }) => actionKey !== value
@@ -138,11 +130,7 @@ export function CommonActionsPreferenceModal(props: Props) {
           clearAfterSelection
         >
           {availableActions.map(({ label, value }) => (
-            <option
-              key={value}
-              value={value}
-              disabled={!isActionSelectable(value)}
-            >
+            <option key={value} value={value}>
               {label}
             </option>
           ))}
