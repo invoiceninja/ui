@@ -804,6 +804,12 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   const onEmptyValues = (query: string) => {
+    const $url = new URL(url);
+
+    if (query === '' && !$url.searchParams.has('filter')) {
+      return;
+    }
+
     setUrl((c) => {
       const url = new URL(c);
 
