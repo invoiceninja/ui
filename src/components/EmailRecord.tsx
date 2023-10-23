@@ -15,13 +15,16 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
-import { date } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import { Icon } from './icons/Icon';
 import { MdTextSnippet } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
+import { Button } from './forms';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props extends CommonProps {
   emailRecord: EmailRecordType;
@@ -52,9 +55,18 @@ export function EmailRecord(props: Props) {
   const { emailRecord, index, withBottomBorder, withEntityNavigationIcon } =
     props;
 
+  console.log(emailRecord);
+
   const [isCollapsed, setIsCollapsed] = useState<boolean>(
     !index ? false : true
   );
+
+  const handleReactivateEmail = (bounceId: string) => {
+    request(
+      'POST',
+      endpoint('/api/v1/reactivate_email/:id', { id: bounceId })
+    ).then(() => toast.success('reactivated_email'));
+  };
 
   return (
     <div
@@ -124,7 +136,7 @@ export function EmailRecord(props: Props) {
         {emailRecord.events.map((event, index) => (
           <EventDiv
             key={index}
-            className="flex flex-col flex-1 min-w-0 space-y-2 px-6 py-2"
+            className="flex flex-col flex-1 min-w-0 space-y-4 px-6 py-2"
             theme={{ hoverColor: colors.$2 }}
           >
             <div className="flex justify-between space-x-2">
@@ -134,7 +146,18 @@ export function EmailRecord(props: Props) {
               <span className="text-sm">{date(event.date, dateFormat)}</span>
             </div>
 
-            <span className="text-sm truncate">{event.delivery_message}</span>
+            <div className="flex space-x-2 justify-between">
+              <span className="text-sm truncate">{event.delivery_message}</span>
+              {event.bounce_id && (
+                <Button
+                  behavior="button"
+                  type="minimal"
+                  onClick={() => handleReactivateEmail(event.bounce_id)}
+                >
+                  {t('unblock')}
+                </Button>
+              )}
+            </div>
           </EventDiv>
         ))}
       </div>
