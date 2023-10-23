@@ -141,7 +141,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
-  const tableKey = useMemo(() => `${location.pathname}${props.endpoint}`, []);
+  const tableKey = `${location.pathname}${props.endpoint}`;
 
   const [dataTableFilterPreferences, setDataTableFilterPreferences] = useAtom(
     dataTableFilterPreferencesAtom
