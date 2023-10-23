@@ -145,7 +145,7 @@ export function EmailRecord(props: Props) {
             </div>
 
             <div className="flex space-x-2 justify-between">
-              <span className="text-sm truncate">{event.delivery_message}</span>
+              <span className="text-sm truncate">{event.recipient}</span>
 
               {event.bounce_id && (
                 <Button
