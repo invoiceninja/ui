@@ -47,6 +47,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useInvoiceExpense } from './useInvoiceExpense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { AddToInvoiceAction } from './components/AddToInvoiceAction';
+import { ExpenseCategory } from './components/ExpenseCategory';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -232,7 +233,7 @@ export function useExpenseColumns() {
       column: 'category',
       id: 'category_id',
       label: t('category'),
-      format: (value, expense) => expense?.category?.name,
+      format: (_, expense) => expense && <ExpenseCategory expense={expense} />,
     },
     {
       column: 'status',

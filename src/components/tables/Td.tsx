@@ -25,6 +25,7 @@ export function Td(props: Props) {
       width={props.width}
       colSpan={props.colSpan}
       rowSpan={props.rowSpan}
+      onClick={props.onClick}
       className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm  ${props.className}`}
       style={{ color: colors.$3 }}
     >

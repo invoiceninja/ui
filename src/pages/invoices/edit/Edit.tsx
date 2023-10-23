@@ -42,6 +42,7 @@ import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
+import { CommonActions } from './components/CommonActions';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -106,27 +107,28 @@ export default function Edit() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  const actions = useActions();
+  const actions = useActions({ excludeCommonActions: true });
   const save = useHandleSave(setErrors);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => invoice && save(invoice)}
-      disableSaveButton={
-        invoice &&
-        (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
-      }
       navigationTopRight={
         invoice && (
           <ResourceActions
-            label={t('more_actions')}
             resource={invoice}
             actions={actions}
+            onSaveClick={() => invoice && save(invoice)}
+            disableSaveButton={
+              invoice &&
+              (invoice.status_id === InvoiceStatus.Cancelled ||
+                invoice.is_deleted)
+            }
           />
         )
       }
+      topRight={invoice && <CommonActions invoice={invoice} />}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
@@ -245,6 +247,8 @@ export default function Edit() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>

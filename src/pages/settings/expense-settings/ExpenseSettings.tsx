@@ -105,6 +105,20 @@ export function ExpenseSettings() {
           />
         </Element>
 
+
+        <Element
+          leftSide={t('notify_vendor_when_paid')}
+          leftSideHelp={t('notify_vendor_when_paid_help')}
+        >
+          <Toggle
+            onChange={(value: boolean) =>
+              handleToggleChange('notify_vendor_when_paid', value)
+            }
+            checked={companyChanges?.notify_vendor_when_paid || false}
+          />
+        </Element>
+
+
         <Divider />
 
         <Element leftSide={t('enter_taxes')}>
@@ -143,6 +157,8 @@ export function ExpenseSettings() {
             checked={companyChanges?.expense_inclusive_taxes || false}
           />
         </Element>
+
+        
       </Card>
 
       <ExpenseCategories />

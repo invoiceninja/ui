@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -54,8 +54,7 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
-import { useAtom } from 'jotai';
+import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 
 export interface SaveOption {
@@ -366,8 +365,6 @@ export function Default(props: Props) {
   const saveBtn = useSaveBtn();
   const colors = useColorScheme();
 
-  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
-
   return (
     <div>
       <ActivateCompany />
@@ -410,22 +407,6 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
-              {import.meta.env.DEV && (
-                <SelectField
-                  value={
-                    JSON.stringify(colorScheme) === JSON.stringify($1)
-                      ? 'dark'
-                      : 'light'
-                  }
-                  onValueChange={(value) =>
-                    value === 'light' ? setColorScheme($2) : setColorScheme($1)
-                  }
-                >
-                  <option value="dark">Dark</option>
-                  <option value="light">Light</option>
-                </SelectField>
-              )}
-
               {shouldShowUnlockButton && (
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"

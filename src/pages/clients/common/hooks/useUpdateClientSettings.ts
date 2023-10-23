@@ -9,6 +9,7 @@
  */
 
 import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { defaultSettings } from '$app/common/constants/blank-company-settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -22,6 +23,7 @@ import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
 import { AxiosError } from 'axios';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 
@@ -33,22 +35,41 @@ export function useUpdateClientSettings() {
 
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
-  const adjustClientSettingsPayload = () => {
-    const adjustedSettings = { ...companyChanges?.settings };
+  const adjustPayload = () => {
+    const adjustedSettings = cloneDeep(companyChanges?.settings);
 
-    Object.entries(adjustedSettings).forEach(([property, value]) => {
-      if (Array.isArray(value) && !value.length) {
-        delete adjustedSettings[property];
-      } else if (
-        value &&
-        typeof value === 'object' &&
-        !Object.entries(value).length
+    if (adjustedSettings) {
+      if (
+        !adjustedSettings.email_template_custom1 ||
+        !adjustedSettings.email_subject_custom1
       ) {
-        delete adjustedSettings[property];
-      } else if (typeof value !== 'boolean' && !value) {
-        delete adjustedSettings[property];
+        delete adjustedSettings.email_template_custom1;
+        delete adjustedSettings.email_subject_custom1;
       }
-    });
+
+      if (
+        !adjustedSettings.email_template_custom2 ||
+        !adjustedSettings.email_subject_custom2
+      ) {
+        delete adjustedSettings.email_template_custom2;
+        delete adjustedSettings.email_subject_custom2;
+      }
+
+      if (
+        !adjustedSettings.email_template_custom3 ||
+        !adjustedSettings.email_subject_custom3
+      ) {
+        delete adjustedSettings.email_template_custom3;
+        delete adjustedSettings.email_subject_custom3;
+      }
+
+      Object.entries(adjustedSettings).forEach(([property, value]) => {
+        if (value === null) {
+          adjustedSettings[property] =
+            defaultSettings[property as keyof typeof defaultSettings];
+        }
+      });
+    }
 
     return {
       ...activeSettings,
@@ -65,7 +86,7 @@ export function useUpdateClientSettings() {
       endpoint('/api/v1/clients/:id', {
         id: activeSettings?.id,
       }),
-      adjustClientSettingsPayload()
+      adjustPayload()
     )
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');

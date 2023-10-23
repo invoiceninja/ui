@@ -28,6 +28,7 @@ import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
+import { useCurrentUser } from './common/hooks/useCurrentUser';
 
 export function App() {
   const [t] = useTranslation();
@@ -61,8 +62,14 @@ export function App() {
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
 
+  const user = useCurrentUser();
+
   const resolvedLanguage = company
-    ? resolveLanguage(company.settings.language_id)
+    ? resolveLanguage(
+        user?.language_id && user.language_id.length > 0
+          ? user.language_id
+          : company.settings.language_id
+      )
     : undefined;
 
   const [colorScheme] = useAtom(colorSchemeAtom);

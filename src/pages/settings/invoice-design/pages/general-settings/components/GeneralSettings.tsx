@@ -26,6 +26,10 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Company } from '$app/common/interfaces/company.interface';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import classNames from 'classnames';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -769,6 +773,8 @@ export function GeneralSettings() {
   const currentCompany = useCurrentCompany();
   const company = useCompanyChanges();
 
+  const disableSettingsField = useDisableSettingsField();
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
@@ -824,12 +830,21 @@ export function GeneralSettings() {
 
   return (
     <Card title={t('general_settings')} padding="small" collapsed={false}>
-      <Element leftSide={t('invoice_design')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="invoice_design_id"
+            labelElement={<SettingsLabel label={t('invoice_design')} />}
+            defaultValue="VolejRejNm"
+          />
+        }
+      >
         <div className="flex flex-col space-y-3">
           <SelectField
             id="settings.invoice_design_id"
             value={company?.settings?.invoice_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('invoice_design_id', value)}
+            disabled={disableSettingsField('invoice_design_id')}
             errorMessage={errors?.errors['settings.invoice_design_id']}
           >
             {designs &&
@@ -842,9 +857,16 @@ export function GeneralSettings() {
 
           {isDesignChanged('invoice_design_id') && (
             <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
+              <span
+                className={classNames({
+                  'opacity-75': disableSettingsField('invoice_design_id'),
+                })}
+              >
+                {t('update_all_records')}
+              </span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('invoice')}
+                disabled={disableSettingsField('invoice_design_id')}
                 onValueChange={(value) =>
                   handleUpdateAllRecordsChange(
                     'invoice',
@@ -858,12 +880,21 @@ export function GeneralSettings() {
         </div>
       </Element>
 
-      <Element leftSide={t('quote_design')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="quote_design_id"
+            labelElement={<SettingsLabel label={t('quote_design')} />}
+            defaultValue="VolejRejNm"
+          />
+        }
+      >
         <div className="flex flex-col space-y-3">
           <SelectField
             id="settings.quote_design_id"
             value={company?.settings?.quote_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('quote_design_id', value)}
+            disabled={disableSettingsField('quote_design_id')}
             errorMessage={errors?.errors['settings.quote_design_id']}
           >
             {designs &&
@@ -876,7 +907,13 @@ export function GeneralSettings() {
 
           {isDesignChanged('quote_design_id') && (
             <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
+              <span
+                className={classNames({
+                  'opacity-75': disableSettingsField('quote_design_id'),
+                })}
+              >
+                {t('update_all_records')}
+              </span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('quote')}
                 onValueChange={(value) =>
@@ -886,18 +923,28 @@ export function GeneralSettings() {
                     value
                   )
                 }
+                disabled={disableSettingsField('quote_design_id')}
               />
             </div>
           )}
         </div>
       </Element>
 
-      <Element leftSide={t('credit_design')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="credit_design_id"
+            labelElement={<SettingsLabel label={t('credit_design')} />}
+            defaultValue="VolejRejNm"
+          />
+        }
+      >
         <div className="flex flex-col space-y-3">
           <SelectField
             id="settings.credit_design_id"
             value={company?.settings?.credit_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleChange('credit_design_id', value)}
+            disabled={disableSettingsField('credit_design_id')}
             errorMessage={errors?.errors['settings.credit_design_id']}
           >
             {designs &&
@@ -910,7 +957,13 @@ export function GeneralSettings() {
 
           {isDesignChanged('credit_design_id') && (
             <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
+              <span
+                className={classNames({
+                  'opacity-75': disableSettingsField('credit_design_id'),
+                })}
+              >
+                {t('update_all_records')}
+              </span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('credit')}
                 onValueChange={(value) =>
@@ -920,13 +973,22 @@ export function GeneralSettings() {
                     value
                   )
                 }
+                disabled={disableSettingsField('credit_design_id')}
               />
             </div>
           )}
         </div>
       </Element>
 
-      <Element leftSide={t('purchase_order_design')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="purchase_order_design_id"
+            labelElement={<SettingsLabel label={t('purchase_order_design')} />}
+            defaultValue="VolejRejNm"
+          />
+        }
+      >
         <div className="flex flex-col space-y-3">
           <SelectField
             id="settings.purchase_order_design_id"
@@ -934,6 +996,7 @@ export function GeneralSettings() {
             onValueChange={(value) =>
               handleChange('purchase_order_design_id', value)
             }
+            disabled={disableSettingsField('purchase_order_design_id')}
             errorMessage={errors?.errors['settings.purchase_order_design_id']}
           >
             {designs &&
@@ -946,7 +1009,15 @@ export function GeneralSettings() {
 
           {isDesignChanged('purchase_order_design_id') && (
             <div className="flex space-x-10">
-              <span>{t('update_all_records')}</span>
+              <span
+                className={classNames({
+                  'opacity-75': disableSettingsField(
+                    'purchase_order_design_id'
+                  ),
+                })}
+              >
+                {t('update_all_records')}
+              </span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('purchase_order')}
                 onValueChange={(value) =>
@@ -956,17 +1027,27 @@ export function GeneralSettings() {
                     value
                   )
                 }
+                disabled={disableSettingsField('purchase_order_design_id')}
               />
             </div>
           )}
         </div>
       </Element>
 
-      <Element leftSide={t('page_layout')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="page_layout"
+            labelElement={<SettingsLabel label={t('page_layout')} />}
+            defaultValue="portrait"
+          />
+        }
+      >
         <SelectField
           id="settings.page_layout"
           value={company?.settings?.page_layout || 'portrait'}
           onValueChange={(value) => handleChange('page_layout', value)}
+          disabled={disableSettingsField('page_layout')}
           errorMessage={errors?.errors['settings.page_layout']}
         >
           <option value="portrait">{t('portrait')}</option>
@@ -974,11 +1055,20 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('page_size')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="page_size"
+            labelElement={<SettingsLabel label={t('page_size')} />}
+            defaultValue="A4"
+          />
+        }
+      >
         <SelectField
           id="settings.page_size"
           value={company?.settings?.page_size || 'A4'}
           onValueChange={(value) => handleChange('page_size', value)}
+          disabled={disableSettingsField('page_size')}
           errorMessage={errors?.errors['settings.page_size']}
         >
           <option value="A5">A5</option>
@@ -994,11 +1084,20 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('font_size')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="font_size"
+            labelElement={<SettingsLabel label={t('font_size')} />}
+            defaultValue={16}
+          />
+        }
+      >
         <SelectField
           id="settings.font_size"
           value={company?.settings?.font_size || 16}
           onValueChange={(value) => handleChange('font_size', parseInt(value))}
+          disabled={disableSettingsField('font_size')}
           errorMessage={errors?.errors['settings.font_size']}
         >
           {range(6, 41, 2).map((number) => (
@@ -1009,16 +1108,28 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('logo_size')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="company_logo_size"
+            labelElement={<SettingsLabel label={t('logo_size')} />}
+          />
+        }
+      >
         <div className="w-full inline-flex items-center space-x-2">
           <div className="w-full">
             <InputField
-              value={company.settings.company_logo_size
+              type="number"
+              value={(company?.settings.company_logo_size || '')
                 ?.replaceAll('px', '')
                 ?.replaceAll('%', '')}
               onValueChange={(value) =>
-                handleChange('company_logo_size', `${value}${logoSizeType}`)
+                handleChange(
+                  'company_logo_size',
+                  `${parseFloat(value) || 0}${logoSizeType}`
+                )
               }
+              disabled={disableSettingsField('company_logo_size')}
               errorMessage={errors?.errors['settings.company_logo_size']}
             />
           </div>
@@ -1027,6 +1138,7 @@ export function GeneralSettings() {
             <SelectField
               value={logoSizeType}
               onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+              disabled={disableSettingsField('company_logo_size')}
             >
               <option value="%">{t('percent')}</option>
               <option value="px">{t('pixels')}</option>
@@ -1037,11 +1149,20 @@ export function GeneralSettings() {
 
       <Divider />
 
-      <Element leftSide={t('primary_font')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="primary_font"
+            labelElement={<SettingsLabel label={t('primary_font')} />}
+            defaultValue="roboto"
+          />
+        }
+      >
         <SelectField
           id="settings.primary_font"
           value={company?.settings?.primary_font || 'roboto'}
           onValueChange={(value) => handleChange('primary_font', value)}
+          disabled={disableSettingsField('primary_font')}
           errorMessage={errors?.errors['settings.primary_font']}
         >
           {fonts.map((font) => (
@@ -1052,11 +1173,20 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('secondary_font')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="secondary_font"
+            labelElement={<SettingsLabel label={t('secondary_font')} />}
+            defaultValue="roboto"
+          />
+        }
+      >
         <SelectField
           id="settings.secondary_font"
           value={company?.settings?.secondary_font || 'roboto'}
           onValueChange={(value) => handleChange('secondary_font', value)}
+          disabled={disableSettingsField('secondary_font')}
           errorMessage={errors?.errors['settings.secondary_font']}
         >
           {fonts.map((font) => (
@@ -1067,7 +1197,15 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('primary_color')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="primary_color"
+            labelElement={<SettingsLabel label={t('primary_color')} />}
+            defaultValue={colors.primary}
+          />
+        }
+      >
         <ColorPicker
           value={company?.settings?.primary_color || colors.primary}
           onValueChange={(value) => {
@@ -1077,10 +1215,19 @@ export function GeneralSettings() {
               handleChange('primary_color', value);
             }
           }}
+          disabled={disableSettingsField('primary_color')}
         />
       </Element>
 
-      <Element leftSide={t('secondary_color')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="secondary_color"
+            labelElement={<SettingsLabel label={t('secondary_color')} />}
+            defaultValue={colors.secondary}
+          />
+        }
+      >
         <ColorPicker
           value={company?.settings?.secondary_color || colors.secondary}
           onValueChange={(value) => {
@@ -1090,30 +1237,76 @@ export function GeneralSettings() {
               handleChange('secondary_color', value);
             }
           }}
+          disabled={disableSettingsField('secondary_color')}
         />
       </Element>
 
       <Divider />
 
-      <Element leftSide={t('show_paid_stamp')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="show_paid_stamp"
+            labelElement={<SettingsLabel label={t('show_paid_stamp')} />}
+            defaultValue={false}
+          />
+        }
+      >
         <Toggle
           onValueChange={(value) => handleChange('show_paid_stamp', value)}
           checked={Boolean(company?.settings.show_paid_stamp)}
+          disabled={disableSettingsField('show_paid_stamp')}
         />
       </Element>
 
-      <Element leftSide={t('show_shipping_address')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="show_shipping_address"
+            labelElement={<SettingsLabel label={t('show_shipping_address')} />}
+            defaultValue={false}
+          />
+        }
+      >
         <Toggle
           onValueChange={(value) =>
             handleChange('show_shipping_address', value)
           }
           checked={Boolean(company?.settings.show_shipping_address)}
+          disabled={disableSettingsField('show_shipping_address')}
+        />
+      </Element>
+
+      <Element
+        leftSideHelp={t('invoice_embed_documents_help')}
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="embed_documents"
+            labelElement={<SettingsLabel label={t('invoice_embed_documents')} />}
+            defaultValue={false}
+          />
+        }
+      >
+        <Toggle
+          onValueChange={(value) =>
+            handleChange('embed_documents', value)
+          }
+          checked={Boolean(company?.settings.embed_documents)}
+          disabled={disableSettingsField('embed_documents')}
         />
       </Element>
 
       <Divider />
 
-      <Element leftSide={t('empty_columns')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="hide_empty_columns_on_pdf"
+            labelElement={<SettingsLabel label={t('empty_columns')} />}
+            defaultValue="false"
+          />
+        }
+      >
         <Radio
           name="empty_columns"
           options={[
@@ -1129,21 +1322,44 @@ export function GeneralSettings() {
           defaultSelected={
             company?.settings?.hide_empty_columns_on_pdf?.toString() ?? 'false'
           }
+          disabled={disableSettingsField('hide_empty_columns_on_pdf')}
         />
       </Element>
 
-      <Element leftSide={t('page_numbering')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="page_numbering"
+            labelElement={<SettingsLabel label={t('page_numbering')} />}
+            defaultValue={false}
+          />
+        }
+      >
         <Toggle
           checked={Boolean(company?.settings?.page_numbering)}
           id="settings.page_numbering"
           onChange={(value) => handleChange('page_numbering', value)}
+          disabled={disableSettingsField('page_numbering')}
         />
       </Element>
 
-      <Element leftSide={t('page_numbering_alignment')}>
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="page_numbering_alignment"
+            labelElement={
+              <SettingsLabel label={t('page_numbering_alignment')} />
+            }
+            defaultValue="C"
+          />
+        }
+      >
         <SelectField
           id="settings.page_numbering_alignment"
-          disabled={company?.settings?.page_numbering ? false : true}
+          disabled={
+            !company?.settings?.page_numbering ||
+            disableSettingsField('page_numbering_alignment')
+          }
           value={company?.settings?.page_numbering_alignment?.toString() || 'C'}
           onValueChange={(value) =>
             handleChange('page_numbering_alignment', value)

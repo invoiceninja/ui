@@ -104,6 +104,7 @@ export default function Create() {
           invoices: [],
           credits: [],
           client_id: '',
+          type_id: company?.settings?.payment_type_id ?? '',
         };
       }
 
@@ -279,11 +280,9 @@ export default function Create() {
                         label: t('invoice') ?? '',
                       }}
                       endpoint={
-                        new URL(
                           endpoint(
                             `/api/v1/invoices?payable=${payment.client_id}&per_page=100`
                           )
-                        )
                       }
                       entryOptions={{
                         label: 'number',
@@ -348,9 +347,7 @@ export default function Create() {
             <Element leftSide={t('invoices')}>
               <ComboboxAsync<Invoice>
                 endpoint={
-                  new URL(
                     endpoint(`/api/v1/invoices?payable=${payment?.client_id}&per_page=100`)
-                  )
                 }
                 inputOptions={{
                   value: 'id',
@@ -394,11 +391,9 @@ export default function Create() {
                         label: t('credit') ?? '',
                       }}
                       endpoint={
-                        new URL(
                           endpoint(
                             `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
                           )
-                        )
                       }
                       entryOptions={{
                         id: 'id',
@@ -471,9 +466,7 @@ export default function Create() {
             <Element leftSide={t('credits')}>
               <ComboboxAsync<Credit>
                 endpoint={
-                  new URL(
                     endpoint(`/api/v1/credits?client_id=${payment.client_id}`)
-                  )
                 }
                 inputOptions={{
                   value: null,
@@ -516,7 +509,7 @@ export default function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={company?.settings?.payment_type_id}
+              value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
@@ -602,7 +595,7 @@ export default function Create() {
               onChange={(value) => {
                 setConvertCurrency(value);
 
-                if(!value)
+                if (!value)
                   handleChange('exchange_currency_id', '');
                 else
                   handleChange('exchange_currency_id', '1')

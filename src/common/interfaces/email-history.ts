@@ -8,11 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from '../queries/statics';
+interface Event {
+  date: string;
+  delivery_message: string;
+  recipient: string;
+  server: string;
+  server_ip: string;
+  status: string;
+}
 
-export function useResolveTimeZone() {
-  const { data: statics } = useStaticsQuery();
-
-  return (id: string) =>
-    statics?.timezones.find((timeZone) => timeZone.id === id);
+export interface EmailRecord {
+  entity: 'invoice';
+  entity_id: string;
+  events: Event[];
+  recipients: string;
+  subject: string;
 }

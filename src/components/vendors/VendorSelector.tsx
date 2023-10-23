@@ -39,7 +39,7 @@ export function VendorSelector(props: VendorSelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<Vendor>
-          endpoint={new URL(endpoint('/api/v1/vendors?status=active&per_page=500'))}
+          endpoint={endpoint('/api/v1/vendors?status=active&per_page=500')}
           onChange={(vendor: Entry<Vendor>) =>
             vendor.resource && props.onChange(vendor.resource)
           }

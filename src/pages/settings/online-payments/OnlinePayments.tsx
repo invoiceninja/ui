@@ -31,11 +31,16 @@ import { useDispatch } from 'react-redux';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+
+  const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -86,7 +91,17 @@ export function OnlinePayments() {
       withoutBackButton
     >
       <Card title={t('settings')}>
-        <Element leftSide={t('auto_bill_standard_invoices')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="auto_bill_standard_invoices"
+              labelElement={
+                <SettingsLabel label={t('auto_bill_standard_invoices')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(company?.settings?.auto_bill_standard_invoices)}
             onChange={(value) =>
@@ -95,14 +110,28 @@ export function OnlinePayments() {
                 value
               )
             }
+            disabled={disableSettingsField('auto_bill_standard_invoices')}
           />
         </Element>
 
-        <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="auto_bill"
+              labelElement={
+                <SettingsLabel
+                  label={`${t('auto_bill')} ${t('recurring_invoices')}`}
+                />
+              }
+              defaultValue="off"
+            />
+          }
+        >
           <SelectField
             value={company?.settings.auto_bill || 'off'}
             onChange={handleChange}
             id="settings.auto_bill"
+            disabled={disableSettingsField('auto_bill')}
             errorMessage={errors?.errors['settings.auto_bill']}
           >
             <option value="always">
@@ -120,11 +149,20 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('auto_bill_on')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="auto_bill_date"
+              labelElement={<SettingsLabel label={t('auto_bill_on')} />}
+              defaultValue="on_send_date"
+            />
+          }
+        >
           <SelectField
             id="settings.auto_bill_date"
             value={company?.settings.auto_bill_date || 'on_send_date'}
             onChange={handleChange}
+            disabled={disableSettingsField('auto_bill_date')}
             errorMessage={errors?.errors['settings.auto_bill_date']}
           >
             <option value="on_send_date">{t('send_date')}</option>
@@ -132,11 +170,22 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('use_available_credits')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="use_credits_payment"
+              labelElement={
+                <SettingsLabel label={t('use_available_credits')} />
+              }
+              defaultValue="off"
+            />
+          }
+        >
           <SelectField
             value={company?.settings.use_credits_payment || 'off'}
             id="settings.use_credits_payment"
             onChange={handleChange}
+            disabled={disableSettingsField('use_credits_payment')}
             errorMessage={errors?.errors['settings.use_credits_payment']}
           >
             <option value="always">{t('enabled')}</option>
@@ -147,11 +196,19 @@ export function OnlinePayments() {
 
         {paymentTerms && (
           <>
-            <Element leftSide={t('payment_terms')}>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="payment_terms"
+                  labelElement={<SettingsLabel label={t('payment_terms')} />}
+                />
+              }
+            >
               <SelectField
                 value={company?.settings?.payment_terms || ''}
                 id="settings.payment_terms"
                 onChange={handleChange}
+                disabled={disableSettingsField('payment_terms')}
                 errorMessage={errors?.errors['settings.payment_terms']}
               >
                 <option value=""></option>
@@ -170,8 +227,17 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
-
-        <Element leftSide={t('manual_payment_email')}>
+        
+        <Element
+          leftSideHelp={t('manual_payment_email_help')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="client_manual_payment_notification"
+              labelElement={<SettingsLabel label={t('manual_payment_email')} />}
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(
               company?.settings.client_manual_payment_notification
@@ -182,10 +248,22 @@ export function OnlinePayments() {
                 value
               )
             }
+            disabled={disableSettingsField(
+              'client_manual_payment_notification'
+            )}
           />
         </Element>
 
-        <Element leftSide={t('online_payment_email')}>
+        <Element
+          leftSideHelp={t('online_payment_email_help')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="client_online_payment_notification"
+              labelElement={<SettingsLabel label={t('online_payment_email')} />}
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             checked={Boolean(
               company?.settings.client_online_payment_notification
@@ -196,18 +274,32 @@ export function OnlinePayments() {
                 value
               )
             }
+            disabled={disableSettingsField(
+              'client_online_payment_notification'
+            )}
           />
         </Element>
 
         <Element
-          leftSide={t('mark_paid_payment_email')}
-          leftSideHelp={t('mark_paid_payment_email_help')}
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="mark_paid_payment_email"
+              labelElement={
+                <SettingsLabel
+                  label={t('mark_paid_payment_email')}
+                  helpLabel={t('mark_paid_payment_email_help')}
+                />
+              }
+              defaultValue={false}
+            />
+          }
         >
           <Toggle
             checked={Boolean(company?.settings.mark_paid_payment_email)}
             onChange={(value: boolean) =>
               handleToggleChange('settings.mark_paid_payment_email', value)
             }
+            disabled={disableSettingsField('mark_paid_payment_email')}
           />
         </Element>
 
@@ -224,7 +316,15 @@ export function OnlinePayments() {
           </Element>
         )}
 
-        <Element leftSide={t('allow_over_payment')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="client_portal_allow_over_payment"
+              labelElement={<SettingsLabel label={t('allow_over_payment')} />}
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             label={t('allow_over_payment_help')}
             id="allow_over_payment"
@@ -237,10 +337,19 @@ export function OnlinePayments() {
                 value
               )
             }
+            disabled={disableSettingsField('client_portal_allow_over_payment')}
           />
         </Element>
 
-        <Element leftSide={t('allow_under_payment')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="client_portal_allow_under_payment"
+              labelElement={<SettingsLabel label={t('allow_under_payment')} />}
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             label={t('allow_under_payment_help')}
             id="allow_under_payment"
@@ -253,20 +362,34 @@ export function OnlinePayments() {
                 value
               )
             }
+            disabled={disableSettingsField('client_portal_allow_under_payment')}
           />
         </Element>
         {company?.settings.client_portal_allow_under_payment && (
-          <Element leftSide={t('minimum_under_payment_amount')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="client_portal_under_payment_minimum"
+                labelElement={
+                  <SettingsLabel label={t('minimum_under_payment_amount')} />
+                }
+              />
+            }
+          >
             <InputField
+              type="number"
               value={
                 company?.settings.client_portal_under_payment_minimum || ''
               }
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_portal_under_payment_minimum',
-                  value
+                  parseFloat(value) || 0
                 )
               }
+              disabled={disableSettingsField(
+                'client_portal_under_payment_minimum'
+              )}
               errorMessage={
                 errors?.errors['settings.client_portal_under_payment_minimum']
               }
@@ -274,7 +397,17 @@ export function OnlinePayments() {
           </Element>
         )}
 
-        <Element leftSide={t('client_initiated_payments')}>
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="client_initiated_payments"
+              labelElement={
+                <SettingsLabel label={t('client_initiated_payments')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
           <Toggle
             label={t('client_initiated_payments_help')}
             id="client_initiated_payments"
@@ -282,19 +415,33 @@ export function OnlinePayments() {
             onChange={(value) =>
               handleChangeProperty('settings.client_initiated_payments', value)
             }
+            disabled={disableSettingsField('client_initiated_payments')}
           />
         </Element>
 
         {company?.settings.client_initiated_payments && (
-          <Element leftSide={t('minimum_payment_amount')}>
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="client_initiated_payments_minimum"
+                labelElement={
+                  <SettingsLabel label={t('minimum_payment_amount')} />
+                }
+              />
+            }
+          >
             <InputField
+              type="number"
               value={company?.settings.client_initiated_payments_minimum || ''}
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_initiated_payments_minimum',
-                  value
+                  parseFloat(value)
                 )
               }
+              disabled={disableSettingsField(
+                'client_initiated_payments_minimum'
+              )}
               errorMessage={
                 errors?.errors['settings.client_initiated_payments_minimum']
               }

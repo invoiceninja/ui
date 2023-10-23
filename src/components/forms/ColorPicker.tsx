@@ -9,6 +9,7 @@
  */
 
 import { Modal } from '$app/components/Modal';
+import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ import { useDebounce } from 'react-use';
 interface Props {
   value?: string;
   onValueChange?: (color: string) => unknown;
+  disabled?: boolean;
 }
 
 export function ColorPicker(props: Props) {
@@ -49,8 +51,15 @@ export function ColorPicker(props: Props) {
 
       <div
         style={{ backgroundColor: color }}
-        className="w-16 h-6 cursor-pointer shadow rounded-md"
-        onClick={() => setIsModalOpen(true)}
+        className={classNames('w-16 h-6 shadow rounded-md', {
+          'opacity-75 cursor-not-allowed': props.disabled,
+          'cursor-pointer':
+            typeof props.disabled === 'undefined' || !props.disabled,
+        })}
+        onClick={() =>
+          (!props.disabled || typeof props.disabled === 'undefined') &&
+          setIsModalOpen(true)
+        }
       ></div>
     </div>
   );

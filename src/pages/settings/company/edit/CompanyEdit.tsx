@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useLanguages } from '$app/common/hooks/useLanguages';
 import { CompanyInput } from '$app/common/interfaces/company.interface';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CurrencySelector } from '$app/components/CurrencySelector';
@@ -28,6 +27,7 @@ import {
   useEffect,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 
 interface Props {
   isModalOpen: boolean;
@@ -36,8 +36,6 @@ interface Props {
 
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
-
-  const languages = useLanguages();
 
   const currentCompany = useCurrentCompany();
 
@@ -183,18 +181,12 @@ export function CompanyEdit(props: Props) {
         />
       )}
 
-      <SelectField
+      <LanguageSelector
         label={t('language')}
         value={company?.language_id}
-        onValueChange={(value) => handleChange('language_id', value)}
+        onChange={(v) => handleChange('language_id', v)}
         errorMessage={errors?.errors?.language_id}
-      >
-        {languages?.map((language, index) => (
-          <option key={index} value={language?.id}>
-            {language?.name}
-          </option>
-        ))}
-      </SelectField>
+      />
 
       <CurrencySelector
         label={t('currency')}

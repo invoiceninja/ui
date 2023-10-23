@@ -52,7 +52,14 @@ export function InputCustomField(props: Props) {
       )}
 
       {type === AvailableTypes.Switch && (
-        <Toggle onChange={props.onValueChange} checked={props.defaultValue} />
+        <Toggle
+          onChange={props.onValueChange}
+          checked={
+            typeof props.defaultValue === 'string'
+              ? props.defaultValue === 'true'
+              : props.defaultValue
+          }
+        />
       )}
 
       {type === AvailableTypes.Date && (

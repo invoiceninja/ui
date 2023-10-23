@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const invoiceMap: Record[] = [
   { trans: 'invoice_number', value: 'invoice.number', map: 'invoice' },
@@ -24,10 +24,22 @@ export const invoiceMap: Record[] = [
   { trans: 'status', value: 'invoice.status', map: 'invoice' },
   { trans: 'public_notes', value: 'invoice.public_notes', map: 'invoice' },
   { trans: 'private_notes', value: 'invoice.private_notes', map: 'invoice' },
-  { trans: 'uses_inclusive_taxes', value: 'invoice.uses_inclusive_taxes', map: 'invoice' },
-  { trans: 'is_amount_discount', value: 'invoice.is_amount_discount', map: 'invoice' },
+  {
+    trans: 'uses_inclusive_taxes',
+    value: 'invoice.uses_inclusive_taxes',
+    map: 'invoice',
+  },
+  {
+    trans: 'is_amount_discount',
+    value: 'invoice.is_amount_discount',
+    map: 'invoice',
+  },
   { trans: 'partial', value: 'invoice.partial', map: 'invoice' },
-  { trans: 'partial_due_date', value: 'invoice.partial_due_date', map: 'invoice' },
+  {
+    trans: 'partial_due_date',
+    value: 'invoice.partial_due_date',
+    map: 'invoice',
+  },
   { trans: 'custom_value1', value: 'invoice.custom_value1', map: 'invoice' },
   { trans: 'custom_value2', value: 'invoice.custom_value2', map: 'invoice' },
   { trans: 'custom_value3', value: 'invoice.custom_value3', map: 'invoice' },
@@ -40,4 +52,5 @@ export const invoiceMap: Record[] = [
   { trans: 'tax_amount', value: 'invoice.total_taxes', map: 'invoice' },
   { trans: 'assigned_user', value: 'invoice.assigned_user_id', map: 'invoice' },
   { trans: 'user', value: 'invoice.user_id', map: 'invoice' },
+  { trans: 'recurring_invoice', value: 'invoice.recurring_id', map: 'invoice' },
 ];
