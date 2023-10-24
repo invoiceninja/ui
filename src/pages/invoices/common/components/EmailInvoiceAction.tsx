@@ -48,13 +48,11 @@ export function EmailInvoiceAction(props: Props) {
       >
         {!commonActionSection ? (
           <DropdownElement
-            to={
-              hasClientEmailContacts(invoice.client)
-                ? route('/invoices/:id/email', {
-                    id: invoice.id,
-                  })
-                : ''
-            }
+            {...(hasClientEmailContacts(invoice.client) && {
+              to: route('/invoices/:id/email', {
+                id: invoice.id,
+              }),
+            })}
             icon={<Icon element={MdSend} />}
           >
             {t('email_invoice')}
