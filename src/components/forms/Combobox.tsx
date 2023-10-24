@@ -754,8 +754,10 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  console.log(new URL(url).pathname);
+
   const { data } = useQuery(
-    [url],
+    [new URL(url).pathname, new URL(url).search],
     () => {
       const $url = new URL(url);
 

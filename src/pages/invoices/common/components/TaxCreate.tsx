@@ -19,6 +19,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useQueryClient } from 'react-query';
 
 interface Props {
   isVisible: boolean;
@@ -29,6 +30,7 @@ interface Props {
 export function TaxCreate(props: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     initialValues: {
@@ -43,12 +45,8 @@ export function TaxCreate(props: Props) {
           toast.success('created_tax_rate');
           props.onClose(false);
 
-          window.dispatchEvent(
-            new CustomEvent('invalidate.combobox.queries', {
-              detail: {
-                url: endpoint('/api/v1/tax_rates'),
-              },
-            })
+          queryClient.invalidateQueries(
+            endpoint('/api/v1/tax_rates?status=active&filter=')
           );
 
           props.onTaxCreated && props.onTaxCreated(response.data.data);
