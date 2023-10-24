@@ -45,7 +45,7 @@ export function MarkdownEditor(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" style={{ zIndex: 0 }}>
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
       <Editor
