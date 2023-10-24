@@ -65,7 +65,11 @@ export function App() {
   const user = useCurrentUser();
 
   const resolvedLanguage = company
-    ? resolveLanguage(user?.language_id ?? company.settings.language_id)
+    ? resolveLanguage(
+        user?.language_id && user.language_id.length > 0
+          ? user.language_id
+          : company.settings.language_id
+      )
     : undefined;
 
   const [colorScheme] = useAtom(colorSchemeAtom);

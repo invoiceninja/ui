@@ -16,7 +16,7 @@ import { ComboboxAsync, Entry } from '../forms/Combobox';
 export function TaskStatusSelector(props: GenericSelectorProps<TaskStatus>) {
   return (
     <ComboboxAsync<TaskStatus>
-      endpoint={new URL(endpoint('/api/v1/task_statuses?status=active'))}
+      endpoint={endpoint('/api/v1/task_statuses?status=active')}
       onChange={(taskStatus: Entry<TaskStatus>) =>
         taskStatus.resource && props.onChange(taskStatus.resource)
       }

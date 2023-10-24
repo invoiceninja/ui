@@ -35,7 +35,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
           label: props.inputLabel?.toString(),
           value: props.value ?? null,
         }}
-        endpoint={new URL(endpoint('/api/v1/projects?status=active'))}
+        endpoint={endpoint('/api/v1/projects?status=active')}
         entryOptions={{ id: 'id', label: 'name', value: 'id' }}
         onChange={(entry) =>
           entry.resource ? props.onChange(entry.resource) : null

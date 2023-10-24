@@ -34,7 +34,7 @@ export function TaxRateSelector(props: Props) {
         inputOptions={{
           value: props.defaultValue ?? null,
         }}
-        endpoint={new URL(endpoint('/api/v1/tax_rates?status=active'))}
+        endpoint={endpoint('/api/v1/tax_rates?status=active')}
         onChange={(taxRate) => props.onChange && props.onChange(taxRate)}
         action={{
           label: t('create_tax_rate'),
