@@ -33,4 +33,5 @@ export interface User extends Timestamps {
   verified_phone_number: boolean;
   company_user?: CompanyUser;
   language_id: string;
+  user_logged_in_notification: boolean;
 }
