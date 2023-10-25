@@ -100,12 +100,14 @@ export default function Edit() {
       </div>
 
       <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
-        <InvoiceViewer
-          link={endpoint('/api/v1/preview')}
-          resource={payload}
-          method="POST"
-          withToast
-        />
+        {payload.design ? (
+          <InvoiceViewer
+            link={endpoint('/api/v1/preview')}
+            resource={payload}
+            method="POST"
+            withToast
+          />
+        ) : null}
       </div>
     </div>
   );

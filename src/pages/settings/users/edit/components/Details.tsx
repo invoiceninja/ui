@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
   user: User;
@@ -64,6 +65,16 @@ export function Details(props: Props) {
           value={user?.phone}
           onValueChange={(value) => onChange('phone', value)}
           errorMessage={props.errors?.errors.phone}
+        />
+      </Element>
+
+      <Element
+        leftSide={t('login_notification')}
+        leftSideHelp={t('login_notification_help')}
+      >
+        <Toggle
+          checked={user?.user_logged_in_notification}
+          onChange={(value) => onChange('user_logged_in_notification', value)}
         />
       </Element>
 
