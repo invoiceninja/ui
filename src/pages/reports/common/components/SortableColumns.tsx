@@ -73,37 +73,40 @@ export function Column({
             {...provided.droppableProps}
           >
             <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
-              {data && data.map((record: Record, i: number) => (
-                <Draggable
-                  key={record.value}
-                  index={i}
-                  draggableId={`left-word-${record.value}`}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <span
-                        className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
-                        key={i}
+              {data &&
+                data.map((record: Record, i: number) => (
+                  <Draggable
+                    key={record.value}
+                    index={i}
+                    draggableId={`left-word-${record.value}`}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
                       >
-                        {translateLabel(record)}
+                        <span
+                          className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
+                          key={i}
+                        >
+                          {translateLabel(record)}
 
-                        {droppableId === reportColumn.toString() && (
-                          <button
-                            type="button"
-                            onClick={() => (onRemove ? onRemove(record) : null)}
-                          >
-                            <X size={15} />
-                          </button>
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+                          {droppableId === reportColumn.toString() && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onRemove ? onRemove(record) : null
+                              }
+                            >
+                              <X size={15} />
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
             </div>
             {provided.placeholder}
           </div>
@@ -192,25 +195,31 @@ export function SortableColumns({ report, columns }: Props) {
       return;
     }
 
-    // Create a copy of the data array
-    const $data = cloneDeep(data);
+    try {
+      // Create a copy of the data array
+      const $data = cloneDeep(data);
 
-    // Find a source index
-    const sourceIndex = parseInt(result.source.droppableId);
+      // Find a source index
+      const sourceIndex = parseInt(result.source.droppableId);
 
-    // Find a string
-    const word = $data[sourceIndex][result.source.index];
+      // Find a string
+      const word = $data[sourceIndex][result.source.index];
 
-    // Cut a word from the original array
-    $data[sourceIndex].splice(result.source.index, 1);
+      // Cut a word from the original array
+      $data[sourceIndex].splice(result.source.index, 1);
 
-    // Find a destination index
-    const destinationIndex = parseInt(result.destination.droppableId);
+      // Find a destination index
+      const destinationIndex = parseInt(result.destination.droppableId);
 
-    // Then we can insert the word into new array at specific index
-    $data[destinationIndex].splice(result.destination.index, 0, word);
+      // Then we can insert the word into new array at specific index
+      $data[destinationIndex].splice(result.destination.index, 0, word);
 
-    update(`preferences.reports.columns.${report}`, [...$data]);
+      update(`preferences.reports.columns.${report}`, [...$data]);
+    } catch (e) {
+      // In case we hit any error, due to wrong data or something similar, we should just reset the state.
+
+      update(`preferences.reports.columns.${report}`, defaultColumns);
+    }
   };
 
   const onRemove = (record: Record) => {
