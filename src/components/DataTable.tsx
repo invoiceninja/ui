@@ -63,7 +63,7 @@ import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { User } from '$app/common/interfaces/user';
-import { TablePreference } from '$app/common/hooks/useReactSettings';
+import { TableFiltersPreference } from '$app/common/hooks/useReactSettings';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -139,7 +139,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const tableKey = `${location.pathname}${props.endpoint}`;
 
-  const getPreference = (filterKey: keyof TablePreference) => {
+  const getPreference = (filterKey: keyof TableFiltersPreference) => {
     const tableFilters = user?.company_user?.react_settings.table_filters;
 
     return tableFilters?.[tableKey]?.[filterKey]
@@ -175,17 +175,15 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
-  const handleUpdateUserPreferences = (updatingUser: User) => {
+  const handleUpdateUserPreferences = (updatedUser: User) => {
     request(
       'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatingUser.id }),
-      updatingUser
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatingUser, 'company_user', response.data.data);
+      set(updatedUser, 'company_user', response.data.data);
 
-      dispatch(updateUser(updatingUser));
-
-      toast.success('updated_settings');
+      dispatch(updateUser(updatedUser));
     });
   };
 
@@ -228,9 +226,9 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     const cleanedUpFilters = {
       ...(filter && { filter }),
-      ...(sort && { sort }),
       ...(sortedBy && { sortedBy }),
       ...(props.customFilters && { customFilter }),
+      sort,
       currentPage,
       status,
     };
