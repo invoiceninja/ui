@@ -8,16 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Modal } from './Modal';
-import { atomWithStorage } from 'jotai/utils';
-import { useAtom } from 'jotai';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { Icon } from './icons/Icon';
 import { MdClose } from 'react-icons/md';
 import { SearchableSelect } from './SearchableSelect';
 import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { User } from '$app/common/interfaces/user';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { cloneDeep, isEqual, set } from 'lodash';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useDispatch } from 'react-redux';
 
 export interface CommonAction {
   value: string;
@@ -32,34 +39,61 @@ interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-export const commonActionsPreferencesAtom = atomWithStorage<
-  Record<Entity, CommonAction[]> | undefined
->('actionPreferences', undefined);
-
 export function CommonActionsPreferenceModal(props: Props) {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
+  const user = useCurrentUser();
 
   const commonActions = useAllCommonActions();
 
-  const [commonActionsAtom, setCommonActionsAtom] = useAtom(
-    commonActionsPreferencesAtom
-  );
-
   const [commonActionsPreferences, setCommonActionsPreferences] = useState<
-    Record<Entity, CommonAction[]> | undefined
-  >(commonActionsAtom);
+    Record<Entity, string[]> | undefined
+  >(user?.company_user?.react_settings?.common_actions);
 
   const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
 
   const { entity, visible, setVisible } = props;
 
-  const allCommonActions = useMemo(() => commonActions[entity], []);
+  const allCommonActions = commonActions[entity];
 
   const [selectedAction, setSelectedAction] = useState<string>('');
 
+  const disableSaveButton = () => {
+    return isEqual(
+      user?.company_user?.react_settings.common_actions,
+      commonActionsPreferences
+    );
+  };
+
+  const getActionLabel = (actionKey: string) => {
+    return (
+      allCommonActions.find(({ value }) => value === actionKey)?.label || ''
+    );
+  };
+
+  const handleUpdateUserDetails = () => {
+    const updatedUser = cloneDeep(user) as User;
+
+    set(
+      updatedUser,
+      'company_user.react_settings.common_actions',
+      commonActionsPreferences
+    );
+
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatedUser, 'company_user', response.data.data);
+
+      dispatch(updateUser(updatedUser));
+    });
+  };
+
   const handleRemoveAction = (actionKey: string) => {
     const filteredCommonActions = commonActionsPreferences?.[entity].filter(
-      ({ value }) => actionKey !== value
+      (value) => actionKey !== value
     );
 
     if (filteredCommonActions) {
@@ -84,10 +118,10 @@ export function CommonActionsPreferenceModal(props: Props) {
           current
             ? {
                 ...current,
-                [entity]: [...current[entity], commonAction],
+                [entity]: [...current[entity], commonAction.value],
               }
             : {
-                [entity]: [commonAction],
+                [entity]: [commonAction.value],
               }
         );
       }
@@ -102,7 +136,7 @@ export function CommonActionsPreferenceModal(props: Props) {
         allCommonActions.filter(
           ({ value }) =>
             !commonActionsPreferences[entity].some(
-              (action) => action.value === value
+              (actionKey) => actionKey === value
             )
         )
       );
@@ -117,7 +151,9 @@ export function CommonActionsPreferenceModal(props: Props) {
       visible={visible}
       onClose={() => {
         setVisible(false);
-        setCommonActionsPreferences(commonActionsAtom);
+        setCommonActionsPreferences(
+          user?.company_user?.react_settings.common_actions
+        );
       }}
       overflowVisible
     >
@@ -144,16 +180,16 @@ export function CommonActionsPreferenceModal(props: Props) {
 
         {Boolean(commonActionsPreferences?.[entity].length) && (
           <div className="flex flex-col space-y-3">
-            {commonActionsPreferences?.[entity].map(({ value, label }) => (
-              <div key={value} className="flex justify-between">
-                <span className="font-medium">{label}</span>
+            {commonActionsPreferences?.[entity].map((actionKey) => (
+              <div key={actionKey} className="flex justify-between">
+                <span className="font-medium">{getActionLabel(actionKey)}</span>
 
                 <div>
                   <Icon
                     className="cursor-pointer"
                     element={MdClose}
                     size={25}
-                    onClick={() => handleRemoveAction(value)}
+                    onClick={() => handleRemoveAction(actionKey)}
                   />
                 </div>
               </div>
@@ -163,9 +199,11 @@ export function CommonActionsPreferenceModal(props: Props) {
 
         <Button
           onClick={() => {
-            setCommonActionsAtom(commonActionsPreferences);
+            handleUpdateUserDetails();
             setVisible(false);
           }}
+          disabled={disableSaveButton()}
+          disableWithoutIcon
         >
           {t('save')}
         </Button>

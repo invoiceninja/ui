@@ -8,20 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Entity,
-  commonActionsPreferencesAtom,
-} from '$app/components/CommonActionsPreferenceModal';
-import { useAtomValue } from 'jotai';
+import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { useDefaultCommonActions } from './useCommonActions';
 import { useEntityPageIdentifier } from './useEntityPageIdentifier';
+import { useCurrentUser } from './useCurrentUser';
 
 interface Params {
   commonActionsSection: boolean;
   entity: 'invoice';
 }
 export function useShowActionByPreferences(params: Params) {
-  const commonActionsPreferences = useAtomValue(commonActionsPreferencesAtom);
+  const user = useCurrentUser();
 
   const { commonActionsSection, entity } = params;
 
@@ -34,12 +31,13 @@ export function useShowActionByPreferences(params: Params) {
       return true;
     }
 
+    const commonActionsPreferences =
+      user?.company_user?.react_settings.common_actions;
+
     if (
       !commonActionsSection &&
       commonActionsPreferences?.[entity] &&
-      !commonActionsPreferences[entity]?.some(
-        ({ value }) => value === actionKey
-      )
+      !commonActionsPreferences[entity]?.includes(actionKey)
     ) {
       return true;
     }
@@ -53,9 +51,7 @@ export function useShowActionByPreferences(params: Params) {
     }
 
     if (commonActionsPreferences && commonActionsSection) {
-      return commonActionsPreferences[entity]?.some(
-        ({ value }) => value === actionKey
-      );
+      return commonActionsPreferences[entity]?.includes(actionKey);
     }
 
     if (!commonActionsPreferences?.[entity] && !commonActionsSection) {
