@@ -32,6 +32,7 @@ import {
 import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
+import { useQueryClient } from 'react-query';
 
 export type Identifier =
   | 'activity'
@@ -100,11 +101,29 @@ interface Payload {
   status?: string;
 }
 
+const download = (data: BlobPart, identifier: string) => {
+  const blob = new Blob([data], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+
+  link.download = `${identifier}.csv`;
+  link.href = url;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+};
+
 export default function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
 
   const reports = useReports();
+  const queryClient = useQueryClient();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -211,22 +230,34 @@ export default function Reports() {
           return toast.success();
         }
 
-        const blob = new Blob([response.data], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
+        if (response.status === 200) {
+          download(response.data, report.identifier);
 
-        const link = document.createElement('a');
+          toast.success();
 
-        link.download = `${report.identifier}.csv`;
-        link.href = url;
-        link.target = '_blank';
+          return;
+        }
 
-        document.body.appendChild(link);
+        if (response.status === 409) {
+          const hash = response.data.message as string;
 
-        link.click();
+          queryClient
+            .fetchQuery({
+              queryKey: ['exports', hash],
+              queryFn: () =>
+                request(
+                  'POST',
+                  endpoint(`/api/v1/exports/preview/${hash}`)
+                ).then((response) => response.data),
+              retry: 10,
+              retryDelay: import.meta.env.DEV ? 1000 : 5000,
+            })
+            .then((response) => {
+              download(response, report.identifier);
 
-        document.body.removeChild(link);
-
-        toast.success();
+              toast.success();
+            });
+        }
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
         if (error.response?.status === 422) {
