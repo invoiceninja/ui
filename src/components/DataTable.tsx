@@ -224,6 +224,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       return;
     }
 
+    const currentTableFilters =
+      user?.company_user?.react_settings.table_filters?.[tableKey];
+
+    const defaultFilters = {
+      ...(props.customFilters && { customFilter: ['all'] }),
+      sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
+      currentPage: 1,
+      status: ['active'],
+    };
+
     const cleanedUpFilters = {
       ...(filter && { filter }),
       ...(sortedBy && { sortedBy }),
@@ -233,12 +243,11 @@ export function DataTable<T extends object>(props: Props<T>) {
       status,
     };
 
-    if (
-      isEqual(
-        user?.company_user?.react_settings.table_filters?.[tableKey],
-        cleanedUpFilters
-      )
-    ) {
+    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
+      return;
+    }
+
+    if (isEqual(currentTableFilters, cleanedUpFilters) && currentTableFilters) {
       return;
     }
 
