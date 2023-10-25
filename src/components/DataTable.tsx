@@ -184,6 +184,8 @@ export function DataTable<T extends object>(props: Props<T>) {
       set(updatingUser, 'company_user', response.data.data);
 
       dispatch(updateUser(updatingUser));
+
+      toast.success('updated_settings');
     });
   };
 
@@ -219,15 +221,24 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   };
 
-  const handleChangeTableFilters = (tableFilters: TablePreference) => {
+  const handleUpdateTableFilters = () => {
     if (!customFilter) {
       return;
     }
 
+    const cleanedUpFilters = {
+      ...(filter && { filter }),
+      ...(sort && { sort }),
+      ...(sortedBy && { sortedBy }),
+      ...(props.customFilters && { customFilter }),
+      currentPage,
+      status,
+    };
+
     if (
       isEqual(
         user?.company_user?.react_settings.table_filters?.[tableKey],
-        tableFilters
+        cleanedUpFilters
       )
     ) {
       return;
@@ -239,7 +250,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       set(
         updatedUser,
         `company_user.react_settings.table_filters.${tableKey}`,
-        tableFilters
+        cleanedUpFilters
       );
 
       handleUpdateUserPreferences(updatedUser as User);
@@ -281,18 +292,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut);
 
-      const currentTimeout = setTimeout(
-        () =>
-          handleChangeTableFilters({
-            ...(filter && { filter }),
-            ...(sort && { sort }),
-            ...(sortedBy && { sortedBy }),
-            ...(customFilter && { customFilter }),
-            currentPage,
-            status,
-          }),
-        1250
-      );
+      const currentTimeout = setTimeout(handleUpdateTableFilters, 1500);
 
       companyUpdateTimeOut = currentTimeout;
     }
@@ -354,7 +354,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   ];
 
   const defaultOptions = useMemo(() => {
-    if (!isInitialConfiguration && !customFilter) {
+    if (!isInitialConfiguration) {
       const preferenceStatuses = getPreference('status') as string[];
 
       const currentStatuses = preferenceStatuses?.length
@@ -370,7 +370,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [isInitialConfiguration]);
 
   const defaultCustomFilterOptions = useMemo(() => {
-    if (!isInitialConfiguration && props.customFilters && !customFilter) {
+    if (!isInitialConfiguration && props.customFilters) {
       const preferenceCustomFilters = getPreference('customFilter') as string[];
 
       const currentStatuses = preferenceCustomFilters?.length
@@ -383,7 +383,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         ) || [props.customFilters[0]]
       );
     }
-  }, [isInitialConfiguration, user]);
+  }, [isInitialConfiguration]);
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(
