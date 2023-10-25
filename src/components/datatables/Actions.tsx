@@ -31,7 +31,7 @@ interface Props extends CommonProps {
   rightSide?: ReactNode;
   onFilterChange?: Dispatch<SetStateAction<string>>;
   onStatusChange?: Dispatch<SetStateAction<string[]>>;
-  onCustomFilterChange?: Dispatch<SetStateAction<string[]>>;
+  onCustomFilterChange?: Dispatch<SetStateAction<string[] | undefined>>;
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
   beforeFilter?: ReactNode;

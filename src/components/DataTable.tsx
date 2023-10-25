@@ -57,6 +57,13 @@ import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useLocation } from 'react-router-dom';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { cloneDeep, isEqual, set } from 'lodash';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { User } from '$app/common/interfaces/user';
+import { TablePreference } from '$app/common/hooks/useReactSettings';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -81,15 +88,6 @@ interface StyleOptions {
   thClassName?: string;
   tdClassName?: string;
   addRowSeparator?: boolean;
-}
-
-interface TablePreference {
-  filter: string;
-  customFilter: string[];
-  currentPage: number;
-  sort: string;
-  status: string[];
-  sortedBy: string | undefined;
 }
 
 interface Props<T> extends CommonProps {
@@ -126,13 +124,11 @@ type ResourceAction<T> = (resource: T) => ReactElement;
 
 export const datatablePerPageAtom = atomWithStorage<string>('perPage', '100');
 
-const dataTableFilterPreferencesAtom = atomWithStorage<
-  Record<string, TablePreference>
->('dataTablePreferences', {});
-
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
+  const user = useUserChanges();
+  const dispatch = useDispatch();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -143,13 +139,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const tableKey = `${location.pathname}${props.endpoint}`;
 
-  const [dataTableFilterPreferences, setDataTableFilterPreferences] = useAtom(
-    dataTableFilterPreferencesAtom
-  );
-
   const getPreference = (filterKey: keyof TablePreference) => {
-    return dataTableFilterPreferences[tableKey]
-      ? dataTableFilterPreferences[tableKey][filterKey]
+    const tableFilters = user?.company_user?.react_settings.table_filters;
+
+    return tableFilters?.[tableKey]?.[filterKey]
+      ? tableFilters[tableKey][filterKey]
       : '';
   };
 
@@ -160,8 +154,12 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { styleOptions, customFilters } = props;
 
+  let companyUpdateTimeOut: NodeJS.Timeout | undefined = undefined;
+
   const [filter, setFilter] = useState<string>('');
-  const [customFilter, setCustomFilter] = useState<string[]>([]);
+  const [customFilter, setCustomFilter] = useState<string[] | undefined>(
+    undefined
+  );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
   const [sort, setSort] = useState<string>(
@@ -176,6 +174,18 @@ export function DataTable<T extends object>(props: Props<T>) {
     useState<boolean>(true);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
+
+  const handleUpdateUserPreferences = (updatingUser: User) => {
+    request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatingUser.id }),
+      updatingUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatingUser, 'company_user', response.data.data);
+
+      dispatch(updateUser(updatingUser));
+    });
+  };
 
   const handleChangingCustomFilters = () => {
     if (customFilters) {
@@ -193,7 +203,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
           if (
             customFilterQueryKey === queryKey &&
-            customFilter.includes(filter.value)
+            customFilter?.includes(filter.value)
           ) {
             selectedFiltersByKey.push(filter.value);
           }
@@ -209,6 +219,33 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   };
 
+  const handleChangeTableFilters = (tableFilters: TablePreference) => {
+    if (!customFilter) {
+      return;
+    }
+
+    if (
+      isEqual(
+        user?.company_user?.react_settings.table_filters?.[tableKey],
+        tableFilters
+      )
+    ) {
+      return;
+    }
+
+    const updatedUser = cloneDeep(user) as User;
+
+    if (updatedUser) {
+      set(
+        updatedUser,
+        `company_user.react_settings.table_filters.${tableKey}`,
+        tableFilters
+      );
+
+      handleUpdateUserPreferences(updatedUser as User);
+    }
+  };
+
   useEffect(() => {
     const perPageParameter = apiEndpoint.searchParams.get('perPage');
 
@@ -218,12 +255,16 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, []);
 
   useEffect(() => {
-    if (!isInitialConfiguration) {
+    if (!isInitialConfiguration && !customFilter) {
       setFilter((getPreference('filter') as string) || '');
-      if ((getPreference('customFilter') as string[]).length) {
-        setCustomFilter(getPreference('customFilter') as string[]);
+      if (props.customFilters) {
+        if ((getPreference('customFilter') as string[]).length) {
+          setCustomFilter(getPreference('customFilter') as string[]);
+        } else {
+          setCustomFilter(['all']);
+        }
       } else {
-        setCustomFilter(['all']);
+        setCustomFilter([]);
       }
       setCurrentPage((getPreference('currentPage') as number) || 1);
       setSort((getPreference('sort') as string) || 'id|asc');
@@ -238,17 +279,22 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   useEffect(() => {
     if (!isInitialConfiguration) {
-      setDataTableFilterPreferences((currentPreferences) => ({
-        ...currentPreferences,
-        [tableKey]: {
-          filter,
-          currentPage,
-          customFilter,
-          sort,
-          sortedBy,
-          status,
-        },
-      }));
+      clearTimeout(companyUpdateTimeOut);
+
+      const currentTimeout = setTimeout(
+        () =>
+          handleChangeTableFilters({
+            ...(filter && { filter }),
+            ...(sort && { sort }),
+            ...(sortedBy && { sortedBy }),
+            ...(customFilter && { customFilter }),
+            currentPage,
+            status,
+          }),
+        1250
+      );
+
+      companyUpdateTimeOut = currentTimeout;
     }
 
     apiEndpoint.searchParams.set('per_page', perPage);
@@ -308,10 +354,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   ];
 
   const defaultOptions = useMemo(() => {
-    if (!isInitialConfiguration) {
+    if (!isInitialConfiguration && !customFilter) {
       const preferenceStatuses = getPreference('status') as string[];
 
-      const currentStatuses = preferenceStatuses.length
+      const currentStatuses = preferenceStatuses?.length
         ? preferenceStatuses
         : ['active'];
 
@@ -324,10 +370,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [isInitialConfiguration]);
 
   const defaultCustomFilterOptions = useMemo(() => {
-    if (!isInitialConfiguration && props.customFilters) {
+    if (!isInitialConfiguration && props.customFilters && !customFilter) {
       const preferenceCustomFilters = getPreference('customFilter') as string[];
 
-      const currentStatuses = preferenceCustomFilters.length
+      const currentStatuses = preferenceCustomFilters?.length
         ? preferenceCustomFilters
         : ['all'];
 
@@ -337,7 +383,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         ) || [props.customFilters[0]]
       );
     }
-  }, [isInitialConfiguration]);
+  }, [isInitialConfiguration, user]);
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(

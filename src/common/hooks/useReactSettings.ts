@@ -16,6 +16,15 @@ import { Record as ClientMapRecord } from '../constants/exports/client-map';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
+export interface TablePreference {
+  filter?: string;
+  customFilter?: string[];
+  currentPage: number;
+  sort?: string;
+  status: string[];
+  sortedBy?: string;
+}
+
 export interface Preferences {
   dashboard_charts: {
     default_view: 'day' | 'week' | 'month';
@@ -39,6 +48,7 @@ export interface ReactSettings {
   number_precision?: number;
   show_document_preview?: boolean;
   preferences: Preferences;
+  table_filters?: Record<string, TablePreference>;
 }
 
 export type ReactTableColumns =
