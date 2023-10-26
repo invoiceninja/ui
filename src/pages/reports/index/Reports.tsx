@@ -261,7 +261,10 @@ export default function Reports() {
       })
       .finally(() => {
         setIsPendingExport(false);
-        save({ silent: true });
+
+        if (showCustomColumns) {
+          save({ silent: true });
+        }
       });
   };
 
