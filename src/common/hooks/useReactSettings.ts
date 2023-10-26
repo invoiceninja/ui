@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { useInjectUserChanges } from './useInjectUserChanges';
 import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
+import { Entity } from '$app/components/CommonActionsPreferenceModal';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -39,6 +40,7 @@ export interface ReactSettings {
   number_precision?: number;
   show_document_preview?: boolean;
   preferences: Preferences;
+  common_actions?: Record<Entity, string[]>;
 }
 
 export type ReactTableColumns =
