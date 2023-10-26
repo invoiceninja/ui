@@ -222,42 +222,29 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.endpoint), updatedPayload, {
-      responseType: report.payload.send_email ? 'json' : 'blob',
-    })
+    request('POST', endpoint(report.endpoint), updatedPayload, {})
       .then((response) => {
         if (report.payload.send_email) {
           return toast.success();
         }
 
-        if (response.status === 200) {
-          download(response.data, report.identifier);
+        const hash = response.data.message as string;
 
-          toast.success();
+        queryClient
+          .fetchQuery({
+            queryKey: ['exports', hash],
+            queryFn: () =>
+              request('POST', endpoint(`/api/v1/exports/preview/${hash}`)).then(
+                (response) => response.data
+              ),
+            retry: 10,
+            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+          })
+          .then((response) => {
+            download(response, report.identifier);
 
-          return;
-        }
-
-        if (response.status === 409) {
-          const hash = response.data.message as string;
-
-          queryClient
-            .fetchQuery({
-              queryKey: ['exports', hash],
-              queryFn: () =>
-                request(
-                  'POST',
-                  endpoint(`/api/v1/exports/preview/${hash}`)
-                ).then((response) => response.data),
-              retry: 10,
-              retryDelay: import.meta.env.DEV ? 1000 : 5000,
-            })
-            .then((response) => {
-              download(response, report.identifier);
-
-              toast.success();
-            });
-        }
+            toast.success();
+          });
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
         if (error.response?.status === 422) {
