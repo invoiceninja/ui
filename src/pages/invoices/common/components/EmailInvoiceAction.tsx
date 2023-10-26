@@ -18,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { Button } from '$app/components/forms';
 import { useNavigate } from 'react-router-dom';
-import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 
 interface Props {
@@ -29,11 +28,9 @@ export function EmailInvoiceAction(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const colors = useColorScheme();
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, commonActionSection } = props;
+  const { invoice, commonActionSection = false } = props;
 
   const hasClientEmailContacts = (client?: Client) => {
     return client?.contacts.some(({ email }) => email);
@@ -46,30 +43,22 @@ export function EmailInvoiceAction(props: Props) {
           !hasClientEmailContacts(invoice.client) && setIsModalOpen(true)
         }
       >
-        {!commonActionSection ? (
-          <DropdownElement
-            {...(hasClientEmailContacts(invoice.client) && {
-              to: route('/invoices/:id/email', {
-                id: invoice.id,
-              }),
-            })}
-            icon={<Icon element={MdSend} />}
-          >
-            {t('email_invoice')}
-          </DropdownElement>
-        ) : (
-          <Button
-            className="flex space-x-2"
-            behavior="button"
-            onClick={() =>
-              hasClientEmailContacts(invoice.client) &&
-              navigate(route('/invoices/:id/email', { id: invoice.id }))
-            }
-          >
-            <Icon element={MdSend} color={colors.$1} />
-            <span>{t('email_invoice')}</span>
-          </Button>
-        )}
+        <DropdownElement
+          {...(commonActionSection && { behavior: 'button' })}
+          {...(hasClientEmailContacts(invoice.client) && {
+            to: route('/invoices/:id/email', {
+              id: invoice.id,
+            }),
+          })}
+          icon={
+            <Icon
+              element={MdSend}
+              {...(commonActionSection && { color: 'white' })}
+            />
+          }
+        >
+          {t('email_invoice')}
+        </DropdownElement>
       </div>
 
       <Modal

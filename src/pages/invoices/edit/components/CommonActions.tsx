@@ -11,8 +11,8 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { CommonActionsPreferenceModal } from '$app/components/CommonActionsPreferenceModal';
 import { Icon } from '$app/components/icons/Icon';
-import { MdSettings } from 'react-icons/md';
 import { useState } from 'react';
+import { MdSettings } from 'react-icons/md';
 import { useActions } from './Actions';
 
 interface Props {
