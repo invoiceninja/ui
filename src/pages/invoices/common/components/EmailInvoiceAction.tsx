@@ -22,7 +22,7 @@ import { Modal } from '$app/components/Modal';
 
 interface Props {
   invoice: Invoice;
-  commonActionSection?: boolean;
+  dropdown?: boolean;
 }
 export function EmailInvoiceAction(props: Props) {
   const [t] = useTranslation();
@@ -30,7 +30,7 @@ export function EmailInvoiceAction(props: Props) {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, commonActionSection = false } = props;
+  const { invoice, dropdown = false } = props;
 
   const hasClientEmailContacts = (client?: Client) => {
     return client?.contacts.some(({ email }) => email);
@@ -44,17 +44,14 @@ export function EmailInvoiceAction(props: Props) {
         }
       >
         <DropdownElement
-          {...(commonActionSection && { behavior: 'button' })}
+          {...(!dropdown && { behavior: 'button' })}
           {...(hasClientEmailContacts(invoice.client) && {
             to: route('/invoices/:id/email', {
               id: invoice.id,
             }),
           })}
           icon={
-            <Icon
-              element={MdSend}
-              {...(commonActionSection && { color: 'white' })}
-            />
+            <Icon element={MdSend} {...(!dropdown && { color: 'white' })} />
           }
         >
           {t('email_invoice')}
