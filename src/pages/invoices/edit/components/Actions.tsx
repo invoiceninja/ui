@@ -54,6 +54,7 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
+import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -67,13 +68,16 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
 interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
-  excludeCommonActions?: boolean;
+  dropdown?: boolean;
 }
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const { showEditAction, showCommonBulkAction, excludeCommonActions } =
-    params || {};
+  const {
+    showEditAction,
+    showCommonBulkAction,
+    dropdown = true,
+  } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
@@ -81,6 +85,11 @@ export function useActions(params?: Params) {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
 
   const reverseInvoice = useReverseInvoice();
+
+  const showActionByPreferences = useShowActionByPreferences({
+    commonActionsSection: Boolean(!dropdown),
+    entity: 'invoice',
+  });
 
   const bulk = useBulk();
 
@@ -205,107 +214,167 @@ export function useActions(params?: Params) {
           {t('edit')}
         </DropdownElement>
       ),
-    () => Boolean(showEditAction) && <Divider withoutPadding />,
+    () => Boolean(showEditAction) && dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      !excludeCommonActions && <EmailInvoiceAction invoice={invoice} />,
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={route('/invoices/:id/pdf', { id: invoice.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
-      >
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
+      showActionByPreferences('invoice', 'email_invoice') && (
+        <EmailInvoiceAction invoice={invoice} />
+      ),
     (invoice: Invoice) =>
-      getEntityState(invoice) !== EntityState.Deleted && (
+      showActionByPreferences('invoice', 'view_pdf') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          to={route('/invoices/:id/pdf', { id: invoice.id })}
+          icon={
+            <Icon
+              element={MdPictureAsPdf}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('view_pdf')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      getEntityState(invoice) !== EntityState.Deleted &&
+      showActionByPreferences('invoice', 'print_pdf') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => printPdf([invoice.id])}
-          icon={<Icon element={MdPrint} />}
+          icon={
+            <Icon element={MdPrint} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('print_pdf')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      invoice.status_id !== InvoiceStatus.Paid && (
+      invoice.status_id !== InvoiceStatus.Paid &&
+      showActionByPreferences('invoice', 'schedule') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={<Icon element={MdSchedule} />}
+          icon={
+            <Icon element={MdSchedule} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('schedule')}
         </DropdownElement>
       ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
-      >
-        {t('delivery_note')} ({t('pdf')})
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => downloadPdf(invoice)}
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('download')}
-      </DropdownElement>
-    ),
     (invoice: Invoice) =>
-      !excludeCommonActions &&
-      invoice.status_id === InvoiceStatus.Draft &&
-      !invoice.is_deleted && (
+      showActionByPreferences('invoice', 'delivery_note') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
+          icon={
+            <Icon
+              element={MdPictureAsPdf}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('delivery_note')} ({t('pdf')})
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'download') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => downloadPdf(invoice)}
+          icon={
+            <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
+          }
+        >
+          {t('download')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      invoice.status_id === InvoiceStatus.Draft &&
+      !invoice.is_deleted &&
+      showActionByPreferences('invoice', 'mark_sent') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'mark_sent')}
-          icon={<Icon element={MdMarkEmailRead} />}
+          icon={
+            <Icon
+              element={MdMarkEmailRead}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
-      !invoice.is_deleted && (
+      !invoice.is_deleted &&
+      showActionByPreferences('invoice', 'mark_paid') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'mark_paid')}
-          icon={<Icon element={MdPaid} />}
+          icon={
+            <Icon element={MdPaid} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('mark_paid')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      isInvoiceAutoBillable(invoice) && (
+      isInvoiceAutoBillable(invoice) &&
+      showActionByPreferences('invoice', 'auto_bill') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'auto_bill')}
-          icon={<Icon element={BiMoney} />}
+          icon={
+            <Icon element={BiMoney} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('auto_bill')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      parseInt(invoice.status_id) < 4 && (
+      parseInt(invoice.status_id) < 4 &&
+      showActionByPreferences('invoice', 'enter_payment') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
             invoiceId: invoice.id,
             clientId: invoice.client_id,
           })}
-          icon={<Icon element={BiPlusCircle} />}
+          icon={
+            <Icon
+              element={BiPlusCircle}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
         >
           {t('enter_payment')}
         </DropdownElement>
       ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => invoice && openClientPortal(invoice)}
-        icon={<Icon element={MdCloudCircle} />}
-      >
-        {t('client_portal')}
-      </DropdownElement>
-    ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'client_portal') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => invoice && openClientPortal(invoice)}
+          icon={
+            <Icon
+              element={MdCloudCircle}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('client_portal')}
+        </DropdownElement>
+      ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && (
+        invoice.status_id === InvoiceStatus.Partial) &&
+      showActionByPreferences('invoice', 'cancel_invoice') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'cancel')}
-          icon={<Icon element={MdCancel} />}
+          icon={
+            <Icon element={MdCancel} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('cancel_invoice')}
         </DropdownElement>
@@ -314,65 +383,107 @@ export function useActions(params?: Params) {
       (invoice.status_id === InvoiceStatus.Paid ||
         invoice.status_id === InvoiceStatus.Partial) &&
       !invoice.is_deleted &&
-      !invoice.archived_at && (
+      !invoice.archived_at &&
+      showActionByPreferences('invoice', 'reverse') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => reverseInvoice(invoice)}
-          icon={<Icon element={MdRefresh} />}
+          icon={
+            <Icon element={MdRefresh} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('reverse')}
         </DropdownElement>
       ),
-    () => <Divider withoutPadding />,
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(invoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(invoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(invoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(invoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(invoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
-    () =>
-      (isEditPage || Boolean(showCommonBulkAction)) && (
-        <Divider withoutPadding />
+    () => dropdown && <Divider withoutPadding />,
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'clone') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => cloneToInvoice(invoice)}
+          icon={
+            <Icon
+              element={MdControlPointDuplicate}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('clone')}
+        </DropdownElement>
       ),
     (invoice: Invoice) =>
-      (isEditPage || Boolean(showCommonBulkAction)) &&
-      invoice.archived_at === 0 && (
+      showActionByPreferences('invoice', 'clone_to_quote') && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => cloneToQuote(invoice)}
+          icon={
+            <Icon
+              element={MdControlPointDuplicate}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('clone_to_quote')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'clone_to_credit') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => cloneToCredit(invoice)}
+          icon={
+            <Icon
+              element={MdControlPointDuplicate}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('clone_to_credit')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'clone_to_recurring') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => cloneToRecurringInvoice(invoice)}
+          icon={
+            <Icon
+              element={MdControlPointDuplicate}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('clone_to_recurring')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'clone_to_purchase_order') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
+          onClick={() => cloneToPurchaseOrder(invoice)}
+          icon={
+            <Icon
+              element={MdControlPointDuplicate}
+              {...(!dropdown && { color: 'white' })}
+            />
+          }
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) &&
+      dropdown && <Divider withoutPadding />,
+    (invoice: Invoice) =>
+      (isEditPage || Boolean(showCommonBulkAction)) &&
+      invoice.archived_at === 0 &&
+      (showActionByPreferences('invoice', 'archive') || dropdown) && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'archive')}
-          icon={<Icon element={MdArchive} />}
+          icon={
+            <Icon element={MdArchive} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('archive')}
         </DropdownElement>
@@ -380,20 +491,28 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
-      invoice.status_id !== InvoiceStatus.Cancelled && (
+      invoice.status_id !== InvoiceStatus.Cancelled &&
+      (showActionByPreferences('invoice', 'restore') || dropdown) && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'restore')}
-          icon={<Icon element={MdRestore} />}
+          icon={
+            <Icon element={MdRestore} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('restore')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      !invoice.is_deleted && (
+      !invoice.is_deleted &&
+      (showActionByPreferences('invoice', 'delete') || dropdown) && (
         <DropdownElement
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'delete')}
-          icon={<Icon element={MdDelete} />}
+          icon={
+            <Icon element={MdDelete} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('delete')}
         </DropdownElement>

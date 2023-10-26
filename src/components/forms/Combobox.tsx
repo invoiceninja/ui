@@ -565,7 +565,7 @@ export function ComboboxStatic<T = any>({
                 entryOptions.inputLabelFn?.(entry?.resource) ??
                 (entry?.label || '')
               }
-              onFocus={() => setIsOpen(true)}
+              onClick={() => setIsOpen(true)}
               placeholder={inputOptions.placeholder}
               style={{
                 backgroundColor: colors.$1,
