@@ -9,7 +9,6 @@
  */
 
 import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
@@ -72,8 +71,6 @@ export default function Edit() {
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const clientResolver = useClientResolver();
-
   const {
     handleChange,
     handleInvitationChange,
@@ -96,8 +93,6 @@ export default function Edit() {
 
       if (ri && ri.client) {
         setClient(ri.client);
-
-        clientResolver.cache(ri.client);
       }
     }
   }, [data]);

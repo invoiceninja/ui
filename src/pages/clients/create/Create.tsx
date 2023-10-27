@@ -31,6 +31,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -119,6 +120,8 @@ export default function Create() {
   return (
     <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
       {isLoading && <Spinner />}
+
+      {errors ? <ValidationAlert errors={errors} /> : null}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
