@@ -237,8 +237,8 @@ export default function Reports() {
               request('POST', endpoint(`/api/v1/exports/preview/${hash}`)).then(
                 (response) => response.data
               ),
-            retry: 10,
-            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+            retry: 50,
+            retryDelay: import.meta.env.DEV ? 1000 : 2000,
           })
           .then((response) => {
             download(response, report.identifier);
