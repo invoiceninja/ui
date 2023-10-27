@@ -9,14 +9,11 @@
  */
 
 import { toast } from '$app/common/helpers/toast/toast';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { Expense } from '$app/common/interfaces/expense';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
-import { useBulk } from '$app/common/queries/expenses';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { Modal } from '$app/components/Modal';
-import { SearchableSelect } from '$app/components/SearchableSelect';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
