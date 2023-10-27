@@ -25,6 +25,7 @@ interface Props {
   onValueChange: (value: string) => void;
   label?: string | null;
   dismissable?: boolean;
+  clearAfterSelection?: boolean;
 }
 
 const isOptionElement = (child: ReactNode): child is React.ReactElement => {
@@ -39,6 +40,7 @@ export function SearchableSelect({
   onValueChange,
   label,
   dismissable,
+  clearAfterSelection,
 }: Props) {
   const valid = React.Children.toArray(children).every(isOptionElement);
 
@@ -75,7 +77,9 @@ export function SearchableSelect({
       }
   );
 
-  const selected = entries?.find((entry) => entry.value === value);
+  const selected = !clearAfterSelection
+    ? entries?.find((entry) => entry.value === value)
+    : '';
   const colors = useColorScheme();
 
   const customStyles: StylesConfig<SelectOption, false> = {
@@ -94,17 +98,19 @@ export function SearchableSelect({
       backgroundColor: colors.$4,
       borderColor: colors.$4,
     }),
-    control: (base) => ({
+    control: (base, { isDisabled }) => ({
       ...base,
       borderRadius: '3px',
       backgroundColor: colors.$1,
       color: colors.$3,
       borderColor: colors.$5,
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      pointerEvents: isDisabled ? 'auto' : 'unset',
     }),
     option: (base, { isSelected, isFocused }) => ({
       ...base,
       color: colors.$3,
-      backgroundColor: (isSelected || isFocused) ? colors.$7 : colors.$1,
+      backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
       ':hover': {
         backgroundColor: colors.$7,
       },
@@ -122,7 +128,7 @@ export function SearchableSelect({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         value={selected}
-        onChange={(v) =>  {
+        onChange={(v) => {
           if (v === null) {
             return onValueChange('');
           }
