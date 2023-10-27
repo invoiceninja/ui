@@ -244,6 +244,11 @@ export default function Reports() {
             download(response, report.identifier);
 
             toast.success();
+          })
+          .catch((e) => {
+            console.error(e);
+
+            toast.error();
           });
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
