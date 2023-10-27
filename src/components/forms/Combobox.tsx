@@ -790,6 +790,9 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false 
     }
   );
 
@@ -804,6 +807,12 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   const onEmptyValues = (query: string) => {
+    const $url = new URL(url);
+
+    if (query === '' && !$url.searchParams.has('filter')) {
+      return;
+    }
+
     setUrl((c) => {
       const url = new URL(c);
 
