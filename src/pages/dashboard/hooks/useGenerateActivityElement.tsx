@@ -159,7 +159,7 @@ export function useGenerateActivityElement() {
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">
-            {date(activity.created_at, dateFormat + ' hh:mm')}
+            {date(activity.created_at, dateFormat + ' HH:mm')}
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>
