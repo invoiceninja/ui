@@ -170,14 +170,14 @@ export class InvoiceItemSumInclusive {
         if (item.line_total != 0) {
 
           if (this.invoice.discount > 0) {
-          var amount =
+          let amount =
             this.subTotal > 0
               ? this.item.line_total -
               this.invoice.discount * (this.item.line_total / this.subTotal)
               : 0;
           }
           else {
-            var amount =
+            let amount =
               this.item.line_total -
               this.item.line_total * (this.invoice.discount / 100);
           }
