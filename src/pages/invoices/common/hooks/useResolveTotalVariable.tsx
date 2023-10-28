@@ -125,6 +125,14 @@ export function useResolveTotalVariable(props: Props) {
       );
     }
 
+    if (variable == '$discount' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.totalDiscount)}
+        </Element>
+      );
+    }
+
     if (variable === '$custom_surcharge1') {
       return (
         <CustomField

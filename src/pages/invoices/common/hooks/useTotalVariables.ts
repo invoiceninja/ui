@@ -19,6 +19,8 @@ export function useTotalVariables() {
     // We need to clone the product columns to local object,
     // because by default it's frozen.
     let variables: string[] = ['$subtotal'];
+
+    variables.push('$discount');
     // clone(company?.settings.pdf_variables.total_columns) || [];
 
     // In case we have `$line_taxes` or `$total_taxes` we want to remove them
