@@ -754,11 +754,27 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const [initialValue, setInitialValue] = useState<string>('');
+
+  useEffect(() => {
+    if (entries.length && inputOptions.value) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      if (!entry) {
+        setInitialValue(inputOptions.value.toString());
+      }
+    }
+  }, [inputOptions.value, entries]);
+
   const { data } = useQuery(
     [
       new URL(url).pathname,
-      new URL(url).searchParams.toString(),
-      inputOptions.value?.toString() || '',
+      'comboboxQuery',
+      ...(initialValue ? [initialValue] : []),
     ],
     () => {
       const $url = new URL(url);
@@ -777,6 +793,16 @@ export function ComboboxAsync<T = any>({
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
+          if (new URL(url).pathname.includes('projects')) {
+            console.log([
+              new URL(url).pathname,
+              'comboboxQuery',
+              ...(initialValue ? [initialValue] : []),
+            ]);
+
+            console.log(response.data.data, $url.href);
+          }
+
           response.data.data.map((entry) =>
             data.push({
               id: entry[entryOptions.id],
@@ -794,13 +820,8 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
     }
   );
-
-  console.log(data);
 
   useEffect(() => {
     if (data) {
@@ -809,7 +830,10 @@ export function ComboboxAsync<T = any>({
   }, [data]);
 
   useEffect(() => {
-    return () => setEntries([]);
+    return () => {
+      setEntries([]);
+      setInitialValue('');
+    };
   }, []);
 
   const onEmptyValues = (query: string) => {
