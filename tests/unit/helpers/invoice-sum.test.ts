@@ -342,4 +342,112 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
+
+  it('Line Item Taxes with Invoice Amount Discount', () => {
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 20;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 0;
+    invoice.tax_name1 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name2 = '';
+    invoice.tax_rate3 = 0;
+    invoice.tax_name3 = '';
+    invoice.uses_inclusive_taxes = false;
+
+    invoice.line_items = [{
+      quantity: 1,
+      cost: 200,
+      product_key: '',
+      notes: '',
+      discount: 0,
+      is_amount_discount: true,
+      tax_name1: 'VAT',
+      tax_rate1: 10,
+      tax_name2: '',
+      tax_rate2: 0,
+      tax_name3: '',
+      tax_rate3: 0,
+      sort_id: 0,
+      line_total: 200,
+      gross_line_total: 220,
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      type_id: InvoiceItemType.Product,
+      task_id: '',
+      expense_id: '',
+      product_cost: 0,
+      date: '',
+      tax_id: '1',
+
+    }];
+
+
+    const invoiceSum = new InvoiceSum(invoice, USD).build();
+
+    expect(invoiceSum.subTotal).toEqual(200);
+    expect(invoiceSum.totalTaxes).toEqual(18);
+    expect(invoiceSum.invoice.amount).toEqual(198);
+    expect(invoiceSum.invoice.balance).toEqual(198);
+    expect(invoiceSum.totalDiscount).toEqual(20);
+  });
+
+
+  it('Line Item Taxes with Invoice Percentage Discount', () => {
+
+    invoice.is_amount_discount = false;
+    invoice.discount = 20;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 0;
+    invoice.tax_name1 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name2 = '';
+    invoice.tax_rate3 = 0;
+    invoice.tax_name3 = '';
+    invoice.uses_inclusive_taxes = false;
+
+    invoice.line_items = [{
+      quantity: 1,
+      cost: 200,
+      product_key: '',
+      notes: '',
+      discount: 0,
+      is_amount_discount: false,
+      tax_name1: 'VAT',
+      tax_rate1: 10,
+      tax_name2: '',
+      tax_rate2: 0,
+      tax_name3: '',
+      tax_rate3: 0,
+      sort_id: 0,
+      line_total: 200,
+      gross_line_total: 220,
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      type_id: InvoiceItemType.Product,
+      task_id: '',
+      expense_id: '',
+      product_cost: 0,
+      date: '',
+      tax_id: '1',
+
+    }];
+
+
+    const invoiceSum = new InvoiceSum(invoice, USD).build();
+
+    expect(invoiceSum.subTotal).toEqual(200);
+    expect(invoiceSum.totalTaxes).toEqual(16);
+    expect(invoiceSum.invoice.amount).toEqual(176);
+    expect(invoiceSum.invoice.balance).toEqual(176);
+    expect(invoiceSum.totalDiscount).toEqual(40);
+  });
+
+
+
 });
