@@ -63,6 +63,14 @@ export function useResolveTotalVariable(props: Props) {
       );
     }
 
+    if (variable == '$discount' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.totalDiscount)}
+        </Element>
+      );
+    }
+
     if (variable == '$subtotal' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
