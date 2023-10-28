@@ -136,17 +136,24 @@ export function Card(props: Props) {
             'py-2': padding === 'small' && !props.withoutBodyPadding,
           })}
         >
-          {props.isLoading && <Element leftSide={<Spinner />} />}
-
-          {props.withContainer ? (
-            <CardContainer>{props.children}</CardContainer>
+          {props.isLoading ? (
+            <Element leftSide={<Spinner />} />
           ) : (
-            props.children
+            <>
+              {props.withContainer ? (
+                <CardContainer>{props.children}</CardContainer>
+              ) : (
+                props.children
+              )}
+            </>
           )}
         </div>
 
         {(props.withSaveButton || props.additionalAction) && (
-          <div className="border-t px-4 py-5 sm:p-0" style={{ borderColor: colors.$4 }}>
+          <div
+            className="border-t px-4 py-5 sm:p-0"
+            style={{ borderColor: colors.$4 }}
+          >
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
@@ -169,7 +176,7 @@ export function Card(props: Props) {
                       disabled={props.disableSubmitButton}
                       disableWithoutIcon={props.disableWithoutIcon}
                     >
-                      {props.saveButtonLabel ?? t('save')} 
+                      {props.saveButtonLabel ?? t('save')}
                     </Button>
 
                     <Dropdown
