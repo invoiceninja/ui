@@ -754,7 +754,10 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const [initialValue, setInitialValue] = useState<string>('');
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
   useEffect(() => {
     if (entries.length && inputOptions.value) {
@@ -769,6 +772,16 @@ export function ComboboxAsync<T = any>({
       }
     }
   }, [inputOptions.value, entries]);
+
+  useEffect(() => {
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
 
   const { data } = useQuery(
     [
@@ -793,16 +806,6 @@ export function ComboboxAsync<T = any>({
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
-          if (new URL(url).pathname.includes('projects')) {
-            console.log([
-              new URL(url).pathname,
-              'comboboxQuery',
-              ...(initialValue ? [initialValue] : []),
-            ]);
-
-            console.log(response.data.data, $url.href);
-          }
-
           response.data.data.map((entry) =>
             data.push({
               id: entry[entryOptions.id],
@@ -820,6 +823,7 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
+      enabled: enableQuery,
     }
   );
 
@@ -833,6 +837,8 @@ export function ComboboxAsync<T = any>({
     return () => {
       setEntries([]);
       setInitialValue('');
+      setEnableQuery(false);
+      enableQueryTimeOut.current && clearTimeout(enableQueryTimeOut.current);
     };
   }, []);
 
