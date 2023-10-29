@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -755,23 +755,19 @@ export function ComboboxAsync<T = any>({
   const [url, setUrl] = useState(endpoint);
 
   const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  const [initialValue, setInitialValue] = useState<string>('');
   const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (entries.length && inputOptions.value) {
-      const entry = entries.find(
-        (entry) =>
-          entry.value === inputOptions.value ||
-          entry.label === inputOptions.value
-      );
+  const $url = useMemo(() => {
+    const currentUrl = new URL(url);
 
-      if (!entry) {
-        setInitialValue(inputOptions.value.toString());
-      }
+    if (sortBy) {
+      currentUrl.searchParams.set('sort', sortBy);
     }
-  }, [inputOptions.value, entries]);
+
+    currentUrl.searchParams.set('status', 'active');
+
+    return currentUrl;
+  }, []);
 
   useEffect(() => {
     if (!enableQuery) {
@@ -783,26 +779,20 @@ export function ComboboxAsync<T = any>({
     }
   }, [inputOptions.value]);
 
+  useEffect(() => {
+    if (enableQuery && inputOptions.value && !disableWithQueryParameter) {
+      $url.searchParams.set('with', inputOptions.value.toString());
+    }
+  }, [enableQuery]);
+
   const { data } = useQuery(
     [
       new URL(url).pathname,
+      new URL(url).searchParams.toString(),
       'comboboxQuery',
-      ...(initialValue ? [initialValue] : []),
     ],
-    () => {
-      const $url = new URL(url);
-
-      if (sortBy) {
-        $url.searchParams.set('sort', sortBy);
-      }
-
-      $url.searchParams.set('status', 'active');
-
-      if (inputOptions.value && !disableWithQueryParameter) {
-        $url.searchParams.set('with', inputOptions.value.toString());
-      }
-
-      return request('GET', $url.href).then(
+    () =>
+      request('GET', $url.href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -819,8 +809,7 @@ export function ComboboxAsync<T = any>({
 
           return data;
         }
-      );
-    },
+      ),
     {
       staleTime: staleTime ?? Infinity,
       enabled: enableQuery,
@@ -836,7 +825,6 @@ export function ComboboxAsync<T = any>({
   useEffect(() => {
     return () => {
       setEntries([]);
-      setInitialValue('');
       setEnableQuery(false);
       enableQueryTimeOut.current && clearTimeout(enableQueryTimeOut.current);
     };
