@@ -754,8 +754,41 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const [initialValue, setInitialValue] = useState<string>('');
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (entries.length && inputOptions.value) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      if (!entry) {
+        setInitialValue(inputOptions.value.toString());
+      }
+    }
+  }, [inputOptions.value, entries]);
+
+  useEffect(() => {
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
+
   const { data } = useQuery(
-    [new URL(url).pathname, new URL(url).searchParams.toString()],
+    [
+      new URL(url).pathname,
+      'comboboxQuery',
+      ...(initialValue ? [initialValue] : []),
+    ],
     () => {
       const $url = new URL(url);
 
@@ -790,9 +823,7 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false 
+      enabled: enableQuery,
     }
   );
 
@@ -803,7 +834,12 @@ export function ComboboxAsync<T = any>({
   }, [data]);
 
   useEffect(() => {
-    return () => setEntries([]);
+    return () => {
+      setEntries([]);
+      setInitialValue('');
+      setEnableQuery(false);
+      enableQueryTimeOut.current && clearTimeout(enableQueryTimeOut.current);
+    };
   }, []);
 
   const onEmptyValues = (query: string) => {
