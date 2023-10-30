@@ -103,7 +103,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
               <CurrencySelector
-                value={client?.settings?.currency_id || ''}
+                value={client?.settings.currency_id || ''}
                 onChange={(v) => handleSettingsChange('currency_id', v)}
                 errorMessage={errors?.errors['settings.currency_id']}
                 dismissable
