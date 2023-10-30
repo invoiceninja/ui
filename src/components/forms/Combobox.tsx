@@ -755,7 +755,7 @@ export function ComboboxAsync<T = any>({
   const [url, setUrl] = useState(endpoint);
 
   const { data } = useQuery(
-    [url],
+    [new URL(url).pathname, new URL(url).href],
     () => {
       const $url = new URL(url);
 
