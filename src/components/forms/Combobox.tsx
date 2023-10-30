@@ -793,22 +793,8 @@ export function ComboboxAsync<T = any>({
     ],
     () =>
       request('GET', $url.href).then(
-        (response: AxiosResponse<GenericManyResponse<any>>) => {
-          const data: Entry<T>[] = [];
-
-          response.data.data.map((entry) =>
-            data.push({
-              id: entry[entryOptions.id],
-              label: entry[entryOptions.label],
-              value: entry[entryOptions.value],
-              resource: entry,
-              eventType: 'external',
-              searchable: entry[entryOptions.searchable || entryOptions.id],
-            })
-          );
-
-          return data;
-        }
+        (response: AxiosResponse<GenericManyResponse<any>>) =>
+          response.data.data
       ),
     {
       staleTime: staleTime ?? Infinity,
@@ -818,7 +804,16 @@ export function ComboboxAsync<T = any>({
 
   useEffect(() => {
     if (data) {
-      setEntries([...data]);
+      setEntries(
+        data.map((entry) => ({
+          id: entry[entryOptions.id],
+          label: entry[entryOptions.label],
+          value: entry[entryOptions.value],
+          resource: entry,
+          eventType: 'external',
+          searchable: entry[entryOptions.searchable || entryOptions.id],
+        }))
+      );
     }
   }, [data]);
 
