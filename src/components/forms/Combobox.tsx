@@ -790,6 +790,8 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   );
 
