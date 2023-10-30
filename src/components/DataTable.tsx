@@ -154,7 +154,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { styleOptions, customFilters } = props;
 
-  let companyUpdateTimeOut: NodeJS.Timeout | undefined = undefined;
+  const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[] | undefined>(
@@ -297,11 +297,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   useEffect(() => {
     if (!isInitialConfiguration) {
-      clearTimeout(companyUpdateTimeOut);
+      clearTimeout(companyUpdateTimeOut.current);
 
       const currentTimeout = setTimeout(handleUpdateTableFilters, 1500);
 
-      companyUpdateTimeOut = currentTimeout;
+      companyUpdateTimeOut.current = currentTimeout;
     }
 
     apiEndpoint.searchParams.set('per_page', perPage);
@@ -335,7 +335,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     ],
     () => request('GET', apiEndpoint.href),
     {
-      staleTime: props.staleTime || 5000,
+      staleTime: props.staleTime ?? Infinity,
     }
   );
 
