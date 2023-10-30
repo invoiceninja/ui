@@ -754,8 +754,6 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
-  console.log(new URL(url).pathname);
-
   const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
   const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
@@ -771,6 +769,20 @@ export function ComboboxAsync<T = any>({
     return currentUrl;
   }, []);
 
+  const isEntryAvailable = () => {
+    if (entries.length) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      return Boolean(entry);
+    }
+
+    return false;
+  };
+
   useEffect(() => {
     if (!enableQuery) {
       clearTimeout(enableQueryTimeOut.current);
@@ -782,15 +794,20 @@ export function ComboboxAsync<T = any>({
   }, [inputOptions.value]);
 
   useEffect(() => {
-    if (enableQuery && inputOptions.value && !disableWithQueryParameter) {
+    if (
+      enableQuery &&
+      inputOptions.value &&
+      !disableWithQueryParameter &&
+      !isEntryAvailable()
+    ) {
       $url.searchParams.set('with', inputOptions.value.toString());
     }
-  }, [enableQuery]);
+  }, [enableQuery, inputOptions.value]);
 
   const { data } = useQuery(
     [
-      new URL(url).pathname,
-      new URL(url).searchParams.toString(),
+      new URL($url).pathname,
+      new URL($url).searchParams.toString(),
       'comboboxQuery',
     ],
     () =>
