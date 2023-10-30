@@ -1,0 +1,43 @@
+import { login, logout, permissions } from '$tests/e2e/helpers';
+import { test, expect } from '@playwright/test';
+
+test('test appropriate invalidation of clients', async ({ page }) => {
+  const { clear, save } = permissions(page);
+
+  await login(page);
+  await clear();
+  await save();
+  await page.getByRole('link', { name: 'Clients' }).click();
+  await page.getByTitle('New Client').click();
+  await page.locator('#name').click();
+  await page.locator('#name').fill('hello dear');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByTitle('New Invoice').click();
+  await page.getByRole('combobox', { name: 'Client' }).click();
+  await page.getByRole('combobox', { name: 'Client' }).fill('hello dear');
+  await page.getByText('hello dear').click();
+  await page.getByRole('button', { name: 'Add Item' }).click();
+  await page.getByRole('row', { name: '$ 0.00' }).getByRole('textbox').first().click();
+  await page.getByText('enterprise_plan').click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('button', { name: 'Mark Sent' }).click();
+  await page.getByRole('link', { name: 'View Client' }).click();
+  await page.locator('div').filter({ hasText: /^Paid to Date\$ 0\.00$/ }).getByRole('definition').click();
+  await page.locator('#root div').filter({ hasText: 'DetailsStatusActive Address Switzerland Contacts StandingPaid to Date$ 0.00Outst' }).nth(3).click();
+  await page.locator('div').filter({ hasText: /^Credit Balance\$ 0\.00$/ }).getByRole('definition').click();
+  await page.locator('div').filter({ hasText: /^Outstanding\$ 0\.00$/ }).getByRole('definition').click();
+  await page.getByRole('main').getByRole('link', { name: 'New Invoice' }).click();
+  await page.getByRole('button', { name: 'Add Item' }).click();
+  await page.getByRole('row', { name: '$ 0.00' }).getByRole('textbox').first().click();
+  await page.getByText('enterprise_plan').click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('button', { name: 'Mark Sent' }).click();
+  await page.getByRole('link', { name: 'View Client' }).click();
+  await page.locator('div').filter({ hasText: /^Paid to Date\$ 0\.00$/ }).getByRole('definition').click();
+  await page.locator('div').filter({ hasText: /^Outstanding\$ 14\.00$/ }).getByRole('definition').click();
+  await page.getByRole('row', { name: 'Sent 0045 hello dear $ 14.00 $ 14.00 30/Oct/2023 More Actions' }).getByRole('button').click();
+  await page.getByRole('button', { name: 'Mark Paid' }).click();
+  await page.locator('div').filter({ hasText: /^Paid to Date\$ 14\.00$/ }).getByRole('definition').click();
+  await page.locator('div').filter({ hasText: /^Outstanding\$ 0\.00$/ }).getByRole('definition').click();
+  await page.locator('div').filter({ hasText: /^Credit Balance\$ 0\.00$/ }).getByRole('definition').click();
+});
