@@ -91,7 +91,7 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateOneLocal;
 
     if (this.item.tax_name1.length >= 1) {
-      this.groupTax(this.item.tax_name1, this.item.tax_rate1, amount);
+      this.groupTax(this.item.tax_name1, this.item.tax_rate1, itemTaxRateOneLocal);
     }
 
     //
@@ -104,7 +104,7 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateTwoLocal;
 
     if (this.item.tax_name2.length >= 1) {
-      this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
+      this.groupTax(this.item.tax_name2, this.item.tax_rate2, itemTaxRateTwoLocal);
     }
 
     const itemTaxRateThreeLocal = this.calculateAmountLineTax(
@@ -115,7 +115,7 @@ export class InvoiceItemSum {
     itemTax += itemTaxRateThreeLocal;
 
     if (this.item.tax_name3.length >= 1) {
-      this.groupTax(this.item.tax_name3, this.item.tax_rate3, amount);
+      this.groupTax(this.item.tax_name3, this.item.tax_rate3, itemTaxRateThreeLocal);
     }
 
     this.item.gross_line_total = this.item.line_total + itemTax;
@@ -163,14 +163,18 @@ export class InvoiceItemSum {
         let itemTax = 0;
         this.item = item;
 
-        if (item.line_total > 0) {
+        if (item.line_total != 0) {
+
+          // const amount =
+          //   this.subTotal > 0
+          //     ? this.item.line_total -
+          //     this.invoice.discount * (this.item.line_total / this.subTotal)
+          //     : 0;
 
           const amount =
-            this.subTotal > 0
-              ? this.item.line_total -
-              this.invoice.discount * (this.item.line_total / this.subTotal)
-              : 0;
-
+            this.item.line_total -
+            (this.item.line_total * (this.invoice.discount / this.subTotal));
+            
           const itemTaxRateOneTotal = this.calculateAmountLineTax(
             this.item.tax_rate1,
             amount
