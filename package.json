@@ -62,6 +62,7 @@
     "format": "prettier --write src/",
     "lint": "eslint src --max-warnings=0",
     "test": "jest",
+    "clear-cache": "jest --clearCache",
     "prepare": "husky install",
     "preview": "vite preview"
   },

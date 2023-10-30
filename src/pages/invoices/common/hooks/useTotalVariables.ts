@@ -55,6 +55,7 @@ export function useTotalVariables() {
       );
     }
 
+    variables.push('$discount');
     variables.push('$total');
     variables.push('$paid_to_date');
     variables.push('$balance_due');

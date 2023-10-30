@@ -122,7 +122,8 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
-    (selectedIds) => <SendEmailBulkAction invoiceIds={selectedIds} />,
+    (_, selectedInvoices) =>
+      selectedInvoices && <SendEmailBulkAction invoices={selectedInvoices} />,
     (selectedIds) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}

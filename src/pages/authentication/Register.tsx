@@ -14,7 +14,7 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { RegisterForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
+import { apiEndpoint, isHosted } from '../../common/helpers';
 import { register } from '../../common/stores/slices/user';
 import { RegisterValidation } from './common/ValidationInterface';
 import { Header } from './components/Header';
@@ -32,6 +32,7 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
+import { useSearchParams } from 'react-router-dom';
 
 export function Register() {
   useTitle('register');
@@ -45,6 +46,8 @@ export function Register() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
+
+  const [searchParams] = useSearchParams();
 
   const form = useFormik({
     initialValues: {
@@ -69,11 +72,26 @@ export function Register() {
         return;
       }
 
+      const endpoint = new URL(
+        '/api/v1/signup?include=token,user.company_user,company,account',
+        apiEndpoint()
+      );
+
+      [
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_content',
+        'utm_term',
+      ].forEach((key) => {
+        if (searchParams.has(key)) {
+          endpoint.searchParams.append(key, searchParams.get(key) as string);
+        }
+      });
+
       request(
         'POST',
-        endpoint(
-          '/api/v1/signup?include=token,user.company_user,company,account'
-        ),
+        endpoint.href,
         values
       )
         .then((response: AxiosResponse) => {
