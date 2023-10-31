@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -29,9 +28,10 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -65,14 +65,18 @@ export default function Create() {
     },
   ]);
 
-  const { data: blankClient, isLoading } = useQuery('/api/v1/clients/create', {
-    refetchOnWindowFocus: false,
+  const { data: blankClient } = useQuery({
+    queryKey: ['/api/v1/clients/create'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/clients/create')).then(
+        (response: AxiosResponse<GenericSingleResourceResponse<Client>>) => response.data.data
+      ),
   });
 
   useEffect(() => {
     if (blankClient) {
       setClient({
-        ...blankClient.data?.data,
+        ...blankClient.data,
         group_settings_id: searchParams.get('group') || '',
       });
     }
@@ -119,8 +123,6 @@ export default function Create() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
-      {isLoading && <Spinner />}
-
       {errors ? <ValidationAlert errors={errors} /> : null}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
