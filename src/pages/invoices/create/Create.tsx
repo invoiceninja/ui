@@ -180,13 +180,6 @@ export default function Create() {
 
         handleChange('invitations', invitations);
 
-        console.log("1");
-        console.log(client?.settings);
-        console.log("2");
-        console.log(client?.group_settings?.settings);
-        console.log("3");
-        console.log(company?.settings);
-
         if (company && company.enabled_tax_rates > 0) {
           handleChange('tax_name1', settingResolver(client, 'tax_name1'));
           handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
