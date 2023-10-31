@@ -21,6 +21,7 @@ import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal'
 import { ValidationBag } from '../interfaces/validation-bag';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
+import { $refetch } from '../hooks/useRefetch';
 
 export interface GenericQueryOptions {
   id?: string;
@@ -116,9 +117,7 @@ export function useBulk(params?: Params) {
 
         params?.onSuccess?.();
 
-        ids.forEach((id) => {
-          queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }));
-        });
+        $refetch(['invoices']);
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);

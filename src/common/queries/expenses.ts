@@ -19,6 +19,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch, useRefetch } from '../hooks/useRefetch';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -92,6 +93,7 @@ export function useExpensesQuery(params: ExpensesParams) {
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const refetch = useRefetch();
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -105,7 +107,7 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+      $refetch(['expenses']);
     });
   };
 }

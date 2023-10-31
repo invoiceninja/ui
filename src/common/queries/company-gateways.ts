@@ -16,6 +16,7 @@ import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
+import { $refetch, useRefetch } from '../hooks/useRefetch';
 
 interface CompanyGatewaysParams {
   status?: string;
@@ -76,6 +77,7 @@ export function useBlankCompanyGatewayQuery() {
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const refetch = useRefetch();
 
   return async (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -86,16 +88,10 @@ export function useBulk() {
     }).then(() => {
       toast.success(`${action}d_company_gateway`);
 
-      queryClient.invalidateQueries('/api/v1/company_gateways');
+      $refetch(['company_gateways'])
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/company_gateways/:id', { id })
-        )
-      );
     });
   };
 }

@@ -47,6 +47,10 @@ export const keys = {
     path: '/api/v1/group_settings',
     dependencies: [],
   },
+  payments: {
+    path: '/api/v1/payments',
+    dependencies: [],
+  },
 };
 
 export function useRefetch() {

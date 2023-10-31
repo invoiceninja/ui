@@ -15,6 +15,7 @@ import { route } from '../helpers/route';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useGroupSettingsQuery() {
   return useQuery('/api/v1/group_settings', () => {
@@ -52,7 +53,7 @@ export function useBulk() {
     }).then(() => {
       toast.success(`${action}d_group`);
 
-      queryClient.invalidateQueries('/api/v1/group_settings');
+      $refetch(['group_settings']);
 
       ids.forEach((id) =>
         queryClient.invalidateQueries(

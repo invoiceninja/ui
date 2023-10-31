@@ -15,6 +15,7 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch, useRefetch } from '../hooks/useRefetch';
 
 const successMessages = {
   email: 'emailed_credits',
@@ -24,6 +25,7 @@ const successMessages = {
 export const useBulk = () => {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const refetch = useRefetch();
 
   return (
     ids: string[],
@@ -41,11 +43,7 @@ export const useBulk = () => {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/credits');
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }))
-      );
+      $refetch(['credits']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

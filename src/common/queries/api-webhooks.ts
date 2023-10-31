@@ -17,6 +17,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { ApiWebhook } from '$app/common/interfaces/api-webhook';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch, useRefetch } from '../hooks/useRefetch';
 
 export function useApiWebhooksQuery(params: Params) {
   const { isAdmin } = useAdmin();
@@ -64,7 +65,6 @@ export function useBlankApiWebhookQuery() {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -75,9 +75,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_webhook`);
 
-      queryClient.invalidateQueries('/api/v1/webhooks');
-
-      queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+      $refetch(['webhooks']);
     });
   };
 }

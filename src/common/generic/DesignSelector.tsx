@@ -22,6 +22,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { $refetch, useRefetch } from '../hooks/useRefetch';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
@@ -36,7 +37,7 @@ export function DesignSelector(props: Props) {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
 
-  const queryClient = useQueryClient();
+  const refetch = useRefetch();
 
   useEffect(() => {
     if (data) {
@@ -52,17 +53,7 @@ export function DesignSelector(props: Props) {
       request('POST', endpoint('/api/v1/designs'), design)
         .then(() => {
           toast.success('created_design');
-
-          window.dispatchEvent(
-            new CustomEvent('invalidate.combobox.queries', {
-              detail: {
-                url: endpoint('/api/v1/designs'),
-              },
-            })
-          );
-
-          queryClient.invalidateQueries(['/api/v1/designs']);
-
+          $refetch(['designs'])
           setDesign(null);
           setIsModalVisible(false);
         })
