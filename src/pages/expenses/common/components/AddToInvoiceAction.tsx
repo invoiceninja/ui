@@ -114,14 +114,14 @@ export function AddToInvoiceAction(props: Props) {
 
       queryClient.fetchQuery(
         endpoint(
-          '/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
+          '/api/v1/invoices?include=client.group_settings&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
           { clientId: expense.client_id || '' }
         ),
         () =>
           request(
             'GET',
             endpoint(
-              '/api/v1/invoices?include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
+              '/api/v1/invoices?include=client.group_settings&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
               { clientId: expense.client_id || '' }
             )
           )
