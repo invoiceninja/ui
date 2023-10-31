@@ -78,7 +78,8 @@ export function PasswordConfirmation(props: Props) {
   const lastPwdTimeDiff = dayjs().unix() - lastPasswordEntryTime;
 
   const isPasswordTimeoutExpired =
-    lastPwdTimeDiff > 100 && company.default_password_timeout > 0;
+    lastPwdTimeDiff > company.default_password_timeout / 1000 &&
+    company.default_password_timeout > 0;
 
   useEffect(() => {
     setIsModalOpen(props.show as boolean);

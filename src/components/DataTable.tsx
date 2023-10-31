@@ -296,8 +296,6 @@ export function DataTable<T extends object>(props: Props<T>) {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        toast.dismiss();
-
         if (error.response?.status === 401) {
           toast.error(error.response?.data.message);
         }
