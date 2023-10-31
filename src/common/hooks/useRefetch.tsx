@@ -10,9 +10,41 @@
 
 import { useQueryClient } from 'react-query';
 
-const keys = {
+export const keys = {
   invoices: {
     path: '/api/v1/invoices',
+    dependencies: [],
+  },
+  designs: {
+    path: '/api/v1/designs',
+    dependencies: [],
+  },
+  tokens: {
+    path: '/api/v1/tokens',
+    dependencies: [],
+  },
+  webhooks: {
+    path: '/api/v1/webhooks',
+    dependencies: [],
+  },
+  company_gateways: {
+    path: '/api/v1/company_gateways',
+    dependencies: [],
+  },
+  credits: {
+    path: '/api/v1/credits',
+    dependencies: [],
+  },
+  expense_categories: {
+    path: '/api/v1/expense_categories',
+    dependencies: [],
+  },
+  expenses: {
+    path: '/api/v1/expenses',
+    dependencies: [],
+  },
+  group_settings: {
+    path: '/api/v1/group_settings',
     dependencies: [],
   },
 };
@@ -29,4 +61,14 @@ export function useRefetch() {
       });
     });
   };
+}
+
+export function $refetch(property: Array<keyof typeof keys>) {
+  window.dispatchEvent(
+    new CustomEvent('refetch', {
+      detail: {
+        property,
+      },
+    })
+  );
 }
