@@ -9,7 +9,7 @@ const createPayment = async (page: Page) => {
 
   await page.waitForTimeout(200);
 
-  await page.locator('[role="combobox"]').first().click();
+  await page.locator('[role="combobox"]').last().click();
 
   await page.getByRole('option').first().click();
 
