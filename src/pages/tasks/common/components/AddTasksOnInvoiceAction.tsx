@@ -64,12 +64,7 @@ export function AddTasksOnInvoiceAction(props: Props) {
     toast.processing();
 
     queryClient.fetchQuery(
-      route(
-        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
-        {
-          clientId: tasks[0].client_id,
-        }
-      ),
+      ['/api/v1/invoices', 'client_id', tasks[0].client_id],
       () =>
         request(
           'GET',

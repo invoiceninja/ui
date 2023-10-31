@@ -48,12 +48,7 @@ export function useCombineProjectsTasks() {
 
     const fetchTasks = selectedIds.map((projectId) => {
       return queryClient.fetchQuery(
-        route(
-          '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-          {
-            projectId,
-          }
-        ),
+        ['/api/v1/tasks', 'project_tasks', projectId, 'active'],
         () =>
           request(
             'GET',
