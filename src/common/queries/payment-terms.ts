@@ -12,7 +12,6 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';

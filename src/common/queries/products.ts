@@ -11,7 +11,6 @@
 import { AxiosResponse } from 'axios';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
 import { Product } from '$app/common/interfaces/product';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';

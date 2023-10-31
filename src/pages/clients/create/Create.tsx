@@ -17,7 +17,6 @@ import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

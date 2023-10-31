@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 

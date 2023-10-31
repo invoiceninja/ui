@@ -19,7 +19,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
 
 interface Props {
