@@ -53,7 +53,7 @@ interface Props {
 
 export function useExpenseCategoryQuery(props: Props) {
   return useQuery(
-    route('/api/v1/expense_categories/:id', { id: props.id }),
+    ['/api/v1/expense_categories', props.id],
     () =>
       request(
         'GET',

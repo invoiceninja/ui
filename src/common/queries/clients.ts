@@ -56,7 +56,7 @@ export function useClientsQuery(props: Props) {
 
 export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
-    route('/api/v1/clients/:id', { id }),
+    ['/api/v1/clients', id],
     () =>
       request('GET', endpoint('/api/v1/clients/:id', { id })).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data

@@ -37,7 +37,7 @@ export function usePaymentTermsQuery(params: Params) {
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/payment_terms/:id', params),
+    ['/api/v1/payment_terms', params],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/:id', params), {
         headers: defaultHeaders(),

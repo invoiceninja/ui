@@ -41,7 +41,7 @@ export function useProductsQuery(params?: Params) {
 
 export function useProductQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/products/:id', { id: params.id }),
+    ['/api/v1/products', params.id],
     () => request('GET', endpoint('/api/v1/products/:id', { id: params.id })),
     { staleTime: Infinity }
   );
@@ -50,7 +50,7 @@ export function useBlankProductQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
   return useQuery(
-    route('/api/v1/products/create'),
+    ['/api/v1/products/create'],
     () =>
       request('GET', endpoint('/api/v1/products/create')).then(
         (response: GenericSingleResourceResponse<Product>) => response.data.data

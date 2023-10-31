@@ -51,7 +51,7 @@ export function useTaskStatusesQuery(params?: Params) {
 
 export function useTaskStatusQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/task_statuses/:id', { id: params.id }),
+    ['/api/v1/task_statuses', params.id],
     () =>
       request('GET', endpoint('/api/v1/task_statuses/:id', { id: params.id })),
     { staleTime: Infinity }

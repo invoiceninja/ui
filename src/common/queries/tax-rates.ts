@@ -40,7 +40,7 @@ export function useTaxRatesQuery(params: Params) {
 
 export function useTaxRateQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/tax_rates/:id', { id: params.id }),
+    ['/api/v1/tax_rates', params.id],
     () => request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
     { staleTime: Infinity }
   );

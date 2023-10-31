@@ -27,7 +27,7 @@ interface UserQueryProps extends GenericQueryOptions {
 
 export function useUserQuery(options: UserQueryProps) {
   return useQuery(
-    route('/api/v1/users/:id', { id: options.id }),
+    ['/api/v1/users', options.id],
     () =>
       request(
         'GET',
@@ -41,7 +41,7 @@ export function useBlankUserQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/users/create'),
+    ['/api/v1/users/create'],
     () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );

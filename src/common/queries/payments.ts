@@ -27,7 +27,7 @@ interface PaymentParams {
 
 export function usePaymentQuery(params: PaymentParams) {
   return useQuery(
-    route('/api/v1/payments/:id', { id: params.id }),
+    ['/api/v1/payment_terms', params.id],
     () =>
       request(
         'GET',

@@ -49,9 +49,7 @@ export function useCompanyGatewayQuery(params: Params) {
 
   return useQuery(
     [
-      route('/api/v1/company_gateways/:id', {
-        id: params.id,
-      }),
+      '/api/v1/company_gateways', params.id,
       params.queryParams,
     ],
     () =>
@@ -69,7 +67,7 @@ export function useBlankCompanyGatewayQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/company_gateways/create'),
+    ['/api/v1/company_gateways/create'],
     () => request('GET', endpoint('/api/v1/company_gateways/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );

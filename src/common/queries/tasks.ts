@@ -41,7 +41,7 @@ export function useBlankTaskQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
   return useQuery(
-    route('/api/v1/tasks/create'),
+    ['/api/v1/tasks/create'],
     () =>
       request('GET', endpoint('/api/v1/tasks/create')).then(
         (response: GenericSingleResourceResponse<Task>) => response.data.data
