@@ -52,11 +52,15 @@ export function Users() {
       <DataTable
         resource="user"
         columns={columns}
-        endpoint={route('/api/v1/users?without=:userId&hideRemovedUsers=true&sort=id|desc', {
-          userId: currentUser?.id,
-        })}
+        endpoint={route(
+          '/api/v1/users?without=:userId&hideRemovedUsers=true&sort=id|desc',
+          {
+            userId: currentUser?.id,
+          }
+        )}
         linkToCreate="/settings/users/create"
         bulkRoute="/api/v1/users/bulk"
+        passwordProtectedBulkActions
       />
     </Settings>
   );
