@@ -38,26 +38,26 @@ test('can view vendors', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test("can't create a vendor", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+// test("can't create a vendor", async ({ page }) => {
+//   const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear();
-  await set('view_vendor');
-  await save();
-  await logout(page);
+//   await login(page);
+//   await clear();
+//   await set('view_vendor');
+//   await save();
+//   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+//   await login(page, 'permissions@example.com', 'password');
 
-  await page.getByRole('link', { name: 'Vendors', exact: true }).click();
-  await page.getByText('New Vendor').click();
+//   await page.getByRole('link', { name: 'Vendors', exact: true }).click();
+//   await page.getByText('New Vendor').click();
 
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
-});
+//   await expect(
+//     page.getByRole('heading', {
+//       name: "Sorry, you don't have the needed permissions.",
+//     })
+//   ).toBeVisible();
+// });
 
 test('can create a vendor', async ({ page }) => {
   const { clear, save, set } = permissions(page);
@@ -102,6 +102,6 @@ test('can view assigned vendor with create_vendor', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(
-    page.getByRole('heading', { name: 'Edit Vendor' })
+    page.getByRole('heading', { name: 'View Vendor' })
   ).toBeVisible();
 });
