@@ -9,6 +9,7 @@
  */
 
 import { ClientContact } from './client-contact';
+import { GroupSettings } from './group-settings';
 import { TaxInfo } from './tax-info';
 import { Timestamps } from './timestamps';
 
@@ -77,6 +78,7 @@ export interface Client extends Timestamps {
   contacts: ClientContact[];
   documents: any[];
   gateway_tokens: GatewayToken[];
+  group_settings?: GroupSettings;
   has_valid_vat_number: boolean;
   is_tax_exempt: boolean;
   routing_id: string;
