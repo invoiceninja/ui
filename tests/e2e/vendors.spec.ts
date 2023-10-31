@@ -102,6 +102,6 @@ test('can view assigned vendor with create_vendor', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(
-    page.getByRole('heading', { name: 'Edit Vendor' })
+    page.getByRole('heading', { name: 'View Vendor' })
   ).toBeVisible();
 });

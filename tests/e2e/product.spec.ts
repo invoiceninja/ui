@@ -355,7 +355,8 @@ test('documents preview', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Edit').click();
+    // await page.getByText('Edit').click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
     await page.waitForURL('**/products/**/edit');
 
@@ -427,7 +428,8 @@ test('documents upload', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Edit').click();
+    // await page.getByText('Edit').click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
     await page.waitForURL('**/products/**/edit');
 
