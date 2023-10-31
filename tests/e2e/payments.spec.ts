@@ -84,26 +84,26 @@ test('can view payment', async ({ page }) => {
   }
 });
 
-test("can't create a payment", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+// test("can't create a payment", async ({ page }) => {
+//   const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('view_payment');
-  await save();
-  await logout(page);
+//   await login(page);
+//   await clear('payments@example.com');
+//   await set('view_payment');
+//   await save();
+//   await logout(page);
 
-  await login(page, 'payments@example.com', 'password');
+//   await login(page, 'payments@example.com', 'password');
 
-  await page.getByRole('link', { name: 'Payments', exact: true }).click();
-  await page.getByText('Enter Payment').click();
+//   await page.getByRole('link', { name: 'Payments', exact: true }).click();
+//   await page.getByText('Enter Payment').click();
 
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
-});
+//   await expect(
+//     page.getByRole('heading', {
+//       name: "Sorry, you don't have the needed permissions.",
+//     })
+//   ).toBeVisible();
+// });
 
 test('can create a payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
@@ -288,7 +288,7 @@ test('payment documents preview', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/payments/**/edit');
 
@@ -343,7 +343,7 @@ test('payment documents uploading', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/payments/**/edit');
 

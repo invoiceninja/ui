@@ -295,7 +295,7 @@ test('client documents preview', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/clients/**/edit');
 
@@ -353,8 +353,7 @@ test('client documents uploading', async ({ page }) => {
 
     await moreActionsButton.click();
   }
-
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/clients/**/edit');
 

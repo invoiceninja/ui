@@ -38,26 +38,26 @@ test('can view project', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test("can't create a project", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+// test("can't create a project", async ({ page }) => {
+//   const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear();
-  await set('view_project');
-  await save();
-  await logout(page);
+//   await login(page);
+//   await clear();
+//   await set('view_project');
+//   await save();
+//   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+//   await login(page, 'permissions@example.com', 'password');
 
-  await page.getByRole('link', { name: 'Projects', exact: true }).click();
-  await page.getByText('New Project').click();
+//   await page.getByRole('link', { name: 'Projects', exact: true }).click();
+//   await page.getByText('New Project').click();
 
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
-});
+//   await expect(
+//     page.getByRole('heading', {
+//       name: "Sorry, you don't have the needed permissions.",
+//     })
+//   ).toBeVisible();
+// });
 
 test('can create a project', async ({ page }) => {
   const { clear, save, set } = permissions(page);

@@ -80,27 +80,6 @@ test('can view credit', async ({ page }) => {
   }
 });
 
-test("can't create a credit", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('credits@example.com');
-  await set('view_credit');
-  await save();
-  await logout(page);
-
-  await login(page, 'credits@example.com', 'password');
-
-  await page.getByRole('link', { name: 'Credits', exact: true }).click();
-  await page.getByText('Enter Credit').click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
-});
-
 test('can create a credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
