@@ -15,9 +15,15 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
+import {
+  REQUIRED_PERMISSIONS,
+  ClientSelector as Selector,
+} from '$app/components/clients/ClientSelector';
 import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  Permissions,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useColorScheme } from '$app/common/colors';
 
@@ -55,34 +61,37 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
+  const disableByPermission = () => {
+    const permission = REQUIRED_PERMISSIONS.find(({ page }) =>
+      location.pathname.startsWith(`/${page}`)
+    )?.permission;
+
+    return Boolean(permission) && !hasPermission(permission as Permissions);
+  };
+
   const hasPermission = useHasPermission();
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <>
-      <div className="flex  flex-col justify-between space-y-2" style={{ color: colors.$3 }}>
-        {hasPermission('create_invoice') ? (
-          props.textOnly ? (
-            <p className="text-sm">
-              {resource?.client?.display_name}
-            </p>
-          ) : (
-            <Selector
-              inputLabel={t('client')}
-              onChange={(client) => props.onChange(client.id)}
-              value={resource?.client_id}
-              readonly={props.readonly || !resource}
-              clearButton={Boolean(resource?.client_id)}
-              onClearButtonClick={props.onClearButtonClick}
-              initiallyVisible={!resource?.client_id}
-              errorMessage={props.errorMessage}
-              disableWithSpinner={props.disableWithSpinner}
-            />
-          )
+      <div
+        className="flex  flex-col justify-between space-y-2"
+        style={{ color: colors.$3 }}
+      >
+        {props.textOnly ? (
+          <p className="text-sm">{resource?.client?.display_name}</p>
         ) : (
-          <p className="text-sm">
-            {resource?.client?.display_name}
-          </p>
+          <Selector
+            inputLabel={t('client')}
+            onChange={(client) => props.onChange(client.id)}
+            value={resource?.client_id}
+            readonly={props.readonly || !resource || disableByPermission()}
+            clearButton={Boolean(resource?.client_id)}
+            onClearButtonClick={props.onClearButtonClick}
+            initiallyVisible={!resource?.client_id}
+            errorMessage={props.errorMessage}
+            disableWithSpinner={props.disableWithSpinner}
+          />
         )}
 
         {client && (
@@ -129,7 +138,9 @@ export function ClientSelector(props: Props) {
             />
 
             <div>
-              <p className="text-sm" style={{ color: colors.$3 }}>{contact.email}</p>
+              <p className="text-sm" style={{ color: colors.$3 }}>
+                {contact.email}
+              </p>
 
               {resource.invitations.length >= 1 && (
                 <>
