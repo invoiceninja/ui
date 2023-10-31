@@ -59,11 +59,6 @@ export function useSearch() {
   return data;
 }
 
-const ComboboxInput = styled(Combobox.Input)`
-  background-color: ${(props) => props.theme.backgroundColor};
-  color: ${(props) => props.theme.color};
-`;
-
 const ComboboxOption = styled(Combobox.Option)`
   color: ${(props) => props.theme.color};
   &:hover {
@@ -126,18 +121,13 @@ export function Search$() {
       ref={comboboxRef}
     >
       <div className="relative mt-2">
-        <ComboboxInput
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          placeholder={`${t('search')}... (Ctrl K)`}
+        <Combobox.Input
           className="border-transparent focus:border-transparent focus:ring-0 w-full"
           onChange={(event) => setQuery(event.target.value)}
-          theme={{
-            backgroundColor: colors.$1,
-            color: colors.$3,
-          }}
           ref={inputRef}
           onFocus={() => setIsVisible(true)}
+          placeholder='Search...'
+          style={{ backgroundColor: colors.$1, color: colors.$3 }}
         />
 
         <Combobox.Options
