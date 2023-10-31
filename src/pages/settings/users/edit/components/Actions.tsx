@@ -76,7 +76,7 @@ export function Actions(props: Props) {
       });
   };
 
-  const bulk = () => {
+  const bulk = (password: string) => {
     if (action === 'remove') {
       return remove();
     }
@@ -90,10 +90,15 @@ export function Actions(props: Props) {
 
     toast.processing();
 
-    request('POST', endpoint('/api/v1/users/bulk'), {
-      action,
-      ids: [id],
-    })
+    request(
+      'POST',
+      endpoint('/api/v1/users/bulk'),
+      {
+        action,
+        ids: [id],
+      },
+      { headers: { 'X-Api-Password': password } }
+    )
       .then(() => {
         const message =
           successMessages[action as keyof typeof successMessages] ||
