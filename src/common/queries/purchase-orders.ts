@@ -14,7 +14,6 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -22,7 +21,7 @@ import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   return useQuery<PurchaseOrder>(
-    '/api/v1/purchase_orders/create',
+    ['/api/v1/purchase_orders', 'create'],
     () =>
       request('GET', endpoint('/api/v1/purchase_orders/create')).then(
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
@@ -34,7 +33,7 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
 
 export function usePurchaseOrderQuery(params: { id: string | undefined }) {
   return useQuery<PurchaseOrder>(
-    route('/api/v1/purchase_orders/:id', { id: params.id }),
+    ['/api/v1/purchase_orders', params.id],
     () =>
       request(
         'GET',

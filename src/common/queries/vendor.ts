@@ -11,7 +11,6 @@
 import { request } from '$app/common/helpers/request';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
@@ -25,7 +24,7 @@ interface VendorParams {
 
 export function useVendorQuery(params: VendorParams) {
   return useQuery<Vendor>(
-    route('/api/v1/vendors/:id', { id: params.id }),
+    ['/api/v1/vendors', params.id],
     () =>
       request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
         (response) => response.data.data
@@ -36,7 +35,7 @@ export function useVendorQuery(params: VendorParams) {
 
 export function useBlankVendorQuery() {
   return useQuery<Vendor>(
-    '/api/v1/vendors/create',
+    ['/api/v1/vendors', 'create'],
     () =>
       request('GET', endpoint('/api/v1/vendors/create')).then(
         (response) => response.data.data

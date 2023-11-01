@@ -14,7 +14,6 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -29,7 +28,7 @@ interface RecurringInvoiceQueryParams {
 
 export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
   return useQuery<RecurringInvoice>(
-    route('/api/v1/recurring_invoices/:id', { id: params.id }),
+    ['/api/v1/recurring_invoices', params.id],
     () =>
       request(
         'GET',
@@ -46,7 +45,7 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
 
 export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
   return useQuery<RecurringInvoice>(
-    '/api/v1/recurring_invoice/create',
+    ['/api/v1/recurring_invoices', 'create'],
     () =>
       request('GET', endpoint('/api/v1/recurring_invoices/create')).then(
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>

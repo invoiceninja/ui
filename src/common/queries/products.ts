@@ -23,7 +23,7 @@ interface Params {
 
 export function useProductsQuery(params?: Params) {
   return useQuery<Product[]>(
-    '/api/v1/products',
+    ['/api/v1/products'],
     () =>
       request(
         'GET',

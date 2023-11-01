@@ -14,11 +14,10 @@ import { Credit } from '$app/common/interfaces/credit';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   return useQuery<Credit>(
-    '/api/v1/credits/create',
+    ['/api/v1/credits', 'create'],
     () =>
       request('GET', endpoint('/api/v1/credits/create')).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data

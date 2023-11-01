@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ApiWebhook } from '$app/common/interfaces/api-webhook';
@@ -40,7 +39,7 @@ export function useApiWebhookQuery(params: { id: string | undefined }) {
   const { isAdmin } = useAdmin();
 
   return useQuery<ApiWebhook>(
-    route('/api/v1/webhooks/:id', { id: params.id }),
+    ['/api/v1/webhooks', params.id],
     () =>
       request('GET', endpoint('/api/v1/webhooks/:id', { id: params.id })).then(
         (response: GenericSingleResourceResponse<ApiWebhook>) =>

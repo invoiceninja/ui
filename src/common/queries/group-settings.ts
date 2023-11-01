@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '../helpers/route';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
@@ -31,7 +30,7 @@ export function useGroupQuery(params: Params) {
   const { id } = params;
 
   return useQuery<GroupSettings>(
-    route('/api/v1/group_settings/:id', { id }),
+    ['/api/v1/group_settings', id],
     () =>
       request('GET', endpoint('/api/v1/group_settings/:id', { id })).then(
         (response: GenericSingleResourceResponse<GroupSettings>) =>

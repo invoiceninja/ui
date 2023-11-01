@@ -60,7 +60,7 @@ export function useBlankTaxRateQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery<TaxRate>(
-    '/api/v1/tax_rates/create',
+    ['/api/v1/tax_rates', 'create'],
     () =>
       request('GET', endpoint('/api/v1/tax_rates/create')).then(
         (response: GenericSingleResourceResponse<TaxRate>) => response.data.data

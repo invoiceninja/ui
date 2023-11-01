@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { ApiToken } from '$app/common/interfaces/api-token';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -40,7 +39,7 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
   const { isOwner, isAdmin } = useAdmin();
 
   return useQuery<ApiToken>(
-    route('/api/v1/tokens/:id', { id: params.id }),
+    ['/api/v1/tokens', params.id],
     () =>
       request('GET', endpoint('/api/v1/tokens/:id', { id: params.id })).then(
         (response: GenericSingleResourceResponse<ApiToken>) =>

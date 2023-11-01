@@ -11,7 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -28,7 +27,7 @@ export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
   const hasPermission = useHasPermission();
 
   return useQuery<RecurringExpense>(
-    '/api/v1/recurring_expenses/create',
+    ['/api/v1/recurring_expenses', 'create'],
     () =>
       request('GET', endpoint('/api/v1/recurring_expenses/create')).then(
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
@@ -50,7 +49,7 @@ interface Params {
 
 export function useRecurringExpenseQuery(params: Params) {
   return useQuery<RecurringExpense>(
-    route('/api/v1/recurring_expenses/:id', { id: params.id }),
+    ['/api/v1/recurring_expenses', params.id],
     () =>
       request(
         'GET',

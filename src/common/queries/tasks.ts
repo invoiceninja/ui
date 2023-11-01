@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Task } from '$app/common/interfaces/task';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -29,7 +28,7 @@ interface TaskParams {
 
 export function useTaskQuery(params: TaskParams) {
   return useQuery<Task>(
-    route('/api/v1/tasks/:id', { id: params.id }),
+    ['/api/v1/tasks', params.id],
     () =>
       request('GET', endpoint('/api/v1/tasks/:id', { id: params.id })).then(
         (response) => response.data.data
@@ -57,9 +56,7 @@ interface TasksParams {
 
 export function useTasksQuery(params: TasksParams) {
   return useQuery<GenericManyResponse<Task>>(
-    route(':endpoint', {
-      endpoint: params.endpoint || '/api/v1/tasks',
-    }),
+    [params.endpoint || '/api/v1/tasks'],
     () =>
       request(
         'GET',

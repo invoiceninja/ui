@@ -22,7 +22,7 @@ export function useBlankTaskStatusQuery() {
   const hasPermission = useHasPermission();
 
   return useQuery<TaskStatus>(
-    '/api/v1/task_statuses/create',
+    ['/api/v1/task_statuses', 'create'],
     () =>
       request('GET', endpoint('/api/v1/task_statuses/create')).then(
         (response: GenericSingleResourceResponse<TaskStatus>) =>

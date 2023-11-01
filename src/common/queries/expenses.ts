@@ -48,7 +48,7 @@ interface ExpenseParams {
 
 export function useExpenseQuery(params: ExpenseParams) {
   return useQuery<Expense>(
-    route('/api/v1/expenses/:id', { id: params.id }),
+    ['/api/v1/expenses', params.id],
     () =>
       request(
         'GET',

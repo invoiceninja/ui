@@ -59,7 +59,7 @@ export function useBlankPaymentTermQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery<PaymentTerm>(
-    '/api/v1/payment_terms/create',
+    ['/api/v1/payment_terms/create'],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/create')).then(
         (response: GenericSingleResourceResponse<PaymentTerm>) =>
