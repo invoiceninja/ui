@@ -252,20 +252,17 @@ export function DataTable<T extends object>(props: Props<T>) {
     );
   };
 
-  const bulk = (
-    currentAction: 'archive' | 'restore' | 'delete',
-    id?: string
-  ) => {
+  const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
     request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
-      action: currentAction,
+      action,
       ids: id ? [id] : Array.from(selected),
     })
       .then((response: GenericSingleResourceResponse<T[]>) => {
-        toast.success(`${currentAction}d_${props.resource}`);
+        toast.success(`${action}d_${props.resource}`);
 
-        props.onBulkActionSuccess?.(response.data.data, currentAction);
+        props.onBulkActionSuccess?.(response.data.data, action);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
