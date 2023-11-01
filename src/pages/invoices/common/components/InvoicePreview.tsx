@@ -17,6 +17,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useEffect, useRef, useState } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
+import { Spinner } from '$app/components/Spinner';
 
 export type Resource =
   | Invoice
@@ -134,6 +135,8 @@ export function InvoicePreview(props: Props) {
     );
   }
 
+  console.log(render);
+
   if (
     props.resource?.id &&
     props.resource?.[props.relationType] &&
@@ -154,7 +157,14 @@ export function InvoicePreview(props: Props) {
             resource={props.resource}
             enabled={props.observable ? isIntersecting : true}
           />
-        ) : null}
+        ) : (
+          <div
+            className="flex justify-center items-center"
+            style={{ height: 1500 }}
+          >
+            <Spinner />
+          </div>
+        )}
       </div>
     );
   }
