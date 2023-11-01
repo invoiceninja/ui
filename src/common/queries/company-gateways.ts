@@ -77,7 +77,6 @@ export function useBlankCompanyGatewayQuery() {
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-  const refetch = useRefetch();
 
   return async (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();

@@ -100,7 +100,7 @@ export function Edit() {
     toast.processing();
 
     queryClient
-      .fetchQuery(generatePath('/api/v1/users/:id', { id: id! }), () =>
+      .fetchQuery(['/api/v1/users', id], () =>
         request(
           'GET',
           endpoint('/api/v1/users/:id?include=company_user', { id: id! }),

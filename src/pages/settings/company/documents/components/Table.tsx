@@ -87,7 +87,7 @@ export function Table() {
     toast.processing();
 
     const response: AxiosResponse = await queryClient.fetchQuery(
-      endpoint('/documents/:hash', { hash: doc.hash }),
+      ['/documents', doc.hash],
       () =>
         request(
           'GET',

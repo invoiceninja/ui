@@ -51,8 +51,6 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
 }
 
 export function useBulkAction() {
-  const refetch = useRefetch()
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 

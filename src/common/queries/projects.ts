@@ -53,7 +53,7 @@ export function useFetchProjectQuery() {
     let project: Project | undefined;
 
     await queryClient
-      .fetchQuery(generatePath('/api/v1/projects/:id', { id: projectId }), () =>
+      .fetchQuery(['/api/v1/projects', projectId], () =>
         request(
           'GET',
           endpoint('/api/v1/projects/:id', {
