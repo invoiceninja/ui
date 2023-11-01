@@ -81,7 +81,7 @@ export function TemplatesAndReminders() {
 
   const [isInitial, setIsInitial] = useState<boolean>(true);
 
-  const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(true);
+  const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
