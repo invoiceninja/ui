@@ -33,7 +33,7 @@ interface CreditQueryProps {
 
 export function useCreditQuery({ id }: CreditQueryProps) {
   return useQuery<Credit>(
-    route('/api/v1/credits/:id', { id }),
+    ['/api/v1/credits', id],
     () =>
       request(
         'GET',
