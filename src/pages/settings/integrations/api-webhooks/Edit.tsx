@@ -31,6 +31,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { useActions } from './common/useActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -145,8 +146,7 @@ export function Edit() {
         .then(() => {
           toast.success('created_webhook');
 
-          queryClient.invalidateQueries('/api/v1/webhooks');
-          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+          $refetch(['webhooks']);
 
           navigate('/settings/integrations/api_webhooks');
         })

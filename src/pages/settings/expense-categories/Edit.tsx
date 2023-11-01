@@ -28,6 +28,7 @@ import { useParams } from 'react-router-dom';
 import { useActions } from '$app/pages/settings/expense-categories/common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface ExpenseCategoryInput {
   name: string;
@@ -90,11 +91,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_expense_category');
 
-          queryClient.invalidateQueries('/api/v1/expense_categories');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expense_categories/:id', { id })
-          );
+          $refetch(['expense_categories'])
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

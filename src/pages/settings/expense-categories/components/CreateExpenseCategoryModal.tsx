@@ -29,6 +29,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { CreateExpenseCategoryForm } from './CreateExpenseCategoryForm';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -60,7 +61,7 @@ export function CreateExpenseCategoryModal(props: Props) {
         .then((response: GenericSingleResourceResponse<ExpenseCategory>) => {
           toast.success('created_expense_category');
 
-          queryClient.invalidateQueries('/api/v1/expense_categories');
+          $refetch(['expense_categories']);
 
           window.dispatchEvent(
             new CustomEvent('invalidate.combobox.queries', {

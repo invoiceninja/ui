@@ -15,18 +15,15 @@ import { Upload } from '$app/pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
 import { useOutletContext } from 'react-router-dom';
 import { Context } from '../edit/Edit';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Documents() {
   const context: Context = useOutletContext();
 
   const { recurringExpense } = context;
 
-  const queryClient = useQueryClient();
-
   const invalidateCache = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/recurring_expenses/:id', { id: recurringExpense.id })
-    );
+    $refetch(['recurring_expenses'])
   };
 
   return (

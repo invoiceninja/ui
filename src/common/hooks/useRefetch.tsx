@@ -51,6 +51,90 @@ export const keys = {
     path: '/api/v1/payments',
     dependencies: [],
   },
+  purchase_orders: {
+    path: '/api/v1/purchase_orders',
+    dependencies: [],
+  },
+  recurring_expenses: {
+    path: '/api/v1/recurring_expenses',
+    dependencies: [],
+  },
+  task_statuses: {
+    path: '/api/v1/task_statuses',
+    dependencies: [],
+  },
+  tasks: {
+    path: '/api/v1/tasks',
+    dependencies: [],
+  },
+  tax_rates: {
+    path: '/api/v1/tax_rates',
+    dependencies: [],
+  },
+  bank_transactions: {
+    path: '/api/v1/bank_transactions',
+    dependencies: [],
+  },
+  bank_transaction_rules: {
+    path: '/api/v1/bank_transaction_rules',
+    dependencies: [],
+  },
+  vendors: {
+    path: '/api/v1/vendors',
+    dependencies: [],
+  },
+  users: {
+    path: '/api/v1/users',
+    dependencies: [],
+  },
+  company_users: {
+    path: '/api/v1/company_users',
+    dependencies: [],
+  },
+  clients: {
+    path: '/api/v1/clients',
+    dependencies: [],
+  },
+  products: {
+    path: '/api/v1/products',
+    dependencies: [],
+  },
+  projects: {
+    path: '/api/v1/projects',
+    dependencies: [],
+  },
+  quotes: {
+    path: '/api/v1/quotes',
+    dependencies: [],
+  },
+  recurring_invoices: {
+    path: '/api/v1/recurring_invoices',
+    dependencies: [],
+  },
+  bank_integrations: {
+    path: '/api/v1/bank_integrations',
+    dependencies: [],
+  },
+  documents: {
+    path: '/api/v1/documents',
+    dependencies: [],
+  },
+  payment_terms: {
+    path: '/api/v1/payment_terms',
+    dependencies: [],
+  },
+  statics: {
+    path: '/api/v1/statics',
+    dependencies: [],
+  },
+  task_schedulers: {
+    path: '/api/v1/task_schedulers',
+    dependencies: [],
+  },
+  subscriptions: {
+    path: '/api/v1/subscriptions',
+    dependencies: [],
+  },
 };
 
 export function useRefetch() {

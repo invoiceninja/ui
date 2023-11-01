@@ -104,10 +104,6 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }))
-      );
-
       $refetch(['payments'])
     });
   };

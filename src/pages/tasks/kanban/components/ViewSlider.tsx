@@ -32,12 +32,12 @@ import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function ViewSlider() {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
-  const queryClient = useQueryClient();
   const accentColor = useAccentColor();
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
@@ -50,9 +50,7 @@ export function ViewSlider() {
     currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/tasks/:id', { id: currentTask?.id })
-    );
+    $refetch(['tasks'])
   };
 
   return (

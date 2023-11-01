@@ -24,6 +24,7 @@ import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
@@ -79,7 +80,7 @@ export function useHandleCompanySave() {
         !adjustedExcludeToaster && toast.dismiss();
 
         if (hasLanguageChanged) {
-          queryClient.invalidateQueries('/api/v1/statics');
+          $refetch(['statics']);
           setHasLanguageIdChanged(false);
         }
 

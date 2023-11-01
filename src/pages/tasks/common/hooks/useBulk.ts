@@ -13,9 +13,9 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -26,9 +26,7 @@ export function useBulkAction() {
     })
       .then(() => toast.success(`${action}d_task`))
       .finally(() => {
-        queryClient.invalidateQueries('/api/v1/tasks');
-
-        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
+        $refetch(['tasks'])
       });
   };
 }

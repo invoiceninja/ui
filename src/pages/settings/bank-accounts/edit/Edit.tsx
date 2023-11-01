@@ -25,6 +25,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Toggle from '$app/components/forms/Toggle';
 import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { Settings } from '$app/components/layouts/Settings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   useTitle('edit_bank_account');
@@ -79,11 +80,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_bank_account');
 
-          queryClient.invalidateQueries('/api/v1/bank_integrations');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_integrations/:id', { id })
-          );
+          $refetch(['bank_integrations'])
 
           navigate('/settings/bank_accounts');
         })

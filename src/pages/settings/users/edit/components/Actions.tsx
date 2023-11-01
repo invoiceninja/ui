@@ -12,6 +12,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
@@ -100,8 +101,8 @@ export function Actions(props: Props) {
           `${action}d_user`;
 
         toast.success(message);
-        queryClient.invalidateQueries(route('/api/v1/users'));
-        queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
+
+        $refetch(['users'])
       })
       .catch((error) => {
         if (error.response?.status === 412) {

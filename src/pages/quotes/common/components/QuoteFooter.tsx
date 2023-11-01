@@ -28,6 +28,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -40,7 +41,6 @@ export function QuoteFooter(props: Props) {
   const { handleChange, errors } = props;
 
   const location = useLocation();
-  const queryClient = useQueryClient();
 
   const [quote] = useAtom(quoteAtom);
 
@@ -55,7 +55,7 @@ export function QuoteFooter(props: Props) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }));
+    $refetch(['quotes']);
   };
 
   return (

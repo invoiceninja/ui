@@ -33,6 +33,7 @@ import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings as SettingsIcon } from 'react-feather';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -79,7 +80,7 @@ export function Edit() {
   }, [groupSettingsResponse]);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/group_settings/:id', { id }));
+    $refetch(['group_settings']);
   };
 
   return (

@@ -20,6 +20,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface TaskParams {
   id?: string;
@@ -99,9 +100,7 @@ export const useBulk = () => {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      ids.forEach((id) => {
-        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
-      });
+      $refetch(['tasks']);
     });
   };
 };

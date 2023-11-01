@@ -27,6 +27,7 @@ import { useQueryClient } from 'react-query';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -88,14 +89,10 @@ export default function Product() {
         : endpoint('/api/v1/products/:id', { id });
 
       request('PUT', url, productValue)
-        .then((response) => {
+        .then(() => {
           toast.success('updated_product');
 
-          queryClient.invalidateQueries('/api/v1/products');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/products/:id', { id: response.data.data.id })
-          );
+          $refetch(['products'])
 
           searchParams.delete('update_in_stock_quantity');
           setSearchParams(searchParams);

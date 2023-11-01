@@ -29,6 +29,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('create_payment_term');
@@ -66,7 +67,7 @@ export function Create() {
         .then((response: AxiosResponse) => {
           toast.success('created_payment_term');
 
-          queryClient.invalidateQueries('/api/v1/payment_terms');
+          $refetch(['payment_terms'])
 
           if (actionType === 'save') {
             navigate(

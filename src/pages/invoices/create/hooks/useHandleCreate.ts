@@ -22,6 +22,7 @@ import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTab
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useQueryClient } from 'react-query';
 import { useResolveProduct } from '$app/common/hooks/useResolveProduct';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCreate(
   setErrors: (errors: ValidationBag | undefined) => unknown
@@ -29,12 +30,7 @@ export function useHandleCreate(
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const queryClient = useQueryClient();
-
-  const resolveProduct = useResolveProduct({ resolveByProductKey: true });
-
   const saveCompany = useHandleCompanySave();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
@@ -47,19 +43,7 @@ export function useHandleCreate(
       .then((response: GenericSingleResourceResponse<Invoice>) => {
         toast.success('created_invoice');
 
-        queryClient.invalidateQueries('/api/v1/products');
-
-        response.data.data.line_items.forEach(({ product_key }) => {
-          if (product_key) {
-            const currentProduct = resolveProduct(product_key);
-
-            if (currentProduct) {
-              queryClient.invalidateQueries(
-                route('/api/v1/products/:id', { id: currentProduct.id })
-              );
-            }
-          }
-        });
+        $refetch(['products']);
 
         navigate(
           route('/invoices/:id/edit?table=:table', {

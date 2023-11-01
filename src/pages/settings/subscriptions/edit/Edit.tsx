@@ -30,6 +30,7 @@ import { Webhook } from '../common/components/Webhook';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment_link');
@@ -114,11 +115,7 @@ export function Edit() {
       .then(() => {
         toast.success('updated_subscription');
 
-        queryClient.invalidateQueries('/api/v1/subscriptions');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/subscriptions/:id', { id })
-        );
+        $refetch(['subscriptions']);
 
         navigate('/settings/subscriptions');
       })

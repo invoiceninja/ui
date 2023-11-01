@@ -29,6 +29,7 @@ import { useActions } from '../common/hooks/useActions';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { cloneDeep, set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -73,8 +74,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-        queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+        $refetch(['vendors'])
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

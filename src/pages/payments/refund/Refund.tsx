@@ -32,6 +32,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import collect from 'collect.js';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Refund() {
   const { id } = useParams();
@@ -87,13 +88,8 @@ export default function Refund() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            route('/api/v1/payments/refund?email_receipt=:email', {
-              email: String(email),
-            })
-          );
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/payments'));
+          
+          $refetch(['payments']);
         });
     },
   });

@@ -28,6 +28,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_schedule');
@@ -80,11 +81,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_schedule');
 
-          queryClient.invalidateQueries('/api/v1/task_schedulers');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/task_schedulers/:id', { id })
-          );
+          $refetch(['task_schedulers']);
 
           navigate('/settings/schedules');
         })

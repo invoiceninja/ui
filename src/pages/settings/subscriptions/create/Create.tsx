@@ -33,6 +33,7 @@ import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisa
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_payment_link');
@@ -102,7 +103,7 @@ export function Create() {
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
 
-        queryClient.invalidateQueries('/api/v1/subscriptions');
+        $refetch(['subscriptions'])
 
         navigate(
           route('/settings/subscriptions/:id/edit', {

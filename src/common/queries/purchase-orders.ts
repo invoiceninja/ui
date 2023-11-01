@@ -18,6 +18,7 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   return useQuery<PurchaseOrder>(
@@ -80,13 +81,7 @@ export function useBulk() {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/purchase_orders');
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id })
-        )
-      );
+      $refetch(['purchase_orders'])
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -110,9 +105,7 @@ export function useMarkSent() {
     ).then(() => {
       toast.success('marked_purchase_order_as_sent');
 
-      queryClient.invalidateQueries(
-        route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
-      );
+      $refetch(['purchase_orders'])
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

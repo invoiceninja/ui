@@ -42,8 +42,6 @@ export function useGroupQuery(params: Params) {
 }
 
 export function useBulk() {
-  const queryClient = useQueryClient();
-
   return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -54,12 +52,6 @@ export function useBulk() {
       toast.success(`${action}d_group`);
 
       $refetch(['group_settings']);
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/group_settings/:id', { id })
-        )
-      );
     });
   };
 }

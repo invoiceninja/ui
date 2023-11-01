@@ -31,6 +31,7 @@ import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface VerificationProps {
   visible: boolean;
@@ -51,7 +52,6 @@ function Confirmation({
   const [t] = useTranslation();
   const [code, setCode] = useState<string | null>(null);
 
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
   const handleConfirmation = () => {
@@ -62,8 +62,7 @@ function Confirmation({
     }).then(() => {
       toast.success('verified_phone_number');
 
-      queryClient.invalidateQueries('/api/v1/users');
-      queryClient.invalidateQueries('/api/v1/company_users');
+      $refetch(['users', 'company_users']);
 
       request('POST', endpoint('/api/v1/refresh')).then(
         (response: GenericSingleResourceResponse<CompanyUser>) => {

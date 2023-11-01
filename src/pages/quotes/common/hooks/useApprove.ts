@@ -16,6 +16,7 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useApprove() {
   const queryClient = useQueryClient();
@@ -31,11 +32,7 @@ export function useApprove() {
     ).then(() => {
       toast.success('approved_quote');
 
-      queryClient.invalidateQueries(
-        route('/api/v1/quotes/:id', { id: quote.id })
-      );
-
-      queryClient.invalidateQueries('/api/v1/quotes');
+      $refetch(['quotes']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

@@ -21,6 +21,7 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -104,11 +105,7 @@ export function useBulkAction(params?: Params) {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
-        ids.forEach((id) =>
-          queryClient.invalidateQueries(
-            route('/api/v1/recurring_invoices/:id', { id })
-          )
-        );
+        $refetch(['recurring_invoices']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

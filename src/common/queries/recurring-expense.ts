@@ -18,6 +18,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -90,11 +91,7 @@ export const useBulk = () => {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', { id })
-        )
-      );
+      $refetch(['recurring_expenses']);
     });
   };
 };

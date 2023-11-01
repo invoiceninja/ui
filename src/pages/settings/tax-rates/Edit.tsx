@@ -30,6 +30,7 @@ import { useActions } from '$app/pages/settings/tax-rates/common/hooks/useAction
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const { setDocumentTitle } = useTitle('edit_tax_rate');
@@ -48,7 +49,6 @@ export function Edit() {
 
   const { data } = useTaxRateQuery({ id });
   const [errors, setErrors] = useState<Record<string, any>>({});
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 
@@ -57,7 +57,7 @@ export function Edit() {
   }, [data]);
 
   const invalidatePaymentTermCache = () => {
-    queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
+    $refetch(['tax_rates'])
   };
 
   const formik = useFormik({

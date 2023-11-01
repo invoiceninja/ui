@@ -17,6 +17,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   setErrors?: (errors: ValidationBag | undefined) => unknown;
@@ -45,13 +46,7 @@ export function useSave(params: Props) {
         .then(() => {
           toast.success('updated_expense');
 
-          queryClient.invalidateQueries('/api/v1/expenses');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expenses/:id', { id: expense.id })
-          );
-
-          queryClient.invalidateQueries('/api/v1/expenses');
+          $refetch(['expenses']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

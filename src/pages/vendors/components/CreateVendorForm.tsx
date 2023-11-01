@@ -23,6 +23,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -71,15 +72,7 @@ export function CreateVendorForm(props: Props) {
       .then((response) => {
         toast.success('created_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/vendors'),
-            },
-          })
-        );
+        $refetch(['vendors'])
 
         if (props.setSelectedIds) {
           props.setSelectedIds([response.data.data.id]);

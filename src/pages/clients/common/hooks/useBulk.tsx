@@ -13,6 +13,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from 'react-query';
 
@@ -32,7 +33,7 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+      $refetch(['clients']);
     });
   };
 }

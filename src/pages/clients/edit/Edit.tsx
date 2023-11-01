@@ -36,6 +36,7 @@ import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -105,9 +106,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_client');
 
-        queryClient.invalidateQueries('/api/v1/clients');
-
-        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+        $refetch(['clients']);
 
         navigate(route('/clients/:id', { id }));
       })

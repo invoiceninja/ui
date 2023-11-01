@@ -57,6 +57,7 @@ import {
   TaskDetails,
 } from '../common/components/CreateTaskModal';
 import { TaskClock } from './components/TaskClock';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface CardItem {
   id: string;
@@ -171,7 +172,7 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
+      .finally(() => $refetch(['tasks']));
   };
 
   const onDragEnd = (result: DropResult) => {

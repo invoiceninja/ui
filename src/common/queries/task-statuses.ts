@@ -17,6 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankTaskStatusQuery() {
   const hasPermission = useHasPermission();
@@ -59,8 +60,6 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -70,9 +69,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_task_status`);
 
-      queryClient.invalidateQueries('/api/v1/task_statuses');
-
-      queryClient.invalidateQueries(route('/api/v1/task_statuses/:id', { id }));
+      $refetch(['task_statuses'])
     });
   };
 }

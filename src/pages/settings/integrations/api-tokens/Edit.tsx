@@ -33,6 +33,7 @@ import { useActions } from './common/hooks/useActions';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -82,9 +83,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_token');
 
-          queryClient.invalidateQueries('/api/v1/tokens');
-
-          queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
+          $refetch(['tokens']);
 
           navigate(route('/settings/integrations/api_tokens'));
         })

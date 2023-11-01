@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TransactionRuleForm } from '../components/TransactionRuleForm';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -79,11 +80,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_transaction_rule');
 
-          queryClient.invalidateQueries('/api/v1/bank_transaction_rules');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transaction_rules/:id', { id })
-          );
+          $refetch(['bank_transaction_rules'])
 
           navigate('/settings/bank_accounts/transaction_rules');
         })

@@ -38,6 +38,7 @@ import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { useQueryClient } from 'react-query';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -107,7 +108,7 @@ export function UserDetails() {
         toast.success('updated_settings');
 
         if (hasLanguageChanged) {
-          queryClient.invalidateQueries('/api/v1/statics');
+          $refetch(['statics'])
           setHasLanguageIdChanged(false);
         }
 

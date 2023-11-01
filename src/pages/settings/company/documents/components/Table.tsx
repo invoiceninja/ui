@@ -49,6 +49,7 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { AxiosResponse } from 'axios';
 import { DocumentUrl } from '$app/components/DocumentsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Table() {
   const { t } = useTranslation();
@@ -80,7 +81,7 @@ export function Table() {
   };
 
   const invalidateDocumentsQuery = () => {
-    queryClient.invalidateQueries('/api/v1/documents');
+    $refetch(['documents']);
   };
 
   const downloadDocument = async (doc: Document, inline: boolean) => {

@@ -18,6 +18,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, FormEvent, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCreate(
   bankAccount: BankAccount | undefined,
@@ -41,18 +42,12 @@ export function useHandleCreate(
         .then((response: GenericSingleResourceResponse<BankAccount>) => {
           toast.success('created_bank_account');
 
-          queryClient.invalidateQueries('/api/v1/bank_integrations');
+          $refetch(['bank_integrations'])
 
           if (!setIsModalOpened) {
             navigate('/settings/bank_accounts');
           } else {
-            window.dispatchEvent(
-              new CustomEvent('invalidate.combobox.queries', {
-                detail: {
-                  url: endpoint('/api/v1/bank_integrations'),
-                },
-              })
-            );
+            $refetch(['bank_integrations'])
 
             if (onCreatedBankAccount) {
               onCreatedBankAccount(response.data.data);

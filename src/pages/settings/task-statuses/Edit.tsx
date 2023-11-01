@@ -34,6 +34,7 @@ import {
   useHandleChange,
 } from '$app/pages/settings/task-statuses/common/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -81,11 +82,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/task_statuses/:id', { id })
-          );
+          $refetch(['task_statuses'])
 
           setIsTitleApplied(false);
         })

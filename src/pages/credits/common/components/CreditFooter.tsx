@@ -28,6 +28,7 @@ import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -45,7 +46,7 @@ export function CreditFooter(props: Props) {
   const [credit] = useAtom(creditAtom);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
+    $refetch(['credits'])
   };
 
   const tabs = [

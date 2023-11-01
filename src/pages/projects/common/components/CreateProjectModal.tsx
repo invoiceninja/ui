@@ -32,6 +32,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -91,7 +92,7 @@ export function CreateProjectModal(props: Props) {
         .then((response: GenericSingleResourceResponse<Project>) => {
           toast.success('created_project');
 
-          queryClient.invalidateQueries('/api/v1/projects');
+          $refetch(['projects']);
 
           window.dispatchEvent(
             new CustomEvent('invalidate.combobox.queries', {

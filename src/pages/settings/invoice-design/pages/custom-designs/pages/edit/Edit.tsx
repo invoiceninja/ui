@@ -28,6 +28,7 @@ import { route } from '$app/common/helpers/route';
 import { Variables } from './components/Variables';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -60,9 +61,7 @@ export default function Edit() {
     return () =>
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
-
-  const queryClient = useQueryClient();
-
+  
   useSaveBtn(
     {
       onClick() {
@@ -70,8 +69,7 @@ export default function Edit() {
 
         request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
           .then(() => {
-            queryClient.invalidateQueries(['/api/v1/designs']);
-            queryClient.invalidateQueries(route('/api/v1/designs/:id', { id }));
+            $refetch(['designs']);
 
             toast.success('updated_design');
           })

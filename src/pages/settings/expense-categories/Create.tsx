@@ -28,6 +28,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { CreateExpenseCategoryForm } from './components/CreateExpenseCategoryForm';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   useTitle('new_expense_category');
@@ -70,7 +71,7 @@ export function Create() {
         .then((response: GenericSingleResourceResponse<ExpenseCategory>) => {
           toast.success('created_expense_category');
 
-          queryClient.invalidateQueries('/api/v1/expense_categories');
+          $refetch(['expense_categories']);
 
           if (actionType === 'save') {
             navigate(

@@ -88,6 +88,7 @@ import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -237,7 +238,6 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const queryClient = useQueryClient();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
@@ -251,9 +251,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/quotes/:id', { id: quote.id })
-        );
+        $refetch(['quotes'])
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

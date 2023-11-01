@@ -32,6 +32,7 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { request } from '$app/common/helpers/request';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   client: Client | undefined;
@@ -102,7 +103,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   }, []);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+    $refetch(['clients']);
   };
 
   return (

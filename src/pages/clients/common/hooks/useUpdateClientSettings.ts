@@ -15,6 +15,7 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -91,13 +92,7 @@ export function useUpdateClientSettings() {
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
 
-        queryClient.invalidateQueries('/api/v1/clients');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/clients/:id', {
-            id: activeSettings?.id,
-          })
-        );
+        $refetch(['clients']);
 
         dispatch(
           updateChanges({

@@ -25,6 +25,7 @@ import { Transaction } from '$app/common/interfaces/transactions';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface TransactionDetails {
   base_type: string;
@@ -87,12 +88,8 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
-          queryClient.invalidateQueries('/api/v1/invoices');
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
+
+          $refetch(['invoices', 'bank_transactions'])
 
           toast.success('converted_transaction');
         })
@@ -120,13 +117,8 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
-          queryClient.invalidateQueries('/api/v1/invoices');
-          queryClient.invalidateQueries('/api/v1/payments');
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
+
+          $refetch(['invoices', 'payments', 'bank_transactions'])
 
           toast.success('linked_transaction');
         })
@@ -153,20 +145,10 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+        .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expenses/:id', {
-              id: response.data.data[0].expense_id,
-            })
-          );
+          $refetch(['bank_transactions', 'expenses'])
 
           toast.success('converted_transaction');
         })
@@ -192,22 +174,10 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+        .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          queryClient.invalidateQueries('/api/v1/expenses');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transactions/:id', {
-              id: props.transactionDetails.transaction_id,
-            })
-          );
-
-          queryClient.invalidateQueries(
-            route('/api/v1/expenses/:id', {
-              id: response.data.data[0].expense_id,
-            })
-          );
+          $refetch(['expenses', 'bank_transactions'])
 
           toast.success('linked_transaction');
         })

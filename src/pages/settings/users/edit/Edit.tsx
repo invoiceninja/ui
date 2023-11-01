@@ -31,6 +31,7 @@ import { Permissions } from './components/Permissions';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [passwordValidated, setPasswordValidated] = useState(false);
@@ -86,7 +87,7 @@ export function Edit() {
       .then(() => {
         toast.success('updated_user');
 
-        queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
+        $refetch(['users'])
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

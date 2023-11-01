@@ -28,6 +28,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -68,12 +69,8 @@ export function MergeClientModal(props: Props) {
         {},
         { headers: { 'X-Api-Password': password } }
       )
-        .then((response: GenericSingleResourceResponse<Client>) => {
-          queryClient.invalidateQueries('/api/v1/clients');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id', { id: response.data.data.id })
-          );
+        .then(() => {
+          $refetch(['clients']);
 
           request('POST', endpoint('/api/v1/refresh')).then(
             (response: AxiosResponse) => {

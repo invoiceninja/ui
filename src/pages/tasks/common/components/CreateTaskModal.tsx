@@ -30,6 +30,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface TaskDetails {
   taskStatusId: string;
@@ -76,16 +77,7 @@ export function CreateTaskModal(props: Props) {
         .then(() => {
           toast.success('created_task');
 
-          queryClient.invalidateQueries('/api/v1/tasks');
-
-          queryClient.invalidateQueries('/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true');
-
-          queryClient.invalidateQueries(
-            task.project_id &&
-            route('/api/v1/tasks?project_tasks=:project_id&per_page=1000&status=active&without_deleted_clients=true', {
-                project_id: task.project_id,
-              })
-          );
+          $refetch(['tasks'])
 
           setTask(data);
 

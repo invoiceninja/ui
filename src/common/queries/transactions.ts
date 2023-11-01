@@ -17,6 +17,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useAtomValue } from 'jotai';
 import { useQuery, useQueryClient } from 'react-query';
+import { $refetch } from '../hooks/useRefetch';
 
 interface TransactionParams {
   id: string | undefined;
@@ -74,13 +75,7 @@ export const useBulk = () => {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/bank_transactions');
-
-      ids.forEach((id) => {
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
-      });
+      $refetch(['bank_transactions'])
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

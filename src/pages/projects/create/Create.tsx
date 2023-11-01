@@ -33,6 +33,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { CustomField } from '$app/components/CustomField';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -108,7 +109,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_project');
 
-        queryClient.invalidateQueries('/api/v1/projects');
+        $refetch(['projects']);
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })

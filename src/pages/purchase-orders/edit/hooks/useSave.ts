@@ -18,6 +18,7 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useSave(setErrors: (errors: ValidationBag) => unknown) {
   const queryClient = useQueryClient();
@@ -42,9 +43,7 @@ export function useSave(setErrors: (errors: ValidationBag) => unknown) {
       .finally(() => {
         setIsDeleteActionTriggered(undefined);
 
-        queryClient.invalidateQueries(
-          route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
-        );
+        $refetch(['purchase_orders']);
       });
   };
 }

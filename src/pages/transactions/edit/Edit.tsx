@@ -30,6 +30,7 @@ import { useQueryClient } from 'react-query';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useTransactionQuery } from '$app/common/queries/transactions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -88,11 +89,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_transaction');
 
-        queryClient.invalidateQueries('/api/v1/bank_transactions');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
+        $refetch(['bank_transactions'])
 
         navigate('/transactions');
       })

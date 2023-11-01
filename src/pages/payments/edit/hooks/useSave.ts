@@ -17,6 +17,7 @@ import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
@@ -54,9 +55,7 @@ export function useSave(
         }
       })
       .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/payments/:id', { id: payment.id })
-        )
+        $refetch(['payments'])
       );
   };
 }

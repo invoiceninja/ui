@@ -18,6 +18,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useTaxRatesQuery(params: Params) {
   return useQuery(
@@ -70,8 +71,6 @@ export function useBlankTaxRateQuery() {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -81,9 +80,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_tax_rate`);
 
-      queryClient.invalidateQueries('/api/v1/tax_rates');
-
-      queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
+      $refetch(['tax_rates']);
     });
   };
 }

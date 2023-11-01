@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Footer(props: PurchaseOrderCardProps) {
   const [t] = useTranslation();
@@ -31,8 +32,6 @@ export function Footer(props: PurchaseOrderCardProps) {
   const { id } = useParams();
 
   const location = useLocation();
-
-  const queryClient = useQueryClient();
 
   const { purchaseOrder, handleChange, errors } = props;
 
@@ -46,7 +45,7 @@ export function Footer(props: PurchaseOrderCardProps) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/purchase_orders/:id', { id }));
+    $refetch(['purchase_orders']);
   };
 
   return (

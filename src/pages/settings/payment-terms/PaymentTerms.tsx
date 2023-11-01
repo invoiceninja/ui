@@ -33,6 +33,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdEdit } from 'react-icons/md';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function PaymentTerms() {
   const { documentTitle } = useTitle('payment_terms');
@@ -61,7 +62,7 @@ export function PaymentTerms() {
 
     bulk([id], 'archive')
       .then(() => toast.success('archived_payment_term'))
-      .finally(() => queryClient.invalidateQueries('/api/v1/payment_terms'));
+      .finally(() => $refetch(['payment_terms']));
   };
 
   return (

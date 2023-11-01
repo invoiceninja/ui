@@ -30,6 +30,7 @@ import { Form } from '../edit/components/Form';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { set } from 'lodash';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -96,15 +97,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_vendor');
 
-        queryClient.invalidateQueries('/api/v1/vendors');
-
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/vendors'),
-            },
-          })
-        );
+        $refetch(['vendors'])
 
         if (isAdmin) {
           dispatch(

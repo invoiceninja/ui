@@ -29,6 +29,7 @@ import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
 import { useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_product');
@@ -61,7 +62,7 @@ export default function Create() {
       request('POST', endpoint('/api/v1/products'), product)
         .then(
           (response: GenericSingleResourceResponse<ProductTableResource>) => {
-            queryClient.invalidateQueries('/api/v1/products');
+            $refetch(['products']);
 
             toast.success('created_product');
 

@@ -28,6 +28,7 @@ import { route } from '$app/common/helpers/route';
 import Toggle from '$app/components/forms/Toggle';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -54,9 +55,7 @@ export function InvoiceFooter(props: Props) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/recurring_invoices/:id', { id })
-    );
+    $refetch(['recurring_invoices']);
   };
 
   return (

@@ -28,6 +28,7 @@ import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Slider } from '$app/components/cards/Slider';
 import { Inline } from '$app/components/Inline';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   isModalOpen: boolean;
@@ -107,8 +108,7 @@ export function ClientCreate({
 
         onClientCreated && onClientCreated(response.data.data);
 
-        queryClient.invalidateQueries('/api/v1/clients');
-        queryClient.invalidateQueries(endpoint('/api/v1/clients'));
+        $refetch(['clients'])
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {

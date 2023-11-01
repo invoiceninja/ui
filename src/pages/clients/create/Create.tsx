@@ -31,6 +31,7 @@ import { useQuery, useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -108,7 +109,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_client');
 
-        queryClient.invalidateQueries('/api/v1/clients');
+        $refetch(['clients']);
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })

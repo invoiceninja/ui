@@ -10,6 +10,7 @@
 
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useProductQuery } from '$app/common/queries/products';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -23,7 +24,7 @@ export default function Documents() {
   const queryClient = useQueryClient();
 
   const invalidateQuery = () => {
-    queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+    $refetch(['products']);
   };
 
   return (

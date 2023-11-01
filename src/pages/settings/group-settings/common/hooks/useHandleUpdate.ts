@@ -17,6 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -106,11 +107,7 @@ export function useHandleUpdate(params: Params) {
         .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('updated_group');
 
-          queryClient.invalidateQueries(
-            route('/api/v1/group_settings/:id', {
-              id: id || activeGroupSettings?.id,
-            })
-          );
+          $refetch(['group_settings']);
 
           if (isGroupSettingsActive) {
             dispatch(

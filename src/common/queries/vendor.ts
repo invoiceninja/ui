@@ -16,6 +16,7 @@ import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface VendorParams {
   id: string | undefined;
@@ -73,8 +74,6 @@ export function useVendorsQuery(params: VendorsParams) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -84,7 +83,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_vendor`);
 
-      queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+      $refetch(['vendors'])
     });
   };
 }

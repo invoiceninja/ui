@@ -31,6 +31,7 @@ import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Apply() {
   const queryClient = useQueryClient();
@@ -63,28 +64,8 @@ export default function Apply() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/invoices'));
-          queryClient.invalidateQueries(route('/api/v1/clients'));
-          queryClient.invalidateQueries('/api/v1/clients');
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id', { id: payment?.client_id })
-          );
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id/edit', { id: payment?.client_id })
-          );
 
-          payment?.invoices?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(
-              route('/api/v1/invoices/:id', { id: paymentable.invoice_id })
-            );
-          });
-
-          payment?.credits?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(
-              route('/api/v1/credits/:id', { id: paymentable.credit_id })
-            );
-          });
+          $refetch(['payments', 'invoices', 'clients', 'credits']);
         });
     },
   });
