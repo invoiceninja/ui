@@ -21,7 +21,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleChange } from '$app/pages/products/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ProductForm } from '$app/pages/products/common/components/ProductForm';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -35,8 +34,6 @@ export function ProductCreate(props: Props) {
   const [t] = useTranslation();
 
   const { data: blankProduct } = useBlankProductQuery();
-
-  const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<ValidationBag>();
 

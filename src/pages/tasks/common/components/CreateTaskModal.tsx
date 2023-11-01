@@ -12,7 +12,6 @@ import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Task } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -29,7 +28,6 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export interface TaskDetails {
@@ -48,8 +46,6 @@ export function CreateTaskModal(props: Props) {
   const [t] = useTranslation();
 
   const { data } = useBlankTaskQuery();
-
-  const queryClient = useQueryClient();
 
   const [task, setTask] = useState<Task>();
 

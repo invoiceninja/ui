@@ -22,7 +22,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -45,8 +44,6 @@ export function Create() {
   const { data } = useBlankSubscriptionQuery();
 
   const { data: productsData } = useProductsQuery({ include: 'company' });
-
-  const queryClient = useQueryClient();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 

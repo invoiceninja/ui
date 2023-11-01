@@ -23,7 +23,6 @@ import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import VerificationInput from 'react-verification-input';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useDispatch } from 'react-redux';

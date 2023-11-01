@@ -27,7 +27,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import {
   useActions,
@@ -40,8 +39,6 @@ export function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 

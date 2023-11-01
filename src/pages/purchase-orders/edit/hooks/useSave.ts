@@ -14,15 +14,11 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useSave(setErrors: (errors: ValidationBag) => unknown) {
-  const queryClient = useQueryClient();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {

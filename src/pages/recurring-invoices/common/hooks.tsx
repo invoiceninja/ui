@@ -209,7 +209,6 @@ interface RecurringInvoiceSaveProps {
 
 export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
-  const queryClient = useQueryClient();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 

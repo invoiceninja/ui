@@ -27,7 +27,7 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -39,8 +39,6 @@ export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const queryClient = useQueryClient();
 
   const saveCompany = useHandleCompanySave();
 

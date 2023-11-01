@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { User } from '$app/common/interfaces/user';
@@ -29,7 +28,6 @@ import {
   MdRestore,
   MdSend,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
@@ -48,7 +46,6 @@ export function Actions(props: Props) {
   const { id } = useParams();
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const invite = () => {
     toast.processing();

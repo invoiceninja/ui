@@ -27,7 +27,6 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { useActions } from './common/useActions';
@@ -121,7 +120,6 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
-  const queryClient = useQueryClient();
   const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
 
   const handleRemoveHeader = (key: string) => {

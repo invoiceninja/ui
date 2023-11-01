@@ -23,7 +23,6 @@ import { Contacts } from '$app/pages/clients/edit/components/Contacts';
 import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Slider } from '$app/components/cards/Slider';
@@ -53,8 +52,6 @@ export function ClientCreate({
       send_email: false,
     },
   ]);
-
-  const queryClient = useQueryClient();
 
   const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,

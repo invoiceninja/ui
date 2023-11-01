@@ -14,7 +14,6 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -23,7 +22,6 @@ export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   return (payment: Payment, sendEmail: boolean) => {
     setErrors(undefined);

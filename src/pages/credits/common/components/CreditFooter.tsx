@@ -20,13 +20,11 @@ import { creditAtom } from '../atoms';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -41,7 +39,6 @@ export function CreditFooter(props: Props) {
   const { handleChange, errors } = props;
 
   const location = useLocation();
-  const queryClient = useQueryClient();
 
   const [credit] = useAtom(creditAtom);
 

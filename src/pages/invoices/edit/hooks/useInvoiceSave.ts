@@ -10,16 +10,12 @@
 
 import { endpoint } from '$app/common/helpers';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useResolveProduct } from '$app/common/hooks/useResolveProduct';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleSave(

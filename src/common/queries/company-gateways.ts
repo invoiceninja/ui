@@ -11,12 +11,11 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
-import { $refetch, useRefetch } from '../hooks/useRefetch';
+import { $refetch } from '../hooks/useRefetch';
 
 interface CompanyGatewaysParams {
   status?: string;

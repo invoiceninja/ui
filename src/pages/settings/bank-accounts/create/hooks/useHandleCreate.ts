@@ -16,7 +16,6 @@ import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, FormEvent, SetStateAction } from 'react';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -29,7 +28,6 @@ export function useHandleCreate(
   onCreatedBankAccount?: (bankAccount: BankAccount) => unknown
 ) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   return (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

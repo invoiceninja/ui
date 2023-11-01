@@ -10,7 +10,7 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { route } from '../helpers/route';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { GroupSettings } from '../interfaces/group-settings';

@@ -23,7 +23,6 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
@@ -51,7 +50,6 @@ export default function Create() {
   const { data } = useBlankVendorQuery();
   const { isAdmin } = useAdmin();
 
-  const queryClient = useQueryClient();
   const company = useInjectCompanyChanges();
 
   const [vendor, setVendor] = useState<Vendor>();

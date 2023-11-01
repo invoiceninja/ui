@@ -21,8 +21,7 @@ import { Modal } from '$app/components/Modal';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { $refetch, useRefetch } from '../hooks/useRefetch';
+import { $refetch } from '../hooks/useRefetch';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
@@ -36,8 +35,6 @@ export function DesignSelector(props: Props) {
 
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
-
-  const refetch = useRefetch();
 
   useEffect(() => {
     if (data) {

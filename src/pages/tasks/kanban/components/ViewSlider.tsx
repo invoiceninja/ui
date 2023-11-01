@@ -10,7 +10,6 @@
 
 import { ClickableElement, Element } from '$app/components/cards';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -26,7 +25,6 @@ import {
   calculateHours,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';

@@ -37,7 +37,6 @@ import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmati
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
-import { useQueryClient } from 'react-query';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function UserDetails() {
@@ -76,7 +75,6 @@ export function UserDetails() {
 
   const { isAdmin } = useAdmin();
   const { save } = usePreferences();
-  const queryClient = useQueryClient();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {

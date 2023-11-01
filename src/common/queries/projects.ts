@@ -16,7 +16,6 @@ import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { generatePath } from 'react-router-dom';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();

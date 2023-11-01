@@ -10,14 +10,14 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { ApiToken } from '$app/common/interfaces/api-token';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { $refetch, useRefetch } from '../hooks/useRefetch';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useApiTokensQuery(params: Params) {
   const { isOwner } = useAdmin();

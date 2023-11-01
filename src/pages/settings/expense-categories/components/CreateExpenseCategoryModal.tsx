@@ -27,7 +27,6 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { CreateExpenseCategoryForm } from './CreateExpenseCategoryForm';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -41,7 +40,6 @@ interface Props {
 export function CreateExpenseCategoryModal(props: Props) {
   const [t] = useTranslation();
 
-  const queryClient = useQueryClient();
   const accentColor: string = useAccentColor();
 
   const { data: blankExpenseCategory } = useBlankExpenseCategoryQuery();

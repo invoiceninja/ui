@@ -20,8 +20,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useQueryClient } from 'react-query';
-import { useResolveProduct } from '$app/common/hooks/useResolveProduct';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCreate(

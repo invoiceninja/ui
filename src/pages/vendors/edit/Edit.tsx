@@ -21,7 +21,6 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Form } from './components/Form';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -44,8 +43,6 @@ export default function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [contacts, setContacts] = useState<Partial<VendorContact>[]>([]);
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 

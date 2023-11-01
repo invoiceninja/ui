@@ -25,7 +25,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { CreateExpenseCategoryForm } from './components/CreateExpenseCategoryForm';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -37,7 +36,6 @@ export function Create() {
 
   const navigate = useNavigate();
   const accentColor: string = useAccentColor();
-  const queryClient = useQueryClient();
 
   const { data: blankExpenseCategory } = useBlankExpenseCategoryQuery();
 

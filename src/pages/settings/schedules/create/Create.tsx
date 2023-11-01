@@ -27,7 +27,6 @@ import { AxiosError } from 'axios';
 import { useAtom } from 'jotai';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
@@ -39,7 +38,6 @@ export function Create() {
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
 

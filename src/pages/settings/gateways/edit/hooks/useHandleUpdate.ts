@@ -11,8 +11,6 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';

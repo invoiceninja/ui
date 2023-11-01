@@ -19,13 +19,11 @@ import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -38,7 +36,6 @@ interface Props {
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
 
-  const queryClient = useQueryClient();
   const location = useLocation();
 
   const { invoice, handleChange, errors } = props;

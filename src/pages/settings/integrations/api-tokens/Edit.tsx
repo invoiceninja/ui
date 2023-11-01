@@ -18,7 +18,6 @@ import { date, endpoint } from '$app/common/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useApiTokenQuery } from '$app/common/queries/api-tokens';
-import { useQueryClient } from 'react-query';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Badge } from '$app/components/Badge';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -53,8 +52,6 @@ export function Edit() {
       href: route('/settings/integrations/api_tokens/:id/edit', { id }),
     },
   ];
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 

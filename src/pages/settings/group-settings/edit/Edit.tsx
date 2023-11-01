@@ -25,7 +25,6 @@ import { useActions } from '../common/hooks/useActions';
 import { Upload } from '../../company/documents/components';
 import { endpoint } from '$app/common/helpers';
 import { DocumentsTable } from '$app/components/DocumentsTable';
-import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
 import { Clients } from './components/Clients';
@@ -38,7 +37,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const queryClient = useQueryClient();
 
   const { documentTitle } = useTitle('edit_group');
 

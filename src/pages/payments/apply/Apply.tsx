@@ -22,7 +22,6 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +33,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Apply() {
-  const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
   const { data: payment, isLoading } = usePaymentQuery({ id });

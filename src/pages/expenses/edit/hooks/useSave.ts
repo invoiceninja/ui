@@ -14,8 +14,6 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Expense } from '$app/common/interfaces/expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -26,8 +24,6 @@ interface Props {
 }
 
 export function useSave(params: Props) {
-  const queryClient = useQueryClient();
-
   const { setErrors, isFormBusy, setIsFormBusy } = params;
 
   return (expense: Expense) => {

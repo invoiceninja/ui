@@ -27,7 +27,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
-import { useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -35,7 +34,6 @@ export default function Create() {
   const { documentTitle } = useTitle('new_product');
 
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const [product, setProduct] = useAtom(productAtom);
   const navigate = useNavigate();

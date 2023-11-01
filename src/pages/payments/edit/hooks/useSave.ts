@@ -13,8 +13,6 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -22,8 +20,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
-  const queryClient = useQueryClient();
-
   const saveCompany = useHandleCompanySave();
 
   return async (payment: Payment) => {

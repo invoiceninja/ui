@@ -20,7 +20,6 @@ import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import Toggle from '$app/components/forms/Toggle';
 import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
@@ -37,8 +36,6 @@ export function Edit() {
   const { id } = useParams<string>();
 
   const { data: response } = useBankAccountQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 

@@ -15,8 +15,6 @@ import { Task } from '$app/common/interfaces/task';
 import { AxiosError } from 'axios';
 import { isOverlapping } from '../helpers/is-overlapping';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
 

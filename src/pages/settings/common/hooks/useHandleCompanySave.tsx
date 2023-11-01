@@ -14,7 +14,6 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useQueryClient } from 'react-query';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
@@ -28,7 +27,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
 
   const handleUpdateGroupSettings = useHandleUpdate({});

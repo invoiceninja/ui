@@ -26,7 +26,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -36,7 +35,6 @@ export function Create() {
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: blankTaxRate } = useBlankTaxRateQuery();
 

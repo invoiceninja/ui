@@ -9,12 +9,10 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useVendorQuery } from '$app/common/queries/vendor';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 export default function Documents() {

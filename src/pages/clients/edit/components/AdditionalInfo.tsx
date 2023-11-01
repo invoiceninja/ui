@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { InputField, Link, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { Client } from '$app/common/interfaces/client';
@@ -22,7 +21,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -46,7 +45,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
   const currencies = useCurrencies();
   const languages = useLanguages();
-  const queryClient = useQueryClient();
 
   const { data: paymentTerms } = useQuery({
     queryKey: ['/api/v1/payment_terms'],

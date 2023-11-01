@@ -32,7 +32,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
-import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -247,7 +246,6 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const setProduct = useSetAtom(productAtom);
 

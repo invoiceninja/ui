@@ -34,7 +34,6 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';

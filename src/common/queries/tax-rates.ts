@@ -11,8 +11,7 @@
 import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { TaxRate } from '$app/common/interfaces/tax-rate';

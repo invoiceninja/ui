@@ -20,7 +20,6 @@ import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { request } from '$app/common/helpers/request';

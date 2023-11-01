@@ -23,7 +23,6 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
@@ -35,8 +34,6 @@ export default function Product() {
   const saveCompany = useHandleCompanySave();
 
   const { id } = useParams();
-
-  const queryClient = useQueryClient();
 
   const { data: productData } = useProductQuery({ id });
 

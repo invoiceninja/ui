@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useQueryClient } from 'react-query';
 import { Table as DocumentsTable, Upload } from './components';
 import { $refetch } from '$app/common/hooks/useRefetch';
 

@@ -29,7 +29,6 @@ import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { useBlankTransactionQuery } from '$app/common/queries/transactions';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -41,8 +40,6 @@ export default function Create() {
   const company = useCurrentCompany();
 
   const { data } = useBlankTransactionQuery();
-
-  const queryClient = useQueryClient();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 

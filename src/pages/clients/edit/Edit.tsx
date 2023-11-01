@@ -25,7 +25,6 @@ import { Spinner } from '$app/components/Spinner';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useActions } from '../common/hooks/useActions';
@@ -47,8 +46,6 @@ export default function Edit() {
   const navigate = useNavigate();
 
   const { data, isLoading } = useClientQuery({ id, enabled: true });
-
-  const queryClient = useQueryClient();
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();

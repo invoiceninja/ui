@@ -25,14 +25,11 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export default function Create() {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery();
-
-  const queryClient = useQueryClient();
 
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);

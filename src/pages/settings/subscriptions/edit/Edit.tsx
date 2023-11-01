@@ -22,7 +22,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -38,8 +37,6 @@ export function Edit() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
-  const queryClient = useQueryClient();
 
   const { id } = useParams();
 

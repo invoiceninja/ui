@@ -24,7 +24,6 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -33,8 +32,6 @@ export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
   const { id } = useParams();
   const { data } = useProjectQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 

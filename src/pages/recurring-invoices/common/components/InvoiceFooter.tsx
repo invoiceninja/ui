@@ -19,12 +19,10 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { route } from '$app/common/helpers/route';
 import Toggle from '$app/components/forms/Toggle';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -43,7 +41,6 @@ export function InvoiceFooter(props: Props) {
   const { handleChange, errors } = props;
 
   const location = useLocation();
-  const queryClient = useQueryClient();
 
   const tabs = [
     t('public_notes'),

@@ -10,14 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch, useRefetch } from '../hooks/useRefetch';
+import { $refetch } from '../hooks/useRefetch';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
@@ -65,8 +64,6 @@ export function useExpenseCategoryQuery(props: Props) {
 }
 
 export function useBulkAction() {
-  const refetch = useRefetch();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 

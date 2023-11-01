@@ -30,7 +30,6 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -42,7 +41,6 @@ interface Props {
 
 export function CreateProjectModal(props: Props) {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const { data: blankProject } = useBlankProjectQuery();
 
