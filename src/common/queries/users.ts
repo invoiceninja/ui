@@ -10,10 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '../helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -45,4 +48,42 @@ export function useBlankUserQuery() {
     () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );
+}
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete',
+    password: string
+  ) => {
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/users/bulk'),
+      {
+        action,
+        ids,
+      },
+      { headers: { 'X-Api-Password': password } }
+    )
+      .then(() => {
+        toast.success(`${action}d_user`);
+
+        ids.forEach((id) => {
+          queryClient.invalidateQueries('/api/v1/users');
+          queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
+        });
+      })
+      .catch((error) => {
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        }
+      });
+  };
 }

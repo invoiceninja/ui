@@ -56,8 +56,6 @@ import collect from 'collect.js';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { PasswordConfirmation } from './PasswordConfirmation';
-import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -112,7 +110,10 @@ interface Props<T> extends CommonProps {
     resource: T[],
     action: 'archive' | 'delete' | 'restore'
   ) => void;
-  passwordProtectedBulkActions?: boolean;
+  onBulkActionCall?: (
+    selectedIds: string[],
+    action: 'archive' | 'restore' | 'delete'
+  ) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -121,12 +122,6 @@ export const datatablePerPageAtom = atomWithStorage('perPage', '100');
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
-
-  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
-
-  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
-    useState<boolean>(false);
-  const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -140,7 +135,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const { styleOptions, customFilters } = props;
+  const { styleOptions, customFilters, onBulkActionCall } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -259,25 +254,14 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const bulk = (
     currentAction: 'archive' | 'restore' | 'delete',
-    id?: string,
-    password?: string
+    id?: string
   ) => {
     toast.processing();
 
-    request(
-      'POST',
-      endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
-      {
-        action: currentAction,
-        ids: id ? [id] : Array.from(selected),
-      },
-      {
-        ...(password &&
-          props.passwordProtectedBulkActions && {
-            headers: { 'X-Api-Password': password },
-          }),
-      }
-    )
+    request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
+      action: currentAction,
+      ids: id ? [id] : Array.from(selected),
+    })
       .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${currentAction}d_${props.resource}`);
 
@@ -298,11 +282,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 401) {
           toast.error(error.response?.data.message);
-        }
-
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-          setLastPasswordEntryTime(0);
         }
       })
       .finally(() => {
@@ -378,9 +357,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             <DropdownElement
               onClick={() => {
-                if (props.passwordProtectedBulkActions) {
-                  setAction('archive');
-                  setIsPasswordConfirmModalOpen(true);
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'archive');
                 } else {
                   bulk('archive');
                 }
@@ -392,9 +370,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             <DropdownElement
               onClick={() => {
-                if (props.passwordProtectedBulkActions) {
-                  setAction('delete');
-                  setIsPasswordConfirmModalOpen(true);
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'delete');
                 } else {
                   bulk('delete');
                 }
@@ -407,9 +384,8 @@ export function DataTable<T extends object>(props: Props<T>) {
             {showRestoreBulkAction() && (
               <DropdownElement
                 onClick={() => {
-                  if (props.passwordProtectedBulkActions) {
-                    setAction('restore');
-                    setIsPasswordConfirmModalOpen(true);
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'restore');
                   } else {
                     bulk('restore');
                   }
@@ -662,15 +638,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           totalPages={data.data.meta.pagination.total_pages}
           totalRecords={data.data.meta.pagination.total}
           leftSideChevrons={props.leftSideChevrons}
-        />
-      )}
-
-      {props.passwordProtectedBulkActions && (
-        <PasswordConfirmation
-          show={isPasswordConfirmModalOpen}
-          onClose={setIsPasswordConfirmModalOpen}
-          onSave={(password) => action && bulk(action, '', password)}
-          tableActions
         />
       )}
     </>

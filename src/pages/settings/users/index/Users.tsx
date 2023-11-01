@@ -16,6 +16,9 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { useState } from 'react';
+import { useBulk } from '$app/common/queries/users';
 
 export function Users() {
   useTitle('user_management');
@@ -23,6 +26,13 @@ export function Users() {
   const currentUser = useCurrentUser();
 
   const [t] = useTranslation();
+
+  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
+    useState<boolean>(false);
+  const [action, setAction] = useState<'archive' | 'restore' | 'delete'>();
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  const bulk = useBulk();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -43,25 +53,38 @@ export function Users() {
   ];
 
   return (
-    <Settings
-      title={t('user_details')}
-      breadcrumbs={pages}
-      docsLink="/docs/advanced-settings/#user_management"
-      withoutBackButton
-    >
-      <DataTable
-        resource="user"
-        columns={columns}
-        endpoint={route(
-          '/api/v1/users?without=:userId&hideRemovedUsers=true&sort=id|desc',
-          {
-            userId: currentUser?.id,
-          }
-        )}
-        linkToCreate="/settings/users/create"
-        bulkRoute="/api/v1/users/bulk"
-        passwordProtectedBulkActions
+    <>
+      <Settings
+        title={t('user_details')}
+        breadcrumbs={pages}
+        docsLink="/docs/advanced-settings/#user_management"
+        withoutBackButton
+      >
+        <DataTable
+          resource="user"
+          columns={columns}
+          endpoint={route(
+            '/api/v1/users?without=:userId&hideRemovedUsers=true&sort=id|desc',
+            {
+              userId: currentUser?.id,
+            }
+          )}
+          linkToCreate="/settings/users/create"
+          bulkRoute="/api/v1/users/bulk"
+          onBulkActionCall={(selectedUserIds, action) => {
+            setSelectedUserIds(selectedUserIds);
+            setAction(action);
+            setIsPasswordConfirmModalOpen(true);
+          }}
+        />
+      </Settings>
+
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setIsPasswordConfirmModalOpen}
+        onSave={(password) => action && bulk(selectedUserIds, action, password)}
+        tableActions
       />
-    </Settings>
+    </>
   );
 }
