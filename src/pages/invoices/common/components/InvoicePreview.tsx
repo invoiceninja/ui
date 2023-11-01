@@ -135,8 +135,6 @@ export function InvoicePreview(props: Props) {
     );
   }
 
-  console.log(render);
-
   if (
     props.resource?.id &&
     props.resource?.[props.relationType] &&
