@@ -69,10 +69,6 @@ export function Actions(props: Props) {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
         }
-
-        if (error.response?.status === 401) {
-          toast.error(error.response?.data.message);
-        }
       });
   };
 

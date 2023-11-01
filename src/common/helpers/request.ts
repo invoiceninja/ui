@@ -31,10 +31,9 @@ client.interceptors.response.use(
 
     if (
       error.response?.status &&
-      error.response.status !== 401 &&
       error.response.status !== 412 &&
       error.response.status !== 422 &&
-      error.response.status !== 400 && // Temporary solution. If you see this in few months, please delete (live previews).
+      !error.request.url.includes('live_preview') && // Temporary solution. If you see this in few months, please delete (live previews).
       error.response.status > 399 &&
       error.response.status < 500
     ) {
