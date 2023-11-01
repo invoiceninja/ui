@@ -15,15 +15,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  REQUIRED_PERMISSIONS,
-  ClientSelector as Selector,
-} from '$app/components/clients/ClientSelector';
+import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { route } from '$app/common/helpers/route';
-import {
-  Permissions,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useColorScheme } from '$app/common/colors';
 
@@ -61,14 +55,6 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
-  const disableByPermission = () => {
-    const permission = REQUIRED_PERMISSIONS.find(({ page }) =>
-      location.pathname.startsWith(`/${page}`)
-    )?.permission;
-
-    return Boolean(permission) && !hasPermission(permission as Permissions);
-  };
-
   const hasPermission = useHasPermission();
   const colors = useColorScheme();
 
@@ -85,7 +71,7 @@ export function ClientSelector(props: Props) {
             inputLabel={t('client')}
             onChange={(client) => props.onChange(client.id)}
             value={resource?.client_id}
-            readonly={props.readonly || !resource || disableByPermission()}
+            readonly={props.readonly || !resource}
             clearButton={Boolean(resource?.client_id)}
             onClearButtonClick={props.onClearButtonClick}
             initiallyVisible={!resource?.client_id}

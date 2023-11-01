@@ -17,11 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { Alert } from '../Alert';
 import { endpoint } from '$app/common/helpers';
-import {
-  Permissions,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
-import { useLocation } from 'react-router-dom';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -32,59 +28,11 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   clearInputAfterSelection?: boolean;
 }
 
-export const REQUIRED_PERMISSIONS = [
-  {
-    page: 'invoices',
-    permission: 'create_invoice',
-  },
-  {
-    page: 'payments',
-    permission: 'create_payment',
-  },
-  {
-    page: 'recurring_invoices',
-    permission: 'create_recurring_invoice',
-  },
-  {
-    page: 'quotes',
-    permission: 'create_quote',
-  },
-  {
-    page: 'credits',
-    permission: 'create_credit',
-  },
-  {
-    page: 'projects',
-    permission: 'create_project',
-  },
-  {
-    page: 'tasks',
-    permission: 'create_task',
-  },
-  {
-    page: 'expenses',
-    permission: 'create_expense',
-  },
-  {
-    page: 'recurring_expenses',
-    permission: 'create_recurring_expense',
-  },
-];
-
 export function ClientSelector(props: ClientSelectorProps) {
   const [t] = useTranslation();
-  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasPermission = useHasPermission();
-
-  const disableByPermission = () => {
-    const permission = REQUIRED_PERMISSIONS.find(({ page }) =>
-      location.pathname.startsWith(`/${page}`)
-    )?.permission;
-
-    return Boolean(permission) && !hasPermission(permission as Permissions);
-  };
 
   return (
     <>
@@ -100,7 +48,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           value: props.value || null,
         }}
         endpoint={endpoint('/api/v1/clients')}
-        readonly={props.readonly || disableByPermission()}
+        readonly={props.readonly}
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
         initiallyVisible={props.initiallyVisible}
