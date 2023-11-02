@@ -10,13 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { ApiToken } from '$app/common/interfaces/api-token';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useApiTokensQuery(params: Params) {
   const { isOwner } = useAdmin();
@@ -39,7 +39,7 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
   const { isOwner, isAdmin } = useAdmin();
 
   return useQuery<ApiToken>(
-    route('/api/v1/tokens/:id', { id: params.id }),
+    ['/api/v1/tokens', params.id],
     () =>
       request('GET', endpoint('/api/v1/tokens/:id', { id: params.id })).then(
         (response: GenericSingleResourceResponse<ApiToken>) =>
@@ -50,8 +50,6 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -61,9 +59,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_token`);
 
-      queryClient.invalidateQueries('/api/v1/tokens');
-
-      queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
+      $refetch(['tokens']);
     });
   };
 }

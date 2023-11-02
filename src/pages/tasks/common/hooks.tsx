@@ -34,7 +34,6 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
@@ -62,6 +61,7 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const defaultColumns: string[] = [
   'status',
@@ -289,24 +289,12 @@ export function useTaskColumns() {
 }
 
 export function useSave() {
-  const queryClient = useQueryClient();
-
   return (task: Task) => {
     request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
       () => {
         toast.success('updated_task');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
-
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+        $refetch(['tasks'])
       }
     );
   };

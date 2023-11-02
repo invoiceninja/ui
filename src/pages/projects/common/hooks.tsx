@@ -276,12 +276,7 @@ export function useActions() {
     toast.processing();
 
     queryClient.fetchQuery(
-      route(
-        '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-        {
-          projectId: project.id,
-        }
-      ),
+      ['/api/v1/tasks', 'project_tasks', project.id, 'per_page', 100, 'status', 'active'],
       () =>
         request(
           'GET',

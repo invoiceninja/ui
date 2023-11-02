@@ -29,7 +29,7 @@ export function useSearch() {
   const [t] = useTranslation();
 
   const { data } = useQuery(
-    '/api/v1/search',
+    ['/api/v1/search'],
     () =>
       request('POST', endpoint('/api/v1/search')).then(
         (response: AxiosResponse<SearchResponse>) => {

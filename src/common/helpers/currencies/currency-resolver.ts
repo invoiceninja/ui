@@ -31,7 +31,7 @@ export class CurrencyResolver {
 
   public find(id: string): Promise<Currency | undefined> {
     return this.queryClient
-      .fetchQuery(endpoint('/api/v1/statics'), () =>
+      .fetchQuery(['/api/v1/statics'], () =>
         request('GET', endpoint('/api/v1/statics'))
       )
       .then((data) =>

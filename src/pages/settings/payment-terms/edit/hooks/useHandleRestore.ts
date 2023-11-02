@@ -9,17 +9,15 @@
  */
 
 import { bulk } from '$app/common/queries/payment-terms';
-import { useInvalidatePaymentTermCache } from './useInvalidatePaymentTermCache';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleRestore() {
-  const invalidateCache = useInvalidatePaymentTermCache();
-
   return (id: string) => {
     toast.processing();
 
     bulk([id], 'restore')
       .then(() => toast.success('restored_payment_term'))
-      .finally(() => invalidateCache(id));
+      .finally(() => $refetch(['payment_terms']));
   };
 }

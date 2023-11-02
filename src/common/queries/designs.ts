@@ -36,7 +36,7 @@ interface DesignQueryOptions extends GenericQueryOptions {
 
 export function useDesignQuery(params: DesignQueryOptions) {
   return useQuery<Design>(
-    route('/api/v1/designs/:id', { id: params.id }),
+    ['/api/v1/designs', params.id],
     () =>
       request(
         'GET',
