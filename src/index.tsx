@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
+import React, { Fragment, ReactNode } from 'react';
 import { App } from './App';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -59,17 +59,27 @@ const container = document.getElementById('root') as HTMLElement;
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+const GoogleOAuth = (props: { children: ReactNode }) => {
+  return import.meta.env.VITE_IS_HOSTED === 'true' ? (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      {props.children}
+    </GoogleOAuthProvider>
+  ) : (
+    <Fragment>{props.children}</Fragment>
+  );
+};
+
 createRoot(container).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <GoogleOAuthProvider clientId={googleClientId}>
+        <GoogleOAuth>
           <Router>
             <ScrollToTop>
               <App />
             </ScrollToTop>
           </Router>
-        </GoogleOAuthProvider>
+        </GoogleOAuth>
       </Provider>
     </QueryClientProvider>
   </React.StrictMode>
