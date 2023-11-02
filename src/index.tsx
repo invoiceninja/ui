@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { Fragment, ReactNode } from 'react';
+import React from 'react';
 import { App } from './App';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -23,7 +23,7 @@ import { createRoot } from 'react-dom/client';
 
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleOAuth } from './components/GoogleOAuth';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -56,18 +56,6 @@ Sentry.init({
 });
 
 const container = document.getElementById('root') as HTMLElement;
-
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-const GoogleOAuth = (props: { children: ReactNode }) => {
-  return import.meta.env.VITE_IS_HOSTED === 'true' ? (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      {props.children}
-    </GoogleOAuthProvider>
-  ) : (
-    <Fragment>{props.children}</Fragment>
-  );
-};
 
 createRoot(container).render(
   <React.StrictMode>
