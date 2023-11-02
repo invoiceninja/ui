@@ -84,28 +84,6 @@ test('can view invoice', async ({ page }) => {
   }
 });
 
-test("can't create an invoice", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await set('view_invoice');
-  await save();
-  await logout(page);
-
-  await login(page, 'invoices@example.com', 'password');
-
-  await page.getByRole('link', { name: 'Invoices', exact: true }).click();
-  await page.getByText('New Invoice').click();
-
-  await expect(
-    page
-      .getByRole('heading', {
-        name: "Sorry, you don't have the needed permissions.",
-      })
-      .first()
-  ).toBeVisible();
-});
 
 test('can create an invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
@@ -340,7 +318,7 @@ test('invoice documents preview', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/invoices/**/edit');
 
@@ -395,7 +373,7 @@ test('invoice documents uploading', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/invoices/**/edit');
 

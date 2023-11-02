@@ -80,7 +80,7 @@ export function useActions(params: Params) {
     (client) =>
       !client.is_deleted && (
         <DropdownElement
-          onClick={route('/invoices/create?client=:id', { id: client.id })}
+          to={route('/invoices/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_invoice')}
