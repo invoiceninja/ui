@@ -34,7 +34,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/invoices/:id?include=client', { id: params.id })
+        endpoint('/api/v1/invoices/:id?include=client.group_settings', { id: params.id })
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
