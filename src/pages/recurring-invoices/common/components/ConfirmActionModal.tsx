@@ -14,7 +14,7 @@ import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const confirmActionModal = atom(false);
+export const confirmActionModalAtom = atom(false);
 
 interface Props {
   onClick: () => void;
@@ -22,7 +22,7 @@ interface Props {
 
 export function ConfirmActionModal({ onClick }: Props) {
   const [t] = useTranslation();
-  const [isModalVisible, setIsModalVisible] = useAtom(confirmActionModal);
+  const [isModalVisible, setIsModalVisible] = useAtom(confirmActionModalAtom);
 
   useEffect(() => {
     return () => {
