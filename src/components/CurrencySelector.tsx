@@ -25,7 +25,7 @@ export function CurrencySelector(props: GenericSelectorProps) {
     >
       {currencies.map((currency, index) => (
         <option key={index} value={currency.id}>
-          {currency.name}
+          {currency.name} ({currency.code})
         </option>
       ))}
     </SearchableSelect>
