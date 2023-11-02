@@ -42,7 +42,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import {
   ConfirmActionModal,
-  confirmActionModal,
+  confirmActionModalAtom,
 } from '../common/components/ConfirmActionModal';
 
 export default function Create() {
@@ -165,7 +165,7 @@ export default function Create() {
 
   const save = useCreate({ setErrors });
 
-  const [, setIsConfirmationVisible] = useAtom(confirmActionModal);
+  const [, setIsConfirmationVisible] = useAtom(confirmActionModalAtom);
 
   const saveOptions: SaveOption[] = [
     {
