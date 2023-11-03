@@ -110,6 +110,7 @@ interface Props<T> extends CommonProps {
     resource: T[],
     action: 'archive' | 'delete' | 'restore'
   ) => void;
+  showMoreActionsDropdown?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -131,7 +132,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const { styleOptions, customFilters } = props;
+  const { styleOptions, customFilters, showMoreActionsDropdown = true } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -307,6 +308,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     <>
       {!props.withoutActions && (
         <Actions
+          resource={props.resource}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}
@@ -334,43 +336,45 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
         >
-          <Dropdown label={t('more_actions')} disabled={!selected.length}>
-            {props.customBulkActions &&
-              props.customBulkActions.map(
-                (bulkAction: CustomBulkAction<T>, index: number) => (
-                  <div key={index}>
-                    {bulkAction(selected, selectedResources, setSelected)}
-                  </div>
-                )
+          {showMoreActionsDropdown && (
+            <Dropdown label={t('more_actions')} disabled={!selected.length}>
+              {props.customBulkActions &&
+                props.customBulkActions.map(
+                  (bulkAction: CustomBulkAction<T>, index: number) => (
+                    <div key={index}>
+                      {bulkAction(selected, selectedResources, setSelected)}
+                    </div>
+                  )
+                )}
+
+              {props.customBulkActions && showCustomBulkActionDivider && (
+                <Divider withoutPadding />
               )}
 
-            {props.customBulkActions && showCustomBulkActionDivider && (
-              <Divider withoutPadding />
-            )}
-
-            <DropdownElement
-              onClick={() => bulk('archive')}
-              icon={<Icon element={MdArchive} />}
-            >
-              {t('archive')}
-            </DropdownElement>
-
-            <DropdownElement
-              onClick={() => bulk('delete')}
-              icon={<Icon element={MdDelete} />}
-            >
-              {t('delete')}
-            </DropdownElement>
-
-            {showRestoreBulkAction() && (
               <DropdownElement
-                onClick={() => bulk('restore')}
-                icon={<Icon element={MdRestore} />}
+                onClick={() => bulk('archive')}
+                icon={<Icon element={MdArchive} />}
               >
-                {t('restore')}
+                {t('archive')}
               </DropdownElement>
-            )}
-          </Dropdown>
+
+              <DropdownElement
+                onClick={() => bulk('delete')}
+                icon={<Icon element={MdDelete} />}
+              >
+                {t('delete')}
+              </DropdownElement>
+
+              {showRestoreBulkAction() && (
+                <DropdownElement
+                  onClick={() => bulk('restore')}
+                  icon={<Icon element={MdRestore} />}
+                >
+                  {t('restore')}
+                </DropdownElement>
+              )}
+            </Dropdown>
+          )}
         </Actions>
       )}
 
@@ -390,7 +394,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
-          {!props.withoutActions && (
+          {!props.withoutActions && showMoreActionsDropdown && (
             <Th className={styleOptions?.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
@@ -427,7 +431,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           ))}
 
-          {props.withResourcefulActions && <Th></Th>}
+          {props.withResourcefulActions && showMoreActionsDropdown && <Th></Th>}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -479,7 +483,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
               >
-                {!props.withoutActions && (
+                {!props.withoutActions && showMoreActionsDropdown && (
                   <Td
                     className="cursor-pointer"
                     onClick={() =>
@@ -505,6 +509,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     className={classNames(
                       {
                         'cursor-pointer': index < 3,
+                        'py-4': !showMoreActionsDropdown,
                       },
                       styleOptions?.tdClassName
                     )}
@@ -522,7 +527,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 ))}
 
-                {props.withResourcefulActions && (
+                {props.withResourcefulActions && showMoreActionsDropdown && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
                       {props.linkToEdit &&

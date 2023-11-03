@@ -14,6 +14,11 @@ import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
+import {
+  Permissions,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 export interface SelectOption {
   value: string;
@@ -35,10 +40,12 @@ interface Props extends CommonProps {
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
   beforeFilter?: ReactNode;
+  resource: string;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const onStatusChange = (
     options:
@@ -144,7 +151,16 @@ export function Actions(props: Props) {
           />
         )}
       </div>
-      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
+      <div
+        className={classNames(
+          'flex flex-col mt-2 lg:mt-0 lg:flex-row lg:items-center  lg:space-y-0',
+          {
+            'space-y-2 lg:space-x-4': hasPermission(
+              `create_${props.resource}` as Permissions
+            ),
+          }
+        )}
+      >
         {props.beforeFilter}
 
         <InputField
