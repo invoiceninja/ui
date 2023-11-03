@@ -14,11 +14,14 @@ import { useParams } from 'react-router-dom';
 import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const dataTableStaleTime = 50;
 
 export default function Invoices() {
   const { id } = useParams();
+  const hasPermission = useHasPermission();
 
   const columns = useInvoiceColumns();
 
@@ -41,6 +44,8 @@ export default function Invoices() {
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
       staleTime={dataTableStaleTime}
+      linkToCreateGuards={[permission('create_invoice')]}
+      showEditEntityOptions={hasPermission('edit_invoice')}
     />
   );
 }
