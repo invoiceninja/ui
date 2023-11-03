@@ -14,11 +14,10 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Quote } from '$app/common/interfaces/quote';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 
 export function useBlankQuoteQuery(options?: GenericQueryOptions) {
   return useQuery<Quote>(
-    '/api/v1/quotes/create',
+    ['/api/v1/quotes', 'create'],
     () =>
       request('GET', endpoint('/api/v1/quotes/create')).then(
         (response: GenericSingleResourceResponse<Quote>) => response.data.data
@@ -33,7 +32,7 @@ interface QuoteQueryParams {
 
 export function useQuoteQuery({ id }: QuoteQueryParams) {
   return useQuery<Quote>(
-    route('/api/v1/quotes/:id', { id }),
+    ['/api/v1/quotes', id],
     () =>
       request(
         'GET',

@@ -21,8 +21,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleChange } from '$app/pages/products/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ProductForm } from '$app/pages/products/common/components/ProductForm';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   isModalOpen: boolean;
@@ -34,8 +34,6 @@ export function ProductCreate(props: Props) {
   const [t] = useTranslation();
 
   const { data: blankProduct } = useBlankProductQuery();
-
-  const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -54,16 +52,8 @@ export function ProductCreate(props: Props) {
       request('POST', endpoint('/api/v1/products'), product)
         .then((response: GenericSingleResourceResponse<Product>) => {
           toast.success('created_product');
-
-          queryClient.invalidateQueries('/api/v1/products');
-
-          window.dispatchEvent(
-            new CustomEvent('invalidate.combobox.queries', {
-              detail: {
-                url: endpoint('/api/v1/products'),
-              },
-            })
-          );
+          
+          $refetch(['products']);
 
           props.setIsModalOpen(false);
           props.onProductCreated?.(response.data.data);

@@ -27,10 +27,10 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
 import { useActions } from './common/useActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -120,7 +120,6 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
-  const queryClient = useQueryClient();
   const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
 
   const handleRemoveHeader = (key: string) => {
@@ -145,8 +144,7 @@ export function Edit() {
         .then(() => {
           toast.success('created_webhook');
 
-          queryClient.invalidateQueries('/api/v1/webhooks');
-          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+          $refetch(['webhooks']);
 
           navigate('/settings/integrations/api_webhooks');
         })
