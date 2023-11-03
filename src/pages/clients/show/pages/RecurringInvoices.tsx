@@ -44,7 +44,7 @@ export default function RecurringInvoices() {
         id,
       })}
       linkToEdit="/recurring_invoices/:id/edit"
-      linkToCreateGuards={[permission('edit_recurring_invoice')]}
+      linkToCreateGuards={[permission('create_recurring_invoice')]}
       showEditEntityOptions={hasPermission('edit_recurring_invoice')}
       staleTime={dataTableStaleTime}
     />

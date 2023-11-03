@@ -63,7 +63,7 @@ export default function Tasks() {
       })}
       linkToEdit="/tasks/:id/edit"
       showEdit={(task: Task) => showEditOption(task)}
-      linkToCreateGuards={[permission('edit_task')]}
+      linkToCreateGuards={[permission('create_task')]}
       showEditEntityOptions={hasPermission('edit_task')}
       staleTime={dataTableStaleTime}
     />

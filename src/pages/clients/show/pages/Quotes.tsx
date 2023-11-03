@@ -41,7 +41,7 @@ export default function Quotes() {
       bulkRoute="/api/v1/quotes/bulk"
       linkToCreate={route('/quotes/create?client=:id', { id })}
       linkToEdit="/quotes/:id/edit"
-      linkToCreateGuards={[permission('edit_quote')]}
+      linkToCreateGuards={[permission('create_quote')]}
       showEditEntityOptions={hasPermission('edit_quote')}
       staleTime={dataTableStaleTime}
     />

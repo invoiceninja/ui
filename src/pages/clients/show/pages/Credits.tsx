@@ -41,7 +41,7 @@ export default function Credits() {
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id })}
       linkToEdit="/credits/:id/edit"
-      linkToCreateGuards={[permission('edit_credit')]}
+      linkToCreateGuards={[permission('create_credit')]}
       showEditEntityOptions={hasPermission('edit_credit')}
       staleTime={dataTableStaleTime}
     />

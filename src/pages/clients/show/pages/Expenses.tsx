@@ -48,7 +48,7 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?client=:id', { id })}
       linkToEdit="/expenses/:id/edit"
-      linkToCreateGuards={[permission('edit_expense')]}
+      linkToCreateGuards={[permission('create_expense')]}
       showEditEntityOptions={hasPermission('edit_expense')}
       staleTime={dataTableStaleTime}
     />

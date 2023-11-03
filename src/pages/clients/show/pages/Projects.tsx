@@ -40,7 +40,7 @@ export default function Projects() {
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
       linkToEdit="/projects/:id/edit"
-      linkToCreateGuards={[permission('edit_project')]}
+      linkToCreateGuards={[permission('create_project')]}
       showEditEntityOptions={hasPermission('edit_project')}
       staleTime={dataTableStaleTime}
     />

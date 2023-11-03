@@ -41,7 +41,7 @@ export default function RecurringExpenses() {
       bulkRoute="/api/v1/recurring_expenses/bulk"
       linkToCreate={route('/recurring_expenses/create?client=:id', { id: id })}
       linkToEdit="/recurring_expenses/:id/edit"
-      linkToCreateGuards={[permission('edit_recurring_expense')]}
+      linkToCreateGuards={[permission('create_recurring_expense')]}
       showEditEntityOptions={hasPermission('edit_recurring_expense')}
       staleTime={dataTableStaleTime}
     />

@@ -40,7 +40,7 @@ export default function Payments() {
       linkToCreate={route('/payments/create?client=:id', { id })}
       linkToEdit="/payments/:id/edit"
       showRestore={(resource: Payment) => !resource.is_deleted}
-      linkToCreateGuards={[permission('edit_payment')]}
+      linkToCreateGuards={[permission('create_payment')]}
       showEditEntityOptions={hasPermission('edit_payment')}
       staleTime={dataTableStaleTime}
     />
