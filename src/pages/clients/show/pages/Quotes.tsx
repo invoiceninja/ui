@@ -14,9 +14,12 @@ import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
 import { useActions, useQuoteColumns } from '$app/pages/quotes/common/hooks';
 import { useCustomBulkActions } from '$app/pages/quotes/common/hooks/useCustomBulkActions';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Quotes() {
   const { id } = useParams();
+  const hasPermission = useHasPermission();
 
   const columns = useQuoteColumns();
 
@@ -38,6 +41,8 @@ export default function Quotes() {
       bulkRoute="/api/v1/quotes/bulk"
       linkToCreate={route('/quotes/create?client=:id', { id })}
       linkToEdit="/quotes/:id/edit"
+      linkToCreateGuards={[permission('edit_quote')]}
+      showEditEntityOptions={hasPermission('edit_quote')}
       staleTime={dataTableStaleTime}
     />
   );

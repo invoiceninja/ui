@@ -16,9 +16,12 @@ import {
   useActions,
   useProjectColumns,
 } from '$app/pages/projects/common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Projects() {
   const { id } = useParams();
+  const hasPermission = useHasPermission();
 
   const columns = useProjectColumns();
 
@@ -37,6 +40,8 @@ export default function Projects() {
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
       linkToEdit="/projects/:id/edit"
+      linkToCreateGuards={[permission('edit_project')]}
+      showEditEntityOptions={hasPermission('edit_project')}
       staleTime={dataTableStaleTime}
     />
   );
