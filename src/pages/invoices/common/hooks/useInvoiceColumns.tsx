@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -113,6 +114,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
 
@@ -135,7 +137,15 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link to={`/invoices/${invoice.id}/edit`}>{value}</Link>
+        <Link
+          to={
+            hasPermission('edit_invoice')
+              ? route('/invoices/:id/edit', { id: invoice.client_id })
+              : ''
+          }
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -153,8 +163,14 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'client',
       id: 'client_id',
       label: t('client'),
-      format: (value, invoice) => (
-        <Link to={route('/clients/:id', { id: invoice.client_id })}>
+      format: (_, invoice) => (
+        <Link
+          to={
+            hasPermission('view_client') || hasPermission('edit_client')
+              ? route('/clients/:id', { id: invoice.client_id })
+              : ''
+          }
+        >
           {invoice.client?.display_name}
         </Link>
       ),

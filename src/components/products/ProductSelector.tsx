@@ -17,6 +17,7 @@ import { Alert } from '../Alert';
 import { endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import classNames from 'classnames';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -32,6 +33,7 @@ interface Props {
 
 export function ProductSelector(props: Props) {
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const currentCompany = useCurrentCompany();
@@ -83,7 +85,7 @@ export function ProductSelector(props: Props) {
         action={{
           label: t('new_product'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: hasPermission('create_product'),
         }}
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"

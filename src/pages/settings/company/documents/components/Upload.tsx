@@ -30,10 +30,13 @@ interface Props {
   endpoint: string;
   onSuccess?: () => unknown;
   widgetOnly?: boolean;
+  disableUpload?: boolean;
 }
 
 export function Upload(props: Props) {
   const [t] = useTranslation();
+
+  const { disableUpload = false } = props;
 
   const user = useCurrentUser();
 
@@ -70,7 +73,7 @@ export function Upload(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: !enterprisePlan() && isHosted(),
+    disabled: (!enterprisePlan() && isHosted()) || disableUpload,
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 
@@ -82,7 +85,7 @@ export function Upload(props: Props) {
     },
   });
 
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   if (props.widgetOnly) {
     return (
@@ -114,8 +117,13 @@ export function Upload(props: Props) {
           <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <input {...getInputProps()} />
             <Image className="mx-auto h-12 w-12 text-gray-400" />
-            <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3 }}>
-            {isDragActive ? t('drop_file_here') : t('dropzone_default_message')}
+            <span
+              className="mt-2 block text-sm font-medium"
+              style={{ color: colors.$3 }}
+            >
+              {isDragActive
+                ? t('drop_file_here')
+                : t('dropzone_default_message')}
             </span>
           </div>
         </div>
@@ -161,7 +169,10 @@ export function Upload(props: Props) {
             <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <input {...getInputProps()} />
               <Image className="mx-auto h-12 w-12 text-gray-400" />
-              <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3 }}>
+              <span
+                className="mt-2 block text-sm font-medium"
+                style={{ color: colors.$3 }}
+              >
                 {isDragActive
                   ? 'drop_file_here'
                   : t('dropzone_default_message')}

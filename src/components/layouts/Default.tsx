@@ -398,7 +398,10 @@ export function Default(props: Props) {
           </button>
           <div className="flex-1 px-4 md:px-8 flex items-center">
             <div className="flex flex-1 items-center space-x-4">
-              <h2 style={{ color: colors.$3 }} className="text-sm md:text-lg whitespace-nowrap">
+              <h2
+                style={{ color: colors.$3 }}
+                className="text-sm md:text-lg whitespace-nowrap"
+              >
                 {props.title}
               </h2>
 
@@ -495,9 +498,11 @@ export function Default(props: Props) {
                 </div>
               )}
 
-              <div className="space-x-3 items-center hidden lg:flex">
-                {props.navigationTopRight}
-              </div>
+              {props.navigationTopRight && (
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
+              )}
             </div>
           </div>
         </div>

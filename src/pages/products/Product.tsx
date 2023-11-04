@@ -20,16 +20,20 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTabs } from './edit/hooks/useTabs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Product() {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const saveCompany = useHandleCompanySave();
 
@@ -53,20 +57,7 @@ export default function Product() {
     },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/products/:id/edit', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/products/:id/documents', { id }),
-    },
-    {
-      name: t('product_fields'),
-      href: route('/products/:id/product_fields', { id }),
-    },
-  ];
+  const tabs = useTabs();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -89,7 +80,7 @@ export default function Product() {
         .then(() => {
           toast.success('updated_product');
 
-          $refetch(['products'])
+          $refetch(['products']);
 
           searchParams.delete('update_in_stock_quantity');
           setSearchParams(searchParams);
@@ -109,16 +100,17 @@ export default function Product() {
       title={t('edit_product')}
       breadcrumbs={pages}
       disableSaveButton={!productData || isFormBusy}
-      onSaveClick={handleSave}
-      navigationTopRight={
-        productData && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={productData.data.data}
-            actions={actions}
-          />
-        )
-      }
+      {...(hasPermission('edit_product') &&
+        productData && {
+          onSaveClick: handleSave,
+          navigationTopRight: (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={productData.data.data}
+              actions={actions}
+            />
+          ),
+        })}
     >
       <Container>
         <Tabs tabs={tabs} />

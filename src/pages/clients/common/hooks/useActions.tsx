@@ -31,6 +31,10 @@ import {
 import { useBulk } from './useBulk';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useConfigureClientSettings } from './useConfigureClientSettings';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 interface Params {
   setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -42,6 +46,9 @@ interface Params {
 export function useActions(params: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
+
+  const { isOwner, isAdmin } = useAdmin();
+  const hasPermission = useHasPermission();
 
   const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'client',
@@ -69,7 +76,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => configureClientSettings(client)}
           icon={<Icon element={MdSettings} />}
@@ -78,7 +86,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           to={route('/invoices/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}
@@ -87,7 +96,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      hasPermission('create_payment') && (
         <DropdownElement
           to={route('/payments/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}
@@ -96,7 +106,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      hasPermission('create_quote') && (
         <DropdownElement
           to={route('/quotes/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}
@@ -105,7 +116,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      hasPermission('create_credit') && (
         <DropdownElement
           to={route('/credits/create?client=:id', { id: client.id })}
           icon={<Icon element={BiPlusCircle} />}

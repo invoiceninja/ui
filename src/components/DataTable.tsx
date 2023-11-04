@@ -31,7 +31,6 @@ import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
-import { Inline } from './Inline';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -290,6 +289,14 @@ export function DataTable<T extends object>(props: Props<T>) {
       : false;
   }, [props.customBulkActions, selected, selectedResources]);
 
+  const showCustomActionDivider = (resource: T) => {
+    return props.customActions
+      ? props.customActions.some((action: ResourceAction<T>) =>
+          React.isValidElement(action(resource))
+        )
+      : false;
+  };
+
   useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
@@ -314,7 +321,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={
-            <Inline>
+            <>
               {props.rightSide}
 
               {props.linkToCreate && (
@@ -328,7 +335,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   }
                 />
               )}
-            </Inline>
+            </>
           }
           beforeFilter={props.beforeFilter}
         >
@@ -540,6 +547,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.linkToEdit &&
                         props.customActions &&
+                        showCustomActionDivider(resource) &&
                         (props.showEdit?.(resource) || !props.showEdit) && (
                           <Divider withoutPadding />
                         )}
@@ -550,7 +558,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key !== 'purge' && (
+                            action(resource)?.key !== 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}
@@ -594,7 +602,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key === 'purge' && (
+                            action(resource)?.key === 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}

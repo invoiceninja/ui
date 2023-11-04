@@ -26,6 +26,7 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   invoice?: Invoice;
@@ -35,6 +36,8 @@ interface Props {
 
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const location = useLocation();
 
@@ -48,7 +51,7 @@ export function InvoiceFooter(props: Props) {
     t('footer'),
     t('documents'),
     t('settings'),
-    t('custom_fields'),
+    ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   const onSuccess = () => {

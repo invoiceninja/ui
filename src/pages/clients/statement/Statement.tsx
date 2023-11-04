@@ -31,6 +31,7 @@ import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
 import { useClientQuery } from '$app/common/queries/clients';
 import { Client } from '$app/common/interfaces/client';
 import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 dayjs.extend(quarter);
 
@@ -53,6 +54,7 @@ export default function Statement() {
   const { documentTitle } = useTitle('statement');
   const { t } = useTranslation();
   const { id } = useParams();
+  const { isAdmin, isOwner } = useAdmin();
 
   const user = useCurrentUser();
 
@@ -236,12 +238,14 @@ export default function Statement() {
           >
             {t('download')}
           </DropdownElement>
-          <DropdownElement
-            onClick={() => scheduleStatement(statement)}
-            icon={<Icon element={MdSchedule} />}
-          >
-            {t('schedule')}
-          </DropdownElement>
+          {(isAdmin || isOwner) && (
+            <DropdownElement
+              onClick={() => scheduleStatement(statement)}
+              icon={<Icon element={MdSchedule} />}
+            >
+              {t('schedule')}
+            </DropdownElement>
+          )}
         </Dropdown>
       }
     >
