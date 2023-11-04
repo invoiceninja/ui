@@ -96,7 +96,7 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateOneLocal;
 
     if (this.item.tax_name1.length >= 1) {
-      this.groupTax(this.item.tax_name1, this.item.tax_rate1, amount);
+      this.groupTax(this.item.tax_name1, this.item.tax_rate1, itemTaxRateOneLocal);
     }
 
     //
@@ -109,7 +109,7 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateTwoLocal;
 
     if (this.item.tax_name2.length >= 1) {
-      this.groupTax(this.item.tax_name2, this.item.tax_rate2, amount);
+      this.groupTax(this.item.tax_name2, this.item.tax_rate2, itemTaxRateTwoLocal);
     }
 
     //
@@ -122,7 +122,7 @@ export class InvoiceItemSumInclusive {
     itemTax += itemTaxRateThreeLocal;
 
     if (this.item.tax_name3.length >= 1) {
-      this.groupTax(this.item.tax_name3, this.item.tax_rate3, amount);
+      this.groupTax(this.item.tax_name3, this.item.tax_rate3, itemTaxRateThreeLocal);
     }
 
     // this.item.gross_line_total = this.item.line_total + itemTax;

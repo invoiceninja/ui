@@ -23,18 +23,17 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_schedule');
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { id } = useParams();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
@@ -80,11 +79,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_schedule');
 
-          queryClient.invalidateQueries('/api/v1/task_schedulers');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/task_schedulers/:id', { id })
-          );
+          $refetch(['task_schedulers']);
 
           navigate('/settings/schedules');
         })

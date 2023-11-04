@@ -13,9 +13,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useMarkPaid() {
   const queryClient = useQueryClient();
@@ -32,17 +32,7 @@ export function useMarkPaid() {
     ).then(() => {
       toast.success('invoice_paid');
 
-      queryClient.invalidateQueries('/api/v1/invoices');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/invoices/:id', { id: invoice.id })
-      );
-
-      queryClient.invalidateQueries('/api/v1/clients');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/clients/:id', { id: invoice.client_id })
-      );
+      $refetch(['invoices', 'clients']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

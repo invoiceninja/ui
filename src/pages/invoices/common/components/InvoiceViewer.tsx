@@ -38,10 +38,9 @@ export function InvoiceViewer(props: Props) {
       toast.processing();
     }
 
-
     if (props.enabled !== false) {
       queryClient.fetchQuery({
-        queryKey: ['preview'],
+        queryKey: [props.link, JSON.stringify(props.resource)],
         queryFn: ({ signal }) =>
           request(props.method, props.link, props.resource, {
             responseType: 'arraybuffer',

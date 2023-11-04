@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 
 export function useStaticsQuery() {
   return useQuery<Statics>(
-    '/api/v1/statics',
+    ['/api/v1/statics'],
     () =>
       request('GET', endpoint('/api/v1/statics')).then(
         (response) => response.data

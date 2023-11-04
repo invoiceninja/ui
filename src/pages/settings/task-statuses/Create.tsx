@@ -28,9 +28,9 @@ import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_task_status');
@@ -40,8 +40,6 @@ export function Create() {
   const navigate = useNavigate();
 
   const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -79,7 +77,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
+          $refetch(['task_statuses'])
 
           if (actionType === 'save') {
             navigate(

@@ -23,10 +23,10 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   useTitle('payment_terms');
@@ -45,10 +45,9 @@ export function Edit() {
   ];
 
   const { data } = usePaymentTermQuery({ id });
-  const queryClient = useQueryClient();
 
   const invalidatePaymentTermCache = () => {
-    queryClient.invalidateQueries(route('/api/v1/payment_terms/:id', { id }));
+    $refetch(['payment_terms'])
   };
 
   const formik = useFormik({
