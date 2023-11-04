@@ -21,6 +21,7 @@ import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCreate(
   companyGateway: CompanyGateway | undefined,
@@ -40,7 +41,7 @@ export function useHandleCreate(
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
-        queryClient.invalidateQueries('/api/v1/company_gateways');
+        $refetch(['company_gateways']);
 
         toast.success('created_company_gateway');
 

@@ -113,10 +113,7 @@ export function CompanyEdit(props: Props) {
           if (subdomain && isHosted()) {
             request('POST', endpoint('/api/v1/check_subdomain'), {
               subdomain: subdomain,
-            }).catch((error: AxiosError) => {
-              if (error?.response?.status === 401) {
-                toast.error('subdomain_is_not_available');
-              }
+            }).catch(() => {
               return;
             });
           }

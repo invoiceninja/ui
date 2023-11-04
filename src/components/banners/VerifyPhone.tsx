@@ -23,7 +23,6 @@ import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import VerificationInput from 'react-verification-input';
-import { useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useDispatch } from 'react-redux';
@@ -31,6 +30,7 @@ import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface VerificationProps {
   visible: boolean;
@@ -51,7 +51,6 @@ function Confirmation({
   const [t] = useTranslation();
   const [code, setCode] = useState<string | null>(null);
 
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
   const handleConfirmation = () => {
@@ -62,8 +61,7 @@ function Confirmation({
     }).then(() => {
       toast.success('verified_phone_number');
 
-      queryClient.invalidateQueries('/api/v1/users');
-      queryClient.invalidateQueries('/api/v1/company_users');
+      $refetch(['users', 'company_users']);
 
       request('POST', endpoint('/api/v1/refresh')).then(
         (response: GenericSingleResourceResponse<CompanyUser>) => {

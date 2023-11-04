@@ -12,10 +12,10 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useMarkSent() {
   const queryClient = useQueryClient();
@@ -32,11 +32,7 @@ export function useMarkSent() {
     ).then(() => {
       toast.success('marked_invoice_as_sent');
 
-      queryClient.invalidateQueries('/api/v1/invoices');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/invoices/:id', { id: invoice.id })
-      );
+      $refetch(['invoices']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

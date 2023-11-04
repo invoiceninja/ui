@@ -11,10 +11,8 @@
 import { Card, Element } from '$app/components/cards';
 import { InputField, Link, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
-import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useStaticsQuery } from '$app/common/queries/statics';
@@ -23,13 +21,17 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
+import { request } from '$app/common/helpers/request';
+import { AxiosResponse } from 'axios';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   client: Client | undefined;
@@ -43,9 +45,15 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
   const currencies = useCurrencies();
   const languages = useLanguages();
-  const queryClient = useQueryClient();
 
-  const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
+  const { data: paymentTerms } = useQuery({
+    queryKey: ['/api/v1/payment_terms'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/payment_terms')).then(
+        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) => response.data.data
+      ),
+  });
+
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
 
@@ -93,7 +101,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   }, []);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
+    $refetch(['clients']);
   };
 
   return (
@@ -133,7 +141,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 withBlank
               >
-                {paymentTerms.data.data.map(
+                {paymentTerms.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}
@@ -155,7 +163,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
               >
-                {paymentTerms.data.data.map(
+                {paymentTerms.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}

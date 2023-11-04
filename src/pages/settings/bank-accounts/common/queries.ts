@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { route } from '$app/common/helpers/route';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -22,7 +21,7 @@ interface BankAccountParams {
 
 export function useBankAccountQuery(params: BankAccountParams) {
   return useQuery<BankAccount>(
-    route('/api/v1/bank_integrations/:id', { id: params.id }),
+    ['/api/v1/bank_integrations', params.id],
     () =>
       request(
         'GET',
@@ -37,7 +36,7 @@ export function useBankAccountQuery(params: BankAccountParams) {
 
 export function useBankAccountsQuery() {
   return useQuery<BankAccount[]>(
-    '/api/v1/bank_integrations',
+    ['/api/v1/bank_integrations'],
     () =>
       request('GET', endpoint('/api/v1/bank_integrations')).then(
         (response: GenericSingleResourceResponse<BankAccount[]>) =>
@@ -49,7 +48,7 @@ export function useBankAccountsQuery() {
 
 export function useBlankBankAccountQuery() {
   return useQuery<BankAccount>(
-    '/api/v1/bank_integrations/create',
+    ['/api/v1/bank_integrations', 'create'],
     () =>
       request('GET', endpoint('/api/v1/bank_integrations/create')).then(
         (response: GenericSingleResourceResponse<BankAccount>) =>

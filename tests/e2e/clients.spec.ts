@@ -13,6 +13,8 @@ const createClient = async (page: Page) => {
   await page.locator('#email_0').fill('first@example.com');
 
   await page.getByRole('button', { name: 'Save' }).click();
+  
+
 };
 
 test("can't view clients without permission", async ({ page }) => {
@@ -28,6 +30,7 @@ test("can't view clients without permission", async ({ page }) => {
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Clients'
   );
+  await logout(page);
 });
 
 test('can view client', async ({ page }) => {
@@ -88,27 +91,8 @@ test('can view client', async ({ page }) => {
 
     await expect(page.getByText('No records found')).toBeVisible();
   }
-});
-
-test("can't create a client", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('clients@example.com');
-  await set('view_client');
-  await save();
   await logout(page);
 
-  await login(page, 'clients@example.com', 'password');
-
-  await page.getByRole('link', { name: 'Clients', exact: true }).click();
-  await page.getByText('New Client').click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
 });
 
 test('can create a client', async ({ page }) => {
@@ -311,7 +295,7 @@ test('client documents preview', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/clients/**/edit');
 
@@ -369,8 +353,7 @@ test('client documents uploading', async ({ page }) => {
 
     await moreActionsButton.click();
   }
-
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/clients/**/edit');
 

@@ -21,7 +21,6 @@ import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import {
   DragDropContext,
@@ -57,6 +56,7 @@ import {
   TaskDetails,
 } from '../common/components/CreateTaskModal';
 import { TaskClock } from './components/TaskClock';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface CardItem {
   id: string;
@@ -86,8 +86,6 @@ export default function Kanban() {
     { name: t('tasks'), href: '/tasks' },
     { name: t('kanban'), href: '/tasks/kanban' },
   ];
-
-  const queryClient = useQueryClient();
 
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
@@ -171,7 +169,7 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
+      .finally(() => $refetch(['tasks']));
   };
 
   const onDragEnd = (result: DropResult) => {
