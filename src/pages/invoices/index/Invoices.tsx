@@ -79,7 +79,7 @@ export default function Invoices() {
     >
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"

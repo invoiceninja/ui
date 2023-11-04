@@ -67,7 +67,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('invoice')}>
           <ComboboxAsync<Invoice>
             endpoint={
-              endpoint('/api/v1/invoices?include=client&status=active')
+              endpoint('/api/v1/invoices?include=client.group_settings&status=active')
             }
             onChange={(invoice: Entry<Invoice>) =>
               invoice.resource &&

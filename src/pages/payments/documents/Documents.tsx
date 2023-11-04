@@ -9,21 +9,18 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 export default function Documents() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
 
-  const queryClient = useQueryClient();
-
   const invalidateQuery = () => {
-    queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+    $refetch(['payments']);
   };
 
   return (
