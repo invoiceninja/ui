@@ -754,22 +754,24 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const isEntryAvailable = () => {
+    if (entries.length) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      return Boolean(entry);
+    }
+
+    return false;
+  };
+
   const { data } = useQuery(
     [new URL(url).pathname, new URL(url).href],
-    () => {
-      const $url = new URL(url);
-
-      if (sortBy) {
-        $url.searchParams.set('sort', sortBy);
-      }
-
-      $url.searchParams.set('status', 'active');
-
-      if (inputOptions.value && !disableWithQueryParameter) {
-        $url.searchParams.set('with', inputOptions.value.toString());
-      }
-
-      return request('GET', $url.href).then(
+    () =>
+      request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -786,8 +788,7 @@ export function ComboboxAsync<T = any>({
 
           return data;
         }
-      );
-    },
+      ),
     {
       staleTime: staleTime ?? Infinity,
       refetchOnWindowFocus: false,
@@ -796,12 +797,41 @@ export function ComboboxAsync<T = any>({
   );
 
   useEffect(() => {
+    if (
+      inputOptions.value &&
+      !disableWithQueryParameter &&
+      !isEntryAvailable()
+    ) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        inputOptions.value &&
+          currentUrl.searchParams.set('with', inputOptions.value.toString());
+
+        return currentUrl.href;
+      });
+    }
+  }, [inputOptions.value]);
+
+  useEffect(() => {
     if (data) {
       setEntries([...data]);
     }
   }, [data]);
 
   useEffect(() => {
+    setUrl((c) => {
+      const currentUrl = new URL(c);
+
+      if (sortBy) {
+        currentUrl.searchParams.set('sort', sortBy);
+      }
+
+      currentUrl.searchParams.set('status', 'active');
+
+      return currentUrl.href;
+    });
+
     return () => setEntries([]);
   }, []);
 
