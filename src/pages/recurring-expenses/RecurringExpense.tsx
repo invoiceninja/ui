@@ -24,9 +24,9 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { useActions } from '$app/pages/recurring-expenses/common/hooks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function RecurringExpense() {
   const [t] = useTranslation();
@@ -38,8 +38,6 @@ export default function RecurringExpense() {
   const { id } = useParams();
 
   const { data } = useRecurringExpenseQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const pages: Page[] = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
@@ -91,11 +89,7 @@ export default function RecurringExpense() {
       .then(() => {
         toast.success('updated_recurring_expense');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_expenses/:id', {
-            id: recurringExpense!.id,
-          })
-        );
+        $refetch(['recurring_expenses']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

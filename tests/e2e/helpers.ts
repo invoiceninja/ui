@@ -2,7 +2,7 @@ import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHa
 import { Page } from '@playwright/test';
 
 export async function logout(page: Page) {
-  await page.goto('/logout');
+  await page.goto('/logout#/logout');
 
   await page.waitForURL('**/login');
 }

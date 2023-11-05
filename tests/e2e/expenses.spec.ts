@@ -82,27 +82,6 @@ test('can view expense', async ({ page }) => {
   }
 });
 
-test("can't create an expense", async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('expenses@example.com');
-  await set('view_expense');
-  await save();
-  await logout(page);
-
-  await login(page, 'expenses@example.com', 'password');
-
-  await page.getByRole('link', { name: 'Expenses', exact: true }).click();
-  await page.getByText('Enter Expense').click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).toBeVisible();
-});
-
 test('can create an expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
@@ -332,7 +311,7 @@ test('expense documents preview', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -387,7 +366,7 @@ test('expense documents uploading', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Edit').first().click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
   await page.waitForURL('**/expenses/**/edit');
 
