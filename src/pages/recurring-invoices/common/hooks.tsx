@@ -79,6 +79,7 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -229,7 +230,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       recurringInvoice
     )
       .then(() => {
-        $refetch(['recurring_invoices'])
+        $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
       })
@@ -289,6 +290,8 @@ export function useActions(params?: Params) {
   const { t } = useTranslation();
 
   const bulk = useBulkAction();
+
+  const hasPermission = useHasPermission();
 
   const { showEditAction, showCommonBulkActions } = params || {};
 
@@ -440,46 +443,51 @@ export function useActions(params?: Params) {
         <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
       ),
     () => <Divider withoutPadding />,
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (recurringInvoice) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(recurringInvoice)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
+    (recurringInvoice) =>
+      hasPermission('create_recurring_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringInvoice(recurringInvoice)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToInvoice(recurringInvoice)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_invoice')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      hasPermission('create_quote') && (
+        <DropdownElement
+          onClick={() => cloneToQuote(recurringInvoice)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_quote')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => cloneToCredit(recurringInvoice)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_credit')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(recurringInvoice)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
     () =>
       (isEditPage || Boolean(showCommonBulkActions)) && (
         <Divider withoutPadding />
@@ -611,6 +619,8 @@ export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
+
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
@@ -643,6 +653,7 @@ export function useRecurringInvoiceColumns() {
           to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
+          disableNavigation={!hasPermission('edit_recurring_invoice')}
         >
           {value}
         </Link>
@@ -653,7 +664,12 @@ export function useRecurringInvoiceColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, recurringInvoice) => (
-        <Link to={route('/clients/:id', { id: recurringInvoice.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: recurringInvoice.client_id })}
+          disableNavigation={
+            !hasPermission('view_client') && !hasPermission('edit_client')
+          }
+        >
           {recurringInvoice.client?.display_name}
         </Link>
       ),

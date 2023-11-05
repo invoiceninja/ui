@@ -42,6 +42,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from './RecurringInvoiceStatus';
 import { RecurringInvoiceActivity } from '$app/common/interfaces/recurring-invoice-activity';
 import frequencies from '$app/common/constants/frequency';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -92,6 +93,8 @@ export const RecurringInvoiceSlider = () => {
   );
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+
   const formatMoney = useFormatMoney();
   const actions = useActions({
     showCommonBulkActions: true,
@@ -127,7 +130,7 @@ export const RecurringInvoiceSlider = () => {
           response: AxiosResponse<GenericManyResponse<RecurringInvoiceActivity>>
         ) => response.data.data
       ),
-    enabled: recurringInvoice !== null && isVisible,
+    enabled: false,
   });
 
   const activityElement = useGenerateActivityElement();
@@ -142,7 +145,7 @@ export const RecurringInvoiceSlider = () => {
       size="regular"
       title={`${t('recurring_invoice')} ${recurringInvoice?.number || ''}`}
       topRight={
-        recurringInvoice ? (
+        recurringInvoice && hasPermission('edit_recurring_invoice') ? (
           <ResourceActions
             label={t('more_actions')}
             resource={recurringInvoice}

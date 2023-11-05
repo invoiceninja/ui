@@ -36,11 +36,14 @@ import { useEffect, useState } from 'react';
 import { useRecurringInvoiceQuery } from '../common/queries';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const [sliderRecurringInvoiceId, setSliderRecurringInvoiceId] =
     useState<string>('');
@@ -113,6 +116,7 @@ export default function RecurringInvoices() {
           />
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
+        showEditEntityOptions={hasPermission('edit_recurring_invoice')}
         onTableRowClick={(recurringInvoice) => {
           setSliderRecurringInvoiceId(
             (recurringInvoice as RecurringInvoice).id

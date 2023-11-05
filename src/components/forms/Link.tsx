@@ -17,10 +17,13 @@ interface Props extends CommonProps {
   to: string;
   children: ReactNode;
   external?: boolean;
+  disableNavigation?: boolean;
 }
 
 export function Link(props: Props) {
   const accentColor = useAccentColor();
+
+  const { disableNavigation } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -44,7 +47,7 @@ export function Link(props: Props) {
     <RouterLink
       className={`text-sm hover:underline ${props.className}`}
       style={css}
-      to={props.to}
+      to={!disableNavigation ? props.to : ''}
     >
       {props.children}
     </RouterLink>
