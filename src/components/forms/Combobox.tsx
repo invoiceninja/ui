@@ -769,20 +769,6 @@ export function ComboboxAsync<T = any>({
     return currentUrl;
   }, []);
 
-  const isEntryAvailable = () => {
-    if (entries.length) {
-      const entry = entries.find(
-        (entry) =>
-          entry.value === inputOptions.value ||
-          entry.label === inputOptions.value
-      );
-
-      return Boolean(entry);
-    }
-
-    return false;
-  };
-
   useEffect(() => {
     if (!enableQuery) {
       clearTimeout(enableQueryTimeOut.current);
@@ -794,20 +780,15 @@ export function ComboboxAsync<T = any>({
   }, [inputOptions.value]);
 
   useEffect(() => {
-    if (
-      enableQuery &&
-      inputOptions.value &&
-      !disableWithQueryParameter &&
-      !isEntryAvailable()
-    ) {
+    if (enableQuery && inputOptions.value && !disableWithQueryParameter) {
       $url.searchParams.set('with', inputOptions.value.toString());
     }
-  }, [enableQuery, inputOptions.value]);
+  }, [enableQuery]);
 
   const { data } = useQuery(
     [
-      new URL($url).pathname,
-      new URL($url).searchParams.toString(),
+      new URL(url).pathname,
+      new URL(url).searchParams.toString(),
       'comboboxQuery',
     ],
     () =>
