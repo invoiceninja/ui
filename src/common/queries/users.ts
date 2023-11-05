@@ -10,13 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
-import { route } from '../helpers/route';
+import { useRefetch } from '../hooks/useRefetch';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -51,9 +51,9 @@ export function useBlankUserQuery() {
 }
 
 export function useBulk() {
-  const queryClient = useQueryClient();
-
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+
+  const $refetch = useRefetch();
 
   return (
     ids: string[],
@@ -74,10 +74,7 @@ export function useBulk() {
       .then(() => {
         toast.success(`${action}d_user`);
 
-        ids.forEach((id) => {
-          queryClient.invalidateQueries('/api/v1/users');
-          queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
-        });
+        $refetch(['users']);
       })
       .catch((error) => {
         if (error.response?.status === 412) {
