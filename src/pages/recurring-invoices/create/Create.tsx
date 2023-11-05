@@ -40,10 +40,13 @@ import dayjs from 'dayjs';
 import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -125,8 +128,7 @@ export default function Create() {
         _recurringInvoice.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 
-        _recurringInvoice.auto_bill =
-          company?.settings?.auto_bill ?? 'off';
+        _recurringInvoice.auto_bill = company?.settings?.auto_bill ?? 'off';
 
         value = _recurringInvoice;
       }
@@ -183,7 +185,9 @@ export default function Create() {
       breadcrumbs={pages}
       disableSaveButton={!recurringInvoice?.client_id}
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
-      additionalSaveOptions={saveOptions}
+      additionalSaveOptions={
+        hasPermission('edit_recurring_invoice') ? saveOptions : undefined
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

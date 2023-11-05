@@ -9,6 +9,10 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { Payment } from '$app/common/interfaces/payment';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +23,10 @@ interface Params {
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
 
   const { id } = useParams();
 
@@ -48,12 +56,26 @@ export function useTabs(params: Params) {
   ];
 
   if (payment) {
-    if (!(payment.amount - payment.applied > 0 && !payment.is_deleted)) {
+    if (
+      !(payment.amount - payment.applied > 0 && !payment.is_deleted) ||
+      !hasPermission('edit_payment')
+    ) {
       tabs = tabs.filter(({ name }) => name !== t('apply'));
     }
 
-    if (!(payment.amount !== payment.refunded && !payment.is_deleted)) {
+    if (
+      !(payment.amount !== payment.refunded && !payment.is_deleted) ||
+      !hasPermission('edit_payment')
+    ) {
       tabs = tabs.filter(({ name }) => name !== t('refund'));
+    }
+
+    if (!hasPermission('edit_payment')) {
+      tabs = tabs.filter(({ name }) => name !== t('documents'));
+    }
+
+    if (!isAdmin || isOwner) {
+      tabs = tabs.filter(({ name }) => name !== t('custom_fields'));
     }
   }
 

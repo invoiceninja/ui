@@ -138,11 +138,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <Link
-          to={
-            hasPermission('edit_invoice')
-              ? route('/invoices/:id/edit', { id: invoice.client_id })
-              : ''
-          }
+          to={route('/invoices/:id/edit', { id: invoice.client_id })}
+          disableNavigation={!hasPermission('edit_invoice')}
         >
           {value}
         </Link>
@@ -165,10 +162,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('client'),
       format: (_, invoice) => (
         <Link
-          to={
-            hasPermission('view_client') || hasPermission('edit_client')
-              ? route('/clients/:id', { id: invoice.client_id })
-              : ''
+          to={route('/clients/:id', { id: invoice.client_id })}
+          disableNavigation={
+            !hasPermission('view_client') && !hasPermission('edit_client')
           }
         >
           {invoice.client?.display_name}

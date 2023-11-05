@@ -17,15 +17,18 @@ import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks/useActions';
 import { useSave } from './edit/hooks/useSave';
 import { useTabs } from './edit/hooks/useTabs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Payment() {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const { id } = useParams();
 
@@ -59,20 +62,18 @@ export default function Payment() {
     <Default
       title={t('payment')}
       breadcrumbs={pages}
-      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSave(paymentValue as unknown as PaymentEntity);
-      }}
+      {...(hasPermission('edit_payment') &&
+        paymentValue && {
+          onSaveClick: onSave(paymentValue as unknown as PaymentEntity),
+          navigationTopRight: (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={paymentValue}
+              actions={actions}
+            />
+          ),
+        })}
       disableSaveButton={!paymentValue}
-      navigationTopRight={
-        paymentValue && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={paymentValue}
-            actions={actions}
-          />
-        )
-      }
     >
       <Container>
         <Tabs tabs={tabs} disableBackupNavigation />
