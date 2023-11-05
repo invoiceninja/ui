@@ -12,9 +12,9 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { defaultSettings } from '$app/common/constants/blank-company-settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -24,11 +24,9 @@ import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
 import { AxiosError } from 'axios';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 
 export function useUpdateClientSettings() {
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
   const activeSettings = useAtomValue(activeSettingsAtom);
@@ -91,13 +89,7 @@ export function useUpdateClientSettings() {
       .then((response: GenericSingleResourceResponse<Client>) => {
         toast.success('updated_settings');
 
-        queryClient.invalidateQueries('/api/v1/clients');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/clients/:id', {
-            id: activeSettings?.id,
-          })
-        );
+        $refetch(['clients']);
 
         dispatch(
           updateChanges({

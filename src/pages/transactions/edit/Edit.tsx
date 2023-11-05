@@ -26,10 +26,10 @@ import { useResolveCurrencySeparator } from '../common/hooks/useResolveCurrencyS
 import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { useTransactionQuery } from '$app/common/queries/transactions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -39,8 +39,6 @@ export default function Edit() {
   const { id } = useParams<string>();
 
   const { data } = useTransactionQuery({ id });
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 
@@ -88,11 +86,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_transaction');
 
-        queryClient.invalidateQueries('/api/v1/bank_transactions');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/bank_transactions/:id', { id })
-        );
+        $refetch(['bank_transactions'])
 
         navigate('/transactions');
       })

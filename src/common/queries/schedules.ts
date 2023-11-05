@@ -12,7 +12,6 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { route } from '$app/common/helpers/route';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
@@ -20,7 +19,7 @@ export function useBlankScheduleQuery() {
   const { isAdmin, isOwner } = useAdmin();
 
   return useQuery<Schedule>(
-    '/api/v1/task_schedulers/create',
+    ['/api/v1/task_schedulers', 'create'],
     () =>
       request('GET', endpoint('/api/v1/task_schedulers/create')).then(
         (response: GenericSingleResourceResponse<Schedule>) =>
@@ -38,7 +37,7 @@ export function useScheduleQuery(params: ScheduleParams) {
   const { isAdmin, isOwner } = useAdmin();
 
   return useQuery<Schedule>(
-    route('/api/v1/task_schedulers/:id', { id: params.id }),
+    ['/api/v1/task_schedulers', params.id],
     () =>
       request(
         'GET',

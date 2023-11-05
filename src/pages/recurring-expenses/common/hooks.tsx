@@ -51,6 +51,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const defaultColumns: string[] = [
   'status',
@@ -417,13 +418,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringExpense.id }),
       recurringExpense
     ).then(() => {
-      queryClient.invalidateQueries('/api/v1/recurring_expenses');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_expenses/:id', {
-          id: recurringExpense.id,
-        })
-      );
+      $refetch(['recurring_expenses'])
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
