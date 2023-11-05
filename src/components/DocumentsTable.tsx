@@ -75,7 +75,7 @@ export function DocumentsTable(props: Props) {
     toast.processing();
 
     queryClient.fetchQuery(
-      endpoint('/documents/:hash', { hash: doc.hash }),
+      ['/api/v1/documents', doc.hash],
       () =>
         request(
           'GET',

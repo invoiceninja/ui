@@ -29,6 +29,7 @@ import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 import { useAdmin } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
+import { useRefetch } from './common/hooks/useRefetch';
 
 export function App() {
   const [t] = useTranslation();
@@ -63,6 +64,7 @@ export function App() {
     useState(false);
 
   const user = useCurrentUser();
+  const refetch = useRefetch();
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -111,6 +113,12 @@ export function App() {
     window.addEventListener('navigate.invalid.page', () =>
       navigate('/not_found')
     );
+
+    window.addEventListener('refetch', (event) => {
+      const { property } = (event as CustomEvent).detail;
+
+      refetch(property);
+    });
   }, []);
 
   useEffect(() => {

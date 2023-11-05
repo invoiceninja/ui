@@ -56,33 +56,28 @@ export function ClientSelector(props: Props) {
   }, [resource?.client_id]);
 
   const hasPermission = useHasPermission();
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <>
-      <div className="flex  flex-col justify-between space-y-2" style={{ color: colors.$3 }}>
-        {hasPermission('create_invoice') ? (
-          props.textOnly ? (
-            <p className="text-sm">
-              {resource?.client?.display_name}
-            </p>
-          ) : (
-            <Selector
-              inputLabel={t('client')}
-              onChange={(client) => props.onChange(client.id)}
-              value={resource?.client_id}
-              readonly={props.readonly || !resource}
-              clearButton={Boolean(resource?.client_id)}
-              onClearButtonClick={props.onClearButtonClick}
-              initiallyVisible={!resource?.client_id}
-              errorMessage={props.errorMessage}
-              disableWithSpinner={props.disableWithSpinner}
-            />
-          )
+      <div
+        className="flex  flex-col justify-between space-y-2"
+        style={{ color: colors.$3 }}
+      >
+        {props.textOnly ? (
+          <p className="text-sm">{resource?.client?.display_name}</p>
         ) : (
-          <p className="text-sm">
-            {resource?.client?.display_name}
-          </p>
+          <Selector
+            inputLabel={t('client')}
+            onChange={(client) => props.onChange(client.id)}
+            value={resource?.client_id}
+            readonly={props.readonly || !resource}
+            clearButton={Boolean(resource?.client_id)}
+            onClearButtonClick={props.onClearButtonClick}
+            initiallyVisible={!resource?.client_id}
+            errorMessage={props.errorMessage}
+            disableWithSpinner={props.disableWithSpinner}
+          />
         )}
 
         {client && (
@@ -129,7 +124,9 @@ export function ClientSelector(props: Props) {
             />
 
             <div>
-              <p className="text-sm" style={{ color: colors.$3 }}>{contact.email}</p>
+              <p className="text-sm" style={{ color: colors.$3 }}>
+                {contact.email}
+              </p>
 
               {resource.invitations.length >= 1 && (
                 <>

@@ -39,7 +39,7 @@ export const usePrintPdf = ({ entity }: Props) => {
 
     toast.processing();
 
-    queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
+    queryClient.fetchQuery([`/api/v1/${entity}s/bulk`], () =>
       request(
         'POST',
         endpoint(`/api/v1/${entity}s/bulk`),

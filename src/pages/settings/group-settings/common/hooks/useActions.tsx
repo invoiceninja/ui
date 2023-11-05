@@ -43,7 +43,7 @@ export function useActions() {
 
   const fetchGroupSettingsDetails = (groupSettingsId: string) => {
     queryClient.fetchQuery(
-      endpoint('/api/v1/group_settings/:id', { id: groupSettingsId }),
+      ['api/v1/group_settings', groupSettingsId],
       () =>
         request(
           'GET',

@@ -34,7 +34,7 @@ export function useResolveTemplate(
   const [template, setTemplate] = useState<EmailTemplate>();
 
   useEffect(() => {
-    queryClient.fetchQuery(templateId, () =>
+    queryClient.fetchQuery(['/api/v1/templates', templateId], () =>
       request('POST', endpoint('/api/v1/templates'), {
         body,
         entity,

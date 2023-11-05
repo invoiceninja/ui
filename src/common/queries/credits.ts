@@ -12,9 +12,9 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { $refetch } from '../hooks/useRefetch';
 
 const successMessages = {
   email: 'emailed_credits',
@@ -41,11 +41,7 @@ export const useBulk = () => {
 
       toast.success(message);
 
-      queryClient.invalidateQueries('/api/v1/credits');
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }))
-      );
+      $refetch(['credits']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
