@@ -32,7 +32,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
-import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -42,6 +41,7 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -246,7 +246,6 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const setProduct = useSetAtom(productAtom);
 
@@ -274,8 +273,7 @@ export function useActions() {
     bulk([id], action).then(() => {
       toast.success(`${action}d_product`);
 
-      queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
-      queryClient.invalidateQueries('/api/v1/products');
+      $refetch(['products']);
     });
   };
 
