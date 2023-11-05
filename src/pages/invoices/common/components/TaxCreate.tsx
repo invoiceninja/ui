@@ -38,6 +38,8 @@ export function TaxCreate(props: Props) {
     onSubmit: (values) => {
       setErrors(undefined);
 
+      console.log('ok');
+
       request('POST', endpoint('/api/v1/tax_rates'), values)
         .then((response) => {
           toast.success('created_tax_rate');
