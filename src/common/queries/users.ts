@@ -11,12 +11,12 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
+import { route } from '../helpers/route';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -30,7 +30,7 @@ interface UserQueryProps extends GenericQueryOptions {
 
 export function useUserQuery(options: UserQueryProps) {
   return useQuery(
-    route('/api/v1/users/:id', { id: options.id }),
+    ['/api/v1/users', options.id],
     () =>
       request(
         'GET',
@@ -44,7 +44,7 @@ export function useBlankUserQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/users/create'),
+    ['/api/v1/users/create'],
     () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );

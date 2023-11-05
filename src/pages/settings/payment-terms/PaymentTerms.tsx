@@ -27,12 +27,12 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Settings } from '$app/components/layouts/Settings';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdEdit } from 'react-icons/md';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function PaymentTerms() {
   const { documentTitle } = useTitle('payment_terms');
@@ -43,8 +43,6 @@ export function PaymentTerms() {
     { name: t('company_details'), href: '/settings/company_details' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
   ];
-
-  const queryClient = useQueryClient();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
@@ -61,7 +59,7 @@ export function PaymentTerms() {
 
     bulk([id], 'archive')
       .then(() => toast.success('archived_payment_term'))
-      .finally(() => queryClient.invalidateQueries('/api/v1/payment_terms'));
+      .finally(() => $refetch(['payment_terms']));
   };
 
   return (

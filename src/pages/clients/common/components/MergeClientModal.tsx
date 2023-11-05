@@ -12,10 +12,7 @@ import { Button } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Client } from '$app/common/interfaces/client';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Modal } from '$app/components/Modal';
@@ -23,11 +20,11 @@ import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -39,7 +36,6 @@ interface Props {
 export function MergeClientModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
@@ -68,12 +64,8 @@ export function MergeClientModal(props: Props) {
         {},
         { headers: { 'X-Api-Password': password } }
       )
-        .then((response: GenericSingleResourceResponse<Client>) => {
-          queryClient.invalidateQueries('/api/v1/clients');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id', { id: response.data.data.id })
-          );
+        .then(() => {
+          $refetch(['clients']);
 
           request('POST', endpoint('/api/v1/refresh')).then(
             (response: AxiosResponse) => {
