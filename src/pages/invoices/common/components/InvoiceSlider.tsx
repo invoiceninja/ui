@@ -47,6 +47,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -122,6 +123,8 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const queryClient = useQueryClient();
@@ -148,6 +151,7 @@ export function InvoiceSlider() {
     enabled: invoice !== null && isVisible,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchEmailHistory = async () => {
     const response = await queryClient.fetchQuery(
       ['/api/v1/invoices', invoice?.id, 'emailHistory'],
@@ -164,7 +168,7 @@ export function InvoiceSlider() {
 
   useEffect(() => {
     if (invoice) {
-      fetchEmailHistory();
+      //fetchEmailHistory();
     }
   }, [invoice]);
 
@@ -192,7 +196,7 @@ export function InvoiceSlider() {
         (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
           response.data.data
       ),
-    enabled: invoice !== null && isVisible,
+    enabled: false,
   });
 
   const activityElement = useGenerateActivityElement();
@@ -207,7 +211,7 @@ export function InvoiceSlider() {
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
-        invoice ? (
+        invoice && hasPermission('edit_invoice') ? (
           <ResourceActions
             label={t('more_actions')}
             resource={invoice}
