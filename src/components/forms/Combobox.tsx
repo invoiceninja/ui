@@ -580,6 +580,8 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
+                    setQuery('');
+
                     selectedValue && setIsOpen(false);
 
                     !selectedValue && setIsOpen((current) => !current);
@@ -758,6 +760,10 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
+
   const isEntryAvailable = () => {
     if (entries.length) {
       const entry = entries.find(
@@ -795,13 +801,23 @@ export function ComboboxAsync<T = any>({
       ),
     {
       staleTime: staleTime ?? Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
+      enabled: enableQuery,
     }
   );
 
   useEffect(() => {
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
+
+  useEffect(() => {
     if (
+      enableQuery &&
       inputOptions.value &&
       !disableWithQueryParameter &&
       !isEntryAvailable()
@@ -815,7 +831,7 @@ export function ComboboxAsync<T = any>({
         return currentUrl.href;
       });
     }
-  }, [inputOptions.value]);
+  }, [enableQuery, inputOptions.value]);
 
   useEffect(() => {
     if (data) {
@@ -833,10 +849,16 @@ export function ComboboxAsync<T = any>({
 
       currentUrl.searchParams.set('status', 'active');
 
+      currentUrl.searchParams.set('filter', '');
+
       return currentUrl.href;
     });
 
-    return () => setEntries([]);
+    return () => {
+      setEntries([]);
+      setEnableQuery(false);
+      enableQueryTimeOut.current = undefined;
+    };
   }, []);
 
   const onEmptyValues = (query: string) => {
