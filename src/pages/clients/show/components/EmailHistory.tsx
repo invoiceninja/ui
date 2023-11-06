@@ -26,6 +26,7 @@ export function EmailHistory() {
 
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchEmailHistory = async () => {
     const response = await queryClient.fetchQuery(
       ['/api/v1/clients', id, 'emailHistory'],
@@ -41,7 +42,7 @@ export function EmailHistory() {
   };
 
   useEffect(() => {
-    fetchEmailHistory();
+    //fetchEmailHistory();
   }, []);
 
   return (

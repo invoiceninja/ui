@@ -27,6 +27,10 @@ import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -38,12 +42,16 @@ export function CreditFooter(props: Props) {
   const { id } = useParams();
   const { handleChange, errors } = props;
 
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
+
   const location = useLocation();
 
   const [credit] = useAtom(creditAtom);
 
   const onSuccess = () => {
-    $refetch(['credits'])
+    $refetch(['credits']);
   };
 
   const tabs = [
@@ -53,7 +61,7 @@ export function CreditFooter(props: Props) {
     t('private_notes'),
     t('documents'),
     t('settings'),
-    t('custom_fields'),
+    ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   return (
@@ -97,11 +105,13 @@ export function CreditFooter(props: Props) {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={!hasPermission('edit_credit')}
             />
 
             <DocumentsTable
               documents={credit?.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={!hasPermission('edit_credit')}
             />
           </div>
         )}

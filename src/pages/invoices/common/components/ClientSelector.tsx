@@ -88,12 +88,9 @@ export function ClientSelector(props: Props) {
               </Link>
             )}
 
-            {hasPermission('view_client') ||
-              (hasPermission('edit_client') && (
-                <span className="text-sm">/</span>
-              ))}
+            {hasPermission('edit_client') && <span className="text-sm">/</span>}
 
-            {hasPermission('view_client') && (
+            {(hasPermission('view_client') || hasPermission('edit_client')) && (
               <Link to={route('/clients/:id', { id: client.id })}>
                 {t('view_client')}
               </Link>

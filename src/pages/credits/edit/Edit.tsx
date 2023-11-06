@@ -36,11 +36,14 @@ import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const reactSettings = useReactSettings();
 
@@ -104,9 +107,11 @@ export default function Edit() {
             resource={credit}
             label={t('more_actions')}
             actions={actions}
+            disabledDropdown={!hasPermission('edit_credit')}
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_credit')}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

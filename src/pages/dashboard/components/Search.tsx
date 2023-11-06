@@ -53,7 +53,7 @@ export function useSearch() {
           return formatted;
         }
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: false }
   );
 
   return data;
@@ -126,7 +126,7 @@ export function Search$() {
           onChange={(event) => setQuery(event.target.value)}
           ref={inputRef}
           onFocus={() => setIsVisible(true)}
-          placeholder='Search...'
+          placeholder="Search..."
           style={{ backgroundColor: colors.$1, color: colors.$3 }}
         />
 
