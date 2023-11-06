@@ -26,16 +26,15 @@ import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('create_tax_rate');
 
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: blankTaxRate } = useBlankTaxRateQuery();
 
@@ -65,7 +64,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_tax_rate');
 
-          queryClient.invalidateQueries('/api/v1/tax_rates');
+          $refetch(['tax_rates'])
 
           if (actionType === 'save') {
             navigate(

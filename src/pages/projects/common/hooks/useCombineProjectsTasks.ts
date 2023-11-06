@@ -10,7 +10,6 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Project } from '$app/common/interfaces/project';
@@ -48,12 +47,7 @@ export function useCombineProjectsTasks() {
 
     const fetchTasks = selectedIds.map((projectId) => {
       return queryClient.fetchQuery(
-        route(
-          '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-          {
-            projectId,
-          }
-        ),
+        ['/api/v1/tasks', 'project_tasks', projectId, 'active'],
         () =>
           request(
             'GET',

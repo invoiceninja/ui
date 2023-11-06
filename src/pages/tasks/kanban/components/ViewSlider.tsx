@@ -10,7 +10,6 @@
 
 import { ClickableElement, Element } from '$app/components/cards';
 import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -26,18 +25,17 @@ import {
   calculateHours,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function ViewSlider() {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
-  const queryClient = useQueryClient();
   const accentColor = useAccentColor();
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
@@ -50,9 +48,7 @@ export function ViewSlider() {
     currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/tasks/:id', { id: currentTask?.id })
-    );
+    $refetch(['tasks'])
   };
 
   return (

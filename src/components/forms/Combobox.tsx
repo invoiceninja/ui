@@ -580,9 +580,13 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
-                    setIsOpen(false);
+                    selectedValue && setIsOpen(false);
+
+                    !selectedValue && setIsOpen((current) => !current);
 
                     return onDismiss();
+                  } else {
+                    setIsOpen((current) => !current);
                   }
                 }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
@@ -755,7 +759,7 @@ export function ComboboxAsync<T = any>({
   const [url, setUrl] = useState(endpoint);
 
   const { data } = useQuery(
-    [new URL(url).pathname, new URL(url).searchParams.toString()],
+    [new URL(url).pathname, new URL(url).href],
     () => {
       const $url = new URL(url);
 
@@ -792,7 +796,6 @@ export function ComboboxAsync<T = any>({
       staleTime: staleTime ?? Infinity,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      refetchOnMount: false 
     }
   );
 
@@ -807,12 +810,6 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   const onEmptyValues = (query: string) => {
-    const $url = new URL(url);
-
-    if (query === '' && !$url.searchParams.has('filter')) {
-      return;
-    }
-
     setUrl((c) => {
       const url = new URL(c);
 
