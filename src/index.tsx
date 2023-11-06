@@ -24,8 +24,6 @@ import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
 import { GoogleOAuth } from './components/GoogleOAuth';
 
-console.log('Sentry dsn', import.meta.env.VITE_SENTRY_URL);
-
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
   integrations: [new Sentry.BrowserTracing()],
