@@ -10,12 +10,11 @@
 
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 import { useQueryClient } from 'react-query';
-import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   link: string;
@@ -34,14 +33,10 @@ export function InvoiceViewer(props: Props) {
   const linkRef = useRef<HTMLAnchorElement>(null);
   const queryClient = useQueryClient();
 
-  const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
     if (props.withToast) {
       toast.processing();
     }
-
-    setIsLoading(true);
 
     if (props.enabled !== false) {
       queryClient.fetchQuery({
@@ -50,28 +45,24 @@ export function InvoiceViewer(props: Props) {
           request(props.method, props.link, props.resource, {
             responseType: 'arraybuffer',
             signal,
-          })
-            .then((response) => {
-              const blob = new Blob([response.data], {
-                type: 'application/pdf',
-              });
-              const url = URL.createObjectURL(blob);
+          }).then((response) => {
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
 
-              if (android && linkRef.current) {
-                linkRef.current.href = url;
+            if (android && linkRef.current) {
+              linkRef.current.href = url;
 
-                props.onLink && props.onLink(url);
-              }
+              props.onLink && props.onLink(url);
+            }
 
-              if (!android && iframeRef.current) {
-                iframeRef.current.src = url;
+            if (!android && iframeRef.current) {
+              iframeRef.current.src = url;
 
-                props.onLink && props.onLink(url);
-              }
+              props.onLink && props.onLink(url);
+            }
 
-              toast.dismiss();
-            })
-            .finally(() => setIsLoading(false)),
+            toast.dismiss();
+          }),
       });
     }
 
@@ -91,22 +82,5 @@ export function InvoiceViewer(props: Props) {
     );
   }
 
-  return (
-    <>
-      {isLoading && (
-        <div
-          className="flex justify-center items-center"
-          style={{ height: props.height || 1500 }}
-        >
-          <Spinner />
-        </div>
-      )}
-
-      <iframe
-        ref={iframeRef}
-        width="100%"
-        height={isLoading ? 0 : props.height || 1500}
-      />
-    </>
-  );
+  return <iframe ref={iframeRef} width="100%" height={props.height || 1500} />;
 }

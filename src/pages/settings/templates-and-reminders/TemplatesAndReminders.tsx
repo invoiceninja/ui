@@ -40,7 +40,6 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { cloneDeep } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { Spinner } from '$app/components/Spinner';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -80,8 +79,6 @@ export function TemplatesAndReminders() {
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
 
   const [isInitial, setIsInitial] = useState<boolean>(true);
-
-  const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -278,17 +275,13 @@ export function TemplatesAndReminders() {
       );
       handleChange(`settings.email_template_${templateId}`, templateBody?.body);
 
-      setIsLoadingPdf(true);
-
       request('POST', endpoint('/api/v1/templates'), {
         body: templateBody?.body,
         subject: templateBody?.subject,
         entity: '',
         entity_id: '',
         template: `email_template_${templateId}`,
-      })
-        .then((response) => setPreview(response.data))
-        .finally(() => setIsLoadingPdf(false));
+      }).then((response) => setPreview(response.data));
     }
   }, [templateBody]);
 
@@ -551,21 +544,12 @@ export function TemplatesAndReminders() {
 
       {preview && (
         <Card className="scale-y-100" title={preview.subject}>
-          {!isLoadingPdf ? (
-            <iframe
-              srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
-              frameBorder="0"
-              width="100%"
-              height={800}
-            />
-          ) : (
-            <div
-              className="flex justify-center items-center"
-              style={{ height: 800 }}
-            >
-              <Spinner />
-            </div>
-          )}
+          <iframe
+            srcDoc={generateEmailPreview(preview.body, preview.wrapper)}
+            frameBorder="0"
+            width="100%"
+            height={800}
+          />
         </Card>
       )}
 

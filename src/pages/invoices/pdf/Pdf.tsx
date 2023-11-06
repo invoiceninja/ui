@@ -74,12 +74,7 @@ export default function Pdf() {
       {pdfUrl ? (
         <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />
       ) : (
-        <div
-          className="flex justify-center items-center"
-          style={{ height: 1500 }}
-        >
-          <Spinner />
-        </div>
+        <Spinner />
       )}
     </Default>
   );
