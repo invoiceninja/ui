@@ -12,6 +12,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Expense } from '$app/common/interfaces/expense';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import { useBulk } from '$app/common/queries/expenses';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -35,16 +36,20 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
     status: ['active'],
   });
 
+  const bulk = useBulk();
+
   useEffect(() => {
     return () => {
       setCategory('');
     };
   }, []);
 
-  const handleChange = () => {
+  const handleSubmit = () => {
     toast.processing();
 
-    //
+    const ids = selectedExpenses.map(({ id }) => id);
+
+    bulk(ids, 'bulk_categorize', { category_id: category });
   };
 
   return (
@@ -54,7 +59,7 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
       onClose={setIsVisible}
       overflowVisible
     >
-      <p>{t('list_of_affected_expenses')}</p>
+      <p>{t('recurring_expenses')}:</p>
 
       <ul>
         {selectedExpenses.map(({ id, number }) => (
@@ -77,7 +82,7 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
         </Link>
       </p>
 
-      <Button>{t('save')}</Button>
+      <Button onClick={handleSubmit}>{t('save')}</Button>
     </Modal>
   );
 }
