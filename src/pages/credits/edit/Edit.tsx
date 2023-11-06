@@ -100,18 +100,17 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => credit && save(credit)}
-      navigationTopRight={
-        credit && (
-          <ResourceActions
-            resource={credit}
-            label={t('more_actions')}
-            actions={actions}
-            disabledDropdown={!hasPermission('edit_credit')}
-          />
-        )
-      }
-      disableSaveButton={!hasPermission('edit_credit')}
+      {...(hasPermission('edit_credit') &&
+        credit && {
+          onSaveClick: save(credit),
+          navigationTopRight: (
+            <ResourceActions
+              resource={credit}
+              label={t('more_actions')}
+              actions={actions}
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

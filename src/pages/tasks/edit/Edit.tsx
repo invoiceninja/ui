@@ -21,6 +21,7 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
 import { useUpdateTask } from '../common/hooks/useUpdateTask';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
@@ -28,6 +29,8 @@ export default function Edit() {
   const { data } = useTaskQuery({ id });
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const [task, setTask] = useState<Task>();
 
@@ -52,16 +55,17 @@ export default function Edit() {
     <Default
       title={documentTitle}
       disableSaveButton={isFormBusy}
-      onSaveClick={() => task && handleSave(task)}
-      navigationTopRight={
-        task && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={task}
-            actions={actions}
-          />
-        )
-      }
+      {...(hasPermission('edit_task') &&
+        task && {
+          onSaveClick: handleSave(task),
+          navigationTopRight: (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={task}
+              actions={actions}
+            />
+          ),
+        })}
     >
       {task && (
         <TaskDetails

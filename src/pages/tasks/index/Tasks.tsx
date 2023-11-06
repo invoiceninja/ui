@@ -27,11 +27,14 @@ import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '../common/hooks/useShowEditOption';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
@@ -78,6 +81,7 @@ export default function Tasks() {
           </Link>
         }
         linkToCreateGuards={[permission('create_task')]}
+        showEditEntityOptions={hasPermission('edit_task')}
       />
     </Default>
   );

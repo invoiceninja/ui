@@ -48,6 +48,7 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const defaultColumns: string[] = [
   'name',
@@ -253,6 +254,8 @@ export function useActions() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const queryClient = useQueryClient();
 
   const bulk = useBulkAction();
@@ -276,7 +279,15 @@ export function useActions() {
     toast.processing();
 
     queryClient.fetchQuery(
-      ['/api/v1/tasks', 'project_tasks', project.id, 'per_page', 100, 'status', 'active'],
+      [
+        '/api/v1/tasks',
+        'project_tasks',
+        project.id,
+        'per_page',
+        100,
+        'status',
+        'active',
+      ],
       () =>
         request(
           'GET',
@@ -315,22 +326,24 @@ export function useActions() {
         </DropdownElement>
       ),
     () => isShowPage && <Divider withoutPadding />,
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => handleInvoiceProject(project)}
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => cloneToProject(project)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    (project: Project) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => handleInvoiceProject(project)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      hasPermission('create_project') && (
+        <DropdownElement
+          onClick={() => cloneToProject(project)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&

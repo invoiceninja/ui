@@ -21,13 +21,12 @@ interface Props {
   actions: Action<any>[];
   onSaveClick?: () => void;
   disableSaveButton?: boolean;
-  disabledDropdown?: boolean;
 }
 
 export function ResourceActions(props: Props) {
   const [t] = useTranslation();
 
-  const { onSaveClick, disableSaveButton, label, disabledDropdown } = props;
+  const { onSaveClick, disableSaveButton, label } = props;
 
   return (
     <>
@@ -56,7 +55,7 @@ export function ResourceActions(props: Props) {
       )}
 
       {!onSaveClick && label && (
-        <Dropdown label={props.label} disabled={disabledDropdown}>
+        <Dropdown label={props.label}>
           {props.actions.map((action, index) => (
             <Fragment key={index}>{action(props.resource)}</Fragment>
           ))}

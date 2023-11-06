@@ -665,7 +665,14 @@ export function useCreditColumns() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>{field}</Link>
+        <Link
+          to={route('/credits/:id/edit', { id: credit.id })}
+          disableNavigation={
+            !hasPermission('view_credit') && !hasPermission('edit_credit')
+          }
+        >
+          {field}
+        </Link>
       ),
     },
     {

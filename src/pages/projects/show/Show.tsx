@@ -44,6 +44,7 @@ import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOpti
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 dayjs.extend(duration);
 
@@ -52,6 +53,8 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const hasPermission = useHasPermission();
 
   const enabled = useEnabled();
 
@@ -96,13 +99,15 @@ export default function Show() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <ResourceActions
-          resource={project}
-          label={t('more_actions')}
-          actions={projectActions}
-        />
-      }
+      {...(hasPermission('edit_project') && {
+        navigationTopRight: (
+          <ResourceActions
+            resource={project}
+            label={t('more_actions')}
+            actions={projectActions}
+          />
+        ),
+      })}
     >
       <div className="grid grid-cols-3 gap-4">
         <InfoCard title={t('details')}>
@@ -116,6 +121,9 @@ export default function Show() {
           <Link
             className="block"
             to={route('/clients/:id', { id: project.client_id })}
+            disableNavigation={
+              !hasPermission('view_client') && !hasPermission('edit_client')
+            }
           >
             {project.client?.display_name}
           </Link>
@@ -178,6 +186,7 @@ export default function Show() {
               />
             }
             linkToCreateGuards={[permission('create_task')]}
+            showEditEntityOptions={hasPermission('edit_task')}
           />
         </div>
       )}

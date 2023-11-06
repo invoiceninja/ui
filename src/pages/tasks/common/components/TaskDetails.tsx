@@ -23,6 +23,7 @@ import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   task: Task;
@@ -34,6 +35,8 @@ interface Props {
 
 export function TaskDetails(props: Props) {
   const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const { task, handleChange, errors, page } = props;
 
@@ -162,7 +165,12 @@ export function TaskDetails(props: Props) {
 
       {location.pathname.endsWith('/edit') && (
         <Card className="col-span-12 xl:col-span-4 h-max px-6">
-          <TabGroup tabs={[t('description'), t('custom_fields')]}>
+          <TabGroup
+            tabs={[
+              t('description'),
+              ...(isAdmin || isOwner ? [t('custom_fields')] : []),
+            ]}
+          >
             <div>
               <InputField
                 element="textarea"

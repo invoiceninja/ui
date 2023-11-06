@@ -105,18 +105,17 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => quote && save(quote)}
-      navigationTopRight={
-        quote && (
-          <ResourceActions
-            resource={quote}
-            label={t('more_actions')}
-            actions={actions}
-            disabledDropdown={!hasPermission('edit_quote')}
-          />
-        )
-      }
-      disableSaveButton={!hasPermission('edit_quote')}
+      {...(hasPermission('edit_quote') &&
+        quote && {
+          onSaveClick: save(quote),
+          navigationTopRight: (
+            <ResourceActions
+              resource={quote}
+              label={t('more_actions')}
+              actions={actions}
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
