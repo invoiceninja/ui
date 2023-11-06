@@ -13,11 +13,11 @@ import { useQueryClient } from 'react-query';
 export const keys = {
   invoices: {
     path: '/api/v1/invoices',
-    dependencies: [],
+    dependencies: ['/api/v1/clients'],
   },
   designs: {
     path: '/api/v1/designs',
-    dependencies: [],
+    dependencies: ['/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/purchase_orders'],
   },
   tokens: {
     path: '/api/v1/tokens',
@@ -33,11 +33,11 @@ export const keys = {
   },
   credits: {
     path: '/api/v1/credits',
-    dependencies: [],
+    dependencies: ['/api/v1/clients'],
   },
   expense_categories: {
     path: '/api/v1/expense_categories',
-    dependencies: [],
+    dependencies: ['/api/v1/expenses', '/api/v1/recurring_expenses','/api/v1/bank_transaction_rules','/api/v1/vendors','/api/v1/bank_transactions'],
   },
   expenses: {
     path: '/api/v1/expenses',
@@ -45,47 +45,47 @@ export const keys = {
   },
   group_settings: {
     path: '/api/v1/group_settings',
-    dependencies: [],
+    dependencies: ['/api/v1/clients'],
   },
   payments: {
     path: '/api/v1/payments',
-    dependencies: [],
+    dependencies: ['/api/v1/expenses', '/api/v1/invoices', '/api/v1/clients'],
   },
   purchase_orders: {
     path: '/api/v1/purchase_orders',
-    dependencies: [],
+    dependencies: ['/api/v1/vendors'],
   },
   recurring_expenses: {
     path: '/api/v1/recurring_expenses',
-    dependencies: [],
+    dependencies: ['/api/v1/vendors'],
   },
   task_statuses: {
     path: '/api/v1/task_statuses',
-    dependencies: [],
+    dependencies: ['/api/v1/tasks'],
   },
   tasks: {
     path: '/api/v1/tasks',
-    dependencies: [],
+    dependencies: ['/api/v1/projects'],
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
-    dependencies: [],
+    dependencies: ['/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/purchase_orders'],
   },
   bank_transactions: {
     path: '/api/v1/bank_transactions',
-    dependencies: [],
+    dependencies: ['/api/v1/payments', '/api/v1/invoices', '/api/v1/vendors','/api/v1/expenses','/api/v1/expense_categories'],
   },
   bank_transaction_rules: {
     path: '/api/v1/bank_transaction_rules',
-    dependencies: [],
+    dependencies: ['/api/v1/bank_transactions'],
   },
   vendors: {
     path: '/api/v1/vendors',
-    dependencies: [],
+    dependencies: ['/api/v1/expenses', '/api/v1/recurring_expenses', '/api/v1/purchase_orders'],
   },
   users: {
     path: '/api/v1/users',
-    dependencies: [],
+    dependencies: ['/api/v1/tasks', '/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/projects', '/api/v1/payments', '/api/v1/expenses', '/api/v1/tasks'],
   },
   company_users: {
     path: '/api/v1/company_users',
@@ -93,27 +93,27 @@ export const keys = {
   },
   clients: {
     path: '/api/v1/clients',
-    dependencies: [],
+    dependencies: ['/api/v1/tasks', '/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/projects', '/api/v1/payments', '/api/v1/expenses', '/api/v1/tasks'],
   },
   products: {
     path: '/api/v1/products',
-    dependencies: [],
+    dependencies: ['/api/v1/subscriptions','/api/v1/invoices'],
   },
   projects: {
     path: '/api/v1/projects',
-    dependencies: [],
+    dependencies: ['/api/v1/tasks'],
   },
   quotes: {
     path: '/api/v1/quotes',
-    dependencies: [],
+    dependencies: ['/api/v1/clients'],
   },
   recurring_invoices: {
     path: '/api/v1/recurring_invoices',
-    dependencies: [],
+    dependencies: ['/api/v1/clients'],
   },
   bank_integrations: {
     path: '/api/v1/bank_integrations',
-    dependencies: [],
+    dependencies: ['/api/v1/bank_transactions'],
   },
   documents: {
     path: '/api/v1/documents',

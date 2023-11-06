@@ -34,7 +34,7 @@ export function CountrySelector(props: GenericSelectorProps) {
     >
       {countries.map((country, index) => (
         <option key={index} value={country.id}>
-          {country.name}
+          {country.name} ({country.iso_3166_2})
         </option>
       ))}
     </SearchableSelect>

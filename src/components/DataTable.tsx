@@ -116,6 +116,10 @@ interface Props<T> extends CommonProps {
     resource: T[],
     action: 'archive' | 'delete' | 'restore'
   ) => void;
+  onBulkActionCall?: (
+    selectedIds: string[],
+    action: 'archive' | 'restore' | 'delete'
+  ) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -150,7 +154,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const { styleOptions, customFilters } = props;
+  const { styleOptions, customFilters, onBulkActionCall } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -500,14 +504,26 @@ export function DataTable<T extends object>(props: Props<T>) {
             )}
 
             <DropdownElement
-              onClick={() => bulk('archive')}
+              onClick={() => {
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'archive');
+                } else {
+                  bulk('archive');
+                }
+              }}
               icon={<Icon element={MdArchive} />}
             >
               {t('archive')}
             </DropdownElement>
 
             <DropdownElement
-              onClick={() => bulk('delete')}
+              onClick={() => {
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'delete');
+                } else {
+                  bulk('delete');
+                }
+              }}
               icon={<Icon element={MdDelete} />}
             >
               {t('delete')}
@@ -515,7 +531,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             {showRestoreBulkAction() && (
               <DropdownElement
-                onClick={() => bulk('restore')}
+                onClick={() => {
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'restore');
+                  } else {
+                    bulk('restore');
+                  }
+                }}
                 icon={<Icon element={MdRestore} />}
               >
                 {t('restore')}
