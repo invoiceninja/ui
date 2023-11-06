@@ -580,9 +580,13 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
-                    setIsOpen(false);
+                    selectedValue && setIsOpen(false);
+
+                    !selectedValue && setIsOpen((current) => !current);
 
                     return onDismiss();
+                  } else {
+                    setIsOpen((current) => !current);
                   }
                 }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"

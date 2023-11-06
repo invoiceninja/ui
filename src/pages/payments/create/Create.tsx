@@ -366,7 +366,7 @@ export default function Create() {
                 entryOptions={{
                   id: 'id',
                   value: 'id',
-                  label: 'name',
+                  label: 'number',
                   searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
