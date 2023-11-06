@@ -31,4 +31,5 @@ export const itemMap: Record[] = [
   { trans: 'item_tax_rate3', value: 'item.tax_rate3' },
   { trans: 'type', value: 'item.type_id' },
   { trans: 'tax_category', value: 'item.tax_id' },
+  { trans: 'tax_amount', value: 'item.tax_amount' },
 ];

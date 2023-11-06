@@ -50,4 +50,6 @@ export const recurringinvoiceMap: Record[] = [
   { trans: 'user', value: 'recurring_invoice.user_id' },
   { trans: 'frequency', value: 'recurring_invoice.frequency_id' },
   { trans: 'next_send_date', value: 'recurring_invoice.next_send_date' },
+  { trans: 'auto_bill', value: 'recurring_invoice.auto_bill' },
+  { trans: 'auto_bill_enabled', value: 'recurring_invoice.auto_bill_enabled' },
 ];
