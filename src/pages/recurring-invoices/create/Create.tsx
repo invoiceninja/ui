@@ -41,6 +41,10 @@ import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ConfirmActionModal,
+  confirmActionModalAtom,
+} from '../common/components/ConfirmActionModal';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
@@ -164,9 +168,11 @@ export default function Create() {
 
   const save = useCreate({ setErrors });
 
+  const [, setIsConfirmationVisible] = useAtom(confirmActionModalAtom);
+
   const saveOptions: SaveOption[] = [
     {
-      onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
+      onClick: () => setIsConfirmationVisible(true),
       label: t('send_now'),
       icon: <Icon element={MdSend} />,
     },
@@ -285,6 +291,10 @@ export default function Create() {
           />
         )}
       </div>
+
+      <ConfirmActionModal
+        onClick={() => save(recurringInvoice as RecurringInvoice, 'send_now')}
+      />
     </Default>
   );
 }
