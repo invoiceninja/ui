@@ -26,9 +26,15 @@ interface Props {
   isVisible: boolean;
   setIsVisible: Dispatch<SetStateAction<boolean>>;
   selectedExpenses: Expense[];
+  setSelected?: Dispatch<SetStateAction<string[]>>;
 }
 
-function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
+function ChangeCategory({
+  isVisible,
+  setIsVisible,
+  selectedExpenses,
+  setSelected,
+}: Props) {
   const [t] = useTranslation();
   const [category, setCategory] = useState('');
 
@@ -50,6 +56,10 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
     const ids = selectedExpenses.map(({ id }) => id);
 
     bulk(ids, 'bulk_categorize', { category_id: category });
+
+    if (setSelected) {
+      setSelected([]);
+    }
   };
 
   return (
@@ -132,6 +142,7 @@ export const useCustomBulkActions = () => {
             isVisible={isChangeCategoryVisible}
             setIsVisible={setIsChangeCategoryVisible}
             selectedExpenses={selectedExpenses}
+            setSelected={setSelected}
           />
         ) : null}
 
