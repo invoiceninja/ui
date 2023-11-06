@@ -38,11 +38,14 @@ import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const reactSettings = useReactSettings();
 
@@ -95,8 +98,8 @@ export default function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
-  const [searchParams] = useSearchParams()
-  const taskColumns = useTaskColumns()
+  const [searchParams] = useSearchParams();
+  const taskColumns = useTaskColumns();
 
   return (
     <Default
@@ -109,9 +112,11 @@ export default function Edit() {
             resource={quote}
             label={t('more_actions')}
             actions={actions}
+            disabledDropdown={!hasPermission('edit_quote')}
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_quote')}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

@@ -27,6 +27,10 @@ import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -37,6 +41,10 @@ export function QuoteFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
   const { handleChange, errors } = props;
+
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const location = useLocation();
 
@@ -49,7 +57,7 @@ export function QuoteFooter(props: Props) {
     t('private_notes'),
     t('documents'),
     t('settings'),
-    t('custom_fields'),
+    ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   const onSuccess = () => {
@@ -97,11 +105,13 @@ export function QuoteFooter(props: Props) {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={!hasPermission('edit_quote')}
             />
 
             <DocumentsTable
               documents={quote?.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={!hasPermission('edit_quote')}
             />
           </div>
         )}

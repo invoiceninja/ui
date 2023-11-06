@@ -27,11 +27,14 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('quotes'), href: route('/quotes') }];
 
@@ -74,6 +77,7 @@ export default function Quotes() {
           />
         }
         linkToCreateGuards={[permission('create_quote')]}
+        showEditEntityOptions={hasPermission('edit_quote')}
       />
     </Default>
   );
