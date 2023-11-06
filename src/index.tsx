@@ -26,8 +26,10 @@ import { GoogleOAuth } from './components/GoogleOAuth';
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
-  integrations: [new Sentry.BrowserTracing()],
+  integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
   tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
 });
 
 i18n.use(initReactI18next).init({
