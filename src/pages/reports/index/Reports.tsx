@@ -251,6 +251,9 @@ export default function Reports() {
             console.error(e);
 
             toast.error();
+          })
+          .finally(() => {
+            setIsPendingExport(false);
           });
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
@@ -267,8 +270,6 @@ export default function Reports() {
         }
       })
       .finally(() => {
-        setIsPendingExport(false);
-
         if (showCustomColumns) {
           save({ silent: true });
         }
