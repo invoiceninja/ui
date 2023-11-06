@@ -15,7 +15,7 @@ import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categorie
 import { CustomBulkAction } from '$app/components/DataTable';
 import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, SelectField } from '$app/components/forms';
+import { Button, Link, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +44,7 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
   const handleChange = () => {
     toast.processing();
 
-    // 
+    //
   };
 
   return (
@@ -62,17 +62,20 @@ function ChangeCategory({ isVisible, setIsVisible, selectedExpenses }: Props) {
         ))}
       </ul>
 
-      <SelectField
-        value={category}
-        onValueChange={setCategory}
-        withBlank
-      >
+      <SelectField value={category} onValueChange={setCategory} withBlank>
         {expenseCategories?.map(({ id, name }) => (
           <option key={id} value={id}>
             {name}
           </option>
         ))}
       </SelectField>
+
+      <p>
+        <span className="capitalize">{t('manage')}</span>{' '}
+        <Link className="lowercase" to="/settings/expense_settings">
+          {t('expense_categories')}
+        </Link>
+      </p>
 
       <Button>{t('save')}</Button>
     </Modal>
