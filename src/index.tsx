@@ -16,7 +16,6 @@ import { store } from './common/stores/store';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 import { ScrollToTop } from '$app/components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { createRoot } from 'react-dom/client';
@@ -24,6 +23,12 @@ import { createRoot } from 'react-dom/client';
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
 import { GoogleOAuth } from './components/GoogleOAuth';
+
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
+  integrations: [new Sentry.BrowserTracing()],
+  tracesSampleRate: 1.0,
+});
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -47,12 +52,6 @@ const queryClient = new QueryClient({
       retry: 1,
     },
   },
-});
-
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
-  integrations: [new BrowserTracing()],
-  tracesSampleRate: 1.0,
 });
 
 const container = document.getElementById('root') as HTMLElement;
