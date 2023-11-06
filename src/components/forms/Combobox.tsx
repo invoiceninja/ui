@@ -565,7 +565,7 @@ export function ComboboxStatic<T = any>({
                 entryOptions.inputLabelFn?.(entry?.resource) ??
                 (entry?.label || '')
               }
-              onFocus={() => setIsOpen(true)}
+              onClick={() => setIsOpen(true)}
               placeholder={inputOptions.placeholder}
               style={{
                 backgroundColor: colors.$1,
@@ -580,9 +580,13 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
-                    setIsOpen(false);
+                    selectedValue && setIsOpen(false);
+
+                    !selectedValue && setIsOpen((current) => !current);
 
                     return onDismiss();
+                  } else {
+                    setIsOpen((current) => !current);
                   }
                 }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
@@ -755,7 +759,7 @@ export function ComboboxAsync<T = any>({
   const [url, setUrl] = useState(endpoint);
 
   const { data } = useQuery(
-    [url],
+    [new URL(url).pathname, new URL(url).href],
     () => {
       const $url = new URL(url);
 
@@ -790,6 +794,8 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   );
 

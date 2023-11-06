@@ -33,6 +33,7 @@ import { useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useQueryClient } from 'react-query';
+import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
 
 export type Identifier =
   | 'activity'
@@ -78,7 +79,7 @@ const ranges: Range[] = [
   { identifier: 'custom', label: 'custom' },
 ];
 
-interface Report {
+export interface Report {
   identifier: Identifier;
   label: string;
   endpoint: string;
@@ -99,6 +100,7 @@ interface Payload {
   is_expense_billed?: boolean;
   include_tax?: boolean;
   status?: string;
+  product_key?: string;
 }
 
 const download = (data: BlobPart, identifier: string) => {
@@ -370,6 +372,11 @@ export default function Reports() {
                 isMulti={true}
               />
             </Element>
+          )}
+
+          {(report.identifier === 'product_sales' ||
+            report.identifier === 'invoice_item') && (
+            <ProductItemsSelector setReport={setReport} />
           )}
         </Card>
 

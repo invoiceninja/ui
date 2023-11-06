@@ -45,16 +45,16 @@ export function DropdownDateRangePicker(props: Props) {
     setCustomEndDate(props.endDate);
   }, [props.startDate, props.endDate]);
 
-  const handleCustomDateChange = (value: [string, string]) => {
+  const handleCustomDateChange = (value: [string, string]) => { 
     dayjs.extend(customParseFormat);
     if (value[0] === '' || value[1] === '') {
       return;
     }
 
     props.handleDateChange(
-      dayjs(value[0]).format('YYYY-MM-DD') +
+      dayjs(value[0], dateFormat, antdLocale?.locale).format('YYYY-MM-DD') +
         ',' +
-        dayjs(value[1]).format('YYYY-MM-DD')
+      dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
     );
   };
 

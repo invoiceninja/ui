@@ -12,7 +12,6 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
@@ -37,7 +36,7 @@ export function usePaymentTermsQuery(params: Params) {
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/payment_terms/:id', params),
+    ['/api/v1/payment_terms', params],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/:id', params), {
         headers: defaultHeaders(),
@@ -60,7 +59,7 @@ export function useBlankPaymentTermQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery<PaymentTerm>(
-    '/api/v1/payment_terms/create',
+    ['/api/v1/payment_terms/create'],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/create')).then(
         (response: GenericSingleResourceResponse<PaymentTerm>) =>

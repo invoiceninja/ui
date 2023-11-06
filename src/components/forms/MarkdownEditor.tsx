@@ -54,6 +54,7 @@ export function MarkdownEditor(props: Props) {
         value={value}
         init={{
           height: 300,
+          entity_encoding: "raw",
           menubar: false,
           plugins: [
             'advlist',

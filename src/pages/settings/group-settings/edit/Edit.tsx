@@ -25,7 +25,6 @@ import { useActions } from '../common/hooks/useActions';
 import { Upload } from '../../company/documents/components';
 import { endpoint } from '$app/common/helpers';
 import { DocumentsTable } from '$app/components/DocumentsTable';
-import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
 import { Clients } from './components/Clients';
@@ -33,11 +32,11 @@ import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings as SettingsIcon } from 'react-feather';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const queryClient = useQueryClient();
 
   const { documentTitle } = useTitle('edit_group');
 
@@ -79,7 +78,7 @@ export function Edit() {
   }, [groupSettingsResponse]);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(route('/api/v1/group_settings/:id', { id }));
+    $refetch(['group_settings']);
   };
 
   return (
