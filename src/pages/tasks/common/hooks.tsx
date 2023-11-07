@@ -322,6 +322,12 @@ export function useTaskFilters() {
       color: 'white',
       backgroundColor: '#22C55E',
     },
+    {
+      label: t('uninvoiced'),
+      value: 'uninvoiced',
+      color: 'white',
+      backgroundColor: '#22C55E',
+    },
   ];
 
   taskStatuses?.data.forEach((taskStatus) => {
