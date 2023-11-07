@@ -326,7 +326,7 @@ export function useTaskFilters() {
       label: t('uninvoiced'),
       value: 'uninvoiced',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: '#F87171', 
     },
   ];
 
