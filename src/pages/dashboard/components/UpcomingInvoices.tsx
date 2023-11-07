@@ -77,7 +77,6 @@ export function UpcomingInvoices() {
           withoutActions
           withoutPagination
           withoutPadding
-          staleTime={Infinity}
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,

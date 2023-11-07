@@ -16,8 +16,6 @@ import {
 } from '$app/pages/recurring-expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
-export const dataTableStaleTime = 50;
-
 export default function RecurringExpenses() {
   const { id } = useParams();
 
@@ -38,7 +36,6 @@ export default function RecurringExpenses() {
       bulkRoute="/api/v1/recurring_expenses/bulk"
       linkToCreate={route('/recurring_expenses/create?client=:id', { id: id })}
       linkToEdit="/recurring_expenses/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

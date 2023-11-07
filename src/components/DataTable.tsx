@@ -54,7 +54,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { refetchByUrl } from '$app/common/hooks/useRefetch';
+import { $refetch, refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useLocation } from 'react-router-dom';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { cloneDeep, isEqual, set } from 'lodash';
@@ -140,7 +140,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
-  const tableKey = `${location.pathname}${props.endpoint}`;
+  const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
 
   const getPreference = (filterKey: keyof TableFiltersPreference) => {
     const tableFilters = user?.company_user?.react_settings.table_filters;
@@ -183,6 +183,8 @@ export function DataTable<T extends object>(props: Props<T>) {
       updatedUser
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(updatedUser, 'company_user', response.data.data);
+
+      $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
     });

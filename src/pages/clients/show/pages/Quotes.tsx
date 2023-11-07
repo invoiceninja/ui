@@ -11,7 +11,6 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import { useActions, useQuoteColumns } from '$app/pages/quotes/common/hooks';
 import { useCustomBulkActions } from '$app/pages/quotes/common/hooks/useCustomBulkActions';
 
@@ -38,7 +37,6 @@ export default function Quotes() {
       bulkRoute="/api/v1/quotes/bulk"
       linkToCreate={route('/quotes/create?client=:id', { id })}
       linkToEdit="/quotes/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

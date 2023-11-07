@@ -11,7 +11,6 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import {
   useActions,
   useProjectColumns,
@@ -37,7 +36,6 @@ export default function Projects() {
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
       linkToEdit="/projects/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

@@ -50,9 +50,11 @@ export function Actions(props: Props) {
   const invite = () => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/users/:id/invite', { id })).then(() =>
-      toast.success('email_sent_to_confirm_email')
-    );
+    request('POST', endpoint('/api/v1/users/:id/invite', { id })).then(() => {
+      $refetch(['users']);
+
+      toast.success('email_sent_to_confirm_email');
+    });
   };
 
   const remove = () => {
@@ -95,7 +97,7 @@ export function Actions(props: Props) {
 
         toast.success(message);
 
-        $refetch(['users'])
+        $refetch(['users']);
       })
       .catch((error) => {
         if (error.response?.status === 412) {

@@ -229,7 +229,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       recurringInvoice
     )
       .then(() => {
-        $refetch(['recurring_invoices'])
+        $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
       })
@@ -540,6 +540,8 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
     request('POST', endpoint(endpointUrl), recurringInvoice)
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
         toast.success('created_recurring_invoice');
+
+        $refetch(['recurring_invoices']);
 
         navigate(
           route('/recurring_invoices/:id/edit', {

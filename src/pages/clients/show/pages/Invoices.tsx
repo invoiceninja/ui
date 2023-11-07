@@ -15,8 +15,6 @@ import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceCo
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
 
-export const dataTableStaleTime = 50;
-
 export default function Invoices() {
   const { id } = useParams();
 
@@ -40,7 +38,6 @@ export default function Invoices() {
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

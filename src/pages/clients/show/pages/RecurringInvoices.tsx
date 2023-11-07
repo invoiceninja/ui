@@ -11,7 +11,6 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import {
   useActions,
   useRecurringInvoiceColumns,
@@ -41,7 +40,6 @@ export default function RecurringInvoices() {
         id,
       })}
       linkToEdit="/recurring_invoices/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

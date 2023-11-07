@@ -11,7 +11,6 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import { useActions, useCreditColumns } from '$app/pages/credits/common/hooks';
 import { useCustomBulkActions } from '$app/pages/credits/common/hooks/useCustomBulkActions';
 
@@ -38,7 +37,6 @@ export default function Credits() {
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id })}
       linkToEdit="/credits/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

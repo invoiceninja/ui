@@ -222,6 +222,8 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Quote>) => {
         toast.success('created_quote');
 
+        $refetch(['quotes']);
+
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -250,7 +252,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        $refetch(['quotes'])
+        $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
