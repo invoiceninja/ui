@@ -54,9 +54,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import {
-  refetchByUrl,
-} from '$app/common/hooks/useRefetch';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -64,10 +62,14 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
+type CustomBulkActionContext<T> = {
+  selectedIds: string[];
+  selectedResources: T[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
+};
+
 export type CustomBulkAction<T> = (
-  selectedIds: string[],
-  selectedResources?: T[],
-  setSelected?: Dispatch<SetStateAction<string[]>>
+  ctx: CustomBulkActionContext<T>
 ) => ReactNode;
 
 interface StyleOptions {
@@ -284,7 +286,13 @@ export function DataTable<T extends object>(props: Props<T>) {
   const showCustomBulkActionDivider = useMemo(() => {
     return props.customBulkActions
       ? props.customBulkActions.some((action) =>
-          React.isValidElement(action(selected, selectedResources))
+          React.isValidElement(
+            action({
+              selectedIds: selected,
+              selectedResources,
+              setSelected,
+            })
+          )
         )
       : false;
   }, [props.customBulkActions, selected, selectedResources]);
@@ -335,7 +343,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               props.customBulkActions.map(
                 (bulkAction: CustomBulkAction<T>, index: number) => (
                   <div key={index}>
-                    {bulkAction(selected, selectedResources, setSelected)}
+                    {bulkAction({
+                      selectedIds: selected,
+                      selectedResources,
+                      setSelected,
+                    })}
                   </div>
                 )
               )}
