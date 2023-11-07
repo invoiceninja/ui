@@ -60,6 +60,8 @@ function ChangeCategory({
     if (setSelected) {
       setSelected([]);
     }
+
+    setIsVisible(false);
   };
 
   return (
