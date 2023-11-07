@@ -9,8 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
-import { useCountries } from '$app/common/hooks/useCountries';
+import { Button, InputField } from '$app/components/forms';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
@@ -27,8 +26,6 @@ interface Props {
 
 export function ShippingAddress(props: Props) {
   const [t] = useTranslation();
-  const countries = useCountries();
-
   const { errors, setErrors, setClient } = props;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +104,7 @@ export function ShippingAddress(props: Props) {
           errorMessage={errors?.errors.shipping_postal_code}
         />
       </Element>
-      
+
       <Element leftSide={t('country')}>
         <CountrySelector
           onChange={(id) =>

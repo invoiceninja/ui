@@ -9,8 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { useCountries } from '$app/common/hooks/useCountries';
+import { InputField } from '$app/components/forms';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
@@ -27,7 +26,6 @@ interface Props {
 
 export function BillingAddress(props: Props) {
   const [t] = useTranslation();
-  const countries = useCountries();
 
   const { errors, setClient, setErrors } = props;
 
