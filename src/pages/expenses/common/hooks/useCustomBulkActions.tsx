@@ -79,7 +79,8 @@ function ChangeCategory({
         ))}
       </ul>
 
-      <SelectField value={category} onValueChange={setCategory} withBlank>
+      <SelectField value={category} onValueChange={setCategory}>
+        <option value="" selected disabled></option>
         {expenseCategories?.map(({ id, name }) => (
           <option key={id} value={id}>
             {name}
