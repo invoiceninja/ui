@@ -24,7 +24,7 @@ import React, {
 } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
@@ -54,6 +54,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useLocation } from 'react-router-dom';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { cloneDeep, isEqual, set } from 'lodash';
@@ -151,8 +152,6 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
   setInvalidationQueryAtom(apiEndpoint.pathname);
-
-  const queryClient = useQueryClient();
 
   const { styleOptions, customFilters, onBulkActionCall } = props;
 
@@ -425,9 +424,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         );
       })
       .finally(() => {
-        queryClient.invalidateQueries([props.endpoint]);
-        queryClient.invalidateQueries([apiEndpoint.pathname]);
-
+        refetchByUrl([props.endpoint, apiEndpoint.pathname]);
         setSelected([]);
       });
   };
