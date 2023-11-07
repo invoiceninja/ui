@@ -122,9 +122,10 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
-    (_, selectedInvoices) =>
-      selectedInvoices && <SendEmailBulkAction invoices={selectedInvoices} />,
-    (selectedIds) => (
+    ({ selectedResources }) => (
+      <SendEmailBulkAction invoices={selectedResources} />
+    ),
+    ({ selectedIds }) => (
       <DropdownElement
         onClick={() => printPdf(selectedIds)}
         icon={<Icon element={MdPrint} />}
@@ -132,17 +133,18 @@ export const useCustomBulkActions = () => {
         {t('print_pdf')}
       </DropdownElement>
     ),
-    (selectedIds) => (
+    ({ selectedIds }) => (
       <DropdownElement
-        onClick={() => downloadPdfs(selectedIds)}
+        onClick={() => {
+          downloadPdfs(selectedIds);
+        }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, selectedInvoices) =>
-      selectedInvoices &&
-      showAutoBillAction(selectedInvoices) && (
+    ({ selectedIds, selectedResources }) =>
+      showAutoBillAction(selectedResources) && (
         <DropdownElement
           onClick={() => bulk(selectedIds, 'auto_bill')}
           icon={<Icon element={BiMoney} />}
@@ -150,29 +152,28 @@ export const useCustomBulkActions = () => {
           {t('auto_bill')}
         </DropdownElement>
       ),
-    (selectedIds, selectedInvoices) =>
-      selectedInvoices &&
-      showMarkSendOption(selectedInvoices) && (
+    ({ selectedIds, selectedResources }) =>
+      showMarkSendOption(selectedResources) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'mark_sent')}
+          onClick={() => {
+            bulk(selectedIds, 'mark_sent');
+          }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    (_, selectedInvoices) =>
-      selectedInvoices &&
-      showEnterPaymentOption(selectedInvoices) && (
+    ({ selectedResources }) =>
+      showEnterPaymentOption(selectedResources) && (
         <DropdownElement
-          onClick={() => handleEnterPayment(selectedInvoices)}
+          onClick={() => handleEnterPayment(selectedResources)}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('enter_payment')}
         </DropdownElement>
       ),
-    (selectedIds, selectedInvoices) =>
-      selectedInvoices &&
-      showMarkPaidOption(selectedInvoices) && (
+    ({ selectedIds, selectedResources }) =>
+      showMarkPaidOption(selectedResources) && (
         <DropdownElement
           onClick={() => bulk(selectedIds, 'mark_paid')}
           icon={<Icon element={MdPaid} />}
@@ -180,13 +181,12 @@ export const useCustomBulkActions = () => {
           {t('mark_paid')}
         </DropdownElement>
       ),
-    (_, selectedInvoices, setSelected) =>
-      selectedInvoices &&
-      shouldShowDownloadDocuments(selectedInvoices) && (
+    ({ selectedResources, setSelected }) =>
+      shouldShowDownloadDocuments(selectedResources) && (
         <DropdownElement
           onClick={() =>
-            shouldDownloadDocuments(selectedInvoices)
-              ? handleDownloadDocuments(selectedInvoices, setSelected)
+            shouldDownloadDocuments(selectedResources)
+              ? handleDownloadDocuments(selectedResources, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}
@@ -194,19 +194,17 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    (_, selectedInvoices) =>
-      selectedInvoices &&
-      showReverseOption(selectedInvoices) && (
+    ({ selectedResources }) =>
+      showReverseOption(selectedResources) && (
         <DropdownElement
-          onClick={() => reverseInvoice(selectedInvoices[0])}
+          onClick={() => reverseInvoice(selectedResources[0])}
           icon={<Icon element={MdRefresh} />}
         >
           {t('reverse')}
         </DropdownElement>
       ),
-    (selectedIds, selectedInvoices) =>
-      selectedInvoices &&
-      showCancelOption(selectedInvoices) && (
+    ({ selectedIds, selectedResources }) =>
+      showCancelOption(selectedResources) && (
         <DropdownElement
           onClick={() => bulk(selectedIds, 'cancel')}
           icon={<Icon element={MdCancel} />}
