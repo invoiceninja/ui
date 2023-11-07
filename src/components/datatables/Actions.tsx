@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
-import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import React, { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 export interface SelectOption {
@@ -24,6 +24,7 @@ export interface SelectOption {
 }
 
 interface Props extends CommonProps {
+  resource: string;
   options?: SelectOption[];
   defaultOption?: SelectOption;
   optionsPlaceholder?: string;
@@ -144,7 +145,7 @@ export function Actions(props: Props) {
           />
         )}
       </div>
-      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
+      <div className="flex flex-col mt-2 space-y-2 lg:mt-0 lg:flex-row lg:items-center lg:space-y-0  lg:space-x-4">
         {props.beforeFilter}
 
         <InputField

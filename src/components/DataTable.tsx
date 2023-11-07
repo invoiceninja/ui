@@ -31,7 +31,6 @@ import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
-import { Inline } from './Inline';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -54,9 +53,7 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import {
-  refetchByUrl,
-} from '$app/common/hooks/useRefetch';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -115,6 +112,7 @@ interface Props<T> extends CommonProps {
     selectedIds: string[],
     action: 'archive' | 'restore' | 'delete'
   ) => void;
+  showEditableOptions?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -134,7 +132,12 @@ export function DataTable<T extends object>(props: Props<T>) {
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
   setInvalidationQueryAtom(apiEndpoint.pathname);
 
-  const { styleOptions, customFilters, onBulkActionCall } = props;
+  const {
+    styleOptions,
+    customFilters,
+    onBulkActionCall,
+    showEditableOptions = true,
+  } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -289,6 +292,14 @@ export function DataTable<T extends object>(props: Props<T>) {
       : false;
   }, [props.customBulkActions, selected, selectedResources]);
 
+  const showCustomActionDivider = (resource: T) => {
+    return props.customActions
+      ? props.customActions.some((action: ResourceAction<T>) =>
+          React.isValidElement(action(resource))
+        )
+      : false;
+  };
+
   useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
@@ -303,6 +314,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     <>
       {!props.withoutActions && (
         <Actions
+          resource={props.resource}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}
@@ -312,7 +324,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={
-            <Inline>
+            <>
               {props.rightSide}
 
               {props.linkToCreate && (
@@ -326,65 +338,67 @@ export function DataTable<T extends object>(props: Props<T>) {
                   }
                 />
               )}
-            </Inline>
+            </>
           }
           beforeFilter={props.beforeFilter}
         >
-          <Dropdown label={t('more_actions')} disabled={!selected.length}>
-            {props.customBulkActions &&
-              props.customBulkActions.map(
-                (bulkAction: CustomBulkAction<T>, index: number) => (
-                  <div key={index}>
-                    {bulkAction(selected, selectedResources, setSelected)}
-                  </div>
-                )
+          {showEditableOptions && (
+            <Dropdown label={t('more_actions')} disabled={!selected.length}>
+              {props.customBulkActions &&
+                props.customBulkActions.map(
+                  (bulkAction: CustomBulkAction<T>, index: number) => (
+                    <div key={index}>
+                      {bulkAction(selected, selectedResources, setSelected)}
+                    </div>
+                  )
+                )}
+
+              {props.customBulkActions && showCustomBulkActionDivider && (
+                <Divider withoutPadding />
               )}
 
-            {props.customBulkActions && showCustomBulkActionDivider && (
-              <Divider withoutPadding />
-            )}
-
-            <DropdownElement
-              onClick={() => {
-                if (onBulkActionCall) {
-                  onBulkActionCall(selected, 'archive');
-                } else {
-                  bulk('archive');
-                }
-              }}
-              icon={<Icon element={MdArchive} />}
-            >
-              {t('archive')}
-            </DropdownElement>
-
-            <DropdownElement
-              onClick={() => {
-                if (onBulkActionCall) {
-                  onBulkActionCall(selected, 'delete');
-                } else {
-                  bulk('delete');
-                }
-              }}
-              icon={<Icon element={MdDelete} />}
-            >
-              {t('delete')}
-            </DropdownElement>
-
-            {showRestoreBulkAction() && (
               <DropdownElement
                 onClick={() => {
                   if (onBulkActionCall) {
-                    onBulkActionCall(selected, 'restore');
+                    onBulkActionCall(selected, 'archive');
                   } else {
-                    bulk('restore');
+                    bulk('archive');
                   }
                 }}
-                icon={<Icon element={MdRestore} />}
+                icon={<Icon element={MdArchive} />}
               >
-                {t('restore')}
+                {t('archive')}
               </DropdownElement>
-            )}
-          </Dropdown>
+
+              <DropdownElement
+                onClick={() => {
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'delete');
+                  } else {
+                    bulk('delete');
+                  }
+                }}
+                icon={<Icon element={MdDelete} />}
+              >
+                {t('delete')}
+              </DropdownElement>
+
+              {showRestoreBulkAction() && (
+                <DropdownElement
+                  onClick={() => {
+                    if (onBulkActionCall) {
+                      onBulkActionCall(selected, 'restore');
+                    } else {
+                      bulk('restore');
+                    }
+                  }}
+                  icon={<Icon element={MdRestore} />}
+                >
+                  {t('restore')}
+                </DropdownElement>
+              )}
+            </Dropdown>
+          )}
         </Actions>
       )}
 
@@ -404,7 +418,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
-          {!props.withoutActions && (
+          {!props.withoutActions && showEditableOptions && (
             <Th className={styleOptions?.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
@@ -441,7 +455,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           ))}
 
-          {props.withResourcefulActions && <Th></Th>}
+          {props.withResourcefulActions && showEditableOptions && <Th></Th>}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -493,7 +507,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
               >
-                {!props.withoutActions && (
+                {!props.withoutActions && showEditableOptions && (
                   <Td
                     className="cursor-pointer"
                     onClick={() =>
@@ -519,6 +533,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     className={classNames(
                       {
                         'cursor-pointer': index < 3,
+                        'py-4': !showEditableOptions,
                       },
                       styleOptions?.tdClassName
                     )}
@@ -536,7 +551,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 ))}
 
-                {props.withResourcefulActions && (
+                {props.withResourcefulActions && showEditableOptions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
                       {props.linkToEdit &&
@@ -553,6 +568,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.linkToEdit &&
                         props.customActions &&
+                        showCustomActionDivider(resource) &&
                         (props.showEdit?.(resource) || !props.showEdit) && (
                           <Divider withoutPadding />
                         )}
@@ -563,7 +579,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key !== 'purge' && (
+                            action(resource)?.key !== 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}
@@ -607,7 +623,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key === 'purge' && (
+                            action(resource)?.key === 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}
