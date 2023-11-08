@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const defaultColumns: string[] = [
   'status',
@@ -77,6 +78,8 @@ export function usePaymentColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
+
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
 
@@ -118,7 +121,12 @@ export function usePaymentColumns() {
       id: 'number',
       label: t('number'),
       format: (value, payment) => (
-        <Link to={route('/payments/:id/edit', { id: payment.id })}>
+        <Link
+          to={route('/payments/:id/edit', { id: payment.id })}
+          disableNavigation={
+            !hasPermission('view_payment') && !hasPermission('edit_payment')
+          }
+        >
           {payment.number}
         </Link>
       ),
@@ -128,7 +136,12 @@ export function usePaymentColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link to={route('/clients/:id', { id: payment.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: payment.client_id })}
+          disableNavigation={
+            !hasPermission('view_client') && !hasPermission('edit_client')
+          }
+        >
           {payment.client?.display_name}
         </Link>
       ),
@@ -149,10 +162,15 @@ export function usePaymentColumns() {
       id: 'id',
       label: t('invoice_number'),
       format: (value, payment) => (
-        <Link to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}>
+        <Link
+          to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
+          disableNavigation={
+            !hasPermission('view_invoice') && !hasPermission('edit_invoice')
+          }
+        >
           {payment.invoices?.[0]?.number}
         </Link>
-      )
+      ),
     },
     {
       column: 'date',

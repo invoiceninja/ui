@@ -33,11 +33,14 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
 
@@ -102,6 +105,7 @@ export default function Invoices() {
           />
         }
         linkToCreateGuards={[permission('create_invoice')]}
+        hideEditableOptions={!hasPermission('edit_invoice')}
         onTableRowClick={(invoice) => {
           setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);

@@ -57,7 +57,9 @@ export function useBlankProductQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_product'),
+      enabled: hasPermission('create_product')
+        ? options?.enabled ?? true
+        : false,
     }
   );
 }

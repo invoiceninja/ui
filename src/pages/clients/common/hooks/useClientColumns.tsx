@@ -28,6 +28,7 @@ import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const defaultColumns: string[] = [
   'name',
@@ -92,6 +93,8 @@ export function useClientColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
+
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -129,7 +132,14 @@ export function useClientColumns() {
       id: 'display_name',
       label: t('name'),
       format: (value, client) => (
-        <Link to={route('/clients/:id', { id: client.id })}>{value}</Link>
+        <Link
+          to={route('/clients/:id', { id: client.id })}
+          disableNavigation={
+            !hasPermission('view_client') && !hasPermission('edit_client')
+          }
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -160,7 +170,12 @@ export function useClientColumns() {
       label: t('contact_name'),
       format: (value, resource) =>
         resource.contacts.length > 0 && (
-          <Link to={route('/clients/:id', { id: resource.id })}>
+          <Link
+            to={route('/clients/:id', { id: resource.id })}
+            disableNavigation={
+              !hasPermission('view_client') && !hasPermission('edit_client')
+            }
+          >
             {resource.contacts[0].first_name} {resource.contacts[0].last_name}
           </Link>
         ),

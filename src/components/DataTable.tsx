@@ -112,7 +112,7 @@ interface Props<T> extends CommonProps {
     selectedIds: string[],
     action: 'archive' | 'restore' | 'delete'
   ) => void;
-  showEditableOptions?: boolean;
+  hideEditableOptions?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -136,7 +136,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     styleOptions,
     customFilters,
     onBulkActionCall,
-    showEditableOptions = true,
+    hideEditableOptions = false,
   } = props;
 
   const [filter, setFilter] = useState<string>('');
@@ -342,7 +342,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
         >
-          {showEditableOptions && (
+          {!hideEditableOptions && (
             <Dropdown label={t('more_actions')} disabled={!selected.length}>
               {props.customBulkActions &&
                 props.customBulkActions.map(
@@ -418,7 +418,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
-          {!props.withoutActions && showEditableOptions && (
+          {!props.withoutActions && !hideEditableOptions && (
             <Th className={styleOptions?.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
@@ -455,7 +455,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           ))}
 
-          {props.withResourcefulActions && showEditableOptions && <Th></Th>}
+          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -507,7 +507,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
               >
-                {!props.withoutActions && showEditableOptions && (
+                {!props.withoutActions && !hideEditableOptions && (
                   <Td
                     className="cursor-pointer"
                     onClick={() =>
@@ -533,7 +533,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     className={classNames(
                       {
                         'cursor-pointer': index < 3,
-                        'py-4': !showEditableOptions,
+                        'py-4': hideEditableOptions,
                       },
                       styleOptions?.tdClassName
                     )}
@@ -551,7 +551,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 ))}
 
-                {props.withResourcefulActions && showEditableOptions && (
+                {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
                       {props.linkToEdit &&

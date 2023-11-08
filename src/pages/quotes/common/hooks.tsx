@@ -88,6 +88,10 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -250,7 +254,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        $refetch(['quotes'])
+        $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -270,6 +274,10 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
@@ -409,7 +417,8 @@ export function useActions() {
     ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
-      quote.status_id !== QuoteStatus.Approved && (
+      quote.status_id !== QuoteStatus.Approved &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => scheduleEmailRecord(quote.id)}
           icon={<Icon element={MdSchedule} />}
@@ -453,7 +462,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      quote.status_id !== QuoteStatus.Converted && (
+      quote.status_id !== QuoteStatus.Converted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
@@ -462,50 +472,56 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      !quote.project_id && (
+      !quote.project_id &&
+      hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
     () => <Divider withoutPadding />,
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring_invoice')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
+    (quote) =>
+      hasPermission('create_quote') && (
+        <DropdownElement
+          onClick={() => cloneToQuote(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToInvoice(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_invoice')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => cloneToCredit(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_credit')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_recurring_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringInvoice(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_recurring_invoice')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (quote) =>
       isEditPage &&

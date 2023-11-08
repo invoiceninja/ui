@@ -30,9 +30,12 @@ import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const user = useCurrentUser();
 
@@ -153,26 +156,30 @@ export function CompanySwitcher() {
                 ))}
             </div>
             <div className="py-1">
-              {shouldShowAddCompany && canUserAddCompany && (
+              {shouldShowAddCompany &&
+                canUserAddCompany &&
+                (isAdmin || isOwner) && (
+                  <Menu.Item>
+                    <DropdownElement
+                      className="flex items-center"
+                      onClick={() => setIsCompanyCreateModalOpened(true)}
+                      icon={<Icon element={BiPlusCircle} size={22} />}
+                    >
+                      <span>{t('add_company')}</span>
+                    </DropdownElement>
+                  </Menu.Item>
+                )}
+
+              {(isAdmin || isOwner) && (
                 <Menu.Item>
                   <DropdownElement
-                    className="flex items-center"
-                    onClick={() => setIsCompanyCreateModalOpened(true)}
-                    icon={<Icon element={BiPlusCircle} size={22} />}
+                    to="/settings/account_management"
+                    icon={<Icon element={MdManageAccounts} size={22} />}
                   >
-                    <span>{t('add_company')}</span>
+                    {t('account_management')}
                   </DropdownElement>
                 </Menu.Item>
               )}
-
-              <Menu.Item>
-                <DropdownElement
-                  to="/settings/account_management"
-                  icon={<Icon element={MdManageAccounts} size={22} />}
-                >
-                  {t('account_management')}
-                </DropdownElement>
-              </Menu.Item>
 
               <Menu.Item>
                 <DropdownElement

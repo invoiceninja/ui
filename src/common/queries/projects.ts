@@ -28,7 +28,9 @@ export function useBlankProjectQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_project'),
+      enabled: hasPermission('create_project')
+        ? options?.enabled ?? true
+        : false,
     }
   );
 }
