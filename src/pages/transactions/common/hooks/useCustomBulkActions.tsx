@@ -29,7 +29,7 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Transaction>[] = [
-    ({selectedIds, selectedResources, setSelected}) =>
+    ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showConvertAction(selectedResources) && (
         <DropdownElement

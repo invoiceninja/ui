@@ -50,8 +50,6 @@ export function useSave(
           setErrors(error.response.data);
         }
       })
-      .finally(() =>
-        $refetch(['payments'])
-      );
+      .finally(() => $refetch(['payments']));
   };
 }

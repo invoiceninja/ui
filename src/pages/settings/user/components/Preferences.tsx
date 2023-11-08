@@ -108,7 +108,7 @@ export function Preferences() {
         <Element leftSide={t('dark_mode')}>
           <Toggle
             checked={JSON.stringify(colorScheme) === JSON.stringify($1)}
-            onChange={(v) => v ? setColorScheme($1) : setColorScheme($2)}
+            onChange={(v) => (v ? setColorScheme($1) : setColorScheme($2))}
           />
         </Element>
       </Card>

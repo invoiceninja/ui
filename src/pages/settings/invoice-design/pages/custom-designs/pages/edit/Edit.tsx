@@ -59,7 +59,7 @@ export default function Edit() {
     return () =>
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
-  
+
   useSaveBtn(
     {
       onClick() {

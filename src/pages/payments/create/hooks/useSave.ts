@@ -46,7 +46,7 @@ export function useSave(
         }
       })
       .finally(() => {
-        $refetch(['payments', 'credits', 'invoices', 'clients'])
+        $refetch(['payments', 'credits', 'invoices', 'clients']);
       });
   };
 }

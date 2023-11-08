@@ -40,11 +40,14 @@ export function TabGroup(props: Props) {
     setCurrentIndex(props.defaultTabIndex || 0);
   }, [props.defaultTabIndex]);
 
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <div className={props.className}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto border-b" style={{ borderColor: colors.$5 }}>
+      <div
+        className="-mb-px flex space-x-8 overflow-x-auto border-b"
+        style={{ borderColor: colors.$5 }}
+      >
         {props.tabs.map((tab, index) => (
           <div
             key={index}

@@ -74,39 +74,37 @@ export function DocumentsTable(props: Props) {
   const downloadDocument = (doc: Document, inline: boolean) => {
     toast.processing();
 
-    queryClient.fetchQuery(
-      ['/api/v1/documents', doc.hash],
-      () =>
-        request(
-          'GET',
-          endpoint('/documents/:hash', { hash: doc.hash }),
-          { headers: defaultHeaders() },
-          { responseType: 'arraybuffer' }
-        ).then((response) => {
-          const blob = new Blob([response.data], {
-            type: response.headers['content-type'],
-          });
-          const url = URL.createObjectURL(blob);
+    queryClient.fetchQuery(['/api/v1/documents', doc.hash], () =>
+      request(
+        'GET',
+        endpoint('/documents/:hash', { hash: doc.hash }),
+        { headers: defaultHeaders() },
+        { responseType: 'arraybuffer' }
+      ).then((response) => {
+        const blob = new Blob([response.data], {
+          type: response.headers['content-type'],
+        });
+        const url = URL.createObjectURL(blob);
 
-          if (inline) {
-            window.open(url);
-            return;
-          }
+        if (inline) {
+          window.open(url);
+          return;
+        }
 
-          const link = document.createElement('a');
+        const link = document.createElement('a');
 
-          link.download = doc.name;
-          link.href = url;
-          link.target = '_blank';
+        link.download = doc.name;
+        link.href = url;
+        link.target = '_blank';
 
-          document.body.appendChild(link);
+        document.body.appendChild(link);
 
-          link.click();
+        link.click();
 
-          document.body.removeChild(link);
+        document.body.removeChild(link);
 
-          toast.dismiss();
-        })
+        toast.dismiss();
+      })
     );
   };
 

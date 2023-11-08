@@ -38,7 +38,11 @@ export function ConvertCurrency(props: Props) {
   return (
     <>
       <Element leftSide={t('currency')}>
-        <CurrencySelector value={props.exchangeCurrencyId} onChange={handleChange} dismissable />
+        <CurrencySelector
+          value={props.exchangeCurrencyId}
+          onChange={handleChange}
+          dismissable
+        />
       </Element>
 
       <Element leftSide={t('exchange_rate')}>
@@ -52,7 +56,10 @@ export function ConvertCurrency(props: Props) {
       </Element>
 
       <Element leftSide={t('converted_amount')}>
-        <InputField value={props.amount * parseFloat(props.exchangeRate)} type="number"/>
+        <InputField
+          value={props.amount * parseFloat(props.exchangeRate)}
+          type="number"
+        />
       </Element>
     </>
   );

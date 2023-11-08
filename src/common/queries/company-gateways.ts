@@ -48,10 +48,7 @@ export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    [
-      '/api/v1/company_gateways', params.id,
-      params.queryParams,
-    ],
+    ['/api/v1/company_gateways', params.id, params.queryParams],
     () =>
       request(
         'GET',
@@ -86,7 +83,7 @@ export function useBulk() {
     }).then(() => {
       toast.success(`${action}d_company_gateway`);
 
-      $refetch(['company_gateways'])
+      $refetch(['company_gateways']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

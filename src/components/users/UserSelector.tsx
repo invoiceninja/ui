@@ -31,9 +31,7 @@ export function UserSelector(props: UserSelectorProps) {
         label: props.inputLabel?.toString(),
         value: props.value ?? null,
       }}
-      endpoint={
-        endpoint(props.endpoint || '/api/v1/users?status=active')
-      }
+      endpoint={endpoint(props.endpoint || '/api/v1/users?status=active')}
       entryOptions={{
         id: 'id',
         value: 'id',

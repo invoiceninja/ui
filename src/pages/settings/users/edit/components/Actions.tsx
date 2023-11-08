@@ -95,7 +95,7 @@ export function Actions(props: Props) {
 
         toast.success(message);
 
-        $refetch(['users'])
+        $refetch(['users']);
       })
       .catch((error) => {
         if (error.response?.status === 412) {

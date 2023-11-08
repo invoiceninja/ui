@@ -250,7 +250,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        $refetch(['quotes'])
+        $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

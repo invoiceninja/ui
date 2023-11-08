@@ -79,7 +79,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_task_status');
 
-          $refetch(['task_statuses'])
+          $refetch(['task_statuses']);
 
           setIsTitleApplied(false);
         })

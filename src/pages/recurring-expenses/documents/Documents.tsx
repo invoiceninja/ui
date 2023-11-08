@@ -21,7 +21,7 @@ export default function Documents() {
   const { recurringExpense } = context;
 
   const invalidateCache = () => {
-    $refetch(['recurring_expenses'])
+    $refetch(['recurring_expenses']);
   };
 
   return (

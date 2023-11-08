@@ -136,16 +136,15 @@ export function UploadImport(props: Props) {
           props.onSuccess;
           toast.dismiss();
 
-          if (response.data?.mappings[props.entity]?.hints)
-          {
+          if (response.data?.mappings[props.entity]?.hints) {
             response.data?.mappings[props.entity]?.hints.forEach(
               (mapping: number, index: number) => {
-                payload.column_map[props.entity].mapping[index] = response.data?.mappings[props.entity].available[mapping];
+                payload.column_map[props.entity].mapping[index] =
+                  response.data?.mappings[props.entity].available[mapping];
                 setPayloadData(payload);
               }
             );
           }
-          
         }
       );
     },
@@ -160,13 +159,14 @@ export function UploadImport(props: Props) {
   };
 
   const defaultHint = (index: number) => {
-  
-    if(!mapData?.mappings[props.entity]?.hints) return null;
+    if (!mapData?.mappings[props.entity]?.hints) return null;
 
-
-    return mapData?.mappings[props.entity].available[mapData.mappings[props.entity]?.hints[index]] ?? null;
-
-  }
+    return (
+      mapData?.mappings[props.entity].available[
+        mapData.mappings[props.entity]?.hints[index]
+      ] ?? null
+    );
+  };
 
   const removeFileFromFormData = (fileIndex: number) => {
     const filteredFileList = files.filter((file, index) => fileIndex !== index);
@@ -306,7 +306,12 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField id={index} onChange={handleChange} withBlank defaultValue={defaultHint(index)}>
+                    <SelectField
+                      id={index}
+                      onChange={handleChange}
+                      withBlank
+                      defaultValue={defaultHint(index)}
+                    >
                       {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
                           <option value={mapping} key={index}>

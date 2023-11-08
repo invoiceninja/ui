@@ -73,7 +73,7 @@ export function CreateTaskModal(props: Props) {
         .then(() => {
           toast.success('created_task');
 
-          $refetch(['tasks'])
+          $refetch(['tasks']);
 
           setTask(data);
 

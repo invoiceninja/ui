@@ -20,9 +20,10 @@ export function useClientResolver() {
     return queryClient.fetchQuery<Client>({
       queryKey: ['/api/v1/clients', id],
       queryFn: () =>
-        request('GET', endpoint('/api/v1/clients/:id?include=group_settings', { id })).then(
-          (response) => response.data.data
-        ),
+        request(
+          'GET',
+          endpoint('/api/v1/clients/:id?include=group_settings', { id })
+        ).then((response) => response.data.data),
       staleTime: Infinity,
     });
   };
