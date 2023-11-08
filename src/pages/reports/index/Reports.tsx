@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,7 +20,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import Select, { MultiValue, StylesConfig } from 'react-select';
@@ -29,39 +29,17 @@ import {
   SortableColumns,
   reportColumn,
 } from '../common/components/SortableColumns';
-import { useReports } from '../common/useReports';
+import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useQueryClient } from 'react-query';
+import { useAtom } from 'jotai';
+import {
+  Preview,
+  PreviewResponse,
+  previewAtom,
+} from '../common/components/Preview';
 import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
-
-export type Identifier =
-  | 'activity'
-  | 'client'
-  | 'contact'
-  | 'credit'
-  | 'document'
-  | 'expense'
-  | 'invoice'
-  | 'invoice_item'
-  | 'quote'
-  | 'quote_item'
-  | 'recurring_invoice'
-  | 'payment'
-  | 'product'
-  | 'product_sales'
-  | 'task'
-  | 'vendor'
-  | 'purchase_order'
-  | 'purchase_order_item'
-  | 'profitloss'
-  | 'client_balance_report'
-  | 'client_sales_report'
-  | 'aged_receivable_detailed_report'
-  | 'aged_receivable_summary_report'
-  | 'user_sales_report'
-  | 'tax_summary_report';
-
 interface Range {
   identifier: string;
   label: string;
@@ -78,30 +56,6 @@ const ranges: Range[] = [
   { identifier: 'this_year', label: 'this_year' },
   { identifier: 'custom', label: 'custom' },
 ];
-
-export interface Report {
-  identifier: Identifier;
-  label: string;
-  endpoint: string;
-  payload: Payload;
-  custom_columns: string[];
-  allow_custom_column: boolean;
-}
-
-interface Payload {
-  start_date: string;
-  end_date: string;
-  date_key?: string;
-  client_id?: string;
-  date_range: string;
-  report_keys: string[];
-  send_email: boolean;
-  is_income_billed?: boolean;
-  is_expense_billed?: boolean;
-  include_tax?: boolean;
-  status?: string;
-  product_key?: string;
-}
 
 const download = (data: BlobPart, identifier: string) => {
   const blob = new Blob([data], { type: 'text/csv' });
@@ -276,6 +230,56 @@ export default function Reports() {
       });
   };
 
+  const [preview, setPreview] = useAtom(previewAtom);
+
+  const handlePreview = async () => {
+    setErrors(undefined);
+    setPreview(null);
+
+    const { client_id } = report.payload;
+
+    let updatedPayload =
+      report.identifier === 'product_sales'
+        ? { ...report.payload, client_id: client_id || null }
+        : report.payload;
+
+    let reportKeys: string[] = [];
+
+    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+      reportKeys = collect(
+        preferences.reports.columns[report.identifier][reportColumn]
+      )
+        .pluck('value')
+        .toArray() as string[];
+    }
+
+    updatedPayload = { ...updatedPayload, report_keys: reportKeys };
+
+    request('POST', endpoint(report.preview), updatedPayload, {}).then(
+      (response) => {
+        const hash = response.data.message as string;
+
+        queryClient
+          .fetchQuery<PreviewResponse>({
+            queryKey: ['reports', hash],
+            queryFn: () =>
+              request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
+                (response) => response.data
+              ),
+            retry: 10,
+            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+          })
+          .then((response) => {
+            const { columns, ...rows } = response;
+
+            setPreview({ columns, rows: Object.values(rows) });
+
+            toast.success();
+          });
+      }
+    );
+  };
+
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
       return {
@@ -300,6 +304,16 @@ export default function Reports() {
 
   const filters = useInvoiceFilters();
 
+  useEffect(() => {
+    return () => {
+      queryClient.cancelQueries(['reports']);
+
+      toast.dismiss();
+
+      setPreview(null);
+    };
+  }, []);
+
   return (
     <Default
       title={documentTitle}
@@ -307,13 +321,23 @@ export default function Reports() {
       onSaveClick={handleExport}
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
+      navigationTopRight={
+        report.supports_previews ? (
+          <Button type="secondary" onClick={handlePreview}>
+            {t('preview')}
+          </Button>
+        ) : null
+      }
       withoutBackButton
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
             <SelectField
-              onValueChange={(value) => handleReportChange(value as Identifier)}
+              onValueChange={(value) => {
+                handleReportChange(value as Identifier);
+                setPreview(null);
+              }}
               value={report.identifier}
             >
               {reports.map((report, i) => (
@@ -452,6 +476,8 @@ export default function Reports() {
           columns={report.custom_columns}
         />
       )}
+
+      {preview && <Preview />}
     </Default>
   );
 }

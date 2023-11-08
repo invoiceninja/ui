@@ -580,6 +580,8 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
+                    setQuery('');
+
                     selectedValue && setIsOpen(false);
 
                     !selectedValue && setIsOpen((current) => !current);
@@ -758,22 +760,28 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
+
+  const isEntryAvailable = () => {
+    if (entries.length) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      return Boolean(entry);
+    }
+
+    return false;
+  };
+
   const { data } = useQuery(
     [new URL(url).pathname, new URL(url).href],
-    () => {
-      const $url = new URL(url);
-
-      if (sortBy) {
-        $url.searchParams.set('sort', sortBy);
-      }
-
-      $url.searchParams.set('status', 'active');
-
-      if (inputOptions.value && !disableWithQueryParameter) {
-        $url.searchParams.set('with', inputOptions.value.toString());
-      }
-
-      return request('GET', $url.href).then(
+    () =>
+      request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -790,14 +798,40 @@ export function ComboboxAsync<T = any>({
 
           return data;
         }
-      );
-    },
+      ),
     {
       staleTime: staleTime ?? Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
+      enabled: enableQuery,
     }
   );
+
+  useEffect(() => {
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
+
+  useEffect(() => {
+    if (
+      enableQuery &&
+      inputOptions.value &&
+      !disableWithQueryParameter &&
+      !isEntryAvailable()
+    ) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        inputOptions.value &&
+          currentUrl.searchParams.set('with', inputOptions.value.toString());
+
+        return currentUrl.href;
+      });
+    }
+  }, [enableQuery, inputOptions.value]);
 
   useEffect(() => {
     if (data) {
@@ -806,7 +840,25 @@ export function ComboboxAsync<T = any>({
   }, [data]);
 
   useEffect(() => {
-    return () => setEntries([]);
+    setUrl((c) => {
+      const currentUrl = new URL(c);
+
+      if (sortBy) {
+        currentUrl.searchParams.set('sort', sortBy);
+      }
+
+      currentUrl.searchParams.set('status', 'active');
+
+      currentUrl.searchParams.set('filter', '');
+
+      return currentUrl.href;
+    });
+
+    return () => {
+      setEntries([]);
+      setEnableQuery(false);
+      enableQueryTimeOut.current = undefined;
+    };
   }, []);
 
   const onEmptyValues = (query: string) => {

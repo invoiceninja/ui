@@ -17,7 +17,13 @@ export const keys = {
   },
   designs: {
     path: '/api/v1/designs',
-    dependencies: ['/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/purchase_orders'],
+    dependencies: [
+      '/api/v1/invoices',
+      '/api/v1/quotes',
+      '/api/v1/credits',
+      '/api/v1/recurring_invoices',
+      '/api/v1/purchase_orders',
+    ],
   },
   tokens: {
     path: '/api/v1/tokens',
@@ -37,7 +43,13 @@ export const keys = {
   },
   expense_categories: {
     path: '/api/v1/expense_categories',
-    dependencies: ['/api/v1/expenses', '/api/v1/recurring_expenses','/api/v1/bank_transaction_rules','/api/v1/vendors','/api/v1/bank_transactions'],
+    dependencies: [
+      '/api/v1/expenses',
+      '/api/v1/recurring_expenses',
+      '/api/v1/bank_transaction_rules',
+      '/api/v1/vendors',
+      '/api/v1/bank_transactions',
+    ],
   },
   expenses: {
     path: '/api/v1/expenses',
@@ -69,11 +81,23 @@ export const keys = {
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
-    dependencies: ['/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/purchase_orders'],
+    dependencies: [
+      '/api/v1/invoices',
+      '/api/v1/quotes',
+      '/api/v1/credits',
+      '/api/v1/recurring_invoices',
+      '/api/v1/purchase_orders',
+    ],
   },
   bank_transactions: {
     path: '/api/v1/bank_transactions',
-    dependencies: ['/api/v1/payments', '/api/v1/invoices', '/api/v1/vendors','/api/v1/expenses','/api/v1/expense_categories'],
+    dependencies: [
+      '/api/v1/payments',
+      '/api/v1/invoices',
+      '/api/v1/vendors',
+      '/api/v1/expenses',
+      '/api/v1/expense_categories',
+    ],
   },
   bank_transaction_rules: {
     path: '/api/v1/bank_transaction_rules',
@@ -81,11 +105,25 @@ export const keys = {
   },
   vendors: {
     path: '/api/v1/vendors',
-    dependencies: ['/api/v1/expenses', '/api/v1/recurring_expenses', '/api/v1/purchase_orders'],
+    dependencies: [
+      '/api/v1/expenses',
+      '/api/v1/recurring_expenses',
+      '/api/v1/purchase_orders',
+    ],
   },
   users: {
     path: '/api/v1/users',
-    dependencies: ['/api/v1/tasks', '/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/projects', '/api/v1/payments', '/api/v1/expenses', '/api/v1/tasks'],
+    dependencies: [
+      '/api/v1/tasks',
+      '/api/v1/invoices',
+      '/api/v1/quotes',
+      '/api/v1/credits',
+      '/api/v1/recurring_invoices',
+      '/api/v1/projects',
+      '/api/v1/payments',
+      '/api/v1/expenses',
+      '/api/v1/tasks',
+    ],
   },
   company_users: {
     path: '/api/v1/company_users',
@@ -93,11 +131,21 @@ export const keys = {
   },
   clients: {
     path: '/api/v1/clients',
-    dependencies: ['/api/v1/tasks', '/api/v1/invoices', '/api/v1/quotes', '/api/v1/credits', '/api/v1/recurring_invoices', '/api/v1/projects', '/api/v1/payments', '/api/v1/expenses', '/api/v1/tasks'],
+    dependencies: [
+      '/api/v1/tasks',
+      '/api/v1/invoices',
+      '/api/v1/quotes',
+      '/api/v1/credits',
+      '/api/v1/recurring_invoices',
+      '/api/v1/projects',
+      '/api/v1/payments',
+      '/api/v1/expenses',
+      '/api/v1/tasks',
+    ],
   },
   products: {
     path: '/api/v1/products',
-    dependencies: ['/api/v1/subscriptions','/api/v1/invoices'],
+    dependencies: ['/api/v1/subscriptions', '/api/v1/invoices'],
   },
   projects: {
     path: '/api/v1/projects',
@@ -142,6 +190,10 @@ export function useRefetch() {
 
   return (property: Array<keyof typeof keys>) => {
     property.map((key) => {
+      if (!keys[key]) {
+        return;
+      }
+
       queryClient.invalidateQueries(keys[key].path);
 
       keys[key].dependencies.map((dependency) => {
@@ -159,4 +211,33 @@ export function $refetch(property: Array<keyof typeof keys>) {
       },
     })
   );
+}
+
+export function getRefetchKeyByUrl(endpoint: string) {
+  const key = Object.keys(keys).find(
+    (key) =>
+      keys[key as keyof typeof keys].path.startsWith(endpoint) ||
+      endpoint.startsWith(keys[key as keyof typeof keys].path)
+  );
+
+  return key;
+}
+
+/**
+ * Use with caution. Generally you should avoid using this,
+ * and only use it when you know what you're doing. Prefer $refetch over this.
+ *
+ * This is fallback for states where $refetch is not available as we don't know plain string/resource,
+ * we are working it so we have to fallback to domain lookup.
+ *
+ * @param endpoint string[]
+ */
+export function refetchByUrl(endpoint: string[]) {
+  endpoint.map((url) => {
+    const key = getRefetchKeyByUrl(url);
+
+    if (key) {
+      $refetch([key as keyof typeof keys]);
+    }
+  });
 }
