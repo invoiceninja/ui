@@ -51,9 +51,7 @@ export const ConvertToProjectBulkAction = (props: Props) => {
             behavior="button"
             onClick={() => {
               bulk(selectedIds, 'convert_to_project');
-
               setSelected?.([]);
-
               setIsModalOpen(false);
             }}
           >

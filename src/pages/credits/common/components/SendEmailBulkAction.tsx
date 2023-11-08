@@ -19,7 +19,7 @@ import { useBulk } from '$app/common/queries/credits';
 
 interface Props {
   selectedIds: string[];
-  setSelected?: Dispatch<SetStateAction<string[]>>;
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -52,7 +52,7 @@ export const SendEmailBulkAction = (props: Props) => {
             onClick={() => {
               bulk(selectedIds, 'email');
 
-              setSelected?.([]);
+              setSelected([]);
 
               setIsModalOpen(false);
             }}
