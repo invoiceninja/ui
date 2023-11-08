@@ -10,14 +10,14 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { Credit } from '$app/common/interfaces/credit';
 import { useQueryClient } from 'react-query';
 
 export function useCreditResolver() {
   const queryClient = useQueryClient();
 
   const find = (id: string) => {
-    return queryClient.fetchQuery<Invoice>(
+    return queryClient.fetchQuery<Credit>(
       ['/api/v1/credits', id],
       () =>
         request(
