@@ -11,6 +11,7 @@
 import { route } from '$app/common/helpers/route';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -40,8 +41,13 @@ export default function InvoiceDesign() {
     tabs = tabs.filter((tab) => t(tab.name) !== t('custom_designs'));
   }
 
+  const pages: Page[] = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('invoice_design'), href: '/settings/invoice_design' },
+  ];
+
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <Tabs tabs={tabs} />
 
       <div className="my-4">
