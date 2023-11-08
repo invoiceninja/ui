@@ -396,6 +396,8 @@ export const useCustomBulkActions = () => {
   const invoiceProject = useInvoiceProject();
   const combineProjectsTasks = useCombineProjectsTasks();
 
+  const hasPermission = useHasPermission();
+
   const documentsBulk = useDocumentsBulk();
 
   const handleInvoiceProjects = (tasks: Task[] | null) => {
@@ -429,18 +431,19 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Project>[] = [
-    (selectedIds, selectedProjects) => (
-      <DropdownElement
-        onClick={async () =>
-          handleInvoiceProjects(
-            await combineProjectsTasks(selectedIds, selectedProjects)
-          )
-        }
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
+    (selectedIds, selectedProjects) =>
+      hasPermission('create_project') && (
+        <DropdownElement
+          onClick={async () =>
+            handleInvoiceProjects(
+              await combineProjectsTasks(selectedIds, selectedProjects)
+            )
+          }
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
     (_, selectedProjects, setSelected) => (
       <DropdownElement
         onClick={() =>

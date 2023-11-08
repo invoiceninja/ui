@@ -52,6 +52,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const defaultColumns: string[] = [
   'status',
@@ -121,6 +122,8 @@ export function useAllRecurringExpenseColumns() {
 export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -148,6 +151,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          disableNavigation={
+            !hasPermission('view_recurring_expense') &&
+            !hasPermission('edit_recurring_expense')
+          }
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
         </Link>
@@ -162,6 +169,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          disableNavigation={
+            !hasPermission('view_recurring_expense') &&
+            !hasPermission('edit_recurring_expense')
+          }
         >
           {field}
         </Link>
@@ -173,7 +184,12 @@ export function useRecurringExpenseColumns() {
       label: t('vendor'),
       format: (value, recurringExpense) =>
         recurringExpense.vendor && (
-          <Link to={route('/vendors/:id', { id: value.toString() })}>
+          <Link
+            to={route('/vendors/:id', { id: value.toString() })}
+            disableNavigation={
+              !hasPermission('view_vendor') && !hasPermission('edit_vendor')
+            }
+          >
             {recurringExpense.vendor.name}
           </Link>
         ),
@@ -184,7 +200,12 @@ export function useRecurringExpenseColumns() {
       label: t('client'),
       format: (value, recurringExpense) =>
         recurringExpense.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={
+              !hasPermission('view_client') && !hasPermission('edit_client')
+            }
+          >
             {recurringExpense.client.display_name}
           </Link>
         ),
@@ -418,7 +439,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringExpense.id }),
       recurringExpense
     ).then(() => {
-      $refetch(['recurring_expenses'])
+      $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -432,6 +453,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const setExpense = useSetAtom(expenseAtom);
 
@@ -489,22 +512,24 @@ export function useActions() {
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_expense')}
-      </DropdownElement>
-    ),
+    (recurringExpense) =>
+      hasPermission('create_recurring_expense') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (recurringExpense) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => cloneToExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_expense')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (recurringExpense) =>
       isEditPage &&

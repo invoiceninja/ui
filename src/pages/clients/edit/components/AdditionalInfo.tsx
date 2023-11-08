@@ -32,6 +32,7 @@ import { request } from '$app/common/helpers/request';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   client: Client | undefined;
@@ -43,6 +44,8 @@ interface Props {
 export function AdditionalInfo({ client, errors, setClient }: Props) {
   const [t] = useTranslation();
 
+  const { isAdmin, isOwner } = useAdmin();
+
   const currencies = useCurrencies();
   const languages = useLanguages();
 
@@ -50,7 +53,8 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     queryKey: ['/api/v1/payment_terms'],
     queryFn: () =>
       request('GET', endpoint('/api/v1/payment_terms')).then(
-        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) => response.data.data
+        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) =>
+          response.data.data
       ),
   });
 
@@ -141,13 +145,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 withBlank
               >
-                {paymentTerms.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
-                      {paymentTerm.name}
-                    </option>
-                  )
-                )}
+                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
+                  <option key={index} value={paymentTerm.num_days}>
+                    {paymentTerm.name}
+                  </option>
+                ))}
               </SelectField>
             </Element>
           )}
@@ -163,13 +165,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
               >
-                {paymentTerms.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
-                      {paymentTerm.name}
-                    </option>
-                  )
-                )}
+                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
+                  <option key={index} value={paymentTerm.num_days}>
+                    {paymentTerm.name}
+                  </option>
+                ))}
               </SelectField>
             </Element>
           )}
@@ -274,14 +274,22 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
         <div>
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
+          <Link
+            to="/settings/custom_fields/clients"
+            className="capitalize"
+            disableNavigation={!isAdmin && !isOwner}
+          >
             {t('click_here')}
           </Link>
         </div>
 
         <div>
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
+          <Link
+            to="/settings/custom_fields/clients"
+            className="capitalize"
+            disableNavigation={!isAdmin && !isOwner}
+          >
             {t('click_here')}
           </Link>
         </div>

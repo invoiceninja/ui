@@ -42,6 +42,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -247,6 +248,8 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const setProduct = useSetAtom(productAtom);
 
   const invoiceProducts = useInvoiceProducts();
@@ -279,7 +282,8 @@ export function useActions() {
 
   const actions = [
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -288,7 +292,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           onClick={() => purchaseOrderProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -297,7 +302,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_product') && (
         <DropdownElement
           onClick={() => cloneToProduct(product)}
           icon={<Icon element={MdControlPointDuplicate} />}

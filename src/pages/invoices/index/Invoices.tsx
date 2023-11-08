@@ -112,7 +112,9 @@ export default function Invoices() {
         }}
       />
 
-      <InvoiceSlider />
+      {(hasPermission('view_invoice') || hasPermission('edit_invoice')) && (
+        <InvoiceSlider />
+      )}
     </Default>
   );
 }

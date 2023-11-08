@@ -34,11 +34,14 @@ import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 import { useReverseInvoice } from './useReverseInvoice';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const documentsBulk = useDocumentsBulk();
+
+  const hasPermission = useHasPermission();
 
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const downloadPdfs = useDownloadPdfs({ entity: 'invoice' });
@@ -162,7 +165,8 @@ export const useCustomBulkActions = () => {
       ),
     (_, selectedInvoices) =>
       selectedInvoices &&
-      showEnterPaymentOption(selectedInvoices) && (
+      showEnterPaymentOption(selectedInvoices) &&
+      hasPermission('create_payment') && (
         <DropdownElement
           onClick={() => handleEnterPayment(selectedInvoices)}
           icon={<Icon element={BiPlusCircle} />}

@@ -22,6 +22,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { $refetch } from '../hooks/useRefetch';
+import { useAdmin } from '../hooks/permissions/useHasPermission';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
@@ -35,6 +36,8 @@ export function DesignSelector(props: Props) {
 
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
+
+  const { isAdmin, isOwner } = useAdmin();
 
   useEffect(() => {
     if (data) {
@@ -50,7 +53,7 @@ export function DesignSelector(props: Props) {
       request('POST', endpoint('/api/v1/designs'), design)
         .then(() => {
           toast.success('created_design');
-          $refetch(['designs'])
+          $refetch(['designs']);
           setDesign(null);
           setIsModalVisible(false);
         })
@@ -80,9 +83,7 @@ export function DesignSelector(props: Props) {
         />
 
         <ComboboxAsync<Design>
-          endpoint={
-            endpoint('/api/v1/designs?per_page=500&status=active')
-          }
+          endpoint={endpoint('/api/v1/designs?per_page=500&status=active')}
           onChange={(design: Entry<Design>) =>
             setDesign(
               (current) =>
@@ -139,8 +140,9 @@ export function DesignSelector(props: Props) {
           label: t('new_design'),
           onClick: () => setIsModalVisible(true),
           visible:
-            typeof props.actionVisibility === 'undefined' ||
-            props.actionVisibility,
+            (typeof props.actionVisibility === 'undefined' ||
+              props.actionVisibility) &&
+            (isAdmin || isOwner),
         }}
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}

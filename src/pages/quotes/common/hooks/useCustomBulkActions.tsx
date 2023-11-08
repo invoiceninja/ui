@@ -32,11 +32,14 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdfs = useDownloadPdfs({ entity: 'quote' });
@@ -117,7 +120,8 @@ export function useCustomBulkActions() {
     ),
     (_, selectedQuotes) =>
       selectedQuotes?.length &&
-      selectedQuotes[0].invoice_id && (
+      selectedQuotes[0].invoice_id &&
+      (hasPermission('view_invoice') || hasPermission('edit_invoice')) && (
         <DropdownElement
           onClick={() =>
             navigate(
@@ -171,7 +175,8 @@ export function useCustomBulkActions() {
       ),
     (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
-      showConvertToInvoiceAction(selectedQuotes) && (
+      showConvertToInvoiceAction(selectedQuotes) &&
+      hasPermission('create_invoice') && (
         <ConvertToInvoiceBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}
@@ -179,7 +184,8 @@ export function useCustomBulkActions() {
       ),
     (selectedIds, selectedQuotes, setSelected) =>
       selectedQuotes &&
-      showConvertToProjectAction(selectedQuotes) && (
+      showConvertToProjectAction(selectedQuotes) &&
+      hasPermission('create_project') && (
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}

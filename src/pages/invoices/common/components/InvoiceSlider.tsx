@@ -47,6 +47,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -55,6 +56,8 @@ dayjs.extend(relativeTime);
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
@@ -68,7 +71,12 @@ export function useGenerateActivityElement() {
 
     const replacements = {
       client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+        <Link
+          to={route('/clients/:id', { id: activity.client?.hashed_id })}
+          disableNavigation={
+            !hasPermission('view_client') && !hasPermission('edit_client')
+          }
+        >
           {activity.client?.label}
         </Link>
       ),
@@ -80,6 +88,9 @@ export function useGenerateActivityElement() {
             to={route('/invoices/:id/edit', {
               id: activity.invoice?.hashed_id,
             })}
+            disableNavigation={
+              !hasPermission('view_invoice') && !hasPermission('edit_invoice')
+            }
           >
             {activity?.invoice?.label}
           </Link>
@@ -91,6 +102,10 @@ export function useGenerateActivityElement() {
             to={route('/recurring_invoices/:id/edit', {
               id: activity?.recurring_invoice?.hashed_id,
             })}
+            disableNavigation={
+              !hasPermission('view_recurring_invoice') &&
+              !hasPermission('edit_recurring_invoice')
+            }
           >
             {activity?.recurring_invoice?.label}
           </Link>
@@ -102,6 +117,7 @@ export function useGenerateActivityElement() {
             to={route('/clients/:id/edit', {
               id: activity?.contact?.hashed_id,
             })}
+            disableNavigation={!hasPermission('edit_client')}
           >
             {activity?.contact?.label}
           </Link>
@@ -121,6 +137,8 @@ export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
@@ -207,7 +225,7 @@ export function InvoiceSlider() {
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
-        invoice ? (
+        invoice && hasPermission('edit_invoice') ? (
           <ResourceActions
             label={t('more_actions')}
             resource={invoice}
@@ -338,6 +356,10 @@ export function InvoiceSlider() {
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
+                  disableNavigation={
+                    !hasPermission('view_payment') &&
+                    !hasPermission('edit_payment')
+                  }
                 >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
@@ -390,7 +412,13 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <Link
+                      to={`/clients/${activity.client_id}`}
+                      disableNavigation={
+                        !hasPermission('view_client') &&
+                        !hasPermission('edit_client')
+                      }
+                    >
                       {invoice?.client?.display_name}
                     </Link>
                   </div>
