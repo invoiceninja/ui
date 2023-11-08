@@ -20,7 +20,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankDesignQuery } from '$app/common/queries/designs';
 import { Container } from '$app/components/Container';
 import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { InputField, Radio } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -77,6 +77,8 @@ export default function Create() {
     [design]
   );
 
+  const [type, setType] = useState<'design' | 'template'>('design');
+
   return (
     <Container>
       <Card title={t('new_design')}>
@@ -88,18 +90,36 @@ export default function Create() {
           />
         </Element>
 
-        <Element leftSide={t('design')}>
-          <DesignSelector
-            onChange={(design) => handleChange('design', design.design)}
-            actionVisibility={false}
-            errorMessage={
-              errors?.errors['design.header'] ||
-              errors?.errors['design.body'] ||
-              errors?.errors['design.footer'] ||
-              errors?.errors['design.includes']
-            }
+        <Element leftSide={t('type')}>
+          <Radio
+            name="type"
+            options={[
+              {
+                id: 'design',
+                title: t('design'),
+                value: 'design',
+              },
+              { id: 'template', title: t('template'), value: 'template' },
+            ]}
+            defaultSelected={type}
+            onValueChange={(v) => setType(v as 'design' | 'template')}
           />
         </Element>
+
+        {type === 'design' && (
+          <Element leftSide={t('design')}>
+            <DesignSelector
+              onChange={(design) => handleChange('design', design.design)}
+              actionVisibility={false}
+              errorMessage={
+                errors?.errors['design.header'] ||
+                errors?.errors['design.body'] ||
+                errors?.errors['design.footer'] ||
+                errors?.errors['design.includes']
+              }
+            />
+          </Element>
+        )}
       </Card>
     </Container>
   );
