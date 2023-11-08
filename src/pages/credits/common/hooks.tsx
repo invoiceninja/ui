@@ -47,7 +47,6 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -87,6 +86,7 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/credits';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -240,8 +240,6 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const queryClient = useQueryClient();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   const saveCompany = useHandleCompanySave();
@@ -257,9 +255,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_credit');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/credits/:id', { id: credit.id })
-        );
+        $refetch(['credits']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

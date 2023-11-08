@@ -17,6 +17,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useEffect, useRef, useState } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
+import { Spinner } from '$app/components/Spinner';
 
 export type Resource =
   | Invoice
@@ -43,11 +44,24 @@ interface Props {
 }
 
 export function InvoicePreview(props: Props) {
-  const [render, setRender] = useState(props.initiallyVisible ?? true);
+  const [render, setRender] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      setRender(props.initiallyVisible ?? true);
+    }, 1000);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!props.observable) {
@@ -141,7 +155,14 @@ export function InvoicePreview(props: Props) {
             resource={props.resource}
             enabled={props.observable ? isIntersecting : true}
           />
-        ) : null}
+        ) : (
+          <div
+            className="flex justify-center items-center"
+            style={{ height: 1500 }}
+          >
+            <Spinner />
+          </div>
+        )}
       </div>
     );
   }

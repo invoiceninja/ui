@@ -39,6 +39,7 @@ import {
   PreviewResponse,
   previewAtom,
 } from '../common/components/Preview';
+import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
 interface Range {
   identifier: string;
   label: string;
@@ -372,6 +373,11 @@ export default function Reports() {
                 isMulti={true}
               />
             </Element>
+          )}
+
+          {(report.identifier === 'product_sales' ||
+            report.identifier === 'invoice_item') && (
+            <ProductItemsSelector setReport={setReport} />
           )}
         </Card>
 
