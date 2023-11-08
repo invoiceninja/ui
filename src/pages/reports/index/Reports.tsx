@@ -32,8 +32,8 @@ import {
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
-import { useAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
+import { useAtom } from 'jotai';
 import {
   Preview,
   PreviewResponse,
@@ -57,11 +57,29 @@ const ranges: Range[] = [
   { identifier: 'custom', label: 'custom' },
 ];
 
+const download = (data: BlobPart, identifier: string) => {
+  const blob = new Blob([data], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+
+  link.download = `${identifier}.csv`;
+  link.href = url;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+};
+
 export default function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
 
   const reports = useReports();
+  const queryClient = useQueryClient();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -160,30 +178,37 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.endpoint), updatedPayload, {
-      responseType: report.payload.send_email ? 'json' : 'blob',
-    })
+    request('POST', endpoint(report.endpoint), updatedPayload, {})
       .then((response) => {
         if (report.payload.send_email) {
           return toast.success();
         }
 
-        const blob = new Blob([response.data], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
+        const hash = response.data.message as string;
 
-        const link = document.createElement('a');
+        queryClient
+          .fetchQuery({
+            queryKey: ['exports', hash],
+            queryFn: () =>
+              request('POST', endpoint(`/api/v1/exports/preview/${hash}`)).then(
+                (response) => response.data
+              ),
+            retry: 50,
+            retryDelay: import.meta.env.DEV ? 1000 : 2000,
+          })
+          .then((response) => {
+            download(response, report.identifier);
 
-        link.download = `${report.identifier}.csv`;
-        link.href = url;
-        link.target = '_blank';
+            toast.success();
+          })
+          .catch((e) => {
+            console.error(e);
 
-        document.body.appendChild(link);
-
-        link.click();
-
-        document.body.removeChild(link);
-
-        toast.success();
+            toast.error();
+          })
+          .finally(() => {
+            setIsPendingExport(false);
+          });
       })
       .catch((error: AxiosError<ValidationBag | Blob>) => {
         if (error.response?.status === 422) {
@@ -199,14 +224,13 @@ export default function Reports() {
         }
       })
       .finally(() => {
-        setIsPendingExport(false);
-        save({ silent: true });
+        if (showCustomColumns) {
+          save({ silent: true });
+        }
       });
   };
 
   const [preview, setPreview] = useAtom(previewAtom);
-
-  const queryClient = useQueryClient();
 
   const handlePreview = async () => {
     setErrors(undefined);
