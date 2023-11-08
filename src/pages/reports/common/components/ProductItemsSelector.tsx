@@ -14,7 +14,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
-import { Report } from '../../index/Reports';
+import { Report } from '../useReports';
 
 interface Props {
   setReport: Dispatch<SetStateAction<Report>>;
