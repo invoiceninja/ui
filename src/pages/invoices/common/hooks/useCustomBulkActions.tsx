@@ -122,60 +122,77 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
-    ({ selectedResources }) => (
-      <SendEmailBulkAction invoices={selectedResources} />
+    ({ selectedResources, setSelected }) => (
+      <SendEmailBulkAction
+        invoices={selectedResources}
+        setSelected={setSelected}
+      />
     ),
-    ({ selectedIds }) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
-        onClick={() => printPdf(selectedIds)}
+        onClick={() => {
+          printPdf(selectedIds);
+          setSelected([]);
+        }}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
     ),
-    ({ selectedIds }) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           downloadPdfs(selectedIds);
+          setSelected([]);
         }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
       </DropdownElement>
     ),
-    ({ selectedIds, selectedResources }) =>
+    ({ selectedIds, selectedResources, setSelected }) =>
       showAutoBillAction(selectedResources) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'auto_bill')}
+          onClick={() => {
+            bulk(selectedIds, 'auto_bill');
+            setSelected([]);
+          }}
           icon={<Icon element={BiMoney} />}
         >
           {t('auto_bill')}
         </DropdownElement>
       ),
-    ({ selectedIds, selectedResources }) =>
+    ({ selectedIds, selectedResources, setSelected }) =>
       showMarkSendOption(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'mark_sent');
+            setSelected([]);
           }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    ({ selectedResources }) =>
+    ({ selectedResources, setSelected }) =>
       showEnterPaymentOption(selectedResources) && (
         <DropdownElement
-          onClick={() => handleEnterPayment(selectedResources)}
+          onClick={() => {
+            handleEnterPayment(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('enter_payment')}
         </DropdownElement>
       ),
-    ({ selectedIds, selectedResources }) =>
+    ({ selectedIds, selectedResources, setSelected }) =>
       showMarkPaidOption(selectedResources) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'mark_paid')}
+          onClick={() => {
+            bulk(selectedIds, 'mark_paid');
+            setSelected([]);
+          }}
           icon={<Icon element={MdPaid} />}
         >
           {t('mark_paid')}
@@ -194,19 +211,25 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    ({ selectedResources }) =>
+    ({ selectedResources, setSelected }) =>
       showReverseOption(selectedResources) && (
         <DropdownElement
-          onClick={() => reverseInvoice(selectedResources[0])}
+          onClick={() => {
+            reverseInvoice(selectedResources[0]);
+            setSelected([]);
+          }}
           icon={<Icon element={MdRefresh} />}
         >
           {t('reverse')}
         </DropdownElement>
       ),
-    ({ selectedIds, selectedResources }) =>
+    ({ selectedIds, selectedResources, setSelected }) =>
       showCancelOption(selectedResources) && (
         <DropdownElement
-          onClick={() => bulk(selectedIds, 'cancel')}
+          onClick={() => {
+            bulk(selectedIds, 'cancel');
+            setSelected([]);
+          }}
           icon={<Icon element={MdCancel} />}
         >
           {t('cancel_invoice')}
