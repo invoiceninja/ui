@@ -22,7 +22,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -30,6 +29,7 @@ import { Webhook } from '../common/components/Webhook';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment_link');
@@ -37,8 +37,6 @@ export function Edit() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
-  const queryClient = useQueryClient();
 
   const { id } = useParams();
 
@@ -114,11 +112,7 @@ export function Edit() {
       .then(() => {
         toast.success('updated_subscription');
 
-        queryClient.invalidateQueries('/api/v1/subscriptions');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/subscriptions/:id', { id })
-        );
+        $refetch(['subscriptions']);
 
         navigate('/settings/subscriptions');
       })

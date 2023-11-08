@@ -30,7 +30,7 @@ export default function Invoices() {
     <DataTable
       resource="invoice"
       endpoint={route(
-        '/api/v1/invoices?include=client&client_id=:id&sort=id|desc',
+        '/api/v1/invoices?include=client.group_settings&client_id=:id&sort=id|desc',
         { id }
       )}
       columns={columns}

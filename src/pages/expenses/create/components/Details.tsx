@@ -137,6 +137,11 @@ export function Details(props: Props) {
                 taxRate.resource &&
                   handleChange('tax_name1', taxRate.resource.name);
               }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate1', taxRate.rate);
+
+                handleChange('tax_name1', taxRate.name);
+              }}
             />
           </Element>
         )}
@@ -183,6 +188,11 @@ export function Details(props: Props) {
                 taxRate.resource &&
                   handleChange('tax_name2', taxRate.resource.name);
               }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate2', taxRate.rate);
+
+                handleChange('tax_name2', taxRate.name);
+              }}
             />
           </Element>
         )}
@@ -228,6 +238,11 @@ export function Details(props: Props) {
 
                 taxRate.resource &&
                   handleChange('tax_name3', taxRate.resource.name);
+              }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate3', taxRate.rate);
+
+                handleChange('tax_name3', taxRate.name);
               }}
             />
           </Element>
