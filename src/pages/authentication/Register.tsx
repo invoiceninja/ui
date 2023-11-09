@@ -89,11 +89,7 @@ export function Register() {
         }
       });
 
-      request(
-        'POST',
-        endpoint.href,
-        values
-      )
+      request('POST', endpoint.href, values)
         .then((response: AxiosResponse) => {
           dispatch(
             register({

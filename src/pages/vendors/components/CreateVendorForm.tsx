@@ -69,7 +69,7 @@ export function CreateVendorForm(props: Props) {
       .then((response) => {
         toast.success('created_vendor');
 
-        $refetch(['vendors'])
+        $refetch(['vendors']);
 
         if (props.setSelectedIds) {
           props.setSelectedIds([response.data.data.id]);

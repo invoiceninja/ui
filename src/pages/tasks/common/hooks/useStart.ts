@@ -35,7 +35,7 @@ export function useStart() {
         ? toast.success('started_task')
         : toast.dismiss();
 
-      $refetch(['tasks'])
+      $refetch(['tasks']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

@@ -44,7 +44,7 @@ export function useAddTasksOnInvoice(params: Params) {
 
   return (invoice: Invoice) => {
     if (tasks) {
-      tasks.forEach( (task: Task) => {
+      tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
@@ -119,8 +119,7 @@ export function useAddTasksOnInvoice(params: Params) {
             : '';
 
         if (parsed.length) {
-          item.notes =
-            projectName + task?.description + ' ' + parsed.join(' ');
+          item.notes = projectName + task?.description + ' ' + parsed.join(' ');
         }
 
         if (typeof invoice.line_items === 'string') {
@@ -137,7 +136,6 @@ export function useAddTasksOnInvoice(params: Params) {
           id: invoice.id,
         })
       );
-    
     }
   };
 }

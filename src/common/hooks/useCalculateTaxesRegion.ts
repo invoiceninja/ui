@@ -15,7 +15,7 @@ export function useCalculateTaxesRegion() {
    * Supported tax regions
    */
   const supportedCountries: string[] = [
-    'AU', // Australia 
+    'AU', // Australia
     'US', // United States
     'AT', // Austria
     'BE', // Belgium

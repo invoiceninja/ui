@@ -164,9 +164,6 @@ export function usePaymentColumns() {
       format: (value, payment) => (
         <Link
           to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
-          disableNavigation={
-            !hasPermission('view_invoice') && !hasPermission('edit_invoice')
-          }
         >
           {payment.invoices?.[0]?.number}
         </Link>

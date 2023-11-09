@@ -48,7 +48,7 @@ export function ViewSlider() {
     currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
-    $refetch(['tasks'])
+    $refetch(['tasks']);
   };
 
   return (

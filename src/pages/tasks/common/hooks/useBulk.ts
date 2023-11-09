@@ -14,7 +14,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useBulkAction() {
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -24,7 +23,7 @@ export function useBulkAction() {
     })
       .then(() => toast.success(`${action}d_task`))
       .finally(() => {
-        $refetch(['tasks'])
+        $refetch(['tasks']);
       });
   };
 }

@@ -43,7 +43,7 @@ export function CreditFooter(props: Props) {
   const [credit] = useAtom(creditAtom);
 
   const onSuccess = () => {
-    $refetch(['credits'])
+    $refetch(['credits']);
   };
 
   const tabs = [

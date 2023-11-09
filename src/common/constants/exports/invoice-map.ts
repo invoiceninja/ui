@@ -53,4 +53,5 @@ export const invoiceMap: Record[] = [
   { trans: 'assigned_user', value: 'invoice.assigned_user_id', map: 'invoice' },
   { trans: 'user', value: 'invoice.user_id', map: 'invoice' },
   { trans: 'recurring_invoice', value: 'invoice.recurring_id', map: 'invoice' },
+  { trans: 'auto_bill', value: 'invoice.auto_bill_enabled', map: 'invoice' },
 ];

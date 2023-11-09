@@ -24,6 +24,7 @@ import { useQueryClient } from 'react-query';
 interface Props {
   tasks: Task[];
   isBulkAction?: boolean;
+  setSelected?: (selected: string[]) => void;
 }
 
 export function AddTasksOnInvoiceAction(props: Props) {
@@ -83,6 +84,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
           setInvoices(response.data.data);
 
           setIsModalVisible(true);
+
+          props.setSelected?.([]);
         })
     );
   };

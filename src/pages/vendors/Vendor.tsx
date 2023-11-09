@@ -55,10 +55,9 @@ export default function Vendor() {
   const tabs = useTabs();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const lastLogin =(last_login: number | undefined) => {
+  const lastLogin = (last_login: number | undefined) => {
     return last_login ? date(last_login, dateFormat) : t('never');
   };
-
 
   return (
     <Default

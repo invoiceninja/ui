@@ -18,9 +18,7 @@ export default function ProductFields() {
   return (
     <Card title={t('custom_fields')} withContainer>
       <div>
-        <span className="text-sm">
-          {t('custom_fields')} &nbsp;
-        </span>
+        <span className="text-sm">{t('custom_fields')} &nbsp;</span>
         <Link to="/settings/custom_fields/products" className="capitalize">
           {t('click_here')}
         </Link>

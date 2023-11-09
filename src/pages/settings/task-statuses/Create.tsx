@@ -77,7 +77,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_task_status');
 
-          $refetch(['task_statuses'])
+          $refetch(['task_statuses']);
 
           if (actionType === 'save') {
             navigate(

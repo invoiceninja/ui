@@ -106,7 +106,7 @@ export function Create() {
         .then((response: GenericSingleResourceResponse<Schedule>) => {
           toast.success('created_schedule');
 
-          $refetch(['task_schedulers'])
+          $refetch(['task_schedulers']);
 
           navigate(
             route('/settings/schedules/:id/edit', {

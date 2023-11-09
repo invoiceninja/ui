@@ -30,7 +30,10 @@ export function ClientCard(props: Props) {
             title={t('client')}
             value={
               <Link to={route('/clients/:id', { id: props.client.id })}>
-                <span className='flex items-center gap-2'> {props.client.display_name} <MdOutlineFileOpen /> </span>
+                <span className="flex items-center gap-2">
+                  {' '}
+                  {props.client.display_name} <MdOutlineFileOpen />{' '}
+                </span>
               </Link>
             }
             className="h-full"

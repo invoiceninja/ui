@@ -64,7 +64,7 @@ export default function Create() {
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
-  
+
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
@@ -72,7 +72,6 @@ export default function Create() {
   const [client, setClient] = useState<Client | undefined>();
 
   const resetInvoiceForm = () => {
-  
     handleChange('client_id', '');
     handleChange('tax_name1', '');
     handleChange('tax_rate1', 0);
@@ -82,7 +81,7 @@ export default function Create() {
     handleChange('tax_rate3', 0);
 
     return true;
-  }
+  };
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -106,7 +105,7 @@ export default function Create() {
 
   useEffect(() => {
     setInvoiceSum(undefined);
-    
+
     setInvoice((current) => {
       let value = current;
 
@@ -146,17 +145,15 @@ export default function Create() {
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
-
-    if(client?.settings && client?.settings[prop]) {
+    if (client?.settings && client?.settings[prop]) {
       return client.settings[prop];
     }
 
-    if(client?.group_settings && client?.group_settings?.settings[prop]) {
+    if (client?.group_settings && client?.group_settings?.settings[prop]) {
       return client?.group_settings?.settings[prop];
     }
 
     return company?.settings[prop as keyof CompanySettings];
-
   };
 
   useEffect(() => {
@@ -183,7 +180,6 @@ export default function Create() {
         if (company && company.enabled_tax_rates > 0) {
           handleChange('tax_name1', settingResolver(client, 'tax_name1'));
           handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
-
         }
 
         if (company && company.enabled_tax_rates > 1) {
@@ -195,7 +191,6 @@ export default function Create() {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }
-
       });
   }, [invoice?.client_id]);
 

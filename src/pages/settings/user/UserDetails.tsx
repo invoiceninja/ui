@@ -55,11 +55,10 @@ export function UserDetails() {
     { name: t('user_details'), href: '/settings/user_details' },
   ];
 
-
   const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
     hasLanguageChangedAtom
   );
-  
+
   const user = useCurrentUser();
 
   const dispatch = useDispatch();
@@ -106,7 +105,7 @@ export function UserDetails() {
         toast.success('updated_settings');
 
         if (hasLanguageChanged) {
-          $refetch(['statics'])
+          $refetch(['statics']);
           setHasLanguageIdChanged(false);
         }
 

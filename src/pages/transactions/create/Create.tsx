@@ -78,7 +78,7 @@ export default function Create() {
       .then((response: GenericSingleResourceResponse<Transaction>) => {
         toast.success('created_transaction');
 
-        $refetch(['bank_transactions'])
+        $refetch(['bank_transactions']);
 
         navigate(
           route('/transactions/:id/edit', { id: response.data.data.id })

@@ -28,14 +28,12 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Payment>[] = [
-    (selectedIds, selectedPayments, setSelected) =>
-      selectedPayments &&
-      showEmailPaymentAction(selectedPayments) && (
+    ({ selectedResources, selectedIds, setSelected }) =>
+      showEmailPaymentAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'email');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdSend} />}
         >

@@ -64,7 +64,6 @@ export function useBlankApiWebhookQuery() {
 }
 
 export function useBulkAction() {
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 

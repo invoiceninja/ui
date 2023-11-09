@@ -64,7 +64,7 @@ export function Create() {
         .then((response) => {
           toast.success('created_tax_rate');
 
-          $refetch(['tax_rates'])
+          $refetch(['tax_rates']);
 
           if (actionType === 'save') {
             navigate(
