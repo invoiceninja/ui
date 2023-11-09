@@ -20,8 +20,9 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankDesignQuery } from '$app/common/queries/designs';
 import { Container } from '$app/components/Container';
 import { Card, Element } from '$app/components/cards';
-import { InputField, Radio } from '$app/components/forms';
+import { Checkbox, InputField, Radio } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { Editor } from '@monaco-editor/react';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +37,31 @@ export default function Create() {
 
   const handleChange = <T extends keyof Design>(key: T, value: Design[T]) => {
     setDesign((current) => current && { ...current, [key]: value });
+  };
+
+  const handleResourceChange = (value: string, checked: boolean) => {
+    if (!design) {
+      return;
+    }
+
+    const entities =
+      design.entities.length > 1
+        ? design.entities.split(',') || ([] as string[])
+        : [];
+
+    const filtered = entities.filter((e) => e !== value);
+
+    if (checked) {
+      filtered.push(value);
+    }
+
+    setDesign(
+      (current) =>
+        current && {
+          ...current,
+          entities: filtered.join(','),
+        }
+    );
   };
 
   useEffect(() => {
@@ -79,6 +105,50 @@ export default function Create() {
 
   const [type, setType] = useState<'design' | 'template'>('design');
 
+  const handleTypeChange = (t: typeof type) => {
+    if (t === 'template') {
+      setDesign(
+        (current) =>
+          current && {
+            ...current,
+            is_template: true,
+            design: {
+              ...current.design,
+              header: ' ',
+              body:
+                current.design.body.length > 0
+                  ? current.design.body
+                  : '<html>\n\t<head>\n\t</head>\n\t<body>\n\t\t<ninja>\n\n\t\t</ninja>\n\t</body>\n</html>\n',
+              footer: ' ',
+              includes: ' ',
+            },
+          }
+      );
+
+      return;
+    }
+
+    if (t === 'design') {
+      setDesign(
+        (current) =>
+          current && {
+            ...current,
+            is_template: false,
+            design: {
+              ...current.design,
+              header: '',
+              body: '',
+              footer: '',
+              includes: '',
+            },
+            entities: '',
+          }
+      );
+
+      return;
+    }
+  };
+
   return (
     <Container>
       <Card title={t('new_design')}>
@@ -102,7 +172,10 @@ export default function Create() {
               { id: 'template', title: t('template'), value: 'template' },
             ]}
             defaultSelected={type}
-            onValueChange={(v) => setType(v as 'design' | 'template')}
+            onValueChange={(v) => {
+              setType(v as 'design' | 'template');
+              handleTypeChange(v as 'design' | 'template');
+            }}
           />
         </Element>
 
@@ -120,7 +193,50 @@ export default function Create() {
             />
           </Element>
         )}
+
+        {type === 'template' && (
+          <Element leftSide={t('resource')}>
+            <Checkbox
+              label={t('invoice')}
+              value="invoice"
+              onValueChange={(value, checked) =>
+                handleResourceChange(value, Boolean(checked))
+              }
+              checked={design?.entities.includes('invoice')}
+            />
+
+            <Checkbox
+              label={t('payment')}
+              value="payment"
+              onValueChange={(value, checked) =>
+                handleResourceChange(value, Boolean(checked))
+              }
+              checked={design?.entities.includes('payment')}
+            />
+          </Element>
+        )}
       </Card>
+
+      {type === 'template' && (
+        <Card title={t('import')} withContainer collapsed>
+          <Editor
+            height="15rem"
+            defaultLanguage="html"
+            value={design?.design.body}
+            options={{
+              minimap: {
+                enabled: false,
+              },
+            }}
+            onChange={(value) =>
+              value &&
+              setDesign(
+                (c) => c && { ...c, design: { ...c.design, body: value } }
+              )
+            }
+          />
+        </Card>
+      )}
     </Container>
   );
 }
