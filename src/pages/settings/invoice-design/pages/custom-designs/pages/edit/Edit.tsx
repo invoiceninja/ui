@@ -27,6 +27,7 @@ import { Variables } from './components/Variables';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Body as TemplateBody } from './components/templates/Body';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -59,7 +60,7 @@ export default function Edit() {
     return () =>
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
-  
+
   useSaveBtn(
     {
       onClick() {
@@ -86,12 +87,20 @@ export default function Edit() {
     <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-          <Settings errors={errors} />
-          <Body />
-          <Header />
-          <Footer />
-          <Includes />
-          <Variables />
+          {payload.design?.is_template === false ? (
+            <>
+              <Settings errors={errors} />
+              <Body />
+              <Header />
+              <Footer />
+              <Includes />
+              <Variables />
+            </>
+          ) : null}
+
+          {payload.design?.is_template ? (
+            <TemplateBody errors={errors} />
+          ) : null}
         </div>
       </div>
 
