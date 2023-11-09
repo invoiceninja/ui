@@ -123,7 +123,7 @@ export const recurringinvoiceMap: Record[] = [
     map: 'recurring_invoice',
   },
   {
-    trans: '',
+    trans: 'surcharge3',
     value: 'recurring_invoice.custom_surcharge3',
     map: 'recurring_invoice',
   },
