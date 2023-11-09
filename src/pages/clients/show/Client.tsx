@@ -32,6 +32,7 @@ import { Button } from '$app/components/forms';
 import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -41,6 +42,8 @@ export default function Client() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+
+  const entityAssigned = useEntityAssigned();
 
   const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
 
@@ -73,7 +76,7 @@ export default function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        hasPermission('edit_client') && (
+        (hasPermission('edit_client') || entityAssigned(client)) && (
           <div className="flex space-x-3">
             <Button to={route('/clients/:id/edit', { id })}>
               {t('edit_client')}
