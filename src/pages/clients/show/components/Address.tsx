@@ -40,8 +40,8 @@ export function Address(props: Props) {
 
                 <p>
                   {client.city.length > 0 && client.city} &nbsp;
-                  {client.postal_code.length > 0 && client.postal_code} &nbsp;
                   {client.state}
+                  {client.postal_code.length > 0 && client.postal_code} &nbsp;
                 </p>
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
