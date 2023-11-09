@@ -52,7 +52,7 @@ export function Settings(props: Props) {
     <>
       <Import onImport={(parts) => handlePropertyChange('design', parts)} />
 
-      <Card title={t('settings')} padding="small" collapsed={false}>
+      <Card>
         <Element leftSide={t('name')}>
           <InputField
             value={payload.design?.name}
