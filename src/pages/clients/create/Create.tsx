@@ -67,7 +67,8 @@ export default function Create() {
     queryKey: ['/api/v1/clients/create'],
     queryFn: () =>
       request('GET', endpoint('/api/v1/clients/create')).then(
-        (response: AxiosResponse<GenericSingleResourceResponse<Client>>) => response.data.data
+        (response: AxiosResponse<GenericSingleResourceResponse<Client>>) =>
+          response.data.data
       ),
   });
 

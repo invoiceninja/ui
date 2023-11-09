@@ -20,7 +20,7 @@ export default function Documents() {
   const { data: vendor } = useVendorQuery({ id });
 
   const onSuccess = () => {
-    $refetch(['vendors'])
+    $refetch(['vendors']);
   };
 
   return (

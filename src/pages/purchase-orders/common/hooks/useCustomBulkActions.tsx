@@ -56,12 +56,12 @@ export function useCustomBulkActions() {
 
   const handleDownloadDocuments = (
     selectedPurchaseOrders: PurchaseOrder[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const purchaseOrderIds = getDocumentsIds(selectedPurchaseOrders);
 
     documentsBulk(purchaseOrderIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const showMarkSendAction = (purchaseOrders: PurchaseOrder[]) => {
@@ -81,56 +81,54 @@ export function useCustomBulkActions() {
   };
 
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <SendEmailBulkAction
         selectedIds={selectedIds}
         setSelected={setSelected}
       />
     ),
-    (selectedIds, selectedPurchaseOrders, setSelected) =>
-      selectedPurchaseOrders &&
-      showMarkSendAction(selectedPurchaseOrders) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      showMarkSendAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'mark_sent');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           printPdf(selectedIds);
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           downloadPdfs(selectedIds);
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (_, selectedPurchaseOrders) =>
-      selectedPurchaseOrders?.length &&
-      selectedPurchaseOrders[0].expense_id && (
+    ({ selectedResources }) =>
+      selectedResources?.length &&
+      selectedResources[0].expense_id && (
         <DropdownElement
           onClick={() =>
             navigate(
               route('/expenses/:id/edit', {
-                id: selectedPurchaseOrders[0].expense_id,
+                id: selectedResources[0].expense_id,
               })
             )
           }
@@ -139,40 +137,36 @@ export function useCustomBulkActions() {
           {`${t('view')} ${t('expense')}`}
         </DropdownElement>
       ),
-    (selectedIds, selectedPurchaseOrders, setSelected) =>
-      selectedPurchaseOrders &&
-      showConvertToExpenseAction(selectedPurchaseOrders) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showConvertToExpenseAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'expense');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdSwitchRight} />}
         >
           {t('convert_to_expense')}
         </DropdownElement>
       ),
-    (selectedIds, selectedPurchaseOrders, setSelected) =>
-      selectedPurchaseOrders &&
-      showAddToInventoryAction(selectedPurchaseOrders) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      showAddToInventoryAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'add_to_inventory');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdInventory} />}
         >
           {t('add_to_inventory')}
         </DropdownElement>
       ),
-    (_, selectedPurchaseOrders, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedPurchaseOrders &&
-          shouldDownloadDocuments(selectedPurchaseOrders)
-            ? handleDownloadDocuments(selectedPurchaseOrders, setSelected)
+          shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

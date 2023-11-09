@@ -86,7 +86,7 @@ export function TransactionMatchDetails(props: Props) {
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          $refetch(['invoices', 'bank_transactions'])
+          $refetch(['invoices', 'bank_transactions']);
 
           toast.success('converted_transaction');
         })
@@ -115,7 +115,7 @@ export function TransactionMatchDetails(props: Props) {
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          $refetch(['invoices', 'payments', 'bank_transactions'])
+          $refetch(['invoices', 'payments', 'bank_transactions']);
 
           toast.success('linked_transaction');
         })
@@ -145,7 +145,7 @@ export function TransactionMatchDetails(props: Props) {
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          $refetch(['bank_transactions', 'expenses'])
+          $refetch(['bank_transactions', 'expenses']);
 
           toast.success('converted_transaction');
         })
@@ -174,7 +174,7 @@ export function TransactionMatchDetails(props: Props) {
         .then(() => {
           queryClient.invalidateQueries([invalidationQuery]);
 
-          $refetch(['expenses', 'bank_transactions'])
+          $refetch(['expenses', 'bank_transactions']);
 
           toast.success('linked_transaction');
         })

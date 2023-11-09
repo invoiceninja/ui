@@ -104,7 +104,7 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      $refetch(['payments'])
+      $refetch(['payments']);
     });
   };
 }

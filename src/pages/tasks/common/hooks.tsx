@@ -294,7 +294,7 @@ export function useSave() {
       () => {
         toast.success('updated_task');
 
-        $refetch(['tasks'])
+        $refetch(['tasks']);
       }
     );
   };
@@ -501,53 +501,58 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Task>[] = [
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStartAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStartAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'start');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStopAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStopAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'stop');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedTasks) =>
-      selectedTasks &&
-      showAddToInvoiceAction(selectedTasks) && (
-        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showAddToInvoiceAction(selectedResources) && (
+        <AddTasksOnInvoiceAction
+          tasks={selectedResources}
+          isBulkAction
+          setSelected={setSelected}
+        />
       ),
-    (_, selectedTasks) =>
-      selectedTasks && showInvoiceTaskAction(selectedTasks) ? (
+    ({ selectedResources, setSelected }) =>
+      selectedResources && showInvoiceTaskAction(selectedResources) ? (
         <DropdownElement
-          onClick={() => invoiceTask(selectedTasks)}
+          onClick={() => {
+            invoiceTask(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
-    (_, selectedTasks, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? handleDownloadDocuments(selectedTasks, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

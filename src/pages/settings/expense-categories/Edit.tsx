@@ -88,7 +88,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_expense_category');
 
-          $refetch(['expense_categories'])
+          $refetch(['expense_categories']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

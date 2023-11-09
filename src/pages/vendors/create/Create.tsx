@@ -95,7 +95,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_vendor');
 
-        $refetch(['vendors'])
+        $refetch(['vendors']);
 
         if (isAdmin) {
           dispatch(

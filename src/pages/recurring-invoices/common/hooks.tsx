@@ -229,7 +229,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       recurringInvoice
     )
       .then(() => {
-        $refetch(['recurring_invoices'])
+        $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
       })

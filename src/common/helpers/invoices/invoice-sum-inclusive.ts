@@ -37,7 +37,6 @@ export class InvoiceSumInclusive {
   }
 
   public build() {
-
     this.calculateLineItems()
       .calculateDiscount()
       .calculateCustomValues()
@@ -173,7 +172,7 @@ export class InvoiceSumInclusive {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
-      this.invoice.line_items = this.invoiceItems.lineItems
+      this.invoice.line_items = this.invoiceItems.lineItems;
     }
 
     this.taxMap = collect();
@@ -200,7 +199,6 @@ export class InvoiceSumInclusive {
 
       this.totalTaxes += totalLineTax as number;
     });
-
 
     return this;
   }

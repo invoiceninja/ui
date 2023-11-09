@@ -89,7 +89,7 @@ export default function Product() {
         .then(() => {
           toast.success('updated_product');
 
-          $refetch(['products'])
+          $refetch(['products']);
 
           searchParams.delete('update_in_stock_quantity');
           setSearchParams(searchParams);

@@ -49,7 +49,7 @@ export function useStop() {
     ).then(() => {
       toast.success('stopped_task');
 
-      $refetch(['tasks'])
+      $refetch(['tasks']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

@@ -50,7 +50,8 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     queryKey: ['/api/v1/payment_terms'],
     queryFn: () =>
       request('GET', endpoint('/api/v1/payment_terms')).then(
-        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) => response.data.data
+        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) =>
+          response.data.data
       ),
   });
 
@@ -141,13 +142,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 withBlank
               >
-                {paymentTerms.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
-                      {paymentTerm.name}
-                    </option>
-                  )
-                )}
+                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
+                  <option key={index} value={paymentTerm.num_days}>
+                    {paymentTerm.name}
+                  </option>
+                ))}
               </SelectField>
             </Element>
           )}
@@ -163,13 +162,11 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
               >
-                {paymentTerms.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.num_days}>
-                      {paymentTerm.name}
-                    </option>
-                  )
-                )}
+                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
+                  <option key={index} value={paymentTerm.num_days}>
+                    {paymentTerm.name}
+                  </option>
+                ))}
               </SelectField>
             </Element>
           )}

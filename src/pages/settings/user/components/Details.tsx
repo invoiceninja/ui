@@ -97,14 +97,15 @@ export function Details() {
             />
           </Element>
 
-
           <Element
             leftSide={t('login_notification')}
             leftSideHelp={t('login_notification_help')}
           >
             <Toggle
               checked={userChanges?.user_logged_in_notification}
-              onChange={(value) => handleChange('user_logged_in_notification', value)}
+              onChange={(value) =>
+                handleChange('user_logged_in_notification', value)
+              }
             />
           </Element>
 

@@ -62,7 +62,7 @@ export function CreateTaskStatusModal(props: Props) {
         .then(() => {
           toast.success('created_task_status');
 
-          $refetch(['task_statuses'])
+          $refetch(['task_statuses']);
 
           setTaskStatus(blankTaskStatus);
 

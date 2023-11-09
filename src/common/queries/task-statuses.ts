@@ -68,7 +68,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_task_status`);
 
-      $refetch(['task_statuses'])
+      $refetch(['task_statuses']);
     });
   };
 }

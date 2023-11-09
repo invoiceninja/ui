@@ -95,8 +95,8 @@ export default function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
-  const [searchParams] = useSearchParams()
-  const taskColumns = useTaskColumns()
+  const [searchParams] = useSearchParams();
+  const taskColumns = useTaskColumns();
 
   return (
     <Default
