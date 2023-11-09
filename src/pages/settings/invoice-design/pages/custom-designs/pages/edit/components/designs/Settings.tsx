@@ -17,9 +17,9 @@ import { useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
 import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
+import { payloadAtom } from '../../Edit';
 import { Import, importModalVisiblityAtom } from './Import';
-import { useDesignUtilities } from '../common/hooks';
+import { useDesignUtilities } from '../../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
