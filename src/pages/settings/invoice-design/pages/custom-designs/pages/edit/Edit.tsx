@@ -28,6 +28,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Body as TemplateBody } from './components/templates/Body';
+import { Settings as TemplateSettings } from './components/templates/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTranslation } from 'react-i18next';
 
@@ -124,7 +125,15 @@ export default function Edit() {
           ) : null}
 
           {payload.design?.is_template ? (
-            <TemplateBody errors={errors} />
+            <TabGroup tabs={[t('settings'), t('body')]}>
+              <div>
+                <TemplateSettings errors={errors} />
+              </div>
+
+              <div>
+                <TemplateBody />
+              </div>
+            </TabGroup>
           ) : null}
         </div>
       </div>
