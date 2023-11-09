@@ -58,7 +58,8 @@ export function QuoteDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value))
             }
-            value={quote?.partial || ''}
+            value={quote?.partial}
+            min="0"
             errorMessage={errors?.errors.partial}
           />
         </Element>

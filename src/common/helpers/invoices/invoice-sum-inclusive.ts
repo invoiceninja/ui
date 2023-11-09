@@ -16,6 +16,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Currency } from '$app/common/interfaces/currency';
+import { NumberFormatter } from '../number-formatter';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
@@ -36,7 +37,6 @@ export class InvoiceSumInclusive {
   }
 
   public build() {
-
     this.calculateLineItems()
       .calculateDiscount()
       .calculateCustomValues()
@@ -172,7 +172,7 @@ export class InvoiceSumInclusive {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
-      this.invoice.line_items = this.invoiceItems.lineItems
+      this.invoice.line_items = this.invoiceItems.lineItems;
     }
 
     this.taxMap = collect();
@@ -199,7 +199,6 @@ export class InvoiceSumInclusive {
 
       this.totalTaxes += totalLineTax as number;
     });
-
 
     return this;
   }
@@ -234,11 +233,11 @@ export class InvoiceSumInclusive {
   }
 
   protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial) {
+    if (!this.invoice?.id && typeof this.invoice.partial === 'number') {
       this.invoice.partial = Math.max(
         0,
-        Math.min(this.invoice.partial, this.invoice.balance)
-      ); // Needs formatting (with rounding 2)
+        parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2))
+      );
     }
 
     return this;

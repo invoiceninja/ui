@@ -59,7 +59,8 @@ export function CreditDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value))
             }
-            value={credit?.partial || ''}
+            value={credit?.partial}
+            min="0"
             errorMessage={errors?.errors.partial}
           />
         </Element>

@@ -183,7 +183,7 @@ export class InvoiceSum {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
-      this.invoice.line_items = this.invoiceItems.lineItems
+      this.invoice.line_items = this.invoiceItems.lineItems;
     }
 
     this.taxMap = collect();
@@ -254,13 +254,10 @@ export class InvoiceSum {
   }
 
   protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial) {
+    if (!this.invoice?.id && typeof this.invoice.partial === 'number') {
       this.invoice.partial = Math.max(
         0,
-        Math.min(
-          parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2)),
-          this.invoice.balance
-        )
+        parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2))
       );
     }
 

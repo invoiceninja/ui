@@ -55,9 +55,10 @@ export function InvoiceDetails(props: Props) {
             id="partial"
             type="number"
             onValueChange={(value) =>
-              handleChange('partial', parseFloat(value) || 0)
+              handleChange('partial', parseFloat(value))
             }
-            value={invoice?.partial || ''}
+            value={invoice?.partial}
+            min="0"
             errorMessage={props.errors?.errors.partial}
           />
         </Element>
