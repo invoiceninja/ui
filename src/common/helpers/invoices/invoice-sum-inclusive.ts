@@ -43,8 +43,8 @@ export class InvoiceSumInclusive {
       .calculateInvoiceTaxes()
       .setTaxMap()
       .calculateTotals()
-      .calculateBalance()
-      .calculatePartial();
+      // .calculatePartial();
+      .calculateBalance();
 
     return this;
   }

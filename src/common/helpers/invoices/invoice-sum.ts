@@ -49,8 +49,8 @@ export class InvoiceSum {
       .calculateCustomValues()
       .setTaxMap()
       .calculateTotals()
-      .calculateBalance()
-      .calculatePartial();
+      // .calculatePartial()
+      .calculateBalance();
 
     return this;
   }
@@ -254,7 +254,7 @@ export class InvoiceSum {
   }
 
   protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial && this.invoice.balance) {
+    if (this.invoice.partial && this.invoice.balance) {
       this.invoice.partial = Math.max(
         0,
         Math.min(
