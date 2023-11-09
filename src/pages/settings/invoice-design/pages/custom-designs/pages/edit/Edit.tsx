@@ -28,6 +28,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Body as TemplateBody } from './components/templates/Body';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTranslation } from 'react-i18next';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -83,19 +85,42 @@ export default function Edit() {
     [payload.design]
   );
 
+  const [t] = useTranslation();
+
   return (
     <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
           {payload.design?.is_template === false ? (
-            <>
-              <Settings errors={errors} />
-              <Body />
-              <Header />
-              <Footer />
-              <Includes />
-              <Variables />
-            </>
+            <TabGroup
+              tabs={[
+                t('settings'),
+                t('body'),
+                t('header'),
+                t('footer'),
+                t('includes'),
+                t('variables'),
+              ]}
+            >
+              <div>
+                <Settings errors={errors} />
+              </div>
+              <div>
+                <Body />
+              </div>
+              <div>
+                <Header />
+              </div>
+              <div>
+                <Footer />
+              </div>
+              <div>
+                <Includes />
+              </div>
+              <div>
+                <Variables />
+              </div>
+            </TabGroup>
           ) : null}
 
           {payload.design?.is_template ? (

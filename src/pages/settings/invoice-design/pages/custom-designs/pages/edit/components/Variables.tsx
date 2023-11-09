@@ -19,10 +19,7 @@ export function Variables() {
 
   return (
     <Card
-      title={t('variables')}
-      padding="small"
       childrenClassName="px-5"
-      collapsed={true}
     >
       <TabGroup tabs={[t('invoice'), t('client'), t('contact'), t('company')]}>
         <section>

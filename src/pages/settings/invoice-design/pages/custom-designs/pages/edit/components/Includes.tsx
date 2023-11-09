@@ -21,7 +21,6 @@
 import { useAtom } from 'jotai';
 import { payloadAtom } from '../Edit';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDesignUtilities } from '../common/hooks';
 import { useDebounce } from 'react-use';
 import { Card } from '$app/components/cards';
@@ -31,7 +30,6 @@ export function Includes() {
   const [payload] = useAtom(payloadAtom);
   const [value, setValue] = useState(payload.design?.design.includes);
 
-  const { t } = useTranslation();
   const { handleBlockChange } = useDesignUtilities();
 
   useDebounce(() => value && handleBlockChange('includes', value), 1000, [
@@ -39,9 +37,9 @@ export function Includes() {
   ]);
 
   return (
-    <Card title={t('includes')} padding="small" collapsed={true}>
+    <Card>
       <Editor
-        height="25rem"
+        height="38rem"
         defaultLanguage="html"
         value={payload.design?.design.includes}
         options={{
