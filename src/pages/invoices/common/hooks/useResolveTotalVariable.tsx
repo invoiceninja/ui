@@ -20,8 +20,6 @@ import {
   RelationType,
 } from '../components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-
 interface Props {
   resource?: ProductTableResource;
   relationType: RelationType;
