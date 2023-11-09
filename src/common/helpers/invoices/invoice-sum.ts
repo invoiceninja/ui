@@ -49,8 +49,8 @@ export class InvoiceSum {
       .calculateCustomValues()
       .setTaxMap()
       .calculateTotals()
-      .calculateBalance()
-      .calculatePartial();
+      // .calculatePartial()
+      .calculateBalance();
 
     return this;
   }
@@ -229,42 +229,25 @@ export class InvoiceSum {
   }
 
   protected setCalculatedAttributes() {
-    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
-    if (this.invoice.amount !== this.invoice.balance) {
-      const paidToDate = this.invoice.amount - this.invoice.balance;
-
-      this.invoice.balance =
-        parseFloat(
-          NumberFormatter.formatValue(this.total, this.currency.precision)
-        ) - paidToDate;
-    } else {
-      this.invoice.balance = parseFloat(
-        NumberFormatter.formatValue(this.total, this.currency.precision)
-      );
-    }
-    // }
 
     this.invoice.amount = parseFloat(
       NumberFormatter.formatValue(this.total, this.currency.precision)
     );
 
+    this.invoice.balance =
+      parseFloat(
+        NumberFormatter.formatValue(this.total, this.currency.precision)
+    ) - (this.invoice.paid_to_date ?? 0);
+    
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
   }
 
-  protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial) {
-      this.invoice.partial = Math.max(
-        0,
-        Math.min(
-          parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2)),
-          this.invoice.balance
-        )
-      );
-    }
+  public getBalanceDue() {
 
-    return this;
+      return (this.invoice.partial && this.invoice.partial > 0) ? Math.min(this.invoice.partial, this.invoice.balance) : this.invoice.balance;
+
   }
 
   /////////////
