@@ -32,7 +32,7 @@ export function Details(props: Props) {
   };
 
   const company = useCurrentCompany();
-  
+
   return (
     <Card title={t('details')}>
       <Element leftSide={t('first_name')} required>
@@ -83,12 +83,7 @@ export function Details(props: Props) {
           field="user1"
           defaultValue={user.custom_value1}
           value={company.custom_fields.user1}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value1',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value1', String(value))}
         />
       )}
 
@@ -97,12 +92,7 @@ export function Details(props: Props) {
           field="user2"
           defaultValue={user.custom_value2}
           value={company.custom_fields.user2}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value2',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value2', String(value))}
         />
       )}
 
@@ -111,12 +101,7 @@ export function Details(props: Props) {
           field="user3"
           defaultValue={user.custom_value3}
           value={company.custom_fields.user3}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value3',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value3', String(value))}
         />
       )}
 
@@ -125,15 +110,9 @@ export function Details(props: Props) {
           field="user4"
           defaultValue={user.custom_value4}
           value={company.custom_fields.user4}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value4',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value4', String(value))}
         />
       )}
-      
     </Card>
   );
 }

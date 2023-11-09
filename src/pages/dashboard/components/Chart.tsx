@@ -261,7 +261,12 @@ export function Chart(props: Props) {
         <CartesianGrid strokeDasharray="0" vertical={false} />
         <Tooltip formatter={formatTooltipValues} />
 
-        <XAxis dataKey="date" tickMargin={8} tick={{ fontSize: 14 }} stroke={colors.$3} />
+        <XAxis
+          dataKey="date"
+          tickMargin={8}
+          tick={{ fontSize: 14 }}
+          stroke={colors.$3}
+        />
         <YAxis
           interval={0}
           tickCount={6}

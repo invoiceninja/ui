@@ -82,7 +82,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_vendor`);
 
-      $refetch(['vendors'])
+      $refetch(['vendors']);
     });
   };
 }

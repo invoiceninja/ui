@@ -40,7 +40,7 @@ export function useUpdateTask(params: Params) {
         .then(() => {
           toast.success('updated_task');
 
-          $refetch(['tasks'])
+          $refetch(['tasks']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

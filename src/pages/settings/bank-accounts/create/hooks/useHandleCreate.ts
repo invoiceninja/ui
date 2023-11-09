@@ -40,12 +40,12 @@ export function useHandleCreate(
         .then((response: GenericSingleResourceResponse<BankAccount>) => {
           toast.success('created_bank_account');
 
-          $refetch(['bank_integrations'])
+          $refetch(['bank_integrations']);
 
           if (!setIsModalOpened) {
             navigate('/settings/bank_accounts');
           } else {
-            $refetch(['bank_integrations'])
+            $refetch(['bank_integrations']);
 
             if (onCreatedBankAccount) {
               onCreatedBankAccount(response.data.data);

@@ -37,22 +37,21 @@ export const useCustomBulkActions = () => {
 
   const handleDownloadDocuments = (
     selectedClients: Client[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const clientIds = getDocumentsIds(selectedClients);
 
     documentsBulk(clientIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const customBulkActions: CustomBulkAction<Client>[] = [
-    (_, selectedClients, setSelected) =>
-      selectedClients &&
-      shouldShowDownloadDocuments(selectedClients) && (
+    ({ selectedResources, setSelected }) =>
+      shouldShowDownloadDocuments(selectedResources) && (
         <DropdownElement
           onClick={() =>
-            shouldDownloadDocuments(selectedClients)
-              ? handleDownloadDocuments(selectedClients, setSelected)
+            shouldDownloadDocuments(selectedResources)
+              ? handleDownloadDocuments(selectedResources, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}

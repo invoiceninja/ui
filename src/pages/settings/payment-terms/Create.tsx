@@ -65,7 +65,7 @@ export function Create() {
         .then((response: AxiosResponse) => {
           toast.success('created_payment_term');
 
-          $refetch(['payment_terms'])
+          $refetch(['payment_terms']);
 
           if (actionType === 'save') {
             navigate(

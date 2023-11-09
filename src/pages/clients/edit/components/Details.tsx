@@ -197,10 +197,9 @@ export function Details(props: Props) {
           <option value="charity">{t('charity')}</option>
           <option value="government">{t('government')}</option>
           <option value="other">{t('other')}</option>
-
         </SelectField>
       </Element>
-    
+
       {company?.custom_fields?.client1 && (
         <CustomField
           field="client1"

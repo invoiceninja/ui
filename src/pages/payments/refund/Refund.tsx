@@ -85,7 +85,7 @@ export default function Refund() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          
+
           $refetch(['payments']);
         });
     },

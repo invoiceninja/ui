@@ -105,7 +105,6 @@ export function ExpenseSettings() {
           />
         </Element>
 
-
         <Element
           leftSide={t('notify_vendor_when_paid')}
           leftSideHelp={t('notify_vendor_when_paid_help')}
@@ -117,7 +116,6 @@ export function ExpenseSettings() {
             checked={companyChanges?.notify_vendor_when_paid || false}
           />
         </Element>
-
 
         <Divider />
 
@@ -157,8 +155,6 @@ export function ExpenseSettings() {
             checked={companyChanges?.expense_inclusive_taxes || false}
           />
         </Element>
-
-        
       </Card>
 
       <ExpenseCategories />

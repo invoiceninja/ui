@@ -133,11 +133,9 @@ export default function Apply() {
       <Element leftSide={t('invoices')}>
         {payment?.client_id ? (
           <ComboboxAsync<Invoice>
-            endpoint={
-                endpoint(
-                  `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
-                )
-            }
+            endpoint={endpoint(
+              `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
+            )}
             inputOptions={{
               value: 'id',
             }}

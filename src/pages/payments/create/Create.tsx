@@ -204,8 +204,6 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
-
-    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);

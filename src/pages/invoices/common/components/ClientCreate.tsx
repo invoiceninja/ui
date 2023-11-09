@@ -105,7 +105,7 @@ export function ClientCreate({
 
         onClientCreated && onClientCreated(response.data.data);
 
-        $refetch(['clients'])
+        $refetch(['clients']);
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {

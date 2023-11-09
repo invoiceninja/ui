@@ -77,7 +77,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_bank_account');
 
-          $refetch(['bank_integrations'])
+          $refetch(['bank_integrations']);
 
           navigate('/settings/bank_accounts');
         })

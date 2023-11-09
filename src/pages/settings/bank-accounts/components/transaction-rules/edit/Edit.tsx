@@ -77,7 +77,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_transaction_rule');
 
-          $refetch(['bank_transaction_rules'])
+          $refetch(['bank_transaction_rules']);
 
           navigate('/settings/bank_accounts/transaction_rules');
         })

@@ -15,6 +15,7 @@ interface Event {
   server: string;
   server_ip: string;
   status: string;
+  bounce_id: string;
 }
 
 export interface EmailRecord {

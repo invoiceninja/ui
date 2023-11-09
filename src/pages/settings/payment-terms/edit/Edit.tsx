@@ -47,7 +47,7 @@ export function Edit() {
   const { data } = usePaymentTermQuery({ id });
 
   const invalidatePaymentTermCache = () => {
-    $refetch(['payment_terms'])
+    $refetch(['payment_terms']);
   };
 
   const formik = useFormik({
