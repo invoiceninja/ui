@@ -54,7 +54,6 @@ import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { refetchByUrl } from '$app/common/hooks/useRefetch';
 import { $refetch, refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useLocation } from 'react-router-dom';
 import { CompanyUser } from '$app/common/interfaces/company-user';
