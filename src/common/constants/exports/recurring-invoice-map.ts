@@ -162,4 +162,14 @@ export const recurringinvoiceMap: Record[] = [
     value: 'recurring_invoice.next_send_date',
     map: 'recurring_invoice',
   },
+  {
+    trans: 'auto_bill',
+    value: 'recurring_invoice.auto_bill',
+    map: 'recurring_invoice',
+  },
+  {
+    trans: 'auto_bill_enabled',
+    value: 'recurring_invoice.auto_bill_enabled',
+    map: 'recurring_invoice',
+  },
 ];

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const itemMap: Record[] = [
   { trans: 'quantity', value: 'item.quantity', map: '' },
@@ -28,4 +28,5 @@ export const itemMap: Record[] = [
   { trans: 'item_tax_rate3', value: 'item.tax_rate3', map: '' },
   { trans: 'type', value: 'item.type_id', map: '' },
   { trans: 'tax_category', value: 'item.tax_id', map: '' },
+  { trans: 'tax_amount', value: 'item.tax_amount', map: '' },
 ];
