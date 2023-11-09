@@ -59,7 +59,7 @@ export function Details(props: PurchaseOrderCardProps) {
             type="number"
             value={purchaseOrder.partial}
             onValueChange={(partial) =>
-              handleChange('partial', parseFloat(partial))
+              handleChange('partial', parseFloat(partial) || 0)
             }
             min="0"
             errorMessage={errors?.errors.partial}

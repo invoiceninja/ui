@@ -56,7 +56,7 @@ export function QuoteDetails(props: Props) {
             id="partial"
             type="number"
             onValueChange={(value) =>
-              handleChange('partial', parseFloat(value))
+              handleChange('partial', parseFloat(value) || 0)
             }
             value={quote?.partial}
             min="0"

@@ -57,7 +57,7 @@ export function CreditDetails(props: Props) {
             id="partial"
             type="number"
             onValueChange={(value) =>
-              handleChange('partial', parseFloat(value))
+              handleChange('partial', parseFloat(value) || 0)
             }
             value={credit?.partial}
             min="0"
