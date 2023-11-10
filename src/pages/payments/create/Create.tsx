@@ -311,6 +311,7 @@ export default function Create() {
                       )
                         .pluck('invoice_id')
                         .toArray()}
+                      queryKey={['payable', payment?.client_id]}
                     />
 
                     <InputField
