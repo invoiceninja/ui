@@ -28,6 +28,17 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+export const templateEntites = [
+  'invoice',
+  'payment',
+  'client',
+  'quote',
+  'credit',
+  'purchase_order',
+  'project',
+  'task',
+];
+
 export default function Create() {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery();
@@ -196,23 +207,17 @@ export default function Create() {
 
         {type === 'template' && (
           <Element leftSide={t('resource')}>
-            <Checkbox
-              label={t('invoice')}
-              value="invoice"
-              onValueChange={(value, checked) =>
-                handleResourceChange(value, Boolean(checked))
-              }
-              checked={design?.entities.includes('invoice')}
-            />
-
-            <Checkbox
-              label={t('payment')}
-              value="payment"
-              onValueChange={(value, checked) =>
-                handleResourceChange(value, Boolean(checked))
-              }
-              checked={design?.entities.includes('payment')}
-            />
+            {templateEntites.map((entity) => (
+              <Checkbox
+                key={entity}
+                label={t(entity)}
+                value={entity}
+                onValueChange={(value, checked) =>
+                  handleResourceChange(value, Boolean(checked))
+                }
+                checked={design?.entities.includes(entity)}
+              />
+            ))}
           </Element>
         )}
       </Card>
