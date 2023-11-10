@@ -18,7 +18,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -34,6 +34,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdMarkEmailRead,
@@ -64,6 +65,9 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
     Boolean(invoice.client?.gateway_tokens.length)
   );
 };
+
+export const isChangeTemplateVisibleAtom = atom(false);
+export const changeTemplateInvoicesAtom = atom<Invoice[]>([]);
 
 interface Params {
   showEditAction?: boolean;
@@ -203,6 +207,9 @@ export function useActions(params?: Params) {
 
     navigate('/purchase_orders/create?action=clone');
   };
+
+  const [, setChangeTemplateVisible] = useAtom(isChangeTemplateVisibleAtom);
+  const [, setChangeTemplateInvoices] = useAtom(changeTemplateInvoicesAtom);
 
   return [
     (invoice: Invoice) =>
@@ -471,6 +478,17 @@ export function useActions(params?: Params) {
           {t('clone_to_purchase_order')}
         </DropdownElement>
       ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateInvoices([invoice]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       dropdown && <Divider withoutPadding />,
