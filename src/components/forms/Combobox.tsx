@@ -738,7 +738,6 @@ export interface ComboboxAsyncProps<T> {
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
-  queryKey?: string[];
 }
 
 export function ComboboxAsync<T = any>({
@@ -757,14 +756,16 @@ export function ComboboxAsync<T = any>({
   disableWithQueryParameter,
   errorMessage,
   clearInputAfterSelection,
-  queryKey,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
+  const [enableQuery, setEnableQuery] = useState<boolean>(false);
+
+  useEffect(() => {
+    setUrl(endpoint);
+  }, [endpoint]);
 
   const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
   const isEntryAvailable = () => {
     if (entries.length) {
@@ -780,16 +781,8 @@ export function ComboboxAsync<T = any>({
     return false;
   };
 
-  const getQueryKey = () => {
-    if (queryKey) {
-      return queryKey;
-    }
-
-    return [];
-  }
-
   const { data } = useQuery(
-    [new URL(url).pathname, ...getQueryKey(), new URL(url).href],
+    [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
     () =>
       request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
@@ -819,7 +812,7 @@ export function ComboboxAsync<T = any>({
     if (!enableQuery) {
       clearTimeout(enableQueryTimeOut.current);
 
-      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 100);
 
       enableQueryTimeOut.current = currentTimeout;
     }
@@ -835,8 +828,9 @@ export function ComboboxAsync<T = any>({
       setUrl((c) => {
         const currentUrl = new URL(c);
 
-        inputOptions.value &&
+        if (inputOptions.value && inputOptions.value.toString().length > 0) {
           currentUrl.searchParams.set('with', inputOptions.value.toString());
+        }
 
         return currentUrl.href;
       });
