@@ -311,7 +311,6 @@ export default function Create() {
                       )
                         .pluck('invoice_id')
                         .toArray()}
-                      queryKey={['payable', payment?.client_id]}
                     />
 
                     <InputField
@@ -382,7 +381,6 @@ export default function Create() {
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
                   .toArray()}
-                queryKey={['payable', payment?.client_id]}
                 clearInputAfterSelection
               />
             </Element>
