@@ -15,6 +15,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import {
   MdCancel,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -33,7 +34,8 @@ import collect from 'collect.js';
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 import { useReverseInvoice } from './useReverseInvoice';
 import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -120,6 +122,8 @@ export const useCustomBulkActions = () => {
     documentsBulk(invoiceIds, 'download');
     setSelected?.([]);
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     (_, selectedInvoices) =>
@@ -214,6 +218,27 @@ export const useCustomBulkActions = () => {
           {t('cancel_invoice')}
         </DropdownElement>
       ),
+    (_, selectedInvoices) => (
+      <>
+        {selectedInvoices ? (
+          <ChangeTemplateModal<Invoice>
+            entity="invoice"
+            entities={selectedInvoices}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+            bulkUrl="/api/v1/invoices/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
   ];
 
   return customBulkActions;
