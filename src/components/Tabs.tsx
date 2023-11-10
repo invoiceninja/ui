@@ -74,10 +74,6 @@ export function Tabs(props: Props) {
         return;
       }
 
-      if (searchParams.get('redirect') === 'false') {
-        return;
-      }
-
       if (!doesDefaultUrlExist) {
         navigate(props.tabs[0].href);
       }
