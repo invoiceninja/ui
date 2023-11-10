@@ -80,6 +80,7 @@ import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -620,6 +621,7 @@ export function useRecurringInvoiceColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
@@ -655,7 +657,8 @@ export function useRecurringInvoiceColumns() {
           })}
           disableNavigation={
             !hasPermission('view_recurring_invoice') &&
-            !hasPermission('edit_recurring_invoice')
+            !hasPermission('edit_recurring_invoice') &&
+            !entityAssigned(recurringInvoice)
           }
         >
           {value}

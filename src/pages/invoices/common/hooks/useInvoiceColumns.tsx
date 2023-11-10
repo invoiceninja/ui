@@ -25,6 +25,7 @@ import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -114,6 +115,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const entityAssigned = useEntityAssigned();
   const hasPermission = useHasPermission();
 
   const formatMoney = useFormatMoney();
@@ -139,9 +141,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <Link
-          to={`/invoices/${invoice.id}/edit`}
+          to={route('/invoices/:id/edit', { id: invoice.id })}
           disableNavigation={
-            !hasPermission('view_invoice') && !hasPermission('edit_invoice')
+            !hasPermission('view_invoice') &&
+            !hasPermission('edit_invoice') &&
+            !entityAssigned(invoice)
           }
         >
           {value}
@@ -167,7 +171,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         <Link
           to={route('/clients/:id', { id: invoice.client_id })}
           disableNavigation={
-            !hasPermission('view_client') && !hasPermission('edit_client')
+            !hasPermission('view_client') &&
+            !hasPermission('edit_client') &&
+            !entityAssigned(invoice)
           }
         >
           {invoice.client?.display_name}

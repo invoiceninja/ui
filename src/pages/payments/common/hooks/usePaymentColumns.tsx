@@ -25,6 +25,7 @@ import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export const defaultColumns: string[] = [
   'status',
@@ -79,6 +80,7 @@ export function usePaymentColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
@@ -124,7 +126,9 @@ export function usePaymentColumns() {
         <Link
           to={route('/payments/:id/edit', { id: payment.id })}
           disableNavigation={
-            !hasPermission('view_payment') && !hasPermission('edit_payment')
+            !hasPermission('view_payment') &&
+            !hasPermission('edit_payment') &&
+            !entityAssigned(payment)
           }
         >
           {payment.number}
@@ -139,7 +143,9 @@ export function usePaymentColumns() {
         <Link
           to={route('/clients/:id', { id: payment.client_id })}
           disableNavigation={
-            !hasPermission('view_client') && !hasPermission('edit_client')
+            !hasPermission('view_client') &&
+            !hasPermission('edit_client') &&
+            !entityAssigned(payment.client)
           }
         >
           {payment.client?.display_name}
@@ -164,6 +170,11 @@ export function usePaymentColumns() {
       format: (value, payment) => (
         <Link
           to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
+          disableNavigation={
+            !hasPermission('view_invoice') &&
+            !hasPermission('edit_invoice') &&
+            !entityAssigned(payment.invoices?.[0])
+          }
         >
           {payment.invoices?.[0]?.number}
         </Link>

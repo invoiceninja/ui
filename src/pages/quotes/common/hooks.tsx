@@ -92,6 +92,8 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { AssignedGuard } from '$app/common/guards/AssignedGuard';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -625,6 +627,9 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
@@ -656,12 +661,21 @@ export function useQuoteColumns() {
           <QuoteStatusBadge entity={quote} />
 
           {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
-            <MdTextSnippet
-              className="cursor-pointer"
-              fontSize={19}
-              color={accentColor}
-              onClick={() =>
-                navigate(route('/invoices/:id/edit', { id: quote.invoice_id }))
+            <AssignedGuard
+              entityId={quote.invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: quote.invoice_id })
+                    )
+                  }
+                />
               }
             />
           )}
@@ -673,7 +687,16 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <Link to={route('/quotes/:id/edit', { id: quote.id })}>{field}</Link>
+        <Link
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          disableNavigation={
+            !hasPermission('view_quote') &&
+            !hasPermission('edit_quote') &&
+            !entityAssigned(quote)
+          }
+        >
+          {field}
+        </Link>
       ),
     },
     {
@@ -681,7 +704,14 @@ export function useQuoteColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, quote) => (
-        <Link to={route('/clients/:id', { id: quote.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: quote.client_id })}
+          disableNavigation={
+            !hasPermission('view_client') &&
+            !hasPermission('edit_client') &&
+            !entityAssigned(quote.client)
+          }
+        >
           {quote.client?.display_name}
         </Link>
       ),

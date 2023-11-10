@@ -9,16 +9,22 @@
  */
 
 import { Client } from '../interfaces/client';
+import { Invoice } from '../interfaces/invoice';
+import { Payment } from '../interfaces/payment';
+import { Quote } from '../interfaces/quote';
+import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { useCurrentUser } from './useCurrentUser';
 
-type Entity = Client;
+type Entity = Client | Invoice | Quote | Payment | RecurringInvoice;
+
 export function useEntityAssigned() {
   const user = useCurrentUser();
 
   return (entity: Entity | undefined) => {
     if (
       user &&
-      (entity?.user_id === user.id || entity?.assigned_user_id === user.id)
+      entity &&
+      (entity.user_id === user.id || entity.assigned_user_id === user.id)
     ) {
       return true;
     }

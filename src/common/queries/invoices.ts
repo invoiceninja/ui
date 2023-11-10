@@ -29,6 +29,8 @@ export interface GenericQueryOptions {
 }
 
 export function useInvoiceQuery(params: { id: string | undefined }) {
+  const hasPermission = useHasPermission();
+
   return useQuery<Invoice>(
     ['/api/v1/invoices', params.id],
     () =>
@@ -40,7 +42,14 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
+    {
+      staleTime: Infinity,
+      enabled:
+        Boolean(params.id) &&
+        (hasPermission('create_invoice') ||
+          hasPermission('view_invoice') ||
+          hasPermission('edit_invoice')),
+    }
   );
 }
 
