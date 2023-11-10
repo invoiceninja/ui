@@ -738,6 +738,7 @@ export interface ComboboxAsyncProps<T> {
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  queryKey?: string[];
 }
 
 export function ComboboxAsync<T = any>({
@@ -756,6 +757,7 @@ export function ComboboxAsync<T = any>({
   disableWithQueryParameter,
   errorMessage,
   clearInputAfterSelection,
+  queryKey,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -778,8 +780,16 @@ export function ComboboxAsync<T = any>({
     return false;
   };
 
+  const getQueryKey = () => {
+    if (queryKey) {
+      return queryKey;
+    }
+
+    return [];
+  }
+
   const { data } = useQuery(
-    [new URL(url).pathname, new URL(url).href],
+    [new URL(url).pathname, ...getQueryKey(), new URL(url).href],
     () =>
       request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
