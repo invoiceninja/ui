@@ -10,6 +10,7 @@
 
 import { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import Pdf from './pages/pdf/Pdf';
 
 const InvoiceDesign = lazy(() => import('./InvoiceDesign'));
 const GeneralSettings = lazy(
@@ -27,5 +28,6 @@ export const invoiceDesignRoutes = (
     <Route path="custom_designs" element={<CustomDesigns />} />
     <Route path="custom_designs/:id/edit" element={<Edit />} />
     <Route path="custom_designs/create" element={<Create />} />
+    <Route path="template_designs/pdf" element={<Pdf />} />
   </Route>
 );
