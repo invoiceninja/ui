@@ -96,5 +96,5 @@ test('can view assigned task with create_task', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Edit Task' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Edit Task' }).first()).toBeVisible();
 });
