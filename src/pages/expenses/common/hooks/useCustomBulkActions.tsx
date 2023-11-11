@@ -142,20 +142,20 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    (_, selectedExpenses, setSelected) => (
+    ({selectedResources, setSelected}) => (
       <>
-        {selectedExpenses ? (
+        {selectedResources ? (
           <ChangeCategory
             isVisible={isChangeCategoryVisible}
             setIsVisible={setIsChangeCategoryVisible}
-            selectedExpenses={selectedExpenses}
+            selectedExpenses={selectedResources}
             setSelected={setSelected}
           />
         ) : null}
 
         <DropdownElement
           onClick={() =>
-            selectedExpenses && selectedExpenses.length
+            selectedResources.length
               ? setIsChangeCategoryVisible(true)
               : toast.error('no_expenses_selected')
           }
