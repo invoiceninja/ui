@@ -43,6 +43,7 @@ import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -95,6 +96,9 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -113,7 +117,14 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link to={route('/products/:id/edit', { id: product.id })}>
+          <Link
+            to={route('/products/:id/edit', { id: product.id })}
+            disableNavigation={
+              !hasPermission('view_product') &&
+              !hasPermission('edit_product') &&
+              !entityAssigned(product)
+            }
+          >
             {value}
           </Link>
         </span>

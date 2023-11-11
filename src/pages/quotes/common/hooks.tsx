@@ -93,7 +93,7 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { AssignedGuard } from '$app/common/guards/AssignedGuard';
+import { Assigned } from '$app/components/Assigned';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -661,7 +661,7 @@ export function useQuoteColumns() {
           <QuoteStatusBadge entity={quote} />
 
           {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
-            <AssignedGuard
+            <Assigned
               entityId={quote.invoice_id}
               cacheEndpoint="/api/v1/invoices"
               apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"

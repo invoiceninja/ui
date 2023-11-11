@@ -53,6 +53,7 @@ import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export const defaultColumns: string[] = [
   'status',
@@ -123,6 +124,7 @@ export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -153,7 +155,8 @@ export function useRecurringExpenseColumns() {
           })}
           disableNavigation={
             !hasPermission('view_recurring_expense') &&
-            !hasPermission('edit_recurring_expense')
+            !hasPermission('edit_recurring_expense') &&
+            !entityAssigned(recurringExpense)
           }
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
@@ -171,7 +174,8 @@ export function useRecurringExpenseColumns() {
           })}
           disableNavigation={
             !hasPermission('view_recurring_expense') &&
-            !hasPermission('edit_recurring_expense')
+            !hasPermission('edit_recurring_expense') &&
+            !entityAssigned(recurringExpense)
           }
         >
           {field}
@@ -187,7 +191,9 @@ export function useRecurringExpenseColumns() {
           <Link
             to={route('/vendors/:id', { id: value.toString() })}
             disableNavigation={
-              !hasPermission('view_vendor') && !hasPermission('edit_vendor')
+              !hasPermission('view_vendor') &&
+              !hasPermission('edit_vendor') &&
+              !entityAssigned(recurringExpense.vendor)
             }
           >
             {recurringExpense.vendor.name}
@@ -203,7 +209,9 @@ export function useRecurringExpenseColumns() {
           <Link
             to={route('/clients/:id', { id: value.toString() })}
             disableNavigation={
-              !hasPermission('view_client') && !hasPermission('edit_client')
+              !hasPermission('view_client') &&
+              !hasPermission('edit_client') &&
+              !entityAssigned(recurringExpense.client)
             }
           >
             {recurringExpense.client.display_name}

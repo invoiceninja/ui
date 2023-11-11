@@ -49,6 +49,8 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { AddToInvoiceAction } from './components/AddToInvoiceAction';
 import { ExpenseCategory } from './components/ExpenseCategory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -224,6 +226,7 @@ export function useExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const navigate = useNavigate();
 
@@ -255,7 +258,9 @@ export function useExpenseColumns() {
           <Link
             to={route('/expenses/:id/edit', { id: expense.id })}
             disableNavigation={
-              !hasPermission('view_expense') && !hasPermission('edit_expense')
+              !hasPermission('view_expense') &&
+              !hasPermission('edit_expense') &&
+              !entityAssigned(expense)
             }
           >
             <span className="inline-flex items-center space-x-4">
@@ -263,19 +268,27 @@ export function useExpenseColumns() {
             </span>
           </Link>
 
-          {expense.invoice_id &&
-            (hasPermission('view_invoice') ||
-              hasPermission('edit_invoice')) && (
-              <Icon
-                element={MdTextSnippet}
-                size={19}
-                onClick={() =>
-                  navigate(
-                    route('/invoices/:id/edit', { id: expense.invoice_id })
-                  )
-                }
-              />
-            )}
+          {expense.invoice_id && (
+            <Assigned
+              entityId={expense.invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <Icon
+                  element={MdTextSnippet}
+                  size={19}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: expense.invoice_id })
+                    )
+                  }
+                />
+              }
+            />
+          )}
         </div>
       ),
     },
@@ -287,7 +300,9 @@ export function useExpenseColumns() {
         <Link
           to={route('/expenses/:id/edit', { id: expense.id })}
           disableNavigation={
-            !hasPermission('view_expense') && !hasPermission('edit_expense')
+            !hasPermission('view_expense') &&
+            !hasPermission('edit_expense') &&
+            !entityAssigned(expense)
           }
         >
           {field}
@@ -303,7 +318,9 @@ export function useExpenseColumns() {
           <Link
             to={route('/vendors/:id', { id: value.toString() })}
             disableNavigation={
-              !hasPermission('view_vendor') && !hasPermission('edit_vendor')
+              !hasPermission('view_vendor') &&
+              !hasPermission('edit_vendor') &&
+              !entityAssigned(expense.vendor)
             }
           >
             {expense.vendor.name}
@@ -319,7 +336,9 @@ export function useExpenseColumns() {
           <Link
             to={route('/clients/:id', { id: value.toString() })}
             disableNavigation={
-              !hasPermission('view_client') && !hasPermission('edit_client')
+              !hasPermission('view_client') &&
+              !hasPermission('edit_client') &&
+              !entityAssigned(expense.client)
             }
           >
             {expense.client.display_name}

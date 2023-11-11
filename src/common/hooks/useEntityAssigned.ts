@@ -9,13 +9,32 @@
  */
 
 import { Client } from '../interfaces/client';
+import { Credit } from '../interfaces/credit';
+import { Expense } from '../interfaces/expense';
 import { Invoice } from '../interfaces/invoice';
 import { Payment } from '../interfaces/payment';
+import { Product } from '../interfaces/product';
+import { Project } from '../interfaces/project';
 import { Quote } from '../interfaces/quote';
+import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
+import { Task } from '../interfaces/task';
+import { Vendor } from '../interfaces/vendor';
 import { useCurrentUser } from './useCurrentUser';
 
-type Entity = Client | Invoice | Quote | Payment | RecurringInvoice;
+type Entity =
+  | Client
+  | Invoice
+  | Quote
+  | Payment
+  | RecurringInvoice
+  | Credit
+  | Project
+  | Task
+  | Expense
+  | Vendor
+  | RecurringExpense
+  | Product;
 
 export function useEntityAssigned() {
   const user = useCurrentUser();

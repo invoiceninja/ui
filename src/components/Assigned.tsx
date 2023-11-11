@@ -9,30 +9,32 @@
  */
 
 import { useQueryClient } from 'react-query';
-import { useCurrentUser } from '../hooks/useCurrentUser';
 import { ReactNode, useEffect, useState } from 'react';
-import { request } from '../helpers/request';
-import { endpoint } from '../helpers';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
 
 interface Props {
   apiEndpoint: string;
   entityId: string;
   cacheEndpoint: string;
   component: ReactNode;
+  preCheck?: boolean;
 }
-export function AssignedGuard({
+export function Assigned({
   apiEndpoint,
   entityId,
   cacheEndpoint,
   component,
+  preCheck,
 }: Props) {
   const user = useCurrentUser();
   const queryClient = useQueryClient();
 
-  const [isAssigned, setIsAssigned] = useState<boolean>(false);
+  const [isAssigned, setIsAssigned] = useState<boolean>(preCheck ?? false);
 
   useEffect(() => {
-    if (user && entityId) {
+    if (user && entityId && !isAssigned) {
       (async () => {
         const entityResponse = await queryClient.fetchQuery(
           [cacheEndpoint, entityId],

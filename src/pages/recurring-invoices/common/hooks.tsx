@@ -673,7 +673,9 @@ export function useRecurringInvoiceColumns() {
         <Link
           to={route('/clients/:id', { id: recurringInvoice.client_id })}
           disableNavigation={
-            !hasPermission('view_client') && !hasPermission('edit_client')
+            !hasPermission('view_client') &&
+            !hasPermission('edit_client') &&
+            !entityAssigned(recurringInvoice.client)
           }
         >
           {recurringInvoice.client?.display_name}
