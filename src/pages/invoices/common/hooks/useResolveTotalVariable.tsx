@@ -62,7 +62,6 @@ export function useResolveTotalVariable(props: Props) {
     }
 
     if (variable == '$discount' && invoiceSum) {
-      console.log('invoiceSum', invoiceSum.totalDiscount)
       return invoiceSum.totalDiscount != 0 ?
       (
         <Element leftSide={resolveTranslation(variable, '$')}>
