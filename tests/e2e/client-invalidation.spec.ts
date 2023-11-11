@@ -1,5 +1,6 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import { test, expect } from '@playwright/test';
+import { faker } from '@faker-js/faker';
 
 test('test appropriate invalidation of clients', async ({ page }) => {
   const { clear, save } = permissions(page);
@@ -7,6 +8,9 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await login(page);
   await clear();
   await save();
+
+  const client_name = faker.person.fullName();
+
   await page.getByRole('link', { name: 'Clients' }).click();
   await page.getByTitle('New Client').first().click();
   await page.locator('#name').click();
@@ -15,8 +19,8 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.getByTitle('New Invoice').click();
   await page.getByRole('link', { name: 'New Invoice', exact: true }).first().click();
   await page.getByRole('combobox', { name: 'Client' }).click();
-  await page.getByRole('combobox', { name: 'Client' }).fill('hello dear');  
-  await expect(page.getByRole('combobox', { name: 'Client' })).toHaveValue('hello dear');
+  await page.getByRole('combobox', { name: 'Client' }).fill(client_name);  
+  await expect(page.getByRole('combobox', { name: 'Client' })).toHaveValue(client_name);
   await page.getByRole('option').first().click();
   await page.getByRole('button', { name: 'Add Item' }).click();
   await page.locator('#notes').click();
@@ -51,7 +55,7 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await expect(page.locator('div').filter({ hasText: /^Outstanding\$ 100\.00$/ }).getByRole('definition')).toBeVisible(); //improper invalidation causing this to fail
   await expect(page.locator('div').filter({ hasText: /^Credit Balance\$ 0\.00$/ }).getByRole('definition')).toBeVisible();
 
-  await page.getByRole('cell', { name: 'More Actions' }).getByRole('button').click();
+  await page.getByRole('cell', { name: 'More Actions' }).getByRole('button').first().click();
   await page.getByRole('button', { name: 'Mark Paid' }).click();
 
   await expect(page.locator('div').filter({ hasText: /^Paid to Date\$ 100\.00$/ }).getByRole('definition')).toBeVisible();
