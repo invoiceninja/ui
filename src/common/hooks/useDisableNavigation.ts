@@ -29,8 +29,7 @@ export function useDisableNavigation() {
     return (
       !hasPermission(`view_${resource.entity}`) &&
       !hasPermission(`edit_${resource.entity}`) &&
-      (!entityAssigned(resource.value) ||
-        !hasPermission(`create_${resource.entity}`))
+      !entityAssigned(resource.value)
     );
   };
 }

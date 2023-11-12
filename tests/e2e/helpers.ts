@@ -1,5 +1,6 @@
 import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
 import { Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 type AdminPermission = 'admin';
 
@@ -62,4 +63,32 @@ export function permissions(page: Page) {
   };
 
   return { clear, save, set };
+}
+
+export async function checkTableEditability(page: Page, isEditable: boolean) {
+  const tableContainer = page.locator('[data-cy="dataTable"]');
+  const table = tableContainer.getByRole('table');
+  const tableBody = table.locator('tbody');
+
+  await page.waitForTimeout(200);
+
+  const numberOfTableMoreActionDropdowns = await tableContainer
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .count();
+  const numberOfTableCheckboxes = await tableContainer
+    .locator('input[type="checkbox"]')
+    .count();
+  const numberOfTableRows = await tableBody.locator('tr').count();
+
+  let expectedNumberOfDropdowns = 0;
+  let expectedNumberOfCheckboxes = 0;
+
+  if (isEditable) {
+    expectedNumberOfDropdowns = numberOfTableRows + 1;
+    expectedNumberOfCheckboxes = numberOfTableRows + 1;
+  }
+
+  expect(numberOfTableCheckboxes).toEqual(expectedNumberOfCheckboxes);
+  expect(expectedNumberOfDropdowns).toEqual(numberOfTableMoreActionDropdowns);
 }

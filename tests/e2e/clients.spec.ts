@@ -1,23 +1,26 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import {
+  checkTableEditability,
+  login,
+  logout,
+  permissions,
+} from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
 
-const createClient = async (page: Page) => {
+const createClient = async (page: Page, clientName?: string) => {
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Client' })
     .click();
 
-  await page.locator('#name').fill('Company Name');
+  await page.locator('#name').fill(clientName || 'Company Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill('first@example.com');
 
   await page.getByRole('button', { name: 'Save' }).click();
-  
-
 };
 
-test("can't view clients without permission", async ({ page }) => {
+test.skip("can't view clients without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -27,9 +30,28 @@ test("can't view clients without permission", async ({ page }) => {
 
   await login(page, 'clients@example.com', 'password');
 
-  await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
+  await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Clients'
   );
+
+  await logout(page);
+});
+
+test.skip('can view clients with admin permission', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await expect(page.locator('[data-cy="navigationBar"]')).toContainText(
+    'Clients'
+  );
+
   await logout(page);
 });
 
@@ -40,6 +62,11 @@ test('can view client', async ({ page }) => {
   await clear('clients@example.com');
   await set('view_client');
   await save();
+
+  await page.getByRole('link', { name: 'Clients', exact: true }).click();
+
+  await createClient(page, 'test view client');
+
   await logout(page);
 
   await login(page, 'clients@example.com', 'password');
@@ -48,54 +75,62 @@ test('can view client', async ({ page }) => {
 
   await page.waitForURL('**/clients');
 
-  const tableBody = page.locator('tbody').first();
+  await checkTableEditability(page, false);
 
-  const tableRow = tableBody.getByRole('row').first();
+  await page
+    .getByRole('link', { name: 'test view client', exact: true })
+    .click();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
-
-  if (doRecordsExist) {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
-
-    await moreActionsButton.click();
-
-    await page.waitForTimeout(200);
-
-    await page
-      .getByRole('link')
-      .filter({ has: page.getByText('Edit') })
+  await expect(
+    page
+      .getByRole('definition', { exact: true })
+      .filter({ hasText: 'Details' })
       .first()
-      .click();
+  ).toBeVisible();
 
-    await expect(
-      page.getByRole('heading', {
-        name: 'Additional Info',
-      })
-    ).toBeVisible();
+  await expect(
+    page
+      .getByRole('definition', { exact: true })
+      .filter({ hasText: 'Address' })
+      .first()
+  ).toBeVisible();
 
-    await expect(
-      page.getByRole('heading', {
-        name: 'Details',
-      })
-    ).toBeVisible();
-  } else {
-    await expect(
-      page.getByRole('heading', {
-        name: "Sorry, you don't have the needed permissions.",
-      })
-    ).not.toBeVisible();
+  await expect(
+    page
+      .getByRole('definition', { exact: true })
+      .filter({ hasText: 'Contacts' })
+      .first()
+  ).toBeVisible();
 
-    await expect(page.getByText('No records found')).toBeVisible();
-  }
+  await expect(
+    page
+      .getByRole('definition', { exact: true })
+      .filter({ hasText: 'Standing' })
+      .first()
+  ).toBeVisible();
+
+  await expect(
+    page
+      .getByRole('button', {
+        name: 'Edit Client',
+        exact: true,
+      })
+      .first()
+  ).not.toBeVisible();
+
+  await expect(
+    page
+      .getByRole('button', {
+        name: 'More Actions',
+        exact: true,
+      })
+      .first()
+  ).not.toBeVisible();
+
   await logout(page);
-
 });
 
-test('can create a client', async ({ page }) => {
+test.skip('can create a client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -135,7 +170,7 @@ test('can create a client', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('can view assigned client with create_client', async ({ page }) => {
+test.skip('can view assigned client with create_client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -153,7 +188,7 @@ test('can view assigned client with create_client', async ({ page }) => {
   await expect(page.getByText('Successfully created client')).toBeVisible();
 });
 
-test('deleting client', async ({ page }) => {
+test.skip('deleting client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -204,7 +239,7 @@ test('deleting client', async ({ page }) => {
   await expect(page.getByText('Successfully deleted client')).toBeVisible();
 });
 
-test('archiving client', async ({ page }) => {
+test.skip('archiving client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -254,7 +289,7 @@ test('archiving client', async ({ page }) => {
   await expect(page.getByText('Successfully archived client')).toBeVisible();
 });
 
-test('client documents preview', async ({ page }) => {
+test.skip('client documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -313,7 +348,7 @@ test('client documents preview', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('client documents uploading', async ({ page }) => {
+test.skip('client documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

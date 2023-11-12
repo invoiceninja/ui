@@ -321,7 +321,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [selected]);
 
   return (
-    <>
+    <div data-cy="dataTable">
       {!props.withoutActions && (
         <Actions
           resource={props.resource}
@@ -449,6 +449,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         );
                   });
                 }}
+                cypressRef="dataTableCheckbox"
               />
             </Th>
           )}
@@ -537,6 +538,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       className="child-checkbox"
                       value={resource.id}
                       id={resource.id}
+                      cypressRef="dataTableCheckbox"
                     />
                   </Td>
                 )}
@@ -659,6 +661,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           leftSideChevrons={props.leftSideChevrons}
         />
       )}
-    </>
+    </div>
   );
 }
