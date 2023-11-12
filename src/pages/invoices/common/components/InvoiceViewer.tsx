@@ -78,7 +78,7 @@ export function InvoiceViewer(props: Props) {
     return () => {
       toast.dismiss();
     };
-  }, [props.link, props.resource]);
+  }, [props.link, props.resource, props.enabled]);
 
   if (android) {
     return (
