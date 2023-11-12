@@ -509,7 +509,7 @@ export function useReports() {
         include_tax: false,
       },
       preview: '/api/v1/reports/user_sales_report?output=json',
-      supports_previews: true,
+      supports_previews: false,
     },
   ];
   return reports;
