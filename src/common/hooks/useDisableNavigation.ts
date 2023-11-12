@@ -9,27 +9,25 @@
  */
 
 import { Client } from '../interfaces/client';
+import { Invoice } from '../interfaces/invoice';
+import { Payment } from '../interfaces/payment';
+import { Quote } from '../interfaces/quote';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { useHasPermission } from './permissions/useHasPermission';
 import { useEntityAssigned } from './useEntityAssigned';
 
-type Entity = 'client' | 'recurring_invoice';
-type EntityType = Client | RecurringInvoice;
-
-interface Resource {
-  entity: Entity;
-  value: EntityType | undefined;
-}
+type Entity = 'client' | 'recurring_invoice' | 'payment' | 'invoice' | 'quote';
+type Resource = Client | RecurringInvoice | Payment | Invoice | Quote;
 
 export function useDisableNavigation() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  return (resource: Resource) => {
+  return (entity: Entity, resource: Resource | undefined) => {
     return (
-      !hasPermission(`view_${resource.entity}`) &&
-      !hasPermission(`edit_${resource.entity}`) &&
-      !entityAssigned(resource.value)
+      !hasPermission(`view_${entity}`) &&
+      !hasPermission(`edit_${entity}`) &&
+      !entityAssigned(resource)
     );
   };
 }

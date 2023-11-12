@@ -134,10 +134,7 @@ export function useClientColumns() {
       format: (value, client) => (
         <Link
           to={route('/clients/:id', { id: client.id })}
-          disableNavigation={disableNavigation({
-            entity: 'client',
-            value: client,
-          })}
+          disableNavigation={disableNavigation('client', client)}
         >
           {value}
         </Link>
@@ -173,10 +170,7 @@ export function useClientColumns() {
         resource.contacts.length > 0 && (
           <Link
             to={route('/clients/:id', { id: resource.id })}
-            disableNavigation={disableNavigation({
-              entity: 'client',
-              value: resource,
-            })}
+            disableNavigation={disableNavigation('client', resource)}
           >
             {resource.contacts[0].first_name} {resource.contacts[0].last_name}
           </Link>

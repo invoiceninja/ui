@@ -654,10 +654,10 @@ export function useRecurringInvoiceColumns() {
           to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
-          disableNavigation={disableNavigation({
-            entity: 'recurring_invoice',
-            value: recurringInvoice,
-          })}
+          disableNavigation={disableNavigation(
+            'recurring_invoice',
+            recurringInvoice
+          )}
         >
           {value}
         </Link>
@@ -670,10 +670,10 @@ export function useRecurringInvoiceColumns() {
       format: (value, recurringInvoice) => (
         <Link
           to={route('/clients/:id', { id: recurringInvoice.client_id })}
-          disableNavigation={disableNavigation({
-            entity: 'client',
-            value: recurringInvoice.client,
-          })}
+          disableNavigation={disableNavigation(
+            'client',
+            recurringInvoice.client
+          )}
         >
           {recurringInvoice.client?.display_name}
         </Link>
