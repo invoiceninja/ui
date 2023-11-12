@@ -40,6 +40,10 @@ import dayjs from 'dayjs';
 import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import {
+  ConfirmActionModal,
+  confirmActionModalAtom,
+} from '../common/components/ConfirmActionModal';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
@@ -125,8 +129,7 @@ export default function Create() {
         _recurringInvoice.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 
-        _recurringInvoice.auto_bill =
-          company?.settings?.auto_bill ?? 'off';
+        _recurringInvoice.auto_bill = company?.settings?.auto_bill ?? 'off';
 
         value = _recurringInvoice;
       }
@@ -162,9 +165,11 @@ export default function Create() {
 
   const save = useCreate({ setErrors });
 
+  const [, setIsConfirmationVisible] = useAtom(confirmActionModalAtom);
+
   const saveOptions: SaveOption[] = [
     {
-      onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
+      onClick: () => setIsConfirmationVisible(true),
       label: t('send_now'),
       icon: <Icon element={MdSend} />,
     },
@@ -281,6 +286,10 @@ export default function Create() {
           />
         )}
       </div>
+
+      <ConfirmActionModal
+        onClick={() => save(recurringInvoice as RecurringInvoice, 'send_now')}
+      />
     </Default>
   );
 }

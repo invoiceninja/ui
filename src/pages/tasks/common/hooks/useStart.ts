@@ -13,10 +13,10 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Task } from '$app/common/interfaces/task';
 import { useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { useLocation } from 'react-router-dom';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useStart() {
   const queryClient = useQueryClient();
@@ -35,19 +35,7 @@ export function useStart() {
         ? toast.success('started_task')
         : toast.dismiss();
 
-      queryClient.invalidateQueries('/api/v1/tasks');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/tasks/:id', { id: task.id })
-      );
-
-      queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-          projectId: task.project_id,
-        })
-      );
+      $refetch(['tasks']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

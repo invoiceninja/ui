@@ -19,12 +19,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
 
 interface Props {
   tasks: Task[];
   isBulkAction?: boolean;
+  setSelected?: (selected: string[]) => void;
 }
 
 export function AddTasksOnInvoiceAction(props: Props) {
@@ -64,12 +64,7 @@ export function AddTasksOnInvoiceAction(props: Props) {
     toast.processing();
 
     queryClient.fetchQuery(
-      route(
-        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
-        {
-          clientId: tasks[0].client_id,
-        }
-      ),
+      ['/api/v1/invoices', 'client_id', tasks[0].client_id],
       () =>
         request(
           'GET',
@@ -89,6 +84,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
           setInvoices(response.data.data);
 
           setIsModalVisible(true);
+
+          props.setSelected?.([]);
         })
     );
   };

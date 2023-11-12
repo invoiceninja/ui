@@ -42,15 +42,13 @@ export function useActions() {
   const isEditPage = location.pathname.includes(id!);
 
   const fetchGroupSettingsDetails = (groupSettingsId: string) => {
-    queryClient.fetchQuery(
-      endpoint('/api/v1/group_settings/:id', { id: groupSettingsId }),
-      () =>
-        request(
-          'GET',
-          endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
-        ).then((response: GenericSingleResourceResponse<GroupSettings>) => {
-          configureGroupSettings(response.data.data);
-        })
+    queryClient.fetchQuery(['api/v1/group_settings', groupSettingsId], () =>
+      request(
+        'GET',
+        endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
+      ).then((response: GenericSingleResourceResponse<GroupSettings>) => {
+        configureGroupSettings(response.data.data);
+      })
     );
   };
 

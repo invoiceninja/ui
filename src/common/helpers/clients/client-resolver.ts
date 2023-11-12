@@ -21,7 +21,10 @@ export class ClientResolver {
         return resolve(this.client);
       }
 
-      request('GET', endpoint('/api/v1/clients/:id', { id }))
+      request(
+        'GET',
+        endpoint('/api/v1/clients/:id?include=group_settings', { id })
+      )
         .then((response) => {
           this.client = response.data.data;
           return resolve(this.client);

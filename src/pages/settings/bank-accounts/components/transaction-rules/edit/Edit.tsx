@@ -21,9 +21,9 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TransactionRuleForm } from '../components/TransactionRuleForm';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -31,8 +31,6 @@ export function Edit() {
   useTitle('edit_transaction_rule');
 
   const { id } = useParams();
-
-  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
 
@@ -79,11 +77,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_transaction_rule');
 
-          queryClient.invalidateQueries('/api/v1/bank_transaction_rules');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/bank_transaction_rules/:id', { id })
-          );
+          $refetch(['bank_transaction_rules']);
 
           navigate('/settings/bank_accounts/transaction_rules');
         })

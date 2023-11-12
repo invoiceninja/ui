@@ -24,7 +24,7 @@ import React, {
 } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
@@ -53,9 +53,8 @@ import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import collect from 'collect.js';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -63,10 +62,14 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
+type CustomBulkActionContext<T> = {
+  selectedIds: string[];
+  selectedResources: T[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
+};
+
 export type CustomBulkAction<T> = (
-  selectedIds: string[],
-  selectedResources?: T[],
-  setSelected?: Dispatch<SetStateAction<string[]>>
+  ctx: CustomBulkActionContext<T>
 ) => ReactNode;
 
 interface StyleOptions {
@@ -110,6 +113,10 @@ interface Props<T> extends CommonProps {
     resource: T[],
     action: 'archive' | 'delete' | 'restore'
   ) => void;
+  onBulkActionCall?: (
+    selectedIds: string[],
+    action: 'archive' | 'restore' | 'delete'
+  ) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -129,9 +136,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
   setInvalidationQueryAtom(apiEndpoint.pathname);
 
-  const queryClient = useQueryClient();
-
-  const { styleOptions, customFilters } = props;
+  const { styleOptions, customFilters, onBulkActionCall } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -272,15 +277,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           })
         );
       })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 401) {
-          toast.error(error.response?.data.message);
-        }
-      })
       .finally(() => {
-        queryClient.invalidateQueries([props.endpoint]);
-        queryClient.invalidateQueries([apiEndpoint.pathname]);
-
+        refetchByUrl([props.endpoint, apiEndpoint.pathname]);
         setSelected([]);
       });
   };
@@ -288,7 +286,13 @@ export function DataTable<T extends object>(props: Props<T>) {
   const showCustomBulkActionDivider = useMemo(() => {
     return props.customBulkActions
       ? props.customBulkActions.some((action) =>
-          React.isValidElement(action(selected, selectedResources))
+          React.isValidElement(
+            action({
+              selectedIds: selected,
+              selectedResources,
+              setSelected,
+            })
+          )
         )
       : false;
   }, [props.customBulkActions, selected, selectedResources]);
@@ -339,7 +343,11 @@ export function DataTable<T extends object>(props: Props<T>) {
               props.customBulkActions.map(
                 (bulkAction: CustomBulkAction<T>, index: number) => (
                   <div key={index}>
-                    {bulkAction(selected, selectedResources, setSelected)}
+                    {bulkAction({
+                      selectedIds: selected,
+                      selectedResources,
+                      setSelected,
+                    })}
                   </div>
                 )
               )}
@@ -349,14 +357,26 @@ export function DataTable<T extends object>(props: Props<T>) {
             )}
 
             <DropdownElement
-              onClick={() => bulk('archive')}
+              onClick={() => {
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'archive');
+                } else {
+                  bulk('archive');
+                }
+              }}
               icon={<Icon element={MdArchive} />}
             >
               {t('archive')}
             </DropdownElement>
 
             <DropdownElement
-              onClick={() => bulk('delete')}
+              onClick={() => {
+                if (onBulkActionCall) {
+                  onBulkActionCall(selected, 'delete');
+                } else {
+                  bulk('delete');
+                }
+              }}
               icon={<Icon element={MdDelete} />}
             >
               {t('delete')}
@@ -364,7 +384,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             {showRestoreBulkAction() && (
               <DropdownElement
-                onClick={() => bulk('restore')}
+                onClick={() => {
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'restore');
+                  } else {
+                    bulk('restore');
+                  }
+                }}
                 icon={<Icon element={MdRestore} />}
               >
                 {t('restore')}

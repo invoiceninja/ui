@@ -59,12 +59,12 @@ export const useCustomBulkActions = () => {
 
   const handleDownloadDocuments = (
     selectedCredits: Credit[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const creditIds = getDocumentsIds(selectedCredits);
 
     documentsBulk(creditIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const handleApplyCredits = (credits: Credit[]) => {
@@ -87,65 +87,63 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Credit>[] = [
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <SendEmailBulkAction
         selectedIds={selectedIds}
         setSelected={setSelected}
       />
     ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           printPdf(selectedIds);
-
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           downloadPdfs(selectedIds);
-
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, selectedCredits, setSelected) =>
-      selectedCredits &&
-      showMarkSendOption(selectedCredits) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      showMarkSendOption(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'mark_sent');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    (_, selectedCredits) =>
-      selectedCredits &&
-      showApplyCreditsAction(selectedCredits) && (
+    ({ selectedResources, setSelected }) =>
+      showApplyCreditsAction(selectedResources) && (
         <DropdownElement
-          onClick={() => handleApplyCredits(selectedCredits)}
+          onClick={() => {
+            handleApplyCredits(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={MdCreditCard} />}
         >
           {t('apply_credit')}
         </DropdownElement>
       ),
-    (_, selectedCredits, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedCredits && shouldDownloadDocuments(selectedCredits)
-            ? handleDownloadDocuments(selectedCredits, setSelected)
+          shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

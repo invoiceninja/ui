@@ -23,11 +23,11 @@ import { Contacts } from '$app/pages/clients/edit/components/Contacts';
 import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Slider } from '$app/components/cards/Slider';
 import { Inline } from '$app/components/Inline';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   isModalOpen: boolean;
@@ -52,8 +52,6 @@ export function ClientCreate({
       send_email: false,
     },
   ]);
-
-  const queryClient = useQueryClient();
 
   const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
@@ -107,8 +105,7 @@ export function ClientCreate({
 
         onClientCreated && onClientCreated(response.data.data);
 
-        queryClient.invalidateQueries('/api/v1/clients');
-        queryClient.invalidateQueries(endpoint('/api/v1/clients'));
+        $refetch(['clients']);
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {

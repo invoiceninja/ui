@@ -28,7 +28,7 @@ interface Props extends CommonProps {
 }
 
 export function Slider(props: Props) {
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <Transition.Root show={props.visible} as={Fragment}>
@@ -58,9 +58,17 @@ export function Slider(props: Props) {
                 style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
-                  <div className="py-6 px-4 sm:px-6 border-b" style={{ borderColor: colors.$4 }}>
+                  <div
+                    className="py-6 px-4 sm:px-6 border-b"
+                    style={{ borderColor: colors.$4 }}
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-medium" style={{ color: colors.$3 }}>{props.title}</span>
+                      <span
+                        className="text-lg font-medium"
+                        style={{ color: colors.$3 }}
+                      >
+                        {props.title}
+                      </span>
 
                       <Inline>
                         {props.topRight}

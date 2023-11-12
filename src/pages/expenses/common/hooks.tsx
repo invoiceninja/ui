@@ -119,7 +119,7 @@ export function useActions() {
       getEntityState(expense) === EntityState.Active &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'archive')}
+          onClick={() => bulk([expense.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -130,7 +130,7 @@ export function useActions() {
         getEntityState(expense) === EntityState.Deleted) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'restore')}
+          onClick={() => bulk([expense.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -141,7 +141,7 @@ export function useActions() {
         getEntityState(expense) === EntityState.Archived) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'delete')}
+          onClick={() => bulk([expense.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

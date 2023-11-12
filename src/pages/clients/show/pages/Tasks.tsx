@@ -25,7 +25,7 @@ export const dataTableStaleTime = 50;
 
 export default function Tasks() {
   const { id } = useParams();
-  
+
   const { data: client } = useClientQuery({ id, enabled: true });
 
   const columns = useTaskColumns();
@@ -54,7 +54,10 @@ export default function Tasks() {
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/tasks/bulk"
-      linkToCreate={route('/tasks/create?client=:id&rate=:rate', { id: id, rate: client?.settings?.default_task_rate || '' })}
+      linkToCreate={route('/tasks/create?client=:id&rate=:rate', {
+        id: id,
+        rate: client?.settings?.default_task_rate || '',
+      })}
       linkToEdit="/tasks/:id/edit"
       showEdit={(task: Task) => showEditOption(task)}
       staleTime={dataTableStaleTime}

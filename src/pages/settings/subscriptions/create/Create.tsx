@@ -22,7 +22,6 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -33,6 +32,7 @@ import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisa
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_payment_link');
@@ -44,8 +44,6 @@ export function Create() {
   const { data } = useBlankSubscriptionQuery();
 
   const { data: productsData } = useProductsQuery({ include: 'company' });
-
-  const queryClient = useQueryClient();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -102,7 +100,7 @@ export function Create() {
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
 
-        queryClient.invalidateQueries('/api/v1/subscriptions');
+        $refetch(['subscriptions']);
 
         navigate(
           route('/settings/subscriptions/:id/edit', {

@@ -152,7 +152,7 @@ export default function Create() {
   }, [quote]);
 
   const save = useCreate({ setErrors });
-  const taskColumns = useTaskColumns()
+  const taskColumns = useTaskColumns();
 
   return (
     <Default

@@ -37,7 +37,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
@@ -88,6 +87,7 @@ import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -237,7 +237,6 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const queryClient = useQueryClient();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
@@ -251,9 +250,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/quotes/:id', { id: quote.id })
-        );
+        $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

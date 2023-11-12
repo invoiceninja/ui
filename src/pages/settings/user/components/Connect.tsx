@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
@@ -21,6 +21,7 @@ import {
   msal,
 } from '$app/pages/authentication/components/SignInProviders';
 import { GoogleLogin } from '@react-oauth/google';
+import classNames from 'classnames';
 
 export function Connect() {
   const [t] = useTranslation();
@@ -97,17 +98,23 @@ export function Connect() {
     <Card title={t('oneclick_login')}>
       {!user?.oauth_provider_id && (
         <>
-          <div className="grid grid-cols-3 text-sm mt-4">
-            <Element leftSide="Google">
-              <GoogleLogin
-                onSuccess={(response) =>
-                  response.credential && handleGoogle(response.credential)
-                }
-                onError={() => toast.error()}
-              />
-            </Element>
-          </div>
-          <div className="grid grid-cols-3 text-sm mt-4">
+          {isHosted() && (
+            <div className="grid grid-cols-3 text-sm mt-4">
+              <Element leftSide="Google">
+                <GoogleLogin
+                  onSuccess={(response) =>
+                    response.credential && handleGoogle(response.credential)
+                  }
+                  onError={() => toast.error()}
+                />
+              </Element>
+            </div>
+          )}
+          <div
+            className={classNames('grid grid-cols-3 text-sm', {
+              'mt-4': isHosted(),
+            })}
+          >
             <Element leftSide="Microsoft">
               <SignInProviderButton
                 onClick={async () => {

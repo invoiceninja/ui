@@ -16,6 +16,7 @@ import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { useNavigate } from 'react-router-dom';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 const successMessages = {
   convert_to_invoice: 'converted_quote',
@@ -57,11 +58,7 @@ export const useBulkAction = () => {
         toast.success(message);
       }
 
-      queryClient.invalidateQueries('/api/v1/quotes');
-
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }))
-      );
+      $refetch(['quotes']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

@@ -34,7 +34,6 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
@@ -62,6 +61,7 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const defaultColumns: string[] = [
   'status',
@@ -289,24 +289,12 @@ export function useTaskColumns() {
 }
 
 export function useSave() {
-  const queryClient = useQueryClient();
-
   return (task: Task) => {
     request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
       () => {
         toast.success('updated_task');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
-
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+        $refetch(['tasks']);
       }
     );
   };
@@ -333,6 +321,12 @@ export function useTaskFilters() {
       value: 'invoiced',
       color: 'white',
       backgroundColor: '#22C55E',
+    },
+    {
+      label: t('uninvoiced'),
+      value: 'uninvoiced',
+      color: 'white',
+      backgroundColor: '#F87171', 
     },
   ];
 
@@ -507,53 +501,58 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Task>[] = [
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStartAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStartAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'start');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStopAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStopAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'stop');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedTasks) =>
-      selectedTasks &&
-      showAddToInvoiceAction(selectedTasks) && (
-        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showAddToInvoiceAction(selectedResources) && (
+        <AddTasksOnInvoiceAction
+          tasks={selectedResources}
+          isBulkAction
+          setSelected={setSelected}
+        />
       ),
-    (_, selectedTasks) =>
-      selectedTasks && showInvoiceTaskAction(selectedTasks) ? (
+    ({ selectedResources, setSelected }) =>
+      selectedResources && showInvoiceTaskAction(selectedResources) ? (
         <DropdownElement
-          onClick={() => invoiceTask(selectedTasks)}
+          onClick={() => {
+            invoiceTask(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
-    (_, selectedTasks, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? handleDownloadDocuments(selectedTasks, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

@@ -161,7 +161,9 @@ export function Settings() {
             value={company?.settings?.timezone_id || '1'}
             disabled={disableSettingsField('timezone_id')}
             errorMessage={errors?.errors['settings.timezone_id']}
-            onValueChange={(v) => handlePropertyChange('settings.timezone_id', v)}
+            onValueChange={(v) =>
+              handlePropertyChange('settings.timezone_id', v)
+            }
           >
             {statics?.timezones.map((timezone: Timezone) => (
               <option value={timezone.id} key={timezone.id}>

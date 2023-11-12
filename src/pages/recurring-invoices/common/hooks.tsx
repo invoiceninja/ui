@@ -78,6 +78,7 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -208,7 +209,6 @@ interface RecurringInvoiceSaveProps {
 
 export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
-  const queryClient = useQueryClient();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -229,11 +229,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       recurringInvoice
     )
       .then(() => {
-        queryClient.invalidateQueries(
-          route('/api/v1/recurring_invoices/:id', {
-            id: recurringInvoice.id,
-          })
-        );
+        $refetch(['recurring_invoices']);
 
         toast.success('updated_recurring_invoice');
       })
@@ -264,13 +260,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringInvoice.id }),
       recurringInvoice
     ).then(() => {
-      queryClient.invalidateQueries('/api/v1/recurring_invoices');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/recurring_invoices/:id', {
-          id: recurringInvoice.id,
-        })
-      );
+      $refetch(['recurring_invoices']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

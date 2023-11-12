@@ -13,7 +13,6 @@ import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
@@ -24,7 +23,6 @@ import { useFormik } from 'formik';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
 import { Gateway } from '$app/common/interfaces/statics';
@@ -32,6 +30,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import collect from 'collect.js';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Refund() {
   const { id } = useParams();
@@ -54,7 +53,6 @@ export default function Refund() {
   const [refundGateway, setRefundGateway] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -87,13 +85,8 @@ export default function Refund() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            route('/api/v1/payments/refund?email_receipt=:email', {
-              email: String(email),
-            })
-          );
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/payments'));
+
+          $refetch(['payments']);
         });
     },
   });

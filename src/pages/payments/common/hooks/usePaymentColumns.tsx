@@ -149,10 +149,12 @@ export function usePaymentColumns() {
       id: 'id',
       label: t('invoice_number'),
       format: (value, payment) => (
-        <Link to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}>
+        <Link
+          to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
+        >
           {payment.invoices?.[0]?.number}
         </Link>
-      )
+      ),
     },
     {
       column: 'date',

@@ -276,12 +276,15 @@ export function useActions() {
     toast.processing();
 
     queryClient.fetchQuery(
-      route(
-        '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-        {
-          projectId: project.id,
-        }
-      ),
+      [
+        '/api/v1/tasks',
+        'project_tasks',
+        project.id,
+        'per_page',
+        100,
+        'status',
+        'active',
+      ],
       () =>
         request(
           'GET',
@@ -403,32 +406,34 @@ export const useCustomBulkActions = () => {
 
   const handleDownloadDocuments = (
     selectedProjects: Project[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const projectIds = getDocumentsIds(selectedProjects);
 
     documentsBulk(projectIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const customBulkActions: CustomBulkAction<Project>[] = [
-    (selectedIds, selectedProjects) => (
+    ({ selectedIds, selectedResources, setSelected }) => (
       <DropdownElement
-        onClick={async () =>
+        onClick={async () => {
           handleInvoiceProjects(
-            await combineProjectsTasks(selectedIds, selectedProjects)
-          )
-        }
+            await combineProjectsTasks(selectedIds, selectedResources)
+          );
+
+          setSelected([]);
+        }}
         icon={<Icon element={MdTextSnippet} />}
       >
         {t('invoice_project')}
       </DropdownElement>
     ),
-    (_, selectedProjects, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedProjects && shouldDownloadDocuments(selectedProjects)
-            ? handleDownloadDocuments(selectedProjects, setSelected)
+          shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

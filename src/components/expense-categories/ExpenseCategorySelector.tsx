@@ -42,9 +42,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<ExpenseCategory>
-          endpoint={
-            endpoint('/api/v1/expense_categories?status=active')
-          }
+          endpoint={endpoint('/api/v1/expense_categories?status=active')}
           onChange={(category: Entry<ExpenseCategory>) =>
             category.resource && props.onChange(category.resource)
           }

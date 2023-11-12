@@ -19,6 +19,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
 
 interface PaymentParams {
   id: string | undefined;
@@ -27,7 +28,7 @@ interface PaymentParams {
 
 export function usePaymentQuery(params: PaymentParams) {
   return useQuery(
-    route('/api/v1/payments/:id', { id: params.id }),
+    ['/api/v1/payment_terms', params.id],
     () =>
       request(
         'GET',
@@ -103,9 +104,7 @@ export function useBulk() {
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
 
-      ids.forEach((id) =>
-        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }))
-      );
+      $refetch(['payments']);
     });
   };
 }
