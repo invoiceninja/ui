@@ -97,7 +97,7 @@ export function ChangeTemplateModal<T = any>({
 
   return (
     <Modal
-      title={t('change_template')}
+      title={t('load_template')}
       visible={visible}
       onClose={setVisible}
       size="small"
@@ -136,7 +136,7 @@ export function ChangeTemplateModal<T = any>({
         disabled={!templateId}
         disableWithoutIcon
       >
-        {t('generate_template')}
+        {t('run_template')}
       </Button>
 
       {pdfUrl ? (
