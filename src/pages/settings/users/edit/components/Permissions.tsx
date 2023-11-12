@@ -103,6 +103,7 @@ export function Permissions(props: Props) {
         <Toggle
           checked={user?.company_user?.is_admin}
           onChange={(value) => handleAdministratorToggle(value)}
+          cypressRef="admin"
         />
       </Element>
 

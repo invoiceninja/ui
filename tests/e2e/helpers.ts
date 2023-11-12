@@ -1,6 +1,10 @@
 import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
 import { Page } from '@playwright/test';
 
+type AdminPermission = 'admin';
+
+type Permission = TPermissions | AdminPermission;
+
 export async function logout(page: Page) {
   await page.goto('/logout#/logout');
 
@@ -37,6 +41,8 @@ export function permissions(page: Page) {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Permissions' }).click();
 
+    await page.uncheck('[data-cy="admin"]');
+
     for (const checkbox of await page.locator('input[type=checkbox]').all()) {
       await checkbox.uncheck();
     }
@@ -49,7 +55,7 @@ export function permissions(page: Page) {
     await page.waitForTimeout(500);
   };
 
-  const set = async (...permissions: TPermissions[]) => {
+  const set = async (...permissions: Permission[]) => {
     for (const p of permissions) {
       await page.check(`[data-cy=${p}]`);
     }

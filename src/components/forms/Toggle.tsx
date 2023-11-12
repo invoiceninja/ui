@@ -22,6 +22,7 @@ interface Props extends CommonProps {
   disabled?: boolean;
   onChange?: (value: boolean) => unknown;
   onValueChange?: (value: boolean) => unknown;
+  cypressRef?: string;
 }
 
 export default function Toggle(props: Props) {
@@ -57,6 +58,7 @@ export default function Toggle(props: Props) {
         }}
         style={styles}
         className="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:cursor-not-allowed"
+        data-cy={props.cypressRef}
       >
         <span
           aria-hidden="true"

@@ -98,7 +98,11 @@ export function CompanySwitcher() {
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
 
-      <Menu as="div" className="relative inline-block text-left w-full">
+      <Menu
+        as="div"
+        className="relative inline-block text-left w-full"
+        data-cy="companyDropdown"
+      >
         <Menu.Button className="flex items-center justify-between w-full rounded font-medium pl-2">
           <div className="flex items-center justify-center space-x-3">
             <img className="w-8" src={logo} alt="Company logo" />
