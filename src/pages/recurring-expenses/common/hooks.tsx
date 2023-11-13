@@ -53,7 +53,7 @@ import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'status',
@@ -123,8 +123,7 @@ export function useAllRecurringExpenseColumns() {
 export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -153,11 +152,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
-          disableNavigation={
-            !hasPermission('view_recurring_expense') &&
-            !hasPermission('edit_recurring_expense') &&
-            !entityAssigned(recurringExpense)
-          }
+          disableNavigation={disableNavigation(
+            'recurring_expense',
+            recurringExpense
+          )}
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
         </Link>
@@ -172,11 +170,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
-          disableNavigation={
-            !hasPermission('view_recurring_expense') &&
-            !hasPermission('edit_recurring_expense') &&
-            !entityAssigned(recurringExpense)
-          }
+          disableNavigation={disableNavigation(
+            'recurring_expense',
+            recurringExpense
+          )}
         >
           {field}
         </Link>
@@ -190,11 +187,10 @@ export function useRecurringExpenseColumns() {
         recurringExpense.vendor && (
           <Link
             to={route('/vendors/:id', { id: value.toString() })}
-            disableNavigation={
-              !hasPermission('view_vendor') &&
-              !hasPermission('edit_vendor') &&
-              !entityAssigned(recurringExpense.vendor)
-            }
+            disableNavigation={disableNavigation(
+              'vendor',
+              recurringExpense.vendor
+            )}
           >
             {recurringExpense.vendor.name}
           </Link>
@@ -208,11 +204,10 @@ export function useRecurringExpenseColumns() {
         recurringExpense.client && (
           <Link
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={
-              !hasPermission('view_client') &&
-              !hasPermission('edit_client') &&
-              !entityAssigned(recurringExpense.client)
-            }
+            disableNavigation={disableNavigation(
+              'client',
+              recurringExpense.client
+            )}
           >
             {recurringExpense.client.display_name}
           </Link>

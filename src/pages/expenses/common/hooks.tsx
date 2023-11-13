@@ -50,7 +50,7 @@ import { AddToInvoiceAction } from './components/AddToInvoiceAction';
 import { ExpenseCategory } from './components/ExpenseCategory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -226,7 +226,7 @@ export function useExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const navigate = useNavigate();
 
@@ -257,11 +257,7 @@ export function useExpenseColumns() {
         <div className="flex items-center space-x-2">
           <Link
             to={route('/expenses/:id/edit', { id: expense.id })}
-            disableNavigation={
-              !hasPermission('view_expense') &&
-              !hasPermission('edit_expense') &&
-              !entityAssigned(expense)
-            }
+            disableNavigation={disableNavigation('expense', expense)}
           >
             <span className="inline-flex items-center space-x-4">
               <ExpenseStatus entity={expense} />
@@ -299,11 +295,7 @@ export function useExpenseColumns() {
       format: (field, expense) => (
         <Link
           to={route('/expenses/:id/edit', { id: expense.id })}
-          disableNavigation={
-            !hasPermission('view_expense') &&
-            !hasPermission('edit_expense') &&
-            !entityAssigned(expense)
-          }
+          disableNavigation={disableNavigation('expense', expense)}
         >
           {field}
         </Link>
@@ -317,11 +309,7 @@ export function useExpenseColumns() {
         expense.vendor && (
           <Link
             to={route('/vendors/:id', { id: value.toString() })}
-            disableNavigation={
-              !hasPermission('view_vendor') &&
-              !hasPermission('edit_vendor') &&
-              !entityAssigned(expense.vendor)
-            }
+            disableNavigation={disableNavigation('vendor', expense.vendor)}
           >
             {expense.vendor.name}
           </Link>
@@ -335,11 +323,7 @@ export function useExpenseColumns() {
         expense.client && (
           <Link
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={
-              !hasPermission('view_client') &&
-              !hasPermission('edit_client') &&
-              !entityAssigned(expense.client)
-            }
+            disableNavigation={disableNavigation('client', expense.client)}
           >
             {expense.client.display_name}
           </Link>

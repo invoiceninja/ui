@@ -46,8 +46,8 @@ export function Link(props: Props) {
   return (
     <RouterLink
       className={`text-sm hover:underline ${props.className}`}
-      style={css}
-      to={!disableNavigation ? props.to : ''}
+      style={{ ...css, pointerEvents: !disableNavigation ? 'all' : 'none' }}
+      to={props.to}
     >
       {props.children}
     </RouterLink>

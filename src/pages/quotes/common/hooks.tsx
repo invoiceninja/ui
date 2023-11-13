@@ -92,8 +92,8 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -628,7 +628,7 @@ export function useQuoteColumns() {
   const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
@@ -665,6 +665,9 @@ export function useQuoteColumns() {
               entityId={quote.invoice_id}
               cacheEndpoint="/api/v1/invoices"
               apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
               component={
                 <MdTextSnippet
                   className="cursor-pointer"
@@ -689,11 +692,7 @@ export function useQuoteColumns() {
       format: (field, quote) => (
         <Link
           to={route('/quotes/:id/edit', { id: quote.id })}
-          disableNavigation={
-            !hasPermission('view_quote') &&
-            !hasPermission('edit_quote') &&
-            !entityAssigned(quote)
-          }
+          disableNavigation={disableNavigation('quote', quote)}
         >
           {field}
         </Link>
@@ -706,11 +705,7 @@ export function useQuoteColumns() {
       format: (_, quote) => (
         <Link
           to={route('/clients/:id', { id: quote.client_id })}
-          disableNavigation={
-            !hasPermission('view_client') &&
-            !hasPermission('edit_client') &&
-            !entityAssigned(quote.client)
-          }
+          disableNavigation={disableNavigation('client', quote.client)}
         >
           {quote.client?.display_name}
         </Link>

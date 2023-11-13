@@ -30,6 +30,7 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   invoice?: Invoice;
@@ -41,6 +42,7 @@ export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -104,13 +106,17 @@ export function InvoiceFooter(props: Props) {
                 id,
               })}
               onSuccess={onSuccess}
-              disableUpload={!hasPermission('edit_invoice')}
+              disableUpload={
+                !hasPermission('edit_invoice') && !entityAssigned(invoice)
+              }
             />
 
             <DocumentsTable
               documents={invoice?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={!hasPermission('edit_invoice')}
+              disableEditableOptions={
+                !hasPermission('edit_invoice') && !entityAssigned(invoice)
+              }
             />
           </div>
         )}

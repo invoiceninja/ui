@@ -91,7 +91,7 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -639,8 +639,7 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
@@ -669,11 +668,7 @@ export function useCreditColumns() {
       format: (field, credit) => (
         <Link
           to={route('/credits/:id/edit', { id: credit.id })}
-          disableNavigation={
-            !hasPermission('view_credit') &&
-            !hasPermission('edit_credit') &&
-            !entityAssigned(credit)
-          }
+          disableNavigation={disableNavigation('credit', credit)}
         >
           {field}
         </Link>
@@ -686,11 +681,7 @@ export function useCreditColumns() {
       format: (_, credit) => (
         <Link
           to={route('/clients/:id', { id: credit.client_id })}
-          disableNavigation={
-            !hasPermission('view_client') &&
-            !hasPermission('edit_client') &&
-            !entityAssigned(credit.client)
-          }
+          disableNavigation={disableNavigation('client', credit.client)}
         >
           {credit.client?.display_name}
         </Link>

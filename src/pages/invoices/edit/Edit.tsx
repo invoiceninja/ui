@@ -43,6 +43,7 @@ import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ export default function Edit() {
   const [searchParams] = useSearchParams();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -112,7 +114,7 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      {...(hasPermission('edit_invoice') &&
+      {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
         invoice && {
           navigationTopRight: (
             <ResourceActions

@@ -24,8 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -115,8 +114,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const entityAssigned = useEntityAssigned();
-  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
@@ -142,11 +140,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) => (
         <Link
           to={route('/invoices/:id/edit', { id: invoice.id })}
-          disableNavigation={
-            !hasPermission('view_invoice') &&
-            !hasPermission('edit_invoice') &&
-            !entityAssigned(invoice)
-          }
+          disableNavigation={disableNavigation('invoice', invoice)}
         >
           {value}
         </Link>
@@ -170,11 +164,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) => (
         <Link
           to={route('/clients/:id', { id: invoice.client_id })}
-          disableNavigation={
-            !hasPermission('view_client') &&
-            !hasPermission('edit_client') &&
-            !entityAssigned(invoice)
-          }
+          disableNavigation={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
         </Link>

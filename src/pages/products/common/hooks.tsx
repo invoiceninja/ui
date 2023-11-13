@@ -43,7 +43,7 @@ import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -96,8 +96,7 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
 
@@ -119,11 +118,7 @@ export function useProductColumns() {
 
           <Link
             to={route('/products/:id/edit', { id: product.id })}
-            disableNavigation={
-              !hasPermission('view_product') &&
-              !hasPermission('edit_product') &&
-              !entityAssigned(product)
-            }
+            disableNavigation={disableNavigation('product', product)}
           >
             {value}
           </Link>

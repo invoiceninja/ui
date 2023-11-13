@@ -9,15 +9,47 @@
  */
 
 import { Client } from '../interfaces/client';
+import { Credit } from '../interfaces/credit';
+import { Expense } from '../interfaces/expense';
 import { Invoice } from '../interfaces/invoice';
 import { Payment } from '../interfaces/payment';
+import { Product } from '../interfaces/product';
+import { Project } from '../interfaces/project';
 import { Quote } from '../interfaces/quote';
+import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
+import { Task } from '../interfaces/task';
+import { Vendor } from '../interfaces/vendor';
 import { useHasPermission } from './permissions/useHasPermission';
 import { useEntityAssigned } from './useEntityAssigned';
 
-type Entity = 'client' | 'recurring_invoice' | 'payment' | 'invoice' | 'quote';
-type Resource = Client | RecurringInvoice | Payment | Invoice | Quote;
+type Entity =
+  | 'client'
+  | 'recurring_invoice'
+  | 'payment'
+  | 'invoice'
+  | 'quote'
+  | 'product'
+  | 'credit'
+  | 'project'
+  | 'task'
+  | 'expense'
+  | 'vendor'
+  | 'recurring_expense';
+
+type Resource =
+  | Client
+  | RecurringInvoice
+  | Payment
+  | Invoice
+  | Quote
+  | Product
+  | Credit
+  | Project
+  | Task
+  | Expense
+  | Vendor
+  | RecurringExpense;
 
 export function useDisableNavigation() {
   const hasPermission = useHasPermission();

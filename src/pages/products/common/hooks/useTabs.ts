@@ -13,38 +13,46 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Product } from '$app/common/interfaces/product';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
-export function useTabs() {
+interface Params {
+  product: Product | undefined;
+}
+export function useTabs(params: Params) {
   const [t] = useTranslation();
+
+  const { product } = params;
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const { id } = useParams();
+  const entityAssigned = useEntityAssigned();
 
   const hasPermission = useHasPermission();
 
-  return [
-    {
-      name: t('edit'),
-      href: route('/products/:id/edit', { id }),
-    },
-    ...(hasPermission('edit_product')
-      ? [
-          {
-            name: t('documents'),
-            href: route('/products/:id/documents', { id }),
-          },
-        ]
-      : []),
-    ...(isAdmin || isOwner
-      ? [
-          {
-            name: t('product_fields'),
-            href: route('/products/:id/product_fields', { id }),
-          },
-        ]
-      : []),
-  ];
+  return product
+    ? [
+        {
+          name: t('edit'),
+          href: route('/products/:id/edit', { id: product.id }),
+        },
+        ...(hasPermission('edit_product') || entityAssigned(product)
+          ? [
+              {
+                name: t('documents'),
+                href: route('/products/:id/documents', { id: product.id }),
+              },
+            ]
+          : []),
+        ...(isAdmin || isOwner
+          ? [
+              {
+                name: t('product_fields'),
+                href: route('/products/:id/product_fields', { id: product.id }),
+              },
+            ]
+          : []),
+      ]
+    : [];
 }

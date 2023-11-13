@@ -63,8 +63,8 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'status',
@@ -117,7 +117,7 @@ export function useTaskColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -145,7 +145,7 @@ export function useTaskColumns() {
             hasPermission('view_project') || hasPermission('edit_project')
           }
           component={
-            <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
+            <Link to={route('/projects/:id', { id: task?.project?.id })}>
               {task?.project?.name}
             </Link>
           }
@@ -165,11 +165,7 @@ export function useTaskColumns() {
       format: (value, task) => (
         <Link
           to={route('/tasks/:id/edit', { id: task.id })}
-          disableNavigation={
-            !hasPermission('view_task') &&
-            !hasPermission('edit_task') &&
-            !entityAssigned(task)
-          }
+          disableNavigation={disableNavigation('task', task)}
         >
           {value}
         </Link>
@@ -183,11 +179,7 @@ export function useTaskColumns() {
         task.client && (
           <Link
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={
-              !hasPermission('view_client') &&
-              !hasPermission('edit_client') &&
-              !entityAssigned(task.client)
-            }
+            disableNavigation={disableNavigation('client', task.client)}
           >
             {task.client.display_name}
           </Link>

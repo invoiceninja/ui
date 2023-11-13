@@ -29,6 +29,7 @@ import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanyS
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTabs } from './common/hooks/useTabs';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -38,6 +39,7 @@ export default function Product() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { data: productData } = useProductQuery({ id });
 
@@ -57,7 +59,7 @@ export default function Product() {
     },
   ];
 
-  const tabs = useTabs();
+  const tabs = useTabs({ product: productValue });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -100,8 +102,9 @@ export default function Product() {
       title={t('edit_product')}
       breadcrumbs={pages}
       disableSaveButton={!productData || isFormBusy}
-      {...(hasPermission('edit_product') &&
-        productData && {
+      {...(productData &&
+        (hasPermission('edit_product') ||
+          entityAssigned(productData.data.data)) && {
           onSaveClick: handleSave,
           navigationTopRight: (
             <ResourceActions

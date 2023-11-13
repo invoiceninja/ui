@@ -49,7 +49,7 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'name',
@@ -100,8 +100,7 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
 
@@ -123,11 +122,7 @@ export function useProjectColumns() {
       format: (value, project) => (
         <Link
           to={route('/projects/:id', { id: project.id })}
-          disableNavigation={
-            !hasPermission('view_project') &&
-            !hasPermission('edit_project') &&
-            !entityAssigned(project)
-          }
+          disableNavigation={disableNavigation('project', project)}
         >
           {value}
         </Link>
