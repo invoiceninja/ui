@@ -17,7 +17,7 @@ import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
-import { useHasPermission } from '../permissions/useHasPermission';
+import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
@@ -34,6 +34,8 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const { data: gatewaysData } = useCompanyGatewaysQuery();
   const { data: bankAccountsData } = useBankAccountsQuery();
@@ -140,7 +142,7 @@ export function useQuickCreateActions() {
       key: 'add_stripe',
       url: '/settings/gateways/create',
       section: 'settings',
-      visible: Boolean(!gateways?.length),
+      visible: Boolean(!gateways?.length) && (isAdmin || isOwner),
     },
     {
       key: 'add_bank_account',
@@ -152,13 +154,14 @@ export function useQuickCreateActions() {
       key: 'tax_settings',
       url: '/settings/tax_rates/create',
       section: 'settings',
-      visible: Boolean(!taxRates?.length),
+      visible: Boolean(!taxRates?.length) && (isAdmin || isOwner),
     },
     {
       key: 'add_company_logo',
       url: '/settings/company_details/logo',
       section: 'settings',
-      visible: Boolean(!currentCompany?.settings.company_logo),
+      visible:
+        Boolean(!currentCompany?.settings.company_logo) && (isAdmin || isOwner),
     },
     {
       key: 'templates_and_reminders',
