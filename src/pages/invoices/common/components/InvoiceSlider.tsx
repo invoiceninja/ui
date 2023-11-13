@@ -57,8 +57,6 @@ dayjs.extend(relativeTime);
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
@@ -71,12 +69,7 @@ export function useGenerateActivityElement() {
 
     const replacements = {
       client: (
-        <Link
-          to={route('/clients/:id', { id: activity.client?.hashed_id })}
-          disableNavigation={
-            !hasPermission('view_client') && !hasPermission('edit_client')
-          }
-        >
+        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
           {activity.client?.label}
         </Link>
       ),
@@ -88,9 +81,6 @@ export function useGenerateActivityElement() {
             to={route('/invoices/:id/edit', {
               id: activity.invoice?.hashed_id,
             })}
-            disableNavigation={
-              !hasPermission('view_invoice') && !hasPermission('edit_invoice')
-            }
           >
             {activity?.invoice?.label}
           </Link>
@@ -102,10 +92,6 @@ export function useGenerateActivityElement() {
             to={route('/recurring_invoices/:id/edit', {
               id: activity?.recurring_invoice?.hashed_id,
             })}
-            disableNavigation={
-              !hasPermission('view_recurring_invoice') &&
-              !hasPermission('edit_recurring_invoice')
-            }
           >
             {activity?.recurring_invoice?.label}
           </Link>
@@ -117,7 +103,6 @@ export function useGenerateActivityElement() {
             to={route('/clients/:id/edit', {
               id: activity?.contact?.hashed_id,
             })}
-            disableNavigation={!hasPermission('edit_client')}
           >
             {activity?.contact?.label}
           </Link>
