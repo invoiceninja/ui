@@ -155,7 +155,7 @@ export const useCustomBulkActions = () => {
 
         <DropdownElement
           onClick={() =>
-            selectedResources && selectedResources.length
+            selectedResources.length
               ? setIsChangeCategoryVisible(true)
               : toast.error('no_expenses_selected')
           }

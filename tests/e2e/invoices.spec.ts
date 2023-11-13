@@ -246,6 +246,7 @@ test('cloning invoice', async ({ page }) => {
 
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
+
   if (!doRecordsExist) {
     await createInvoice(page);
 
@@ -270,7 +271,7 @@ test('cloning invoice', async ({ page }) => {
 
   await expect(page.getByText('Successfully created invoice')).toBeVisible();
 
-  await page.waitForURL('**/invoices/**/edit');
+  await page.waitForURL('**/invoices/**/edit**');
 
   await expect(
     page.getByRole('heading', { name: 'Edit Invoice' }).first()
