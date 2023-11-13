@@ -9,7 +9,6 @@
  */
 
 import { Button, SelectField } from '$app/components/forms';
-import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
@@ -30,6 +29,7 @@ import { usePreferences } from '$app/common/hooks/usePreferences';
 import collect from 'collect.js';
 import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useQuery } from 'react-query';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -77,6 +77,7 @@ export function Totals() {
   const [t] = useTranslation();
 
   const settings = useReactSettings();
+
   const { Preferences, update } = usePreferences();
 
   const formatMoney = useFormatMoney();
@@ -84,7 +85,6 @@ export function Totals() {
 
   const user = useCurrentUser();
 
-  const [isLoadingTotals, setIsLoadingTotals] = useState(true);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -135,53 +135,63 @@ export function Totals() {
     }
   };
 
-  const getTotals = () => {
-    request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
-      (response: AxiosResponse) => {
-        setTotalsData(response.data);
-        const currencies: Currency[] = [];
+  const totals = useQuery({
+    queryKey: ['/api/v1/charts/totals_v2', body],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
 
-        Object.entries(response.data.currencies).map(([id, name]) => {
-          currencies.push({ value: id, label: name as unknown as string });
-        });
-
-        const $currencies = collect(currencies)
-          .pluck('value')
-          .map((value) => parseInt(value as string))
-          .toArray() as number[];
-
-        if (!$currencies.includes(currency)) {
-          update('preferences.dashboard_charts.currency', $currencies[0]);
-        }
-
-        setCurrencies(currencies);
-        setIsLoadingTotals(false);
-      }
-    );
-  };
-
-  const getChartData = () => {
-    request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
-      (response: AxiosResponse) => {
-        setDates({
-          start_date: response.data.start_date,
-          end_date: response.data.end_date,
-        });
-        setChartData(response.data);
-      }
-    );
-  };
+  const chart = useQuery({
+    queryKey: ['/api/v1/charts/chart_summary_v2', body],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
 
   useEffect(() => {
-    getTotals();
-    getChartData();
-  }, [body]);
+    if (totals.data) {
+      setTotalsData(totals.data);
+
+      const currencies: Currency[] = [];
+
+      Object.entries(totals.data.currencies).map(([id, name]) => {
+        currencies.push({ value: id, label: name as unknown as string });
+      });
+
+      const $currencies = collect(currencies)
+        .pluck('value')
+        .map((value) => parseInt(value as string))
+        .toArray() as number[];
+
+      if (!$currencies.includes(currency)) {
+        update('preferences.dashboard_charts.currency', $currencies[0]);
+      }
+
+      setCurrencies(currencies);
+    }
+  }, [totals.data]);
+
+  useEffect(() => {
+    if (chart.data) {
+      setDates({
+        start_date: chart.data.start_date,
+        end_date: chart.data.end_date,
+      });
+
+      setChartData(chart.data);
+    }
+  }, [chart.data]);
 
   const colors = useColorScheme();
 
   return (
     <>
-      {isLoadingTotals && (
+      {totals.isLoading && (
         <div className="w-full flex justify-center">
           <Spinner />
         </div>
