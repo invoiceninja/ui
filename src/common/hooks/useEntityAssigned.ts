@@ -39,7 +39,7 @@ type Entity =
 export function useEntityAssigned() {
   const user = useCurrentUser();
 
-  return (entity: Entity | undefined) => {
+  return (entity: Entity | undefined | null) => {
     if (
       user &&
       entity &&

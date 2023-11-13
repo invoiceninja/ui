@@ -30,10 +30,11 @@ import {
   invoiceSliderAtom,
   invoiceSliderVisibilityAtom,
 } from '../common/components/InvoiceSlider';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -41,6 +42,7 @@ export default function Invoices() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
 
@@ -58,7 +60,7 @@ export default function Invoices() {
 
   const customBulkActions = useCustomBulkActions();
 
-  const setInvoiceSlider = useSetAtom(invoiceSliderAtom);
+  const [invoiceSlider, setInvoiceSlider] = useAtom(invoiceSliderAtom);
   const [invoiceSliderVisibility, setInvoiceSliderVisibility] = useAtom(
     invoiceSliderVisibilityAtom
   );
@@ -112,9 +114,7 @@ export default function Invoices() {
         }}
       />
 
-      {(hasPermission('view_invoice') || hasPermission('edit_invoice')) && (
-        <InvoiceSlider />
-      )}
+      {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
     </Default>
   );
 }

@@ -55,7 +55,7 @@ export function useDisableNavigation() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  return (entity: Entity, resource: Resource | undefined) => {
+  return (entity: Entity, resource: Resource | undefined | null) => {
     return (
       !hasPermission(`view_${entity}`) &&
       !hasPermission(`edit_${entity}`) &&
