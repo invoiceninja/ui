@@ -105,7 +105,7 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname.startsWith('/dashboard'),
-      visible: true,
+      visible: hasPermission('view_dashboard'),
     },
     {
       name: t('clients'),

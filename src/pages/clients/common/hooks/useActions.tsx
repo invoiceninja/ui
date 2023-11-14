@@ -127,7 +127,8 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      !client.is_deleted && (
+      !client.is_deleted &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => {
             params.setMergeFromClientId?.(client.id);
@@ -172,18 +173,19 @@ export function useActions(params: Params) {
           {t('delete')}
         </DropdownElement>
       ),
-    (client) => (
-      <DropdownElement
-        key="purge"
-        onClick={() => {
-          params.setPurgeClientId?.(client.id);
-          params.setPasswordConfirmModalOpen(true);
-        }}
-        icon={<Icon element={MdDeleteForever} />}
-      >
-        {t('purge')}
-      </DropdownElement>
-    ),
+    (client) =>
+      (isAdmin || isOwner) && (
+        <DropdownElement
+          key="purge"
+          onClick={() => {
+            params.setPurgeClientId?.(client.id);
+            params.setPasswordConfirmModalOpen(true);
+          }}
+          icon={<Icon element={MdDeleteForever} />}
+        >
+          {t('purge')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

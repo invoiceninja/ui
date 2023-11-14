@@ -14,6 +14,7 @@ import { User } from '$app/common/interfaces/user';
 import Toggle from '$app/components/forms/Toggle';
 import { clone } from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { Permissions as PermissionsType } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   user: User;
@@ -54,11 +55,16 @@ export function Permissions(props: Props) {
     );
   };
 
-  const isPermissionChecked = (permission: string) => {
+  const isPermissionChecked = (permission: PermissionsType) => {
     const permissions = user?.company_user?.permissions;
     const [type] = permission.split('_');
 
-    if (permissions && permissions.includes(`${type}_all`)) {
+    if (
+      permissions &&
+      permissions.includes(`${type}_all`) &&
+      permission !== 'view_reports' &&
+      permission !== 'view_dashboard'
+    ) {
       return true;
     }
 
@@ -69,7 +75,10 @@ export function Permissions(props: Props) {
     return false;
   };
 
-  const handlePermissionChange = (permission: string, value: boolean) => {
+  const handlePermissionChange = (
+    permission: PermissionsType,
+    value: boolean
+  ) => {
     const permissions = clone(user?.company_user?.permissions ?? '')
       .split(',')
       .filter((value) => value !== permission);
@@ -173,10 +182,12 @@ export function Permissions(props: Props) {
           <div className="grid grid-cols-3  md:grid-cols-6">
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`create_${permission}`)}
+                checked={isPermissionChecked(
+                  `create_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `create_${permission}`,
+                    `create_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }
@@ -185,10 +196,12 @@ export function Permissions(props: Props) {
             </div>
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`view_${permission}`)}
+                checked={isPermissionChecked(
+                  `view_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `view_${permission}`,
+                    `view_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }
@@ -197,10 +210,12 @@ export function Permissions(props: Props) {
             </div>
             <div className="col-1">
               <Checkbox
-                checked={isPermissionChecked(`edit_${permission}`)}
+                checked={isPermissionChecked(
+                  `edit_${permission}` as PermissionsType
+                )}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange(
-                    `edit_${permission}`,
+                    `edit_${permission}` as PermissionsType,
                     event.target.checked
                   )
                 }

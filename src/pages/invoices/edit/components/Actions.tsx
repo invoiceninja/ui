@@ -394,7 +394,8 @@ export function useActions(params?: Params) {
         invoice.status_id === InvoiceStatus.Partial) &&
       !invoice.is_deleted &&
       !invoice.archived_at &&
-      showActionByPreferences('invoice', 'reverse') && (
+      showActionByPreferences('invoice', 'reverse') &&
+      hasPermission('create_credit') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => reverseInvoice(invoice)}

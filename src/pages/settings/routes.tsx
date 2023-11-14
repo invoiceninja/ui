@@ -239,7 +239,8 @@ export const settingsRoutes = (
         <Route path="create" element={<Settings.CreateTransactionRule />} />
         <Route path=":id/edit" element={<Settings.EditTransactionRule />} />
       </Route>
+
+      {invoiceDesignRoutes}
     </Route>
-    {invoiceDesignRoutes}
   </Route>
 );

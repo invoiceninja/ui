@@ -109,7 +109,7 @@ export function useQuickCreateActions() {
       key: 'subscription',
       url: '/settings/subscription/create',
       section: 'income',
-      visible: proPlan() || enterprisePlan(),
+      visible: (proPlan() || enterprisePlan()) && (isAdmin || isOwner),
     },
     {
       key: 'expense',
@@ -136,7 +136,9 @@ export function useQuickCreateActions() {
       key: 'transaction',
       url: '/transactions/create',
       section: 'expense',
-      visible: hasPermission('create_bank_transaction'),
+      visible:
+        hasPermission('create_bank_transaction') &&
+        enabled(ModuleBitmask.Transactions),
     },
     {
       key: 'add_stripe',
@@ -148,7 +150,10 @@ export function useQuickCreateActions() {
       key: 'add_bank_account',
       url: '/settings/bank_accounts/create',
       section: 'settings',
-      visible: enterprisePlan() && Boolean(!bankAccounts?.length),
+      visible:
+        enterprisePlan() &&
+        Boolean(!bankAccounts?.length) &&
+        (isAdmin || isOwner),
     },
     {
       key: 'tax_settings',
@@ -167,7 +172,7 @@ export function useQuickCreateActions() {
       key: 'templates_and_reminders',
       url: '/settings/templates_and_reminders',
       section: 'settings',
-      visible: proPlan() || enterprisePlan(),
+      visible: (proPlan() || enterprisePlan()) && (isAdmin || isOwner),
     },
   ];
 

@@ -70,7 +70,9 @@ export function useHasPermission() {
       user?.is_admin ||
         user?.is_owner ||
         permissions.includes(permission) ||
-        permissions.includes(`${action}_all`)
+        (permissions.includes(`${action}_all`) &&
+          permission !== 'view_reports' &&
+          permission !== 'view_dashboard')
     );
   };
 }
