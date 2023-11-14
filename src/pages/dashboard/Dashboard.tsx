@@ -26,6 +26,7 @@ import { ModuleBitmask } from '../settings';
 
 export default function Dashboard() {
   useTitle('dashboard');
+  
   const [t] = useTranslation();
 
   const user = useCurrentUser();
