@@ -13,7 +13,11 @@ import { useQueryClient } from 'react-query';
 export const keys = {
   invoices: {
     path: '/api/v1/invoices',
-    dependencies: ['/api/v1/clients'],
+    dependencies: [
+      '/api/v1/clients',
+      '/api/v1/charts/totals_v2',
+      '/api/v1/charts/chart_summary_v2',
+    ],
   },
   designs: {
     path: '/api/v1/designs',
@@ -53,7 +57,10 @@ export const keys = {
   },
   expenses: {
     path: '/api/v1/expenses',
-    dependencies: [],
+    dependencies: [
+      '/api/v1/charts/totals_v2',
+      '/api/v1/charts/chart_summary_v2',
+    ],
   },
   group_settings: {
     path: '/api/v1/group_settings',
@@ -61,7 +68,13 @@ export const keys = {
   },
   payments: {
     path: '/api/v1/payments',
-    dependencies: ['/api/v1/expenses', '/api/v1/invoices', '/api/v1/clients'],
+    dependencies: [
+      '/api/v1/expenses',
+      '/api/v1/invoices',
+      '/api/v1/clients',
+      '/api/v1/charts/totals_v2',
+      '/api/v1/charts/chart_summary_v2',
+    ],
   },
   purchase_orders: {
     path: '/api/v1/purchase_orders',
@@ -141,6 +154,8 @@ export const keys = {
       '/api/v1/payments',
       '/api/v1/expenses',
       '/api/v1/tasks',
+      '/api/v1/charts/totals_v2',
+      '/api/v1/charts/chart_summary_v2',
     ],
   },
   products: {
