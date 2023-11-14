@@ -343,11 +343,17 @@ export default function Statement() {
         </Card>
       </div>
 
-      {!isLoadingPdf ? (
-        <iframe className="my-6" ref={iframeRef} width="100%" height={1500} />
-      ) : (
+      <iframe
+        className="my-6"
+        ref={iframeRef}
+        width="100%"
+        height={1500}
+        style={{ display: !isLoadingPdf ? 'block' : 'none' }}
+      />
+
+      {isLoadingPdf && (
         <div
-          className="flex justify-center items-center"
+          className="flex justify-center items-center mt-6"
           style={{ height: 1500 }}
         >
           <Spinner />
