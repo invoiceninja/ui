@@ -122,6 +122,7 @@ export function Permissions(props: Props) {
           onValueChange={(value) =>
             handlePermissionChange('view_dashboard', value)
           }
+          cypressRef="viewDashboard"
         />
       </Element>
 
@@ -134,6 +135,7 @@ export function Permissions(props: Props) {
           onValueChange={(value) =>
             handlePermissionChange('view_reports', value)
           }
+          cypressRef="viewReports"
         />
       </Element>
 

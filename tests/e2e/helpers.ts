@@ -43,6 +43,8 @@ export function permissions(page: Page) {
     await page.getByRole('button', { name: 'Permissions' }).click();
 
     await page.uncheck('[data-cy="admin"]');
+    await page.uncheck('[data-cy="viewDashboard"]');
+    await page.uncheck('[data-cy="viewReports"]');
 
     for (const checkbox of await page.locator('input[type=checkbox]').all()) {
       await checkbox.uncheck();
@@ -58,7 +60,17 @@ export function permissions(page: Page) {
 
   const set = async (...permissions: Permission[]) => {
     for (const p of permissions) {
-      await page.check(`[data-cy=${p}]`);
+      let updatedPermission = p;
+
+      if (updatedPermission === 'view_dashboard') {
+        updatedPermission = 'viewDashboard' as Permission;
+      }
+
+      if (updatedPermission === 'view_reports') {
+        updatedPermission = 'viewReports' as Permission;
+      }
+
+      await page.check(`[data-cy=${updatedPermission}]`);
     }
   };
 
