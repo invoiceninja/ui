@@ -15,13 +15,14 @@ export interface Action {
 }
 
 interface Params {
-  isAdmin: boolean;
   permissions: Permission[];
 }
 export function useClientActions(params: Params) {
-  const { isAdmin, permissions } = params;
+  const { permissions } = params;
 
-  const hasPermission = useHasPermission({ permissions, isAdmin });
+  const isAdmin = permissions.includes('admin');
+
+  const hasPermission = useHasPermission({ permissions });
 
   const actions: Action[] = [
     { label: 'Settings', visible: isAdmin },
@@ -29,9 +30,9 @@ export function useClientActions(params: Params) {
       label: 'New Invoice',
       visible: hasPermission('create_invoice'),
     },
-    { label: 'New Payment', visible: hasPermission('create_payment') },
+    { label: 'Enter Payment', visible: hasPermission('create_payment') },
     { label: 'New Quote', visible: hasPermission('create_quote') },
-    { label: 'New Credit', visible: hasPermission('create_credit') },
+    { label: 'Enter Credit', visible: hasPermission('create_credit') },
     { label: 'Merge', visible: isAdmin },
     { label: 'Purge', visible: isAdmin },
   ];
@@ -67,7 +68,7 @@ const createClient = async (
   ).toBeVisible();
 };
 
-test.skip("can't view clients without permission", async ({ page }) => {
+test("can't view clients without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -84,7 +85,7 @@ test.skip("can't view clients without permission", async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view client', async ({ page }) => {
+test('can view client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -132,12 +133,11 @@ test.skip('can view client', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can edit client', async ({ page }) => {
+test('can edit client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['edit_client'],
-    isAdmin: false,
   });
 
   await login(page);
@@ -236,12 +236,11 @@ test.skip('can edit client', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can create a client', async ({ page }) => {
+test('can create a client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['create_client'],
-    isAdmin: false,
   });
 
   await login(page);
@@ -364,8 +363,6 @@ test.skip('can create a client', async ({ page }) => {
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 
-  await page.waitForTimeout(500000);
-
   await logout(page);
 });
 
@@ -376,7 +373,6 @@ test('can view and edit assigned client with create_client', async ({
 
   const actions = useClientActions({
     permissions: ['create_client'],
-    isAdmin: false,
   });
 
   await login(page);
@@ -475,12 +471,12 @@ test('can view and edit assigned client with create_client', async ({
   await logout(page);
 });
 
-test.skip('deleting client', async ({ page }) => {
+test('deleting client with edit_client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('clients@example.com');
-  await set('create_client');
+  await set('create_client', 'edit_client');
   await save();
   await logout(page);
 
@@ -526,12 +522,12 @@ test.skip('deleting client', async ({ page }) => {
   await expect(page.getByText('Successfully deleted client')).toBeVisible();
 });
 
-test.skip('archiving client', async ({ page }) => {
+test('archiving client withe edit_client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('clients@example.com');
-  await set('create_client');
+  await set('create_client', 'edit_client');
   await save();
   await logout(page);
 
@@ -576,12 +572,109 @@ test.skip('archiving client', async ({ page }) => {
   await expect(page.getByText('Successfully archived client')).toBeVisible();
 });
 
-test.skip('client documents preview', async ({ page }) => {
+test("can't purge client without admin permission", async ({ page }) => {
   const { clear, save, set } = permissions(page);
+
+  const actions = useClientActions({
+    permissions: ['create_client'],
+  });
 
   await login(page);
   await clear('clients@example.com');
   await set('create_client');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await checkTableEditability(page, false);
+
+  await createClient(page, 'test purge client');
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('link', { name: 'Edit Client', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown');
+
+  await logout(page);
+});
+
+test('can purge client with admin permission', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await checkTableEditability(page, true);
+
+  await createClient(page, 'test purge client');
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('link', { name: 'Edit Client', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await page.getByText('Purge', { exact: true }).click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Confirmation' })
+  ).toBeVisible();
+
+  await page.getByLabel('Current Password').fill('password');
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByText('Successfully purged client')).toBeVisible();
+
+  await logout(page);
+});
+
+test('client documents preview with edit_client', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('create_client', 'edit_client');
   await save();
   await logout(page);
 
@@ -635,12 +728,12 @@ test.skip('client documents preview', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('client documents uploading enabled', async ({ page }) => {
+test('client documents uploading with edit_client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('clients@example.com');
-  await set('create_client');
+  await set('create_client', 'edit_client');
   await save();
   await logout(page);
 
@@ -697,64 +790,107 @@ test.skip('client documents uploading enabled', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('client documents uploading disabled', async ({ page }) => {
+test('all actions in dropdown displayed with admin permission', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const actions = useClientActions({
+    permissions: ['admin'],
+  });
 
   await login(page);
   await clear('clients@example.com');
-  await set('create_client');
+  await set('admin');
   await save();
   await logout(page);
 
   await login(page, 'clients@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
-  await page.getByRole('link', { name: 'Clients', exact: true }).click();
-
-  await page.waitForURL('**/clients');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
-
-  if (!doRecordsExist) {
-    await createClient(page);
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
-  }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-
-  await page.waitForURL('**/clients/**/edit');
-
   await page
-    .getByRole('button', {
-      name: 'Documents',
-      exact: true,
-    })
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await page
-    .locator('input[type="file"]')
-    .setInputFiles('./tests/assets/images/test-image.png');
+  await checkTableEditability(page, true);
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await createClient(page, 'test dropdown client');
 
   await expect(
-    page.getByText('test-image.png', { exact: true }).first()
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('link', { name: 'Edit Client', exact: true })
   ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown');
+
+  await logout(page);
+});
+
+test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with creation permissions', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useClientActions({
+    permissions: [
+      'create_invoice',
+      'create_credit',
+      'create_quote',
+      'create_payment',
+    ],
+  });
+
+  await login(page);
+  await clear('clients@example.com');
+  await set(
+    'create_client',
+    'create_invoice',
+    'create_credit',
+    'create_quote',
+    'create_payment'
+  );
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await createClient(page, 'test enter credit payment client');
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('link', { name: 'Edit Client', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown');
+
+  await logout(page);
 });

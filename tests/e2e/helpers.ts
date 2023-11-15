@@ -97,9 +97,11 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
   let expectedNumberOfDropdowns = 0;
   let expectedNumberOfCheckboxes = 0;
 
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
   if (isEditable) {
-    expectedNumberOfDropdowns = numberOfTableRows + 1;
-    expectedNumberOfCheckboxes = numberOfTableRows + 1;
+    expectedNumberOfDropdowns = doRecordsExist ? numberOfTableRows + 1 : 1;
+    expectedNumberOfCheckboxes = doRecordsExist ? numberOfTableRows + 1 : 1;
   }
 
   expect(numberOfTableCheckboxes).toEqual(expectedNumberOfCheckboxes);
@@ -124,11 +126,11 @@ export async function checkDropdownActions(
 
 export function useHasPermission({
   permissions,
-  isAdmin,
 }: {
   permissions: Permission[];
-  isAdmin: boolean;
 }) {
+  const isAdmin = permissions.includes('admin');
+
   return (permission: Permission) => {
     return isAdmin || permissions.includes(permission);
   };
