@@ -23,6 +23,7 @@ import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   resource: ProductTableResource | undefined;
@@ -31,6 +32,8 @@ interface Props {
 
 export function useFormatMoney(props: Props) {
   const company = useCurrentCompany();
+
+  const hasPermission = useHasPermission();
 
   const currencyResolver = useResolveCurrency();
   const countryResolver = useResolveCountry();
@@ -48,7 +51,11 @@ export function useFormatMoney(props: Props) {
   const [relation, setRelation] = useState<Client | Vendor>();
 
   useEffect(() => {
-    if (clientId && relationType === 'client_id') {
+    if (
+      clientId &&
+      relationType === 'client_id' &&
+      (hasPermission('view_client') || hasPermission('edit_client'))
+    ) {
       clientResolver.find(clientId).then((client) => setRelation(client));
     }
 

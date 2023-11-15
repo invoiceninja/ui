@@ -41,6 +41,7 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -52,6 +53,8 @@ export default function Create() {
   const { documentTitle } = useTitle('new_invoice');
 
   const reactSettings = useReactSettings();
+
+  const hasPermission = useHasPermission();
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
@@ -157,41 +160,43 @@ export default function Create() {
   };
 
   useEffect(() => {
-    invoice &&
-      invoice.client_id.length > 1 &&
-      clientResolver.find(invoice.client_id).then((client) => {
-        setClient(client);
+    if (hasPermission('view_client') || hasPermission('edit_client')) {
+      invoice &&
+        invoice.client_id.length > 1 &&
+        clientResolver.find(invoice.client_id).then((client) => {
+          setClient(client);
 
-        const invitations: Invitation[] = [];
+          const invitations: Invitation[] = [];
 
-        client.contacts.map((contact) => {
-          if (contact.send_email) {
-            const invitation = cloneDeep(
-              blankInvitation
-            ) as unknown as Invitation;
+          client.contacts.map((contact) => {
+            if (contact.send_email) {
+              const invitation = cloneDeep(
+                blankInvitation
+              ) as unknown as Invitation;
 
-            invitation.client_contact_id = contact.id;
-            invitations.push(invitation);
+              invitation.client_contact_id = contact.id;
+              invitations.push(invitation);
+            }
+          });
+
+          handleChange('invitations', invitations);
+
+          if (company && company.enabled_tax_rates > 0) {
+            handleChange('tax_name1', settingResolver(client, 'tax_name1'));
+            handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
+          }
+
+          if (company && company.enabled_tax_rates > 1) {
+            handleChange('tax_name2', settingResolver(client, 'tax_name2'));
+            handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
+          }
+
+          if (company && company.enabled_tax_rates > 2) {
+            handleChange('tax_name3', settingResolver(client, 'tax_name3'));
+            handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
           }
         });
-
-        handleChange('invitations', invitations);
-
-        if (company && company.enabled_tax_rates > 0) {
-          handleChange('tax_name1', settingResolver(client, 'tax_name1'));
-          handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
-        }
-
-        if (company && company.enabled_tax_rates > 1) {
-          handleChange('tax_name2', settingResolver(client, 'tax_name2'));
-          handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
-        }
-
-        if (company && company.enabled_tax_rates > 2) {
-          handleChange('tax_name3', settingResolver(client, 'tax_name3'));
-          handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
-        }
-      });
+    }
   }, [invoice?.client_id]);
 
   useEffect(() => {

@@ -36,6 +36,8 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
 
+  const hasPermission = useHasPermission();
+
   const { resource } = props;
 
   const clientResolver = useClientResolver();
@@ -49,13 +51,14 @@ export function ClientSelector(props: Props) {
   };
 
   useEffect(() => {
-    resource?.client_id &&
-      clientResolver
-        .find(resource.client_id)
-        .then((client) => setClient(client));
+    if (hasPermission('view_client') || hasPermission('edit_client')) {
+      resource?.client_id &&
+        clientResolver
+          .find(resource.client_id)
+          .then((client) => setClient(client));
+    }
   }, [resource?.client_id]);
 
-  const hasPermission = useHasPermission();
   const colors = useColorScheme();
 
   return (
