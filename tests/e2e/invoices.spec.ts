@@ -51,20 +51,22 @@ const createInvoice = async (page: Page, assignTo?: string) => {
     .getByRole('link', { name: 'New Invoice' })
     .click();
 
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(900);
 
   await page.getByRole('option').first().click();
 
   if (assignTo) {
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
-    await page.getByLabel('User').click();
+    await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created invoice')).toBeVisible();
 };
 
-test.skip("can't view invoices without permission", async ({ page }) => {
+test("can't view invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -81,7 +83,7 @@ test.skip("can't view invoices without permission", async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view invoice', async ({ page }) => {
+test('can view invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -119,9 +121,7 @@ test.skip('can view invoice', async ({ page }) => {
       .getByRole('button', { name: 'Save', exact: true })
   ).not.toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).not.toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).not.toBeVisible();
 
   await expect(
     page
@@ -141,7 +141,7 @@ test('can edit invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('edit_invoice', 'view_client');
+  await set('edit_invoice');
   await save();
 
   await page
@@ -174,9 +174,7 @@ test('can edit invoice', async ({ page }) => {
       .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
   await expect(
     page
@@ -193,14 +191,14 @@ test('can edit invoice', async ({ page }) => {
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('button[data-cy="moreActionsChevronDown"]').click();
+  await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown');
 
   await logout(page);
 });
 
-test.skip('can create a invoice', async ({ page }) => {
+test('can create a invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
@@ -209,8 +207,16 @@ test.skip('can create a invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'view_client');
+  await set('create_invoice');
   await save();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await createInvoice(page);
+
   await logout(page);
 
   await login(page, 'invoices@example.com', 'password');
@@ -222,7 +228,9 @@ test.skip('can create a invoice', async ({ page }) => {
 
   await checkTableEditability(page, false);
 
-  await createInvoice(page);
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
+
+  await tableRow.getByRole('link').first().click();
 
   await page.waitForURL('**/invoices/**/edit');
 
@@ -232,9 +240,7 @@ test.skip('can create a invoice', async ({ page }) => {
       .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
   await expect(
     page
@@ -251,30 +257,30 @@ test.skip('can create a invoice', async ({ page }) => {
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('button[data-cy="moreActionsChevronDown"]').click();
+  await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown');
 
   await logout(page);
 });
 
-test.skip('can view and edit assigned invoice with create_invoice', async ({
+test('can view and edit assigned invoice with create_invoice', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['create_client'],
+    permissions: ['create_invoice'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_client');
+  await set('create_invoice');
   await save();
 
   await page
     .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
+    .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
   await createInvoice(page, 'Invoices Example');
@@ -285,34 +291,16 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
 
   await page
     .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
+    .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
   await checkTableEditability(page, false);
 
-  await page
-    .getByRole('link', { name: 'test assigned client', exact: true })
-    .first()
-    .click();
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
 
-  await page.waitForURL('**/clients/**');
+  await tableRow.getByRole('link').first().click();
 
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
-    .click();
-
-  await page.waitForURL('**/clients/**/edit');
+  await page.waitForURL('**/invoices/**/edit');
 
   await expect(
     page
@@ -320,25 +308,7 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
       .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Company Details', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Contacts', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Address', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Additional Info', exact: true })
-  ).toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -346,22 +316,22 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
     .click();
 
   await expect(
-    page.getByText('Successfully updated client', { exact: true })
+    page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('[data-cy="moreActionsChevronDown"]').click();
+  await page.locator('[data-cy="chevronDownButton"]').click();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await checkDropdownActions(page, actions, 'invoiceActionDropdown');
 
   await logout(page);
 });
 
-test.skip('deleting invoice with edit_invoice', async ({ page }) => {
+test('deleting invoice with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice');
+  await set('create_invoice', 'edit_invoice', 'view_client');
   await save();
   await logout(page);
 
@@ -383,8 +353,7 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
     await createInvoice(page);
 
     const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .locator('[data-cy="chevronDownButton"]')
       .first();
 
     await moreActionsButton.click();
@@ -392,10 +361,6 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
     await page.getByText('Delete').click();
 
     await expect(page.getByText('Successfully deleted invoice')).toBeVisible();
-
-    await expect(
-      page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -409,12 +374,12 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
   }
 });
 
-test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
+test('archiving invoice withe edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice');
+  await set('create_invoice', 'edit_invoice', 'view_client');
   await save();
   await logout(page);
 
@@ -436,8 +401,7 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
     await createInvoice(page);
 
     const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .locator('[data-cy="chevronDownButton"]')
       .first();
 
     await moreActionsButton.click();
@@ -463,12 +427,12 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
   }
 });
 
-test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
+test('invoice documents preview with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice');
+  await set('create_invoice', 'edit_invoice', 'view_client');
   await save();
   await logout(page);
 
@@ -490,8 +454,7 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
     await createInvoice(page);
 
     const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .locator('[data-cy="chevronDownButton"]')
       .first();
 
     await moreActionsButton.click();
@@ -509,23 +472,21 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
   await page.waitForURL('**/invoices/**/edit');
 
   await page
-    .getByRole('link', {
+    .getByRole('button', {
       name: 'Documents',
       exact: true,
     })
     .click();
-
-  await page.waitForURL('**/invoices/**/documents');
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
+test('invoice documents uploading with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice');
+  await set('create_invoice', 'edit_invoice', 'view_client');
   await save();
   await logout(page);
 
@@ -547,8 +508,7 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
     await createInvoice(page);
 
     const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
+      .locator('[data-cy="chevronDownButton"]')
       .first();
 
     await moreActionsButton.click();
@@ -565,13 +525,11 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
   await page.waitForURL('**/invoices/**/edit');
 
   await page
-    .getByRole('link', {
+    .getByRole('button', {
       name: 'Documents',
       exact: true,
     })
     .click();
-
-  await page.waitForURL('**/invoices/**/documents');
 
   await page
     .locator('input[type="file"]')
@@ -584,7 +542,7 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('all actions in dropdown displayed with admin permission', async ({
+test('all actions in dropdown displayed with admin permission', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -610,14 +568,12 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
 
   await createInvoice(page);
 
-  await expect(
-    page.getByRole('heading', { name: 'test dropdown invoice', exact: true })
-  ).toBeVisible();
+  await page.waitForURL('**/invoices/**/edit**');
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
+      .getByRole('button', { name: 'Documents', exact: true })
   ).toBeVisible();
 
   await expect(
@@ -632,29 +588,42 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
       .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
-  await page.locator('[data-cy="moreActionsChevronDown"]').click();
+  await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown');
 
   await logout(page);
 });
 
-test.skip('New Invoice, New Purchase Order, and Clone displayed with creation permissions', async ({
+test('Enter Payment and all clone actions displayed with creation permissions', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['create_invoice', 'create_purchase_order', 'create_invoice'],
+    permissions: [
+      'create_payment',
+      'create_invoice',
+      'create_quote',
+      'create_credit',
+      'create_recurring_invoice',
+      'create_purchase_order',
+    ],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'create_purchase_order', 'create_invoice');
+  await set(
+    'create_payment',
+    'create_invoice',
+    'create_quote',
+    'create_credit',
+    'create_recurring_invoice',
+    'create_purchase_order',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -668,13 +637,9 @@ test.skip('New Invoice, New Purchase Order, and Clone displayed with creation pe
   await createInvoice(page);
 
   await expect(
-    page.getByRole('heading', { name: 'test actions invoice', exact: true })
-  ).toBeVisible();
-
-  await expect(
     page
       .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
+      .getByRole('button', { name: 'Documents', exact: true })
   ).toBeVisible();
 
   await expect(
@@ -689,33 +654,34 @@ test.skip('New Invoice, New Purchase Order, and Clone displayed with creation pe
       .getByRole('button', { name: 'Save', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.locator('[data-cy="moreActionsChevronDown"]')
-  ).toBeVisible();
+  await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
-  await page.locator('[data-cy="moreActionsChevronDown"]').click();
+  await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown');
 
   await logout(page);
 });
 
-test.skip('cloning invoice', async ({ page }) => {
+test('cloning invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client');
   await save();
   await logout(page);
 
   await login(page, 'invoices@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
-  await page.getByRole('link', { name: 'Invoices', exact: true }).click();
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
 
   await page.waitForURL('**/invoices');
+
+  const tableBody = page.locator('tbody').first();
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -726,15 +692,14 @@ test.skip('cloning invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createInvoice(page);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+    const moreActionsButton = page.locator('[data-cy="chevronDownButton"]');
 
     await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
+      .filter({ has: page.getByText('More Actions') })
+      .first();
 
     await moreActionsButton.click();
   }

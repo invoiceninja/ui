@@ -126,6 +126,7 @@ export default function Edit() {
                 (invoice.status_id === InvoiceStatus.Cancelled ||
                   invoice.is_deleted)
               }
+              cypressRef="invoiceActionDropdown"
             />
           ),
           topRight: <CommonActions invoice={invoice} />,

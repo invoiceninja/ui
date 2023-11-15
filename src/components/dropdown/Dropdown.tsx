@@ -129,7 +129,7 @@ export function Dropdown(props: Props) {
             backgroundColor: props.cardActions && accentColor,
             color: props.cardActions ? 'white' : '',
           }}
-          data-cy="moreActionsChevronDown"
+          data-cy="chevronDownButton"
         >
           {!props.cardActions && <span>{props.label}</span>}
           <ChevronDown size={props.cardActions ? 18 : 14} />
