@@ -87,6 +87,7 @@ export default function Client() {
                 label={t('more_actions')}
                 resource={client}
                 actions={actions}
+                cypressRef="clientActionDropdown"
               />
             )}
           </div>

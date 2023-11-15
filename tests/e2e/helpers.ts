@@ -1,10 +1,11 @@
 import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
 import { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { Action } from './clients.spec';
 
 type AdminPermission = 'admin';
 
-type Permission = TPermissions | AdminPermission;
+export type Permission = TPermissions | AdminPermission;
 
 export async function logout(page: Page) {
   await page.goto('/logout#/logout');
@@ -103,4 +104,32 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 
   expect(numberOfTableCheckboxes).toEqual(expectedNumberOfCheckboxes);
   expect(expectedNumberOfDropdowns).toEqual(numberOfTableMoreActionDropdowns);
+}
+
+export async function checkDropdownActions(
+  page: Page,
+  actions: Action[],
+  dropdownId: string
+) {
+  const dropDown = page.locator(`[data-cy=${dropdownId}]`);
+
+  actions.forEach(async ({ label, visible }) => {
+    if (visible) {
+      await expect(dropDown.getByText(label).first()).toBeVisible();
+    } else {
+      await expect(dropDown.getByText(label).first()).not.toBeVisible();
+    }
+  });
+}
+
+export function useHasPermission({
+  permissions,
+  isAdmin,
+}: {
+  permissions: Permission[];
+  isAdmin: boolean;
+}) {
+  return (permission: Permission) => {
+    return isAdmin || permissions.includes(permission);
+  };
 }

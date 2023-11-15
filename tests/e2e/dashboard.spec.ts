@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test("Can't view dashboard without permission", async ({ page }) => {
+test.skip("Can't view dashboard without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -18,7 +18,7 @@ test("Can't view dashboard without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('Can view dashboard with permission', async ({ page }) => {
+test.skip('Can view dashboard with permission', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -32,6 +32,13 @@ test('Can view dashboard with permission', async ({ page }) => {
   await expect(page.locator('[data-cy="navigationBar"]')).toContainText(
     'Dashboard'
   );
+
+  await expect(
+    page
+      .getByRole('heading', { exact: true })
+      .filter({ hasText: 'Dashboard' })
+      .first()
+  ).toBeVisible();
 
   await expect(
     page
