@@ -24,7 +24,16 @@ export async function login(
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
-  await page.waitForURL('**/dashboard');
+  await page.waitForTimeout(300);
+
+  const isDashboardAvailable = await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Dashboard', exact: true })
+    .isVisible();
+
+  await page.waitForURL(
+    isDashboardAvailable ? '**/dashboard' : '**/settings/user_details'
+  );
 }
 
 export function permissions(page: Page) {

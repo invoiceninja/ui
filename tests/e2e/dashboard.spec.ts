@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("Can't view dashboard without permission", async ({ page }) => {
+test("Can't view dashboard without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -18,7 +18,7 @@ test.skip("Can't view dashboard without permission", async ({ page }) => {
   await logout(page);
 });
 
-test.skip('Can view dashboard with permission', async ({ page }) => {
+test('Can view dashboard with permission', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

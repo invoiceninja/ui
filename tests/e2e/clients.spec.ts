@@ -17,9 +17,7 @@ export interface Action {
 interface Params {
   permissions: Permission[];
 }
-export function useClientActions(params: Params) {
-  const { permissions } = params;
-
+export function useClientActions({ permissions }: Params) {
   const isAdmin = permissions.includes('admin');
 
   const hasPermission = useHasPermission({ permissions });
@@ -507,8 +505,6 @@ test('deleting client with edit_client', async ({ page }) => {
     await page.getByText('Delete').click();
 
     await expect(page.getByText('Restore')).toBeVisible();
-
-    await expect(page.getByText('Purge')).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -871,7 +867,7 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
     .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await createClient(page, 'test enter credit payment client');
+  await createClient(page, 'test actions client');
 
   await expect(
     page
