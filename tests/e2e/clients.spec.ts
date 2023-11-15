@@ -504,7 +504,11 @@ test('deleting client with edit_client', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Restore')).toBeVisible();
+    await expect(page.getByText('Successfully deleted client')).toBeVisible();
+
+    await expect(
+      page.getByRole('button', { name: 'Restore', exact: true })
+    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -513,9 +517,9 @@ test('deleting client with edit_client', async ({ page }) => {
     await moreActionsButton.click();
 
     await page.getByText('Delete').click();
-  }
 
-  await expect(page.getByText('Successfully deleted client')).toBeVisible();
+    await expect(page.getByText('Successfully deleted client')).toBeVisible();
+  }
 });
 
 test('archiving client withe edit_client', async ({ page }) => {
@@ -553,7 +557,11 @@ test('archiving client withe edit_client', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Restore')).toBeVisible();
+    await expect(page.getByText('Successfully archived client')).toBeVisible();
+
+    await expect(
+      page.getByRole('button', { name: 'Restore', exact: true })
+    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -563,9 +571,9 @@ test('archiving client withe edit_client', async ({ page }) => {
     await moreActionsButton.click();
 
     await page.getByText('Archive').click();
-  }
 
-  await expect(page.getByText('Successfully archived client')).toBeVisible();
+    await expect(page.getByText('Successfully archived client')).toBeVisible();
+  }
 });
 
 test("can't purge client without admin permission", async ({ page }) => {

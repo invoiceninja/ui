@@ -24,7 +24,7 @@ export async function login(
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 
   const isDashboardAvailable = await page
     .locator('[data-cy="navigationBar"]')

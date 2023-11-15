@@ -111,6 +111,7 @@ export default function Product() {
               label={t('more_actions')}
               resource={productData.data.data}
               actions={actions}
+              cypressRef="productActionDropdown"
             />
           ),
         })}
