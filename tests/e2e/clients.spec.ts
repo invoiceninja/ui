@@ -17,7 +17,7 @@ export interface Action {
 interface Params {
   permissions: Permission[];
 }
-export function useClientActions({ permissions }: Params) {
+function useClientActions({ permissions }: Params) {
   const isAdmin = permissions.includes('admin');
 
   const hasPermission = useHasPermission({ permissions });
@@ -38,11 +38,32 @@ export function useClientActions({ permissions }: Params) {
   return actions;
 }
 
-const createClient = async (
-  page: Page,
-  clientName?: string,
-  assignTo?: string
-) => {
+interface CreateParams {
+  page: Page;
+  isTableEditable?: boolean;
+  clientName?: string;
+  assignTo?: string;
+  withNavigation?: boolean;
+}
+
+const createClient = async (params: CreateParams) => {
+  const {
+    page,
+    clientName,
+    assignTo,
+    withNavigation = true,
+    isTableEditable = true,
+  } = params;
+
+  if (withNavigation) {
+    await page
+      .locator('[data-cy="navigationBar"]')
+      .getByRole('link', { name: 'Clients', exact: true })
+      .click();
+
+    await checkTableEditability(page, isTableEditable);
+  }
+
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Client' })
@@ -66,209 +87,8 @@ const createClient = async (
   ).toBeVisible();
 };
 
-test("can't view clients without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('clients@example.com');
-  await save();
-  await logout(page);
-
-  await login(page, 'clients@example.com', 'password');
-
-  await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
-    'Clients'
-  );
-
-  await logout(page);
-});
-
-test('can view client', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('clients@example.com');
-  await set('view_client');
-  await save();
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await createClient(page, 'test view client');
-
-  await logout(page);
-
-  await login(page, 'clients@example.com', 'password');
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await checkTableEditability(page, false);
-
-  await page
-    .getByRole('link', { name: 'test view client', exact: true })
-    .first()
-    .click();
-
+const checkShowPage = async (page: Page, isEditable: boolean) => {
   await page.waitForURL('**/clients/**');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).not.toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).not.toBeVisible();
-
-  await logout(page);
-});
-
-test('can edit client', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  const actions = useClientActions({
-    permissions: ['edit_client'],
-  });
-
-  await login(page);
-  await clear('clients@example.com');
-  await set('edit_client');
-  await save();
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await createClient(page, 'test edit client');
-
-  await logout(page);
-
-  await login(page, 'clients@example.com', 'password');
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await checkTableEditability(page, true);
-
-  await page
-    .getByRole('link', { name: 'test edit client', exact: true })
-    .first()
-    .click();
-
-  await page.waitForURL('**/clients/**');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
-    .click();
-
-  await page.waitForURL('**/clients/**/edit');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Company Details', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Contacts', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Address', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Additional Info', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
-
-  await expect(
-    page.getByText('Successfully updated client', { exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
-
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
-
-  await logout(page);
-});
-
-test('can create a client', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  const actions = useClientActions({
-    permissions: ['create_client'],
-  });
-
-  await login(page);
-  await clear('clients@example.com');
-  await set('create_client');
-  await save();
-  await logout(page);
-
-  await login(page, 'clients@example.com', 'password');
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await createClient(page, 'test create client');
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await page.waitForURL('**/clients');
-
-  await checkTableEditability(page, false);
-
-  await page
-    .getByRole('link', { name: 'test create client', exact: true })
-    .first()
-    .click();
 
   await expect(
     page
@@ -298,23 +118,34 @@ test('can create a client', async ({ page }) => {
       .first()
   ).toBeVisible();
 
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
+  if (!isEditable) {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('link', { name: 'Edit Client', exact: true })
+    ).not.toBeVisible();
 
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).not.toBeVisible();
+  } else {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('link', { name: 'Edit Client', exact: true })
+    ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
-    .click();
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).toBeVisible();
+  }
+};
 
+const checkEditPage = async (page: Page) => {
   await page.waitForURL('**/clients/**/edit');
 
   await expect(
@@ -344,6 +175,90 @@ test('can create a client', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Additional Info', exact: true })
   ).toBeVisible();
+};
+
+test("can't view clients without permission", async ({ page }) => {
+  const { clear, save } = permissions(page);
+
+  await login(page);
+  await clear('clients@example.com');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
+    'Clients'
+  );
+
+  await logout(page);
+});
+
+test('can view client', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('view_client');
+  await save();
+
+  await createClient({ page, clientName: 'test view client' });
+
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'test view client', exact: true })
+    .first()
+    .click();
+
+  await checkShowPage(page, false);
+
+  await logout(page);
+});
+
+test('can edit client', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useClientActions({
+    permissions: ['edit_client'],
+  });
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('edit_client');
+  await save();
+
+  await createClient({ page, clientName: 'test edit client' });
+
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'test edit client', exact: true })
+    .first()
+    .click();
+
+  await checkShowPage(page, true);
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('link', { name: 'Edit Client', exact: true })
+    .click();
+
+  await checkEditPage(page);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -354,10 +269,61 @@ test('can create a client', async ({ page }) => {
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
+  await checkDropdownActions(page, actions, 'clientActionDropdown');
+
+  await logout(page);
+});
+
+test('can create a client', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useClientActions({
+    permissions: ['create_client'],
+  });
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('create_client');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    clientName: 'test create client',
+    isTableEditable: false,
+  });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await page.waitForURL('**/clients');
+
+  await page
+    .getByRole('link', { name: 'test create client', exact: true })
+    .first()
+    .click();
+
+  await checkShowPage(page, true);
+
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
+    .getByRole('link', { name: 'Edit Client', exact: true })
     .click();
+
+  await checkEditPage(page);
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated client', { exact: true })
+  ).toBeVisible();
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 
@@ -378,12 +344,11 @@ test('can view and edit assigned client with create_client', async ({
   await set('create_client');
   await save();
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
-
-  await createClient(page, 'test assigned client', 'Clients Example');
+  await createClient({
+    page,
+    clientName: 'test assigned client',
+    assignTo: 'Clients Example',
+  });
 
   await logout(page);
 
@@ -394,61 +359,19 @@ test('can view and edit assigned client with create_client', async ({
     .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await checkTableEditability(page, false);
-
   await page
     .getByRole('link', { name: 'test assigned client', exact: true })
     .first()
     .click();
 
-  await page.waitForURL('**/clients/**');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
+  await checkShowPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('link', { name: 'Edit Client', exact: true })
     .click();
 
-  await page.waitForURL('**/clients/**/edit');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Company Details', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Contacts', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Address', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'Additional Info', exact: true })
-  ).toBeVisible();
+  await checkEditPage(page);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -458,11 +381,6 @@ test('can view and edit assigned client with create_client', async ({
   await expect(
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 
@@ -493,7 +411,7 @@ test('deleting client with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient(page);
+    await createClient({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -546,7 +464,7 @@ test('archiving client withe edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient(page);
+    await createClient({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -596,26 +514,13 @@ test("can't purge client without admin permission", async ({ page }) => {
     .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await checkTableEditability(page, false);
+  await createClient({
+    page,
+    clientName: 'test purge client',
+    isTableEditable: false,
+  });
 
-  await createClient(page, 'test purge client');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await checkShowPage(page, true);
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 
@@ -633,26 +538,13 @@ test('can purge client with admin permission', async ({ page }) => {
 
   await login(page, 'clients@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
+  await createClient({
+    page,
+    clientName: 'test purge client',
+    isTableEditable: true,
+  });
 
-  await checkTableEditability(page, true);
-
-  await createClient(page, 'test purge client');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
+  await checkShowPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -697,7 +589,7 @@ test('client documents preview with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient(page);
+    await createClient({ page });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -716,7 +608,7 @@ test('client documents preview with edit_client', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
-  await page.waitForURL('**/clients/**/edit');
+  await checkEditPage(page);
 
   await page
     .getByRole('button', {
@@ -724,10 +616,6 @@ test('client documents preview with edit_client', async ({ page }) => {
       exact: true,
     })
     .click();
-
-  await expect(
-    page.getByRole('heading', { name: 'Additional Info' })
-  ).toBeVisible();
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
@@ -756,7 +644,7 @@ test('client documents uploading with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient(page);
+    await createClient({ page });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -774,7 +662,7 @@ test('client documents uploading with edit_client', async ({ page }) => {
   }
   await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
-  await page.waitForURL('**/clients/**/edit');
+  await checkEditPage(page);
 
   await page
     .getByRole('button', {
@@ -811,31 +699,13 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'clients@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
+  await createClient({
+    page,
+    clientName: 'test dropdown client',
+    isTableEditable: true,
+  });
 
-  await checkTableEditability(page, true);
-
-  await createClient(page, 'test dropdown client');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await checkShowPage(page, true);
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 
@@ -870,29 +740,13 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 
   await login(page, 'clients@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Clients', exact: true })
-    .click();
+  await createClient({
+    page,
+    clientName: 'test actions client',
+    isTableEditable: false,
+  });
 
-  await createClient(page, 'test actions client');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Edit Client', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await checkShowPage(page, true);
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
 

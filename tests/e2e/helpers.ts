@@ -120,8 +120,14 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 export async function checkDropdownActions(
   page: Page,
   actions: Action[],
-  dropdownId: string
+  dropdownId: string,
+  buttonId?: string
 ) {
+  await page
+    .locator(`[data-cy=${buttonId || 'topNavbar'}]`)
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
   const dropDown = page.locator(`[data-cy=${dropdownId}]`);
 
   actions.forEach(async ({ label, visible }) => {
