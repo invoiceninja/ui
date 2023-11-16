@@ -121,13 +121,16 @@ export async function checkDropdownActions(
   page: Page,
   actions: Action[],
   dropdownId: string,
-  containerId?: string
+  containerId?: string,
+  withOutOpening?: boolean
 ) {
-  await page
-    .locator(`[data-cy=${containerId || 'topNavbar'}]`)
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .first()
-    .click();
+  if (!withOutOpening) {
+    await page
+      .locator(`[data-cy=${containerId || 'topNavbar'}]`)
+      .getByRole('button', { name: 'More Actions', exact: true })
+      .first()
+      .click();
+  }
 
   const dropDown = page.locator(`[data-cy=${dropdownId}]`);
 
