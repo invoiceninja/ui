@@ -430,12 +430,7 @@ export function useActions() {
           {t('invoice_task')}
         </DropdownElement>
       ),
-    (task: Task) =>
-      (hasPermission('create_invoice') ||
-        hasPermission('view_invoice') ||
-        hasPermission('edit_invoice')) && (
-        <AddTasksOnInvoiceAction tasks={[task]} />
-      ),
+    (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
     (task: Task) =>
       hasPermission('create_task') && (
         <DropdownElement
@@ -564,10 +559,7 @@ export const useCustomBulkActions = () => {
       ),
     ({ selectedResources, setSelected }) =>
       selectedResources &&
-      showAddToInvoiceAction(selectedResources) &&
-      (hasPermission('create_invoice') ||
-        hasPermission('view_invoice') ||
-        hasPermission('edit_invoice')) && (
+      showAddToInvoiceAction(selectedResources) && (
         <AddTasksOnInvoiceAction
           tasks={selectedResources}
           isBulkAction

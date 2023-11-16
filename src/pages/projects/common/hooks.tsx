@@ -431,7 +431,7 @@ export const useCustomBulkActions = () => {
 
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
-      hasPermission('create_project') && (
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={async () => {
             handleInvoiceProjects(

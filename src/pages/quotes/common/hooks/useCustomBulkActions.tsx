@@ -33,6 +33,7 @@ import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -117,20 +118,29 @@ export function useCustomBulkActions() {
     ),
     ({ selectedResources }) =>
       selectedResources?.length &&
-      selectedResources[0].invoice_id &&
-      (hasPermission('view_invoice') || hasPermission('edit_invoice')) && (
-        <DropdownElement
-          onClick={() =>
-            navigate(
-              route('/invoices/:id/edit', {
-                id: selectedResources[0].invoice_id,
-              })
-            )
+      selectedResources[0].invoice_id && (
+        <Assigned
+          entityId={selectedResources[0].invoice_id}
+          cacheEndpoint="/api/v1/invoices"
+          apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+          preCheck={
+            hasPermission('view_invoice') || hasPermission('edit_invoice')
           }
-          icon={<Icon element={MdContactPage} />}
-        >
-          {t('view_invoice')}
-        </DropdownElement>
+          component={
+            <DropdownElement
+              onClick={() =>
+                navigate(
+                  route('/invoices/:id/edit', {
+                    id: selectedResources[0].invoice_id,
+                  })
+                )
+              }
+              icon={<Icon element={MdContactPage} />}
+            >
+              {t('view_invoice')}
+            </DropdownElement>
+          }
+        />
       ),
     ({ selectedResources, setSelected }) => (
       <DropdownElement

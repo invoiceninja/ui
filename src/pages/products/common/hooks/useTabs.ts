@@ -37,7 +37,9 @@ export function useTabs(params: Params) {
           name: t('edit'),
           href: route('/products/:id/edit', { id: product.id }),
         },
-        ...(hasPermission('edit_product') || entityAssigned(product)
+        ...(hasPermission('view_product') ||
+        hasPermission('edit_product') ||
+        entityAssigned(product)
           ? [
               {
                 name: t('documents'),

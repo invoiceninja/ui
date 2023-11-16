@@ -14,6 +14,7 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { admin } from '$app/common/guards/guards/admin';
 
 const Product = lazy(() => import('$app/pages/products/Product'));
 const Import = lazy(() => import('$app/pages/products/import/Import'));
@@ -75,10 +76,13 @@ export const productRoutes = (
         />
       }
     >
-      <Route path="product_fields" element={<ProductFields />} />
       <Route path="" element={<Show />} />
       <Route path="documents" element={<Documents />} />
     </Route>
+    <Route
+      path=":id/product_fields"
+      element={<Guard guards={[admin()]} component={<ProductFields />} />}
+    />
     <Route
       path=":id/edit"
       element={

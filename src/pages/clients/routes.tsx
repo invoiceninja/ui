@@ -108,11 +108,7 @@ export const clientRoutes = (
       element={
         <Guard
           guards={[
-            or(
-              permission('view_client'),
-              permission('edit_client'),
-              assigned('/api/v1/clients/:id')
-            ),
+            or(permission('edit_client'), assigned('/api/v1/clients/:id')),
           ]}
           component={<Statement />}
         />

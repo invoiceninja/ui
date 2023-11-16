@@ -174,7 +174,7 @@ export function DocumentsTable(props: Props) {
           <Th>{t('date')}</Th>
           <Th>{t('type')}</Th>
           <Th>{t('size')}</Th>
-          <Th>{/* Placeholder for actions */}</Th>
+          {!disableEditableOptions && <Th>{/* Placeholder for actions */}</Th>}
         </Thead>
 
         <Tbody>

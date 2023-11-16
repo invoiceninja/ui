@@ -216,7 +216,8 @@ export const useCustomBulkActions = () => {
         </DropdownElement>
       ),
     ({ selectedResources, setSelected }) =>
-      showReverseOption(selectedResources) && (
+      showReverseOption(selectedResources) &&
+      hasPermission('create_credit') && (
         <DropdownElement
           onClick={() => {
             reverseInvoice(selectedResources[0]);

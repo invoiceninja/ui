@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
 import {
   useActions,
+  useCustomBulkActions,
   useProjectColumns,
 } from '$app/pages/projects/common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
@@ -28,6 +29,8 @@ export default function Projects() {
 
   const actions = useActions();
 
+  const customBulkActions = useCustomBulkActions();
+
   return (
     <DataTable
       resource="project"
@@ -37,6 +40,7 @@ export default function Projects() {
       )}
       columns={columns}
       customActions={actions}
+      customBulkActions={customBulkActions}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
