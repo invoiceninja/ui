@@ -353,7 +353,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
         >
           {!hideEditableOptions && (
-            <Dropdown label={t('more_actions')} disabled={!selected.length}>
+            <Dropdown
+              label={t('more_actions')}
+              disabled={!selected.length}
+              cypressRef="bulkActionsDropdown"
+            >
               {props.customBulkActions &&
                 props.customBulkActions.map(
                   (bulkAction: CustomBulkAction<T>, index: number) => (

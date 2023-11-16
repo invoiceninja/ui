@@ -62,9 +62,10 @@ function useCustomInvoiceActions({ permissions }: Params) {
 const checkEditPage = async (
   page: Page,
   isEditable: boolean,
-  isAdmin: boolean
+  isAdmin: boolean,
+  expectingUrl?: string
 ) => {
-  //await page.waitForURL('**/invoices/**/edit');
+  await page.waitForURL(expectingUrl || '**/invoices/**/edit');
 
   if (isEditable) {
     await expect(
@@ -144,7 +145,7 @@ const createInvoice = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created invoice')).toBeVisible();
 };
 
-test.skip("can't view invoices without permission", async ({ page }) => {
+test("can't view invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -161,7 +162,7 @@ test.skip("can't view invoices without permission", async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view invoice', async ({ page }) => {
+test('can view invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -191,7 +192,7 @@ test.skip('can view invoice', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can edit invoice', async ({ page }) => {
+test('can edit invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
@@ -233,12 +234,12 @@ test.skip('can edit invoice', async ({ page }) => {
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown');
+  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
   await logout(page);
 });
 
-test.skip('can create a invoice', async ({ page }) => {
+test('can create a invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
@@ -250,7 +251,7 @@ test.skip('can create a invoice', async ({ page }) => {
   await set('create_invoice');
   await save();
 
-  await createInvoice({ page, isTableEditable: false });
+  await createInvoice({ page });
 
   await logout(page);
 
@@ -280,12 +281,12 @@ test.skip('can create a invoice', async ({ page }) => {
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown');
+  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
   await logout(page);
 });
 
-test.skip('can view and edit assigned invoice with create_invoice', async ({
+test('can view and edit assigned invoice with create_invoice', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -329,12 +330,12 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown');
+  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
   await logout(page);
 });
 
-test.skip('deleting invoice with edit_invoice', async ({ page }) => {
+test('deleting invoice with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -382,7 +383,7 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
   }
 });
 
-test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
+test('archiving invoice withe edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -435,7 +436,7 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
   }
 });
 
-test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
+test('invoice documents preview with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -489,7 +490,7 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
+test('invoice documents uploading with edit_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -550,7 +551,7 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('all actions in dropdown displayed with admin permission', async ({
+test('all actions in dropdown displayed with admin permission', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -569,9 +570,7 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
 
   await createInvoice({ page });
 
-  await page.waitForURL('**/invoices/**/edit**');
-
-  await checkEditPage(page, true, true);
+  await checkEditPage(page, true, true, '**/invoices/**/edit**');
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -580,7 +579,7 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
   await logout(page);
 });
 
-test.skip('Enter Payment and all clone actions displayed with creation permissions', async ({
+test('Enter Payment and all clone actions displayed with creation permissions', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -612,9 +611,9 @@ test.skip('Enter Payment and all clone actions displayed with creation permissio
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page });
+  await createInvoice({ page, isTableEditable: false });
 
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -623,7 +622,7 @@ test.skip('Enter Payment and all clone actions displayed with creation permissio
   await logout(page);
 });
 
-test.skip('cloning invoice', async ({ page }) => {
+test('cloning invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -698,14 +697,21 @@ test('Enter Payment displayed displayed with admin permission', async ({
 
   await createInvoice({ page });
 
-  await checkEditPage(page, true, true);
+  await checkEditPage(page, true, true, '**/invoices/**/edit**');
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    customActions,
+    'bulkActionsDropdown',
+    'dataTable'
+  );
 
   await logout(page);
 });
@@ -743,14 +749,21 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
 
   await createInvoice({ page });
 
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    customActions,
+    'bulkActionsDropdown',
+    'dataTable'
+  );
 
   await logout(page);
 });

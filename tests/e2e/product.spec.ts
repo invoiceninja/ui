@@ -668,7 +668,12 @@ test('all custom actions in dropdown displayed with admin permission', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+  await checkDropdownActions(
+    page,
+    customActions,
+    'bulkActionsDropdown',
+    'dataTable'
+  );
 
   await logout(page);
 });
@@ -704,7 +709,12 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+  await checkDropdownActions(
+    page,
+    customActions,
+    'bulkActionsDropdown',
+    'dataTable'
+  );
 
   await logout(page);
 });
