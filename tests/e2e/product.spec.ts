@@ -13,7 +13,7 @@ import { Action } from './clients.spec';
 interface Params {
   permissions: Permission[];
 }
-export function useProductActions({ permissions }: Params) {
+function useProductActions({ permissions }: Params) {
   const hasPermission = useHasPermission({ permissions });
 
   const actions: Action[] = [
@@ -33,7 +33,42 @@ export function useProductActions({ permissions }: Params) {
 
   return actions;
 }
-const createProduct = async (page: Page, name?: string) => {
+
+function useProductCustomActions({ permissions }: Params) {
+  const hasPermission = useHasPermission({ permissions });
+
+  const actions: Action[] = [
+    {
+      label: 'New Invoice',
+      visible: hasPermission('create_invoice'),
+    },
+    {
+      label: 'New Purchase Order',
+      visible: hasPermission('create_purchase_order'),
+    },
+  ];
+
+  return actions;
+}
+
+interface CreateParams {
+  page: Page;
+  name?: string;
+  isTableEditable?: boolean;
+  withNavigation?: boolean;
+}
+const createProduct = async (params: CreateParams) => {
+  const { page, withNavigation = true, isTableEditable = true, name } = params;
+
+  if (withNavigation) {
+    await page
+      .locator('[data-cy="navigationBar"]')
+      .getByRole('link', { name: 'Products', exact: true })
+      .click();
+
+    await checkTableEditability(page, isTableEditable);
+  }
+
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Product' })
@@ -57,6 +92,66 @@ const createProduct = async (page: Page, name?: string) => {
   await expect(
     page.getByText('Successfully created product', { exact: true })
   ).toBeVisible();
+};
+
+const checkEditPage = async (
+  page: Page,
+  isEditable: boolean,
+  isAdmin: boolean
+) => {
+  await page.waitForURL('**/products/**/edit');
+
+  if (isEditable) {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'Save', exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .locator('[data-cy="tabs"]')
+        .getByRole('link', { name: 'Documents', exact: true })
+    ).toBeVisible();
+  } else {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'Save', exact: true })
+    ).not.toBeVisible();
+
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).not.toBeVisible();
+
+    await expect(
+      page
+        .locator('[data-cy="tabs"]')
+        .getByRole('link', { name: 'Documents', exact: true })
+    ).not.toBeVisible();
+  }
+
+  if (!isAdmin) {
+    await expect(
+      page
+        .locator('[data-cy="tabs"]')
+        .getByRole('link', { name: 'Product Fields', exact: true })
+    ).not.toBeVisible();
+  } else {
+    await expect(
+      page
+        .locator('[data-cy="tabs"]')
+        .getByRole('link', { name: 'Product Fields', exact: true })
+    ).toBeVisible();
+  }
 };
 
 test("can't view products without permission", async ({ page }) => {
@@ -84,12 +179,10 @@ test('can view product', async ({ page }) => {
   await set('view_product');
   await save();
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Products', exact: true })
-    .click();
-
-  await createProduct(page, 'test view product');
+  await createProduct({
+    page,
+    name: 'test view product',
+  });
 
   await logout(page);
 
@@ -107,31 +200,7 @@ test('can view product', async ({ page }) => {
     .first()
     .click();
 
-  await page.waitForURL('**/products/**/edit');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('link', { name: 'Save', exact: true })
-  ).not.toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).not.toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-  ).not.toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-  ).not.toBeVisible();
+  await checkEditPage(page, false, false);
 
   await logout(page);
 });
@@ -148,12 +217,7 @@ test('can edit product', async ({ page }) => {
   await set('edit_product');
   await save();
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Products', exact: true })
-    .click();
-
-  await createProduct(page, 'test edit product');
+  await createProduct({ page, name: 'test edit product' });
 
   await logout(page);
 
@@ -173,33 +237,7 @@ test('can edit product', async ({ page }) => {
 
   await page.waitForURL('**/products/**/edit');
 
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'test edit product', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-  ).not.toBeVisible();
+  await checkEditPage(page, true, false);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -209,11 +247,6 @@ test('can edit product', async ({ page }) => {
   await expect(
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
 
   await checkDropdownActions(page, actions, 'productActionDropdown');
 
@@ -235,42 +268,13 @@ test('can create a product', async ({ page }) => {
 
   await login(page, 'products@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Products', exact: true })
-    .click();
+  await createProduct({
+    page,
+    name: 'test create product',
+    isTableEditable: false,
+  });
 
-  await createProduct(page, 'test create product');
-
-  await page.waitForURL('**/products/**/edit');
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('heading', { name: 'test create product', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-  ).not.toBeVisible();
+  await checkEditPage(page, true, false);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -280,11 +284,6 @@ test('can create a product', async ({ page }) => {
   await expect(
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
 
   await checkDropdownActions(page, actions, 'productActionDropdown');
 
@@ -315,7 +314,7 @@ test('deleting product with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct(page);
+    await createProduct({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -368,7 +367,7 @@ test('archiving product withe edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct(page);
+    await createProduct({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -422,7 +421,7 @@ test('product documents preview with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct(page);
+    await createProduct({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -479,7 +478,7 @@ test('product documents uploading with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct(page);
+    await createProduct({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -536,47 +535,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'products@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Products', exact: true })
-    .click();
+  await createProduct({ page, name: 'test dropdown product' });
 
-  await checkTableEditability(page, true);
-
-  await createProduct(page, 'test dropdown product');
-
-  await expect(
-    page.getByRole('heading', { name: 'test dropdown product', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await checkEditPage(page, true, true);
 
   await checkDropdownActions(page, actions, 'productActionDropdown');
 
@@ -600,45 +561,13 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await login(page, 'products@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Products', exact: true })
-    .click();
+  await createProduct({
+    page,
+    name: 'test actions product',
+    isTableEditable: false,
+  });
 
-  await createProduct(page, 'test actions product');
-
-  await expect(
-    page.getByRole('heading', { name: 'test actions product', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-  ).not.toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-  ).toBeVisible();
-
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await checkEditPage(page, true, false);
 
   await checkDropdownActions(page, actions, 'productActionDropdown');
 
@@ -669,7 +598,7 @@ test('cloning product with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct(page);
+    await createProduct({ page, withNavigation: false });
 
     const moreActionsButton = page
       .getByRole('button')
@@ -681,7 +610,7 @@ test('cloning product with edit_product', async ({ page }) => {
 
     await page.waitForURL('**/products/create?action=clone');
 
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Save' }).first().click();
 
     await expect(page.getByText('Successfully created product')).toBeVisible();
 
@@ -711,4 +640,71 @@ test('cloning product with edit_product', async ({ page }) => {
       page.getByRole('heading', { name: 'Edit Product' }).first()
     ).toBeVisible();
   }
+});
+
+test('all custom actions in dropdown displayed with admin permission', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const customActions = useProductCustomActions({
+    permissions: ['admin'],
+  });
+
+  await login(page);
+  await clear('products@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'products@example.com', 'password');
+
+  await createProduct({ page, name: 'test bulk actions product' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Products', exact: true })
+    .click();
+
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+
+  await logout(page);
+});
+
+test('New Invoice and New Purchase Order displayed with creation permissions', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const customActions = useProductCustomActions({
+    permissions: ['create_invoice', 'create_purchase_order'],
+  });
+
+  await login(page);
+  await clear('products@example.com');
+  await set(
+    'create_invoice',
+    'create_purchase_order',
+    'edit_product',
+    'create_product'
+  );
+  await save();
+  await logout(page);
+
+  await login(page, 'products@example.com', 'password');
+
+  await createProduct({ page, name: 'test bulk actions product' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Products', exact: true })
+    .click();
+
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  await checkDropdownActions(page, customActions, 'dataTable', 'dataTable');
+
+  await logout(page);
 });

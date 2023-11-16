@@ -121,11 +121,12 @@ export async function checkDropdownActions(
   page: Page,
   actions: Action[],
   dropdownId: string,
-  buttonId?: string
+  containerId?: string
 ) {
   await page
-    .locator(`[data-cy=${buttonId || 'topNavbar'}]`)
+    .locator(`[data-cy=${containerId || 'topNavbar'}]`)
     .getByRole('button', { name: 'More Actions', exact: true })
+    .first()
     .click();
 
   const dropDown = page.locator(`[data-cy=${dropdownId}]`);
