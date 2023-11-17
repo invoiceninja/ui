@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
-import React, { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 export interface SelectOption {
