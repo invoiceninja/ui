@@ -40,14 +40,10 @@ export function useEntityAssigned() {
   const user = useCurrentUser();
 
   return (entity: Entity | undefined | null) => {
-    if (
+    return Boolean(
       user &&
-      entity &&
-      (entity.user_id === user.id || entity.assigned_user_id === user.id)
-    ) {
-      return true;
-    }
-
-    return false;
+        entity &&
+        (entity.user_id === user.id || entity.assigned_user_id === user.id)
+    );
   };
 }

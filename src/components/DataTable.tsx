@@ -324,7 +324,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     <div data-cy="dataTable">
       {!props.withoutActions && (
         <Actions
-          resource={props.resource}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}

@@ -49,7 +49,8 @@ export function ClickableElement(props: Props) {
     return (
       <LinkStyled
         theme={{ hoverColor: colors.$4, color: colors.$3 }}
-        to={!props.disableNavigation ? props.to : ''}
+        to={props.to}
+        style={{ pointerEvents: !props.disableNavigation ? 'all' : 'none' }}
         className={classes}
       >
         {props.children}
