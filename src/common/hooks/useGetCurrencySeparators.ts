@@ -19,7 +19,6 @@ import { useClientResolver } from './clients/useClientResolver';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useResolveCountry } from './useResolveCountry';
 import { useVendorResolver } from './vendors/useVendorResolver';
-import { useHasPermission } from './permissions/useHasPermission';
 
 export function useGetCurrencySeparators(
   setInputCurrencySeparators: React.Dispatch<
@@ -27,7 +26,6 @@ export function useGetCurrencySeparators(
   >
 ) {
   const company = useCurrentCompany();
-  const hasPermission = useHasPermission();
 
   const clientResolver = useClientResolver();
   const vendorResolver = useVendorResolver();
@@ -36,11 +34,7 @@ export function useGetCurrencySeparators(
   const resolveCountry = useResolveCountry();
 
   return (relationId: string, relationType: RelationType) => {
-    if (
-      relationId.length >= 1 &&
-      relationType === 'client_id' &&
-      (hasPermission('view_client') || hasPermission('edit_client'))
-    ) {
+    if (relationId.length >= 1 && relationType === 'client_id') {
       clientResolver.find(relationId).then((client: Client) =>
         currencyResolver
           .find(client.settings.currency_id || company.settings?.currency_id)

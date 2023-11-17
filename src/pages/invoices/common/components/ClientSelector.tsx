@@ -51,12 +51,10 @@ export function ClientSelector(props: Props) {
   };
 
   useEffect(() => {
-    if (hasPermission('view_client') || hasPermission('edit_client')) {
-      resource?.client_id &&
-        clientResolver
-          .find(resource.client_id)
-          .then((client) => setClient(client));
-    }
+    resource?.client_id &&
+      clientResolver
+        .find(resource.client_id)
+        .then((client) => setClient(client));
   }, [resource?.client_id]);
 
   const colors = useColorScheme();
