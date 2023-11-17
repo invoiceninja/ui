@@ -239,12 +239,12 @@ export const useCustomBulkActions = () => {
           {t('cancel_invoice')}
         </DropdownElement>
       ),
-    (_, selectedInvoices) => (
+    ({ selectedResources }) => (
       <>
-        {selectedInvoices ? (
+        {selectedResources ? (
           <ChangeTemplateModal<Invoice>
             entity="invoice"
-            entities={selectedInvoices}
+            entities={selectedResources}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
