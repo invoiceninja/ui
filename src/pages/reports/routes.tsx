@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Outlet, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
@@ -17,11 +17,9 @@ const Reports = lazy(() => import('$app/pages/reports/index/Reports'));
 
 export const reportRoutes = (
   <Route
-    path=""
+    path="/reports"
     element={
-      <Guard guards={[permission('view_reports')]} component={<Outlet />} />
+      <Guard guards={[permission('view_reports')]} component={<Reports />} />
     }
-  >
-    <Route path="/reports" element={<Reports />} />
-  </Route>
+  />
 );

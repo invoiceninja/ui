@@ -15,8 +15,6 @@ import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useAddTasksOnInvoice } from '../hooks/useAddTasksOnInvoice';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   visible: boolean;
@@ -27,9 +25,6 @@ interface Props {
 
 export function AddTasksOnInvoiceModal(props: Props) {
   const { visible, setVisible, tasks, invoices } = props;
-
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
 
   const formatMoney = useFormatMoney();
 
@@ -42,26 +37,23 @@ export function AddTasksOnInvoiceModal(props: Props) {
       onClose={() => setVisible(false)}
     >
       <div className="flex flex-col overflow-y-auto max-h-96">
-        {invoices?.map(
-          (invoice, index) =>
-            (hasPermission('edit_invoice') || entityAssigned(invoice)) && (
-              <div
-                key={index}
-                className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 px-3"
-                onClick={() => addTasksOnInvoice(invoice)}
-              >
-                <span>{invoice.number}</span>
+        {invoices?.map((invoice, index) => (
+          <div
+            key={index}
+            className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 px-3"
+            onClick={() => addTasksOnInvoice(invoice)}
+          >
+            <span>{invoice.number}</span>
 
-                <span>
-                  {formatMoney(
-                    invoice.amount,
-                    invoice.client?.country_id,
-                    invoice.client?.settings.currency_id
-                  )}
-                </span>
-              </div>
-            )
-        )}
+            <span>
+              {formatMoney(
+                invoice.amount,
+                invoice.client?.country_id,
+                invoice.client?.settings.currency_id
+              )}
+            </span>
+          </div>
+        ))}
       </div>
     </Modal>
   );
