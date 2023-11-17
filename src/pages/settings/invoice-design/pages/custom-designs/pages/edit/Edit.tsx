@@ -141,7 +141,11 @@ export default function Edit() {
       <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
         {payload.design ? (
           <InvoiceViewer
-            link={endpoint('/api/v1/preview')}
+            link={
+              payload.design.is_template
+                ? endpoint('/api/v1/preview?template=true')
+                : endpoint('/api/v1/preview')
+            }
             resource={payload}
             method="POST"
             withToast
