@@ -15,12 +15,9 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { ChangeEvent } from 'react';
-import { endpoint } from '$app/common/helpers';
-import { useQuery } from 'react-query';
 import { RootState } from '$app/common/stores/store';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';
-import { request } from '$app/common/helpers/request';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Divider } from '$app/components/cards/Divider';
 import { useAtomValue } from 'jotai';
@@ -29,6 +26,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -41,9 +39,7 @@ export function Defaults() {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const { data: terms } = useQuery('/api/v1/payment_terms', () =>
-    request('GET', endpoint('/api/v1/payment_terms'))
-  );
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const companyChanges = useSelector(
     (state: RootState) => state.companyUsers.changes.company
@@ -89,7 +85,7 @@ export function Defaults() {
             </SelectField>
           </Element>
 
-          {terms && (
+          {paymentTermsResponse && (
             <Element
               leftSide={
                 <PropertyCheckbox
@@ -108,7 +104,7 @@ export function Defaults() {
                 withBlank
                 errorMessage={errors?.errors['settings.valid_until']}
               >
-                {terms.data.data.map((type: PaymentTerm) => (
+                {paymentTermsResponse.data.data.map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days}>
                     {type.name}
                   </option>

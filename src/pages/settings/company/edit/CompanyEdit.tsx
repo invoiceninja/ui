@@ -162,6 +162,7 @@ export function CompanyEdit(props: Props) {
         setErrors(undefined);
       }}
       backgroundColor="white"
+      overflowVisible
     >
       <InputField
         label={t('company_name')}

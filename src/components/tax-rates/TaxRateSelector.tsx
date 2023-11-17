@@ -52,6 +52,7 @@ export function TaxRateSelector(props: Props) {
             taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
           dropdownLabelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
         }}
+        sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
       />
 
