@@ -165,11 +165,13 @@ export function Settings() {
               handlePropertyChange('settings.timezone_id', v)
             }
           >
-            {statics?.timezones.map((timezone: Timezone) => (
-              <option value={timezone.id} key={timezone.id}>
-                {timezone.name}
-              </option>
-            ))}
+            {statics?.timezones
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((timezone: Timezone) => (
+                <option value={timezone.id} key={timezone.id}>
+                  {timezone.name}
+                </option>
+              ))}
           </SearchableSelect>
         </Element>
 

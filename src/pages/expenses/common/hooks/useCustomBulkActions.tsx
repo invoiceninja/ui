@@ -89,6 +89,7 @@ function ChangeCategory({
           label: 'name',
           value: 'id',
         }}
+        sortBy="name|asc"
         onChange={(e) => (e.resource ? setCategory(e.resource.id) : null)}
       />
 
@@ -142,7 +143,7 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    ({selectedResources, setSelected}) => (
+    ({ selectedResources, setSelected }) => (
       <>
         {selectedResources ? (
           <ChangeCategory

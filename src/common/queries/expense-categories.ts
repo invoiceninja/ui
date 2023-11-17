@@ -33,7 +33,7 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
           {
             perPage: params.perPage ?? '100',
             currentPage: params.currentPage ?? '1',
-            sort: params.sort ?? 'id|asc',
+            sort: params.sort ?? 'name|asc',
             filter: params.filter ?? '',
             status: params.status?.join(',') ?? '',
           }

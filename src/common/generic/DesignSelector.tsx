@@ -106,6 +106,7 @@ export function DesignSelector(props: Props) {
               typeof props.actionVisibility === 'undefined' ||
               props.actionVisibility,
           }}
+          sortBy="name|asc"
           onDismiss={() => setDesign(null)}
           disableWithQueryParameter={props.disableWithQueryParameter}
           errorMessage={
@@ -140,6 +141,7 @@ export function DesignSelector(props: Props) {
             typeof props.actionVisibility === 'undefined' ||
             props.actionVisibility,
         }}
+        sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}
