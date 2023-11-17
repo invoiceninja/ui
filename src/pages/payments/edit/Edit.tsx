@@ -40,7 +40,9 @@ export default function Edit() {
 
   const { setPayment, payment, errors } = context;
 
-  const [convertCurrency, setConvertCurrency] = useState(Boolean(payment?.exchange_currency_id));
+  const [convertCurrency, setConvertCurrency] = useState(
+    Boolean(payment?.exchange_currency_id)
+  );
 
   const company = useCurrentCompany();
 
@@ -169,28 +171,30 @@ export default function Edit() {
           onChange={(value) => {
             setConvertCurrency(value);
 
-            if(!value){
+            if (!value) {
               handleChange('exchange_currency_id', '');
               handleChange('exchange_rate', 1);
             }
-
           }}
         />
       </Element>
 
-      {payment && (Boolean(payment?.exchange_currency_id) || convertCurrency) && (
-        <ConvertCurrency
-          exchangeRate={payment.exchange_rate.toString() || '1'}
-          exchangeCurrencyId={payment.exchange_currency_id || '1'}
-          currencyId={payment.currency_id || '1'}
-          amount={payment?.amount}
-          onChange={(exchangeRate, exchangeCurrencyId) => {
-            handleChange('exchange_rate', exchangeRate);
-            handleChange('exchange_currency_id', exchangeCurrencyId);
-          }}
-          onExchangeRateChange={(value) => handleChange('exchange_rate', value)}
-        />
-      )}
+      {payment &&
+        (Boolean(payment?.exchange_currency_id) || convertCurrency) && (
+          <ConvertCurrency
+            exchangeRate={payment.exchange_rate.toString() || '1'}
+            exchangeCurrencyId={payment.exchange_currency_id || '1'}
+            currencyId={payment.currency_id || '1'}
+            amount={payment?.amount}
+            onChange={(exchangeRate, exchangeCurrencyId) => {
+              handleChange('exchange_rate', exchangeRate);
+              handleChange('exchange_currency_id', exchangeCurrencyId);
+            }}
+            onExchangeRateChange={(value) =>
+              handleChange('exchange_rate', value)
+            }
+          />
+        )}
     </Card>
   );
 }

@@ -80,7 +80,7 @@ export function useBulk() {
 
       toast.success(message);
 
-      $refetch(['purchase_orders'])
+      $refetch(['purchase_orders']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);
@@ -104,7 +104,7 @@ export function useMarkSent() {
     ).then(() => {
       toast.success('marked_purchase_order_as_sent');
 
-      $refetch(['purchase_orders'])
+      $refetch(['purchase_orders']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

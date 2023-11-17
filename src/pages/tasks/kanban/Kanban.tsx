@@ -90,7 +90,9 @@ export default function Kanban() {
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true');
+  const [apiEndpoint, setApiEndpoint] = useState(
+    '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
+  );
   const [projectId, setProjectId] = useState<string>();
 
   const [taskDetails, setTaskDetails] = useState<TaskDetails>();
@@ -243,11 +245,16 @@ export default function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-        route('/api/v1/tasks?project_tasks=:projectId&per_page=1000&status=active&without_deleted_clients=true', {
-            projectId,
-          })
+          route(
+            '/api/v1/tasks?project_tasks=:projectId&per_page=1000&status=active&without_deleted_clients=true',
+            {
+              projectId,
+            }
+          )
         )
-      : setApiEndpoint('/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true');
+      : setApiEndpoint(
+          '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
+        );
   }, [projectId]);
 
   return (

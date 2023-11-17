@@ -52,7 +52,7 @@ export function ProductCreate(props: Props) {
       request('POST', endpoint('/api/v1/products'), product)
         .then((response: GenericSingleResourceResponse<Product>) => {
           toast.success('created_product');
-          
+
           $refetch(['products']);
 
           props.setIsModalOpen(false);

@@ -71,7 +71,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_vendor');
 
-        $refetch(['vendors'])
+        $refetch(['vendors']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

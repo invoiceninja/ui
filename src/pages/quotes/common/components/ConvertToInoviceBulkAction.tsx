@@ -19,7 +19,7 @@ import { useBulkAction } from '../hooks/useBulkAction';
 
 interface Props {
   selectedIds: string[];
-  setSelected?: Dispatch<SetStateAction<string[]>>;
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const ConvertToInvoiceBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -51,9 +51,7 @@ export const ConvertToInvoiceBulkAction = (props: Props) => {
             behavior="button"
             onClick={() => {
               bulk(selectedIds, 'convert_to_invoice');
-
-              setSelected?.([]);
-
+              setSelected([]);
               setIsModalOpen(false);
             }}
           >

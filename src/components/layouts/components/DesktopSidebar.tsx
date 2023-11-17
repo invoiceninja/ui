@@ -54,7 +54,10 @@ export function DesktopSidebar(props: Props) {
         style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
         className="flex flex-col flex-grow overflow-y-auto border-r"
       >
-        <div style={{ borderColor: colors.$5 }} className="flex items-center flex-shrink-0 pl-3 pr-6 h-16 border-b">
+        <div
+          style={{ borderColor: colors.$5 }}
+          className="flex items-center flex-shrink-0 pl-3 pr-6 h-16 border-b"
+        >
           {isMiniSidebar ? (
             <img className="w-8" src={logo} alt="Company logo" />
           ) : (

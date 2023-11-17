@@ -87,7 +87,7 @@ export function Edit() {
       .then(() => {
         toast.success('updated_user');
 
-        $refetch(['users'])
+        $refetch(['users']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

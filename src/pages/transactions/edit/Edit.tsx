@@ -86,7 +86,7 @@ export default function Edit() {
       .then(() => {
         toast.success('updated_transaction');
 
-        $refetch(['bank_transactions'])
+        $refetch(['bank_transactions']);
 
         navigate('/transactions');
       })

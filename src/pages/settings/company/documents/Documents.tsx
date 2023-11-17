@@ -15,7 +15,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Documents() {
   const onSuccess = () => {
-    $refetch(['documents'])
+    $refetch(['documents']);
   };
 
   const company = useCurrentCompany();

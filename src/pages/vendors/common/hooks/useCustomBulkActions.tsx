@@ -42,11 +42,11 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Vendor>[] = [
-    (_, selectedVendors, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedVendors && shouldDownloadDocuments(selectedVendors)
-            ? handleDownloadDocuments(selectedVendors, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

@@ -74,7 +74,7 @@ export const useBulk = () => {
 
       toast.success(message);
 
-      $refetch(['bank_transactions'])
+      $refetch(['bank_transactions']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

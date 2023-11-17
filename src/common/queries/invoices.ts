@@ -34,7 +34,9 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/invoices/:id?include=client.group_settings', { id: params.id })
+        endpoint('/api/v1/invoices/:id?include=client.group_settings', {
+          id: params.id,
+        })
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
@@ -111,7 +113,7 @@ export function useBulk(params?: Params) {
         const message =
           successMessages[action as keyof typeof successMessages] ||
           `${action}d_invoice`;
-          
+
         toast.success(message);
 
         params?.onSuccess?.();

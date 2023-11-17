@@ -50,7 +50,7 @@ export function DesignSelector(props: Props) {
       request('POST', endpoint('/api/v1/designs'), design)
         .then(() => {
           toast.success('created_design');
-          $refetch(['designs'])
+          $refetch(['designs']);
           setDesign(null);
           setIsModalVisible(false);
         })
@@ -80,9 +80,7 @@ export function DesignSelector(props: Props) {
         />
 
         <ComboboxAsync<Design>
-          endpoint={
-            endpoint('/api/v1/designs?per_page=500&status=active')
-          }
+          endpoint={endpoint('/api/v1/designs?per_page=500&status=active')}
           onChange={(design: Entry<Design>) =>
             setDesign(
               (current) =>
@@ -108,6 +106,7 @@ export function DesignSelector(props: Props) {
               typeof props.actionVisibility === 'undefined' ||
               props.actionVisibility,
           }}
+          sortBy="name|asc"
           onDismiss={() => setDesign(null)}
           disableWithQueryParameter={props.disableWithQueryParameter}
           errorMessage={
@@ -142,6 +141,7 @@ export function DesignSelector(props: Props) {
             typeof props.actionVisibility === 'undefined' ||
             props.actionVisibility,
         }}
+        sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}

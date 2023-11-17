@@ -94,12 +94,17 @@ export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'bulk_categorize',
+    rest?: Record<string, unknown>
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/expenses/bulk'), {
       action,
-      ids: [id],
+      ids,
+      ...rest,
     }).then(() => {
       toast.success(`${action}d_expense`);
 

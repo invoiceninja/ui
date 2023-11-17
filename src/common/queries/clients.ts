@@ -44,7 +44,12 @@ interface Props {
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    ['/api/v1/clients', 'filter_deleted_clients=true', 'per_page=500', 'include=group_settings'],
+    [
+      '/api/v1/clients',
+      'filter_deleted_clients=true',
+      'per_page=500',
+      'include=group_settings',
+    ],
     () =>
       request('GET', endpoint('/api/v1/clients?per_page=500')).then(
         (response) => response.data.data
@@ -57,7 +62,10 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   return useQuery(
     ['/api/v1/clients', id],
     () =>
-      request('GET', endpoint('/api/v1/clients/:id?include=group_settings', { id })).then(
+      request(
+        'GET',
+        endpoint('/api/v1/clients/:id?include=group_settings', { id })
+      ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
     {

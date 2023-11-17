@@ -73,7 +73,7 @@ export default function Project() {
       .then(() => {
         toast.success('updated_project');
 
-        $refetch(['projects'])
+        $refetch(['projects']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status == 422) {

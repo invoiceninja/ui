@@ -80,7 +80,7 @@ export function Create() {
         .then((response: GenericSingleResourceResponse<TransactionRule>) => {
           toast.success('created_transaction_rule');
 
-          $refetch(['bank_transaction_rules'])
+          $refetch(['bank_transaction_rules']);
 
           navigate(
             route('/settings/bank_accounts/transaction_rules/:id/edit', {

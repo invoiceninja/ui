@@ -100,7 +100,7 @@ export function Create() {
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
 
-        $refetch(['subscriptions'])
+        $refetch(['subscriptions']);
 
         navigate(
           route('/settings/subscriptions/:id/edit', {

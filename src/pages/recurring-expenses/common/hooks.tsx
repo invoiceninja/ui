@@ -418,7 +418,7 @@ export function useToggleStartStop() {
       endpoint(url, { id: recurringExpense.id }),
       recurringExpense
     ).then(() => {
-      $refetch(['recurring_expenses'])
+      $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

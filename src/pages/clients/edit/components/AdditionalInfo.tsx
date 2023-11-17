@@ -21,17 +21,14 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
-import { request } from '$app/common/helpers/request';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 
 interface Props {
   client: Client | undefined;
@@ -46,13 +43,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const currencies = useCurrencies();
   const languages = useLanguages();
 
-  const { data: paymentTerms } = useQuery({
-    queryKey: ['/api/v1/payment_terms'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/payment_terms')).then(
-        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) => response.data.data
-      ),
-  });
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
@@ -130,7 +121,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
@@ -141,7 +132,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 withBlank
               >
-                {paymentTerms.map(
+                {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}
@@ -152,7 +143,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
@@ -163,7 +154,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
               >
-                {paymentTerms.map(
+                {paymentTermsResponse.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}

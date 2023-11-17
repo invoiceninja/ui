@@ -56,7 +56,7 @@ export function Edit() {
   }, [data]);
 
   const invalidatePaymentTermCache = () => {
-    $refetch(['tax_rates'])
+    $refetch(['tax_rates']);
   };
 
   const formik = useFormik({
