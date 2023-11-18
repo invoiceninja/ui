@@ -34,16 +34,16 @@ const StyledSwitch = styled(Switch)`
 `;
 
 export default function Toggle(props: Props) {
-  const [checked, setChecked] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
+
+  const [checked, setChecked] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   useEffect(() => {
     setChecked(Boolean(props.checked));
     setDisabled(Boolean(props.disabled));
   }, [props.checked, props.disabled]);
-
-  const accentColor = useAccentColor();
-  const colors = useColorScheme();
 
   return (
     <Switch.Group as="div" className="flex items-center">
@@ -53,14 +53,6 @@ export default function Toggle(props: Props) {
           borderColor: colors.$5,
           backgroundColor: checked ? accentColor : colors.$5,
         }}
-        checked={checked}
-        onChange={(value) => {
-          if (!disabled) {
-            setChecked(value);
-            props.onChange && props.onChange(value);
-            props.onValueChange && props.onValueChange(value);
-          }
-        }}
         className={classNames(
           'relative inline-flex items-center border flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
           {
@@ -69,6 +61,14 @@ export default function Toggle(props: Props) {
               !disabled,
           }
         )}
+        checked={checked}
+        onChange={(value) => {
+          if (!disabled) {
+            setChecked(value);
+            props.onChange && props.onChange(value);
+            props.onValueChange && props.onValueChange(value);
+          }
+        }}
       >
         <span
           aria-hidden="true"
