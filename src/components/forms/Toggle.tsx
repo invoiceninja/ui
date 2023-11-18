@@ -54,10 +54,10 @@ export default function Toggle(props: Props) {
           backgroundColor: checked ? accentColor : colors.$5,
         }}
         className={classNames(
-          'relative inline-flex items-center border flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
+          'relative inline-flex items-center flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
           {
-            'border-transparent cursor-not-allowed opacity-75': disabled,
-            'cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2':
+            'pointer-events-none opacity-75': disabled,
+            'border cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2':
               !disabled,
           }
         )}
