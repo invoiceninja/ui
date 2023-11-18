@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdContactPage,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdMarkEmailRead,
@@ -31,7 +32,8 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -81,6 +83,8 @@ export function useCustomBulkActions() {
     documentsBulk(quoteIds, 'download');
     setSelected?.([]);
   };
+  
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Quote>[] = [
     ({ selectedIds, selectedResources, setSelected }) => (
@@ -182,6 +186,27 @@ export function useCustomBulkActions() {
           setSelected={setSelected}
         />
       ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Quote>
+            entity="quote"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(quote) => `${t('number')}: ${quote.number}`}
+            bulkUrl="/api/v1/quotes/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
   ];
 
   return customBulkActions;

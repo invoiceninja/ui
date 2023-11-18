@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdContactPage,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -26,11 +27,12 @@ import {
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useBulk } from '$app/common/queries/purchase-orders';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -79,6 +81,8 @@ export function useCustomBulkActions() {
       ({ status_id }) => status_id === PurchaseOrderStatus.Accepted
     );
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
     ({ selectedIds, setSelected }) => (
@@ -173,6 +177,27 @@ export function useCustomBulkActions() {
       >
         {t('documents')}
       </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<PurchaseOrder>
+            entity="quote"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+            bulkUrl="/api/v1/purchase_orders/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
     ),
   ];
 

@@ -116,7 +116,7 @@ export function ChangeTemplateModal<T = any>({
         />
       </Element>
 
-      <p>{t('invoices')}:</p>
+      <p>{t('entity')}:</p>
 
       <ul>
         {entities.map((entity, i) => (

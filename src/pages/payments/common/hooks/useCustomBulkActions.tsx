@@ -13,8 +13,10 @@ import { useBulk } from '$app/common/queries/payments';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdSend } from 'react-icons/md';
+import { MdDesignServices, MdSend } from 'react-icons/md';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -26,6 +28,8 @@ export const useCustomBulkActions = () => {
       client?.contacts.some(({ email }) => email)
     );
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Payment>[] = [
     ({ selectedResources, selectedIds, setSelected }) =>
@@ -40,6 +44,27 @@ export const useCustomBulkActions = () => {
           {t('email_payment')}
         </DropdownElement>
       ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Payment>
+            entity="payment"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(payment) => `${t('number')}: ${payment.number}`}
+            bulkUrl="/api/v1/payments/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
   ];
 
   return customBulkActions;

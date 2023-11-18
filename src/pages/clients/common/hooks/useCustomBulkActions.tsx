@@ -14,14 +14,17 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdDownload } from 'react-icons/md';
+import { MdDesignServices, MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const documentsBulk = useDocumentsBulk();
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const getDocumentsIds = (clients: Client[]) => {
     return clients.flatMap(({ documents }) => documents.map(({ id }) => id));
@@ -59,6 +62,28 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
+
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Client>
+            entity="client"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(client) => `${t('number')}: ${client.number}`}
+            bulkUrl="/api/v1/quotes/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
   ];
 
   return customBulkActions;

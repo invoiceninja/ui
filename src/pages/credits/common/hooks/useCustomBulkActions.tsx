@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdCreditCard,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPrint,
@@ -25,10 +26,11 @@ import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { CreditStatus } from '$app/common/enums/credit-status';
 import { useBulk } from '$app/common/queries/credits';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import collect from 'collect.js';
 import { useApplyCredits } from './useApplyCredits';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -78,6 +80,8 @@ export const useCustomBulkActions = () => {
       applyCredits(credits);
     }
   };
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const showApplyCreditsAction = (credits: Credit[]) => {
     return credits.every(
@@ -150,6 +154,27 @@ export const useCustomBulkActions = () => {
       >
         {t('documents')}
       </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Credit>
+            entity="credit"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(credit) => `${t('number')}: ${credit.number}`}
+            bulkUrl="/api/v1/quotes/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
     ),
   ];
 
