@@ -10,12 +10,12 @@
 
 import { useState } from 'react';
 import { Switch } from '@headlessui/react';
-import { classNames } from '../../common/helpers';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useEffect } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import classNames from 'classnames';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -27,7 +27,7 @@ interface Props extends CommonProps {
 
 const StyledSwitch = styled(Switch)`
   &:focus {
-    ring-color: ${(props) => props.theme.ringColor};
+    outline: 2px solid ${(props) => props.theme.ringColor};
   }
   border-color: ${(props) => props.theme.borderColor};
   background-color: ${(props) => props.theme.backgroundColor};
@@ -38,34 +38,37 @@ export default function Toggle(props: Props) {
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
-    setChecked(props.checked as boolean);
-    setDisabled(props.disabled as boolean);
+    setChecked(Boolean(props.checked));
+    setDisabled(Boolean(props.disabled));
   }, [props.checked, props.disabled]);
 
   const accentColor = useAccentColor();
   const colors = useColorScheme();
 
-  const styles: React.CSSProperties = {
-    backgroundColor: colors.$5,
-    borderColor: colors.$5,
-  };
-
-  if (checked) {
-    styles.backgroundColor = accentColor;
-  }
-
   return (
     <Switch.Group as="div" className="flex items-center">
       <StyledSwitch
-        disabled={disabled}
+        theme={{
+          ringColor: colors.$5,
+          borderColor: colors.$5,
+          backgroundColor: checked ? accentColor : colors.$5,
+        }}
         checked={checked}
         onChange={(value) => {
-          setChecked(value);
-          props.onChange && props.onChange(value);
-          props.onValueChange && props.onValueChange(value);
+          if (!disabled) {
+            setChecked(value);
+            props.onChange && props.onChange(value);
+            props.onValueChange && props.onValueChange(value);
+          }
         }}
-        style={styles}
-        className="relative inline-flex flex-shrink-0 h-6 w-11 border border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:cursor-not-allowed"
+        className={classNames(
+          'relative inline-flex items-center border flex-shrink-0 h-6 w-11 rounded-full transition-colors ease-in-out duration-200',
+          {
+            'border-transparent cursor-not-allowed opacity-75': disabled,
+            'cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2':
+              !disabled,
+          }
+        )}
       >
         <span
           aria-hidden="true"
