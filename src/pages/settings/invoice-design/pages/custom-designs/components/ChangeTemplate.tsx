@@ -116,7 +116,7 @@ export function ChangeTemplateModal<T = any>({
         />
       </Element>
 
-      <p>{t('entity')}:</p>
+      <p className='capitalize'>{t('entities')}:</p>
 
       <ul>
         {entities.map((entity, i) => (

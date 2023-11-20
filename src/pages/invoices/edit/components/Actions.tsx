@@ -478,17 +478,18 @@ export function useActions(params?: Params) {
           {t('clone_to_purchase_order')}
         </DropdownElement>
       ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateInvoices([invoice]);
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'run_template') && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateInvoices([invoice]);
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       dropdown && <Divider withoutPadding />,

@@ -37,11 +37,17 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { useActions } from './components/Actions';
+import {
+  changeTemplateInvoicesAtom,
+  isChangeTemplateVisibleAtom,
+  useActions,
+} from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -104,6 +110,11 @@ export default function Edit() {
 
   const actions = useActions();
   const save = useHandleSave(setErrors);
+
+  const [isChangeTemplateVisible, setIsChangeTemplateVisible] = useAtom(
+    isChangeTemplateVisibleAtom
+  );
+  const [changeTemplateInvoices] = useAtom(changeTemplateInvoicesAtom);
 
   return (
     <Default
@@ -248,6 +259,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<Invoice>
+        entity="invoice"
+        entities={changeTemplateInvoices}
+        visible={isChangeTemplateVisible}
+        setVisible={setIsChangeTemplateVisible}
+        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        bulkUrl="/api/v1/invoices/bulk"
+      />
     </Default>
   );
 }
