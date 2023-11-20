@@ -106,6 +106,7 @@ export function Button(props: Props) {
       )}
       style={css}
       onClick={props.onClick}
+      ref={props.innerRef}
     >
       {props.disabled && !props.disableWithoutIcon ? (
         <Spinner variant="light" />
