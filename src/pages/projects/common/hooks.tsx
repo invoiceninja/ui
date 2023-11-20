@@ -26,6 +26,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdRestore,
@@ -47,7 +48,8 @@ import { useCombineProjectsTasks } from './hooks/useCombineProjectsTasks';
 import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'name',
@@ -413,6 +415,7 @@ export const useCustomBulkActions = () => {
     documentsBulk(projectIds, 'download');
     setSelected([]);
   };
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) => (
@@ -441,6 +444,29 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Project>
+            entity="project"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(project) => `${t('number')}: ${project.number}`}
+            bulkUrl="/api/v1/projects/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
+
+
   ];
 
   return customBulkActions;

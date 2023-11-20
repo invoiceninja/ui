@@ -299,6 +299,10 @@ export interface Settings {
   enable_e_invoice: boolean;
   mark_paid_payment_email: boolean;
   classification: string;
+  statement_design_id: string;
+  delivery_note_design_id: string;
+  payment_receipt_design_id: string;
+  payment_refund_design_id: string;
 }
 
 export interface TaxData {

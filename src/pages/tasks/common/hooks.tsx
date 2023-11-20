@@ -28,6 +28,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdNotStarted,
   MdRestore,
@@ -60,8 +61,9 @@ import {
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'status',
@@ -490,6 +492,8 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
+
   const handleDownloadDocuments = (
     selectedTasks: Task[],
     setSelected?: Dispatch<SetStateAction<string[]>>
@@ -560,6 +564,28 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    ({ selectedResources }) => (
+      <>
+        {selectedResources ? (
+          <ChangeTemplateModal<Task>
+            entity="task"
+            entities={selectedResources}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(task) => `${t('number')}: ${task.number}`}
+            bulkUrl="/api/v1/tasks/bulk"
+          />
+        ) : null}
+
+        <DropdownElement
+          onClick={() => setChangeTemplateVisible(true)}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      </>
+    ),
+
   ];
 
   return customBulkActions;

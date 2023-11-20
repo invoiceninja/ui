@@ -1037,6 +1037,37 @@ export function GeneralSettings() {
       <Element
         leftSide={
           <PropertyCheckbox
+            propertyKey="statement_design_id"
+            labelElement={<SettingsLabel label={t('statement_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.statement_design_id"
+            value={company?.settings?.statement_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('statement_design_id', value)
+            }
+            disabled={disableSettingsField('statement_design_id')}
+            errorMessage={errors?.errors['settings.statement_design_id']}
+          >
+            {designs &&
+              designs.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+        </div>
+      </Element>
+
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
             propertyKey="page_layout"
             labelElement={<SettingsLabel label={t('page_layout')} />}
             defaultValue="portrait"
