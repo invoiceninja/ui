@@ -71,6 +71,10 @@ export default function Invoices() {
     }
   }, [invoiceResponse, invoiceSliderVisibility]);
 
+  useEffect(() => {
+    return () => setInvoiceSliderVisibility(false);
+  }, []);
+
   return (
     <Default
       title={documentTitle}

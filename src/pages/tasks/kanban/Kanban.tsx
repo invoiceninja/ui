@@ -99,7 +99,7 @@ export default function Kanban() {
 
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
 
-  const { data: taskStatuses } = useTaskStatusesQuery();
+  const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,

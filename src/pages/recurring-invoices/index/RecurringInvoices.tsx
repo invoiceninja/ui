@@ -74,6 +74,10 @@ export default function RecurringInvoices() {
     }
   }, [recurringInvoiceResponse, recurringInvoiceSliderVisibility]);
 
+  useEffect(() => {
+    return () => setRecurringInvoiceSliderVisibility(false);
+  }, []);
+
   return (
     <Default
       title={t('recurring_invoices')}

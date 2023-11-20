@@ -62,6 +62,7 @@ import {
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -115,6 +116,7 @@ export function useAllTaskColumns() {
 export function useTaskColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const accentColor = useAccentColor();
 
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
@@ -122,6 +124,7 @@ export function useTaskColumns() {
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const navigate = useNavigate();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -156,7 +159,22 @@ export function useTaskColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, task) => <TaskStatus entity={task} />,
+      format: (value, task) => (
+        <div className="flex items-center space-x-2">
+          <TaskStatus entity={task} />
+
+          {task.invoice_id && (
+            <MdTextSnippet
+              className="cursor-pointer"
+              fontSize={19}
+              color={accentColor}
+              onClick={() =>
+                navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+              }
+            />
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
