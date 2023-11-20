@@ -12,11 +12,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import {
-  changeTemplateResourcesAtom,
-  isChangeTemplateVisibleAtom,
-  useActions,
-} from '../edit/components/Actions';
+import { useActions } from '../edit/components/Actions';
 import {
   defaultColumns,
   useAllInvoiceColumns,
@@ -37,8 +33,6 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
-import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Invoice } from '$app/common/interfaces/invoice';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -71,11 +65,6 @@ export default function Invoices() {
       setInvoiceSlider(invoiceResponse);
     }
   }, [invoiceResponse, invoiceSliderVisibility]);
-
-  const [isChangeTemplateVisible, setIsChangeTemplateVisible] = useAtom(
-    isChangeTemplateVisibleAtom
-  );
-  const [changeTemplateInvoices] = useAtom(changeTemplateResourcesAtom);
 
   return (
     <Default
@@ -120,15 +109,6 @@ export default function Invoices() {
       />
 
       <InvoiceSlider />
-
-      <ChangeTemplateModal<Invoice>
-        entity="invoice"
-        entities={changeTemplateInvoices as Invoice[]}
-        visible={isChangeTemplateVisible}
-        setVisible={setIsChangeTemplateVisible}
-        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
-        bulkUrl="/api/v1/invoices/bulk"
-      />
     </Default>
   );
 }
