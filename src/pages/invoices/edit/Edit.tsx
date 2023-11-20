@@ -38,7 +38,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import {
-  changeTemplateInvoicesAtom,
+  changeTemplateResourcesAtom,
   isChangeTemplateVisibleAtom,
   useActions,
 } from './components/Actions';
@@ -114,7 +114,7 @@ export default function Edit() {
   const [isChangeTemplateVisible, setIsChangeTemplateVisible] = useAtom(
     isChangeTemplateVisibleAtom
   );
-  const [changeTemplateInvoices] = useAtom(changeTemplateInvoicesAtom);
+  const [changeTemplateInvoices] = useAtom(changeTemplateResourcesAtom);
 
   return (
     <Default

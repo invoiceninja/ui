@@ -67,7 +67,7 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
 };
 
 export const isChangeTemplateVisibleAtom = atom(false);
-export const changeTemplateInvoicesAtom = atom<Invoice[]>([]);
+export const changeTemplateResourcesAtom = atom<Invoice[]>([]);
 
 interface Params {
   showEditAction?: boolean;
@@ -209,7 +209,7 @@ export function useActions(params?: Params) {
   };
 
   const [, setChangeTemplateVisible] = useAtom(isChangeTemplateVisibleAtom);
-  const [, setChangeTemplateInvoices] = useAtom(changeTemplateInvoicesAtom);
+  const [, setChangeTemplateInvoices] = useAtom(changeTemplateResourcesAtom);
 
   return [
     (invoice: Invoice) =>

@@ -13,7 +13,7 @@ import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
-  changeTemplateInvoicesAtom,
+  changeTemplateResourcesAtom,
   isChangeTemplateVisibleAtom,
   useActions,
 } from '../edit/components/Actions';
@@ -75,7 +75,7 @@ export default function Invoices() {
   const [isChangeTemplateVisible, setIsChangeTemplateVisible] = useAtom(
     isChangeTemplateVisibleAtom
   );
-  const [changeTemplateInvoices] = useAtom(changeTemplateInvoicesAtom);
+  const [changeTemplateInvoices] = useAtom(changeTemplateResourcesAtom);
 
   return (
     <Default
