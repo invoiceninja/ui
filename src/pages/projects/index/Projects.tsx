@@ -21,6 +21,11 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Project } from '$app/common/interfaces/project';
 
 export default function Projects() {
   useTitle('projects');
@@ -36,6 +41,12 @@ export default function Projects() {
   const projectColumns = useAllProjectColumns();
 
   const customBulkActions = useCustomBulkActions();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -62,6 +73,15 @@ export default function Projects() {
           />
         }
         linkToCreateGuards={[permission('create_project')]}
+      />
+
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
       />
     </Default>
   );

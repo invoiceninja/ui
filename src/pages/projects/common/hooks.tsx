@@ -49,7 +49,10 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'name',
@@ -274,6 +277,9 @@ export function useActions() {
     navigate('/projects/create?action=clone');
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const handleInvoiceProject = (project: Project) => {
     toast.processing();
 
@@ -339,6 +345,17 @@ export function useActions() {
         icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone')}
+      </DropdownElement>
+    ),
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([project]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
     () => isEditOrShowPage && <Divider withoutPadding />,
@@ -465,8 +482,6 @@ export const useCustomBulkActions = () => {
         </DropdownElement>
       </>
     ),
-
-
   ];
 
   return customBulkActions;

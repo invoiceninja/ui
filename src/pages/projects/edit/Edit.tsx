@@ -21,6 +21,7 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { ChangeTemplateModal, useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -53,141 +54,158 @@ export default function Edit() {
     setProject((project) => project && { ...project, [property]: value });
   };
 
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
+
   return (
-    <Card title={t('edit_project')}>
-      {project && (
-        <Element leftSide={t('status')}>
-          <EntityStatus entity={project} />
+    <>
+      <Card title={t('edit_project')}>
+        {project && (
+          <Element leftSide={t('status')}>
+            <EntityStatus entity={project} />
+          </Element>
+        )}
+
+        <Element leftSide={t('project_name')} required>
+          <InputField
+            value={project?.name}
+            onValueChange={(value) => handleChange('name', value)}
+            errorMessage={errors?.errors.name}
+          />
         </Element>
-      )}
 
-      <Element leftSide={t('project_name')} required>
-        <InputField
-          value={project?.name}
-          onValueChange={(value) => handleChange('name', value)}
-          errorMessage={errors?.errors.name}
-        />
-      </Element>
+        <Element leftSide={t('project_number')}>
+          <InputField
+            value={project?.number}
+            onValueChange={(value) => handleChange('number', value)}
+            errorMessage={errors?.errors.number}
+          />
+        </Element>
 
-      <Element leftSide={t('project_number')}>
-        <InputField
-          value={project?.number}
-          onValueChange={(value) => handleChange('number', value)}
-          errorMessage={errors?.errors.number}
-        />
-      </Element>
+        <Element leftSide={t('client')} required>
+          <ClientSelector
+            value={project?.client_id}
+            onChange={(id) => handleChange('client_id', id)}
+            readonly
+            staleTime={Infinity}
+          />
+        </Element>
 
-      <Element leftSide={t('client')} required>
-        <ClientSelector
-          value={project?.client_id}
-          onChange={(id) => handleChange('client_id', id)}
-          readonly
-          staleTime={Infinity}
-        />
-      </Element>
+        <Element leftSide={t('user')}>
+          <UserSelector
+            value={project?.assigned_user_id}
+            onChange={(user) => handleChange('assigned_user_id', user.id)}
+            onClearButtonClick={() => handleChange('assigned_user_id', '')}
+            errorMessage={errors?.errors.assigned_user_id}
+            readonly
+          />
+        </Element>
 
-      <Element leftSide={t('user')}>
-        <UserSelector
-          value={project?.assigned_user_id}
-          onChange={(user) => handleChange('assigned_user_id', user.id)}
-          onClearButtonClick={() => handleChange('assigned_user_id', '')}
-          errorMessage={errors?.errors.assigned_user_id}
-          readonly
-        />
-      </Element>
+        <Element leftSide={t('due_date')}>
+          <InputField
+            type="date"
+            value={project?.due_date}
+            onValueChange={(value) => handleChange('due_date', value)}
+            errorMessage={errors?.errors.due_date}
+          />
+        </Element>
 
-      <Element leftSide={t('due_date')}>
-        <InputField
-          type="date"
-          value={project?.due_date}
-          onValueChange={(value) => handleChange('due_date', value)}
-          errorMessage={errors?.errors.due_date}
-        />
-      </Element>
+        <Element leftSide={t('budgeted_hours')}>
+          <InputField
+            type="number"
+            value={project?.budgeted_hours}
+            onValueChange={(value) =>
+              handleChange('budgeted_hours', parseFloat(value))
+            }
+            errorMessage={errors?.errors.budgeted_hours}
+          />
+        </Element>
 
-      <Element leftSide={t('budgeted_hours')}>
-        <InputField
-          type="number"
-          value={project?.budgeted_hours}
-          onValueChange={(value) =>
-            handleChange('budgeted_hours', parseFloat(value))
-          }
-          errorMessage={errors?.errors.budgeted_hours}
-        />
-      </Element>
+        <Element leftSide={t('task_rate')}>
+          <InputField
+            type="number"
+            value={project?.task_rate}
+            onValueChange={(value) =>
+              handleChange('task_rate', parseFloat(value))
+            }
+            errorMessage={errors?.errors.task_rate}
+          />
+        </Element>
 
-      <Element leftSide={t('task_rate')}>
-        <InputField
-          type="number"
-          value={project?.task_rate}
-          onValueChange={(value) =>
-            handleChange('task_rate', parseFloat(value))
-          }
-          errorMessage={errors?.errors.task_rate}
-        />
-      </Element>
+        <Element leftSide={t('public_notes')}>
+          <InputField
+            element="textarea"
+            value={project?.public_notes}
+            onValueChange={(value) => handleChange('public_notes', value)}
+            errorMessage={errors?.errors.public_notes}
+          />
+        </Element>
 
-      <Element leftSide={t('public_notes')}>
-        <InputField
-          element="textarea"
-          value={project?.public_notes}
-          onValueChange={(value) => handleChange('public_notes', value)}
-          errorMessage={errors?.errors.public_notes}
-        />
-      </Element>
+        <Element leftSide={t('private_notes')}>
+          <InputField
+            element="textarea"
+            value={project?.private_notes}
+            onValueChange={(value) => handleChange('private_notes', value)}
+            errorMessage={errors?.errors.private_notes}
+          />
+        </Element>
 
-      <Element leftSide={t('private_notes')}>
-        <InputField
-          element="textarea"
-          value={project?.private_notes}
-          onValueChange={(value) => handleChange('private_notes', value)}
-          errorMessage={errors?.errors.private_notes}
-        />
-      </Element>
+        {project && company?.custom_fields?.project1 && (
+          <CustomField
+            field="project1"
+            defaultValue={project.custom_value1 || ''}
+            value={company.custom_fields.project1}
+            onValueChange={(value) =>
+              handleChange('custom_value1', value.toString())
+            }
+          />
+        )}
 
-      {project && company?.custom_fields?.project1 && (
-        <CustomField
-          field="project1"
-          defaultValue={project.custom_value1 || ''}
-          value={company.custom_fields.project1}
-          onValueChange={(value) =>
-            handleChange('custom_value1', value.toString())
-          }
-        />
-      )}
+        {project && company?.custom_fields?.project2 && (
+          <CustomField
+            field="project2"
+            defaultValue={project.custom_value2 || ''}
+            value={company.custom_fields.project2}
+            onValueChange={(value) =>
+              handleChange('custom_value2', value.toString())
+            }
+          />
+        )}
 
-      {project && company?.custom_fields?.project2 && (
-        <CustomField
-          field="project2"
-          defaultValue={project.custom_value2 || ''}
-          value={company.custom_fields.project2}
-          onValueChange={(value) =>
-            handleChange('custom_value2', value.toString())
-          }
-        />
-      )}
+        {project && company?.custom_fields?.project3 && (
+          <CustomField
+            field="project3"
+            defaultValue={project.custom_value3 || ''}
+            value={company.custom_fields.project3}
+            onValueChange={(value) =>
+              handleChange('custom_value3', value.toString())
+            }
+          />
+        )}
 
-      {project && company?.custom_fields?.project3 && (
-        <CustomField
-          field="project3"
-          defaultValue={project.custom_value3 || ''}
-          value={company.custom_fields.project3}
-          onValueChange={(value) =>
-            handleChange('custom_value3', value.toString())
-          }
-        />
-      )}
+        {project && company?.custom_fields?.project4 && (
+          <CustomField
+            field="project4"
+            defaultValue={project.custom_value4 || ''}
+            value={company.custom_fields.project4}
+            onValueChange={(value) =>
+              handleChange('custom_value4', value.toString())
+            }
+          />
+        )}
+      </Card>
 
-      {project && company?.custom_fields?.project4 && (
-        <CustomField
-          field="project4"
-          defaultValue={project.custom_value4 || ''}
-          value={company.custom_fields.project4}
-          onValueChange={(value) =>
-            handleChange('custom_value4', value.toString())
-          }
-        />
-      )}
-    </Card>
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
+      />
+    </>
   );
 }
