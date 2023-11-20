@@ -23,10 +23,9 @@ import {
 } from '$app/pages/invoices/edit/components/Actions';
 import collect from 'collect.js';
 import { atom, useAtom } from 'jotai';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
-import { Link } from 'react-router-dom';
 
 export const changeTemplateModalAtom = atom<boolean>(false);
 export const templatePdfUrlAtom = atom<string | null>(null);
@@ -55,6 +54,8 @@ export function ChangeTemplateModal<T = any>({
 
   const queryClient = useQueryClient();
 
+  const submitBtn = useRef<HTMLButtonElement | null>(null);
+
   const changeTemplate = () => {
     const ids = collect(entities).pluck('id').toArray();
 
@@ -78,6 +79,10 @@ export function ChangeTemplateModal<T = any>({
         return;
       }
 
+      if (submitBtn.current) {
+        submitBtn.current.disabled = true;
+      }
+
       queryClient
         .fetchQuery({
           queryKey: ['reports', hash],
@@ -95,8 +100,27 @@ export function ChangeTemplateModal<T = any>({
           setPdfUrl(fileUrl);
 
           toast.success();
+        })
+        .finally(() => {
+          if (submitBtn.current) {
+            submitBtn.current.disabled = false;
+          }
         });
     });
+  };
+
+  const handleDownload = (url: string) => {
+    const link = document.createElement('a');
+
+    link.download = 'template.pdf';
+    link.href = url;
+    link.target = '_blank';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
   };
 
   return (
@@ -135,6 +159,7 @@ export function ChangeTemplateModal<T = any>({
       />
 
       <Button
+        innerRef={submitBtn}
         behavior="button"
         onClick={changeTemplate}
         disabled={!templateId}
@@ -144,9 +169,13 @@ export function ChangeTemplateModal<T = any>({
       </Button>
 
       {pdfUrl ? (
-        <Link to="/settings/invoice_design/template_designs/pdf?redirect=false">
-          {t('success')}! {t('view_pdf')}
-        </Link>
+        <Button
+          type="secondary"
+          behavior="button"
+          onClick={() => handleDownload(pdfUrl)}
+        >
+          {t('download_pdf')}
+        </Button>
       ) : null}
     </Modal>
   );
