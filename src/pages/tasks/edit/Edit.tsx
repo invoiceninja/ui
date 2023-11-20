@@ -21,6 +21,10 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
 import { useUpdateTask } from '../common/hooks/useUpdateTask';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
@@ -48,6 +52,12 @@ export default function Edit() {
 
   const handleSave = useUpdateTask({ isFormBusy, setIsFormBusy, setErrors });
 
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -72,6 +82,15 @@ export default function Edit() {
         />
       )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
+
+      <ChangeTemplateModal<Task>
+        entity="task"
+        entities={changeTemplateResources as Task[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
+      />
     </Default>
   );
 }

@@ -63,7 +63,10 @@ import {
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'status',
@@ -328,7 +331,7 @@ export function useTaskFilters() {
       label: t('uninvoiced'),
       value: 'uninvoiced',
       color: 'white',
-      backgroundColor: '#F87171', 
+      backgroundColor: '#F87171',
     },
   ];
 
@@ -374,6 +377,9 @@ export function useActions() {
     navigate('/tasks/create?action=clone');
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const actions = [
     (task: Task) =>
       !isTaskRunning(task) &&
@@ -415,6 +421,17 @@ export function useActions() {
       </DropdownElement>
     ),
     () => isEditPage && <Divider withoutPadding />,
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([task]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (task: Task) =>
       isEditPage &&
       getEntityState(task) === EntityState.Active && (
@@ -585,7 +602,6 @@ export const useCustomBulkActions = () => {
         </DropdownElement>
       </>
     ),
-
   ];
 
   return customBulkActions;

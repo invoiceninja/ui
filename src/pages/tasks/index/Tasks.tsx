@@ -27,6 +27,10 @@ import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '../common/hooks/useShowEditOption';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -46,6 +50,12 @@ export default function Tasks() {
   const customBulkActions = useCustomBulkActions();
 
   const showEditOption = useShowEditOption();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -78,6 +88,15 @@ export default function Tasks() {
           </Link>
         }
         linkToCreateGuards={[permission('create_task')]}
+      />
+
+      <ChangeTemplateModal<Task>
+        entity="task"
+        entities={changeTemplateResources as Task[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
       />
     </Default>
   );
