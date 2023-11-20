@@ -36,6 +36,11 @@ import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Credit } from '$app/common/interfaces/credit';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -92,6 +97,12 @@ export default function Edit() {
 
   const actions = useActions();
   const save = useSave({ setErrors });
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -183,6 +194,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<Credit>
+        entity="credit"
+        entities={changeTemplateResources as Credit[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        bulkUrl="/api/v1/credits/bulk"
+      />
     </Default>
   );
 }

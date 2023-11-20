@@ -164,7 +164,7 @@ export const useCustomBulkActions = () => {
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(credit) => `${t('number')}: ${credit.number}`}
-            bulkUrl="/api/v1/quotes/bulk"
+            bulkUrl="/api/v1/credits/bulk"
           />
         ) : null}
 

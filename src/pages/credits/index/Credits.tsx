@@ -21,6 +21,11 @@ import {
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Credit } from '$app/common/interfaces/credit';
 
 export default function Credits() {
   useTitle('credits');
@@ -35,6 +40,12 @@ export default function Credits() {
   const creditColumns = useAllCreditColumns();
 
   const customBulkActions = useCustomBulkActions();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -61,6 +72,15 @@ export default function Credits() {
           />
         }
         linkToCreateGuards={[permission('create_credit')]}
+      />
+
+      <ChangeTemplateModal<Credit>
+        entity="credit"
+        entities={changeTemplateResources as Credit[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        bulkUrl="/api/v1/credits/bulk"
       />
     </Default>
   );

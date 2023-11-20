@@ -64,6 +64,7 @@ import {
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -87,6 +88,7 @@ import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/credits';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -396,6 +398,9 @@ export function useActions() {
     navigate('/purchase_orders/create?action=clone');
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const actions: Action<Credit>[] = [
     (credit) => (
       <DropdownElement
@@ -523,6 +528,17 @@ export function useActions() {
         icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone_to_purchase_order')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([credit]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
     () => isEditPage && <Divider withoutPadding />,
