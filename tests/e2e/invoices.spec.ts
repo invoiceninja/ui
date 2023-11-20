@@ -2,6 +2,7 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
+  createClient,
   login,
   logout,
   permissions,
@@ -106,24 +107,18 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
-  withNavigation?: boolean;
 }
 const createInvoice = async (params: CreateParams) => {
-  const {
-    page,
-    withNavigation = true,
-    isTableEditable = true,
-    assignTo,
-  } = params;
+  const { page, isTableEditable = true, assignTo } = params;
 
-  if (withNavigation) {
-    await page
-      .locator('[data-cy="navigationBar"]')
-      .getByRole('link', { name: 'Invoices', exact: true })
-      .click();
+  await createClient({ page, withNavigation: true, createIfNotExist: true });
 
-    await checkTableEditability(page, isTableEditable);
-  }
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await checkTableEditability(page, isTableEditable);
 
   await page
     .getByRole('main')
@@ -359,7 +354,7 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page, withNavigation: false });
+    await createInvoice({ page });
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -407,7 +402,7 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page, withNavigation: false });
+    await createInvoice({ page });
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -460,7 +455,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page, withNavigation: false });
+    await createInvoice({ page });
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -514,7 +509,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page, withNavigation: false });
+    await createInvoice({ page });
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -649,7 +644,7 @@ test('cloning invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page, withNavigation: false });
+    await createInvoice({ page });
 
     const moreActionsButton = page.locator('[data-cy="chevronDownButton"]');
 
