@@ -27,6 +27,11 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote } from '$app/common/interfaces/quote';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -44,6 +49,12 @@ export default function Quotes() {
   const filters = useQuoteFilters();
 
   const customBulkActions = useCustomBulkActions();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -74,6 +85,15 @@ export default function Quotes() {
           />
         }
         linkToCreateGuards={[permission('create_quote')]}
+      />
+
+      <ChangeTemplateModal<Quote>
+        entity="quote"
+        entities={changeTemplateResources as Quote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
       />
     </Default>
   );

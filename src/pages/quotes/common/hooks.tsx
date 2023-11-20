@@ -62,6 +62,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdMarkEmailRead,
@@ -88,6 +89,7 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -381,6 +383,11 @@ export function useActions() {
     navigate('/invoices/create?action=clone');
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+  } = useChangeTemplate();
+
   const actions: Action<Quote>[] = [
     (quote) => (
       <DropdownElement
@@ -504,6 +511,17 @@ export function useActions() {
         icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone_to_purchase_order')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([quote]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
     () => isEditPage && <Divider withoutPadding />,

@@ -38,6 +38,11 @@ import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { Quote } from '$app/common/interfaces/quote';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -97,6 +102,12 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -215,6 +226,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<Quote>
+        entity="quote"
+        entities={changeTemplateResources as Quote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
+      />
     </Default>
   );
 }
