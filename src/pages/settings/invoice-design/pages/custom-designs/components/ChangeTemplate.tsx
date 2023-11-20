@@ -17,6 +17,10 @@ import { Element } from '$app/components/cards';
 import { Button, SelectField, SelectProps } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import Toggle from '$app/components/forms/Toggle';
+import {
+  changeTemplateResourcesAtom,
+  isChangeTemplateVisibleAtom,
+} from '$app/pages/invoices/edit/components/Actions';
 import collect from 'collect.js';
 import { atom, useAtom } from 'jotai';
 import { ReactNode, useState } from 'react';
@@ -116,7 +120,7 @@ export function ChangeTemplateModal<T = any>({
         />
       </Element>
 
-      <p className='capitalize'>{t('entities')}:</p>
+      <p className="capitalize">{t('entities')}:</p>
 
       <ul>
         {entities.map((entity, i) => (
@@ -176,4 +180,20 @@ export function CustomTemplateSelector({
       ))}
     </SelectField>
   );
+}
+
+export function useChangeTemplate() {
+  const [changeTemplateVisible, setChangeTemplateVisible] = useAtom(
+    isChangeTemplateVisibleAtom
+  );
+  const [changeTemplateResources, setChangeTemplateResources] = useAtom(
+    changeTemplateResourcesAtom
+  );
+
+  return {
+    changeTemplateVisible,
+    changeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+  };
 }
