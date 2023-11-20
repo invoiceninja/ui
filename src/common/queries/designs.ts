@@ -24,7 +24,22 @@ export function useDesignsQuery() {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/designs?status=active&sort=name|asc')
+        endpoint('/api/v1/designs?status=active&sort=name|asc&template=false')
+      ).then(
+        (response: AxiosResponse<GenericManyResponse<Design>>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useTemplateQuery(entity: string) {
+  return useQuery<Design[]>(
+    ['/api/v1/designs?template=true'],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/designs?template=true&status=active&sort=name|asc&entities=' + entity)
       ).then(
         (response: AxiosResponse<GenericManyResponse<Design>>) =>
           response.data.data

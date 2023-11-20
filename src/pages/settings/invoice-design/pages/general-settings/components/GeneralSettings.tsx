@@ -10,7 +10,7 @@
 
 import colors from '$app/common/constants/colors';
 import { Design } from '$app/common/interfaces/design';
-import { useDesignsQuery } from '$app/common/queries/designs';
+import { useDesignsQuery, useTemplateQuery } from '$app/common/queries/designs';
 import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom, useAtomValue } from 'jotai';
@@ -781,6 +781,9 @@ export function GeneralSettings() {
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
   const { data: designs } = useDesignsQuery();
+  const { data: invoice_designs } = useTemplateQuery('invoice');
+  const { data: payment_designs } = useTemplateQuery('payment');
+  
 
   const isDesignChanged = (property: keyof Company['settings']) => {
     return currentCompany?.settings[property] !== company?.settings[property];
@@ -1053,8 +1056,8 @@ export function GeneralSettings() {
             disabled={disableSettingsField('statement_design_id')}
             errorMessage={errors?.errors['settings.statement_design_id']}
           >
-            {designs &&
-              designs.map((design: Design) => (
+            {invoice_designs &&
+              invoice_designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1063,6 +1066,97 @@ export function GeneralSettings() {
 
         </div>
       </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="delivery_note_design_id"
+            labelElement={<SettingsLabel label={t('delivery_note_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.delivery_note_design_id"
+            value={company?.settings?.delivery_note_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('delivery_note_design_id', value)
+            }
+            disabled={disableSettingsField('delivery_note_design_id')}
+            errorMessage={errors?.errors['settings.delivery_note_design_id']}
+          >
+            {invoice_designs &&
+              invoice_designs.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="payment_receipt_design_id"
+            labelElement={<SettingsLabel label={t('payment_receipt_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.payment_receipt_design_id"
+            value={company?.settings?.payment_receipt_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('payment_receipt_design_id', value)
+            }
+            disabled={disableSettingsField('payment_receipt_design_id')}
+            errorMessage={errors?.errors['settings.payment_receipt_design_id']}
+          >
+            {invoice_designs &&
+              invoice_designs.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="payment_refund_design_id"
+            labelElement={<SettingsLabel label={t('payment_refund_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.payment_refund_design_id"
+            value={company?.settings?.payment_refund_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('payment_refund_design_id', value)
+            }
+            disabled={disableSettingsField('payment_refund_design_id')}
+            errorMessage={errors?.errors['settings.payment_refund_design_id']}
+          >
+            {invoice_designs &&
+              invoice_designs.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+        </div>
+      </Element>
+
 
 
       <Element
