@@ -35,6 +35,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -60,6 +61,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -404,6 +406,9 @@ export function useActions() {
     navigate('/purchase_orders/create?action=clone');
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
       <DropdownElement
@@ -507,6 +512,17 @@ export function useActions() {
         icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([purchaseOrder]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
     () => isEditPage && <Divider withoutPadding />,

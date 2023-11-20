@@ -41,6 +41,10 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -106,6 +110,12 @@ export default function Edit() {
   const onSave = useSave(setErrors);
 
   const actions = useActions();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    } = useChangeTemplate();
 
   return (
     <Default
@@ -210,6 +220,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<PurchaseOrder>
+        entity="purchase_order"
+        entities={changeTemplateResources as PurchaseOrder[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(po) => `${t('number')}: ${po.number}`}
+        bulkUrl="/api/v1/purchase_orders/bulk"
+      />
     </Default>
   );
 }

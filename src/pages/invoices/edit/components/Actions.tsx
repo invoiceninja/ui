@@ -58,6 +58,8 @@ import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import { Payment } from '$app/common/interfaces/payment';
 import { Client } from '$app/common/interfaces/client';
+import { Project } from '$app/common/interfaces/project';
+import { Task } from '$app/common/interfaces/task';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -68,7 +70,13 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
   );
 };
 
-type ChangeTemplateResource = Invoice | Payment | Client;
+type ChangeTemplateResource =
+  | Invoice
+  | Payment
+  | Client
+  | PurchaseOrder
+  | Project
+  | Task;
 
 export const isChangeTemplateVisibleAtom = atom(false);
 export const changeTemplateResourcesAtom = atom<ChangeTemplateResource[]>([]);

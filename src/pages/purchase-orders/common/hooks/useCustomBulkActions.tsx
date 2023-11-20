@@ -182,11 +182,11 @@ export function useCustomBulkActions() {
       <>
         {selectedResources ? (
           <ChangeTemplateModal<PurchaseOrder>
-            entity="quote"
+            entity="purchase_order"
             entities={selectedResources}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
-            labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+            labelFn={(po) => `${t('number')}: ${po.number}`}
             bulkUrl="/api/v1/purchase_orders/bulk"
           />
         ) : null}
