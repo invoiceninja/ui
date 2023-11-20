@@ -262,7 +262,7 @@ export default function Edit() {
 
       <ChangeTemplateModal<Invoice>
         entity="invoice"
-        entities={changeTemplateInvoices}
+        entities={changeTemplateInvoices as Invoice[]}
         visible={isChangeTemplateVisible}
         setVisible={setIsChangeTemplateVisible}
         labelFn={(invoice) => `${t('number')}: ${invoice.number}`}

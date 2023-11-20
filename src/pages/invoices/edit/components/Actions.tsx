@@ -56,6 +56,7 @@ import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
+import { Payment } from '$app/common/interfaces/payment';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -67,7 +68,7 @@ export const isInvoiceAutoBillable = (invoice: Invoice) => {
 };
 
 export const isChangeTemplateVisibleAtom = atom(false);
-export const changeTemplateResourcesAtom = atom<Invoice[]>([]);
+export const changeTemplateResourcesAtom = atom<Invoice[] | Payment[]>([]);
 
 interface Params {
   showEditAction?: boolean;
