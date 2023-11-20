@@ -29,6 +29,11 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Client } from '$app/common/interfaces/client';
 
 export default function Clients() {
   useTitle('clients');
@@ -56,6 +61,12 @@ export default function Clients() {
   const handlePurgeClient = usePurgeClient(purgeClientId);
 
   const customBulkActions = useCustomBulkActions();
+
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -103,6 +114,15 @@ export default function Clients() {
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
         onSave={handlePurgeClient}
+      />
+
+      <ChangeTemplateModal<Client>
+        entity="client"
+        entities={changeTemplateResources as Client[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(client) => `${t('number')}: ${client.number}`}
+        bulkUrl="/api/v1/clients/bulk"
       />
     </Default>
   );

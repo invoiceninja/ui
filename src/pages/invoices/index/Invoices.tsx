@@ -13,8 +13,6 @@ import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
-  changeTemplateResourcesAtom,
-  isChangeTemplateVisibleAtom,
   useActions,
 } from '../edit/components/Actions';
 import {
@@ -37,7 +35,10 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
-import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice } from '$app/common/interfaces/invoice';
 
 export default function Invoices() {
@@ -72,10 +73,11 @@ export default function Invoices() {
     }
   }, [invoiceResponse, invoiceSliderVisibility]);
 
-  const [changeTemplateVisible, setChangeTemplateVisible] = useAtom(
-    isChangeTemplateVisibleAtom
-  );
-  const [changeTemplateResources] = useAtom(changeTemplateResourcesAtom);
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default

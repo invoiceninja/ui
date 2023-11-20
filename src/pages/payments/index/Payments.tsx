@@ -24,12 +24,11 @@ import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useAtom } from 'jotai';
+import {} from '$app/pages/invoices/edit/components/Actions';
 import {
-  changeTemplateResourcesAtom,
-  isChangeTemplateVisibleAtom,
-} from '$app/pages/invoices/edit/components/Actions';
-import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Payments() {
   useTitle('payments');
@@ -48,10 +47,11 @@ export default function Payments() {
 
   const customBulkActions = useCustomBulkActions();
 
-  const [changeTemplateVisible, setChangeTemplateVisible] = useAtom(
-    isChangeTemplateVisibleAtom
-  );
-  const [changeTemplateResources] = useAtom(changeTemplateResourcesAtom);
+  const {
+    changeTemplateResources,
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+  } = useChangeTemplate();
 
   return (
     <Default

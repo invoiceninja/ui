@@ -24,6 +24,7 @@ import {
   MdCloudCircle,
   MdDelete,
   MdDeleteForever,
+  MdDesignServices,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
@@ -31,6 +32,7 @@ import {
 import { useBulk } from './useBulk';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useConfigureClientSettings } from './useConfigureClientSettings';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Params {
   setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -48,6 +50,8 @@ export function useActions(params: Params) {
   });
 
   const configureClientSettings = useConfigureClientSettings();
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -137,6 +141,17 @@ export function useActions(params: Params) {
           {t('archive')}
         </DropdownElement>
       ),
+    (client) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([client]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (client) =>
       isEditOrShowPage &&
       (getEntityState(client) === EntityState.Archived ||
