@@ -781,8 +781,8 @@ export function GeneralSettings() {
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
   const { data: designs } = useDesignsQuery();
-  const { data: invoice_designs } = useTemplateQuery('invoice');
-  const { data: payment_designs } = useTemplateQuery('payment');
+  const { data: invoiceDesigns } = useTemplateQuery('invoice');
+  const { data: paymentDesigns } = useTemplateQuery('payment');
   
 
   const isDesignChanged = (property: keyof Company['settings']) => {
@@ -1057,8 +1057,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.statement_design_id']}
             withBlank={true}
           >
-            {invoice_designs &&
-              invoice_designs.map((design: Design) => (
+            {invoiceDesigns &&
+              invoiceDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1088,8 +1088,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.delivery_note_design_id']}
             withBlank={true}
           >
-            {invoice_designs &&
-              invoice_designs.map((design: Design) => (
+            {invoiceDesigns &&
+              invoiceDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1119,8 +1119,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.payment_receipt_design_id']}
             withBlank={true}
           >
-            {payment_designs &&
-              payment_designs.map((design: Design) => (
+            {paymentDesigns &&
+              paymentDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1150,8 +1150,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.payment_refund_design_id']}
             withBlank={true}
           >
-            {payment_designs &&
-              payment_designs.map((design: Design) => (
+            {paymentDesigns &&
+              paymentDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
