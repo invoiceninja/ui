@@ -62,7 +62,6 @@ import {
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { accentColor } from 'tailwindcss/defaultTheme';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export const defaultColumns: string[] = [
