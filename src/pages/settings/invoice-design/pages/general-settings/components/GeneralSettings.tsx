@@ -1116,8 +1116,8 @@ export function GeneralSettings() {
             disabled={disableSettingsField('payment_receipt_design_id')}
             errorMessage={errors?.errors['settings.payment_receipt_design_id']}
           >
-            {invoice_designs &&
-              invoice_designs.map((design: Design) => (
+            {payment_designs &&
+              payment_designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1146,8 +1146,8 @@ export function GeneralSettings() {
             disabled={disableSettingsField('payment_refund_design_id')}
             errorMessage={errors?.errors['settings.payment_refund_design_id']}
           >
-            {invoice_designs &&
-              invoice_designs.map((design: Design) => (
+            {payment_designs &&
+              payment_designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
