@@ -2,7 +2,6 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
-  createClient,
   login,
   logout,
   permissions,
@@ -10,6 +9,7 @@ import {
 } from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
 import { Action } from './clients.spec';
+import { createClient } from './client-helpers';
 
 interface Params {
   permissions: Permission[];
