@@ -18,10 +18,16 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
+import {
+  changeTemplateResourcesAtom,
+  isChangeTemplateVisibleAtom,
+} from '$app/pages/invoices/edit/components/Actions';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdDelete,
+  MdDesignServices,
   MdPayment,
   MdRestore,
   MdSend,
@@ -37,6 +43,9 @@ export function useActions() {
   });
 
   const bulk = useBulk();
+
+  const [, setChangeTemplateVisible] = useAtom(isChangeTemplateVisibleAtom);
+  const [, setChangeTemplateResources] = useAtom(changeTemplateResourcesAtom);
 
   const actions: Action<Payment>[] = [
     (resource: Payment) =>
@@ -72,6 +81,17 @@ export function useActions() {
       getEntityState(payment) !== EntityState.Deleted && (
         <Divider withoutPadding />
       ),
+    (payment: Payment) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([payment]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (payment: Payment) =>
       getEntityState(payment) === EntityState.Active &&
       isEditPage && (

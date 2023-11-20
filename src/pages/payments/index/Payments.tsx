@@ -24,6 +24,12 @@ import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useAtom } from 'jotai';
+import {
+  changeTemplateResourcesAtom,
+  isChangeTemplateVisibleAtom,
+} from '$app/pages/invoices/edit/components/Actions';
+import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Payments() {
   useTitle('payments');
@@ -41,6 +47,11 @@ export default function Payments() {
   const filters = usePaymentFilters();
 
   const customBulkActions = useCustomBulkActions();
+
+  const [changeTemplateVisible, setChangeTemplateVisible] = useAtom(
+    isChangeTemplateVisibleAtom
+  );
+  const [changeTemplateResources] = useAtom(changeTemplateResourcesAtom);
 
   return (
     <Default
@@ -70,6 +81,15 @@ export default function Payments() {
           />
         }
         linkToCreateGuards={[permission('create_payment')]}
+      />
+
+      <ChangeTemplateModal<Payment>
+        entity="payment"
+        entities={changeTemplateResources as Payment[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        bulkUrl="/api/v1/payments/bulk"
       />
     </Default>
   );
