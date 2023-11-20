@@ -1055,6 +1055,7 @@ export function GeneralSettings() {
             }
             disabled={disableSettingsField('statement_design_id')}
             errorMessage={errors?.errors['settings.statement_design_id']}
+            withBlank={true}
           >
             {invoice_designs &&
               invoice_designs.map((design: Design) => (
@@ -1085,6 +1086,7 @@ export function GeneralSettings() {
             }
             disabled={disableSettingsField('delivery_note_design_id')}
             errorMessage={errors?.errors['settings.delivery_note_design_id']}
+            withBlank={true}
           >
             {invoice_designs &&
               invoice_designs.map((design: Design) => (
@@ -1115,6 +1117,7 @@ export function GeneralSettings() {
             }
             disabled={disableSettingsField('payment_receipt_design_id')}
             errorMessage={errors?.errors['settings.payment_receipt_design_id']}
+            withBlank={true}
           >
             {payment_designs &&
               payment_designs.map((design: Design) => (
@@ -1145,6 +1148,7 @@ export function GeneralSettings() {
             }
             disabled={disableSettingsField('payment_refund_design_id')}
             errorMessage={errors?.errors['settings.payment_refund_design_id']}
+            withBlank={true}
           >
             {payment_designs &&
               payment_designs.map((design: Design) => (
