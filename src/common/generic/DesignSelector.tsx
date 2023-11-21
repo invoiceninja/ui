@@ -26,6 +26,16 @@ import { $refetch } from '../hooks/useRefetch';
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
   disableWithQueryParameter?: boolean;
+  entity?:
+    | 'invoice'
+    | 'quote'
+    | 'payment'
+    | 'client'
+    | 'quote'
+    | 'credit'
+    | 'purchase_order'
+    | 'project'
+    | 'task';
 }
 
 export function DesignSelector(props: Props) {
@@ -62,6 +72,12 @@ export function DesignSelector(props: Props) {
         });
     }
   };
+
+  const url = props.entity
+    ? endpoint(
+        `/api/v1/designs?per_page=500&status=active&entity=${props.entity}`
+      )
+    : endpoint('/api/v1/designs?per_page=500&status=active');
 
   return (
     <>
@@ -121,7 +137,7 @@ export function DesignSelector(props: Props) {
       </Modal>
 
       <ComboboxAsync<Design>
-        endpoint={endpoint('/api/v1/designs?status=active')}
+        endpoint={url}
         onChange={(design: Entry<Design>) =>
           design.resource && props.onChange(design.resource)
         }
