@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface UserSelectorProps extends GenericSelectorProps<User> {
   endpoint?: string;
@@ -24,6 +25,8 @@ interface UserSelectorProps extends GenericSelectorProps<User> {
 export function UserSelector(props: UserSelectorProps) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   return (
     <ComboboxAsync<User>
@@ -46,7 +49,7 @@ export function UserSelector(props: UserSelectorProps) {
       action={{
         label: t('new_user'),
         onClick: () => navigate('/settings/users'),
-        visible: true,
+        visible: isAdmin || isOwner,
       }}
       onChange={(entry) =>
         entry.resource ? props.onChange(entry.resource) : null

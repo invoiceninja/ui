@@ -86,11 +86,25 @@ export const invoiceRoutes = (
       path=":id/pdf"
       element={
         <Guard
-          guards={[enabled(ModuleBitmask.Invoices), permission('view_invoice')]}
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
           component={<Pdf />}
         />
       }
     />
-    <Route path=":id/email" element={<Email />} />
+    <Route
+      path=":id/email"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
+          component={<Email />}
+        />
+      }
+    />
   </Route>
 );

@@ -17,9 +17,12 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function UpcomingInvoices() {
   const formatMoney = useFormatMoney();
+
+  const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -27,7 +30,10 @@ export function UpcomingInvoices() {
       label: t('number'),
       format: (value, invoice) => {
         return (
-          <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+          <Link
+            to={route('/invoices/:id/edit', { id: invoice.id })}
+            disableNavigation={disableNavigation('invoice', invoice)}
+          >
             {invoice.number}
           </Link>
         );
@@ -37,7 +43,10 @@ export function UpcomingInvoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={route('/clients/:id', { id: invoice.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: invoice.client_id })}
+          disableNavigation={disableNavigation('client', invoice.client)}
+        >
           {invoice.client?.display_name}
         </Link>
       ),

@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
@@ -21,17 +21,14 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
-import { request } from '$app/common/helpers/request';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 
 interface Props {
   client: Client | undefined;
@@ -46,14 +43,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const currencies = useCurrencies();
   const languages = useLanguages();
 
-  const { data: paymentTerms } = useQuery({
-    queryKey: ['/api/v1/payment_terms'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/payment_terms')).then(
-        (response: AxiosResponse<GenericManyResponse<PaymentTerm>>) =>
-          response.data.data
-      ),
-  });
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
@@ -90,8 +80,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     t('settings'),
     t('notes'),
     t('classify'),
-    t('client_fields'),
-    t('contact_fields'),
     t('documents'),
   ]);
 
@@ -131,7 +119,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
@@ -142,16 +130,18 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 }
                 withBlank
               >
-                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
-                  <option key={index} value={paymentTerm.num_days}>
-                    {paymentTerm.name}
-                  </option>
-                ))}
+                {paymentTermsResponse.data.data.map(
+                  (paymentTerm: PaymentTerm, index: number) => (
+                    <option key={index} value={paymentTerm.num_days}>
+                      {paymentTerm.name}
+                    </option>
+                  )
+                )}
               </SelectField>
             </Element>
           )}
 
-          {paymentTerms && (
+          {paymentTermsResponse && (
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
@@ -162,11 +152,13 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 errorMessage={errors?.errors['settings.valid_until']}
                 withBlank
               >
-                {paymentTerms.map((paymentTerm: PaymentTerm, index: number) => (
-                  <option key={index} value={paymentTerm.num_days}>
-                    {paymentTerm.name}
-                  </option>
-                ))}
+                {paymentTermsResponse.data.data.map(
+                  (paymentTerm: PaymentTerm, index: number) => (
+                    <option key={index} value={paymentTerm.num_days}>
+                      {paymentTerm.name}
+                    </option>
+                  )
+                )}
               </SelectField>
             </Element>
           )}
@@ -267,20 +259,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               </SelectField>
             </Element>
           )}
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
         </div>
 
         {id ? (

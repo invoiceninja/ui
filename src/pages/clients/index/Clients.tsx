@@ -29,11 +29,13 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
@@ -91,6 +93,7 @@ export default function Clients() {
           />
         }
         linkToCreateGuards={[permission('create_client')]}
+        hideEditableOptions={!hasPermission('edit_client')}
       />
 
       <MergeClientModal

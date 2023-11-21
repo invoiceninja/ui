@@ -16,9 +16,13 @@ import {
   useActions,
   useRecurringInvoiceColumns,
 } from '$app/pages/recurring-invoices/common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function RecurringInvoices() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = useRecurringInvoiceColumns();
 
@@ -42,6 +46,8 @@ export default function RecurringInvoices() {
       })}
       linkToEdit="/recurring_invoices/:id/edit"
       staleTime={dataTableStaleTime}
+      linkToCreateGuards={[permission('create_recurring_invoice')]}
+      hideEditableOptions={!hasPermission('edit_recurring_invoice')}
     />
   );
 }

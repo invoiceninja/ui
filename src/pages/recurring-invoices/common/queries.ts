@@ -21,6 +21,7 @@ import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -44,6 +45,8 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
 }
 
 export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<RecurringInvoice>(
     ['/api/v1/recurring_invoices', 'create'],
     () =>
@@ -51,7 +54,13 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_recurring_invoice')
+        ? options?.enabled ?? true
+        : false,
+    }
   );
 }
 
