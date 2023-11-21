@@ -38,11 +38,16 @@ import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -102,16 +107,18 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => quote && save(quote)}
-      navigationTopRight={
-        quote && (
-          <ResourceActions
-            resource={quote}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_quote') || entityAssigned(quote)) &&
+        quote && {
+          onSaveClick: () => save(quote),
+          navigationTopRight: (
+            <ResourceActions
+              resource={quote}
+              label={t('more_actions')}
+              actions={actions}
+              cypressRef="quoteActionDropdown"
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
