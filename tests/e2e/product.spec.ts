@@ -119,6 +119,17 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Documents', exact: true })
     ).toBeVisible();
+
+    await page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Documents', exact: true })
+      .click();
+
+    await page.waitForURL('**/products/**/documents');
+
+    await expect(
+      page.getByRole('heading', { name: 'Upload', exact: true })
+    ).toBeVisible();
   } else {
     await expect(
       page
@@ -151,6 +162,28 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Product Fields', exact: true })
     ).toBeVisible();
+
+    await page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Product Fields', exact: true })
+      .click();
+
+    await page.waitForURL('**/products/**/product_fields');
+
+    await expect(
+      page.getByRole('heading', { name: 'Custom Fields', exact: true })
+    ).toBeVisible();
+  }
+
+  const url = page.url();
+
+  if (url !== '**/products/**/edit') {
+    await page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Product Fields', exact: true })
+      .click();
+
+    await page.waitForURL('**/products/**/edit');
   }
 };
 
