@@ -136,6 +136,7 @@ export function CreditFooter(props: Props) {
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
+                  entity='credit'
                 />
               </div>
             </div>

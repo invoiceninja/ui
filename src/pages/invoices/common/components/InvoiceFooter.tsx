@@ -142,6 +142,7 @@ export function InvoiceFooter(props: Props) {
                   onClearButtonClick={() => handleChange('design_id', '')}
                   disableWithQueryParameter
                   errorMessage={errors?.errors.design_id}
+                  entity="invoice"
                 />
               </div>
             </div>

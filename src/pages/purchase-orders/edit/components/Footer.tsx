@@ -126,6 +126,7 @@ export function Footer(props: PurchaseOrderCardProps) {
                 onClearButtonClick={() => handleChange('design_id', '')}
                 disableWithQueryParameter
                 errorMessage={errors?.errors.design_id}
+                entity='purchase_order'
               />
             </div>
           </div>
