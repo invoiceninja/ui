@@ -177,10 +177,12 @@ const checkEditPage = async (
 
   const url = page.url();
 
-  if (url !== '**/products/**/edit') {
+  const pattern = /\/products\/.*\/edit/;
+
+  if (!pattern.test(url)) {
     await page
       .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
+      .getByRole('link', { name: 'Edit', exact: true })
       .click();
 
     await page.waitForURL('**/products/**/edit');
