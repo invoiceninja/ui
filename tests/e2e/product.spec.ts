@@ -119,17 +119,6 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Documents', exact: true })
     ).toBeVisible();
-
-    await page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
-      .click();
-
-    await page.waitForURL('**/products/**/documents');
-
-    await expect(
-      page.getByRole('heading', { name: 'Upload', exact: true })
-    ).toBeVisible();
   } else {
     await expect(
       page
@@ -162,30 +151,6 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Product Fields', exact: true })
     ).toBeVisible();
-
-    await page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Product Fields', exact: true })
-      .click();
-
-    await page.waitForURL('**/products/**/product_fields');
-
-    await expect(
-      page.getByRole('heading', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
-  }
-
-  const url = page.url();
-
-  const pattern = /\/products\/.*\/edit/;
-
-  if (!pattern.test(url)) {
-    await page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Edit', exact: true })
-      .click();
-
-    await page.waitForURL('**/products/**/edit');
   }
 };
 
@@ -750,6 +715,46 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     'bulkActionsDropdown',
     'dataTable'
   );
+
+  await logout(page);
+});
+
+test('rendering documents and product_fields tabs with admin permission', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createProduct({ page, name: 'test product tabs' });
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .getByRole('link', { name: 'Documents', exact: true })
+    .click();
+
+  await page.waitForURL('**/products/**/documents');
+
+  await expect(
+    page.getByRole('heading', { name: 'Upload', exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="tabs"]')
+    .getByRole('link', { name: 'Product Fields', exact: true })
+    .click();
+
+  await page.waitForURL('**/products/**/product_fields');
+
+  await expect(
+    page.getByRole('heading', { name: 'Custom Fields', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('link', { name: 'Edit', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('link', { name: 'Documents', exact: true })
+  ).toBeVisible();
 
   await logout(page);
 });
