@@ -27,6 +27,8 @@ import Toggle from '$app/components/forms/Toggle';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -41,6 +43,9 @@ export function InvoiceFooter(props: Props) {
   const { handleChange, errors } = props;
 
   const location = useLocation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const tabs = [
     t('public_notes'),
@@ -96,11 +101,19 @@ export function InvoiceFooter(props: Props) {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={
+                !hasPermission('edit_recurring_invoice') &&
+                !entityAssigned(recurringInvoice)
+              }
             />
 
             <DocumentsTable
               documents={recurringInvoice?.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={
+                !hasPermission('edit_recurring_invoice') &&
+                !entityAssigned(recurringInvoice)
+              }
             />
           </div>
         )}
