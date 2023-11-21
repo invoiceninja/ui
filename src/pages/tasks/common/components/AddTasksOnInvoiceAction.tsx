@@ -20,6 +20,8 @@ import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   tasks: Task[];
@@ -31,6 +33,9 @@ export function AddTasksOnInvoiceAction(props: Props) {
   const { tasks, isBulkAction, setSelected } = props;
 
   const queryClient = useQueryClient();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -81,7 +86,13 @@ export function AddTasksOnInvoiceAction(props: Props) {
             return toast.error('no_invoices_found');
           }
 
-          setInvoices(response.data.data);
+          if (hasPermission('edit_invoice')) {
+            setInvoices(response.data.data);
+          } else {
+            setInvoices(
+              response.data.data.filter((invoice) => entityAssigned(invoice))
+            );
+          }
 
           setIsModalVisible(true);
         })

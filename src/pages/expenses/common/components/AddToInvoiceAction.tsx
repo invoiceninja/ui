@@ -31,6 +31,8 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   expense: Expense;
@@ -46,6 +48,9 @@ export function AddToInvoiceAction(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const colors = useColorScheme();
 
@@ -125,9 +130,17 @@ export function AddToInvoiceAction(props: Props) {
               { clientId: expense.client_id || '' }
             )
           )
-            .then((response: GenericSingleResourceResponse<Invoice[]>) =>
-              setInvoices(response.data.data)
-            )
+            .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+              if (hasPermission('edit_invoice')) {
+                setInvoices(response.data.data);
+              } else {
+                setInvoices(
+                  response.data.data.filter((invoice) =>
+                    entityAssigned(invoice)
+                  )
+                );
+              }
+            })
             .finally(() => setIsLoading(false))
       );
     }

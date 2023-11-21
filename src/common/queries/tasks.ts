@@ -46,7 +46,11 @@ export function useBlankTaskQuery(options?: GenericQueryOptions) {
       request('GET', endpoint('/api/v1/tasks/create')).then(
         (response: GenericSingleResourceResponse<Task>) => response.data.data
       ),
-    { ...options, staleTime: Infinity, enabled: hasPermission('create_task') }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_task') ? options?.enabled ?? true : false,
+    }
   );
 }
 

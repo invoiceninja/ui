@@ -20,9 +20,12 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './useInvoiceProducts';
 import { usePurchaseOrderProducts } from './usePurchaseOrderProducts';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -62,7 +65,8 @@ export const useCustomBulkActions = () => {
 
   const customBulkActions: CustomBulkAction<Product>[] = [
     ({ selectedResources, setSelected }) =>
-      shouldShowNewInvoice(selectedResources) && (
+      shouldShowNewInvoice(selectedResources) &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => {
             invoiceProducts(selectedResources);
@@ -74,7 +78,8 @@ export const useCustomBulkActions = () => {
         </DropdownElement>
       ),
     ({ selectedResources, setSelected }) =>
-      shouldShowPurchaseOrder(selectedResources) && (
+      shouldShowPurchaseOrder(selectedResources) &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           onClick={() => {
             purchaseOrderProducts(selectedResources);

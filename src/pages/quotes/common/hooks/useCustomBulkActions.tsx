@@ -32,11 +32,15 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdfs = useDownloadPdfs({ entity: 'quote' });
@@ -115,18 +119,28 @@ export function useCustomBulkActions() {
     ({ selectedResources }) =>
       selectedResources?.length &&
       selectedResources[0].invoice_id && (
-        <DropdownElement
-          onClick={() =>
-            navigate(
-              route('/invoices/:id/edit', {
-                id: selectedResources[0].invoice_id,
-              })
-            )
+        <Assigned
+          entityId={selectedResources[0].invoice_id}
+          cacheEndpoint="/api/v1/invoices"
+          apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+          preCheck={
+            hasPermission('view_invoice') || hasPermission('edit_invoice')
           }
-          icon={<Icon element={MdContactPage} />}
-        >
-          {t('view_invoice')}
-        </DropdownElement>
+          component={
+            <DropdownElement
+              onClick={() =>
+                navigate(
+                  route('/invoices/:id/edit', {
+                    id: selectedResources[0].invoice_id,
+                  })
+                )
+              }
+              icon={<Icon element={MdContactPage} />}
+            >
+              {t('view_invoice')}
+            </DropdownElement>
+          }
+        />
       ),
     ({ selectedResources, setSelected }) => (
       <DropdownElement
@@ -168,7 +182,8 @@ export function useCustomBulkActions() {
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
-      showConvertToInvoiceAction(selectedResources) && (
+      showConvertToInvoiceAction(selectedResources) &&
+      hasPermission('create_invoice') && (
         <ConvertToInvoiceBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}
@@ -176,7 +191,8 @@ export function useCustomBulkActions() {
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
-      showConvertToProjectAction(selectedResources) && (
+      showConvertToProjectAction(selectedResources) &&
+      hasPermission('create_project') && (
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}

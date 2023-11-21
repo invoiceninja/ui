@@ -18,8 +18,11 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { $refetch } from '../hooks/useRefetch';
+import { useHasPermission } from '../hooks/permissions/useHasPermission';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<PurchaseOrder>(
     ['/api/v1/purchase_orders', 'create'],
     () =>
@@ -27,7 +30,13 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_purchase_order')
+        ? options?.enabled ?? true
+        : false,
+    }
   );
 }
 

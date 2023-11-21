@@ -63,6 +63,9 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'status',
@@ -115,6 +118,9 @@ export function useTaskColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const accentColor = useAccentColor();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
@@ -134,9 +140,19 @@ export function useTaskColumns() {
       id: 'project_id',
       label: t('project'),
       format: (value, task) => (
-        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
-          {task?.project?.name}
-        </Link>
+        <Assigned
+          entityId={task.project_id}
+          cacheEndpoint="/api/v1/projects"
+          apiEndpoint="/api/v1/projects/:id"
+          preCheck={
+            hasPermission('view_project') || hasPermission('edit_project')
+          }
+          component={
+            <Link to={route('/projects/:id', { id: task?.project?.id })}>
+              {task?.project?.name}
+            </Link>
+          }
+        />
       ),
     },
     {
@@ -145,9 +161,8 @@ export function useTaskColumns() {
       label: t('status'),
       format: (value, task) => (
         <div className="flex items-center space-x-2">
+          <TaskStatus entity={task} />
 
-        <TaskStatus entity={task} />
-        
           {task.invoice_id && (
             <MdTextSnippet
               className="cursor-pointer"
@@ -159,15 +174,19 @@ export function useTaskColumns() {
             />
           )}
         </div>
-        
-      )
+      ),
     },
     {
       column: 'number',
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link to={route('/tasks/:id/edit', { id: task.id })}>{value}</Link>
+        <Link
+          to={route('/tasks/:id/edit', { id: task.id })}
+          disableNavigation={disableNavigation('task', task)}
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -176,7 +195,10 @@ export function useTaskColumns() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', task.client)}
+          >
             {task.client.display_name}
           </Link>
         ),
@@ -346,7 +368,7 @@ export function useTaskFilters() {
       label: t('uninvoiced'),
       value: 'uninvoiced',
       color: 'white',
-      backgroundColor: '#F87171', 
+      backgroundColor: '#F87171',
     },
   ];
 
@@ -371,6 +393,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
@@ -415,7 +439,8 @@ export function useActions() {
       ),
     (task: Task) =>
       !isTaskRunning(task) &&
-      !task.invoice_id && (
+      !task.invoice_id &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceTask([task])}
           icon={<Icon element={MdTextSnippet} />}
@@ -424,14 +449,15 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
-    (task: Task) => (
-      <DropdownElement
-        onClick={() => cloneToTask(task)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    (task: Task) =>
+      hasPermission('create_task') && (
+        <DropdownElement
+          onClick={() => cloneToTask(task)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (task: Task) =>
       isEditPage &&
@@ -475,6 +501,8 @@ export const useCustomBulkActions = () => {
   const invoiceTask = useInvoiceTask();
 
   const bulk = useBulk();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -557,7 +585,9 @@ export const useCustomBulkActions = () => {
         />
       ),
     ({ selectedResources, setSelected }) =>
-      selectedResources && showInvoiceTaskAction(selectedResources) ? (
+      selectedResources &&
+      showInvoiceTaskAction(selectedResources) &&
+      hasPermission('create_invoice') ? (
         <DropdownElement
           onClick={() => {
             invoiceTask(selectedResources);

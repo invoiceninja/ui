@@ -23,6 +23,7 @@ interface Props extends CommonProps {
   disabled?: boolean;
   onChange?: (value: boolean) => unknown;
   onValueChange?: (value: boolean) => unknown;
+  cypressRef?: string;
 }
 
 const StyledSwitch = styled(Switch)`
@@ -69,6 +70,7 @@ export default function Toggle(props: Props) {
             props.onValueChange && props.onValueChange(value);
           }
         }}
+        data-cy={props.cypressRef}
       >
         <span
           aria-hidden="true"

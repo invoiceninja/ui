@@ -47,6 +47,9 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -121,6 +124,10 @@ export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
@@ -207,7 +214,8 @@ export function InvoiceSlider() {
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
-        invoice ? (
+        invoice &&
+        (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
             label={t('more_actions')}
             resource={invoice}
@@ -338,6 +346,7 @@ export function InvoiceSlider() {
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
+                  disableNavigation={disableNavigation('payment', payment)}
                 >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
@@ -390,7 +399,13 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <Link
+                      to={`/clients/${activity.client_id}`}
+                      disableNavigation={disableNavigation(
+                        'client',
+                        invoice?.client
+                      )}
+                    >
                       {invoice?.client?.display_name}
                     </Link>
                   </div>

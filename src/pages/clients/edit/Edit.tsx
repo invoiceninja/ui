@@ -135,6 +135,7 @@ export default function Edit() {
             label={t('more_actions')}
             resource={client}
             actions={actions}
+            cypressRef="clientActionDropdown"
           />
         )
       }
