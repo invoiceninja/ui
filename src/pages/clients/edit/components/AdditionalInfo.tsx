@@ -29,7 +29,6 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   client: Client | undefined;
@@ -40,8 +39,6 @@ interface Props {
 
 export function AdditionalInfo({ client, errors, setClient }: Props) {
   const [t] = useTranslation();
-
-  const { isAdmin, isOwner } = useAdmin();
 
   const currencies = useCurrencies();
   const languages = useLanguages();
