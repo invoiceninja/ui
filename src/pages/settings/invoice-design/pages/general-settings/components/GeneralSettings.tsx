@@ -783,7 +783,11 @@ export function GeneralSettings() {
   const { data: designs } = useDesignsQuery();
   const { data: invoiceDesigns } = useTemplateQuery('invoice');
   const { data: paymentDesigns } = useTemplateQuery('payment');
+  const { data: clientDesigns } = useTemplateQuery('client');
   
+  const designsFilter = (entity: string, designs: Design[]) => {
+    return designs.filter((design: Design) => design.is_template === false || design.entities.match(entity)) ?? designs;
+  };
 
   const isDesignChanged = (property: keyof Company['settings']) => {
     return currentCompany?.settings[property] !== company?.settings[property];
@@ -851,7 +855,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.invoice_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('invoice', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -900,8 +904,8 @@ export function GeneralSettings() {
             disabled={disableSettingsField('quote_design_id')}
             errorMessage={errors?.errors['settings.quote_design_id']}
           >
-            {designs &&
-              designs.map((design: Design) => (
+            {designs && 
+              designsFilter('quote', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -951,7 +955,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.credit_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('credit', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1003,7 +1007,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.purchase_order_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('purchase_order', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1057,8 +1061,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.statement_design_id']}
             withBlank={true}
           >
-            {invoiceDesigns &&
-              invoiceDesigns.map((design: Design) => (
+            {clientDesigns &&
+              clientDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>

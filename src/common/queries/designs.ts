@@ -24,7 +24,7 @@ export function useDesignsQuery() {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/designs?status=active&sort=name|asc&template=false')
+        endpoint('/api/v1/designs?status=active&sort=name|asc')
       ).then(
         (response: AxiosResponse<GenericManyResponse<Design>>) =>
           response.data.data
@@ -35,7 +35,7 @@ export function useDesignsQuery() {
 
 export function useTemplateQuery(entity: string) {
   return useQuery<Design[]>(
-    ['/api/v1/designs?template=true'],
+    ['/api/v1/designs?template=true&entities=' + entity],
     () =>
       request(
         'GET',
