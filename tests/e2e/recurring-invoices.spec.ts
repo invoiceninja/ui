@@ -43,12 +43,8 @@ function useRecurringInvoiceActions({ permissions }: Params) {
   return actions;
 }
 
-const checkEditPage = async (
-  page: Page,
-  isEditable: boolean,
-  expectingUrl?: string
-) => {
-  await page.waitForURL(expectingUrl || '**/recurring_invoices/**/edit');
+const checkEditPage = async (page: Page, isEditable: boolean) => {
+  await page.waitForURL('**/recurring_invoices/**/edit');
 
   if (isEditable) {
     await expect(
@@ -599,7 +595,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await createRecurringInvoice({ page });
 
-  await checkEditPage(page, true, '**/recurring_invoices/**/edit**');
+  await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -651,7 +647,7 @@ test('all clone actions displayed with creation permissions', async ({
 
   await createRecurringInvoice({ page, isTableEditable: false });
 
-  await checkEditPage(page, true, '**/recurring_invoices/**/edit**');
+  await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
