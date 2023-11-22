@@ -191,12 +191,12 @@ test('can edit invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['edit_invoice'],
+    permissions: ['edit_invoice', 'view_client'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('edit_invoice');
+  await set('edit_invoice', 'view_client');
   await save();
 
   await createInvoice({ page });

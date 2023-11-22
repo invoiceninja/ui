@@ -168,7 +168,7 @@ test('can edit recurring invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('edit_recurring_invoice');
+  await set('edit_recurring_invoice', 'view_client');
   await save();
 
   await createRecurringInvoice({ page });
