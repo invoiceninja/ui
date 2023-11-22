@@ -46,7 +46,6 @@ function useRecurringInvoiceActions({ permissions }: Params) {
 const checkEditPage = async (
   page: Page,
   isEditable: boolean,
-  isAdmin: boolean,
   expectingUrl?: string
 ) => {
   await page.waitForURL(expectingUrl || '**/recurring_invoices/**/edit');
@@ -75,20 +74,6 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
-  }
-
-  if (!isAdmin) {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
-  } else {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
   }
 };
 
@@ -131,9 +116,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
   ).toBeVisible();
 };
 
-test.skip("can't view recurring invoices without permission", async ({
-  page,
-}) => {
+test("can't view recurring invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -150,7 +133,7 @@ test.skip("can't view recurring invoices without permission", async ({
   await logout(page);
 });
 
-test.skip('can view recurring invoice', async ({ page }) => {
+test('can view recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -175,21 +158,21 @@ test.skip('can view recurring invoice', async ({ page }) => {
 
   await tableRow.getByRole('link').first().click();
 
-  await checkEditPage(page, false, false);
+  await checkEditPage(page, false);
 
   await logout(page);
 });
 
-test('can edit invoice', async ({ page }) => {
+test('can edit recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringInvoiceActions({
-    permissions: ['edit_invoice'],
+    permissions: ['edit_recurring_invoice'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('edit_invoice');
+  await set('edit_recurring_invoice');
   await save();
 
   await createRecurringInvoice({ page });
@@ -209,7 +192,7 @@ test('can edit invoice', async ({ page }) => {
 
   await tableRow.getByRole('link').first().click();
 
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -217,26 +200,35 @@ test('can edit invoice', async ({ page }) => {
     .click();
 
   await expect(
-    page.getByText('Successfully updated invoice', { exact: true })
+    page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('[data-cy="chevronDownButton"]').click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringInvoiceActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
 
-test.skip('can create a invoice', async ({ page }) => {
+test('can create a recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringInvoiceActions({
-    permissions: ['create_invoice'],
+    permissions: ['create_recurring_invoice'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice');
+  await set('create_recurring_invoice');
   await save();
 
   await createRecurringInvoice({ page });
@@ -256,7 +248,7 @@ test.skip('can create a invoice', async ({ page }) => {
 
   await tableRow.getByRole('link').first().click();
 
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -264,28 +256,37 @@ test.skip('can create a invoice', async ({ page }) => {
     .click();
 
   await expect(
-    page.getByText('Successfully updated invoice', { exact: true })
+    page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('[data-cy="chevronDownButton"]').click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringInvoiceActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
 
-test.skip('can view and edit assigned invoice with create_invoice', async ({
+test('can view and edit assigned invoice with create_recurring_invoice', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringInvoiceActions({
-    permissions: ['create_invoice'],
+    permissions: ['create_recurring_invoice'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice');
+  await set('create_recurring_invoice');
   await save();
 
   await createRecurringInvoice({ page, assignTo: 'Invoices Example' });
@@ -305,7 +306,7 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
 
   await tableRow.getByRole('link').first().click();
 
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -313,22 +314,35 @@ test.skip('can view and edit assigned invoice with create_invoice', async ({
     .click();
 
   await expect(
-    page.getByText('Successfully updated invoice', { exact: true })
+    page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page.locator('[data-cy="chevronDownButton"]').click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringInvoiceActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
 
-test.skip('deleting invoice with edit_invoice', async ({ page }) => {
+test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set(
+    'create_recurring_invoice',
+    'edit_recurring_invoice',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -342,7 +356,7 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForURL('**/invoices');
+  await page.waitForURL('**/recurring_invoices');
 
   await page.waitForTimeout(200);
 
@@ -352,14 +366,17 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
     await createRecurringInvoice({ page });
 
     const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted invoice')).toBeVisible();
+    await expect(
+      page.getByText('Successfully deleted recurring invoice')
+    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -369,16 +386,22 @@ test.skip('deleting invoice with edit_invoice', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted invoice')).toBeVisible();
+    await expect(
+      page.getByText('Successfully deleted recurring invoice')
+    ).toBeVisible();
   }
 });
 
-test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
+test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set(
+    'create_recurring_invoice',
+    'edit_recurring_invoice',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -390,7 +413,7 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
     .click();
 
-  await page.waitForURL('**/invoices');
+  await page.waitForURL('**/recurring_invoices');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -402,14 +425,17 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
     await createRecurringInvoice({ page });
 
     const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+    await expect(
+      page.getByText('Successfully archived recurring invoice')
+    ).toBeVisible();
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
@@ -424,16 +450,24 @@ test.skip('archiving invoice withe edit_invoice', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+    await expect(
+      page.getByText('Successfully archived recurring invoice')
+    ).toBeVisible();
   }
 });
 
-test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
+test('invoice documents preview with edit_recurring_invoice', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set(
+    'create_recurring_invoice',
+    'edit_recurring_invoice',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -445,7 +479,7 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
     .click();
 
-  await page.waitForURL('**/invoices');
+  await page.waitForURL('**/recurring_invoices');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -457,7 +491,8 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
     await createRecurringInvoice({ page });
 
     const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
@@ -468,9 +503,9 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await page.waitForURL('**/recurring_invoices/**/edit');
 
@@ -484,12 +519,18 @@ test.skip('invoice documents preview with edit_invoice', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
+test('invoice documents uploading with edit_recurring_invoice', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set(
+    'create_recurring_invoice',
+    'edit_recurring_invoice',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -501,7 +542,7 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
     .click();
 
-  await page.waitForURL('**/invoices');
+  await page.waitForURL('**/recurring_invoices');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -513,7 +554,8 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
     await createRecurringInvoice({ page });
 
     const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
       .first();
 
     await moreActionsButton.click();
@@ -524,8 +566,9 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/recurring_invoices/**/edit');
 
@@ -547,7 +590,7 @@ test.skip('invoice documents uploading with edit_invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('all actions in dropdown displayed with admin permission', async ({
+test('all actions in dropdown displayed with admin permission', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -566,27 +609,35 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
 
   await createRecurringInvoice({ page });
 
-  await checkEditPage(page, true, true, '**/recurring_invoices/**/edit**');
+  await checkEditPage(page, true, '**/recurring_invoices/**/edit**');
 
-  await page.locator('[data-cy="chevronDownButton"]').click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringInvoiceActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
 
-test.skip('Enter Payment and all clone actions displayed with creation permissions', async ({
+test('all clone actions displayed with creation permissions', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringInvoiceActions({
     permissions: [
-      'create_payment',
+      'create_recurring_invoice',
       'create_invoice',
       'create_quote',
       'create_credit',
-      'create_recurring_invoice',
       'create_purchase_order',
     ],
   });
@@ -594,11 +645,10 @@ test.skip('Enter Payment and all clone actions displayed with creation permissio
   await login(page);
   await clear('invoices@example.com');
   await set(
-    'create_payment',
+    'create_recurring_invoice',
     'create_invoice',
     'create_quote',
     'create_credit',
-    'create_recurring_invoice',
     'create_purchase_order',
     'view_client'
   );
@@ -609,21 +659,34 @@ test.skip('Enter Payment and all clone actions displayed with creation permissio
 
   await createRecurringInvoice({ page, isTableEditable: false });
 
-  await checkEditPage(page, true, false, '**/recurring_invoices/**/edit**');
+  await checkEditPage(page, true, '**/recurring_invoices/**/edit**');
 
-  await page.locator('[data-cy="chevronDownButton"]').click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
 
-  await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringInvoiceActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
 
-test.skip('cloning recurring invoice', async ({ page }) => {
+test('cloning recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set(
+    'create_recurring_invoice',
+    'edit_recurring_invoice',
+    'view_client'
+  );
   await save();
   await logout(page);
 
@@ -634,7 +697,7 @@ test.skip('cloning recurring invoice', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
     .click();
 
-  await page.waitForURL('**/invoices');
+  await page.waitForURL('**/recurring_invoices');
 
   const tableBody = page.locator('tbody').first();
 
@@ -647,7 +710,9 @@ test.skip('cloning recurring invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createRecurringInvoice({ page });
 
-    const moreActionsButton = page.locator('[data-cy="chevronDownButton"]');
+    const moreActionsButton = page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true });
 
     await moreActionsButton.click();
   } else {
@@ -665,11 +730,13 @@ test.skip('cloning recurring invoice', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+  await expect(
+    page.getByText('Successfully created recurring invoice')
+  ).toBeVisible();
 
   await page.waitForURL('**/recurring_invoices/**/edit**');
 
   await expect(
-    page.getByRole('heading', { name: 'Edit Invoice' }).first()
+    page.getByRole('heading', { name: 'Edit Recurring Invoice' }).first()
   ).toBeVisible();
 });
