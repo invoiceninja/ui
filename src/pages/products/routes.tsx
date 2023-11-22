@@ -79,10 +79,14 @@ export const productRoutes = (
       <Route path="" element={<Show />} />
       <Route path="documents" element={<Documents />} />
     </Route>
+
     <Route
-      path=":id/product_fields"
-      element={<Guard guards={[admin()]} component={<ProductFields />} />}
-    />
+      path=":id"
+      element={<Guard guards={[admin()]} component={<Product />} />}
+    >
+      <Route path="product_fields" element={<ProductFields />} />
+    </Route>
+
     <Route
       path=":id/edit"
       element={
