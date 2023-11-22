@@ -452,10 +452,11 @@ export function SortableColumns({ report, columns }: Props) {
                   </p>
 
                   <div
-                    className="flex items-start text-xs cursor-pointer"
+                    className="flex items-end space-x-1 cursor-pointer"
                     onClick={onRemoveAll}
                   >
-                    {t('reset')}
+                    <X size={19} />
+                    <span className="text-xs">({t('reset')})</span>
                   </div>
                 </div>
               )}
