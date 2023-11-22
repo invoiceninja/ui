@@ -349,13 +349,6 @@ test('payment documents preview with edit_payment', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -406,13 +399,6 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')

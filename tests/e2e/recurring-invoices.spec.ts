@@ -341,7 +341,8 @@ test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
   await set(
     'create_recurring_invoice',
     'edit_recurring_invoice',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -400,7 +401,8 @@ test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
   await set(
     'create_recurring_invoice',
     'edit_recurring_invoice',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -466,7 +468,8 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   await set(
     'create_recurring_invoice',
     'edit_recurring_invoice',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -489,13 +492,6 @@ test('invoice documents preview with edit_recurring_invoice', async ({
 
   if (!doRecordsExist) {
     await createRecurringInvoice({ page });
-
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -529,7 +525,8 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   await set(
     'create_recurring_invoice',
     'edit_recurring_invoice',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -552,13 +549,6 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
 
   if (!doRecordsExist) {
     await createRecurringInvoice({ page });
-
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -639,6 +629,7 @@ test('all clone actions displayed with creation permissions', async ({
       'create_quote',
       'create_credit',
       'create_purchase_order',
+      'create_client',
     ],
   });
 
@@ -650,7 +641,8 @@ test('all clone actions displayed with creation permissions', async ({
     'create_quote',
     'create_credit',
     'create_purchase_order',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -685,7 +677,8 @@ test('cloning recurring invoice', async ({ page }) => {
   await set(
     'create_recurring_invoice',
     'edit_recurring_invoice',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);

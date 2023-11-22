@@ -335,7 +335,7 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -383,7 +383,7 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -436,7 +436,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -457,11 +457,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createInvoice({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.waitForURL('**/invoices/**/edit**');
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -469,11 +465,11 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+
+    await page.waitForURL('**/invoices/**/edit');
   }
-
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-
-  await page.waitForURL('**/invoices/**/edit');
 
   await page
     .getByRole('button', {
@@ -490,7 +486,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -511,11 +507,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createInvoice({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.waitForURL('**/invoices/**/edit**');
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -523,10 +515,11 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
-  await page.waitForURL('**/invoices/**/edit');
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+
+    await page.waitForURL('**/invoices/**/edit');
+  }
 
   await page
     .getByRole('button', {
@@ -587,6 +580,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
       'create_credit',
       'create_recurring_invoice',
       'create_purchase_order',
+      'create_client',
     ],
   });
 
@@ -599,7 +593,8 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     'create_credit',
     'create_recurring_invoice',
     'create_purchase_order',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -622,7 +617,7 @@ test('cloning invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -722,6 +717,7 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
       'create_credit',
       'create_recurring_invoice',
       'create_purchase_order',
+      'create_client',
     ],
   });
 
@@ -735,7 +731,8 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
     'create_recurring_invoice',
     'create_purchase_order',
     'view_client',
-    'edit_invoice'
+    'edit_invoice',
+    'create_client'
   );
   await save();
   await logout(page);
