@@ -422,13 +422,6 @@ test('product documents preview with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -436,9 +429,9 @@ test('product documents preview with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await page.waitForURL('**/products/**/edit');
 
@@ -479,13 +472,6 @@ test('product documents uploading with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -493,8 +479,9 @@ test('product documents uploading with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/products/**/edit');
 
