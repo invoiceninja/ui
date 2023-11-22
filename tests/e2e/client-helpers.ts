@@ -16,6 +16,8 @@ export const createClient = async (params: ClientCreateParams) => {
       .click();
   }
 
+  await page.waitForTimeout(200);
+
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (createIfNotExist && doRecordsExist) {
