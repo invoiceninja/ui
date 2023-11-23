@@ -719,12 +719,23 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
-    permissions: ['create_quote', 'create_project', 'create_client'],
+    permissions: [
+      'create_quote',
+      'create_project',
+      'create_client',
+      'view_client',
+    ],
   });
 
   await login(page);
   await clear('quotes@example.com');
-  await set('create_project', 'create_quote', 'edit_quote', 'create_client');
+  await set(
+    'create_quote',
+    'create_project',
+    'edit_quote',
+    'create_client',
+    'view_client'
+  );
   await save();
   await logout(page);
 

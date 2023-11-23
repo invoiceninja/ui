@@ -192,7 +192,7 @@ test('can create a payment', async ({ page }) => {
 
   await login(page);
   await clear('payments@example.com');
-  await set('create_payment', 'create_client');
+  await set('create_payment', 'create_client', 'view_client');
   await save();
   await logout(page);
 

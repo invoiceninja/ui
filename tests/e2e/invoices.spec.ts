@@ -238,32 +238,20 @@ test('can create a invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['create_invoice'],
+    permissions: ['create_invoice', 'create_client', 'view_client'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice');
+  await set('create_invoice', 'create_client', 'view_client');
   await save();
-
-  await createInvoice({ page });
-
   await logout(page);
 
   await login(page, 'invoices@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Invoices', exact: true })
-    .click();
+  await createInvoice({ page, isTableEditable: false });
 
-  await checkTableEditability(page, false);
-
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-  await tableRow.getByRole('link').first().click();
-
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -668,9 +656,7 @@ test('cloning invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Enter Payment displayed displayed with admin permission', async ({
-  page,
-}) => {
+test('Enter Payment displayed with admin permission', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomInvoiceActions({

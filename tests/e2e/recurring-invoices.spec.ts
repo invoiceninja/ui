@@ -219,30 +219,18 @@ test('can create a recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringInvoiceActions({
-    permissions: ['create_recurring_invoice'],
+    permissions: ['create_recurring_invoice', 'create_client', 'view_client'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_recurring_invoice');
+  await set('create_recurring_invoice', 'create_client', 'view_client');
   await save();
-
-  await createRecurringInvoice({ page });
-
   await logout(page);
 
   await login(page, 'invoices@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Recurring Invoices', exact: true })
-    .click();
-
-  await checkTableEditability(page, false);
-
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-  await tableRow.getByRole('link').first().click();
+  await createRecurringInvoice({ page, isTableEditable: false });
 
   await checkEditPage(page, true);
 
