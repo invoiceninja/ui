@@ -276,7 +276,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               <DocumentsTable
                 documents={client?.documents || []}
                 onDocumentDelete={onSuccess}
-                disableEditableOptions={!entityAssigned(client)}
+                disableEditableOptions={!entityAssigned(client, true)}
               />
             </div>
           </div>

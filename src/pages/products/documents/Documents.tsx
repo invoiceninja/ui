@@ -42,7 +42,7 @@ export default function Documents() {
         <DocumentsTable
           documents={product.data.data.documents}
           onDocumentDelete={invalidateQuery}
-          disableEditableOptions={!entityAssigned(product.data.data)}
+          disableEditableOptions={!entityAssigned(product.data.data, true)}
         />
       )}
     </>

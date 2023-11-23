@@ -39,7 +39,11 @@ type Entity =
 export function useEntityAssigned() {
   const user = useCurrentUser();
 
-  return (entity: Entity | undefined | null) => {
+  return (entity: Entity | undefined | null, creationOnly?: boolean) => {
+    if (creationOnly) {
+      Boolean(user && entity && entity.user_id === user.id);
+    }
+
     return Boolean(
       user &&
         entity &&
