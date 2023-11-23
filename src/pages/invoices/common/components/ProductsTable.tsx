@@ -190,7 +190,7 @@ export function ProductsTable(props: Props) {
                       className="w-full py-2 inline-flex justify-center items-center space-x-2"
                     >
                       <Plus size={18} />
-                      <span>{t('add_item')}</span>
+                      <span>{ props.type === 'product' ? t('add_item') : t('add_line')}</span>
                     </button>
                   </Td>
                 </Tr>
