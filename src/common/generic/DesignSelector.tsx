@@ -22,6 +22,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { $refetch } from '../hooks/useRefetch';
+import { useAdmin } from '../hooks/permissions/useHasPermission';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
@@ -35,6 +36,8 @@ export function DesignSelector(props: Props) {
 
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
+
+  const { isAdmin, isOwner } = useAdmin();
 
   useEffect(() => {
     if (data) {
@@ -106,6 +109,7 @@ export function DesignSelector(props: Props) {
               typeof props.actionVisibility === 'undefined' ||
               props.actionVisibility,
           }}
+          sortBy="name|asc"
           onDismiss={() => setDesign(null)}
           disableWithQueryParameter={props.disableWithQueryParameter}
           errorMessage={
@@ -137,9 +141,11 @@ export function DesignSelector(props: Props) {
           label: t('new_design'),
           onClick: () => setIsModalVisible(true),
           visible:
-            typeof props.actionVisibility === 'undefined' ||
-            props.actionVisibility,
+            (typeof props.actionVisibility === 'undefined' ||
+              props.actionVisibility) &&
+            (isAdmin || isOwner),
         }}
+        sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}

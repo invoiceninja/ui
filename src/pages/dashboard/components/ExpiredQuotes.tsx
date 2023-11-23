@@ -17,17 +17,23 @@ import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function ExpiredQuotes() {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Quote> = [
     {
       id: 'number',
       label: t('number'),
       format: (value, quote) => (
-        <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+        <Link
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          disableNavigation={disableNavigation('quote', quote)}
+        >
           {quote.number}
         </Link>
       ),
@@ -36,7 +42,10 @@ export function ExpiredQuotes() {
       id: 'client_id',
       label: t('client'),
       format: (value, quote) => (
-        <Link to={route('/clients/:id', { id: quote.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: quote.client_id })}
+          disableNavigation={disableNavigation('client', quote.client)}
+        >
           {quote.client?.display_name}
         </Link>
       ),

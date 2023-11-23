@@ -89,6 +89,7 @@ function ChangeCategory({
           label: 'name',
           value: 'id',
         }}
+        sortBy="name|asc"
         onChange={(e) => (e.resource ? setCategory(e.resource.id) : null)}
       />
 
@@ -143,11 +144,14 @@ export const useCustomBulkActions = () => {
       </DropdownElement>
     ),
     ({ selectedResources, setSelected }) => (
+    ({ selectedResources, setSelected }) => (
       <>
+        {selectedResources ? (
         {selectedResources ? (
           <ChangeCategory
             isVisible={isChangeCategoryVisible}
             setIsVisible={setIsChangeCategoryVisible}
+            selectedExpenses={selectedResources}
             selectedExpenses={selectedResources}
             setSelected={setSelected}
           />

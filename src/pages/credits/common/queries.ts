@@ -10,19 +10,28 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Credit } from '$app/common/interfaces/credit';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery } from 'react-query';
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<Credit>(
     ['/api/v1/credits', 'create'],
     () =>
       request('GET', endpoint('/api/v1/credits/create')).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_credit')
+        ? options?.enabled ?? true
+        : false,
+    }
   );
 }
 

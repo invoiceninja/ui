@@ -32,6 +32,7 @@ import { useClientQuery } from '$app/common/queries/clients';
 import { Client } from '$app/common/interfaces/client';
 import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
 import { Spinner } from '$app/components/Spinner';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 dayjs.extend(quarter);
 
@@ -54,6 +55,8 @@ export default function Statement() {
   const { documentTitle } = useTitle('statement');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const user = useCurrentUser();
 
@@ -239,12 +242,14 @@ export default function Statement() {
           >
             {t('download')}
           </DropdownElement>
-          <DropdownElement
-            onClick={() => scheduleStatement(statement)}
-            icon={<Icon element={MdSchedule} />}
-          >
-            {t('schedule')}
-          </DropdownElement>
+          {(isAdmin || isOwner) && (
+            <DropdownElement
+              onClick={() => scheduleStatement(statement)}
+              icon={<Icon element={MdSchedule} />}
+            >
+              {t('schedule')}
+            </DropdownElement>
+          )}
         </Dropdown>
       }
     >
@@ -343,11 +348,17 @@ export default function Statement() {
         </Card>
       </div>
 
-      {!isLoadingPdf ? (
-        <iframe className="my-6" ref={iframeRef} width="100%" height={1500} />
-      ) : (
+      <iframe
+        className="my-6"
+        ref={iframeRef}
+        width="100%"
+        height={1500}
+        style={{ display: !isLoadingPdf ? 'block' : 'none' }}
+      />
+
+      {isLoadingPdf && (
         <div
-          className="flex justify-center items-center"
+          className="flex justify-center items-center mt-6"
           style={{ height: 1500 }}
         >
           <Spinner />

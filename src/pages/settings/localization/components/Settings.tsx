@@ -165,11 +165,13 @@ export function Settings() {
               handlePropertyChange('settings.timezone_id', v)
             }
           >
-            {statics?.timezones.map((timezone: Timezone) => (
-              <option value={timezone.id} key={timezone.id}>
-                {timezone.name}
-              </option>
-            ))}
+            {statics?.timezones
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((timezone: Timezone) => (
+                <option value={timezone.id} key={timezone.id}>
+                  {timezone.name}
+                </option>
+              ))}
           </SearchableSelect>
         </Element>
 
@@ -227,11 +229,10 @@ export function Settings() {
           <Element leftSide={t('first_month_of_the_year')}>
             <SelectField
               id="first_month_of_year"
-              value={company?.first_month_of_year || ''}
+              value={company?.first_month_of_year || '1'}
               onChange={handleChange}
               errorMessage={errors?.errors['settings.first_month_of_year']}
             >
-              <option value="">{/*  */}</option>
               <option value="1">{t('january')}</option>
               <option value="2">{t('february')}</option>
               <option value="3">{t('march')}</option>

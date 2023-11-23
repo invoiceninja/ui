@@ -42,11 +42,16 @@ import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -109,21 +114,23 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        invoice && (
-          <ResourceActions
-            resource={invoice}
-            actions={actions}
-            onSaveClick={() => invoice && save(invoice)}
-            disableSaveButton={
-              invoice &&
-              (invoice.status_id === InvoiceStatus.Cancelled ||
-                invoice.is_deleted)
-            }
-          />
-        )
-      }
-      topRight={invoice && <CommonActions invoice={invoice} />}
+      {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
+        invoice && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={invoice}
+              actions={actions}
+              onSaveClick={() => invoice && save(invoice)}
+              disableSaveButton={
+                invoice &&
+                (invoice.status_id === InvoiceStatus.Cancelled ||
+                  invoice.is_deleted)
+              }
+              cypressRef="invoiceActionDropdown"
+            />
+          ),
+          topRight: <CommonActions invoice={invoice} />,
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

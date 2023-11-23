@@ -19,10 +19,13 @@ import { generatePath } from 'react-router-dom';
 import { Badge } from '$app/components/Badge';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -30,7 +33,10 @@ export function RecentPayments() {
       label: t('number'),
       format: (value, payment) => {
         return (
-          <Link to={route('/payments/:id/edit', { id: payment.id })}>
+          <Link
+            to={route('/payments/:id/edit', { id: payment.id })}
+            disableNavigation={disableNavigation('payment', payment)}
+          >
             {payment.number}
           </Link>
         );
@@ -40,7 +46,10 @@ export function RecentPayments() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link to={route('/clients/:id', { id: payment.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: payment.client_id })}
+          disableNavigation={disableNavigation('client', payment.client)}
+        >
           {payment.client?.display_name}
         </Link>
       ),
@@ -55,6 +64,10 @@ export function RecentPayments() {
             to={generatePath('/invoices/:id/edit', {
               id: payment.invoices[0].id,
             })}
+            disableNavigation={disableNavigation(
+              'invoice',
+              payment.invoices[0]
+            )}
           >
             {payment.invoices[0].number}
           </Link>

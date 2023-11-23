@@ -22,11 +22,13 @@ export function PaymentTypeSelector(props: GenericSelectorProps) {
       withBlank
       errorMessage={props.errorMessage}
     >
-      {statics.data?.payment_types.map((type, index) => (
-        <option key={index} value={type.id}>
-          {type.name}
-        </option>
-      ))}
+      {statics.data?.payment_types
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((type, index) => (
+          <option key={index} value={type.id}>
+            {type.name}
+          </option>
+        ))}
     </SelectField>
   );
 }

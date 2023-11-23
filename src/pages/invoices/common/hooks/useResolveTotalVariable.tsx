@@ -62,11 +62,13 @@ export function useResolveTotalVariable(props: Props) {
     }
 
     if (variable == '$discount' && invoiceSum) {
-      return (
+      return invoiceSum.totalDiscount != 0 ?
+      (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.totalDiscount)}
         </Element>
-      );
+      ) : 
+      '';
     }
 
     if (variable == '$subtotal' && invoiceSum) {
