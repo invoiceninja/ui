@@ -14,6 +14,7 @@ import { useInjectUserChanges } from './useInjectUserChanges';
 import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
+import { PerPageType } from '$app/components/DataTable';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -24,6 +25,7 @@ export interface TableFiltersPreference {
   sort?: string;
   status: string[];
   sortedBy?: string;
+  perPage?: PerPageType;
 }
 
 export interface Preferences {
