@@ -104,7 +104,7 @@ export function useBulkAction(params?: Params) {
       .then(() => {
         const message =
           successMessages[action as keyof typeof successMessages] ||
-          `${action}d_invoice`;
+          `${action}d_recurring_invoice`;
 
         toast.success(message);
 
