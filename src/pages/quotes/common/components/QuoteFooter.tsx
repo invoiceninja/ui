@@ -115,9 +115,7 @@ export function QuoteFooter(props: Props) {
             <DocumentsTable
               documents={quote?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={
-                !hasPermission('edit_quote') && !entityAssigned(quote)
-              }
+              disableEditableOptions={!entityAssigned(quote)}
             />
           </div>
         )}

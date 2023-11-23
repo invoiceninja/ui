@@ -42,9 +42,7 @@ export default function Documents() {
         <DocumentsTable
           documents={payment.documents ?? []}
           onDocumentDelete={invalidateQuery}
-          disableEditableOptions={
-            !hasPermission('edit_payment') && !entityAssigned(payment)
-          }
+          disableEditableOptions={!entityAssigned(payment)}
         />
       )}
     </>

@@ -114,9 +114,7 @@ export function InvoiceFooter(props: Props) {
             <DocumentsTable
               documents={invoice?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={
-                !hasPermission('edit_invoice') && !entityAssigned(invoice)
-              }
+              disableEditableOptions={!entityAssigned(invoice)}
             />
           </div>
         )}
