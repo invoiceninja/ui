@@ -11,7 +11,7 @@ import { PaymentType } from '$app/common/enums/payment-type';
 
 export default {
   [PaymentType.ACH]: 'payment_type_ACH',
-  [PaymentType.ACSS]: 'acss',
+  [PaymentType.ACSS]: 'payment_type_ACSS',
   [PaymentType.ALIPAY]: 'payment_type_Alipay',
   [PaymentType.AMERICAN_EXPRESS]: 'payment_type_American Express',
   [PaymentType.BANCONTACT]: 'bancontact',
