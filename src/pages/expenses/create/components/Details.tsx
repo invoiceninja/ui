@@ -310,7 +310,7 @@ export function Details(props: Props) {
       {expense && company?.custom_fields?.expense1 && (
         <CustomField
           field="expense1"
-          defaultValue={expense?.custom_value1 || ''}
+          defaultValue={expense.custom_value1 || ''}
           value={company.custom_fields.expense1}
           onValueChange={(value) =>
             handleChange('custom_value1', String(value))
@@ -321,7 +321,7 @@ export function Details(props: Props) {
       {expense && company?.custom_fields?.expense2 && (
         <CustomField
           field="expense2"
-          defaultValue={expense?.custom_value2 || ''}
+          defaultValue={expense.custom_value2 || ''}
           value={company.custom_fields.expense2}
           onValueChange={(value) =>
             handleChange('custom_value2', String(value))
@@ -332,7 +332,7 @@ export function Details(props: Props) {
       {expense && company?.custom_fields?.expense3 && (
         <CustomField
           field="expense3"
-          defaultValue={expense?.custom_value3 || ''}
+          defaultValue={expense.custom_value3 || ''}
           value={company.custom_fields.expense3}
           onValueChange={(value) =>
             handleChange('custom_value3', String(value))
@@ -343,7 +343,7 @@ export function Details(props: Props) {
       {expense && company?.custom_fields?.expense4 && (
         <CustomField
           field="expense4"
-          defaultValue={expense?.custom_value4 || ''}
+          defaultValue={expense.custom_value4 || ''}
           value={company.custom_fields.expense4}
           onValueChange={(value) =>
             handleChange('custom_value4', String(value))
