@@ -22,6 +22,7 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import { ExpenseStatus } from '../../common/components/ExpenseStatus';
+import { CustomField } from '$app/components/CustomField';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -304,6 +305,50 @@ export function Details(props: Props) {
             value={expense.date}
           />
         </Element>
+      )}
+
+      {expense && company?.custom_fields?.expense1 && (
+        <CustomField
+          field="expense1"
+          defaultValue={expense?.custom_value1 || ''}
+          value={company.custom_fields.expense1}
+          onValueChange={(value) =>
+            handleChange('custom_value1', String(value))
+          }
+        />
+      )}
+
+      {expense && company?.custom_fields?.expense2 && (
+        <CustomField
+          field="expense2"
+          defaultValue={expense?.custom_value2 || ''}
+          value={company.custom_fields.expense2}
+          onValueChange={(value) =>
+            handleChange('custom_value2', String(value))
+          }
+        />
+      )}
+
+      {expense && company?.custom_fields?.expense3 && (
+        <CustomField
+          field="expense3"
+          defaultValue={expense?.custom_value3 || ''}
+          value={company.custom_fields.expense3}
+          onValueChange={(value) =>
+            handleChange('custom_value3', String(value))
+          }
+        />
+      )}
+
+      {expense && company?.custom_fields?.expense4 && (
+        <CustomField
+          field="expense4"
+          defaultValue={expense?.custom_value4 || ''}
+          value={company.custom_fields.expense4}
+          onValueChange={(value) =>
+            handleChange('custom_value4', String(value))
+          }
+        />
       )}
     </Card>
   );
