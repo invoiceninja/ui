@@ -9,18 +9,19 @@
  */
 
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { useUserChanges } from './useInjectUserChanges';
-import { User } from '../interfaces/user';
-import { request } from '../helpers/request';
-import { endpoint } from '../helpers';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { CompanyUser } from '../interfaces/company-user';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { $refetch } from './useRefetch';
-import { updateUser } from '../stores/slices/user';
-import { useDispatch } from 'react-redux';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTablePreference } from './useDataTablePreference';
+import { PerPage } from '$app/components/DataTable';
+import { cloneDeep, isEqual, set } from 'lodash';
+import { User } from '../interfaces/user';
+import { $refetch } from './useRefetch';
+import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { CompanyUser } from '../interfaces/company-user';
+import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
+import { useUserChanges } from './useInjectUserChanges';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../stores/slices/user';
 
 interface Params {
   apiEndpoint: URL;
@@ -34,6 +35,7 @@ interface Params {
   setSort: Dispatch<SetStateAction<string>>;
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
+  setPerPage: Dispatch<SetStateAction<PerPage>>;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -43,8 +45,8 @@ export function useDataTablePreferences(params: Params) {
   const {
     apiEndpoint,
     customFilters,
-    isInitialConfiguration,
     tableKey,
+    isInitialConfiguration,
     customFilter,
     setFilter,
     setCustomFilter,
@@ -52,6 +54,7 @@ export function useDataTablePreferences(params: Params) {
     setSort,
     setSortedBy,
     setStatus,
+    setPerPage,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -71,11 +74,12 @@ export function useDataTablePreferences(params: Params) {
   };
 
   const handleUpdateTableFilters = (
-    status: string[],
     filter: string,
-    currentPage: number,
+    sortedBy: string | undefined,
     sort: string,
-    sortedBy: string | undefined
+    currentPage: number,
+    status: string[],
+    perPage: PerPage
   ) => {
     if (!customFilter) {
       return;
@@ -89,6 +93,7 @@ export function useDataTablePreferences(params: Params) {
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       currentPage: 1,
       status: ['active'],
+      perPage: '10',
     };
 
     const cleanedUpFilters = {
@@ -98,6 +103,7 @@ export function useDataTablePreferences(params: Params) {
       sort,
       currentPage,
       status,
+      perPage,
     };
 
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
@@ -133,6 +139,7 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setCustomFilter([]);
       }
+      setPerPage((getPreference('perPage') as PerPage) || '10');
       setCurrentPage((getPreference('currentPage') as number) || 1);
       setSort((getPreference('sort') as string) || 'id|asc');
       setSortedBy((getPreference('sortedBy') as string) || undefined);
@@ -144,7 +151,5 @@ export function useDataTablePreferences(params: Params) {
     }
   }, [isInitialConfiguration]);
 
-  return {
-    handleUpdateTableFilters,
-  };
+  return { handleUpdateTableFilters };
 }

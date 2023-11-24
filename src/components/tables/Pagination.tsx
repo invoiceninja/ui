@@ -20,14 +20,14 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { SelectField } from '../forms';
-import { PerPageType } from '../DataTable';
+import { PerPage } from '../DataTable';
 
 interface Props extends CommonProps {
   totalPages: number;
   currentPage: number;
   onPageChange: any;
-  currentPerPage?: PerPageType;
-  onRowsChange: (rows: PerPageType) => any;
+  currentPerPage?: PerPage;
+  onRowsChange: (rows: PerPage) => any;
   totalRecords?: number;
   leftSideChevrons?: ReactNode;
 }
@@ -37,7 +37,7 @@ const defaultProps: Props = {
   currentPage: 1,
   currentPerPage: '10',
   onPageChange: (page: number) => page,
-  onRowsChange: (rows: PerPageType) => rows,
+  onRowsChange: (rows: PerPage) => rows,
   totalRecords: 0,
 };
 
@@ -60,7 +60,7 @@ export function Pagination(props: Props) {
         <div className="flex items-center space-x-2 flex-wrap">
           <SelectField
             value={props.currentPerPage}
-            onValueChange={(value) => props.onRowsChange(value as PerPageType)}
+            onValueChange={(value) => props.onRowsChange(value as PerPage)}
           >
             <option value="10">10</option>
             <option value="50">50</option>

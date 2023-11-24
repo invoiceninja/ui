@@ -51,17 +51,11 @@ import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { $refetch, refetchByUrl } from '$app/common/hooks/useRefetch';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useLocation } from 'react-router-dom';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { useDispatch } from 'react-redux';
-import { updateUser } from '$app/common/stores/slices/user';
-import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { User } from '$app/common/interfaces/user';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
-import { useDataTablePreference } from '$app/common/hooks/useDataTablePreference';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
+import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -129,14 +123,11 @@ interface Props<T> extends CommonProps {
 
 type ResourceAction<T> = (resource: T) => ReactElement;
 
-export type PerPageType = '10' | '50' | '100';
+export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
-  const user = useUserChanges();
-  const dispatch = useDispatch();
-
   const options = useDataTableOptions();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
@@ -148,10 +139,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
 
-  const getPreference = useDataTablePreference({ tableKey });
-
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
-  setInvalidationQueryAtom(apiEndpoint.pathname);
 
   const {
     styleOptions,
@@ -167,8 +155,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     undefined
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [perPage, setPerPage] = useState<PerPageType>(
-    (apiEndpoint.searchParams.get('perPage') as PerPageType) || '10'
+  const [perPage, setPerPage] = useState<PerPage>(
+    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
   );
   const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
@@ -183,68 +171,20 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
-  const handleUpdateUserPreferences = (updatedUser: User) => {
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      toast.success('success');
-
-      $refetch(['company_users']);
-
-      dispatch(updateUser(updatedUser));
-    });
-  };
-
-  const handleUpdateTableFilters = () => {
-    if (!customFilter) {
-      return;
-    }
-
-    const currentTableFilters =
-      user?.company_user?.react_settings.table_filters?.[tableKey];
-
-    const defaultFilters = {
-      ...(props.customFilters && { customFilter: ['all'] }),
-      sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
-      currentPage: 1,
-      status: ['active'],
-      perPage: '10',
-    };
-
-    const cleanedUpFilters = {
-      ...(filter && { filter }),
-      ...(sortedBy && { sortedBy }),
-      ...(props.customFilters && { customFilter }),
-      sort,
-      currentPage,
-      status,
-      perPage,
-    };
-
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
-      return;
-    }
-
-    if (isEqual(currentTableFilters, cleanedUpFilters) && currentTableFilters) {
-      return;
-    }
-
-    const updatedUser = cloneDeep(user) as User;
-
-    if (updatedUser) {
-      set(
-        updatedUser,
-        `company_user.react_settings.table_filters.${tableKey}`,
-        cleanedUpFilters
-      );
-
-      handleUpdateUserPreferences(updatedUser as User);
-    }
-  };
+  const { handleUpdateTableFilters } = useDataTablePreferences({
+    apiEndpoint,
+    isInitialConfiguration,
+    customFilter,
+    setCurrentPage,
+    setCustomFilter,
+    setFilter,
+    setPerPage,
+    setSort,
+    setSortedBy,
+    setStatus,
+    tableKey,
+    customFilters,
+  });
 
   const {
     defaultOptions,
@@ -257,6 +197,44 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilter,
     customFilters,
   });
+
+  useEffect(() => {
+    if (!isInitialConfiguration) {
+      clearTimeout(companyUpdateTimeOut.current);
+
+      const currentTimeout = setTimeout(
+        () =>
+          handleUpdateTableFilters(
+            filter,
+            sortedBy,
+            sort,
+            currentPage,
+            status,
+            perPage
+          ),
+        1500
+      );
+
+      companyUpdateTimeOut.current = currentTimeout;
+    }
+
+    apiEndpoint.searchParams.set('per_page', perPage);
+    apiEndpoint.searchParams.set('page', currentPage.toString());
+    apiEndpoint.searchParams.set('filter', filter);
+
+    handleChangingCustomFilters();
+
+    apiEndpoint.searchParams.set('sort', sort);
+    apiEndpoint.searchParams.set('status', status as unknown as string);
+
+    setApiEndpoint(apiEndpoint);
+
+    isInitialConfiguration && setIsInitialConfiguration(false);
+
+    return () => {
+      isProduction() && setInvalidationQueryAtom(undefined);
+    };
+  }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
     [
@@ -334,6 +312,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   useEffect(() => {
+    setInvalidationQueryAtom(apiEndpoint.pathname);
+  }, [apiEndpoint.pathname]);
+
+  useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
         selected.includes(resource.id)
@@ -348,57 +330,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
-
-  useEffect(() => {
-    if (!isInitialConfiguration && !customFilter) {
-      setFilter((getPreference('filter') as string) || '');
-      if (props.customFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
-        } else {
-          setCustomFilter(['all']);
-        }
-      } else {
-        setCustomFilter([]);
-      }
-      setPerPage((getPreference('perPage') as PerPageType) || '10');
-      setCurrentPage((getPreference('currentPage') as number) || 1);
-      setSort((getPreference('sort') as string) || 'id|asc');
-      setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if ((getPreference('status') as string[]).length) {
-        setStatus(getPreference('status') as string[]);
-      } else {
-        setStatus(['active']);
-      }
-    }
-  }, [isInitialConfiguration]);
-
-  useEffect(() => {
-    if (!isInitialConfiguration) {
-      clearTimeout(companyUpdateTimeOut.current);
-
-      const currentTimeout = setTimeout(handleUpdateTableFilters, 1500);
-
-      companyUpdateTimeOut.current = currentTimeout;
-    }
-
-    apiEndpoint.searchParams.set('per_page', perPage);
-    apiEndpoint.searchParams.set('page', currentPage.toString());
-    apiEndpoint.searchParams.set('filter', filter);
-
-    handleChangingCustomFilters();
-
-    apiEndpoint.searchParams.set('sort', sort);
-    apiEndpoint.searchParams.set('status', status as unknown as string);
-
-    setApiEndpoint(apiEndpoint);
-
-    isInitialConfiguration && setIsInitialConfiguration(false);
-
-    return () => {
-      isProduction() && setInvalidationQueryAtom(undefined);
-    };
-  }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   return (
     <div data-cy="dataTable">
