@@ -28,7 +28,7 @@ export function CommonActions(props: Props) {
 
   return (
     <>
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-4">
         {actions.map((action) => action(invoice))}
 
         <div>
