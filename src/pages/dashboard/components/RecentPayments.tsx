@@ -107,7 +107,6 @@ export function RecentPayments() {
           endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
           withoutActions
           withoutPagination
-          staleTime={Infinity}
           withoutPadding
           styleOptions={{
             addRowSeparator: true,

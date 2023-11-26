@@ -550,6 +550,8 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
         toast.success('created_recurring_invoice');
 
+        $refetch(['recurring_invoices']);
+
         navigate(
           route('/recurring_invoices/:id/edit', {
             id: response.data.data.id,
