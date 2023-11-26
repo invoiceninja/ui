@@ -233,6 +233,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('view_pdf'),
+            key: 'view_pdf',
           })}
           to={route('/invoices/:id/pdf', { id: invoice.id })}
           icon={
@@ -249,6 +250,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('print_pdf'),
+            key: 'print_pdf',
           })}
           onClick={() => printPdf([invoice.id])}
           icon={<Icon element={MdPrint} {...(!dropdown && { size: 23.5 })} />}
@@ -264,6 +266,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('schedule'),
+            key: 'schedule',
           })}
           onClick={() => scheduleEmailRecord(invoice.id)}
           icon={
@@ -279,6 +282,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: `${t('delivery_note')} ${t('pdf')}`,
+            key: 'delivery_note',
           })}
           to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
           icon={
@@ -294,6 +298,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('download'),
+            key: 'download',
           })}
           onClick={() => downloadPdf(invoice)}
           icon={
@@ -311,6 +316,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('mark_sent'),
+            key: 'mark_sent',
           })}
           onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={
@@ -331,6 +337,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('mark_paid'),
+            key: 'mark_paid',
           })}
           onClick={() => bulk([invoice.id], 'mark_paid')}
           icon={<Icon element={MdPaid} {...(!dropdown && { size: 23.5 })} />}
@@ -345,6 +352,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('auto_bill'),
+            key: 'auto_bill',
           })}
           onClick={() => bulk([invoice.id], 'auto_bill')}
           icon={<Icon element={BiMoney} {...(!dropdown && { size: 23.5 })} />}
@@ -360,6 +368,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('enter_payment'),
+            key: 'enter_payment',
           })}
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
             invoiceId: invoice.id,
@@ -378,6 +387,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('client_portal'),
+            key: 'client_portal',
           })}
           onClick={() => invoice && openClientPortal(invoice)}
           icon={
@@ -395,6 +405,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('cancel_invoice'),
+            key: 'cancel_invoice',
           })}
           onClick={() => bulk([invoice.id], 'cancel')}
           icon={<Icon element={MdCancel} {...(!dropdown && { size: 23.5 })} />}
@@ -413,6 +424,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('reverse'),
+            key: 'reverse',
           })}
           onClick={() => reverseInvoice(invoice)}
           icon={<Icon element={MdRefresh} {...(!dropdown && { size: 23.5 })} />}
@@ -428,6 +440,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('clone'),
+            key: 'clone',
           })}
           onClick={() => cloneToInvoice(invoice)}
           icon={
@@ -447,6 +460,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('clone_to_quote'),
+            key: 'clone_to_quote',
           })}
           onClick={() => cloneToQuote(invoice)}
           icon={
@@ -466,6 +480,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('clone_to_credit'),
+            key: 'clone_to_credit',
           })}
           onClick={() => cloneToCredit(invoice)}
           icon={
@@ -485,6 +500,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('clone_to_recurring'),
+            key: 'clone_to_recurring',
           })}
           onClick={() => cloneToRecurringInvoice(invoice)}
           icon={
@@ -504,6 +520,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('clone_to_purchase_order'),
+            key: 'clone_to_purchase_order',
           })}
           onClick={() => cloneToPurchaseOrder(invoice)}
           icon={
@@ -527,6 +544,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('archive'),
+            key: 'archive',
           })}
           onClick={() => bulk([invoice.id], 'archive')}
           icon={<Icon element={MdArchive} {...(!dropdown && { size: 23.5 })} />}
@@ -543,6 +561,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('restore'),
+            key: 'restore',
           })}
           onClick={() => bulk([invoice.id], 'restore')}
           icon={<Icon element={MdRestore} {...(!dropdown && { size: 23.5 })} />}
@@ -558,6 +577,7 @@ export function useActions(params?: Params) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('delete'),
+            key: 'delete',
           })}
           onClick={() => bulk([invoice.id], 'delete')}
           icon={<Icon element={MdDelete} {...(!dropdown && { size: 23.5 })} />}

@@ -11,25 +11,54 @@
 import { Invoice } from '$app/common/interfaces/invoice';
 import { CommonActionsPreferenceModal } from '$app/components/CommonActionsPreferenceModal';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdSettings } from 'react-icons/md';
 import { useActions } from './Actions';
+import { ResourceAction } from '$app/components/DataTable';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 interface Props {
   invoice: Invoice;
 }
 export function CommonActions(props: Props) {
-  const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
-    useState<boolean>(false);
-
+  const user = useCurrentUser();
   const actions = useActions({ dropdown: false });
 
   const { invoice } = props;
 
+  const [isPreferenceModalOpen, setIsPreferenceModalOpen] =
+    useState<boolean>(false);
+
+  const [selectedActions, setSelectedActions] =
+    useState<ResourceAction<Invoice>[]>();
+
+  useEffect(() => {
+    const currentActions =
+      user?.company_user?.react_settings?.common_actions?.invoice;
+
+    if (currentActions && !selectedActions) {
+      actions.forEach((action) => {
+        currentActions.forEach((currentAction) => {
+          if (
+            (action as ResourceAction<Invoice>)(invoice)?.key === currentAction
+          ) {
+            setSelectedActions((current) =>
+              current
+                ? [...current, action as ResourceAction<Invoice>]
+                : [action as ResourceAction<Invoice>]
+            );
+          }
+        });
+      });
+    }
+  }, [user]);
+
   return (
     <>
       <div className="flex items-center space-x-4">
-        {actions.map((action) => action(invoice))}
+        {selectedActions?.map((action, index) => (
+          <div key={index}>{action(invoice)}</div>
+        ))}
 
         <div>
           <Icon

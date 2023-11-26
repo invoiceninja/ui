@@ -119,7 +119,7 @@ interface Props<T> extends CommonProps {
   hideEditableOptions?: boolean;
 }
 
-type ResourceAction<T> = (resource: T) => ReactElement;
+export type ResourceAction<T> = (resource: T) => ReactElement;
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '100');
 
