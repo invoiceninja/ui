@@ -40,7 +40,7 @@ export function PayPalPPCP(props: Props) {
         }).then((response) =>
             window
                 .open(
-                    route('http://ninja.test:8000/paypal?hash=:hash', {
+                    route('https://invoicing.co/paypal?hash=:hash', {
                         hash: response.data.hash,
                     }),
                     '_blank'
