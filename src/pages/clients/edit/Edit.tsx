@@ -135,6 +135,7 @@ export default function Edit() {
             label={t('more_actions')}
             resource={client}
             actions={actions}
+            cypressRef="clientActionDropdown"
           />
         )
       }
@@ -142,8 +143,8 @@ export default function Edit() {
       {isLoading && <Spinner />}
 
       {client && (
-        <div className="flex flex-col xl:flex-row xl:gap-4">
-          <div className="w-full xl:w-1/2">
+        <div className="flex flex-col xl:flex-row xl:space-x-4">
+          <div className="flex flex-col w-full xl:w-1/2 space-y-4">
             <Details
               client={client}
               setClient={setClient}
@@ -159,7 +160,7 @@ export default function Edit() {
             />
           </div>
 
-          <div className="w-full xl:w-1/2">
+          <div className="flex flex-col w-full xl:w-1/2 space-y-4">
             <Contacts
               contacts={contacts}
               setContacts={setContacts}

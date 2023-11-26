@@ -21,6 +21,7 @@ interface Props {
   actions: Action<any>[];
   onSaveClick?: () => void;
   disableSaveButton?: boolean;
+  cypressRef?: string;
 }
 
 export function ResourceActions(props: Props) {
@@ -46,6 +47,7 @@ export function ResourceActions(props: Props) {
             className="rounded-bl-none rounded-tl-none h-full border-l-1 border-y-0 border-r-0"
             cardActions
             disabled={disableSaveButton}
+            cypressRef={props.cypressRef}
           >
             {props.actions.map((action, index) => (
               <Fragment key={index}>{action(props.resource)}</Fragment>
@@ -55,7 +57,7 @@ export function ResourceActions(props: Props) {
       )}
 
       {!onSaveClick && label && (
-        <Dropdown label={props.label}>
+        <Dropdown label={props.label} cypressRef={props.cypressRef}>
           {props.actions.map((action, index) => (
             <Fragment key={index}>{action(props.resource)}</Fragment>
           ))}

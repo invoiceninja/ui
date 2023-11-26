@@ -55,6 +55,10 @@ import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -72,6 +76,10 @@ interface Params {
 }
 export function useActions(params?: Params) {
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const {
     showEditAction,
@@ -249,7 +257,8 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       invoice.status_id !== InvoiceStatus.Paid &&
-      showActionByPreferences('invoice', 'schedule') && (
+      showActionByPreferences('invoice', 'schedule') &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => scheduleEmailRecord(invoice.id)}
@@ -333,7 +342,8 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < 4 &&
-      showActionByPreferences('invoice', 'enter_payment') && (
+      showActionByPreferences('invoice', 'enter_payment') &&
+      hasPermission('create_payment') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
@@ -384,7 +394,8 @@ export function useActions(params?: Params) {
         invoice.status_id === InvoiceStatus.Partial) &&
       !invoice.is_deleted &&
       !invoice.archived_at &&
-      showActionByPreferences('invoice', 'reverse') && (
+      showActionByPreferences('invoice', 'reverse') &&
+      hasPermission('create_credit') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => reverseInvoice(invoice)}
@@ -397,7 +408,8 @@ export function useActions(params?: Params) {
       ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone') && (
+      showActionByPreferences('invoice', 'clone') &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToInvoice(invoice)}
@@ -412,7 +424,8 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_quote') && (
+      showActionByPreferences('invoice', 'clone_to_quote') &&
+      hasPermission('create_quote') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToQuote(invoice)}
@@ -427,7 +440,8 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_credit') && (
+      showActionByPreferences('invoice', 'clone_to_credit') &&
+      hasPermission('create_credit') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToCredit(invoice)}
@@ -442,7 +456,8 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_recurring') && (
+      showActionByPreferences('invoice', 'clone_to_recurring') &&
+      hasPermission('create_recurring_invoice') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToRecurringInvoice(invoice)}
@@ -457,7 +472,8 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_purchase_order') && (
+      showActionByPreferences('invoice', 'clone_to_purchase_order') &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToPurchaseOrder(invoice)}

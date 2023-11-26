@@ -17,8 +17,6 @@ import {
 } from '$app/pages/expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
-const dataTableStaleTime = 50;
-
 export default function Expenses() {
   const { id } = useParams();
 
@@ -45,7 +43,6 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?vendor=:id', { id })}
       linkToEdit="/expenses/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

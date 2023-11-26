@@ -41,6 +41,7 @@ import { useSetDocumentVisibility } from '$app/common/queries/documents';
 interface Props {
   documents: Document[];
   onDocumentDelete?: () => unknown;
+  disableEditableOptions?: boolean;
 }
 
 export interface DocumentUrl {
@@ -51,6 +52,8 @@ export interface DocumentUrl {
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
   const reactSettings = useReactSettings();
+
+  const { disableEditableOptions = false } = props;
 
   const setDocumentVisibility = useSetDocumentVisibility();
 
@@ -171,7 +174,7 @@ export function DocumentsTable(props: Props) {
           <Th>{t('date')}</Th>
           <Th>{t('type')}</Th>
           <Th>{t('size')}</Th>
-          <Th>{/* Placeholder for actions */}</Th>
+          {!disableEditableOptions && <Th>{/* Placeholder for actions */}</Th>}
         </Thead>
 
         <Tbody>
@@ -217,61 +220,63 @@ export function DocumentsTable(props: Props) {
               <Td>{date(document.updated_at, dateFormat)}</Td>
               <Td>{document.type}</Td>
               <Td>{prettyBytes(document.size)}</Td>
-              <Td>
-                <Dropdown label={t('more_actions')}>
-                  <DropdownElement
-                    onClick={() => {
-                      downloadDocument(document, true);
-                    }}
-                    icon={<Icon element={MdPageview} />}
-                  >
-                    {t('view')}
-                  </DropdownElement>
-
-                  <DropdownElement
-                    onClick={() => {
-                      downloadDocument(document, false);
-                    }}
-                    icon={<Icon element={MdDownload} />}
-                  >
-                    {t('download')}
-                  </DropdownElement>
-
-                  {document.is_public ? (
+              {!disableEditableOptions && (
+                <Td>
+                  <Dropdown label={t('more_actions')}>
                     <DropdownElement
                       onClick={() => {
-                        setDocumentVisibility(document.id, false).then(() =>
-                          props.onDocumentDelete?.()
-                        );
+                        downloadDocument(document, true);
                       }}
-                      icon={<Icon element={MdLockOutline} />}
+                      icon={<Icon element={MdPageview} />}
                     >
-                      {t('set_private')}
+                      {t('view')}
                     </DropdownElement>
-                  ) : (
+
                     <DropdownElement
                       onClick={() => {
-                        setDocumentVisibility(document.id, true).then(() =>
-                          props.onDocumentDelete?.()
-                        );
+                        downloadDocument(document, false);
                       }}
-                      icon={<Icon element={MdOutlineLockOpen} />}
+                      icon={<Icon element={MdDownload} />}
                     >
-                      {t('set_public')}
+                      {t('download')}
                     </DropdownElement>
-                  )}
 
-                  <DropdownElement
-                    onClick={() => {
-                      setDocumentId(document.id);
-                      setIsPasswordConfirmModalOpen(true);
-                    }}
-                    icon={<Icon element={MdDelete} />}
-                  >
-                    {t('delete')}
-                  </DropdownElement>
-                </Dropdown>
-              </Td>
+                    {document.is_public ? (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, false).then(() =>
+                            props.onDocumentDelete?.()
+                          );
+                        }}
+                        icon={<Icon element={MdLockOutline} />}
+                      >
+                        {t('set_private')}
+                      </DropdownElement>
+                    ) : (
+                      <DropdownElement
+                        onClick={() => {
+                          setDocumentVisibility(document.id, true).then(() =>
+                            props.onDocumentDelete?.()
+                          );
+                        }}
+                        icon={<Icon element={MdOutlineLockOpen} />}
+                      >
+                        {t('set_public')}
+                      </DropdownElement>
+                    )}
+
+                    <DropdownElement
+                      onClick={() => {
+                        setDocumentId(document.id);
+                        setIsPasswordConfirmModalOpen(true);
+                      }}
+                      icon={<Icon element={MdDelete} />}
+                    >
+                      {t('delete')}
+                    </DropdownElement>
+                  </Dropdown>
+                </Td>
+              )}
             </Tr>
           ))}
         </Tbody>

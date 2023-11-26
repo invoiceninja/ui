@@ -42,6 +42,8 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -94,6 +96,8 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -112,7 +116,10 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link to={route('/products/:id/edit', { id: product.id })}>
+          <Link
+            to={route('/products/:id/edit', { id: product.id })}
+            disableNavigation={disableNavigation('product', product)}
+          >
             {value}
           </Link>
         </span>
@@ -247,6 +254,8 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const setProduct = useSetAtom(productAtom);
 
   const invoiceProducts = useInvoiceProducts();
@@ -279,7 +288,8 @@ export function useActions() {
 
   const actions = [
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -288,7 +298,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           onClick={() => purchaseOrderProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -297,7 +308,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_product') && (
         <DropdownElement
           onClick={() => cloneToProduct(product)}
           icon={<Icon element={MdControlPointDuplicate} />}

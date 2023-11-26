@@ -11,13 +11,16 @@
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
-import { dataTableStaleTime } from './Invoices';
 import { Payment } from '$app/common/interfaces/payment';
 import { usePaymentColumns } from '$app/pages/payments/common/hooks/usePaymentColumns';
 import { useActions } from '$app/pages/payments/common/hooks/useActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Payments() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = usePaymentColumns();
 
@@ -37,7 +40,8 @@ export default function Payments() {
       linkToCreate={route('/payments/create?client=:id', { id })}
       linkToEdit="/payments/:id/edit"
       showRestore={(resource: Payment) => !resource.is_deleted}
-      staleTime={dataTableStaleTime}
+      linkToCreateGuards={[permission('create_payment')]}
+      hideEditableOptions={!hasPermission('edit_payment')}
     />
   );
 }

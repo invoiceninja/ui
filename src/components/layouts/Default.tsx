@@ -105,7 +105,7 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname.startsWith('/dashboard'),
-      visible: true,
+      visible: hasPermission('view_dashboard'),
     },
     {
       name: t('clients'),
@@ -396,7 +396,10 @@ export function Default(props: Props) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="dark:text-gray-100" />
           </button>
-          <div className="flex-1 px-4 md:px-8 flex items-center">
+          <div
+            className="flex-1 px-4 md:px-8 flex items-center"
+            data-cy="topNavbar"
+          >
             <div className="flex flex-1 items-center space-x-4">
               <h2
                 style={{ color: colors.$3 }}
@@ -498,9 +501,11 @@ export function Default(props: Props) {
                 </div>
               )}
 
-              <div className="space-x-3 items-center hidden lg:flex">
-                {props.navigationTopRight}
-              </div>
+              {props.navigationTopRight && (
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
+              )}
             </div>
           </div>
         </div>

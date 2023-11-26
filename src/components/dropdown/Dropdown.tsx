@@ -29,6 +29,7 @@ import { useColorScheme } from '$app/common/colors';
 interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
+  cypressRef?: string;
 }
 
 const LabelButton = styled.button`
@@ -91,6 +92,7 @@ export function Dropdown(props: Props) {
               minWidth: '12rem',
               maxWidth: '14.7rem',
             }}
+            data-cy={props.cypressRef}
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
@@ -127,6 +129,7 @@ export function Dropdown(props: Props) {
             backgroundColor: props.cardActions && accentColor,
             color: props.cardActions ? 'white' : '',
           }}
+          data-cy="chevronDownButton"
         >
           {!props.cardActions && <span>{props.label}</span>}
           <ChevronDown size={props.cardActions ? 18 : 14} />

@@ -36,6 +36,8 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
 
+  const hasPermission = useHasPermission();
+
   const { resource } = props;
 
   const clientResolver = useClientResolver();
@@ -55,7 +57,6 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
-  const hasPermission = useHasPermission();
   const colors = useColorScheme();
 
   return (
@@ -88,12 +89,9 @@ export function ClientSelector(props: Props) {
               </Link>
             )}
 
-            {hasPermission('view_client') ||
-              (hasPermission('edit_client') && (
-                <span className="text-sm">/</span>
-              ))}
+            {hasPermission('edit_client') && <span className="text-sm">/</span>}
 
-            {hasPermission('view_client') && (
+            {(hasPermission('view_client') || hasPermission('edit_client')) && (
               <Link to={route('/clients/:id', { id: client.id })}>
                 {t('view_client')}
               </Link>

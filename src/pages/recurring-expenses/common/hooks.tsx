@@ -52,6 +52,8 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { useBulk } from '$app/common/queries/recurring-expense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'status',
@@ -121,6 +123,8 @@ export function useAllRecurringExpenseColumns() {
 export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
+  const disableNavigation = useDisableNavigation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
@@ -148,6 +152,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          disableNavigation={disableNavigation(
+            'recurring_expense',
+            recurringExpense
+          )}
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
         </Link>
@@ -162,6 +170,10 @@ export function useRecurringExpenseColumns() {
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
+          disableNavigation={disableNavigation(
+            'recurring_expense',
+            recurringExpense
+          )}
         >
           {field}
         </Link>
@@ -173,7 +185,13 @@ export function useRecurringExpenseColumns() {
       label: t('vendor'),
       format: (value, recurringExpense) =>
         recurringExpense.vendor && (
-          <Link to={route('/vendors/:id', { id: value.toString() })}>
+          <Link
+            to={route('/vendors/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation(
+              'vendor',
+              recurringExpense.vendor
+            )}
+          >
             {recurringExpense.vendor.name}
           </Link>
         ),
@@ -184,7 +202,13 @@ export function useRecurringExpenseColumns() {
       label: t('client'),
       format: (value, recurringExpense) =>
         recurringExpense.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation(
+              'client',
+              recurringExpense.client
+            )}
+          >
             {recurringExpense.client.display_name}
           </Link>
         ),
@@ -433,6 +457,8 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const setExpense = useSetAtom(expenseAtom);
 
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
@@ -489,22 +515,24 @@ export function useActions() {
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (recurringExpense) => (
-      <DropdownElement
-        onClick={() => cloneToExpense(recurringExpense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_expense')}
-      </DropdownElement>
-    ),
+    (recurringExpense) =>
+      hasPermission('create_recurring_expense') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (recurringExpense) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => cloneToExpense(recurringExpense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_expense')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (recurringExpense) =>
       isEditPage &&
