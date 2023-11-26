@@ -27,6 +27,9 @@ import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '../common/hooks/useShowEditOption';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -62,6 +65,15 @@ export default function Tasks() {
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
+        rightSide={
+          <Guard
+            type="component"
+            component={<ImportButton route="/tasks/import" />}
+            guards={[
+              or(permission('create_task'), permission('edit_task')),
+            ]}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={taskColumns as unknown as string[]}
