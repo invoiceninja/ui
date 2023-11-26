@@ -17,6 +17,7 @@ import { Alert } from '../Alert';
 import { endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import classNames from 'classnames';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -36,6 +37,8 @@ export function ProductSelector(props: Props) {
 
   const currentCompany = useCurrentCompany();
 
+  const hasPermission = useHasPermission();
+
   return (
     <>
       <ProductCreate
@@ -45,7 +48,7 @@ export function ProductSelector(props: Props) {
       />
 
       <ComboboxAsync<Product>
-        endpoint={new URL(endpoint('/api/v1/products?per_page=800'))}
+        endpoint={endpoint('/api/v1/products?per_page=800')}
         inputOptions={{ value: props.defaultValue ?? null }}
         entryOptions={{
           id: 'id',
@@ -83,7 +86,7 @@ export function ProductSelector(props: Props) {
         action={{
           label: t('new_product'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: hasPermission('create_product'),
         }}
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"

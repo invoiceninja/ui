@@ -58,25 +58,24 @@ export function PaymentOverview(props: Props) {
             )}`}
           </span>
         </div>
-      
+
         {props?.payment?.applied < props?.payment?.amount && (
           <>
-          <div className="flex items-center justify-center">
-          </div>
-          
-          <div className="flex items-center justify-center">
-            <span className="text-gray-800">
-              {`${t('unapplied')}: ${formatMoney(
-                props?.payment?.amount - props?.payment?.applied  || 0,
-                props.payment.client?.country_id,
-                props.payment?.currency_id
-              )}`}
-            </span>
-          </div>
+            <div className="flex items-center justify-center"></div>
+
+            <div className="flex items-center justify-center">
+              <span className="text-gray-800">
+                {`${t('unapplied')}: ${formatMoney(
+                  props?.payment?.amount - props?.payment?.applied || 0,
+                  props.payment.client?.country_id,
+                  props.payment?.currency_id
+                )}`}
+              </span>
+            </div>
           </>
         )}
       </div>
-      
+
       <div>
         {props.payment.paymentables.map((value) => (
           <PaymentOverviewInvoice

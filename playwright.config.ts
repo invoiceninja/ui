@@ -13,7 +13,7 @@ config();
 export default defineConfig({
   testDir: './tests/e2e',
   /* Maximum time one test can run for. */
-  timeout: 10 * 1000,
+  timeout: 10 * 1500,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -28,7 +28,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 16 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

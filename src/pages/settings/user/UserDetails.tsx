@@ -32,10 +32,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -52,6 +54,10 @@ export function UserDetails() {
     { name: t('settings'), href: '/settings' },
     { name: t('user_details'), href: '/settings/user_details' },
   ];
+
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
 
   const user = useCurrentUser();
 
@@ -97,6 +103,11 @@ export function UserDetails() {
       .all(requests)
       .then((response) => {
         toast.success('updated_settings');
+
+        if (hasLanguageChanged) {
+          $refetch(['statics']);
+          setHasLanguageIdChanged(false);
+        }
 
         if (
           response[0].data.data.phone !== user?.phone &&

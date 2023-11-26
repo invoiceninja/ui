@@ -48,8 +48,9 @@ export function PaymentOverviewInvoice(props: Props) {
                   id: props.paymentable.invoice_id,
                 })}
               >
-                <span className='flex items-center gap-2'>
-                   {setLabel(props.payment, props.paymentable)} <MdOutlineFileOpen /> 
+                <span className="flex items-center gap-2">
+                  {setLabel(props.payment, props.paymentable)}{' '}
+                  <MdOutlineFileOpen />
                 </span>
               </Link>
             </span>

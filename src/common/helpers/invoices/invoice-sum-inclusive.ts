@@ -16,6 +16,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Currency } from '$app/common/interfaces/currency';
+import { NumberFormatter } from '../number-formatter';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
@@ -36,15 +37,14 @@ export class InvoiceSumInclusive {
   }
 
   public build() {
-
     this.calculateLineItems()
       .calculateDiscount()
       .calculateCustomValues()
       .calculateInvoiceTaxes()
       .setTaxMap()
       .calculateTotals()
-      .calculateBalance()
-      .calculatePartial();
+      // .calculatePartial();
+      .calculateBalance();
 
     return this;
   }
@@ -172,7 +172,7 @@ export class InvoiceSumInclusive {
   protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
-      this.invoice.line_items = this.invoiceItems.lineItems
+      this.invoice.line_items = this.invoiceItems.lineItems;
     }
 
     this.taxMap = collect();
@@ -200,7 +200,6 @@ export class InvoiceSumInclusive {
       this.totalTaxes += totalLineTax as number;
     });
 
-
     return this;
   }
 
@@ -217,31 +216,36 @@ export class InvoiceSumInclusive {
   }
 
   protected setCalculatedAttributes() {
-    // if (this.invoice.status_id !== InvoiceStatus.Draft) {
-    if (this.invoice.amount !== this.invoice.balance) {
-      const paidToDate = this.invoice.amount - this.invoice.balance;
 
-      this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
-    } else {
-      this.invoice.balance = this.total; // Needs implementing formatting with number class.
-    }
-    // }
+    this.invoice.amount = parseFloat(
+      NumberFormatter.formatValue(this.total, this.currency.precision)
+    );
 
-    this.invoice.amount = this.total; // Needs implementing formatting with number class.
+    this.invoice.balance =
+      parseFloat(
+        NumberFormatter.formatValue(this.total, this.currency.precision)
+      ) - (this.invoice.paid_to_date ?? 0);
+
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
   }
 
-  protected calculatePartial() {
-    if (!this.invoice?.id && this.invoice.partial) {
-      this.invoice.partial = Math.max(
-        0,
-        Math.min(this.invoice.partial, this.invoice.balance)
-      ); // Needs formatting (with rounding 2)
-    }
+  // protected calculatePartial() {
+  //   if (!this.invoice?.id && this.invoice.partial && this.invoice.balance) {
+  //     this.invoice.partial = Math.max(
+  //       0,
+  //       Math.min(this.invoice.partial, this.invoice.balance)
+  //     ); // Needs formatting (with rounding 2)
+  //   }
 
-    return this;
+  //   return this;
+  // }
+
+  public getBalanceDue() {
+
+    return (this.invoice.partial && this.invoice.partial > 0) ? Math.min(this.invoice.partial, this.invoice.balance) : this.invoice.balance;
+
   }
 
   /////////////

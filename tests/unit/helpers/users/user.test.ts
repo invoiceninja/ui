@@ -26,6 +26,8 @@ describe('Test User Logic Bools', () => {
             created_at: 0,
             updated_at: 0,
             archived_at: 0,
+            language_id: "1",
+            user_logged_in_notification: true,
         }
 
         expect(user?.has_password && user.oauth_provider_id.length >=1).toEqual(true);

@@ -48,9 +48,14 @@ import { useInvoiceExpense } from './useInvoiceExpense';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { AddToInvoiceAction } from './components/AddToInvoiceAction';
 import { ExpenseCategory } from './components/ExpenseCategory';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function useActions() {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const navigate = useNavigate();
   const bulk = useBulk();
@@ -85,7 +90,8 @@ export function useActions() {
   const actions: Action<Expense>[] = [
     (expense) =>
       expense.should_be_invoiced === true &&
-      expense.invoice_id.length === 0 && (
+      expense.invoice_id.length === 0 &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => create(expense)}
           icon={<Icon element={MdTextSnippet} />}
@@ -98,28 +104,30 @@ export function useActions() {
       expense.invoice_id.length === 0 && (
         <AddToInvoiceAction expense={expense} />
       ),
-    (expense) => (
-      <DropdownElement
-        onClick={() => cloneToExpense(expense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (expense) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringExpense(expense)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring')}
-      </DropdownElement>
-    ),
+    (expense) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => cloneToExpense(expense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (expense) =>
+      hasPermission('create_recurring_expense') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringExpense(expense)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_recurring')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (expense) =>
       getEntityState(expense) === EntityState.Active &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'archive')}
+          onClick={() => bulk([expense.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -130,7 +138,7 @@ export function useActions() {
         getEntityState(expense) === EntityState.Deleted) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'restore')}
+          onClick={() => bulk([expense.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -141,7 +149,7 @@ export function useActions() {
         getEntityState(expense) === EntityState.Archived) &&
       isEditPage && (
         <DropdownElement
-          onClick={() => bulk(expense.id, 'delete')}
+          onClick={() => bulk([expense.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
@@ -214,6 +222,9 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   const navigate = useNavigate();
 
   const formatMoney = useFormatMoney();
@@ -241,20 +252,33 @@ export function useExpenseColumns() {
       label: t('status'),
       format: (value, expense) => (
         <div className="flex items-center space-x-2">
-          <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+          <Link
+            to={route('/expenses/:id/edit', { id: expense.id })}
+            disableNavigation={disableNavigation('expense', expense)}
+          >
             <span className="inline-flex items-center space-x-4">
               <ExpenseStatus entity={expense} />
             </span>
           </Link>
 
           {expense.invoice_id && (
-            <Icon
-              element={MdTextSnippet}
-              size={19}
-              onClick={() =>
-                navigate(
-                  route('/invoices/:id/edit', { id: expense.invoice_id })
-                )
+            <Assigned
+              entityId={expense.invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <Icon
+                  element={MdTextSnippet}
+                  size={19}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: expense.invoice_id })
+                    )
+                  }
+                />
               }
             />
           )}
@@ -266,7 +290,10 @@ export function useExpenseColumns() {
       id: 'number',
       label: t('number'),
       format: (field, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+        <Link
+          to={route('/expenses/:id/edit', { id: expense.id })}
+          disableNavigation={disableNavigation('expense', expense)}
+        >
           {field}
         </Link>
       ),
@@ -277,7 +304,10 @@ export function useExpenseColumns() {
       label: t('vendor'),
       format: (value, expense) =>
         expense.vendor && (
-          <Link to={route('/vendors/:id', { id: value.toString() })}>
+          <Link
+            to={route('/vendors/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('vendor', expense.vendor)}
+          >
             {expense.vendor.name}
           </Link>
         ),
@@ -288,7 +318,10 @@ export function useExpenseColumns() {
       label: t('client'),
       format: (value, expense) =>
         expense.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', expense.client)}
+          >
             {expense.client.display_name}
           </Link>
         ),

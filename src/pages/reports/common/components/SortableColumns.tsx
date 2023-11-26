@@ -16,7 +16,7 @@ import {
   Draggable,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
-import { clientMap } from '$app/common/constants/exports/client-map';
+import { Record, clientMap } from '$app/common/constants/exports/client-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { t } from 'i18next';
@@ -31,14 +31,10 @@ import { taskMap } from '$app/common/constants/exports/task-map';
 import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Identifier } from '../../index/Reports';
+import { Identifier } from '../useReports';
+import { contactMap } from '$app/common/constants/exports/contact-map';
 
-export const reportColumn = 10;
-
-interface Record {
-  trans: string;
-  value: string;
-}
+export const reportColumn = 11;
 
 interface ColumnProps {
   title: string | (() => JSX.Element);
@@ -77,37 +73,40 @@ export function Column({
             {...provided.droppableProps}
           >
             <div className="overflow-y-scroll h-96 mt-2 border rounded-md divide-y">
-              {data.map((record: Record, i: number) => (
-                <Draggable
-                  key={record.value}
-                  index={i}
-                  draggableId={`left-word-${record.value}`}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <span
-                        className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
-                        key={i}
+              {data &&
+                data.map((record: Record, i: number) => (
+                  <Draggable
+                    key={record.value}
+                    index={i}
+                    draggableId={`left-word-${record.value}`}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
                       >
-                        {translateLabel(record)}
+                        <span
+                          className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
+                          key={i}
+                        >
+                          {translateLabel(record)}
 
-                        {droppableId === reportColumn.toString() && (
-                          <button
-                            type="button"
-                            onClick={() => (onRemove ? onRemove(record) : null)}
-                          >
-                            <X size={15} />
-                          </button>
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+                          {droppableId === reportColumn.toString() && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onRemove ? onRemove(record) : null
+                              }
+                            >
+                              <X size={15} />
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
             </div>
             {provided.placeholder}
           </div>
@@ -133,82 +132,98 @@ const positions = [
   'task',
   'expense',
   'recurring_invoice',
-];
+  'contact',
+] as const;
 
-export function SortableColumns({ report, columns }: Props) {
-  const { preferences, update } = usePreferences();
+export function useColumns({ report, columns }: Props) {
+  const { preferences } = usePreferences();
+
+  const defaultColumns = [
+    columns.includes('client') ? clientMap : [],
+    columns.includes('invoice')
+      ? columns.includes('item')
+        ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
+        : invoiceMap
+      : [],
+    columns.includes('credit')
+      ? columns.includes('item')
+        ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+        : creditMap
+      : [],
+    columns.includes('quote')
+      ? columns.includes('item')
+        ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+        : quoteMap
+      : [],
+    columns.includes('payment') ? paymentMap : [],
+    columns.includes('vendor') ? vendorMap : [],
+    columns.includes('purchase_order')
+      ? columns.includes('item')
+        ? purchaseorderMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+          )
+        : purchaseorderMap
+      : [],
+    columns.includes('task') ? taskMap : [],
+    columns.includes('expense') ? expenseMap : [],
+    columns.includes('recurring_invoice')
+      ? columns.includes('item')
+        ? recurringinvoiceMap.concat(
+            itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+          )
+        : recurringinvoiceMap
+      : [],
+    columns.includes('contact') ? contactMap : [],
+    [],
+  ];
 
   const data =
     report in preferences.reports.columns &&
     preferences.reports.columns[report as Identifier].length !== 0
       ? preferences.reports.columns[report]
-      : [
-          columns.includes('client') ? clientMap : [],
-          columns.includes('invoice')
-            ? columns.includes('item')
-              ? invoiceMap.concat(itemMap)
-              : invoiceMap
-            : [],
-          columns.includes('credit')
-            ? columns.includes('item')
-              ? creditMap.concat(itemMap)
-              : creditMap
-            : [],
-          columns.includes('quote')
-            ? columns.includes('item')
-              ? quoteMap.concat(itemMap)
-              : quoteMap
-            : [],
-          columns.includes('payment') ? paymentMap : [],
-          columns.includes('vendor') ? vendorMap : [],
-          columns.includes('purchase_order')
-            ? columns.includes('item')
-              ? purchaseorderMap.concat(itemMap)
-              : purchaseorderMap
-            : [],
-          columns.includes('task') ? taskMap : [],
-          columns.includes('expense') ? expenseMap : [],
-          columns.includes('recurring_invoice')
-            ? columns.includes('item')
-              ? recurringinvoiceMap.concat(itemMap)
-              : recurringinvoiceMap
-            : [],
-          [],
-        ];
+      : defaultColumns;
+
+  return { data, defaultColumns };
+}
+
+export function SortableColumns({ report, columns }: Props) {
+  const { update } = usePreferences();
+  const { data, defaultColumns } = useColumns({ report, columns });
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
-    // Create a copy of the data array
-    const $data = cloneDeep(data);
 
-    // Find a source index
-    const sourceIndex = parseInt(result.source.droppableId);
+    try {
+      // Create a copy of the data array
+      const $data = cloneDeep(data);
 
-    // Find a string
-    const word = $data[sourceIndex][result.source.index];
+      // Find a source index
+      const sourceIndex = parseInt(result.source.droppableId);
 
-    // Cut a word from the original array
-    $data[sourceIndex].splice(result.source.index, 1);
+      // Find a string
+      const word = $data[sourceIndex][result.source.index];
 
-    // Find a destination index
-    const destinationIndex = parseInt(result.destination.droppableId);
+      // Cut a word from the original array
+      $data[sourceIndex].splice(result.source.index, 1);
 
-    // Then we can insert the word into new array at specific index
-    $data[destinationIndex].splice(result.destination.index, 0, word);
+      // Find a destination index
+      const destinationIndex = parseInt(result.destination.droppableId);
 
-    update(`preferences.reports.columns.${report}`, [...$data]);
+      // Then we can insert the word into new array at specific index
+      $data[destinationIndex].splice(result.destination.index, 0, word);
+
+      update(`preferences.reports.columns.${report}`, [...$data]);
+    } catch (e) {
+      // In case we hit any error, due to wrong data or something similar, we should just reset the state.
+
+      update(`preferences.reports.columns.${report}`, defaultColumns);
+    }
   };
 
   const onRemove = (record: Record) => {
-    // Find where's the original
-    const type =
-      record.value.split('.')[0] === 'item'
-        ? 'invoice' // Workaround for items as they're part of invoices.
-        : record.value.split('.')[0];
-
-    const index = positions.indexOf(type);
+    const index = positions.indexOf(record.map as (typeof positions)[number]);
 
     // Remove it from the reports
     const $data = cloneDeep(data);
@@ -224,39 +239,7 @@ export function SortableColumns({ report, columns }: Props) {
   };
 
   const onRemoveAll = () => {
-    update(`preferences.reports.columns.${report}`, [
-      columns.includes('client') ? clientMap : [],
-      columns.includes('invoice')
-        ? columns.includes('item')
-          ? invoiceMap.concat(itemMap)
-          : invoiceMap
-        : [],
-      columns.includes('credit')
-        ? columns.includes('item')
-          ? creditMap.concat(itemMap)
-          : creditMap
-        : [],
-      columns.includes('quote')
-        ? columns.includes('item')
-          ? quoteMap.concat(itemMap)
-          : quoteMap
-        : [],
-      columns.includes('payment') ? paymentMap : [],
-      columns.includes('vendor') ? vendorMap : [],
-      columns.includes('purchase_order')
-        ? columns.includes('item')
-          ? purchaseorderMap.concat(itemMap)
-          : purchaseorderMap
-        : [],
-      columns.includes('task') ? taskMap : [],
-      columns.includes('expense') ? expenseMap : [],
-      columns.includes('recurring_invoice')
-        ? columns.includes('item')
-          ? recurringinvoiceMap.concat(itemMap)
-          : recurringinvoiceMap
-        : [],
-      [],
-    ]);
+    update(`preferences.reports.columns.${report}`, defaultColumns);
   };
 
   const onAddAll = (index: number) => {
@@ -444,6 +427,23 @@ export function SortableColumns({ report, columns }: Props) {
               />
             )}
 
+            {columns.includes('contact') && (
+              <Column
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <p>{t('contact')}</p>
+
+                    <button type="button" onClick={() => onAddAll(10)}>
+                      <ChevronsRight size={16} />
+                    </button>
+                  </div>
+                )}
+                data={data[10]}
+                droppableId="10"
+                isDropDisabled={true}
+              />
+            )}
+
             <Column
               title={() => (
                 <div className="flex items-center justify-between">
@@ -451,9 +451,13 @@ export function SortableColumns({ report, columns }: Props) {
                     {t('report')} {t('columns')}
                   </p>
 
-                  <button type="button" onClick={onRemoveAll}>
-                    <X size={16} />
-                  </button>
+                  <div
+                    className="flex items-end space-x-1 cursor-pointer"
+                    onClick={onRemoveAll}
+                  >
+                    <X size={19} />
+                    <span className="text-xs">({t('reset')})</span>
+                  </div>
                 </div>
               )}
               data={data[reportColumn]}

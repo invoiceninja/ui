@@ -25,6 +25,7 @@ import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
+import { CustomField } from '$app/components/CustomField';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -146,6 +147,11 @@ export function Details(props: Props) {
                 taxRate.resource &&
                   handleChange('tax_name1', taxRate.resource.name);
               }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate1', taxRate.rate);
+
+                handleChange('tax_name1', taxRate.name);
+              }}
             />
           </Element>
         )}
@@ -192,6 +198,11 @@ export function Details(props: Props) {
                 taxRate.resource &&
                   handleChange('tax_name2', taxRate.resource.name);
               }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate2', taxRate.rate);
+
+                handleChange('tax_name2', taxRate.name);
+              }}
             />
           </Element>
         )}
@@ -237,6 +248,11 @@ export function Details(props: Props) {
 
                 taxRate.resource &&
                   handleChange('tax_name3', taxRate.resource.name);
+              }}
+              onTaxCreated={(taxRate) => {
+                handleChange('tax_rate3', taxRate.rate);
+
+                handleChange('tax_name3', taxRate.name);
               }}
             />
           </Element>
@@ -346,6 +362,50 @@ export function Details(props: Props) {
           ))}
         </SelectField>
       </Element>
+
+      {recurringExpense && company?.custom_fields?.expense1 && (
+        <CustomField
+          field="recurringExpense1"
+          defaultValue={recurringExpense.custom_value1 || ''}
+          value={company.custom_fields.expense1}
+          onValueChange={(value) =>
+            handleChange('custom_value1', String(value))
+          }
+        />
+      )}
+
+      {recurringExpense && company?.custom_fields?.expense2 && (
+        <CustomField
+          field="recurringExpense2"
+          defaultValue={recurringExpense.custom_value2 || ''}
+          value={company.custom_fields.expense2}
+          onValueChange={(value) =>
+            handleChange('custom_value2', String(value))
+          }
+        />
+      )}
+
+      {recurringExpense && company?.custom_fields?.expense3 && (
+        <CustomField
+          field="recurringExpense3"
+          defaultValue={recurringExpense.custom_value3 || ''}
+          value={company.custom_fields.expense3}
+          onValueChange={(value) =>
+            handleChange('custom_value3', String(value))
+          }
+        />
+      )}
+
+      {recurringExpense && company?.custom_fields?.expense4 && (
+        <CustomField
+          field="recurringExpense4"
+          defaultValue={recurringExpense.custom_value4 || ''}
+          value={company.custom_fields.expense4}
+          onValueChange={(value) =>
+            handleChange('custom_value4', String(value))
+          }
+        />
+      )}
     </Card>
   );
 }

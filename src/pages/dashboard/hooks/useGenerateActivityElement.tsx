@@ -32,11 +32,12 @@ export function useGenerateActivityElement() {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     if (activity.activity_type_id === 4) {
-
-      text = text.replace(":user", `${t('recurring_invoice')} :recurring_invoice`);
-
+      text = text.replace(
+        ':user',
+        `${t('recurring_invoice')} :recurring_invoice`
+      );
     }
-    
+
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
@@ -151,7 +152,7 @@ export function useGenerateActivityElement() {
 
   return (activity: ActivityRecord) => (
     <Div
-      theme={{ borderColor: colors.$4,  hoverColor: colors.$2 }}
+      theme={{ borderColor: colors.$4, hoverColor: colors.$2 }}
       className="flex flex-col py-2 border border-t-0 border-x-0 last:border-b-0"
     >
       <div className="flex flex-col">
@@ -159,7 +160,7 @@ export function useGenerateActivityElement() {
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">
-            {date(activity.created_at, dateFormat)}
+            {date(activity.created_at, dateFormat + ' HH:mm')}
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>

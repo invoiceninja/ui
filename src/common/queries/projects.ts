@@ -12,17 +12,15 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Project } from '$app/common/interfaces/project';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { generatePath } from 'react-router-dom';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
   return useQuery<Project>(
-    '/api/v1/projects/create',
+    ['/api/v1/projects/create'],
     () =>
       request('GET', endpoint('/api/v1/projects/create')).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
@@ -30,14 +28,16 @@ export function useBlankProjectQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_project'),
+      enabled: hasPermission('create_project')
+        ? options?.enabled ?? true
+        : false,
     }
   );
 }
 
 export function useProjectQuery(params: { id: string | undefined }) {
   return useQuery<Project>(
-    route('/api/v1/projects/:id', { id: params.id }),
+    ['/api/v1/projects', params.id],
     () =>
       request('GET', endpoint('/api/v1/projects/:id', { id: params.id })).then(
         (response) => response.data.data
@@ -53,7 +53,7 @@ export function useFetchProjectQuery() {
     let project: Project | undefined;
 
     await queryClient
-      .fetchQuery(generatePath('/api/v1/projects/:id', { id: projectId }), () =>
+      .fetchQuery(['/api/v1/projects', projectId], () =>
         request(
           'GET',
           endpoint('/api/v1/projects/:id', {

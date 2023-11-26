@@ -227,7 +227,7 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
-        
+
         <Element
           leftSideHelp={t('manual_payment_email_help')}
           leftSide={
@@ -304,9 +304,11 @@ export function OnlinePayments() {
         </Element>
 
         {isCompanySettingsActive && (
-          <Element leftSide={t('enable_applying_payments')}>
+          <Element
+            leftSide={t('enable_applying_payments')}
+            leftSideHelp={t('enable_applying_payments_help')}
+          >
             <Toggle
-              label={t('enable_applying_payments_help')}
               id="allow_over_payment"
               checked={Boolean(company?.enable_applying_payments)}
               onChange={(value) =>
@@ -324,9 +326,9 @@ export function OnlinePayments() {
               defaultValue={false}
             />
           }
+          leftSideHelp={t('allow_over_payment_help')}
         >
           <Toggle
-            label={t('allow_over_payment_help')}
             id="allow_over_payment"
             checked={Boolean(
               company?.settings.client_portal_allow_over_payment
@@ -349,9 +351,9 @@ export function OnlinePayments() {
               defaultValue={false}
             />
           }
+          leftSideHelp={t('allow_under_payment_help')}
         >
           <Toggle
-            label={t('allow_under_payment_help')}
             id="allow_under_payment"
             checked={Boolean(
               company?.settings.client_portal_allow_under_payment
@@ -407,9 +409,9 @@ export function OnlinePayments() {
               defaultValue={false}
             />
           }
+          leftSideHelp={t('client_initiated_payments_help')}
         >
           <Toggle
-            label={t('client_initiated_payments_help')}
             id="client_initiated_payments"
             checked={Boolean(company?.settings.client_initiated_payments)}
             onChange={(value) =>

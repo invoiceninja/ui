@@ -21,7 +21,6 @@ import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import {
   DragDropContext,
@@ -57,6 +56,7 @@ import {
   TaskDetails,
 } from '../common/components/CreateTaskModal';
 import { TaskClock } from './components/TaskClock';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface CardItem {
   id: string;
@@ -87,19 +87,19 @@ export default function Kanban() {
     { name: t('kanban'), href: '/tasks/kanban' },
   ];
 
-  const queryClient = useQueryClient();
-
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
+  const [apiEndpoint, setApiEndpoint] = useState(
+    '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
+  );
   const [projectId, setProjectId] = useState<string>();
 
   const [taskDetails, setTaskDetails] = useState<TaskDetails>();
 
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
 
-  const { data: taskStatuses } = useTaskStatusesQuery();
+  const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
@@ -171,7 +171,7 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
+      .finally(() => $refetch(['tasks']));
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -245,11 +245,16 @@ export default function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId,
-          })
+          route(
+            '/api/v1/tasks?project_tasks=:projectId&per_page=1000&status=active&without_deleted_clients=true',
+            {
+              projectId,
+            }
+          )
         )
-      : setApiEndpoint('/api/v1/tasks?per_page=1000');
+      : setApiEndpoint(
+          '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
+        );
   }, [projectId]);
 
   return (

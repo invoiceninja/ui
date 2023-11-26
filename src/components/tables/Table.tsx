@@ -112,10 +112,7 @@ export function Table(props: Props) {
               height: manualTableHeight,
             }}
           >
-            <table
-              ref={handleTableHeight}
-              className="min-w-full table-auto"
-            >
+            <table ref={handleTableHeight} className="min-w-full table-auto">
               {props.children}
             </table>
           </div>

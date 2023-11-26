@@ -21,9 +21,9 @@ import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useHandleChange } from '../common/hooks';
 import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   visible: boolean;
@@ -34,8 +34,6 @@ export function CreateTaskStatusModal(props: Props) {
   const [t] = useTranslation();
 
   const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
 
   const { data: blankTaskStatus } = useBlankTaskStatusQuery();
 
@@ -64,7 +62,7 @@ export function CreateTaskStatusModal(props: Props) {
         .then(() => {
           toast.success('created_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
+          $refetch(['task_statuses']);
 
           setTaskStatus(blankTaskStatus);
 

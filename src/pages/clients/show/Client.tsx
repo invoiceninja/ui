@@ -30,6 +30,9 @@ import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { Button } from '$app/components/forms';
 import { useTabs } from './hooks/useTabs';
+import { EmailHistory } from './components/EmailHistory';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -37,6 +40,10 @@ export default function Client() {
   const { data: client, isLoading } = useClientQuery({ id, enabled: true });
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+
+  const entityAssigned = useEntityAssigned();
 
   const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
 
@@ -69,19 +76,22 @@ export default function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <div className="flex space-x-3">
-          <Button to={route('/clients/:id/edit', { id })}>
-            {t('edit_client')}
-          </Button>
+        (hasPermission('edit_client') || entityAssigned(client)) && (
+          <div className="flex space-x-3">
+            <Button to={route('/clients/:id/edit', { id })}>
+              {t('edit_client')}
+            </Button>
 
-          {client && (
-            <ResourceActions
-              label={t('more_actions')}
-              resource={client}
-              actions={actions}
-            />
-          )}
-        </div>
+            {client && (
+              <ResourceActions
+                label={t('more_actions')}
+                resource={client}
+                actions={actions}
+                cypressRef="clientActionDropdown"
+              />
+            )}
+          </div>
+        )
       }
     >
       {isLoading && <Spinner />}
@@ -94,6 +104,8 @@ export default function Client() {
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}
+
+            <EmailHistory />
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />

@@ -20,9 +20,12 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './useInvoiceProducts';
 import { usePurchaseOrderProducts } from './usePurchaseOrderProducts';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -52,42 +55,47 @@ export const useCustomBulkActions = () => {
 
   const handleDownloadDocuments = (
     selectedProducts: Product[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const productIds = getDocumentsIds(selectedProducts);
 
     documentsBulk(productIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const customBulkActions: CustomBulkAction<Product>[] = [
-    (_, selectedProducts) =>
-      selectedProducts &&
-      shouldShowNewInvoice(selectedProducts) && (
+    ({ selectedResources, setSelected }) =>
+      shouldShowNewInvoice(selectedResources) &&
+      hasPermission('create_invoice') && (
         <DropdownElement
-          onClick={() => invoiceProducts(selectedProducts)}
+          onClick={() => {
+            invoiceProducts(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_invoice')}
         </DropdownElement>
       ),
-    (_, selectedProducts) =>
-      selectedProducts &&
-      shouldShowPurchaseOrder(selectedProducts) && (
+    ({ selectedResources, setSelected }) =>
+      shouldShowPurchaseOrder(selectedResources) &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
-          onClick={() => purchaseOrderProducts(selectedProducts)}
+          onClick={() => {
+            purchaseOrderProducts(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_purchase_order')}
         </DropdownElement>
       ),
-    (_, selectedProducts, setSelected) =>
-      selectedProducts &&
-      shouldShowDownloadDocuments(selectedProducts) && (
+    ({ selectedResources, setSelected }) =>
+      shouldShowDownloadDocuments(selectedResources) && (
         <DropdownElement
           onClick={() =>
-            shouldDownloadDocuments(selectedProducts)
-              ? handleDownloadDocuments(selectedProducts, setSelected)
+            shouldDownloadDocuments(selectedResources)
+              ? handleDownloadDocuments(selectedResources, setSelected)
               : toast.error('no_documents_to_download')
           }
           icon={<Icon element={MdDownload} />}

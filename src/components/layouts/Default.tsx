@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -54,8 +54,7 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { $1, $2, colorSchemeAtom, useColorScheme } from '$app/common/colors';
-import { useAtom } from 'jotai';
+import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 
 export interface SaveOption {
@@ -106,7 +105,7 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname.startsWith('/dashboard'),
-      visible: true,
+      visible: hasPermission('view_dashboard'),
     },
     {
       name: t('clients'),
@@ -366,8 +365,6 @@ export function Default(props: Props) {
   const saveBtn = useSaveBtn();
   const colors = useColorScheme();
 
-  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
-
   return (
     <div>
       <ActivateCompany />
@@ -399,9 +396,15 @@ export function Default(props: Props) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="dark:text-gray-100" />
           </button>
-          <div className="flex-1 px-4 md:px-8 flex items-center">
+          <div
+            className="flex-1 px-4 md:px-8 flex items-center"
+            data-cy="topNavbar"
+          >
             <div className="flex flex-1 items-center space-x-4">
-              <h2 style={{ color: colors.$3 }} className="text-sm md:text-lg whitespace-nowrap">
+              <h2
+                style={{ color: colors.$3 }}
+                className="text-sm md:text-lg whitespace-nowrap"
+              >
                 {props.title}
               </h2>
 
@@ -410,22 +413,6 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
-              {import.meta.env.DEV && (
-                <SelectField
-                  value={
-                    JSON.stringify(colorScheme) === JSON.stringify($1)
-                      ? 'dark'
-                      : 'light'
-                  }
-                  onValueChange={(value) =>
-                    value === 'light' ? setColorScheme($2) : setColorScheme($1)
-                  }
-                >
-                  <option value="dark">Dark</option>
-                  <option value="light">Light</option>
-                </SelectField>
-              )}
-
               {shouldShowUnlockButton && (
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
@@ -514,9 +501,11 @@ export function Default(props: Props) {
                 </div>
               )}
 
-              <div className="space-x-3 items-center hidden lg:flex">
-                {props.navigationTopRight}
-              </div>
+              {props.navigationTopRight && (
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
+              )}
             </div>
           </div>
         </div>

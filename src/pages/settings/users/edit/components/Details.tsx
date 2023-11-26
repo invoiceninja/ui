@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
   user: User;
@@ -31,7 +32,7 @@ export function Details(props: Props) {
   };
 
   const company = useCurrentCompany();
-  
+
   return (
     <Card title={t('details')}>
       <Element leftSide={t('first_name')} required>
@@ -67,17 +68,22 @@ export function Details(props: Props) {
         />
       </Element>
 
+      <Element
+        leftSide={t('login_notification')}
+        leftSideHelp={t('login_notification_help')}
+      >
+        <Toggle
+          checked={user?.user_logged_in_notification}
+          onChange={(value) => onChange('user_logged_in_notification', value)}
+        />
+      </Element>
+
       {company?.custom_fields?.user1 && (
         <CustomField
           field="user1"
           defaultValue={user.custom_value1}
           value={company.custom_fields.user1}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value1',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value1', String(value))}
         />
       )}
 
@@ -86,12 +92,7 @@ export function Details(props: Props) {
           field="user2"
           defaultValue={user.custom_value2}
           value={company.custom_fields.user2}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value2',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value2', String(value))}
         />
       )}
 
@@ -100,12 +101,7 @@ export function Details(props: Props) {
           field="user3"
           defaultValue={user.custom_value3}
           value={company.custom_fields.user3}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value3',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value3', String(value))}
         />
       )}
 
@@ -114,15 +110,9 @@ export function Details(props: Props) {
           field="user4"
           defaultValue={user.custom_value4}
           value={company.custom_fields.user4}
-          onValueChange={(value) =>
-            onChange(
-              'custom_value4',
-              String(value)
-            )
-          }
+          onValueChange={(value) => onChange('custom_value4', String(value))}
         />
       )}
-      
     </Card>
   );
 }

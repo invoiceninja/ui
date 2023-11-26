@@ -23,6 +23,8 @@ import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
+import { $1, $2, colorSchemeAtom } from '$app/common/colors';
+import { useAtom } from 'jotai';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -37,6 +39,8 @@ export function Preferences() {
       })
     );
   };
+
+  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
   return (
     <div className="space-y-4">
@@ -98,6 +102,13 @@ export function Preferences() {
             }
             type="number"
             placeholder={t('number_precision')}
+          />
+        </Element>
+
+        <Element leftSide={t('dark_mode')}>
+          <Toggle
+            checked={JSON.stringify(colorScheme) === JSON.stringify($1)}
+            onChange={(v) => (v ? setColorScheme($1) : setColorScheme($2))}
           />
         </Element>
       </Card>

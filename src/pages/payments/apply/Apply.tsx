@@ -22,7 +22,6 @@ import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
@@ -31,9 +30,9 @@ import collect from 'collect.js';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Apply() {
-  const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();
   const { data: payment, isLoading } = usePaymentQuery({ id });
@@ -63,28 +62,8 @@ export default function Apply() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
-          queryClient.invalidateQueries(route('/api/v1/invoices'));
-          queryClient.invalidateQueries(route('/api/v1/clients'));
-          queryClient.invalidateQueries('/api/v1/clients');
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id', { id: payment?.client_id })
-          );
-          queryClient.invalidateQueries(
-            route('/api/v1/clients/:id/edit', { id: payment?.client_id })
-          );
 
-          payment?.invoices?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(
-              route('/api/v1/invoices/:id', { id: paymentable.invoice_id })
-            );
-          });
-
-          payment?.credits?.forEach((paymentable: any) => {
-            queryClient.invalidateQueries(
-              route('/api/v1/credits/:id', { id: paymentable.credit_id })
-            );
-          });
+          $refetch(['payments', 'invoices', 'clients', 'credits']);
         });
     },
   });
@@ -154,13 +133,9 @@ export default function Apply() {
       <Element leftSide={t('invoices')}>
         {payment?.client_id ? (
           <ComboboxAsync<Invoice>
-            endpoint={
-              new URL(
-                endpoint(
-                  `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
-                )
-              )
-            }
+            endpoint={endpoint(
+              `/api/v1/invoices?payable=${payment?.client_id}&per_page=100`
+            )}
             inputOptions={{
               value: 'id',
             }}

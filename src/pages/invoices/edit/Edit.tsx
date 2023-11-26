@@ -10,7 +10,6 @@
 
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
@@ -43,11 +42,16 @@ import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -70,8 +74,6 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
-
-  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -97,8 +99,6 @@ export default function Edit() {
 
       if (_invoice?.client) {
         setClient(_invoice.client);
-
-        clientResolver.cache(_invoice.client);
       }
     }
   }, [data]);
@@ -107,28 +107,30 @@ export default function Edit() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  const actions = useActions({ excludeCommonActions: true });
+  const actions = useActions();
   const save = useHandleSave(setErrors);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        invoice && (
-          <ResourceActions
-            resource={invoice}
-            actions={actions}
-            onSaveClick={() => invoice && save(invoice)}
-            disableSaveButton={
-              invoice &&
-              (invoice.status_id === InvoiceStatus.Cancelled ||
-                invoice.is_deleted)
-            }
-          />
-        )
-      }
-      topRight={invoice && <CommonActions invoice={invoice} />}
+      {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
+        invoice && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={invoice}
+              actions={actions}
+              onSaveClick={() => invoice && save(invoice)}
+              disableSaveButton={
+                invoice &&
+                (invoice.status_id === InvoiceStatus.Cancelled ||
+                  invoice.is_deleted)
+              }
+              cypressRef="invoiceActionDropdown"
+            />
+          ),
+          topRight: <CommonActions invoice={invoice} />,
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
@@ -247,6 +249,8 @@ export default function Edit() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>

@@ -49,7 +49,8 @@ export function Badge(props: Props) {
       style={styles}
       className={classNames('text-xs px-2 py-1 rounded', {
         'bg-gray-500 text-white': props.variant === 'generic',
-        'bg-white border text-gray-900 hover:bg-white': props.variant === 'white',
+        'bg-white border text-gray-900 hover:bg-white':
+          props.variant === 'white',
         'bg-yellow-600 text-white': props.variant === 'yellow',
         'bg-red-600 text-white': props.variant === 'red',
         'bg-blue-300 text-white': props.variant === 'light-blue',

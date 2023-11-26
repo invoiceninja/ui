@@ -15,9 +15,8 @@ import { Task } from '$app/common/interfaces/task';
 import { AxiosError } from 'axios';
 import { isOverlapping } from '../helpers/is-overlapping';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { route } from '$app/common/helpers/route';
-import { useQueryClient } from 'react-query';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Params {
   isFormBusy: boolean;
@@ -26,8 +25,6 @@ interface Params {
 }
 export function useUpdateTask(params: Params) {
   const { isFormBusy, setErrors, setIsFormBusy } = params;
-
-  const queryClient = useQueryClient();
 
   return (task: Task) => {
     if (!isFormBusy) {
@@ -43,11 +40,7 @@ export function useUpdateTask(params: Params) {
         .then(() => {
           toast.success('updated_task');
 
-          queryClient.invalidateQueries('/api/v1/tasks');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/tasks/:id', { id: task.id })
-          );
+          $refetch(['tasks']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

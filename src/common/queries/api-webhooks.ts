@@ -10,13 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ApiWebhook } from '$app/common/interfaces/api-webhook';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useApiWebhooksQuery(params: Params) {
   const { isAdmin } = useAdmin();
@@ -39,7 +39,7 @@ export function useApiWebhookQuery(params: { id: string | undefined }) {
   const { isAdmin } = useAdmin();
 
   return useQuery<ApiWebhook>(
-    route('/api/v1/webhooks/:id', { id: params.id }),
+    ['/api/v1/webhooks', params.id],
     () =>
       request('GET', endpoint('/api/v1/webhooks/:id', { id: params.id })).then(
         (response: GenericSingleResourceResponse<ApiWebhook>) =>
@@ -64,8 +64,6 @@ export function useBlankApiWebhookQuery() {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -75,9 +73,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_webhook`);
 
-      queryClient.invalidateQueries('/api/v1/webhooks');
-
-      queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+      $refetch(['webhooks']);
     });
   };
 }

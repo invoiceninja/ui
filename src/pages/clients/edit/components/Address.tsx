@@ -37,7 +37,7 @@ export function Address(props: Props) {
           <BillingAddress {...props} />
         </div>
 
-        <div className='-mx-5'>
+        <div className="-mx-5">
           <ShippingAddress {...props} />
         </div>
       </TabGroup>

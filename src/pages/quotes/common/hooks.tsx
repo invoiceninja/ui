@@ -37,7 +37,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
@@ -88,6 +87,13 @@ import dayjs from 'dayjs';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { ConvertToProjectBulkAction } from './components/ConvertToProjectBulkAction';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -237,7 +243,6 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const queryClient = useQueryClient();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
 
@@ -251,9 +256,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_quote');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/quotes/:id', { id: quote.id })
-        );
+        $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -273,6 +276,10 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
@@ -412,7 +419,8 @@ export function useActions() {
     ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
-      quote.status_id !== QuoteStatus.Approved && (
+      quote.status_id !== QuoteStatus.Approved &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => scheduleEmailRecord(quote.id)}
           icon={<Icon element={MdSchedule} />}
@@ -456,7 +464,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      quote.status_id !== QuoteStatus.Converted && (
+      quote.status_id !== QuoteStatus.Converted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'convert_to_invoice')}
           icon={<Icon element={MdSwitchRight} />}
@@ -465,50 +474,56 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      !quote.project_id && (
+      !quote.project_id &&
+      hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
     () => <Divider withoutPadding />,
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring_invoice')}
-      </DropdownElement>
-    ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(quote)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
+    (quote) =>
+      hasPermission('create_quote') && (
+        <DropdownElement
+          onClick={() => cloneToQuote(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToInvoice(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_invoice')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => cloneToCredit(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_credit')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_recurring_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringInvoice(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_recurring_invoice')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(quote)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (quote) =>
       isEditPage &&
@@ -612,6 +627,9 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
@@ -643,12 +661,24 @@ export function useQuoteColumns() {
           <QuoteStatusBadge entity={quote} />
 
           {quote.status_id === QuoteStatus.Converted && quote.invoice_id && (
-            <MdTextSnippet
-              className="cursor-pointer"
-              fontSize={19}
-              color={accentColor}
-              onClick={() =>
-                navigate(route('/invoices/:id/edit', { id: quote.invoice_id }))
+            <Assigned
+              entityId={quote.invoice_id}
+              cacheEndpoint="/api/v1/invoices"
+              apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+              preCheck={
+                hasPermission('view_invoice') || hasPermission('edit_invoice')
+              }
+              component={
+                <MdTextSnippet
+                  className="cursor-pointer"
+                  fontSize={19}
+                  color={accentColor}
+                  onClick={() =>
+                    navigate(
+                      route('/invoices/:id/edit', { id: quote.invoice_id })
+                    )
+                  }
+                />
               }
             />
           )}
@@ -660,7 +690,12 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <Link to={route('/quotes/:id/edit', { id: quote.id })}>{field}</Link>
+        <Link
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          disableNavigation={disableNavigation('quote', quote)}
+        >
+          {field}
+        </Link>
       ),
     },
     {
@@ -668,7 +703,10 @@ export function useQuoteColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, quote) => (
-        <Link to={route('/clients/:id', { id: quote.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: quote.client_id })}
+          disableNavigation={disableNavigation('client', quote.client)}
+        >
           {quote.client?.display_name}
         </Link>
       ),

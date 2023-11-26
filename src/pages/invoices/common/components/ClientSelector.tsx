@@ -36,6 +36,8 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
 
+  const hasPermission = useHasPermission();
+
   const { resource } = props;
 
   const clientResolver = useClientResolver();
@@ -55,34 +57,28 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
-  const hasPermission = useHasPermission();
-  const colors = useColorScheme()
+  const colors = useColorScheme();
 
   return (
     <>
-      <div className="flex  flex-col justify-between space-y-2" style={{ color: colors.$3 }}>
-        {hasPermission('create_invoice') ? (
-          props.textOnly ? (
-            <p className="text-sm">
-              {resource?.client?.display_name}
-            </p>
-          ) : (
-            <Selector
-              inputLabel={t('client')}
-              onChange={(client) => props.onChange(client.id)}
-              value={resource?.client_id}
-              readonly={props.readonly || !resource}
-              clearButton={Boolean(resource?.client_id)}
-              onClearButtonClick={props.onClearButtonClick}
-              initiallyVisible={!resource?.client_id}
-              errorMessage={props.errorMessage}
-              disableWithSpinner={props.disableWithSpinner}
-            />
-          )
+      <div
+        className="flex  flex-col justify-between space-y-2"
+        style={{ color: colors.$3 }}
+      >
+        {props.textOnly ? (
+          <p className="text-sm">{resource?.client?.display_name}</p>
         ) : (
-          <p className="text-sm">
-            {resource?.client?.display_name}
-          </p>
+          <Selector
+            inputLabel={t('client')}
+            onChange={(client) => props.onChange(client.id)}
+            value={resource?.client_id}
+            readonly={props.readonly || !resource}
+            clearButton={Boolean(resource?.client_id)}
+            onClearButtonClick={props.onClearButtonClick}
+            initiallyVisible={!resource?.client_id}
+            errorMessage={props.errorMessage}
+            disableWithSpinner={props.disableWithSpinner}
+          />
         )}
 
         {client && (
@@ -93,12 +89,9 @@ export function ClientSelector(props: Props) {
               </Link>
             )}
 
-            {hasPermission('view_client') ||
-              (hasPermission('edit_client') && (
-                <span className="text-sm">/</span>
-              ))}
+            {hasPermission('edit_client') && <span className="text-sm">/</span>}
 
-            {hasPermission('view_client') && (
+            {(hasPermission('view_client') || hasPermission('edit_client')) && (
               <Link to={route('/clients/:id', { id: client.id })}>
                 {t('view_client')}
               </Link>
@@ -129,7 +122,9 @@ export function ClientSelector(props: Props) {
             />
 
             <div>
-              <p className="text-sm" style={{ color: colors.$3 }}>{contact.email}</p>
+              <p className="text-sm" style={{ color: colors.$3 }}>
+                {contact.email}
+              </p>
 
               {resource.invitations.length >= 1 && (
                 <>

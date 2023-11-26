@@ -17,9 +17,12 @@ import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { Alert } from '../Alert';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export function ProjectSelector(props: GenericSelectorProps<Project>) {
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -35,7 +38,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
           label: props.inputLabel?.toString(),
           value: props.value ?? null,
         }}
-        endpoint={new URL(endpoint('/api/v1/projects?status=active'))}
+        endpoint={endpoint('/api/v1/projects?status=active')}
         entryOptions={{ id: 'id', label: 'name', value: 'id' }}
         onChange={(entry) =>
           entry.resource ? props.onChange(entry.resource) : null
@@ -45,7 +48,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         action={{
           label: t('new_project'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: hasPermission('create_project'),
         }}
       />
 

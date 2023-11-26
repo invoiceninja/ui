@@ -164,6 +164,10 @@ export function useResolveInputField(props: Props) {
     await props.onLineItemPropertyChange(key, value, index);
   };
 
+  const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+  const resource = props.resource;
+
   const onProductChange = async (
     index: number,
     value: string,
@@ -171,12 +175,30 @@ export function useResolveInputField(props: Props) {
   ) => {
     setIsDeleteActionTriggered(false);
 
+    if (product && company && company.enabled_tax_rates === 0) {
+        product.tax_name1 = '';
+        product.tax_rate1 = 0;
+        product.tax_name2 = '';
+        product.tax_rate2 = 0;
+        product.tax_name3 = '';
+        product.tax_rate3 = 0;
+    }
+
+    if (product && company && company.enabled_tax_rates === 1) {
+        product.tax_name2 = '';
+        product.tax_rate2 = 0;
+        product.tax_name3 = '';
+        product.tax_rate3 = 0;
+    }
+
+    if (product && company && company.enabled_tax_rates === 2) {
+        product.tax_name3 = '';
+        product.tax_rate3 = 0;
+    }
+
     await handleProductChange(index, value, product);
   };
 
-  const company = useCurrentCompany();
-  const reactSettings = useReactSettings();
-  const resource = props.resource;
 
   const formatMoney = useFormatMoney({
     resource: props.resource,

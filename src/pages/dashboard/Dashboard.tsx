@@ -9,7 +9,6 @@
  */
 
 import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
@@ -27,13 +26,12 @@ import { ModuleBitmask } from '../settings';
 
 export default function Dashboard() {
   useTitle('dashboard');
+  
   const [t] = useTranslation();
 
   const user = useCurrentUser();
 
   const enabled = useEnabled();
-
-  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -47,7 +45,7 @@ export default function Dashboard() {
       }
       withoutBackButton
     >
-      {hasPermission('view_dashboard') && <Totals />}
+      <Totals />
 
       <div className="grid grid-cols-12 gap-4 my-6">
         <div className="col-span-12 xl:col-span-6">

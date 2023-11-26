@@ -20,13 +20,16 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTabs } from './common/hooks/useTabs';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Product() {
   const [t] = useTranslation();
@@ -35,7 +38,8 @@ export default function Product() {
 
   const { id } = useParams();
 
-  const queryClient = useQueryClient();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { data: productData } = useProductQuery({ id });
 
@@ -55,20 +59,7 @@ export default function Product() {
     },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/products/:id/edit', { id }),
-    },
-    {
-      name: t('documents'),
-      href: route('/products/:id/documents', { id }),
-    },
-    {
-      name: t('product_fields'),
-      href: route('/products/:id/product_fields', { id }),
-    },
-  ];
+  const tabs = useTabs({ product: productValue });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -88,14 +79,10 @@ export default function Product() {
         : endpoint('/api/v1/products/:id', { id });
 
       request('PUT', url, productValue)
-        .then((response) => {
+        .then(() => {
           toast.success('updated_product');
 
-          queryClient.invalidateQueries('/api/v1/products');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/products/:id', { id: response.data.data.id })
-          );
+          $refetch(['products']);
 
           searchParams.delete('update_in_stock_quantity');
           setSearchParams(searchParams);
@@ -115,16 +102,19 @@ export default function Product() {
       title={t('edit_product')}
       breadcrumbs={pages}
       disableSaveButton={!productData || isFormBusy}
-      onSaveClick={handleSave}
-      navigationTopRight={
-        productData && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={productData.data.data}
-            actions={actions}
-          />
-        )
-      }
+      {...(productData &&
+        (hasPermission('edit_product') ||
+          entityAssigned(productData.data.data)) && {
+          onSaveClick: handleSave,
+          navigationTopRight: (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={productData.data.data}
+              actions={actions}
+              cypressRef="productActionDropdown"
+            />
+          ),
+        })}
     >
       <Container>
         <Tabs tabs={tabs} />

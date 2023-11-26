@@ -10,10 +10,12 @@
 
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Resource } from './InvoicePreview';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
+import { useQueryClient } from 'react-query';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   link: string;
@@ -22,6 +24,7 @@ interface Props {
   onLink?: (url: string) => unknown;
   withToast?: boolean;
   height?: number;
+  enabled?: boolean;
 }
 
 export const android = Boolean(navigator.userAgent.match(/Android/i));
@@ -29,41 +32,53 @@ export const android = Boolean(navigator.userAgent.match(/Android/i));
 export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const queryClient = useQueryClient();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (props.withToast) {
       toast.processing();
     }
 
-    const controller = new AbortController();
+    setIsLoading(true);
 
-    request(props.method, props.link, props.resource, {
-      responseType: 'arraybuffer',
-      signal: controller.signal,
-    }).then((response) => {
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+    if (props.enabled !== false) {
+      queryClient.fetchQuery({
+        queryKey: [props.link, JSON.stringify(props.resource)],
+        queryFn: ({ signal }) =>
+          request(props.method, props.link, props.resource, {
+            responseType: 'arraybuffer',
+            signal,
+          })
+            .then((response) => {
+              const blob = new Blob([response.data], {
+                type: 'application/pdf',
+              });
+              const url = URL.createObjectURL(blob);
 
-      if (android && linkRef.current) {
-        linkRef.current.href = url;
+              if (android && linkRef.current) {
+                linkRef.current.href = url;
 
-        props.onLink && props.onLink(url);
-      }
+                props.onLink && props.onLink(url);
+              }
 
-      if (!android && iframeRef.current) {
-        iframeRef.current.src = url;
+              if (!android && iframeRef.current) {
+                iframeRef.current.src = url;
 
-        props.onLink && props.onLink(url);
-      }
+                props.onLink && props.onLink(url);
+              }
 
-      toast.dismiss();
-    });
+              toast.dismiss();
+            })
+            .finally(() => setIsLoading(false)),
+      });
+    }
 
     return () => {
-      controller.abort();
       toast.dismiss();
     };
-  }, [props.link, props.resource]);
+  }, [props.link, props.resource, props.enabled]);
 
   if (android) {
     return (
@@ -76,5 +91,22 @@ export function InvoiceViewer(props: Props) {
     );
   }
 
-  return <iframe ref={iframeRef} width="100%" height={props.height || 1500} />;
+  return (
+    <>
+      {isLoading && (
+        <div
+          className="flex justify-center items-center"
+          style={{ height: props.height || 1500 }}
+        >
+          <Spinner />
+        </div>
+      )}
+
+      <iframe
+        ref={iframeRef}
+        width="100%"
+        height={isLoading ? 0 : props.height || 1500}
+      />
+    </>
+  );
 }

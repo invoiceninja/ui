@@ -83,7 +83,7 @@ export default function Create() {
         }
 
         if (searchParams.has('client')) {
-          _expense.vendor_id = searchParams.get('client') as string;
+          _expense.client_id = searchParams.get('client') as string;
         }
 
         value = {

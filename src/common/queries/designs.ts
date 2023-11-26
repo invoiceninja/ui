@@ -22,7 +22,10 @@ export function useDesignsQuery() {
   return useQuery<Design[]>(
     ['/api/v1/designs'],
     () =>
-      request('GET', endpoint('/api/v1/designs?status=active')).then(
+      request(
+        'GET',
+        endpoint('/api/v1/designs?status=active&sort=name|asc')
+      ).then(
         (response: AxiosResponse<GenericManyResponse<Design>>) =>
           response.data.data
       ),
@@ -36,7 +39,7 @@ interface DesignQueryOptions extends GenericQueryOptions {
 
 export function useDesignQuery(params: DesignQueryOptions) {
   return useQuery<Design>(
-    route('/api/v1/designs/:id', { id: params.id }),
+    ['/api/v1/designs', params.id],
     () =>
       request(
         'GET',

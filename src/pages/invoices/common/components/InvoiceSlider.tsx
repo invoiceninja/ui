@@ -25,7 +25,7 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -44,6 +44,12 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
+import { useEffect, useState } from 'react';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { EmailRecord } from '$app/components/EmailRecord';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -57,7 +63,10 @@ export function useGenerateActivityElement() {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     if (activity.activity_type_id === 4) {
-      text = text.replace(":user", `${t('recurring_invoice')} :recurring_invoice`);
+      text = text.replace(
+        ':user',
+        `${t('recurring_invoice')} :recurring_invoice`
+      );
     }
 
     const replacements = {
@@ -68,32 +77,38 @@ export function useGenerateActivityElement() {
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
-        >
-          {activity?.invoice?.label}
-        </Link>
-      ) ?? '',
-    
-      recurring_invoice: (
-        <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity?.recurring_invoice?.hashed_id,
-          })}
-        >
-          {activity?.recurring_invoice?.label}
-        </Link>
-      ) ?? '',
+      invoice:
+        (
+          <Link
+            to={route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
+            })}
+          >
+            {activity?.invoice?.label}
+          </Link>
+        ) ?? '',
 
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', { id: activity?.contact?.hashed_id })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      
-      ) ?? '' ,
+      recurring_invoice:
+        (
+          <Link
+            to={route('/recurring_invoices/:id/edit', {
+              id: activity?.recurring_invoice?.hashed_id,
+            })}
+          >
+            {activity?.recurring_invoice?.label}
+          </Link>
+        ) ?? '',
+
+      contact:
+        (
+          <Link
+            to={route('/clients/:id/edit', {
+              id: activity?.contact?.hashed_id,
+            })}
+          >
+            {activity?.contact?.label}
+          </Link>
+        ) ?? '',
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -109,6 +124,14 @@ export function InvoiceSlider() {
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
+
+  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
+
+  const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -131,6 +154,26 @@ export function InvoiceSlider() {
       ),
     enabled: invoice !== null && isVisible,
   });
+
+  const fetchEmailHistory = async () => {
+    const response = await queryClient.fetchQuery(
+      ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+      () =>
+        request('POST', endpoint('/api/v1/emails/entityHistory'), {
+          entity: 'invoice',
+          entity_id: invoice?.id,
+        }).then((response) => response.data),
+      { staleTime: Infinity }
+    );
+
+    setEmailRecords(response);
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      fetchEmailHistory();
+    }
+  }, [invoice]);
 
   //duplicate not needed
   // const { data: activities } = useQuery({
@@ -171,7 +214,8 @@ export function InvoiceSlider() {
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
-        invoice ? (
+        invoice &&
+        (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
             label={t('more_actions')}
             resource={invoice}
@@ -182,7 +226,7 @@ export function InvoiceSlider() {
       withoutActionContainer
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity')]}
+        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
         width="full"
       >
         <div className="space-y-2">
@@ -302,6 +346,7 @@ export function InvoiceSlider() {
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
+                  disableNavigation={disableNavigation('payment', payment)}
                 >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
@@ -354,7 +399,13 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <Link
+                      to={`/clients/${activity.client_id}`}
+                      disableNavigation={disableNavigation(
+                        'client',
+                        invoice?.client
+                      )}
+                    >
                       {invoice?.client?.display_name}
                     </Link>
                   </div>
@@ -380,6 +431,17 @@ export function InvoiceSlider() {
                 <p>{activity.ip}</p>
               </p>
             </NonClickableElement>
+          ))}
+        </div>
+
+        <div className="flex flex-col">
+          {emailRecords.map((emailRecord, index) => (
+            <EmailRecord
+              key={index}
+              className="py-4"
+              emailRecord={emailRecord}
+              index={index}
+            />
           ))}
         </div>
       </TabGroup>

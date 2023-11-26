@@ -83,8 +83,13 @@ export function Login() {
     <div className="h-screen">
       <Header />
       <div className="flex flex-col items-center">
-        <div className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border" style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}>
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>{t('login')}</h2>
+        <div
+          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+        >
+          <h2 className="text-2xl" style={{ color: colors.$3 }}>
+            {t('login')}
+          </h2>
 
           <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField

@@ -12,25 +12,30 @@ import { endpoint, trans } from '$app/common/helpers';
 import { Task } from '$app/common/interfaces/task';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdAddCircleOutline } from 'react-icons/md';
 import { AddTasksOnInvoiceModal } from './AddTasksOnInvoiceModal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   tasks: Task[];
   isBulkAction?: boolean;
+  setSelected?: (selected: string[]) => void;
 }
 
 export function AddTasksOnInvoiceAction(props: Props) {
-  const { tasks, isBulkAction } = props;
+  const { tasks, isBulkAction, setSelected } = props;
 
   const queryClient = useQueryClient();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -64,12 +69,7 @@ export function AddTasksOnInvoiceAction(props: Props) {
     toast.processing();
 
     queryClient.fetchQuery(
-      route(
-        '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
-        {
-          clientId: tasks[0].client_id,
-        }
-      ),
+      ['/api/v1/invoices', 'client_id', tasks[0].client_id],
       () =>
         request(
           'GET',
@@ -86,12 +86,22 @@ export function AddTasksOnInvoiceAction(props: Props) {
             return toast.error('no_invoices_found');
           }
 
-          setInvoices(response.data.data);
+          if (hasPermission('edit_invoice')) {
+            setInvoices(response.data.data);
+          } else {
+            setInvoices(
+              response.data.data.filter((invoice) => entityAssigned(invoice))
+            );
+          }
 
           setIsModalVisible(true);
         })
     );
   };
+
+  useEffect(() => {
+    !isModalVisible && setSelected?.([]);
+  }, [isModalVisible]);
 
   return (tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
     isBulkAction ? (

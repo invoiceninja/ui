@@ -27,20 +27,18 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import {
   useActions,
   useHandleChange,
 } from '$app/pages/settings/task-statuses/common/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-
-  const queryClient = useQueryClient();
 
   const actions = useActions();
 
@@ -81,11 +79,7 @@ export function Edit() {
         .then(() => {
           toast.success('updated_task_status');
 
-          queryClient.invalidateQueries('/api/v1/task_statuses');
-
-          queryClient.invalidateQueries(
-            route('/api/v1/task_statuses/:id', { id })
-          );
+          $refetch(['task_statuses']);
 
           setIsTitleApplied(false);
         })

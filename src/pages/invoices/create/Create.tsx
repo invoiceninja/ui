@@ -40,6 +40,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
+import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -69,6 +70,18 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
   const [client, setClient] = useState<Client | undefined>();
+
+  const resetInvoiceForm = () => {
+    handleChange('client_id', '');
+    handleChange('tax_name1', '');
+    handleChange('tax_rate1', 0);
+    handleChange('tax_name2', '');
+    handleChange('tax_rate2', 0);
+    handleChange('tax_name3', '');
+    handleChange('tax_rate3', 0);
+
+    return true;
+  };
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -113,21 +126,6 @@ export default function Create() {
       ) {
         const _invoice = cloneDeep(data);
 
-        if (company && company.enabled_tax_rates > 0) {
-          _invoice.tax_name1 = company.settings.tax_name1;
-          _invoice.tax_rate1 = company.settings.tax_rate1;
-        }
-
-        if (company && company.enabled_tax_rates > 1) {
-          _invoice.tax_name2 = company.settings.tax_name2;
-          _invoice.tax_rate2 = company.settings.tax_rate2;
-        }
-
-        if (company && company.enabled_tax_rates > 2) {
-          _invoice.tax_name3 = company.settings.tax_name3;
-          _invoice.tax_rate3 = company.settings.tax_rate3;
-        }
-
         if (typeof _invoice.line_items === 'string') {
           _invoice.line_items = [];
         }
@@ -145,6 +143,18 @@ export default function Create() {
       return value;
     });
   }, [data]);
+
+  const settingResolver = (client: Client, prop: string) => {
+    if (client?.settings && client?.settings[prop]) {
+      return client.settings[prop];
+    }
+
+    if (client?.group_settings && client?.group_settings?.settings[prop]) {
+      return client?.group_settings?.settings[prop];
+    }
+
+    return company?.settings[prop as keyof CompanySettings];
+  };
 
   useEffect(() => {
     invoice &&
@@ -166,6 +176,21 @@ export default function Create() {
         });
 
         handleChange('invitations', invitations);
+
+        if (company && company.enabled_tax_rates > 0) {
+          handleChange('tax_name1', settingResolver(client, 'tax_name1'));
+          handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          handleChange('tax_name2', settingResolver(client, 'tax_name2'));
+          handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          handleChange('tax_name3', settingResolver(client, 'tax_name3'));
+          handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
+        }
       });
   }, [invoice?.client_id]);
 
@@ -185,7 +210,7 @@ export default function Create() {
           <ClientSelector
             resource={invoice}
             onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
+            onClearButtonClick={resetInvoiceForm}
             onContactCheckboxChange={handleInvitationChange}
             readonly={searchParams.get('project') === 'true'}
             errorMessage={errors?.errors.client_id}
@@ -290,6 +315,8 @@ export default function Create() {
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              observable={true}
+              initiallyVisible={false}
             />
           )}
         </div>

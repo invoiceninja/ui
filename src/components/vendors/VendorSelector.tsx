@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
   initiallyVisible?: boolean;
@@ -25,6 +26,7 @@ export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
 
 export function VendorSelector(props: VendorSelectorProps) {
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,7 +41,7 @@ export function VendorSelector(props: VendorSelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<Vendor>
-          endpoint={new URL(endpoint('/api/v1/vendors?status=active&per_page=500'))}
+          endpoint={endpoint('/api/v1/vendors?status=active&per_page=500')}
           onChange={(vendor: Entry<Vendor>) =>
             vendor.resource && props.onChange(vendor.resource)
           }
@@ -55,7 +57,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           action={{
             label: t('new_vendor'),
             onClick: () => setIsModalOpen(true),
-            visible: true,
+            visible: hasPermission('create_vendor'),
           }}
           readonly={props.readonly}
           onDismiss={props.onClearButtonClick}

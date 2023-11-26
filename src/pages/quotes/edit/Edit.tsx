@@ -9,7 +9,6 @@
  */
 
 import { route } from '$app/common/helpers/route';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
@@ -64,7 +63,6 @@ export default function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();
-  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -86,8 +84,6 @@ export default function Edit() {
 
       if (_quote && _quote.client) {
         setClient(_quote.client);
-
-        clientResolver.cache(_quote.client);
       }
     }
   }, [data]);
@@ -99,8 +95,8 @@ export default function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
-  const [searchParams] = useSearchParams()
-  const taskColumns = useTaskColumns()
+  const [searchParams] = useSearchParams();
+  const taskColumns = useTaskColumns();
 
   return (
     <Default

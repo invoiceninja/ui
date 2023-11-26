@@ -40,11 +40,16 @@ export function Address(props: Props) {
 
                 <p>
                   {client.city.length > 0 && client.city} &nbsp;
-                  {client.postal_code.length > 0 && client.postal_code} &nbsp;
-                  {client.state}
+                  {client.state} &nbsp;
+                  {client.postal_code.length > 0 && client.postal_code}
                 </p>
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
+
+                <span
+                  className="whitespace-normal"
+                  dangerouslySetInnerHTML={{ __html: client.public_notes }}
+                />
               </>
             }
             className="h-full"
