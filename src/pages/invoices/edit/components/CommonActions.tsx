@@ -32,7 +32,7 @@ export function CommonActions(props: Props) {
   const [selectedActions, setSelectedActions] =
     useState<ResourceAction<Invoice>[]>();
 
-  const updateSelectedActions = () => {
+  useEffect(() => {
     const currentActions =
       user?.company_user?.react_settings?.common_actions?.invoice;
 
@@ -51,10 +51,6 @@ export function CommonActions(props: Props) {
 
       setSelectedActions(selected as ResourceAction<Invoice>[]);
     }
-  };
-
-  useEffect(() => {
-    updateSelectedActions();
   }, [user, invoice]);
 
   return (
