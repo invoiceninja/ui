@@ -42,6 +42,9 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from './RecurringInvoiceStatus';
 import { RecurringInvoiceActivity } from '$app/common/interfaces/recurring-invoice-activity';
 import frequencies from '$app/common/constants/frequency';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -91,6 +94,10 @@ export const RecurringInvoiceSlider = () => {
     recurringInvoiceSliderAtom
   );
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -142,7 +149,9 @@ export const RecurringInvoiceSlider = () => {
       size="regular"
       title={`${t('recurring_invoice')} ${recurringInvoice?.number || ''}`}
       topRight={
-        recurringInvoice ? (
+        recurringInvoice &&
+        (hasPermission('edit_recurring_invoice') ||
+          entityAssigned(recurringInvoice)) ? (
           <ResourceActions
             label={t('more_actions')}
             resource={recurringInvoice}
@@ -271,7 +280,13 @@ export const RecurringInvoiceSlider = () => {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <Link
+                      to={`/clients/${activity.client_id}`}
+                      disableNavigation={disableNavigation(
+                        'client',
+                        recurringInvoice?.client
+                      )}
+                    >
                       {recurringInvoice?.client?.display_name}
                     </Link>
                   </div>

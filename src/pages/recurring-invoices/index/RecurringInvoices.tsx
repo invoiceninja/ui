@@ -133,7 +133,7 @@ export default function RecurringInvoices() {
         }}
       />
 
-      {!disableNavigation('invoice', recurringInvoiceSlider) && (
+      {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (
         <RecurringInvoiceSlider />
       )}
     </Default>
