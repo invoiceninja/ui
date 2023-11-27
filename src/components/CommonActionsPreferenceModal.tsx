@@ -25,6 +25,7 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { cloneDeep, isEqual, set } from 'lodash';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   DragDropContext,
   Draggable,
@@ -93,6 +94,8 @@ export function CommonActionsPreferenceModal(props: Props) {
       updatedUser
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(updatedUser, 'company_user', response.data.data);
+
+      $refetch(['company_users']);
 
       dispatch(updateUser(updatedUser));
     });
