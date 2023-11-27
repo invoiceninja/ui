@@ -30,10 +30,13 @@ interface Props {
   endpoint: string;
   onSuccess?: () => unknown;
   widgetOnly?: boolean;
+  disableUpload?: boolean;
 }
 
 export function Upload(props: Props) {
   const [t] = useTranslation();
+
+  const { disableUpload = false } = props;
 
   const user = useCurrentUser();
 
@@ -70,7 +73,7 @@ export function Upload(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: !enterprisePlan() && isHosted(),
+    disabled: (!enterprisePlan() && isHosted()) || disableUpload,
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 

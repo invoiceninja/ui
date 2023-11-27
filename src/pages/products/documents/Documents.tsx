@@ -9,6 +9,8 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useProductQuery } from '$app/common/queries/products';
 import { DocumentsTable } from '$app/components/DocumentsTable';
@@ -19,6 +21,9 @@ export default function Documents() {
   const { id } = useParams();
   const { data: product } = useProductQuery({ id });
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const invalidateQuery = () => {
     $refetch(['products']);
   };
@@ -28,12 +33,18 @@ export default function Documents() {
       <Upload
         endpoint={endpoint('/api/v1/products/:id/upload', { id })}
         onSuccess={invalidateQuery}
+        disableUpload={
+          !hasPermission('edit_product') && !entityAssigned(product?.data.data)
+        }
       />
 
       {product?.data.data && (
         <DocumentsTable
           documents={product.data.data.documents}
           onDocumentDelete={invalidateQuery}
+          disableEditableOptions={
+            !hasPermission('edit_product') && !entityAssigned(product.data.data)
+          }
         />
       )}
     </>

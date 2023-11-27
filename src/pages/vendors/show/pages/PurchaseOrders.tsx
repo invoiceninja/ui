@@ -18,8 +18,6 @@ import {
 import { useCustomBulkActions } from '$app/pages/purchase-orders/common/hooks/useCustomBulkActions';
 import { useParams } from 'react-router-dom';
 
-const dataTableStaleTime = 50;
-
 export default function PurchaseOrders() {
   const { id } = useParams();
 
@@ -49,7 +47,6 @@ export default function PurchaseOrders() {
       bulkRoute="/api/v1/purchase_orders/bulk"
       linkToCreate={route('/purchase_orders/create?vendor=:id', { id })}
       linkToEdit="/purchase_orders/:id/edit"
-      staleTime={dataTableStaleTime}
     />
   );
 }

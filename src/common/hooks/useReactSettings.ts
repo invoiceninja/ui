@@ -14,8 +14,19 @@ import { useInjectUserChanges } from './useInjectUserChanges';
 import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
+import { PerPage } from '$app/components/DataTable';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
+
+export interface TableFiltersPreference {
+  filter?: string;
+  customFilter?: string[];
+  currentPage: number;
+  sort?: string;
+  status: string[];
+  sortedBy?: string;
+  perPage?: PerPage;
+}
 
 export interface Preferences {
   dashboard_charts: {
@@ -40,6 +51,7 @@ export interface ReactSettings {
   number_precision?: number;
   show_document_preview?: boolean;
   preferences: Preferences;
+  table_filters?: Record<string, TableFiltersPreference>;
   common_actions?: Record<Entity, string[]>;
 }
 

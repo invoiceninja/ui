@@ -31,11 +31,14 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import collect from 'collect.js';
 import { useApplyCredits } from './useApplyCredits';
 import { ChangeTemplateModal } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const bulk = useBulk();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -132,7 +135,8 @@ export const useCustomBulkActions = () => {
         </DropdownElement>
       ),
     ({ selectedResources, setSelected }) =>
-      showApplyCreditsAction(selectedResources) && (
+      showApplyCreditsAction(selectedResources) &&
+      hasPermission('create_payment') && (
         <DropdownElement
           onClick={() => {
             handleApplyCredits(selectedResources);

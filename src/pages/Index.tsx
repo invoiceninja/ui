@@ -10,12 +10,20 @@
 
 import { Navigate } from 'react-router';
 import { useAuthenticated } from '../common/hooks/useAuthenticated';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export function Index() {
   const authenticated = useAuthenticated();
+  const hasPermission = useHasPermission();
 
   return authenticated ? (
-    <Navigate to="/dashboard" />
+    <Navigate
+      to={
+        hasPermission('view_dashboard')
+          ? '/dashboard'
+          : '/settings/user_details'
+      }
+    />
   ) : (
     <Navigate to="/login" />
   );

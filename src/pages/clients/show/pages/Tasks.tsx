@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Task } from '$app/common/interfaces/task';
 import { useClientQuery } from '$app/common/queries/clients';
 import { DataTable } from '$app/components/DataTable';
@@ -25,6 +27,8 @@ export const dataTableStaleTime = 50;
 
 export default function Tasks() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const { data: client } = useClientQuery({ id, enabled: true });
 
@@ -60,7 +64,8 @@ export default function Tasks() {
       })}
       linkToEdit="/tasks/:id/edit"
       showEdit={(task: Task) => showEditOption(task)}
-      staleTime={dataTableStaleTime}
+      linkToCreateGuards={[permission('create_task')]}
+      hideEditableOptions={!hasPermission('edit_task')}
     />
   );
 }

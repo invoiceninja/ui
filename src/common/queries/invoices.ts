@@ -40,7 +40,10 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
+    {
+      staleTime: Infinity,
+      enabled: Boolean(params.id),
+    }
   );
 }
 
@@ -56,7 +59,9 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_invoice'),
+      enabled: hasPermission('create_invoice')
+        ? options?.enabled ?? true
+        : false,
     }
   );
 }

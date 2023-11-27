@@ -43,7 +43,7 @@ export function TabGroup(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className={props.className}>
+    <div className={props.className} data-cy="tabs">
       <div
         className="-mb-px flex space-x-8 overflow-x-auto border-b"
         style={{ borderColor: colors.$5 }}

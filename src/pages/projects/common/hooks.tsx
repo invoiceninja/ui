@@ -53,6 +53,8 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'name',
@@ -103,6 +105,8 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -121,7 +125,12 @@ export function useProjectColumns() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={route('/projects/:id', { id: project.id })}>{value}</Link>
+        <Link
+          to={route('/projects/:id', { id: project.id })}
+          disableNavigation={disableNavigation('project', project)}
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -258,6 +267,8 @@ export function useActions() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const queryClient = useQueryClient();
 
   const bulk = useBulkAction();
@@ -331,33 +342,35 @@ export function useActions() {
         </DropdownElement>
       ),
     () => isShowPage && <Divider withoutPadding />,
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => handleInvoiceProject(project)}
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => cloneToProject(project)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([project]);
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (project: Project) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => handleInvoiceProject(project)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      hasPermission('create_project') && (
+        <DropdownElement
+          onClick={() => cloneToProject(project)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+      (project: Project) => (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([project]);
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -401,6 +414,8 @@ export const useCustomBulkActions = () => {
   const invoiceProject = useInvoiceProject();
   const combineProjectsTasks = useCombineProjectsTasks();
 
+  const hasPermission = useHasPermission();
+
   const documentsBulk = useDocumentsBulk();
 
   const handleInvoiceProjects = (tasks: Task[] | null) => {
@@ -435,20 +450,21 @@ export const useCustomBulkActions = () => {
   const [changeTemplateVisible, setChangeTemplateVisible] = useState(false);
 
   const customBulkActions: CustomBulkAction<Project>[] = [
-    ({ selectedIds, selectedResources, setSelected }) => (
-      <DropdownElement
-        onClick={async () => {
-          handleInvoiceProjects(
-            await combineProjectsTasks(selectedIds, selectedResources)
-          );
+    ({ selectedIds, selectedResources, setSelected }) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={async () => {
+            handleInvoiceProjects(
+              await combineProjectsTasks(selectedIds, selectedResources)
+            );
 
-          setSelected([]);
-        }}
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
+            setSelected([]);
+          }}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
     ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>

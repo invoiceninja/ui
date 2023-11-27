@@ -72,11 +72,7 @@ export const clientRoutes = (
       element={
         <Guard
           guards={[
-            or(
-              permission('view_client'),
-              permission('edit_client'),
-              assigned('/api/v1/clients/:id')
-            ),
+            or(permission('edit_client'), assigned('/api/v1/clients/:id')),
           ]}
           component={<Edit />}
         />
@@ -107,6 +103,16 @@ export const clientRoutes = (
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
     </Route>
-    <Route path=":id/statement" element={<Statement />} />
+    <Route
+      path=":id/statement"
+      element={
+        <Guard
+          guards={[
+            or(permission('edit_client'), assigned('/api/v1/clients/:id')),
+          ]}
+          component={<Statement />}
+        />
+      }
+    />
   </Route>
 );

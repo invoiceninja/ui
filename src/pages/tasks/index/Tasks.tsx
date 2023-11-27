@@ -31,6 +31,9 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -72,6 +75,15 @@ export default function Tasks() {
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
         withResourcefulActions
+        rightSide={
+          <Guard
+            type="component"
+            component={<ImportButton route="/tasks/import" />}
+            guards={[
+              or(permission('create_task'), permission('edit_task')),
+            ]}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={taskColumns as unknown as string[]}

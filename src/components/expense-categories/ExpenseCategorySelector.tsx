@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface ExpenseCategorySelectorProps
   extends GenericSelectorProps<ExpenseCategory> {
@@ -28,6 +29,8 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
   const [t] = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { isAdmin, isOwner } = useAdmin();
 
   return (
     <>
@@ -58,7 +61,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
           action={{
             label: t('new_expense_category'),
             onClick: () => setIsModalOpen(true),
-            visible: true,
+            visible: isAdmin || isOwner,
           }}
           readonly={props.readonly}
           onDismiss={props.onClearButtonClick}

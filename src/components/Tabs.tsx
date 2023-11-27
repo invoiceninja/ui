@@ -83,7 +83,7 @@ export function Tabs(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className={props.className}>
+    <div className={props.className} data-cy="tabs">
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab

@@ -32,7 +32,7 @@ import {
   invoiceSliderAtom,
   invoiceSliderVisibilityAtom,
 } from '../common/components/InvoiceSlider';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 import {
@@ -40,11 +40,16 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
 
@@ -62,7 +67,7 @@ export default function Invoices() {
 
   const customBulkActions = useCustomBulkActions();
 
-  const setInvoiceSlider = useSetAtom(invoiceSliderAtom);
+  const [invoiceSlider, setInvoiceSlider] = useAtom(invoiceSliderAtom);
   const [invoiceSliderVisibility, setInvoiceSliderVisibility] = useAtom(
     invoiceSliderVisibilityAtom
   );
@@ -78,6 +83,10 @@ export default function Invoices() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+  
+  useEffect(() => {
+    return () => setInvoiceSliderVisibility(false);
+  }, []);
 
   return (
     <Default
@@ -115,13 +124,12 @@ export default function Invoices() {
           />
         }
         linkToCreateGuards={[permission('create_invoice')]}
+        hideEditableOptions={!hasPermission('edit_invoice')}
         onTableRowClick={(invoice) => {
           setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);
         }}
       />
-
-      <InvoiceSlider />
 
       <ChangeTemplateModal<Invoice>
         entity="invoice"
@@ -131,6 +139,8 @@ export default function Invoices() {
         labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
         bulkUrl="/api/v1/invoices/bulk"
       />
+
+      {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
     </Default>
   );
 }

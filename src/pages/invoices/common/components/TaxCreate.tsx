@@ -19,7 +19,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useRefetch } from '$app/common/hooks/useRefetch';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   isVisible: boolean;
@@ -30,8 +30,6 @@ interface Props {
 export function TaxCreate(props: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
   const [t] = useTranslation();
-
-  const $refetch = useRefetch();
 
   const formik = useFormik({
     initialValues: {

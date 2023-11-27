@@ -26,6 +26,11 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   invoice?: Invoice;
@@ -35,6 +40,11 @@ interface Props {
 
 export function InvoiceFooter(props: Props) {
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const location = useLocation();
 
@@ -48,7 +58,7 @@ export function InvoiceFooter(props: Props) {
     t('footer'),
     t('documents'),
     t('settings'),
-    t('custom_fields'),
+    ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   const onSuccess = () => {
@@ -96,11 +106,17 @@ export function InvoiceFooter(props: Props) {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={
+                !hasPermission('edit_invoice') && !entityAssigned(invoice)
+              }
             />
 
             <DocumentsTable
               documents={invoice?.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={
+                !hasPermission('edit_invoice') && !entityAssigned(invoice)
+              }
             />
           </div>
         )}

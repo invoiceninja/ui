@@ -34,11 +34,13 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client } from '$app/common/interfaces/client';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
@@ -102,6 +104,7 @@ export default function Clients() {
           />
         }
         linkToCreateGuards={[permission('create_client')]}
+        hideEditableOptions={!hasPermission('edit_client')}
       />
 
       <MergeClientModal

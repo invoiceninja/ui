@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
@@ -80,8 +80,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
     t('settings'),
     t('notes'),
     t('classify'),
-    t('client_fields'),
-    t('contact_fields'),
     t('documents'),
   ]);
 
@@ -261,20 +259,6 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
               </SelectField>
             </Element>
           )}
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
-        </div>
-
-        <div>
-          <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-          <Link to="/settings/custom_fields/clients" className="capitalize">
-            {t('click_here')}
-          </Link>
         </div>
 
         {id ? (

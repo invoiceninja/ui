@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -113,6 +114,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
 
@@ -135,7 +138,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link to={`/invoices/${invoice.id}/edit`}>{value}</Link>
+        <Link
+          to={route('/invoices/:id/edit', { id: invoice.id })}
+          disableNavigation={disableNavigation('invoice', invoice)}
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -154,7 +162,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={route('/clients/:id', { id: invoice.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: invoice.client_id })}
+          disableNavigation={disableNavigation('client', invoice.client)}
+        >
           {invoice.client?.display_name}
         </Link>
       ),

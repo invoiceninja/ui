@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { CreateBankAccountModal } from './CreateBankAccountModal';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface BankAccountSelectorProps
   extends GenericSelectorProps<BankAccount> {
@@ -24,6 +25,8 @@ export interface BankAccountSelectorProps
 export function BankAccountSelector(props: BankAccountSelectorProps) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { isAdmin, isOwner } = useAdmin();
 
   return (
     <>
@@ -50,7 +53,7 @@ export function BankAccountSelector(props: BankAccountSelectorProps) {
         action={{
           label: t('new_bank_account'),
           onClick: () => setIsModalOpen(true),
-          visible: true,
+          visible: isAdmin || isOwner,
         }}
         readonly={props.readonly}
         onDismiss={props.onClearButtonClick}

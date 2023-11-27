@@ -105,11 +105,11 @@ export default function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!data || isFormBusy}
+      disableSaveButton={!product || isFormBusy}
       onSaveClick={handleSave}
     >
       <Container>
-        {data ? (
+        {product ? (
           <CreateProduct errors={errors} setErrors={setErrors} />
         ) : (
           <Spinner />
