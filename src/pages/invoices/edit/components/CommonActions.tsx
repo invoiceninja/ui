@@ -38,16 +38,21 @@ export function CommonActions(props: Props) {
 
     if (currentActions) {
       const selected = actions
-        .filter((action) => (action as ResourceAction<Invoice>)(invoice))
-        .sort(
-          (a, b) =>
+        .filter((action) =>
+          currentActions.includes(
+            (action as ResourceAction<Invoice>)(invoice)?.key as string
+          )
+        )
+        .sort((a, b) => {
+          return (
             currentActions.indexOf(
               String((a as ResourceAction<Invoice>)(invoice)?.key) ?? ''
             ) -
             currentActions.indexOf(
               String((b as ResourceAction<Invoice>)(invoice)?.key) ?? ''
             )
-        );
+          );
+        });
 
       setSelectedActions(selected as ResourceAction<Invoice>[]);
     }

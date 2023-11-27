@@ -47,7 +47,6 @@ export function EmailInvoiceAction(props: Props) {
           {...(!dropdown && {
             behavior: 'tooltipButton',
             tooltipText: t('email_invoice'),
-            key: 'email_invoice',
           })}
           {...(hasClientEmailContacts(invoice.client) && {
             to: route('/invoices/:id/email', {

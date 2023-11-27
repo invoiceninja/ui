@@ -225,7 +225,13 @@ export function useActions(params?: Params) {
     () => Boolean(showEditAction) && dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'email_invoice') && (
-        <EmailInvoiceAction invoice={invoice} dropdown={dropdown} />
+        <EmailInvoiceAction
+          {...(!dropdown && {
+            key: 'email_invoice',
+          })}
+          invoice={invoice}
+          dropdown={dropdown}
+        />
       ),
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'view_pdf') && (
