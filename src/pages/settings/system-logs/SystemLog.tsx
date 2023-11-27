@@ -110,6 +110,7 @@ export function SystemLog() {
     { id: 320, name: `Square` },
     { id: 321, name: t('gocardless') },
     { id: 322, name: `Razorpay` },
+    { id: 323, name: t('paypal') },
     { id: 400, name: `Quota exceeded` },
     { id: 401, name: `Upstream failure` },
     { id: 500, name: `Webhook response` },

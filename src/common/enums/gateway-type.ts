@@ -31,4 +31,10 @@ export const enum GatewayType {
   BECS = '20',
   InstantBankPay = '21',
   FPX = '22',
+  KLARNA = '23',
+  BACS = '24',
+  VENMO = '25',
+  MERCADOPAGO = '26',
+  MYBANK = '27',
+  PAYLATER = '28',
 }

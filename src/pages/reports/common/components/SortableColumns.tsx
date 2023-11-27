@@ -451,9 +451,13 @@ export function SortableColumns({ report, columns }: Props) {
                     {t('report')} {t('columns')}
                   </p>
 
-                  <button type="button" onClick={onRemoveAll}>
-                    <X size={16} />
-                  </button>
+                  <div
+                    className="flex items-end space-x-1 cursor-pointer"
+                    onClick={onRemoveAll}
+                  >
+                    <X size={19} />
+                    <span className="text-xs">({t('reset')})</span>
+                  </div>
                 </div>
               )}
               data={data[reportColumn]}

@@ -29,6 +29,7 @@ import { AxiosError } from 'axios';
 import { RootState } from '../stores/store';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
 import { CompanyUser } from '../interfaces/company-user';
+import { $refetch } from './useRefetch';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix
@@ -94,6 +95,8 @@ export function usePreferences() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         !silent && toast.success('updated_user');
+
+        $refetch(['company_users']);
 
         dispatch(updateUser(response.data.data));
         dispatch(injectInChanges());

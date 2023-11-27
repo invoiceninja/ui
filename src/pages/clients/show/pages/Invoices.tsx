@@ -44,7 +44,6 @@ export default function Invoices() {
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
-      staleTime={dataTableStaleTime}
       linkToCreateGuards={[permission('create_invoice')]}
       hideEditableOptions={!hasPermission('edit_invoice')}
     />

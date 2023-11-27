@@ -85,7 +85,6 @@ export function UpcomingQuotes() {
           endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
           withoutActions
           withoutPagination
-          staleTime={Infinity}
           withoutPadding
           styleOptions={{
             addRowSeparator: true,

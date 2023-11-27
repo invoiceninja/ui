@@ -30,6 +30,7 @@ import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   useTitle('new_user');
@@ -91,6 +92,8 @@ export function Create() {
     })
       .then((response) => {
         toast.success('created_user');
+
+        $refetch(['users']);
 
         navigate(
           route('/settings/users/:id/edit', {

@@ -29,6 +29,7 @@ import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const [t] = useTranslation();
@@ -136,6 +137,8 @@ export function Create() {
       request('POST', endpoint('/api/v1/webhooks'), apiWebHook)
         .then((response: GenericSingleResourceResponse<ApiWebhook>) => {
           toast.success('created_webhook');
+
+          $refetch(['webhooks']);
 
           navigate(
             route('/settings/integrations/api_webhooks/:id/edit', {

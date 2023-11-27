@@ -36,6 +36,7 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   columns: string[];
@@ -94,6 +95,8 @@ export function DataTableColumnsPicker(props: Props) {
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(user, 'company_user', response.data.data);
       setIsModalVisible(false);
+
+      $refetch(['company_users']);
 
       dispatch(updateUser(user));
 

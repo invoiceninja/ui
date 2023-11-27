@@ -30,6 +30,7 @@ import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 import { useStart } from '../common/hooks/useStart';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -105,6 +106,8 @@ export default function Create() {
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
         company?.auto_start_tasks && start(response.data.data);
+
+        $refetch(['tasks']);
 
         toast.success('created_task');
 
