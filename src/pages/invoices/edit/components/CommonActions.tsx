@@ -32,26 +32,30 @@ export function CommonActions(props: Props) {
   const [selectedActions, setSelectedActions] =
     useState<ResourceAction<Invoice>[]>();
 
-  useEffect(() => {
+  const updateSelectedActions = () => {
     const currentActions =
       user?.company_user?.react_settings?.common_actions?.invoice;
 
-    if (currentActions && !selectedActions) {
-      actions.forEach((action) => {
-        currentActions.forEach((currentAction) => {
-          if (
-            (action as ResourceAction<Invoice>)(invoice)?.key === currentAction
-          ) {
-            setSelectedActions((current) =>
-              current
-                ? [...current, action as ResourceAction<Invoice>]
-                : [action as ResourceAction<Invoice>]
-            );
-          }
-        });
-      });
+    if (currentActions) {
+      const selected = actions
+        .filter((action) => (action as ResourceAction<Invoice>)(invoice))
+        .sort(
+          (a, b) =>
+            currentActions.indexOf(
+              String((a as ResourceAction<Invoice>)(invoice)?.key) ?? ''
+            ) -
+            currentActions.indexOf(
+              String((b as ResourceAction<Invoice>)(invoice)?.key) ?? ''
+            )
+        );
+
+      setSelectedActions(selected as ResourceAction<Invoice>[]);
     }
-  }, [user]);
+  };
+
+  useEffect(() => {
+    updateSelectedActions();
+  }, [user, invoice]);
 
   return (
     <>

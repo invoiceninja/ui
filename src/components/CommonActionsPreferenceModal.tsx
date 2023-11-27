@@ -254,7 +254,6 @@ export function CommonActionsPreferenceModal(props: Props) {
                           <div
                             className="flex items-center justify-between py-1.5"
                             {...provided.draggableProps}
-                            {...provided.dragHandleProps}
                             ref={provided.innerRef}
                             key={index}
                           >
@@ -271,7 +270,7 @@ export function CommonActionsPreferenceModal(props: Props) {
                               </span>
                             </div>
 
-                            <div>
+                            <div {...provided.dragHandleProps}>
                               <Icon
                                 className="cursor-pointer"
                                 element={MdDragHandle}
