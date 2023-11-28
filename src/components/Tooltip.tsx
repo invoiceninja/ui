@@ -19,12 +19,13 @@ interface Props {
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
   width?: number | string;
-  placement?: 'top';
+  placement?: 'top' | 'bottom';
   containsUnsafeHTMLTags?: boolean;
+  withoutArrow?: boolean;
 }
 
 export function Tooltip(props: Props) {
-  const { width, placement } = props;
+  const { width, placement, withoutArrow } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
 
@@ -79,7 +80,9 @@ export function Tooltip(props: Props) {
               )}
             </span>
 
-            <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
+            {!withoutArrow && (
+              <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
+            )}
           </div>
         )}
       >
