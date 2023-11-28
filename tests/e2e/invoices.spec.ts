@@ -680,6 +680,8 @@ test('Enter Payment displayed with admin permission', async ({ page }) => {
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -733,6 +735,8 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

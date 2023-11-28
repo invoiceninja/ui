@@ -701,6 +701,8 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
     .getByRole('link', { name: 'Quotes', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -749,6 +751,8 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Quotes', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

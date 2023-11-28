@@ -56,12 +56,6 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'More Actions', exact: true })
     ).toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
-    ).toBeVisible();
   } else {
     await expect(
       page
@@ -74,13 +68,13 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
-    ).not.toBeVisible();
   }
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Documents', exact: true })
+  ).toBeVisible();
 
   if (!isAdmin) {
     await expect(

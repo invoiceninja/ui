@@ -653,6 +653,8 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -693,6 +695,8 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Products', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
