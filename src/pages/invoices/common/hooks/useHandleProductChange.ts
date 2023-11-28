@@ -29,14 +29,7 @@ export function useHandleProductChange(props: Props) {
   const resource = props.resource;
 
   return (index: number, product_key: string, product: Product | null) => {
-    const lineItem = { ...resource.line_items[index] };
-
-    lineItem.product_key = product?.product_key || product_key;
-
     if (!product) {
-      // When we deal with inline product key
-      // keep everything but the name.
-
       return props.onChange(index, {
         ...blankLineItem(),
         type_id:
@@ -45,6 +38,10 @@ export function useHandleProductChange(props: Props) {
             : InvoiceItemType.Task,
       });
     }
+
+    const lineItem = { ...resource.line_items[index] };
+
+    lineItem.product_key = product?.product_key || product_key;
 
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
