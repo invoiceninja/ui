@@ -783,7 +783,7 @@ export function GeneralSettings() {
   const { data: designs } = useDesignsQuery();
   const { data: invoiceDesigns } = useTemplateQuery('invoice');
   const { data: paymentDesigns } = useTemplateQuery('payment');
-  const { data: clientDesigns } = useTemplateQuery('client');
+  const { data: statementDesigns } = useTemplateQuery('statement');
   
   const designsFilter = (entity: string, designs: Design[]) => {
     return designs.filter((design: Design) => design.is_template === false || design.entities.match(entity)) ?? designs;
@@ -799,7 +799,7 @@ export function GeneralSettings() {
     return Boolean(updatingRecords?.find((value) => value.entity === property));
   };
 
-  const handleChange = useHandleSettingsValueChange();
+  const handleChange = useHandleSettingsValueChange(); 
 
   const handleUpdateAllRecordsChange = (
     property: 'invoice' | 'quote' | 'credit' | 'purchase_order',
@@ -1061,8 +1061,8 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.statement_design_id']}
             withBlank={true}
           >
-            {clientDesigns &&
-              clientDesigns.map((design: Design) => (
+            {statementDesigns &&
+              statementDesigns.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>

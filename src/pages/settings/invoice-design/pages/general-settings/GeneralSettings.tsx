@@ -30,16 +30,19 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useAtom } from 'jotai';
 import { updatingRecordsAtom } from '../../common/atoms';
+import { liveDesignAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { current } from '@reduxjs/toolkit';
 
 export interface GeneralSettingsPayload {
   client_id: string;
-  entity_type: 'invoice';
+  entity_type: string;
   group_id: string;
   settings: Settings | null;
   settings_type: 'company';
+  entity_id : string | null;
 }
 
 export default function GeneralSettings() {
@@ -48,14 +51,7 @@ export default function GeneralSettings() {
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  const [payload, setPayload] = useState<GeneralSettingsPayload>({
-    client_id: '-1',
-    entity_type: 'invoice',
-    group_id: '-1',
-    settings: null,
-    settings_type: 'company',
-  });
-
+  const [payload, setPayload] = useAtom(liveDesignAtom);
   const [updatingRecords] = useAtom(updatingRecordsAtom);
 
   const handleSave = () => {
@@ -77,9 +73,7 @@ export default function GeneralSettings() {
 
   useEffect(() => {
     if (company?.settings) {
-      setPayload(
-        (current) => current && { ...current, settings: company.settings }
-      );
+      setPayload((current) => current && { ...current, settings: company?.settings})
     }
   }, [company?.settings]);
 

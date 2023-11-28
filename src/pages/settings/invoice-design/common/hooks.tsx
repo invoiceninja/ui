@@ -12,8 +12,10 @@ import { route } from '$app/common/helpers/route';
 import { Settings } from '$app/common/interfaces/company.interface';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Tab } from '$app/components/Tabs';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { liveDesignAtom } from './atoms';
 
 export function useInvoiceDesignTabs() {
   const [t] = useTranslation();
@@ -73,12 +75,28 @@ export function useInvoiceDesignTabs() {
 }
 
 export function useHandleSettingsValueChange() {
+  const [payload, setPayload] = useAtom(liveDesignAtom);
   const dispatch = useDispatch();
 
   return <T extends keyof Settings, R extends Settings[T]>(
     property: T,
     value: R
   ) => {
+
+    const designs = ['invoice_design_id', 'quote_design_id', 'credit_design_id', 'purchase_order_design_id', 'statement_design_id', 'payment_receipt_design_id', 'payment_refund_design_id','delivery_note_design_id'];
+    
+    if(designs.includes(property as string)) {
+    
+      let design = property.replace('_design_id', '');
+
+      setPayload((current) => current && { ...current,  
+          entity_type: design,
+          settings: payload.settings,
+          design_id: value as string,
+        }
+      )
+    }
+
     dispatch(
       updateChanges({
         object: 'company',

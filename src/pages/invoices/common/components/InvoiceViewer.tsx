@@ -16,10 +16,11 @@ import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
+import { LiveDesign } from '$app/pages/settings/invoice-design/common/atoms';
 
 interface Props {
   link: string;
-  resource?: Resource | GeneralSettingsPayload | PreviewPayload;
+  resource?: Resource | GeneralSettingsPayload | PreviewPayload | LiveDesign;
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
   withToast?: boolean;
