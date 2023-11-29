@@ -65,7 +65,7 @@ export function Details(props: Props) {
       <Element leftSide={t('name')}>
         <InputField
           id="name"
-          value={props.client?.name}
+          value={props.client?.name || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.name}
         />
@@ -74,7 +74,7 @@ export function Details(props: Props) {
       <Element leftSide={t('number')}>
         <InputField
           id="number"
-          value={props.client?.number}
+          value={props.client?.number || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.number}
         />
@@ -121,7 +121,7 @@ export function Details(props: Props) {
       <Element leftSide={t('id_number')}>
         <InputField
           id="id_number"
-          value={props.client?.id_number}
+          value={props.client?.id_number || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.id_number}
         />
@@ -130,7 +130,7 @@ export function Details(props: Props) {
       <Element leftSide={t('vat_number')}>
         <InputField
           id="vat_number"
-          value={props.client?.vat_number}
+          value={props.client?.vat_number || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.vat_number}
         />
@@ -139,7 +139,7 @@ export function Details(props: Props) {
       <Element leftSide={t('website')}>
         <InputField
           id="website"
-          value={props.client?.website}
+          value={props.client?.website || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.website}
         />
@@ -148,7 +148,7 @@ export function Details(props: Props) {
       <Element leftSide={t('phone')}>
         <InputField
           id="phone"
-          value={props.client?.phone}
+          value={props.client?.phone || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.phone}
         />
@@ -157,7 +157,7 @@ export function Details(props: Props) {
       <Element leftSide={t('routing_id')}>
         <InputField
           id="routing_id"
-          value={props.client?.routing_id}
+          value={props.client?.routing_id || ''}
           onChange={handleChange}
           errorMessage={props.errors?.errors.routing_id}
         />

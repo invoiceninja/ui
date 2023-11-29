@@ -9,9 +9,13 @@
  */
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { ProductTableResource } from '../components/ProductsTable';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 
 interface Props {
   resource: ProductTableResource;
@@ -25,16 +29,19 @@ export function useHandleProductChange(props: Props) {
   const resource = props.resource;
 
   return (index: number, product_key: string, product: Product | null) => {
+    if (!product) {
+      return props.onChange(index, {
+        ...blankLineItem(),
+        type_id:
+          props.type === 'product'
+            ? InvoiceItemType.Product
+            : InvoiceItemType.Task,
+      });
+    }
+
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
-
-    if (!product) {
-      // When we deal with inline product key
-      // keep everything but the name.
-
-      return props.onChange(index, lineItem);
-    }
 
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
