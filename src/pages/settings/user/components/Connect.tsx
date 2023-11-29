@@ -23,6 +23,7 @@ import {
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export function Connect() {
   const [t] = useTranslation();
@@ -99,6 +100,8 @@ export function Connect() {
     });
   };
 
+  const colors = useColorScheme();
+
   return (
     <Card title={t('oneclick_login')}>
       {!user?.oauth_provider_id && (
@@ -145,7 +148,7 @@ export function Connect() {
                   <path fill="#ffba08" d="M12 12h10v10H12z"></path>
                 </svg>
 
-                <p>Log in with Microsoft</p>
+                <p style={{ color: "#000" }}>Log in with Microsoft</p>
               </SignInProviderButton>
             </Element>
           </div>

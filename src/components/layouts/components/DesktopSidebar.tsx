@@ -77,7 +77,7 @@ export function DesktopSidebar(props: Props) {
                     placement="right"
                     truncate={false}
                     size="large"
-                    className="whitespace-nowrap"
+                    withoutArrow={true}
                   >
                   <SidebarItem key={index} item={item} colors={colors} />
                   </Tooltip>

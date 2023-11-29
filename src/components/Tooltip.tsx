@@ -65,7 +65,7 @@ export function Tooltip(props: Props) {
           <div className="flex flex-col items-center whitespace-normal">
             <span
               className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all',
+                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all whitespace-nowrap',
                 {
                   'leading-1': includeLeading,
                   'leading-none': !includeLeading,
