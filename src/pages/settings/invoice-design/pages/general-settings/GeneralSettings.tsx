@@ -9,7 +9,7 @@
  */
 
 import { Settings } from '$app/common/interfaces/company.interface';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ClientDetails } from './components/ClientDetails';
 import { CompanyAddress } from './components/CompanyAddress';
 import { CompanyDetails } from './components/CompanyDetails';
@@ -34,7 +34,6 @@ import { liveDesignAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { current } from '@reduxjs/toolkit';
 
 export interface GeneralSettingsPayload {
   client_id: string;

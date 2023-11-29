@@ -87,7 +87,7 @@ export function useHandleSettingsValueChange() {
     
     if(designs.includes(property as string)) {
     
-      let design = property.replace('_design_id', '');
+      const design = property.replace('_design_id', '');
 
       setPayload((current) => current && { ...current,  
           entity_type: design,
