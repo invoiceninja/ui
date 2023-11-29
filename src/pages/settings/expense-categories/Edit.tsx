@@ -127,7 +127,6 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
           <Card
             withSaveButton
             disableSubmitButton={isFormBusy}
@@ -165,7 +164,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-        </Container>
       )}
     </Settings>
   );
