@@ -199,9 +199,10 @@ export function ListBox(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className="flex flex-col flex-1 w-full">
+    <div className="flex flex-col flex-1 w-full" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
       <div
-        className={`flex justify-center px-5 py-3 relative border-b border-t border-gray-200 ${props.className}`}
+        style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+        className={`flex justify-center px-5 py-3 relative border-b border-t ${props.className}`}
       >
         <SearchArea
           dataKey={props.dataKey}
@@ -213,10 +214,8 @@ export function ListBox(props: Props) {
         />
       </div>
       <ul
+        style={{ height: isInvoicesDataKey ? 400 : 200, color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
         className="flex flex-col grow justify-start overflow-y-auto"
-        style={{
-          height: isInvoicesDataKey ? 400 : 200, color: colors.$3, colorScheme: colors.$0
-        }}
       >
         {resourceItems?.map(
           (resourceItem: ResourceItem) =>

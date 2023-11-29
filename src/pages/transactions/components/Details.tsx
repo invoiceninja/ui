@@ -135,7 +135,7 @@ export function Details(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <div className="flex flex-col flex-1 border-b border-gray-200">
+    <div className="flex flex-col flex-1 border-b" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
       <div>
         <Element leftSide={t('type')}>
           {isCreditTransactionType
@@ -157,10 +157,10 @@ export function Details(props: Props) {
 
         <Element
           leftSide={t('bank_account')}
-          className="hover:bg-gray-100 cursor-pointer"
+          className="cursor-pointer"
         >
           <Link
-            style={{ color: colors.$3, colorScheme: colors.$0 }}
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             to={route('/settings/bank_accounts/:id/details', {
               id: bankAccountResponse?.id,
             })}
@@ -176,10 +176,10 @@ export function Details(props: Props) {
             <Element
               key={id}
               leftSide={t('invoice')}
-              className="hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer"
             >
               <Link
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                 to={route('/invoices/:id/edit', {
                   id,
                 })}
@@ -192,7 +192,7 @@ export function Details(props: Props) {
           {transaction?.payment_id && (
             <Element
               leftSide={t('payment')}
-              className="hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer"
             >
               <Link
                 style={{ color: colors.$3, colorScheme: colors.$0 }}
@@ -208,10 +208,10 @@ export function Details(props: Props) {
           {transaction?.vendor_id && (
             <Element
               leftSide={t('vendor')}
-              className="hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer"
             >
               <Link
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                 to={route('/vendors/:id', {
                   id: vendorResponse?.id,
                 })}

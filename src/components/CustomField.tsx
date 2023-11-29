@@ -60,7 +60,7 @@ export function CustomField(props: Props) {
   }
 
   return (
-    <Element leftSide={label} noExternalPadding={props.noExternalPadding}>
+    <Element leftSide={label} noExternalPadding={props.noExternalPadding} >
       <InputCustomField {...props} />
     </Element>
   );
