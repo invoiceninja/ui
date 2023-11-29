@@ -57,14 +57,14 @@ export function ProductItemsSelector(props: Props) {
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles, { data }) => {
+    multiValue: (styles) => {
       return {
         ...styles,
         color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
         borderRadius: '3px',
       };
     },
-    multiValueLabel: (styles, { data }) => ({
+    multiValueLabel: (styles) => ({
       ...styles,
       color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
