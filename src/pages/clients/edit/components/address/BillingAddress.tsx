@@ -42,7 +42,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('billing_address1')}>
         <InputField
           id="address1"
-          value={props.client?.address1}
+          value={props.client?.address1 || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.address1}
         />
@@ -51,7 +51,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('address2')}>
         <InputField
           id="address2"
-          value={props.client?.address2}
+          value={props.client?.address2 || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.address2}
         />
@@ -60,7 +60,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('city')}>
         <InputField
           id="city"
-          value={props.client?.city}
+          value={props.client?.city || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.city}
         />
@@ -69,7 +69,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('state')}>
         <InputField
           id="state"
-          value={props.client?.state}
+          value={props.client?.state || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.state}
         />
@@ -78,7 +78,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('postal_code')}>
         <InputField
           id="postal_code"
-          value={props.client?.postal_code}
+          value={props.client?.postal_code || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.postal_code}
         />

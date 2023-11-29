@@ -107,7 +107,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('name')}>
             <InputField
-              value={vendor.name}
+              value={vendor.name || ''}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
             />
@@ -115,7 +115,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('number')}>
             <InputField
-              value={vendor.number}
+              value={vendor.number || ''}
               onValueChange={(value) => handleChange('number', value)}
               errorMessage={errors?.errors.number}
             />
@@ -133,7 +133,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('id_number')}>
             <InputField
-              value={vendor.id_number}
+              value={vendor.id_number || ''}
               onValueChange={(value) => handleChange('id_number', value)}
               errorMessage={errors?.errors.id_number}
             />
@@ -141,7 +141,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('vat_number')}>
             <InputField
-              value={vendor.vat_number}
+              value={vendor.vat_number || ''}
               onValueChange={(value) => handleChange('vat_number', value)}
               errorMessage={errors?.errors.vat_number}
             />
@@ -149,7 +149,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('website')}>
             <InputField
-              value={vendor.website}
+              value={vendor.website || ''}
               onValueChange={(value) => handleChange('website', value)}
               errorMessage={errors?.errors.website}
             />
@@ -157,7 +157,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('phone')}>
             <InputField
-              value={vendor.phone}
+              value={vendor.phone || ''}
               onValueChange={(value) => handleChange('phone', value)}
               errorMessage={errors?.errors.phone}
             />
