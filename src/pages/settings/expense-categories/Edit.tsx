@@ -17,7 +17,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useExpenseCategoryQuery } from '$app/common/queries/expense-categories';
 import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';

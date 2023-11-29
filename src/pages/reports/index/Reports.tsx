@@ -40,6 +40,7 @@ import {
   previewAtom,
 } from '../common/components/Preview';
 import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
+import { useColorScheme } from '$app/common/colors';
 interface Range {
   identifier: string;
   label: string;
@@ -313,6 +314,7 @@ export default function Reports() {
       setPreview(null);
     };
   }, []);
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -330,7 +332,7 @@ export default function Reports() {
       }
       withoutBackButton
     >
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
             <SelectField
@@ -350,6 +352,7 @@ export default function Reports() {
 
           <Element leftSide={t('send_email')}>
             <Toggle
+              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
               checked={report.payload.send_email}
               onValueChange={handleSendEmailChange}
             />
@@ -359,6 +362,7 @@ export default function Reports() {
             <>
               <Element leftSide={t('expense_paid_report')}>
                 <Toggle
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   checked={report.payload.is_expense_billed}
                   onValueChange={(value) =>
                     handlePayloadChange('is_expense_billed', value)
@@ -368,6 +372,7 @@ export default function Reports() {
 
               <Element leftSide={t('cash_vs_accrual')}>
                 <Toggle
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   checked={report.payload.is_income_billed}
                   onValueChange={(value) =>
                     handlePayloadChange('is_income_billed', value)
@@ -377,6 +382,7 @@ export default function Reports() {
 
               <Element leftSide={t('include_tax')}>
                 <Toggle
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   checked={report.payload.include_tax}
                   onValueChange={(value) =>
                     handlePayloadChange('include_tax', value)
@@ -408,6 +414,7 @@ export default function Reports() {
         <Card className="col-span-6 h-max">
           <Element leftSide={t('range')}>
             <SelectField
+              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
               onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
             >
@@ -435,6 +442,7 @@ export default function Reports() {
           {report.payload.date_range === 'custom' && (
             <Element leftSide={t('end_date')}>
               <InputField
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                 type="date"
                 value={report.payload.end_date}
                 onValueChange={(value) =>
@@ -462,6 +470,7 @@ export default function Reports() {
           {report.allow_custom_column && (
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                 checked={showCustomColumns}
                 onValueChange={(value) => setShowCustomColumns(Boolean(value))}
               />

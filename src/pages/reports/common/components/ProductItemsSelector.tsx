@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { Report } from '../useReports';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   setReport: Dispatch<SetStateAction<Report>>;
@@ -27,6 +28,7 @@ export function ProductItemsSelector(props: Props) {
   const [productItems, setProductItems] = useState<SelectOption[]>([]);
 
   const { data: products } = useProductsQuery();
+  const colors = useColorScheme();
 
   useEffect(() => {
     if (products) {
@@ -34,8 +36,8 @@ export function ProductItemsSelector(props: Props) {
         products.map((product) => ({
           value: product.product_key,
           label: product.product_key,
-          color: 'black',
-          backgroundColor: '#e4e4e4',
+          color: colors.$3,
+          backgroundColor: colors.$1,
         }))
       );
     }
@@ -58,21 +60,53 @@ export function ProductItemsSelector(props: Props) {
     multiValue: (styles, { data }) => {
       return {
         ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
+        color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
         borderRadius: '3px',
       };
     },
     multiValueLabel: (styles, { data }) => ({
       ...styles,
-      color: data.color,
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
     multiValueRemove: (styles) => ({
       ...styles,
+      colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
       ':hover': {
         color: 'white',
       },
       color: '#999999',
+    }),
+    input: (styles) => ({
+      ...styles,
+      color: colors.$3,
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: colors.$3,
+    }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base, { isDisabled }) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      pointerEvents: isDisabled ? 'auto' : 'unset',
+    }),
+    option: (base, { isSelected, isFocused }) => ({
+      ...base,
+      color: colors.$3,
+      backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
     }),
   };
 

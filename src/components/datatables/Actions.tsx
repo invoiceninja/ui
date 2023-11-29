@@ -80,40 +80,33 @@ export function Actions(props: Props) {
     multiValue: (styles, { data }) => {
       return {
         ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
+        color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
         borderRadius: '3px',
       };
     },
     multiValueLabel: (styles, { data }) => ({
       ...styles,
-      color: data.color,
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
     menu: (base) => ({
       ...base,
       width: 'max-content',
       minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
     control: (base) => ({
       ...base,
       borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
     }),
     option: (base) => ({
       ...base,
-      backgroundColor: colors.$1,
+      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
       ':hover': {
         backgroundColor: colors.$7,
       },
@@ -121,8 +114,8 @@ export function Actions(props: Props) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
         {props.children}
         {props.options && props.defaultOptions && (
           <Select
