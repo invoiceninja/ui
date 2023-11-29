@@ -71,6 +71,7 @@ export function DesktopSidebar(props: Props) {
 
                 isMiniSidebar ? (
                   <Tooltip
+                    key={index}
                     message={item.name as string}
                     width="auto"
                     placement="right"
