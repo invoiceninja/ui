@@ -23,7 +23,6 @@ import {
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
 
 export function Connect() {
   const [t] = useTranslation();
@@ -99,8 +98,6 @@ export function Connect() {
       window.location.reload();
     });
   };
-
-  const colors = useColorScheme();
 
   return (
     <Card title={t('oneclick_login')}>
