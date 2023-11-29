@@ -40,9 +40,11 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import classNames from 'classnames';
 
 interface Props {
   docsLink?: string;
+  mobileNavbar?: boolean;
 }
 
 export function HelpSidebarIcons(props: Props) {
@@ -52,6 +54,8 @@ export function HelpSidebarIcons(props: Props) {
   const account = useCurrentAccount();
 
   const colors = useColorScheme();
+
+  const { mobileNavbar } = props;
 
   const dispatch = useDispatch();
   const updateCompanyUser = useUpdateCompanyUser();
@@ -229,9 +233,12 @@ export function HelpSidebarIcons(props: Props) {
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className="flex p-2 justify-around text-white border-t"
+        className={classNames('flex p-2 text-white border-t', {
+          'justify-end': mobileNavbar,
+          'justify-around': !mobileNavbar,
+        })}
       >
-        {!isMiniSidebar && (
+        {!isMiniSidebar && !mobileNavbar && (
           <>
             {isSelfHosted() && account && !account.is_scheduler_running && (
               <button
