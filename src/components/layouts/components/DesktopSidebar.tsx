@@ -9,13 +9,12 @@
  */
 
 import { useLogo } from '$app/common/hooks/useLogo';
-import { RootState } from '$app/common/stores/store';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
-import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 export interface NavigationItem {
   name: string;
@@ -37,8 +36,10 @@ interface Props {
 }
 
 export function DesktopSidebar(props: Props) {
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
+  const user = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
   );
 
   const logo = useLogo();
