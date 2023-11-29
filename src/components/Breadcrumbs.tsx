@@ -18,7 +18,7 @@ export function Breadcrumbs(props: { pages: Page[] }) {
   const colors = useColorScheme();
 
   return (
-    <nav className="flex" aria-label="Breadcrumb" style={{ color: colors.$3 }}>
+    <nav className="flex" aria-label="Breadcrumb" style={{ color: colors.$3, opacity: colors.$10}}>
       <ol role="list" className="flex items-center space-x-4">
         <li>
           <div>
