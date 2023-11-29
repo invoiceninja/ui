@@ -436,7 +436,7 @@ export default function Reports() {
         <Card className="col-span-6 h-max">
           <Element leftSide={t('range')}>
             <SelectField
-              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1 }}
               onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
             >
