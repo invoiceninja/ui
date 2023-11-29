@@ -77,41 +77,49 @@ export function Actions(props: Props) {
   const colors = useColorScheme();
 
   const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles) => {
+    multiValue: (styles, { data }) => {
       return {
         ...styles,
-        color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
         borderRadius: '3px',
       };
     },
-    multiValueLabel: (styles) => ({
+    multiValueLabel: (styles, { data }) => ({
       ...styles,
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
+      color: data.color,
     }),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
     }),
     menu: (base) => ({
       ...base,
       width: 'max-content',
       minWidth: '100%',
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
     }),
     control: (base) => ({
       ...base,
       borderRadius: '3px',
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
     }),
     option: (base) => ({
       ...base,
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
+      backgroundColor: colors.$1,
       ':hover': {
         backgroundColor: colors.$7,
       },
     }),
   };
+
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>

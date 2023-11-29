@@ -294,12 +294,34 @@ export default function Reports() {
       ...styles,
       color: data.color,
     }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
         color: 'white',
       },
       color: '#999999',
+    }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
     }),
   };
 

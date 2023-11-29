@@ -57,32 +57,25 @@ export function ProductItemsSelector(props: Props) {
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles) => {
+    multiValue: (styles, { data }) => {
       return {
         ...styles,
-        color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
         borderRadius: '3px',
       };
     },
-    multiValueLabel: (styles) => ({
+    multiValueLabel: (styles, { data }) => ({
       ...styles,
-      color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4
+      color: data.color,
     }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
-      colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4,
       ':hover': {
         color: 'white',
       },
       color: '#999999',
-    }),
-    input: (styles) => ({
-      ...styles,
-      color: colors.$3,
-    }),
-    singleValue: (styles) => ({
-      ...styles,
-      color: colors.$3,
     }),
     menu: (base) => ({
       ...base,
@@ -91,24 +84,22 @@ export function ProductItemsSelector(props: Props) {
       backgroundColor: colors.$4,
       borderColor: colors.$4,
     }),
-    control: (base, { isDisabled }) => ({
+    control: (base) => ({
       ...base,
       borderRadius: '3px',
       backgroundColor: colors.$1,
       color: colors.$3,
       borderColor: colors.$5,
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      pointerEvents: isDisabled ? 'auto' : 'unset',
     }),
-    option: (base, { isSelected, isFocused }) => ({
+    option: (base) => ({
       ...base,
-      color: colors.$3,
-      backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
+      backgroundColor: colors.$1,
       ':hover': {
         backgroundColor: colors.$7,
       },
     }),
   };
+
 
   return (
     <Element leftSide={t('products')}>
