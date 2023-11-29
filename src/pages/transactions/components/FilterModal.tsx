@@ -12,6 +12,7 @@ import { InputField } from '$app/components/forms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchInput } from './ListBox';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   searchParams: SearchInput;
@@ -20,6 +21,7 @@ interface Props {
 
 export function FilterModal(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const handleChangeSearchParams = (
     property: keyof SearchInput,
@@ -33,6 +35,7 @@ export function FilterModal(props: Props) {
       <div className="flex flex-col items-center p-3">
         <div className="flex justify-evenly w-full">
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
             className="w-52"
             label={`${t('min')} ${t('amount')}`}
             value={props.searchParams.minAmount}
@@ -41,6 +44,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
             className="w-52"
             label={`${t('max')} ${t('amount')}`}
             value={props.searchParams.maxAmount}
@@ -51,6 +55,7 @@ export function FilterModal(props: Props) {
         </div>
         <div className="flex justify-evenly mt-3 w-full">
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
             className="w-52"
             label={t('start')}
             type="date"
@@ -60,6 +65,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
             className="w-52"
             label={t('end')}
             type="date"

@@ -20,6 +20,7 @@ import { useVendorsQuery } from '$app/common/queries/vendor';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import { usePaymentsQuery } from '$app/common/queries/payments';
 import { useExpensesQuery } from '$app/common/queries/expenses';
+import { useColorScheme } from '$app/common/colors';
 
 export interface ResourceItem {
   id: string;
@@ -194,6 +195,8 @@ export function ListBox(props: Props) {
       setClientId('');
     }
   }, [props.selectedIds]);
+  
+  const colors = useColorScheme();
 
   return (
     <div className="flex flex-col flex-1 w-full">
@@ -212,7 +215,7 @@ export function ListBox(props: Props) {
       <ul
         className="flex flex-col grow justify-start overflow-y-auto"
         style={{
-          height: isInvoicesDataKey ? 400 : 200,
+          height: isInvoicesDataKey ? 400 : 200, color: colors.$3, colorScheme: colors.$0
         }}
       >
         {resourceItems?.map(
