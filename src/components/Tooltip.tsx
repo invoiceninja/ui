@@ -19,7 +19,7 @@ interface Props {
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
   width?: number | string;
-  placement?: 'top' | 'bottom';
+  placement?: 'top' | 'bottom' | 'right';
   containsUnsafeHTMLTags?: boolean;
   withoutArrow?: boolean;
 }

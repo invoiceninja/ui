@@ -16,6 +16,7 @@ import { Icon } from 'react-feather';
 import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
+import { Tooltip } from '$app/components/Tooltip';
 
 export interface NavigationItem {
   name: string;
@@ -46,9 +47,8 @@ export function DesktopSidebar(props: Props) {
 
   return (
     <div
-      className={`hidden md:flex z-10 ${
-        isMiniSidebar ? 'md:w-16' : 'md:w-64'
-      } md:flex-col md:fixed md:inset-y-0`}
+      className={`hidden md:flex z-10 ${isMiniSidebar ? 'md:w-16' : 'md:w-64'
+        } md:flex-col md:fixed md:inset-y-0`}
     >
       <div
         style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
@@ -68,7 +68,21 @@ export function DesktopSidebar(props: Props) {
         <div className="flex-grow flex flex-col mt-4">
           <nav className="flex-1 pb-4 space-y-1" data-cy="navigationBar">
             {props.navigation.map((item, index) => (
-              <SidebarItem key={index} item={item} colors={colors} />
+
+                isMiniSidebar ? (
+                  <Tooltip
+                    message={item.name as string}
+                    width="auto"
+                    placement="right"
+                    truncate={false}
+                    size="large"
+                    className="whitespace-nowrap"
+                  >
+                  <SidebarItem key={index} item={item} colors={colors} />
+                  </Tooltip>
+                ) : (
+                  <SidebarItem key={index} item={item} colors={colors} />
+                )
             ))}
           </nav>
 

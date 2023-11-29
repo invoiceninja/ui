@@ -78,5 +78,6 @@ export function SidebarItem(props: Props) {
         </Link>
       )}
     </Div>
+
   );
 }
