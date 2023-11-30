@@ -20,7 +20,7 @@ import { useRefetch } from '../hooks/useRefetch';
 
 export function useUsersQuery() {
   return useQuery(
-    '/api/v1/users',
+    ['/api/v1/users'],
     () => request('GET', endpoint('/api/v1/users')),
     { staleTime: Infinity }
   );
