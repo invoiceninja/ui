@@ -75,7 +75,6 @@ export default function Create() {
 
   useEffect(() => {
     if (blankClient) {
-      console.log("i am blank, so DELEETTTTTTE");
       setClient({
         ...blankClient.data,
         group_settings_id: searchParams.get('group') || '',
