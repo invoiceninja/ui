@@ -68,9 +68,8 @@ export function AddTasksOnInvoiceAction(props: Props) {
 
     toast.processing();
 
-    queryClient.fetchQuery(
-      ['/api/v1/invoices', 'client_id', tasks[0].client_id],
-      () =>
+    queryClient
+      .fetchQuery(['/api/v1/invoices', 'client_id', tasks[0].client_id], () =>
         request(
           'GET',
           endpoint(
@@ -78,25 +77,27 @@ export function AddTasksOnInvoiceAction(props: Props) {
             {
               clientId: tasks[0].client_id,
             }
-          )
-        ).then((response: GenericSingleResourceResponse<Invoice[]>) => {
-          toast.dismiss();
+          ),
+          { staleTime: Infinity }
+        )
+      )
+      .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+        toast.dismiss();
 
-          if (!response.data.data.length) {
-            return toast.error('no_invoices_found');
-          }
+        if (!response.data.data.length) {
+          return toast.error('no_invoices_found');
+        }
 
-          if (hasPermission('edit_invoice')) {
-            setInvoices(response.data.data);
-          } else {
-            setInvoices(
-              response.data.data.filter((invoice) => entityAssigned(invoice))
-            );
-          }
+        if (hasPermission('edit_invoice')) {
+          setInvoices(response.data.data);
+        } else {
+          setInvoices(
+            response.data.data.filter((invoice) => entityAssigned(invoice))
+          );
+        }
 
-          setIsModalVisible(true);
-        })
-    );
+        setIsModalVisible(true);
+      });
   };
 
   useEffect(() => {
