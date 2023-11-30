@@ -19,9 +19,7 @@ import { $refetch } from '../hooks/useRefetch';
 export function useGroupSettingsQuery() {
   return useQuery(
     '/api/v1/group_settings',
-    () => {
-      return request('GET', endpoint('/api/v1/group_settings'));
-    },
+    () => request('GET', endpoint('/api/v1/group_settings')),
     { staleTime: Infinity }
   );
 }

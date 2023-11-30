@@ -17,6 +17,7 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/activities/entity',
     ],
   },
   designs: {
@@ -172,7 +173,7 @@ export const keys = {
   },
   recurring_invoices: {
     path: '/api/v1/recurring_invoices',
-    dependencies: ['/api/v1/clients'],
+    dependencies: ['/api/v1/clients', '/api/v1/activities/entity'],
   },
   bank_integrations: {
     path: '/api/v1/bank_integrations',
