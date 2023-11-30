@@ -65,7 +65,8 @@ export function useCombineProjectsTasks() {
             if (tasks !== null) {
               tasks = [...tasks, ...unInvoicedTasks];
             }
-          })
+          }),
+        { staleTime: Infinity }
       );
     });
 

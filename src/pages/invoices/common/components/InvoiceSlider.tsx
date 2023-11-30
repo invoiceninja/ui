@@ -153,6 +153,7 @@ export function InvoiceSlider() {
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const fetchEmailHistory = async () => {
@@ -200,6 +201,7 @@ export function InvoiceSlider() {
           response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const activityElement = useGenerateActivityElement();

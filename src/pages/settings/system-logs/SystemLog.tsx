@@ -63,7 +63,10 @@ export function SystemLog() {
       request(
         'GET',
         endpoint('/api/v1/system_logs?per_page=200&sort=created_at|DESC')
-      )
+      ),
+    {
+      staleTime: Infinity,
+    }
   );
 
   const categories: Category[] = [

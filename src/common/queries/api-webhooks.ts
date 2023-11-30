@@ -31,7 +31,7 @@ export function useApiWebhooksQuery(params: Params) {
           currentPage: params.currentPage,
         })
       ),
-    { enabled: isAdmin }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 

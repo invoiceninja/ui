@@ -317,7 +317,8 @@ export function useActions() {
           }
 
           invoiceProject(unInvoicedTasks);
-        })
+        }),
+      { staleTime: Infinity }
     );
   };
 

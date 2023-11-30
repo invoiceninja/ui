@@ -40,8 +40,13 @@ export function Selector(props: Props) {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const { data } = useQuery('/api/v1/tax_rates', () =>
-    request('GET', endpoint('/api/v1/tax_rates?status=active&per_page=100'))
+  const { data } = useQuery(
+    '/api/v1/tax_rates',
+    () =>
+      request('GET', endpoint('/api/v1/tax_rates?status=active&per_page=100')),
+    {
+      staleTime: Infinity,
+    }
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {

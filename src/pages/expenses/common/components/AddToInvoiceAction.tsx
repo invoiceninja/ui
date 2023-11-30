@@ -141,7 +141,8 @@ export function AddToInvoiceAction(props: Props) {
                 );
               }
             })
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsLoading(false)),
+        { staleTime: Infinity }
       );
     }
 
