@@ -69,17 +69,19 @@ export function AddTasksOnInvoiceAction(props: Props) {
     toast.processing();
 
     queryClient
-      .fetchQuery(['/api/v1/invoices', 'client_id', tasks[0].client_id], () =>
-        request(
-          'GET',
-          endpoint(
-            '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
-            {
-              clientId: tasks[0].client_id,
-            }
+      .fetchQuery(
+        ['/api/v1/invoices', 'client_id', tasks[0].client_id],
+        () =>
+          request(
+            'GET',
+            endpoint(
+              '/api/v1/invoices?client_id=:clientId&include=client&status=active&per_page=100',
+              {
+                clientId: tasks[0].client_id,
+              }
+            )
           ),
-          { staleTime: Infinity }
-        )
+        { staleTime: Infinity }
       )
       .then((response: GenericSingleResourceResponse<Invoice[]>) => {
         toast.dismiss();

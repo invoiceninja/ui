@@ -56,15 +56,14 @@ export function CompanyEdit(props: Props) {
   });
 
   const fetchCompanyDetails = async (companyId: string) => {
-    const response = await queryClient.fetchQuery(
-      ['/api/v1/companies', companyId],
-      () =>
-        request(
-          'GET',
-          endpoint('/api/v1/companies/:id', { id: companyId })
-        ).then((response) => response.data.data),
-      { staleTime: Infinity }
-    );
+    const response = await queryClient
+      .fetchQuery(
+        ['/api/v1/companies', companyId],
+        () =>
+          request('GET', endpoint('/api/v1/companies/:id', { id: companyId })),
+        { staleTime: Infinity }
+      )
+      .then((response) => response.data.data);
 
     const companySettings = response?.settings;
 
