@@ -70,6 +70,7 @@ export default function Create() {
         (response: AxiosResponse<GenericSingleResourceResponse<Client>>) =>
           response.data.data
       ),
+    staleTime: Infinity,
   });
 
   useEffect(() => {
