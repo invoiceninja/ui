@@ -18,6 +18,7 @@ export const keys = {
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/activities/entity',
+      '/api/v1/activities',
     ],
   },
   designs: {
@@ -75,6 +76,7 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/activities',
     ],
   },
   purchase_orders: {
@@ -169,7 +171,7 @@ export const keys = {
   },
   quotes: {
     path: '/api/v1/quotes',
-    dependencies: ['/api/v1/clients'],
+    dependencies: ['/api/v1/clients', '/api/v1/activities'],
   },
   recurring_invoices: {
     path: '/api/v1/recurring_invoices',
