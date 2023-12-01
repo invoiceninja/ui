@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -27,11 +27,10 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useQuery } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useBlankClientQuery } from '$app/common/queries/clients';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -63,14 +62,7 @@ export default function Create() {
     },
   ]);
 
-  const { data: blankClient } = useQuery({
-    queryKey: ['/api/v1/clients/create'],
-    queryFn: () =>
-      request('GET', endpoint('/api/v1/clients/create')).then(
-        (response: AxiosResponse<GenericSingleResourceResponse<Client>>) =>
-          response.data.data
-      ),
-  });
+  const { data: blankClient } = useBlankClientQuery({});
 
   useEffect(() => {
     if (blankClient) {
