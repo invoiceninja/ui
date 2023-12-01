@@ -28,6 +28,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
+import { Logo } from '../components';
 
 interface Props {
   isModalOpen: boolean;
@@ -44,6 +45,8 @@ export function CompanyEdit(props: Props) {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const [companyId, setCompanyId] = useState<string | undefined>();
+
+  const [stepIndex, setStepIndex] = useState<number>(0);
 
   const [company, setCompany] = useState<CompanyInput>({
     name: '',
@@ -164,36 +167,68 @@ export function CompanyEdit(props: Props) {
       backgroundColor="white"
       overflowVisible
     >
-      <InputField
-        label={t('company_name')}
-        value={company?.name}
-        onValueChange={(value) => handleChange('name', value)}
-        errorMessage={errors?.errors?.name}
-      />
+      <div className="flex flex-col space-y-6">
+        {stepIndex === 0 && (
+          <div className="flex flex-col space-y-4">
+            <InputField
+              label={t('company_name')}
+              value={company?.name}
+              onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors?.name}
+            />
 
-      {isHosted() && (
-        <InputField
-          label={t('subdomain')}
-          value={company?.subdomain}
-          onValueChange={(value) => handleChange('subdomain', value)}
-        />
-      )}
+            {isHosted() && (
+              <InputField
+                label={t('subdomain')}
+                value={company?.subdomain}
+                onValueChange={(value) => handleChange('subdomain', value)}
+              />
+            )}
 
-      <LanguageSelector
-        label={t('language')}
-        value={company?.language_id}
-        onChange={(v) => handleChange('language_id', v)}
-        errorMessage={errors?.errors?.language_id}
-      />
+            <LanguageSelector
+              label={t('language')}
+              value={company?.language_id}
+              onChange={(v) => handleChange('language_id', v)}
+              errorMessage={errors?.errors?.language_id}
+            />
 
-      <CurrencySelector
-        label={t('currency')}
-        value={company?.currency_id || ''}
-        onChange={(value) => handleChange('currency_id', value)}
-      />
+            <CurrencySelector
+              label={t('currency')}
+              value={company?.currency_id || ''}
+              onChange={(value) => handleChange('currency_id', value)}
+            />
+          </div>
+        )}
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave}>{t('save')}</Button>
+        {stepIndex === 1 && (
+          <div>
+            <Logo isSettingsPage={false} />
+          </div>
+        )}
+
+        <div className="flex justify-between">
+          <Button
+            behavior="button"
+            type="secondary"
+            onClick={() => props.setIsModalOpen(false)}
+          >
+            {t('skip')}
+          </Button>
+
+          {stepIndex !== 2 && (
+            <Button
+              behavior="button"
+              onClick={() => setStepIndex((current) => current + 1)}
+            >
+              {t('next')}
+            </Button>
+          )}
+          {stepIndex === 2 && (
+            <Button behavior="button" onClick={handleSave}>
+              {t('save')}
+            </Button>
+          )}
+        </div>
       </div>
     </Modal>
   );
