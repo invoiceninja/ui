@@ -105,6 +105,7 @@ export function InputField(props: Props) {
           //   props.onValueChange && props.onValueChange(event.target.value);
           //   props.onChange && props.onChange(event);
           // }}
+          onChange={() => {}}
           value={props.value}
           list={props.list}
           rows={props.textareaRows || 5}
