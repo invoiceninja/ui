@@ -97,10 +97,14 @@ export function InputField(props: Props) {
             }
           )}
           placeholder={props.placeholder || ''}
-          onChange={(event) => {
+          onBlur={(event) => {
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}
+          // onChange={(event) => {
+          //   props.onValueChange && props.onValueChange(event.target.value);
+          //   props.onChange && props.onChange(event);
+          // }}
           value={props.value}
           list={props.list}
           rows={props.textareaRows || 5}
