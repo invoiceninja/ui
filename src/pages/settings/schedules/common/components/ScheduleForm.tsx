@@ -31,6 +31,7 @@ interface Props {
 export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
+  EMAIL_REPORT = 'email_report',
 }
 
 export function ScheduleForm(props: Props) {
@@ -48,6 +49,7 @@ export function ScheduleForm(props: Props) {
         >
           <option value="email_statement">{t('email_statement')}</option>
           <option value="email_record">{t('email_record')}</option>
+          <option value="email_report">{t('email_report')}</option>
         </SelectField>
       </Element>
 
@@ -60,7 +62,7 @@ export function ScheduleForm(props: Props) {
         />
       </Element>
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {Object.values([Templates.EMAIL_STATEMENT, Templates.EMAIL_REPORT]).includes(schedule.template as Templates) && (
         <Element leftSide={t('frequency')}>
           <SelectField
             value={schedule.frequency_id}
@@ -76,7 +78,7 @@ export function ScheduleForm(props: Props) {
         </Element>
       )}
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {Object.values([Templates.EMAIL_STATEMENT, Templates.EMAIL_REPORT]).includes(schedule.template as Templates) && (
         <Element leftSide={t('remaining_cycles')}>
           <SelectField
             value={schedule.remaining_cycles}
@@ -113,6 +115,10 @@ export function ScheduleForm(props: Props) {
           errors={errors}
         />
       )}
+
+      {/* {schedule.template === Templates.EMAIL_REPORT && (
+
+      )} */}
     </Card>
   );
 }

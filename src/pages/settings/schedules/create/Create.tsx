@@ -73,7 +73,7 @@ export function Create() {
 
         return {
           ...blankSchedule,
-          template: searchParams.get('template') || 'email_statement',
+          template: searchParams.get('template') || 'email_statement' || 'email_report',
           frequency_id: Frequency.Monthly,
           remaining_cycles: -1,
           parameters: currentParameters || {
@@ -86,6 +86,12 @@ export function Create() {
             status: 'all',
             entity: 'invoice',
             entity_id: '',
+            report_name: '',
+            report_keys: [],
+            is_income_billed: true,
+            is_expense_billed: true,
+            include_tax: true,
+            product_key: '',
           },
         };
       });
