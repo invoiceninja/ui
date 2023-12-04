@@ -84,15 +84,15 @@ export function EmailReport(props: Props) {
         handleChange('parameters', currentParameters);
     };
 
-    const handleRemoveClient = (clientIndex: number) => {
-        const updatedClientsList = selectedClients.filter(
-            (client, index) => index !== clientIndex
-        );
+    // const handleRemoveClient = (clientIndex: number) => {
+    //     const updatedClientsList = selectedClients.filter(
+    //         (client, index) => index !== clientIndex
+    //     );
 
-        handleChangeParameters(updatedClientsList);
+    //     handleChangeParameters(updatedClientsList);
 
-        setSelectedClients(updatedClientsList);
-    };
+    //     setSelectedClients(updatedClientsList);
+    // };
 
     const handleStatusChange = (
         statuses: MultiValue<{ value: string; label: string }>

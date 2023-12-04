@@ -19,7 +19,6 @@ import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
 import { EmailReport } from './EmailReport';
 import { Report } from '$app/pages/reports/common/useReports';
-import { useEffect } from 'react';
 
 interface Props {
   report: Report;
