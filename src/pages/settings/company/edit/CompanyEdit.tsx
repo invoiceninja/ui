@@ -9,26 +9,25 @@
  */
 
 import { Button, InputField } from '$app/components/forms';
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { AxiosError } from 'axios';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { CompanyInput } from '$app/common/interfaces/company.interface';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { Modal } from '$app/components/Modal';
-import {
-  FormEvent,
-  useState,
-  SetStateAction,
-  Dispatch,
-  useEffect,
-} from 'react';
+import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { Logo } from '../components';
+import classNames from 'classnames';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { useDispatch } from 'react-redux';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { isEqual } from 'lodash';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   isModalOpen: boolean;
@@ -37,124 +36,86 @@ interface Props {
 
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
 
-  const currentCompany = useCurrentCompany();
+  const company = useCurrentCompany();
+  const companyChanges = useInjectCompanyChanges();
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [companyId, setCompanyId] = useState<string | undefined>();
-
   const [stepIndex, setStepIndex] = useState<number>(0);
 
-  const [company, setCompany] = useState<CompanyInput>({
-    name: '',
-    language_id: '',
-    currency_id: '',
-    subdomain: '',
-  });
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const fetchCompanyDetails = async (company_id: string) => {
-    const response = await request(
-      'GET',
-      endpoint('/api/v1/companies/:id', { id: company_id })
-    );
+  const handleUpdateCompany = (isWizard: boolean) => {
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+      companyChanges
+    )
+      .then((response) => {
+        toast.success('updated_company');
 
-    const companySettings = response?.data?.data?.settings;
+        isWizard
+          ? setStepIndex((current) => current + 1)
+          : props.setIsModalOpen(false);
 
-    const { name, subdomain, language_id, currency_id } = companySettings;
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
+      })
+      .finally(() => setIsFormBusy(false));
+  };
 
-    setCompany({
-      name,
-      subdomain,
-      language_id,
-      currency_id,
+  const handleConnectStripe = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'stripe_connect',
+    }).then((response) => {
+      window
+        .open(
+          route('https://invoicing.co/stripe/signup/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus();
+
+      toast.dismiss();
     });
   };
 
-  const handleChange = (
-    property: keyof CompanyInput,
-    value: CompanyInput[keyof CompanyInput]
-  ) => {
-    setCompany((prevState) => ({
-      ...prevState,
-      [property]: value,
-    }));
-  };
-
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (isWizard: boolean) => {
     if (!isFormBusy) {
-      event?.preventDefault();
+      if (isEqual(company, companyChanges)) {
+        isWizard
+          ? setStepIndex((current) => current + 1)
+          : props.setIsModalOpen(false);
+        return;
+      }
 
       toast.processing();
-
       setErrors(undefined);
-
       setIsFormBusy(true);
 
-      const { name, language_id, subdomain, currency_id } = company;
-
-      request('GET', endpoint('/api/v1/companies/:id', { id: companyId }))
-        .then((response: AxiosResponse) => {
-          const respondedCompany = response.data.data;
-
-          const companySettings = respondedCompany.settings;
-
-          respondedCompany.settings = {
-            ...respondedCompany.settings,
-            name: name ? name : companySettings?.name,
-            subdomain: subdomain ? subdomain : companySettings?.subdomain,
-            language_id: language_id
-              ? language_id
-              : companySettings?.language_id,
-            currency_id: currency_id
-              ? currency_id
-              : companySettings?.currency_id,
-          };
-
-          if (subdomain && isHosted()) {
-            request('POST', endpoint('/api/v1/check_subdomain'), {
-              subdomain: subdomain,
-            }).catch(() => {
-              return;
-            });
-          }
-
-          request(
-            'PUT',
-            endpoint('/api/v1/companies/:id', { id: companyId }),
-            respondedCompany
-          )
-            .then(() => {
-              toast.success('updated_company');
-
-              props.setIsModalOpen(false);
-
-              window.location.href = route('/');
-            })
-            .catch((error: AxiosError<ValidationBag>) => {
-              if (error.response?.status === 422) {
-                setErrors(error.response.data);
-                toast.dismiss();
-              }
-            });
+      if (companyChanges?.subdomain && isHosted()) {
+        request('POST', endpoint('/api/v1/check_subdomain'), {
+          subdomain: companyChanges.subdomain,
         })
-        .finally(() => setIsFormBusy(false));
+          .then(() => handleUpdateCompany(isWizard))
+          .finally(() => setIsFormBusy(false));
+      } else {
+        handleUpdateCompany(isWizard);
+      }
     }
   };
-
-  useEffect(() => {
-    if (currentCompany?.id) {
-      setCompanyId(currentCompany.id);
-    }
-  }, [currentCompany]);
-
-  useEffect(() => {
-    if (companyId) {
-      fetchCompanyDetails(companyId);
-    }
-  }, [companyId]);
 
   return (
     <Modal
@@ -172,30 +133,30 @@ export function CompanyEdit(props: Props) {
           <div className="flex flex-col space-y-4">
             <InputField
               label={t('company_name')}
-              value={company?.name}
-              onValueChange={(value) => handleChange('name', value)}
+              value={companyChanges?.settings?.name}
+              onValueChange={(value) => handleChange('settings.name', value)}
               errorMessage={errors?.errors?.name}
             />
 
             {isHosted() && (
               <InputField
                 label={t('subdomain')}
-                value={company?.subdomain}
+                value={companyChanges?.subdomain}
                 onValueChange={(value) => handleChange('subdomain', value)}
               />
             )}
 
             <LanguageSelector
               label={t('language')}
-              value={company?.language_id}
-              onChange={(v) => handleChange('language_id', v)}
+              value={companyChanges?.settings?.language_id || ''}
+              onChange={(value) => handleChange('settings.language_id', value)}
               errorMessage={errors?.errors?.language_id}
             />
 
             <CurrencySelector
               label={t('currency')}
-              value={company?.currency_id || ''}
-              onChange={(value) => handleChange('currency_id', value)}
+              value={companyChanges?.settings?.currency_id || ''}
+              onChange={(value) => handleChange('settings.currency_id', value)}
             />
           </div>
         )}
@@ -206,26 +167,50 @@ export function CompanyEdit(props: Props) {
           </div>
         )}
 
-        <div className="flex justify-between">
-          <Button
-            behavior="button"
-            type="secondary"
-            onClick={() => props.setIsModalOpen(false)}
-          >
-            {t('skip')}
-          </Button>
+        {stepIndex === 2 && (
+          <div className="flex flex-col space-y-5">
+            <span className="text-lg font-medium">
+              {t('configure_gateways')}
+            </span>
 
-          {stepIndex !== 2 && (
+            <Button behavior="button" onClick={handleConnectStripe}>
+              {t('connect_stripe')}
+            </Button>
+          </div>
+        )}
+
+        <div
+          className={classNames('flex', {
+            'justify-between': stepIndex !== 0,
+            'justify-end': stepIndex === 0,
+          })}
+        >
+          {stepIndex !== 0 && isHosted() && (
             <Button
               behavior="button"
-              onClick={() => setStepIndex((current) => current + 1)}
+              type="secondary"
+              onClick={() => setStepIndex((current) => current - 1)}
             >
-              {t('next')}
+              {t('back')}
             </Button>
           )}
-          {stepIndex === 2 && (
-            <Button behavior="button" onClick={handleSave}>
-              {t('save')}
+
+          {stepIndex !== 2 || isSelfHosted() ? (
+            <Button
+              behavior="button"
+              onClick={() => {
+                stepIndex === 0 && handleSave(isHosted());
+                stepIndex !== 0 && setStepIndex((current) => current + 1);
+              }}
+            >
+              {isHosted() ? t('next') : t('save')}
+            </Button>
+          ) : (
+            <Button
+              behavior="button"
+              onClick={() => props.setIsModalOpen(false)}
+            >
+              {t('done')}
             </Button>
           )}
         </div>

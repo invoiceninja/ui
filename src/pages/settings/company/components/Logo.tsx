@@ -29,7 +29,6 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { InputLabel } from '$app/components/forms';
 
 interface Props {
   isSettingsPage?: boolean;
@@ -160,7 +159,7 @@ export function Logo({ isSettingsPage = true }: Props) {
     </Card>
   ) : (
     <div className="flex flex-col space-y-5">
-      <InputLabel>{t('logo')}</InputLabel>
+      <span className="text-lg font-medium">{t('upload_logo')}</span>
 
       <div className="grid grid-cols-12 gap-x-4">
         <div className="bg-gray-200 col-span-6 rounded-lg p-6">
@@ -172,18 +171,24 @@ export function Logo({ isSettingsPage = true }: Props) {
         </div>
       </div>
 
-      <div
-        {...getRootProps()}
-        className="flex flex-col md:flex-row md:items-center"
-      >
-        <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-          <input {...getInputProps()} />
-          <Image className="mx-auto h-12 w-12 text-gray-400" />
-          <span className="mt-2 block text-sm font-medium">
-            {isDragActive
-              ? 'drop_your_logo_here'
-              : t('dropzone_default_message')}
-          </span>
+      <div className="flex flex-col space-y-3">
+        <div
+          {...getRootProps()}
+          className="flex flex-col md:flex-row md:items-center"
+        >
+          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <input {...getInputProps()} />
+            <Image className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-medium">
+              {isDragActive
+                ? 'drop_your_logo_here'
+                : t('dropzone_default_message')}
+            </span>
+          </div>
+        </div>
+
+        <div className="self-start">
+          <DeleteLogo isSettingsPage={false} />
         </div>
       </div>
     </div>
