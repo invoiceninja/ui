@@ -31,7 +31,7 @@ export const useInvoiceProducts = () => {
         cost: product.price,
         quantity: product.quantity,
         line_total: Number((product.price * product.quantity).toFixed(2)),
-        product_key: product.id,
+        product_key: product.product_key,
         notes: product.notes,
         tax_name1: product.tax_name1,
         tax_rate1: product.tax_rate1,
