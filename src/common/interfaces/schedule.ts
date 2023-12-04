@@ -18,6 +18,10 @@ export interface Parameters {
   clients: string[];
   entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
   entity_id: string;
+  report_name?: string;
+  date_key?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface Schedule {

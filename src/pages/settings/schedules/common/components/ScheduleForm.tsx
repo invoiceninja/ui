@@ -17,6 +17,7 @@ import frequencies from '$app/common/constants/frequency';
 import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
+import { EmailReport } from './EmailReport';
 
 interface Props {
   schedule: Schedule;
@@ -116,9 +117,13 @@ export function ScheduleForm(props: Props) {
         />
       )}
 
-      {/* {schedule.template === Templates.EMAIL_REPORT && (
-
-      )} */}
+      {schedule.template === Templates.EMAIL_REPORT && (
+        <EmailReport
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
     </Card>
   );
 }
