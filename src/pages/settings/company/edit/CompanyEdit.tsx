@@ -21,13 +21,13 @@ import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { Logo } from '../components';
-import classNames from 'classnames';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { isEqual } from 'lodash';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { route } from '$app/common/helpers/route';
+import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
 
 interface Props {
   isModalOpen: boolean;
@@ -164,33 +164,20 @@ export function CompanyEdit(props: Props) {
         {stepIndex === 1 && <Logo isSettingsPage={false} />}
 
         {stepIndex === 2 && (
-          <>
-            <span className="text-lg font-medium">
-              {t('configure_gateways')}
-            </span>
+          <div className="flex flex-col items-center">
+            <GatewayTypeIcon name="stripe" style={{ width: '75%' }} />
 
-            <Button behavior="button" onClick={handleConnectStripe}>
-              {t('connect_stripe')}
-            </Button>
-          </>
-        )}
-
-        <div
-          className={classNames('flex', {
-            'justify-between': stepIndex !== 0,
-            'justify-end': stepIndex === 0,
-          })}
-        >
-          {stepIndex !== 0 && isHosted() && (
             <Button
               behavior="button"
-              type="secondary"
-              onClick={() => setStepIndex((current) => current - 1)}
+              className="w-full"
+              onClick={handleConnectStripe}
             >
-              {t('back')}
+              {t('setup')}
             </Button>
-          )}
+          </div>
+        )}
 
+        <div className="flex justify-end">
           {stepIndex !== 2 || isSelfHosted() ? (
             <Button
               behavior="button"
@@ -199,7 +186,7 @@ export function CompanyEdit(props: Props) {
                 stepIndex !== 0 && setStepIndex((current) => current + 1);
               }}
             >
-              {isHosted() ? t('next') : t('save')}
+              {isHosted() ? t('skip') : t('save')}
             </Button>
           ) : (
             <Button
