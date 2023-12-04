@@ -144,7 +144,7 @@ export function EmailReport(props: Props) {
         }
 
         if(props.report && !schedule.parameters.send_email){
-            console.log("inside props");
+            
             const currentParameters = { ...schedule.parameters };
 
             currentParameters.date_range = report.payload.date_range;
@@ -161,15 +161,10 @@ export function EmailReport(props: Props) {
         }
 
         if(report){
-            console.log("inside report");
             const currentParameters = { ...schedule.parameters };
-
             currentParameters.product_key = report.payload.product_key;  
-
             handleChange('parameters', currentParameters);  
         }
-        console.log(report);
-        console.log(schedule);
 
     }, [clientsResponse, report]);
 
@@ -221,7 +216,7 @@ export function EmailReport(props: Props) {
         </Element>
     )}
 
-    {schedule.parameters.report_name && ([Reports.PRODUCT_SALES, Reports.INVOICE_ITEMS]).includes(schedule.parameters.report_name) &&(
+    {schedule.parameters.report_name && (schedule.parameters.report_name === 'product_sales' || schedule.parameters.report_name === 'invoice_items') && (
         <ProductItemsSelector setReport={setReport} />
     )}
 
