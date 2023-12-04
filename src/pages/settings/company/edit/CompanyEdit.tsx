@@ -161,14 +161,10 @@ export function CompanyEdit(props: Props) {
           </div>
         )}
 
-        {stepIndex === 1 && (
-          <div>
-            <Logo isSettingsPage={false} />
-          </div>
-        )}
+        {stepIndex === 1 && <Logo isSettingsPage={false} />}
 
         {stepIndex === 2 && (
-          <div className="flex flex-col space-y-5">
+          <>
             <span className="text-lg font-medium">
               {t('configure_gateways')}
             </span>
@@ -176,7 +172,7 @@ export function CompanyEdit(props: Props) {
             <Button behavior="button" onClick={handleConnectStripe}>
               {t('connect_stripe')}
             </Button>
-          </div>
+          </>
         )}
 
         <div
