@@ -87,7 +87,7 @@ export function Login() {
       form.setValues({
         email: (document.querySelector('input[name="email"]') as HTMLInputElement)?.value ?? '',
         password: (document.querySelector('input[name="password"]') as HTMLInputElement)?.value ?? '',
-        one_time_password: null,
+        one_time_password: undefined,
       });
     }
   }, []);
