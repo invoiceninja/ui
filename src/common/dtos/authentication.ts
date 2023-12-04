@@ -11,7 +11,7 @@
 export interface LoginForm {
   email: string;
   password: string;
-  one_time_password?: string;
+  one_time_password?: string | undefined;
 }
 
 export interface RegisterForm {
