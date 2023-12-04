@@ -14,7 +14,7 @@ export interface Parameters {
   show_credits_table: boolean;
   show_aging_table: boolean;
   only_clients_with_invoices: boolean;
-  status: string;
+  status?: string;
   clients: string[];
   entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
   entity_id: string;
@@ -22,6 +22,9 @@ export interface Parameters {
   date_key?: string;
   start_date?: string;
   end_date?: string;
+  report_keys?: string[];
+  product_key?: string;
+  send_email?: boolean;
 }
 
 export interface Schedule {

@@ -18,8 +18,11 @@ import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
 import { EmailReport } from './EmailReport';
+import { Report } from '$app/pages/reports/common/useReports';
+import { useEffect } from 'react';
 
 interface Props {
+  report: Report;
   schedule: Schedule;
   handleChange: (
     property: keyof Schedule,
@@ -38,7 +41,7 @@ export enum Templates {
 export function ScheduleForm(props: Props) {
   const [t] = useTranslation();
 
-  const { schedule, handleChange, errors, page } = props;
+  const { report, schedule, handleChange, errors, page } = props;
 
   return (
     <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
@@ -119,6 +122,7 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_REPORT && (
         <EmailReport
+          report={report}
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}

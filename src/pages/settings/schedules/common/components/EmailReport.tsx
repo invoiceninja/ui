@@ -25,6 +25,7 @@ import { ProductItemsSelector } from '$app/pages/reports/common/components/Produ
 import { Report, useReports } from '$app/pages/reports/common/useReports';
 
 interface Props {
+    report?: Report;
     schedule: Schedule;
     handleChange: (
         property: keyof Schedule,
@@ -60,20 +61,16 @@ export enum Reports {
     PRODUCT_SALES = 'product_sales',
 }
 
-interface Props {
-    report?: Report;
-}
-
 export function EmailReport(props: Props) {
     const [t] = useTranslation();
-    const accentColor = useAccentColor();
-    const reports = useReports();
 
-    const [report, setReport] = useState<Report | undefined>(props.report ?? undefined);
+    const reports = useReports();
 
     const parametersAtom = useAtomValue(scheduleParametersAtom);
 
     const { schedule, handleChange, errors, page } = props;
+
+    const [report, setReport] = useState<Report>(props.report ?? reports[1]);
 
     const { data: clientsResponse } = useClientsQuery({
         enabled: page === 'edit' || Boolean(parametersAtom),
@@ -146,7 +143,35 @@ export function EmailReport(props: Props) {
             setSelectedClients(clients);
         }
 
-    }, [clientsResponse]);
+        if(props.report && !schedule.parameters.send_email){
+            console.log("inside props");
+            const currentParameters = { ...schedule.parameters };
+
+            currentParameters.date_range = report.payload.date_range;
+            currentParameters.end_date = report.payload.end_date;
+            currentParameters.start_date = report.payload.start_date;
+            currentParameters.report_keys = report.payload.report_keys;
+            currentParameters.status = report.payload.status;
+            currentParameters.report_name = report.identifier;  
+            currentParameters.send_email = true;
+            currentParameters.date_key = report.payload.date_key;  
+
+            handleChange('parameters', currentParameters);  
+
+        }
+
+        if(report){
+            console.log("inside report");
+            const currentParameters = { ...schedule.parameters };
+
+            currentParameters.product_key = report.payload.product_key;  
+
+            handleChange('parameters', currentParameters);  
+        }
+        console.log(report);
+        console.log(schedule);
+
+    }, [clientsResponse, report]);
 
     return (
     <>
@@ -196,7 +221,7 @@ export function EmailReport(props: Props) {
         </Element>
     )}
 
-    {schedule.parameters.report_name && (['product_sales', 'invoice_item']).includes(schedule.parameters.report_name) &&(
+    {schedule.parameters.report_name && ([Reports.PRODUCT_SALES, Reports.INVOICE_ITEMS]).includes(schedule.parameters.report_name) &&(
         <ProductItemsSelector setReport={setReport} />
     )}
 
