@@ -22,6 +22,9 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import Toggle from '$app/components/forms/Toggle';
 import { MdClose } from 'react-icons/md';
 import { BankAccountSelector } from '$app/pages/transactions/components/BankAccountSelector';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
+import { Alert } from '../Alert';
 
 interface Props {
   entity: string;
@@ -56,6 +59,7 @@ export function UploadImport(props: Props) {
     skip_header: true,
     column_map: { [props.entity]: { mapping: {} } },
   });
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     payload.column_map[props.entity].mapping[event.target.id] =
@@ -129,9 +133,10 @@ export function UploadImport(props: Props) {
     initialValues: {},
     onSubmit: () => {
       toast.processing();
+      setErrors(undefined);
 
-      request('POST', endpoint('/api/v1/preimport'), formData).then(
-        (response) => {
+      request('POST', endpoint('/api/v1/preimport'), formData)
+        .then((response) => {
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();
@@ -145,8 +150,13 @@ export function UploadImport(props: Props) {
               }
             );
           }
-        }
-      );
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        });
     },
   });
 
@@ -221,19 +231,28 @@ export function UploadImport(props: Props) {
           leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
         >
           {!files.length ? (
-            <div
-              {...getRootProps()}
-              className="flex flex-col md:flex-row md:items-center"
-            >
-              <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <input {...getInputProps()} />
-                <Image className="mx-auto h-12 w-12 text-gray-400" />
-                <span className="mt-2 block text-sm font-medium text-gray-900">
-                  {isDragActive
-                    ? t('drop_file_here')
-                    : t('dropzone_default_message')}
-                </span>
+            <div className="flex flex-col space-y-4">
+              <div
+                {...getRootProps()}
+                className="flex flex-col md:flex-row md:items-center"
+              >
+                <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  <input {...getInputProps()} />
+                  <Image className="mx-auto h-12 w-12 text-gray-400" />
+                  <span className="mt-2 block text-sm font-medium text-gray-900">
+                    {isDragActive
+                      ? t('drop_file_here')
+                      : t('dropzone_default_message')}
+                  </span>
+                </div>
               </div>
+
+              {errors &&
+                Object.keys(errors.errors).map((key, index) => (
+                  <Alert key={index} type="danger">
+                    {errors.errors[key]}
+                  </Alert>
+                ))}
             </div>
           ) : (
             <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
