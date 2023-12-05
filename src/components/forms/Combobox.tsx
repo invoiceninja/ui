@@ -243,6 +243,10 @@ export function Combobox<T = any>({
     setIsOpen(false);
 
     if (selectedOption && selectedOption.value) {
+      if (inputValue !== selectedOption.label) {
+        setInputValue(selectedOption.label.toString());
+      }
+
       return;
     }
 
@@ -262,6 +266,8 @@ export function Combobox<T = any>({
     handleOptionClick(option);
     onChange(option);
   });
+
+  console.log(selectedOption);
 
   useDebounce(
     () => {
@@ -311,9 +317,7 @@ export function Combobox<T = any>({
             onFocus={() => setIsOpen(true)}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
-            defaultValue={
-              selectedOption ? selectedOption.label : inputValue?.toString()
-            }
+            value={inputValue}
             className="w-full border-0 rounded py-1.5 pl-3 pr-10 shadow-sm sm:text-sm sm:leading-6"
             ref={inputRef}
             style={{
