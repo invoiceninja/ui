@@ -267,8 +267,6 @@ export function Combobox<T = any>({
     onChange(option);
   });
 
-  console.log(selectedOption);
-
   useDebounce(
     () => {
       if (inputValue === '' && filteredOptions.length > 0) {
