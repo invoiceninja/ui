@@ -24,12 +24,12 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { AxiosError } from 'axios';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
-import { ScheduleForm } from '../common/components/ScheduleForm';
+import { ScheduleForm, Templates } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
@@ -60,6 +60,8 @@ export function Create() {
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
   const formatSchedulePayload = useFormatSchedulePayload();
+
+  const parametersAtomValue = useAtomValue(scheduleParametersAtom);
 
   useEffect(() => {
     if (blankSchedule) {
@@ -106,7 +108,18 @@ export function Create() {
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
+      let formattedSchedule = formatSchedulePayload(schedule);
+      
+      console.log(schedule);      
+      
+      if (schedule?.template === Templates.EMAIL_REPORT) {
+
+        console.log(parametersAtomValue);
+        formattedSchedule = { ...formattedSchedule, parameters: parametersAtomValue };
+        
+      }
+      
+      console.log(formattedSchedule);
 
       request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
         .then((response: GenericSingleResourceResponse<Schedule>) => {

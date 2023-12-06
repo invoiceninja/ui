@@ -15,6 +15,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { Report } from '../useReports';
+import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
+import { useAtom } from 'jotai';
 
 interface Props {
   setReport: Dispatch<SetStateAction<Report>>;
@@ -27,6 +29,8 @@ export function ProductItemsSelector(props: Props) {
   const [productItems, setProductItems] = useState<SelectOption[]>([]);
 
   const { data: products } = useProductsQuery();
+
+  const [parametersAtom, setParametersAtom] = useAtom(scheduleParametersAtom);
 
   useEffect(() => {
     if (products) {
@@ -52,6 +56,9 @@ export function ProductItemsSelector(props: Props) {
       ...current,
       payload: { ...current.payload, product_key: values.join(',') },
     }));
+
+    setParametersAtom((current) => current && { ...current, product_key: values.join(',') });
+
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {

@@ -21,7 +21,7 @@ import { EmailReport } from './EmailReport';
 import { Report } from '$app/pages/reports/common/useReports';
 
 interface Props {
-  report: Report;
+  report?: Report;
   schedule: Schedule;
   handleChange: (
     property: keyof Schedule,

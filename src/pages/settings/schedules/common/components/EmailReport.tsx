@@ -13,7 +13,7 @@ import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { SelectField } from '$app/components/forms';
-import { atom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from '$app/components/cards';
@@ -37,6 +37,7 @@ interface Props {
 export const scheduleParametersAtom = atom<Parameters | undefined>(undefined);
 
 export enum Reports {
+    ACTIVITIES = 'activities',
     CLIENTS = 'clients',
     CLIENT_CONTACTS = 'client_contacts',
     INVOICES = 'invoices',
@@ -66,6 +67,8 @@ export function EmailReport(props: Props) {
     const reports = useReports();
 
     const parametersAtom = useAtomValue(scheduleParametersAtom);
+
+    const [parameters, setParameters] = useAtom(scheduleParametersAtom);
 
     const { schedule, handleChange, errors, page } = props;
 
@@ -155,14 +158,19 @@ export function EmailReport(props: Props) {
             currentParameters.send_email = true;
             currentParameters.date_key = report.payload.date_key;  
 
-            handleChange('parameters', currentParameters);  
+            // handleChange('parameters', currentParameters);  
+            setParameters(currentParameters);
 
         }
 
         if(report){
             const currentParameters = { ...schedule.parameters };
             currentParameters.product_key = report.payload.product_key;  
-            handleChange('parameters', currentParameters);  
+            // handleChange('parameters', currentParameters);  
+            setParameters(currentParameters);
+
+            console.log('updating parameters');
+
         }
 
     }, [clientsResponse, report]);
