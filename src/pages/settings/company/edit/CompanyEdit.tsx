@@ -186,7 +186,7 @@ export function CompanyEdit(props: Props) {
                 stepIndex !== 0 && setStepIndex((current) => current + 1);
               }}
             >
-              {isHosted() ? t('skip') : t('save')}
+              {isHosted() ? t('next') : t('save')}
             </Button>
           ) : (
             <Button
