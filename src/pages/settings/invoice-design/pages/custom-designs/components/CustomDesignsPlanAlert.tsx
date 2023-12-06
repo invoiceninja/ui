@@ -14,7 +14,6 @@ import { MdInfoOutline } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { isHosted } from '$app/common/helpers';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
@@ -25,7 +24,7 @@ export function CustomDesignsPlanAlert() {
 
   return (
     <>
-      {isHosted() && !proPlan() && !enterprisePlan() && (
+      {!proPlan() && !enterprisePlan() && (
         <Alert className="mb-4" type="warning" disableClosing>
           <div className="flex items-center justify-between">
             <p className="inline-flex items-center space-x-1">

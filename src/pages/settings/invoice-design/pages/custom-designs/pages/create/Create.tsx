@@ -11,7 +11,7 @@
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -76,7 +76,7 @@ export default function Create() {
             }
           });
       },
-      disableSaveButton: isHosted() && !proPlan() && !enterprisePlan(),
+      disableSaveButton: !proPlan() && !enterprisePlan(),
     },
     [design]
   );

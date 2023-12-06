@@ -10,7 +10,6 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { isHosted } from '$app/common/helpers';
 import { DataTable } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
@@ -40,7 +39,7 @@ export default function CustomDesigns() {
         bulkRoute="/api/v1/designs/bulk"
         linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
         withResourcefulActions
-        hideEditableOptions={isHosted() && !proPlan() && !enterprisePlan()}
+        hideEditableOptions={!proPlan() && !enterprisePlan()}
       />
     </>
   );
