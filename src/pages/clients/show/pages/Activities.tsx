@@ -18,7 +18,6 @@ import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import React from 'react';
 import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { AxiosResponse } from 'axios';
-import { data } from 'tailwindcss/defaultTheme';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 
 export default function Activities() {
