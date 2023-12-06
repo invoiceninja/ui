@@ -9,7 +9,9 @@
  */
 
 import { DesignSelector } from '$app/common/generic/DesignSelector';
-import { endpoint } from '$app/common/helpers';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,6 +28,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { CustomDesignsPlanAlert } from '../../components/CustomDesignsPlanAlert';
 
 export default function Create() {
   const { t } = useTranslation();
@@ -73,12 +76,15 @@ export default function Create() {
             }
           });
       },
+      disableSaveButton: isHosted() && !proPlan() && !enterprisePlan(),
     },
     [design]
   );
 
   return (
     <Container>
+      <CustomDesignsPlanAlert />
+
       <Card title={t('new_design')}>
         <Element leftSide={t('name')}>
           <InputField

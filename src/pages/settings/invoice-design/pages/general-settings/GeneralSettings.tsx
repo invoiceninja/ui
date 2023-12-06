@@ -25,7 +25,7 @@ import { TotalFields } from './components/TotalFields';
 import { VendorDetails } from './components/VendorDetails';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { useAtom } from 'jotai';
@@ -33,6 +33,8 @@ import { updatingRecordsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -96,22 +98,24 @@ export default function GeneralSettings() {
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
           <InvoiceGeneralSettings />
 
-          {isCompanySettingsActive && (
-            <>
-              <ClientDetails />
-              <CompanyDetails />
-              <CompanyAddress />
-              <InvoiceDetails />
-              <QuoteDetails />
-              <CreditDetails />
-              <VendorDetails />
-              <PurchaseOrderDetails />
-              <ProductColumns />
-              <ProductQuoteColumns />
-              <TaskColumns />
-              <TotalFields />
-            </>
-          )}
+          {isCompanySettingsActive &&
+            ((isHosted() && (proPlan() || enterprisePlan())) ||
+              isSelfHosted()) && (
+              <>
+                <ClientDetails />
+                <CompanyDetails />
+                <CompanyAddress />
+                <InvoiceDetails />
+                <QuoteDetails />
+                <CreditDetails />
+                <VendorDetails />
+                <PurchaseOrderDetails />
+                <ProductColumns />
+                <ProductQuoteColumns />
+                <TaskColumns />
+                <TotalFields />
+              </>
+            )}
         </div>
       </div>
 
