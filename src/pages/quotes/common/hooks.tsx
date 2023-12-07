@@ -228,8 +228,6 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Quote>) => {
         toast.success('created_quote');
 
-        $refetch(['quotes']);
-
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {

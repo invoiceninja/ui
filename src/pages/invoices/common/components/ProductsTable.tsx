@@ -180,8 +180,6 @@ export function ProductsTable(props: Props) {
                 <Fragment />
               )}
 
-              {provided.placeholder}
-
               {resource?.[relationType] ? (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
@@ -192,11 +190,7 @@ export function ProductsTable(props: Props) {
                       className="w-full py-2 inline-flex justify-center items-center space-x-2"
                     >
                       <Plus size={18} />
-                      <span>
-                        {props.type === 'product'
-                          ? t('add_item')
-                          : t('add_line')}
-                      </span>
+                      <span>{ props.type === 'product' ? t('add_item') : t('add_line')}</span>
                     </button>
                   </Td>
                 </Tr>
@@ -216,6 +210,8 @@ export function ProductsTable(props: Props) {
               ) : (
                 <Fragment />
               )}
+
+              {provided.placeholder}
             </Tbody>
           )}
         </Droppable>

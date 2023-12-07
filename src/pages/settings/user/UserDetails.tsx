@@ -104,8 +104,6 @@ export function UserDetails() {
       .then((response) => {
         toast.success('updated_settings');
 
-        $refetch(['users']);
-
         if (hasLanguageChanged) {
           $refetch(['statics']);
           setHasLanguageIdChanged(false);

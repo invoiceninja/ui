@@ -28,7 +28,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const [t] = useTranslation();
@@ -69,8 +68,6 @@ export function Create() {
       })
         .then((response: GenericSingleResourceResponse<ApiToken>) => {
           toast.success('created_token');
-
-          $refetch(['tokens']);
 
           navigate(
             route('/settings/integrations/api_tokens/:id/edit', {

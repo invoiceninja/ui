@@ -225,25 +225,18 @@ export function useActions(params?: Params) {
     () => Boolean(showEditAction) && dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'email_invoice') && (
-        <EmailInvoiceAction
-          {...(!dropdown && {
-            key: 'email_invoice',
-          })}
-          invoice={invoice}
-          dropdown={dropdown}
-        />
+        <EmailInvoiceAction invoice={invoice} dropdown={dropdown} />
       ),
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'view_pdf') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('view_pdf'),
-            key: 'view_pdf',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           to={route('/invoices/:id/pdf', { id: invoice.id })}
           icon={
-            <Icon element={MdPictureAsPdf} {...(!dropdown && { size: 23.5 })} />
+            <Icon
+              element={MdPictureAsPdf}
+              {...(!dropdown && { color: 'white' })}
+            />
           }
         >
           {t('view_pdf')}
@@ -253,13 +246,11 @@ export function useActions(params?: Params) {
       getEntityState(invoice) !== EntityState.Deleted &&
       showActionByPreferences('invoice', 'print_pdf') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('print_pdf'),
-            key: 'print_pdf',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => printPdf([invoice.id])}
-          icon={<Icon element={MdPrint} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdPrint} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('print_pdf')}
         </DropdownElement>
@@ -269,14 +260,10 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'schedule') &&
       (isAdmin || isOwner) && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('schedule'),
-            key: 'schedule',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => scheduleEmailRecord(invoice.id)}
           icon={
-            <Icon element={MdSchedule} {...(!dropdown && { size: 23.5 })} />
+            <Icon element={MdSchedule} {...(!dropdown && { color: 'white' })} />
           }
         >
           {t('schedule')}
@@ -285,14 +272,13 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'delivery_note') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: `${t('delivery_note')} ${t('pdf')}`,
-            key: 'delivery_note',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
           icon={
-            <Icon element={MdPictureAsPdf} {...(!dropdown && { size: 23.5 })} />
+            <Icon
+              element={MdPictureAsPdf}
+              {...(!dropdown && { color: 'white' })}
+            />
           }
         >
           {t('delivery_note')} ({t('pdf')})
@@ -301,14 +287,10 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'download') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('download'),
-            key: 'download',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => downloadPdf(invoice)}
           icon={
-            <Icon element={MdDownload} {...(!dropdown && { size: 23.5 })} />
+            <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
           }
         >
           {t('download')}
@@ -319,16 +301,12 @@ export function useActions(params?: Params) {
       !invoice.is_deleted &&
       showActionByPreferences('invoice', 'mark_sent') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('mark_sent'),
-            key: 'mark_sent',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={
             <Icon
               element={MdMarkEmailRead}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -340,13 +318,11 @@ export function useActions(params?: Params) {
       !invoice.is_deleted &&
       showActionByPreferences('invoice', 'mark_paid') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('mark_paid'),
-            key: 'mark_paid',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'mark_paid')}
-          icon={<Icon element={MdPaid} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdPaid} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('mark_paid')}
         </DropdownElement>
@@ -355,13 +331,11 @@ export function useActions(params?: Params) {
       isInvoiceAutoBillable(invoice) &&
       showActionByPreferences('invoice', 'auto_bill') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('auto_bill'),
-            key: 'auto_bill',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'auto_bill')}
-          icon={<Icon element={BiMoney} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={BiMoney} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('auto_bill')}
         </DropdownElement>
@@ -371,17 +345,16 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'enter_payment') &&
       hasPermission('create_payment') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('enter_payment'),
-            key: 'enter_payment',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
             invoiceId: invoice.id,
             clientId: invoice.client_id,
           })}
           icon={
-            <Icon element={BiPlusCircle} {...(!dropdown && { size: 23.5 })} />
+            <Icon
+              element={BiPlusCircle}
+              {...(!dropdown && { color: 'white' })}
+            />
           }
         >
           {t('enter_payment')}
@@ -390,14 +363,13 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'client_portal') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('client_portal'),
-            key: 'client_portal',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => invoice && openClientPortal(invoice)}
           icon={
-            <Icon element={MdCloudCircle} {...(!dropdown && { size: 23.5 })} />
+            <Icon
+              element={MdCloudCircle}
+              {...(!dropdown && { color: 'white' })}
+            />
           }
         >
           {t('client_portal')}
@@ -408,13 +380,11 @@ export function useActions(params?: Params) {
         invoice.status_id === InvoiceStatus.Partial) &&
       showActionByPreferences('invoice', 'cancel_invoice') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('cancel_invoice'),
-            key: 'cancel_invoice',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'cancel')}
-          icon={<Icon element={MdCancel} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdCancel} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('cancel_invoice')}
         </DropdownElement>
@@ -427,13 +397,11 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'reverse') &&
       hasPermission('create_credit') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('reverse'),
-            key: 'reverse',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => reverseInvoice(invoice)}
-          icon={<Icon element={MdRefresh} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdRefresh} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('reverse')}
         </DropdownElement>
@@ -443,16 +411,12 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'clone') &&
       hasPermission('create_invoice') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone'),
-            key: 'clone',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToInvoice(invoice)}
           icon={
             <Icon
               element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -463,16 +427,12 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'clone_to_quote') &&
       hasPermission('create_quote') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_quote'),
-            key: 'clone_to_quote',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToQuote(invoice)}
           icon={
             <Icon
               element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -483,16 +443,12 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'clone_to_credit') &&
       hasPermission('create_credit') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_credit'),
-            key: 'clone_to_credit',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToCredit(invoice)}
           icon={
             <Icon
               element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -503,16 +459,12 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'clone_to_recurring') &&
       hasPermission('create_recurring_invoice') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_recurring'),
-            key: 'clone_to_recurring',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToRecurringInvoice(invoice)}
           icon={
             <Icon
               element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -523,16 +475,12 @@ export function useActions(params?: Params) {
       showActionByPreferences('invoice', 'clone_to_purchase_order') &&
       hasPermission('create_purchase_order') && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_purchase_order'),
-            key: 'clone_to_purchase_order',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => cloneToPurchaseOrder(invoice)}
           icon={
             <Icon
               element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
+              {...(!dropdown && { color: 'white' })}
             />
           }
         >
@@ -547,13 +495,11 @@ export function useActions(params?: Params) {
       invoice.archived_at === 0 &&
       (showActionByPreferences('invoice', 'archive') || dropdown) && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('archive'),
-            key: 'archive',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'archive')}
-          icon={<Icon element={MdArchive} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdArchive} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('archive')}
         </DropdownElement>
@@ -564,13 +510,11 @@ export function useActions(params?: Params) {
       invoice.status_id !== InvoiceStatus.Cancelled &&
       (showActionByPreferences('invoice', 'restore') || dropdown) && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('restore'),
-            key: 'restore',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'restore')}
-          icon={<Icon element={MdRestore} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdRestore} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('restore')}
         </DropdownElement>
@@ -580,13 +524,11 @@ export function useActions(params?: Params) {
       !invoice.is_deleted &&
       (showActionByPreferences('invoice', 'delete') || dropdown) && (
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('delete'),
-            key: 'delete',
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           onClick={() => bulk([invoice.id], 'delete')}
-          icon={<Icon element={MdDelete} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdDelete} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('delete')}
         </DropdownElement>

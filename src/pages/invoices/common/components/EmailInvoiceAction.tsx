@@ -44,16 +44,15 @@ export function EmailInvoiceAction(props: Props) {
         }
       >
         <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('email_invoice'),
-          })}
+          {...(!dropdown && { behavior: 'button' })}
           {...(hasClientEmailContacts(invoice.client) && {
             to: route('/invoices/:id/email', {
               id: invoice.id,
             }),
           })}
-          icon={<Icon element={MdSend} {...(!dropdown && { size: 23.5 })} />}
+          icon={
+            <Icon element={MdSend} {...(!dropdown && { color: 'white' })} />
+          }
         >
           {t('email_invoice')}
         </DropdownElement>

@@ -32,7 +32,6 @@ import { useHandleChange } from '../common/hooks';
 import { cloneDeep } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import dayjs from 'dayjs';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -109,8 +108,6 @@ export default function Create() {
     request('POST', endpoint('/api/v1/expenses'), expense)
       .then((response: GenericSingleResourceResponse<Expense>) => {
         toast.success('created_expense');
-
-        $refetch(['expenses']);
 
         navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
       })

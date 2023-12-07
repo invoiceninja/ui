@@ -22,7 +22,6 @@ import {
 } from '$app/pages/authentication/components/SignInProviders';
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Connect() {
   const [t] = useTranslation();
@@ -50,8 +49,6 @@ export function Connect() {
       endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
       {}
     ).then((response) => {
-      $refetch(['users']);
-
       toast.success(response.data.message);
       window.location.reload();
     });
@@ -66,8 +63,6 @@ export function Connect() {
       'POST',
       endpoint('/api/v1/users/:id/disconnect_oauth', { id: user!.id })
     ).then((response) => {
-      $refetch(['users']);
-
       toast.success(response.data.message);
       window.location.reload();
     });

@@ -181,7 +181,6 @@ export default function Reports() {
     request('POST', endpoint(report.endpoint), updatedPayload, {})
       .then((response) => {
         if (report.payload.send_email) {
-          setIsPendingExport(false);
           return toast.success();
         }
 

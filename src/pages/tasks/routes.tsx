@@ -16,7 +16,6 @@ import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
-import Import from './import/Import';
 
 const Tasks = lazy(() => import('$app/pages/tasks/index/Tasks'));
 const Kanban = lazy(() => import('$app/pages/tasks/kanban/Kanban'));
@@ -41,7 +40,6 @@ export const taskRoutes = (
         />
       }
     />
-    
     <Route
       path="kanban"
       element={
@@ -76,18 +74,6 @@ export const taskRoutes = (
             ),
           ]}
           component={<Edit />}
-        />
-      }
-    />
-    <Route
-      path="import"
-      element={
-        <Guard
-          guards={[
-            enabled(ModuleBitmask.Tasks),
-            or(permission('create_task'), permission('edit_task')),
-          ]}
-          component={<Import />}
         />
       }
     />

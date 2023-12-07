@@ -42,7 +42,8 @@ import {
   Thead,
   Tr,
 } from './tables';
-import { useSetAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -50,12 +51,9 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
+import collect from 'collect.js';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { refetchByUrl } from '$app/common/hooks/useRefetch';
-import { useLocation } from 'react-router-dom';
-import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
-import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
-import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -121,14 +119,12 @@ interface Props<T> extends CommonProps {
   hideEditableOptions?: boolean;
 }
 
-export type ResourceAction<T> = (resource: T) => ReactElement;
+type ResourceAction<T> = (resource: T) => ReactElement;
 
-export type PerPage = '10' | '50' | '100';
+export const datatablePerPageAtom = atomWithStorage('perPage', '100');
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
-  const location = useLocation();
-  const options = useDataTableOptions();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -137,9 +133,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
-  const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
-
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
+  setInvalidationQueryAtom(apiEndpoint.pathname);
 
   const {
     styleOptions,
@@ -148,17 +143,11 @@ export function DataTable<T extends object>(props: Props<T>) {
     hideEditableOptions = false,
   } = props;
 
-  const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
-
   const [filter, setFilter] = useState<string>('');
-  const [customFilter, setCustomFilter] = useState<string[] | undefined>(
-    undefined
-  );
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [perPage, setPerPage] = useState<PerPage>(
-    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
-  );
-  const [sort, setSort] = useState<string>(
+  const [customFilter, setCustomFilter] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
+  const [sort, setSort] = useState(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
@@ -166,58 +155,49 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
-  const [isInitialConfiguration, setIsInitialConfiguration] =
-    useState<boolean>(true);
-
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
-  const { handleUpdateTableFilters } = useDataTablePreferences({
-    apiEndpoint,
-    isInitialConfiguration,
-    customFilter,
-    setCurrentPage,
-    setCustomFilter,
-    setFilter,
-    setPerPage,
-    setSort,
-    setSortedBy,
-    setStatus,
-    tableKey,
-    customFilters,
-  });
+  const handleChangingCustomFilters = () => {
+    if (customFilters) {
+      const queryKeys: string[] = collect(props.customFilters)
+        .pluck('queryKey')
+        .unique()
+        .toArray();
 
-  const {
-    defaultOptions,
-    defaultCustomFilterOptions,
-    handleChangingCustomFilters,
-  } = useDataTableUtilities({
-    apiEndpoint,
-    isInitialConfiguration,
-    tableKey,
-    customFilter,
-    customFilters,
-  });
+      queryKeys.forEach((queryKey) => {
+        const currentQueryKey = queryKey || 'client_status';
+        const selectedFiltersByKey: string[] = [];
+
+        customFilters.forEach((filter, index) => {
+          const customFilterQueryKey = filter.queryKey || null;
+
+          if (
+            customFilterQueryKey === queryKey &&
+            customFilter.includes(filter.value)
+          ) {
+            selectedFiltersByKey.push(filter.value);
+          }
+
+          if (index === customFilters.length - 1) {
+            apiEndpoint.searchParams.set(
+              currentQueryKey,
+              selectedFiltersByKey.join(',')
+            );
+          }
+        });
+      });
+    }
+  };
 
   useEffect(() => {
-    if (!isInitialConfiguration) {
-      clearTimeout(companyUpdateTimeOut.current);
+    const perPageParameter = apiEndpoint.searchParams.get('perPage');
 
-      const currentTimeout = setTimeout(
-        () =>
-          handleUpdateTableFilters(
-            filter,
-            sortedBy,
-            sort,
-            currentPage,
-            status,
-            perPage
-          ),
-        1500
-      );
-
-      companyUpdateTimeOut.current = currentTimeout;
+    if (perPageParameter) {
+      setPerPage(perPageParameter);
     }
+  }, []);
 
+  useEffect(() => {
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
@@ -228,8 +208,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
-
-    isInitialConfiguration && setIsInitialConfiguration(false);
 
     return () => {
       isProduction() && setInvalidationQueryAtom(undefined);
@@ -249,9 +227,30 @@ export function DataTable<T extends object>(props: Props<T>) {
     ],
     () => request('GET', apiEndpoint.href),
     {
-      staleTime: props.staleTime ?? Infinity,
+      staleTime: props.staleTime || 5000,
     }
   );
+
+  const options: SelectOption[] = [
+    {
+      value: 'active',
+      label: t('active'),
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      value: 'archived',
+      label: t('archived'),
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+    {
+      value: 'deleted',
+      label: t('deleted'),
+      color: 'white',
+      backgroundColor: '#c95f53',
+    },
+  ];
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(
@@ -312,10 +311,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   useEffect(() => {
-    setInvalidationQueryAtom(apiEndpoint.pathname);
-  }, [apiEndpoint.pathname]);
-
-  useEffect(() => {
     if (data) {
       const filteredSelectedResources = data.data.data.filter((resource: any) =>
         selected.includes(resource.id)
@@ -325,22 +320,14 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   }, [selected]);
 
-  useEffect(() => {
-    if (data && !data.data.data.length) {
-      setCurrentPage(1);
-    }
-  }, [data]);
-
   return (
     <div data-cy="dataTable">
       {!props.withoutActions && (
         <Actions
-          filter={filter}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}
-          defaultOptions={defaultOptions}
-          defaultCustomFilterOptions={defaultCustomFilterOptions}
+          defaultOption={options[0]}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
@@ -669,7 +656,6 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       {data && !props.withoutPagination && (
         <Pagination
-          currentPerPage={perPage}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
