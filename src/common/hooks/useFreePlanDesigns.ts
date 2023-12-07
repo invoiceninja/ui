@@ -9,22 +9,5 @@
  */
 
 export function useFreePlanDesigns() {
-  return [
-    {
-      id: 'VolejRejNm',
-      name: 'Plain',
-    },
-    {
-      id: 'Wpmbk5ezJn',
-      name: 'Clean',
-    },
-    {
-      id: 'Opnel5aKBz',
-      name: 'Bold',
-    },
-    {
-      id: 'wMvbmOeYAl',
-      name: 'Modern',
-    },
-  ];
+  return ['Plain', 'Clean', 'Bold', 'Modern'];
 }

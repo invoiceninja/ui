@@ -33,7 +33,7 @@ export function useDesignsQuery() {
       ).then((response: AxiosResponse<GenericManyResponse<Design>>) =>
         response.data.data.filter(
           (design) =>
-            freePlanDesigns.find(({ id }) => id === design.id) ||
+            freePlanDesigns.includes(design.name) ||
             proPlan() ||
             enterprisePlan()
         )

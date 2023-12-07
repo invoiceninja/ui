@@ -54,6 +54,7 @@ export interface ComboboxStaticProps<T = any> {
   initiallyVisible?: boolean;
   exclude?: (string | number | boolean)[];
   includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
@@ -91,6 +92,7 @@ export function Combobox<T = any>({
   initiallyVisible = false,
   exclude = [],
   includeOnly = [],
+  includeByLabel,
   action,
   onChange,
   onDismiss,
@@ -127,7 +129,9 @@ export function Combobox<T = any>({
   );
 
   filteredOptions = filteredOptions.filter((entry) =>
-    includeOnly.length > 0 ? includeOnly.includes(entry.value) : true
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
   );
 
   useEffect(() => {
@@ -430,6 +434,7 @@ export function ComboboxStatic<T = any>({
   initiallyVisible = false,
   exclude = [],
   includeOnly = [],
+  includeByLabel,
   action,
   onEmptyValues,
   onChange,
@@ -461,7 +466,9 @@ export function ComboboxStatic<T = any>({
   );
 
   filteredValues = filteredValues.filter((entry) =>
-    includeOnly.length > 0 ? includeOnly.includes(entry.value) : true
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
   );
 
   const comboboxRef = useRef<HTMLDivElement>(null);
@@ -743,6 +750,7 @@ export interface ComboboxAsyncProps<T> {
   sortBy?: string | null;
   exclude?: (string | number | boolean)[];
   includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
@@ -762,6 +770,7 @@ export function ComboboxAsync<T = any>({
   sortBy = 'created_at|desc',
   exclude,
   includeOnly,
+  includeByLabel,
   action,
   nullable,
   onChange,
@@ -900,6 +909,7 @@ export function ComboboxAsync<T = any>({
         initiallyVisible={initiallyVisible}
         exclude={exclude}
         includeOnly={includeOnly}
+        includeByLabel={includeByLabel}
         action={action}
         nullable={nullable}
         entryOptions={entryOptions}
@@ -919,6 +929,7 @@ export function ComboboxAsync<T = any>({
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
       includeOnly={includeOnly}
+      includeByLabel={includeByLabel}
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}

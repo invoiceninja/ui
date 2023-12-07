@@ -157,7 +157,8 @@ export function DesignSelector(props: Props) {
         errorMessage={props.errorMessage}
         {...(!proPlan() &&
           !enterprisePlan() && {
-            includeOnly: freePlanDesigns.map(({ id }) => id),
+            includeOnly: freePlanDesigns,
+            includeByLabel: true,
           })}
       />
     </>

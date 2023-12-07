@@ -98,20 +98,25 @@ export default function GeneralSettings() {
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
           <InvoiceGeneralSettings />
 
-          {isCompanySettingsActive && (proPlan() || enterprisePlan()) && (
+          {isCompanySettingsActive && (
             <>
               <ClientDetails />
-              <CompanyDetails />
-              <CompanyAddress />
-              <InvoiceDetails />
-              <QuoteDetails />
-              <CreditDetails />
-              <VendorDetails />
-              <PurchaseOrderDetails />
-              <ProductColumns />
-              <ProductQuoteColumns />
-              <TaskColumns />
-              <TotalFields />
+
+              {(proPlan() || enterprisePlan()) && (
+                <>
+                  <CompanyDetails />
+                  <CompanyAddress />
+                  <InvoiceDetails />
+                  <QuoteDetails />
+                  <CreditDetails />
+                  <VendorDetails />
+                  <PurchaseOrderDetails />
+                  <ProductColumns />
+                  <ProductQuoteColumns />
+                  <TaskColumns />
+                  <TotalFields />
+                </>
+              )}
             </>
           )}
         </div>
