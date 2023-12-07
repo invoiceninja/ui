@@ -19,8 +19,10 @@ import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
 import { useRefetch } from '../hooks/useRefetch';
 
 export function useUsersQuery() {
-  return useQuery('/api/v1/users', () =>
-    request('GET', endpoint('/api/v1/users'))
+  return useQuery(
+    ['/api/v1/users'],
+    () => request('GET', endpoint('/api/v1/users')),
+    { staleTime: Infinity }
   );
 }
 

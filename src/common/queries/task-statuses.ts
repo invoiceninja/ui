@@ -49,7 +49,8 @@ export function useTaskStatusesQuery(params?: Params) {
         endpoint('/api/v1/task_statuses?status=:status', {
           status: params?.status || 'all',
         })
-      ).then((response) => response.data)
+      ).then((response) => response.data),
+    { staleTime: Infinity }
   );
 }
 

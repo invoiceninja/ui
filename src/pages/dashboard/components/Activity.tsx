@@ -25,7 +25,7 @@ export function Activity() {
   const { data, isLoading, isError } = useQuery(
     ['/api/v1/activities'],
     () => request('GET', endpoint('/api/v1/activities?reactv2')),
-    { staleTime: 60 }
+    { staleTime: 300000 }
   );
 
   const activityElement = useGenerateActivityElement();
