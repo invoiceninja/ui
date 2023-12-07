@@ -9,6 +9,7 @@
  */
 
 import { Number } from '$app/common/helpers/number';
+import { isNaN } from 'lodash';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { useResolveCountry } from '../useResolveCountry';
 import { useResolveCurrency } from '../useResolveCurrency';
@@ -30,7 +31,7 @@ export function useFormatMoney() {
     const currency = resolveCurrency(currentCurrencyId);
 
     if (country && currency) {
-      return Number.formatMoney(value, currency, country, {
+      return Number.formatMoney(isNaN(value) ? 0 : value, currency, country, {
         showCurrencyCode: company.settings.show_currency_code,
       });
     }

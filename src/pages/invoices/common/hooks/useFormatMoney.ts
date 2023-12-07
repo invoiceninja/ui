@@ -23,6 +23,7 @@ import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
+import { isNaN } from 'lodash';
 
 interface Props {
   resource: ProductTableResource | undefined;
@@ -93,7 +94,7 @@ export function useFormatMoney(props: Props) {
 
   return (value: number | string) => {
     if (currency && country) {
-      return Number.formatMoney(value, currency, country);
+      return Number.formatMoney(isNaN(value) ? 0 : value, currency, country);
     }
 
     return value;
