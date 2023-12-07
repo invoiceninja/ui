@@ -69,7 +69,7 @@ export function useAllProjectColumns() {
 
   const projectColumns = [
     'name',
-    //   'client', @Todo: Need to resolve translation
+    'client',
     'task_rate',
     'due_date',
     'public_notes',
@@ -127,6 +127,20 @@ export function useProjectColumns() {
           {value}
         </Link>
       ),
+    },
+    {
+      column: 'client',
+      id: 'client_id',
+      label: t('client'),
+      format: (value, project) =>
+        project.client && (
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', project.client)}
+          >
+            {project.client.display_name}
+          </Link>
+        ),
     },
     {
       column: 'task_rate',
