@@ -226,6 +226,8 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Credit>) => {
         toast.success('created_credit');
 
+        $refetch(['credits']);
+
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {

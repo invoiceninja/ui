@@ -34,6 +34,7 @@ const RecurringExpenses = lazy(
 );
 const Statement = lazy(() => import('$app/pages/clients/statement/Statement'));
 const Invoices = lazy(() => import('$app/pages/clients/show/pages/Invoices'));
+const Activities = lazy(() => import('$app/pages/clients/show/pages/Activities'));
 
 export const clientRoutes = (
   <Route path="clients">
@@ -102,6 +103,7 @@ export const clientRoutes = (
       <Route path="tasks" element={<Tasks />} />
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
+      <Route path="activities" element={<Activities />} />
     </Route>
     <Route
       path=":id/statement"

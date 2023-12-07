@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { LoginForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
@@ -78,6 +78,19 @@ export function Login() {
   });
 
   const colors = useColorScheme();
+
+  useEffect(() => {
+    if (
+      (document.querySelector('input[name="email"]') as HTMLInputElement)?.value ||
+      (document.querySelector('input[name="password"]') as HTMLInputElement)?.value
+    ) {
+      form.setValues({
+        email: (document.querySelector('input[name="email"]') as HTMLInputElement)?.value ?? '',
+        password: (document.querySelector('input[name="password"]') as HTMLInputElement)?.value ?? '',
+        one_time_password: "",
+      });
+    }
+  }, []);
 
   return (
     <div className="h-screen">

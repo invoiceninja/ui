@@ -18,9 +18,12 @@ import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function UpcomingInvoices() {
   const formatMoney = useFormatMoney();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
 
@@ -54,7 +57,15 @@ export function UpcomingInvoices() {
     {
       id: 'due_date',
       label: t('due_date'),
-      format: (value) => value && dayjs(value).format('MMM DD'),
+      format: (value, invoice) => {
+
+        if(invoice.partial_due_date.length > 2)
+          return dayjs(invoice.partial_due_date).format(dateFormat);
+        else if(invoice.due_date.length > 2)
+          return dayjs(invoice.due_date).format(dateFormat)
+        else 
+          return '';
+        },
     },
     {
       id: 'balance',
@@ -86,7 +97,6 @@ export function UpcomingInvoices() {
           withoutActions
           withoutPagination
           withoutPadding
-          staleTime={Infinity}
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,

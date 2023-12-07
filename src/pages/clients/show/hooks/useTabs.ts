@@ -52,6 +52,10 @@ export function useTabs() {
       name: t('recurring_expenses'),
       href: route('/clients/:id/recurring_expenses', { id }),
     },
+    {
+      name: t('activity'),
+      href: route('/clients/:id/activities', { id }),
+    },
   ];
 
   modules.forEach((module) => {
