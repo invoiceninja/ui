@@ -111,6 +111,7 @@ export function InputField(props: Props) {
           rows={props.textareaRows || 5}
           step={props.step}
           data-cy={props.cypressRef}
+          name={props.name}
         />
 
         {isInitialTypePassword && (
