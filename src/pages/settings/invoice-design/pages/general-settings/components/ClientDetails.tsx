@@ -70,7 +70,11 @@ export function ClientDetails() {
   ];
 
   return (
-    <Card title={t('client_details')} padding="small" collapsed={true}>
+    <Card
+      title={t('client_details')}
+      padding="small"
+      collapsed={!proPlan() && !enterprisePlan() ? false : true}
+    >
       <CustomDesignsPlanAlert className="px-6" />
 
       <SortableVariableList
