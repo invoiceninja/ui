@@ -36,7 +36,7 @@ export function PayPalPPCP(props: Props) {
 
     const handleSetup = () => {
         request('POST', endpoint('/api/v1/one_time_token'), {
-            context: 'stripe_connect',
+            context: 'paypal_ppcp',
         }).then((response) =>
             window
                 .open(
@@ -109,3 +109,4 @@ export function PayPalPPCP(props: Props) {
     );
     
 }
+

@@ -31,9 +31,14 @@ import {
   GatewayTypeIcon,
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
 import { isHosted } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { request } from '$app/common/helpers/request';
+
 
 const gatewaysStyles = [
-  { name: 'paypal', width: 110 },
+  { name: 'paypal_ppcp', width: 110 },
+  { name: 'paypal_express', width: 110 },
   { name: 'mollie', width: 110 },
   { name: 'eway', width: 170 },
   { name: 'forte', width: 190 },
@@ -46,6 +51,7 @@ export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
   { name: 'paypal', key: '80af24a6a691230bbec33e930ab40666' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
+  { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666'},
   { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
   { name: 'mollie', key: '1bd651fb213ca0c9d66ae3c336dc77e8' },
   { name: 'gocardless', key: 'b9886f9257f0c6ee7c302f1c74475f6c' },
@@ -88,9 +94,49 @@ export function Create() {
   const onSave = useHandleCreate(companyGateway, setErrors);
 
   const handleChange = (value: string, isManualChange?: boolean) => {
-    setGateway(gateways.find((gateway) => gateway.id === value));
 
-    isManualChange && setTabIndex(1);
+    const gateway = gateways.find((gateway) => gateway.id === value);
+
+    setGateway(gateway);
+
+    if(gateway?.key === '80af24a6a691230bbec33e930ab40666') {
+      handleSetup();
+    }
+    else if(gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
+      handleStripeSetup();
+    }
+    else
+      isManualChange && setTabIndex(1);
+  };
+
+  const handleSetup = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'paypal_ppcp',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/paypal?hash=:hash', {
+            hash: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
+  };
+
+  const handleStripeSetup = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'stripe_connect',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/stripe/signup/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
   };
 
   const defaultTab = [t('provider')];

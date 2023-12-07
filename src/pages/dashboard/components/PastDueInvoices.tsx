@@ -18,9 +18,11 @@ import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function PastDueInvoices() {
   const formatMoney = useFormatMoney();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
 
@@ -54,7 +56,7 @@ export function PastDueInvoices() {
     {
       id: 'due_date',
       label: t('due_date'),
-      format: (value) => value && dayjs(value).format('MMM DD'),
+      format: (value, invoice) => value && invoice.partial_due_date.length > 2 ? dayjs(invoice.partial_due_date).format(dateFormat) : dayjs(value).format(dateFormat),
     },
     {
       id: 'balance',
