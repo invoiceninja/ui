@@ -10,13 +10,10 @@
 
 import { Card, Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
@@ -24,6 +21,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { cloneDeep } from 'lodash';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 
 interface Props {
   title?: string;
@@ -40,9 +38,7 @@ export function Selector(props: Props) {
 
   const errors = useAtomValue(companySettingsErrorsAtom);
 
-  const { data } = useQuery('/api/v1/tax_rates', () =>
-    request('GET', endpoint('/api/v1/tax_rates?status=active&per_page=100'))
-  );
+  const { data } = useTaxRatesQuery({ perPage: 100, status: ['active'] });
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const option = event.target.options[event.target.selectedIndex];

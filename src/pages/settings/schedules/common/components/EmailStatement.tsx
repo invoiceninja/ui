@@ -170,7 +170,6 @@ export function EmailStatement(props: Props) {
           withoutAction
           clearInputAfterSelection
           exclude={schedule.parameters.clients}
-          staleTime={Infinity}
         />
 
         <div className="flex justify-center">

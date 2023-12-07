@@ -142,7 +142,6 @@ export function CreateProjectModal(props: Props) {
               clearButton
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              staleTime={Infinity}
             />
 
             <UserSelector

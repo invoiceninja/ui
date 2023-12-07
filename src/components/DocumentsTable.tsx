@@ -77,13 +77,19 @@ export function DocumentsTable(props: Props) {
   const downloadDocument = (doc: Document, inline: boolean) => {
     toast.processing();
 
-    queryClient.fetchQuery(['/api/v1/documents', doc.hash], () =>
-      request(
-        'GET',
-        endpoint('/documents/:hash', { hash: doc.hash }),
-        { headers: defaultHeaders() },
-        { responseType: 'arraybuffer' }
-      ).then((response) => {
+    queryClient
+      .fetchQuery(
+        ['/api/v1/documents', doc.hash],
+        () =>
+          request(
+            'GET',
+            endpoint('/documents/:hash', { hash: doc.hash }),
+            { headers: defaultHeaders() },
+            { responseType: 'arraybuffer' }
+          ),
+        { staleTime: Infinity }
+      )
+      .then((response) => {
         const blob = new Blob([response.data], {
           type: response.headers['content-type'],
         });
@@ -107,8 +113,7 @@ export function DocumentsTable(props: Props) {
         document.body.removeChild(link);
 
         toast.dismiss();
-      })
-    );
+      });
   };
 
   const destroy = (password: string) => {

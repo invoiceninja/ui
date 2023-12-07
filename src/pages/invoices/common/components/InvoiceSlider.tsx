@@ -153,18 +153,21 @@ export function InvoiceSlider() {
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const fetchEmailHistory = async () => {
-    const response = await queryClient.fetchQuery(
-      ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-      () =>
-        request('POST', endpoint('/api/v1/emails/entityHistory'), {
-          entity: 'invoice',
-          entity_id: invoice?.id,
-        }).then((response) => response.data),
-      { staleTime: Infinity }
-    );
+    const response = await queryClient
+      .fetchQuery(
+        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+        () =>
+          request('POST', endpoint('/api/v1/emails/entityHistory'), {
+            entity: 'invoice',
+            entity_id: invoice?.id,
+          }),
+        { staleTime: Infinity }
+      )
+      .then((response) => response.data);
 
     setEmailRecords(response);
   };
@@ -200,6 +203,7 @@ export function InvoiceSlider() {
           response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const activityElement = useGenerateActivityElement();
