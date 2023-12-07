@@ -928,6 +928,7 @@ export function ComboboxAsync<T = any>({
       onEmptyValues={onEmptyValues}
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
+      exclude={exclude}
       includeOnly={includeOnly}
       includeByLabel={includeByLabel}
       action={action}
