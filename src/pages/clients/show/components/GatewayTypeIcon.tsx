@@ -33,11 +33,11 @@ interface Props {
 }
 
 export const availableGatewayLogos = [
-  'paypal_ppcp',
   'visa',
   'american_express',
   'mastercard',
   'paypal',
+  'paypal_express',
   'authorize',
   'braintree',
   'checkoutcom',
@@ -86,16 +86,16 @@ export function GatewayTypeIcon(props: Props) {
       return (
         <img
           src={paypalLogo}
-          alt="PayPal"
+          alt="Paypal"
           style={props.style || { width: 40, height: 40 }}
         />
       );
 
-    case 'paypal_ppcp':
+    case 'paypal_express':
       return (
         <img
           src={paypalLogo}
-          alt="PayPal"
+          alt="Paypal"
           style={props.style || { width: 40, height: 40 }}
         />
       );

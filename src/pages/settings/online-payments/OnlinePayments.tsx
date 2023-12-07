@@ -90,8 +90,6 @@ export function OnlinePayments() {
       onCancelClick={onCancel}
       withoutBackButton
     >
-      <Gateways />
-      
       <Card title={t('settings')}>
         <Element
           leftSide={
@@ -285,11 +283,11 @@ export function OnlinePayments() {
         <Element
           leftSide={
             <PropertyCheckbox
-              propertyKey="send_email_on_mark_paid"
+              propertyKey="mark_paid_payment_email"
               labelElement={
                 <SettingsLabel
-                  label={t('send_email_on_mark_paid')}
-                  helpLabel={t('send_email_on_mark_paid_help')}
+                  label={t('mark_paid_payment_email')}
+                  helpLabel={t('mark_paid_payment_email_help')}
                 />
               }
               defaultValue={false}
@@ -297,11 +295,11 @@ export function OnlinePayments() {
           }
         >
           <Toggle
-            checked={Boolean(company?.settings.send_email_on_mark_paid)}
+            checked={Boolean(company?.settings.mark_paid_payment_email)}
             onChange={(value: boolean) =>
-              handleToggleChange('settings.send_email_on_mark_paid', value)
+              handleToggleChange('settings.mark_paid_payment_email', value)
             }
-            disabled={disableSettingsField('send_email_on_mark_paid')}
+            disabled={disableSettingsField('mark_paid_payment_email')}
           />
         </Element>
 
@@ -452,34 +450,9 @@ export function OnlinePayments() {
             />
           </Element>
         )}
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="payment_email_all_contacts"
-              labelElement={
-                <SettingsLabel label={t('payment_email_all_contacts')} />
-              }
-              defaultValue={false}
-            />
-          }
-          leftSideHelp={t('payment_email_all_contacts_help')}
-        >
-          <Toggle
-            id="payment_email_all_contacts"
-            checked={Boolean(company?.settings.payment_email_all_contacts)}
-            onChange={(value) =>
-              handleChangeProperty('settings.payment_email_all_contacts', value)
-            }
-            disabled={disableSettingsField('payment_email_all_contacts')}
-          />
-        </Element>
-
-        
-
       </Card>
 
-      
+      <Gateways />
     </Settings>
   );
 }

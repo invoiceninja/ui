@@ -14,14 +14,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
-import { Tooltip } from '../Tooltip';
+import { Button as BaseButton } from '$app/components/forms';
 
 interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
-  behavior?: 'tooltipButton';
-  tooltipText?: string | null;
+  behavior?: 'button';
 }
 
 const Button = styled.button`
@@ -42,9 +41,7 @@ export function DropdownElement(props: Props) {
   const navigate = useNavigate();
   const colors = useColorScheme();
 
-  const { behavior, tooltipText } = props;
-
-  if (props.to && behavior !== 'tooltipButton') {
+  if (props.to && props.behavior !== 'button') {
     return (
       <StyledLink
         theme={{
@@ -71,23 +68,24 @@ export function DropdownElement(props: Props) {
     );
   }
 
-  if (behavior === 'tooltipButton') {
+  if (props.behavior === 'button') {
     return (
-      <Tooltip
-        width="auto"
-        placement="bottom"
-        message={tooltipText as string}
-        withoutArrow
+      <BaseButton
+        onClick={() => {
+          props.to && navigate(props.to);
+          !props.to && props.onClick?.(event);
+        }}
       >
+        {props.icon}
+
         <div
-          onClick={() => {
-            props.to && navigate(props.to);
-            !props.to && props.onClick?.(event);
-          }}
+          className={classNames('whitespace-nowrap', {
+            'ml-2': props.icon,
+          })}
         >
-          {props.icon}
+          {props.children}
         </div>
-      </Tooltip>
+      </BaseButton>
     );
   }
 
