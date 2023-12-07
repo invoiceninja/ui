@@ -44,6 +44,9 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const [isInitialConfiguration, setIsInitialConfiguration] =
+    useState<boolean>(true);
+
   const { data: taskStatuses } = useTaskStatusesQuery();
   const { data } = useBlankTaskQuery({ enabled: typeof task === 'undefined' });
 
@@ -68,9 +71,6 @@ export default function Create() {
       ) {
         const _task = cloneDeep(data);
 
-        _task.status_id =
-          taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '';
-
         if (searchParams.get('client')) {
           _task.client_id = searchParams.get('client')!;
         }
@@ -90,7 +90,22 @@ export default function Create() {
 
       return value;
     });
-  }, [data, taskStatuses]);
+  }, [data]);
+
+  useEffect(() => {
+    if (task && taskStatuses && isInitialConfiguration) {
+      setTask(
+        (current) =>
+          current && {
+            ...current,
+            status_id:
+              taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
+          }
+      );
+
+      setIsInitialConfiguration(false);
+    }
+  }, [task, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {
     setTask((current) => current && { ...current, [property]: value });
