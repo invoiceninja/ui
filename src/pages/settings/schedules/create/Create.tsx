@@ -25,7 +25,7 @@ import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { AxiosError } from 'axios';
 import { useAtom } from 'jotai';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
@@ -86,15 +86,20 @@ export function Create() {
             status: 'all',
             entity: 'invoice',
             entity_id: '',
+            report_name: '',
+            date_key: '',
+            start_date: '',
+            end_date: '',
+            report_keys: [],
+            product_keys: [],
+            send_email: false,
           },
         };
       });
     }
   }, [blankSchedule]);
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
