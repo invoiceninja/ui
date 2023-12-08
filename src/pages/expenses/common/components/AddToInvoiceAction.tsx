@@ -117,32 +117,32 @@ export function AddToInvoiceAction(props: Props) {
     if (visibleModal) {
       setIsLoading(true);
 
-      queryClient.fetchQuery(
-        [
-          '/api/v1/invoices',
-          `include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=${expense.client_id}`,
-        ],
-        () =>
-          request(
-            'GET',
-            endpoint(
-              '/api/v1/invoices?include=client.group_settings&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
-              { clientId: expense.client_id || '' }
-            )
-          )
-            .then((response: GenericSingleResourceResponse<Invoice[]>) => {
-              if (hasPermission('edit_invoice')) {
-                setInvoices(response.data.data);
-              } else {
-                setInvoices(
-                  response.data.data.filter((invoice) =>
-                    entityAssigned(invoice)
-                  )
-                );
-              }
-            })
-            .finally(() => setIsLoading(false))
-      );
+      queryClient
+        .fetchQuery(
+          [
+            '/api/v1/invoices',
+            `include=client&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=${expense.client_id}`,
+          ],
+          () =>
+            request(
+              'GET',
+              endpoint(
+                '/api/v1/invoices?include=client.group_settings&status_id=1,2,3&is_deleted=true&without_deleted_clients=true&client_id=:clientId',
+                { clientId: expense.client_id || '' }
+              )
+            ),
+          { staleTime: Infinity }
+        )
+        .then((response: GenericSingleResourceResponse<Invoice[]>) => {
+          if (hasPermission('edit_invoice')) {
+            setInvoices(response.data.data);
+          } else {
+            setInvoices(
+              response.data.data.filter((invoice) => entityAssigned(invoice))
+            );
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
 
     if (!visibleModal) {

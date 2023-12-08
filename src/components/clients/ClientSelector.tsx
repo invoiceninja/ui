@@ -54,7 +54,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         initiallyVisible={props.initiallyVisible}
         entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
-        staleTime={props.staleTime || 500}
+        staleTime={props.staleTime || Infinity}
         sortBy={null}
         exclude={props.exclude}
         action={{
