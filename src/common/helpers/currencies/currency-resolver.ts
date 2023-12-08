@@ -8,51 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { Currency } from '$app/common/interfaces/currency';
-import { Statics } from '$app/common/interfaces/statics';
-import { useState } from 'react';
-import { QueryClient } from 'react-query';
-import { request } from '../request';
-
-export class CurrencyResolver {
-  protected declare statics: Statics;
-  protected queryClient: QueryClient;
-
-  constructor() {
-    this.queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: Infinity,
-        },
-      },
-    });
-  }
-
-  public find(id: string): Promise<Currency | undefined> {
-    return this.queryClient
-      .fetchQuery(['/api/v1/statics'], () =>
-        request('GET', endpoint('/api/v1/statics'))
-      )
-      .then((data) =>
-        data.data.currencies.find((currency: Currency) => currency.id === id)
-      );
-  }
-}
-
-const currencyResolver = new CurrencyResolver();
+import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function useCurrencyResolver() {
-  return currencyResolver;
+  const statics = useStaticsQuery();
+
+  const find = (id: string) => {
+    if (statics) {
+      return Promise.resolve(
+        statics.data?.currencies.find((currency) => currency.id === id)
+      );
+    }
+
+    return Promise.resolve(undefined);
+  };
+
+  return { find };
 }
 
 export function useResolveCurrency() {
-  const currencyResolver = useCurrencyResolver();
-  const [currency, setCurrency] = useState<Currency>();
+  const statics = useStaticsQuery();
 
   return (id: string) => {
-    currencyResolver.find(id).then((currency) => setCurrency(currency));
+    if (statics) {
+      return statics.data?.currencies.find((currency) => currency.id === id);
+    }
 
-    return currency;
+    return undefined;
   };
 }
