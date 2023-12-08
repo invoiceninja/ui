@@ -72,4 +72,10 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.getByRole('row', { name: 'Status Number Client Amount Balance Date Due Date' }).getByRole('checkbox').click();
   await page.locator('div').filter({ hasText: /^More ActionsActive$/ }).locator('button').click();
   await page.getByRole('button', { name: 'Delete' }).click();
+
+  await page.getByRole('link', { name: 'Clients' }).first().click();
+  await page.getByRole('row', { name: 'Name Contact Email ID Number Balance Paid to Date Date Created Last Login Website' }).getByRole('checkbox').click();
+  await page.locator('div').filter({ hasText: /^More ActionsActive$/ }).locator('button').click();
+  await page.getByRole('button', { name: 'Delete' }).click();
+
 });
