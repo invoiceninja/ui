@@ -101,13 +101,11 @@ export function InputField(props: Props) {
           onBlur={(event) => {
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
-            console.log(event.target.value);
           }}
           onChange={(event) => {
             if (props.changeOverride && props.changeOverride === true) {
                 props.onValueChange && props.onValueChange(event.target.value);
                 props.onChange && props.onChange(event);
-              console.log(event.target.value + 'override');
             }
           }}
           value={props.value}
