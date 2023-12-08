@@ -103,8 +103,6 @@ export function HelpSidebarIcons(props: Props) {
     const showMiniSidebar =
       user?.company_user?.react_settings?.show_mini_sidebar;
 
-    console.log(showMiniSidebar);
-
     if (
       user &&
       typeof showMiniSidebar !== 'undefined' &&
