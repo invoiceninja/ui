@@ -153,6 +153,7 @@ export function Actions(props: Props) {
 
         <InputField
           id="filter"
+          changeOverride={true}
           placeholder={t('filter')}
           value={props.filter}
           onValueChange={(value) =>

@@ -17,8 +17,9 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { GenericQueryOptions } from './invoices';
 
-export function useBlankTaskStatusQuery() {
+export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
   return useQuery<TaskStatus>(
@@ -28,7 +29,10 @@ export function useBlankTaskStatusQuery() {
         (response: GenericSingleResourceResponse<TaskStatus>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('create_task') }
+    {
+      staleTime: Infinity,
+      enabled: hasPermission('create_task') ? options?.enabled ?? true : false,
+    }
   );
 }
 
@@ -45,7 +49,8 @@ export function useTaskStatusesQuery(params?: Params) {
         endpoint('/api/v1/task_statuses?status=:status', {
           status: params?.status || 'all',
         })
-      ).then((response) => response.data)
+      ).then((response) => response.data),
+    { staleTime: Infinity }
   );
 }
 

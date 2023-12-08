@@ -19,18 +19,23 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function usePaymentTermsQuery(params: Params) {
-  return useQuery(['/api/v1/payment_terms', params], () =>
-    request(
-      'GET',
-      endpoint(
-        '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
-        {
-          perPage: params.perPage ?? 1000,
-          currentPage: params.currentPage,
-          sort: params.sort ?? 'id|asc',
-        }
-      )
-    )
+  return useQuery(
+    ['/api/v1/payment_terms', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
+          {
+            perPage: params.perPage ?? 1000,
+            currentPage: params.currentPage,
+            sort: params.sort ?? 'id|asc',
+          }
+        )
+      ),
+    {
+      staleTime: Infinity,
+    }
   );
 }
 

@@ -144,7 +144,6 @@ export default function Create() {
               clearButton={Boolean(project?.client_id)}
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              staleTime={Infinity}
             />
           </Element>
 

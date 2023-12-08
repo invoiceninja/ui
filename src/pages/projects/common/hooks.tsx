@@ -69,7 +69,7 @@ export function useAllProjectColumns() {
 
   const projectColumns = [
     'name',
-    //   'client', @Todo: Need to resolve translation
+    'client',
     'task_rate',
     'due_date',
     'public_notes',
@@ -127,6 +127,20 @@ export function useProjectColumns() {
           {value}
         </Link>
       ),
+    },
+    {
+      column: 'client',
+      id: 'client_id',
+      label: t('client'),
+      format: (value, project) =>
+        project.client && (
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', project.client)}
+          >
+            {project.client.display_name}
+          </Link>
+        ),
     },
     {
       column: 'task_rate',
@@ -286,39 +300,42 @@ export function useActions() {
   const handleInvoiceProject = (project: Project) => {
     toast.processing();
 
-    queryClient.fetchQuery(
-      [
-        '/api/v1/tasks',
-        'project_tasks',
-        project.id,
-        'per_page',
-        100,
-        'status',
-        'active',
-      ],
-      () =>
-        request(
-          'GET',
-          endpoint(
-            '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-            {
-              projectId: project.id,
-            }
-          )
-        ).then((response: GenericSingleResourceResponse<Task[]>) => {
-          toast.dismiss();
+    queryClient
+      .fetchQuery(
+        [
+          '/api/v1/tasks',
+          'project_tasks',
+          project.id,
+          'per_page',
+          100,
+          'status',
+          'active',
+        ],
+        () =>
+          request(
+            'GET',
+            endpoint(
+              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+              {
+                projectId: project.id,
+              }
+            )
+          ),
+        { staleTime: Infinity }
+      )
+      .then((response: GenericSingleResourceResponse<Task[]>) => {
+        toast.dismiss();
 
-          const unInvoicedTasks = response.data.data.filter(
-            (task) => !task.invoice_id
-          );
+        const unInvoicedTasks = response.data.data.filter(
+          (task) => !task.invoice_id
+        );
 
-          if (!response.data.data.length) {
-            return toast.error('no_assigned_tasks');
-          }
+        if (!response.data.data.length) {
+          return toast.error('no_assigned_tasks');
+        }
 
-          invoiceProject(unInvoicedTasks);
-        })
-    );
+        invoiceProject(unInvoicedTasks);
+      });
   };
 
   const actions = [

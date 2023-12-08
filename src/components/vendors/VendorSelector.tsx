@@ -63,7 +63,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           onDismiss={props.onClearButtonClick}
           initiallyVisible={props.initiallyVisible}
           sortBy="name|asc"
-          staleTime={props.staleTime || 500}
+          staleTime={props.staleTime || Infinity}
           errorMessage={props.errorMessage}
         />
       )}

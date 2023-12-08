@@ -101,13 +101,16 @@ export function Edit() {
     toast.processing();
 
     queryClient
-      .fetchQuery(['/api/v1/users', id], () =>
-        request(
-          'GET',
-          endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
-          {},
-          { headers: { 'X-Api-Password': password } }
-        )
+      .fetchQuery(
+        ['/api/v1/users', id],
+        () =>
+          request(
+            'GET',
+            endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
+            {},
+            { headers: { 'X-Api-Password': password } }
+          ),
+        { staleTime: Infinity }
       )
       .then(() => {
         setPasswordValidated(true);

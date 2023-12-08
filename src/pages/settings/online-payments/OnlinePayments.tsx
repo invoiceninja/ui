@@ -90,6 +90,8 @@ export function OnlinePayments() {
       onCancelClick={onCancel}
       withoutBackButton
     >
+      <Gateways />
+      
       <Card title={t('settings')}>
         <Element
           leftSide={
@@ -477,7 +479,7 @@ export function OnlinePayments() {
 
       </Card>
 
-      <Gateways />
+      
     </Settings>
   );
 }

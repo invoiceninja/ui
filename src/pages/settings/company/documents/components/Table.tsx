@@ -88,7 +88,7 @@ export function Table() {
     toast.processing();
 
     const response: AxiosResponse = await queryClient.fetchQuery(
-      ['/documents', doc.hash],
+      ['/api/v1/documents', doc.hash],
       () =>
         request(
           'GET',
@@ -153,7 +153,7 @@ export function Table() {
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
           const response: AxiosResponse = await queryClient.fetchQuery(
-            ['documents', hash],
+            ['/api/v1/documents', hash],
             () =>
               request(
                 'GET',
