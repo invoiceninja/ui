@@ -80,7 +80,6 @@ export function Details(props: Props) {
             onClearButtonClick={() => handleChange('client_id', '')}
             onChange={(client) => handleChange('client_id', client.id)}
             errorMessage={errors?.errors.client_id}
-            staleTime={Infinity}
           />
         </Element>
       )}

@@ -111,7 +111,6 @@ export function MergeClientModal(props: Props) {
         onClearButtonClick={() => setMergeIntoClientId('')}
         withoutAction
         exclude={[props.mergeFromClientId]}
-        staleTime={Infinity}
       />
 
       <div className="self-end pt-2">

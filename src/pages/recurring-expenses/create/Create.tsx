@@ -31,6 +31,7 @@ import { useBlankRecurringExpenseQuery } from '$app/common/queries/recurring-exp
 import { useHandleChange } from '../common/hooks';
 import { RecurringExpensesFrequency } from '$app/common/enums/recurring-expense-frequency';
 import { cloneDeep } from 'lodash';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -101,6 +102,8 @@ export default function Create() {
     request('POST', endpoint('/api/v1/recurring_expenses'), recurringExpense)
       .then((response: GenericSingleResourceResponse<RecurringExpense>) => {
         toast.success('created_recurring_expense');
+
+        $refetch(['recurring_expenses']);
 
         navigate(
           route('/recurring_expenses/:id/edit', { id: response.data.data.id })

@@ -10,41 +10,19 @@
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { ApiWebhook } from '$app/common/interfaces/api-webhook';
-import { Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
+import { DataTable } from '$app/components/DataTable';
+import { useColumns } from './common/hooks/useColumns';
 
 export function ApiWebhooks() {
+  useTitle('api_webhooks');
+
   const [t] = useTranslation();
+  const columns = useColumns();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('account_management'), href: '/settings/account_management' },
     { name: t('api_webhooks'), href: '/settings/integrations/api_webhooks' },
-  ];
-
-  useTitle('api_webhooks');
-
-  const columns: DataTableColumns<ApiWebhook> = [
-    {
-      id: 'endpoint',
-      label: t('endpoint'),
-      format: (field, webhook) => (
-        <Link
-          to={route('/settings/integrations/api_webhooks/:id/edit', {
-            id: webhook.id,
-          })}
-        >
-          {webhook.target_url}
-        </Link>
-      ),
-    },
-    {
-      id: 'method',
-      label: t('method'),
-      format: (field, webhook) => webhook.rest_method.toUpperCase(),
-    },
   ];
 
   return (

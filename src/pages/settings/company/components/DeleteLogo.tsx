@@ -24,6 +24,7 @@ import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -82,10 +83,12 @@ export function DeleteLogo() {
         }
 
         if (isGroupSettingsActive) {
+          $refetch(['group_settings']);
           configureGroupSettings(response.data.data);
         }
 
         if (isClientSettingsActive) {
+          $refetch(['clients']);
           configureClientSettings(response.data.data);
         }
 

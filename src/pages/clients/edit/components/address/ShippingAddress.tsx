@@ -64,7 +64,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('billing_address1')}>
         <InputField
           id="shipping_address1"
-          value={props.client?.shipping_address1}
+          value={props.client?.shipping_address1 || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_address1}
         />
@@ -73,7 +73,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('address2')}>
         <InputField
           id="shipping_address2"
-          value={props.client?.shipping_address2}
+          value={props.client?.shipping_address2 || ''}
           onChange={handleChange}
         />
       </Element>
@@ -81,7 +81,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('city')}>
         <InputField
           id="shipping_city"
-          value={props.client?.shipping_city}
+          value={props.client?.shipping_city || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_city}
         />
@@ -90,7 +90,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('state')}>
         <InputField
           id="shipping_state"
-          value={props.client?.shipping_state}
+          value={props.client?.shipping_state || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_state}
         />
@@ -99,7 +99,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('postal_code')}>
         <InputField
           id="shipping_postal_code"
-          value={props.client?.shipping_postal_code}
+          value={props.client?.shipping_postal_code || ''}
           onChange={handleChange}
           errorMessage={errors?.errors.shipping_postal_code}
         />

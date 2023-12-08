@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
-import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ReactNode, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 export interface SelectOption {
@@ -25,16 +25,18 @@ export interface SelectOption {
 
 interface Props extends CommonProps {
   options?: SelectOption[];
-  defaultOption?: SelectOption;
+  defaultOptions?: SelectOption[];
   optionsPlaceholder?: string;
   optionsMultiSelect?: true | undefined;
   rightSide?: ReactNode;
   onFilterChange?: Dispatch<SetStateAction<string>>;
   onStatusChange?: Dispatch<SetStateAction<string[]>>;
-  onCustomFilterChange?: Dispatch<SetStateAction<string[]>>;
+  onCustomFilterChange?: Dispatch<SetStateAction<string[] | undefined>>;
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
   beforeFilter?: ReactNode;
+  defaultCustomFilterOptions?: SelectOption[];
+  filter: string;
 }
 
 export function Actions(props: Props) {
@@ -122,10 +124,10 @@ export function Actions(props: Props) {
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.children}
-        {props.options && (
+        {props.options && props.defaultOptions && (
           <Select
             styles={customStyles}
-            defaultValue={props.defaultOption}
+            defaultValue={props.defaultOptions}
             onChange={(options) => onStatusChange(options)}
             placeholder={t('status')}
             options={props.options}
@@ -133,25 +135,29 @@ export function Actions(props: Props) {
           />
         )}
 
-        {props.customFilters && props.customFilterPlaceholder && (
-          <Select
-            styles={customStyles}
-            defaultValue={props.customFilters[0]}
-            onChange={(options) => onCustomFilterChange(options)}
-            placeholder={t(props.customFilterPlaceholder)}
-            options={props.customFilters}
-            isMulti={props.optionsMultiSelect}
-          />
-        )}
+        {props.customFilters &&
+          props.customFilterPlaceholder &&
+          props.defaultCustomFilterOptions && (
+            <Select
+              styles={customStyles}
+              defaultValue={props.defaultCustomFilterOptions}
+              onChange={(options) => onCustomFilterChange(options)}
+              placeholder={t(props.customFilterPlaceholder)}
+              options={props.customFilters}
+              isMulti={props.optionsMultiSelect}
+            />
+          )}
       </div>
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.beforeFilter}
 
         <InputField
           id="filter"
+          changeOverride={true}
           placeholder={t('filter')}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            props.onFilterChange && props.onFilterChange(event.target.value)
+          value={props.filter}
+          onValueChange={(value) =>
+            props.onFilterChange && props.onFilterChange(value)
           }
           debounceTimeout={800}
         />

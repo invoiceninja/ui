@@ -60,6 +60,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -79,6 +80,8 @@ export function useCreate(props: CreateProps) {
     request('POST', endpoint('/api/v1/purchase_orders'), purchaseOrder)
       .then((response: GenericSingleResourceResponse<PurchaseOrder>) => {
         toast.success('created_purchase_order');
+
+        $refetch(['purchase_orders']);
 
         navigate(
           route('/purchase_orders/:id/edit', {

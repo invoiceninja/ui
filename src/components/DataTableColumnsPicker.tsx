@@ -36,6 +36,8 @@ import {
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Icon } from './icons/Icon';
 
 interface Props {
   columns: string[];
@@ -95,6 +97,8 @@ export function DataTableColumnsPicker(props: Props) {
       set(user, 'company_user', response.data.data);
       setIsModalVisible(false);
 
+      $refetch(['company_users']);
+
       dispatch(updateUser(user));
 
       toast.success('saved_settings');
@@ -153,43 +157,69 @@ export function DataTableColumnsPicker(props: Props) {
           ))}
         </SelectField>
 
-        <div className="max-h-64 overflow-y-auto">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="columns">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {currentColumns.map((column, index) => (
-                    <Draggable
-                      key={index}
-                      draggableId={`item-${index}`}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="w-full inline-flex items-center justify-between pr-4 my-2"
-                        >
-                          <div className="space-x-2 inline-flex items-center">
-                            <button onClick={() => handleDelete(column)}>
-                              <MdClose size={20} />
-                            </button>
-                            <p>{t(column)}</p>
-                          </div>
-                          <button className="cursor-grab">
-                            <MdDragHandle size={20} />
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable
+            droppableId="columns"
+            renderClone={(provided, _, rubric) => {
+              const column = currentColumns[rubric.source.index];
+
+              return (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  className="flex items-center justify-between py-2 text-sm"
+                >
+                  <div className="flex space-x-2 items-center">
+                    <Icon element={MdClose} size={20} />
+
+                    <p>{t(column)}</p>
+                  </div>
+
+                  <div {...provided.dragHandleProps}>
+                    <Icon element={MdDragHandle} size={23} />
+                  </div>
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </div>
+              );
+            }}
+          >
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {currentColumns.map((column, index) => (
+                  <Draggable
+                    key={index}
+                    draggableId={`item-${index}`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="flex items-center justify-between py-2"
+                      >
+                        <div className="flex space-x-2 items-center">
+                          <Icon
+                            className="cursor-pointer"
+                            element={MdClose}
+                            size={20}
+                            onClick={() => handleDelete(column)}
+                          />
+
+                          <p>{t(column)}</p>
+                        </div>
+
+                        <div {...provided.dragHandleProps}>
+                          <Icon element={MdDragHandle} size={23} />
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         <div className="flex lg:flex-row lg:justify-end">
           <Inline>
