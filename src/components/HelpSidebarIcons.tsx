@@ -105,10 +105,9 @@ export function HelpSidebarIcons(props: Props) {
 
     if (
       user &&
-      currentUser &&
       Object.keys(user).length &&
       typeof showMiniSidebar !== 'undefined' &&
-      currentUser.company_user?.react_settings?.show_mini_sidebar !==
+      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
         showMiniSidebar
     ) {
       updateCompanyUser(user);
