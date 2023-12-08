@@ -319,7 +319,9 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'download_e_invoice') && (
         <DropdownElement
-          {...(!dropdown && { behavior: 'button' })}
+          {...(!dropdown && { behavior: 'tooltipButton',
+              tooltipText: t('download_e_invoice'),
+              key: 'download', })}
           onClick={() => downloadEInvoice(invoice)}
           icon={
             <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
