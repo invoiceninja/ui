@@ -30,8 +30,12 @@ import {
   availableGatewayLogos,
   GatewayTypeIcon,
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { request } from '$app/common/helpers/request';
 
 const gatewaysStyles = [
+  { name: 'paypal_ppcp', width: 110 },
   { name: 'paypal_express', width: 110 },
   { name: 'mollie', width: 110 },
   { name: 'eway', width: 170 },
@@ -44,7 +48,7 @@ export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
-  { name: 'paypal_express', key: '38f2c48af60c7dd69e04248cbb24c36e' },
+  { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666'},
   { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
   { name: 'mollie', key: '1bd651fb213ca0c9d66ae3c336dc77e8' },
   { name: 'gocardless', key: 'b9886f9257f0c6ee7c302f1c74475f6c' },
@@ -56,7 +60,7 @@ export const gatewaysDetails = [
   { name: 'payfast', key: 'd6814fc83f45d2935e7777071e629ef9' },
   { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
   { name: 'wepay', key: '8fdeed552015b3c7b44ed6c8ebd9e992' },
-  { name: 'paypalx', key: '80af24a6a691230bbec33e930ab40666'},
+  { name: 'paypal_express', key: '38f2c48af60c7dd69e04248cbb24c36e' },
 ];
 
 export function Create() {
@@ -83,9 +87,49 @@ export function Create() {
   const onSave = useHandleCreate(companyGateway, setErrors);
 
   const handleChange = (value: string, isManualChange?: boolean) => {
-    setGateway(gateways.find((gateway) => gateway.id === value));
 
-    isManualChange && setTabIndex(1);
+    const gateway = gateways.find((gateway) => gateway.id === value);
+
+    setGateway(gateway);
+
+    if(gateway?.key === '80af24a6a691230bbec33e930ab40666') {
+      handleSetup();
+    }
+    else if(gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
+      handleStripeSetup();
+    }
+    else
+      isManualChange && setTabIndex(1);
+  };
+
+  const handleSetup = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'paypal_ppcp',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/paypal?hash=:hash', {
+            hash: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
+  };
+
+  const handleStripeSetup = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'stripe_connect',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/stripe/signup/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+    );
   };
 
   const defaultTab = [t('provider')];
