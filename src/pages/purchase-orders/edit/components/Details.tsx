@@ -57,6 +57,7 @@ export function Details(props: PurchaseOrderCardProps) {
         <Element leftSide={t('partial')}>
           <InputField
             type="number"
+            changeOverride={true}
             value={purchaseOrder.partial}
             onValueChange={(partial) =>
               handleChange('partial', parseFloat(partial) || 0)

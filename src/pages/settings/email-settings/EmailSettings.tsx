@@ -374,7 +374,6 @@ export function EmailSettings() {
                 }
                 readonly={disableSettingsField('gmail_sending_user_id')}
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
-                staleTime={1}
               />
             </Element>
           )}
