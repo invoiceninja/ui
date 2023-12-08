@@ -11,7 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Project } from '$app/common/interfaces/project';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -44,27 +44,4 @@ export function useProjectQuery(params: { id: string | undefined }) {
       ),
     { staleTime: Infinity }
   );
-}
-
-export function useFetchProjectQuery() {
-  const queryClient = useQueryClient();
-
-  return async (projectId: string) => {
-    let project: Project | undefined;
-
-    await queryClient
-      .fetchQuery(['/api/v1/projects', projectId], () =>
-        request(
-          'GET',
-          endpoint('/api/v1/projects/:id', {
-            id: projectId,
-          })
-        )
-      )
-      .then((response: GenericSingleResourceResponse<Project>) => {
-        project = response.data.data;
-      });
-
-    return project;
-  };
 }
