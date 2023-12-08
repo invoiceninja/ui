@@ -28,6 +28,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
+import { useQueryClient } from 'react-query';
 
 interface Props {
   isModalOpen: boolean;
@@ -36,6 +37,8 @@ interface Props {
 
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const currentCompany = useCurrentCompany();
 
@@ -52,13 +55,17 @@ export function CompanyEdit(props: Props) {
     subdomain: '',
   });
 
-  const fetchCompanyDetails = async (company_id: string) => {
-    const response = await request(
-      'GET',
-      endpoint('/api/v1/companies/:id', { id: company_id })
-    );
+  const fetchCompanyDetails = async (companyId: string) => {
+    const response = await queryClient
+      .fetchQuery(
+        ['/api/v1/companies', companyId],
+        () =>
+          request('GET', endpoint('/api/v1/companies/:id', { id: companyId })),
+        { staleTime: Infinity }
+      )
+      .then((response) => response.data.data);
 
-    const companySettings = response?.data?.data?.settings;
+    const companySettings = response?.settings;
 
     const { name, subdomain, language_id, currency_id } = companySettings;
 

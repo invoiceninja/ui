@@ -46,27 +46,30 @@ export function useCombineProjectsTasks() {
     toast.processing();
 
     const fetchTasks = selectedIds.map((projectId) => {
-      return queryClient.fetchQuery(
-        ['/api/v1/tasks', 'project_tasks', projectId, 'active'],
-        () =>
-          request(
-            'GET',
-            endpoint(
-              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-              {
-                projectId,
-              }
-            )
-          ).then((response: GenericSingleResourceResponse<Task[]>) => {
-            const unInvoicedTasks = response.data.data.filter(
-              (task) => !task.invoice_id
-            );
+      return queryClient
+        .fetchQuery(
+          ['/api/v1/tasks', 'project_tasks', projectId, 'active'],
+          () =>
+            request(
+              'GET',
+              endpoint(
+                '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+                {
+                  projectId,
+                }
+              )
+            ),
+          { staleTime: Infinity }
+        )
+        .then((response: GenericSingleResourceResponse<Task[]>) => {
+          const unInvoicedTasks = response.data.data.filter(
+            (task) => !task.invoice_id
+          );
 
-            if (tasks !== null) {
-              tasks = [...tasks, ...unInvoicedTasks];
-            }
-          })
-      );
+          if (tasks !== null) {
+            tasks = [...tasks, ...unInvoicedTasks];
+          }
+        });
     });
 
     toast.dismiss();

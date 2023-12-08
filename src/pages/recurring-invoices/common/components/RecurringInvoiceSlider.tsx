@@ -114,6 +114,7 @@ export const RecurringInvoiceSlider = () => {
           response.data.data
       ),
     enabled: recurringInvoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const { data: activities } = useQuery({
@@ -128,6 +129,7 @@ export const RecurringInvoiceSlider = () => {
         ) => response.data.data
       ),
     enabled: recurringInvoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const activityElement = useGenerateActivityElement();
