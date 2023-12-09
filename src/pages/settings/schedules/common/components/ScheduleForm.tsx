@@ -21,6 +21,7 @@ import {
   Template,
   useDisplayTemplateField,
 } from '../hooks/useDisplayTemplateField';
+import { EmailReport } from './EmailReport';
 
 interface Props {
   schedule: Schedule;
@@ -35,6 +36,7 @@ interface Props {
 export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
+  EMAIL_REPORT = 'email_report',
 }
 
 export function ScheduleForm(props: Props) {
@@ -121,6 +123,14 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_RECORD && (
         <EmailRecord
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.EMAIL_REPORT && (
+        <EmailReport
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}

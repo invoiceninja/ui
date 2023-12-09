@@ -10,7 +10,7 @@
 
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
-import { Schedule } from '$app/common/interfaces/schedule';
+import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { Frequency } from '$app/common/enums/frequency';
@@ -20,6 +20,25 @@ interface Params {
   setSchedule: Dispatch<SetStateAction<Schedule | undefined>>;
   schedule: Schedule | undefined;
 }
+
+export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
+  clients: [],
+  date_range: 'last7_days',
+  show_aging_table: false,
+  show_credits_table: false,
+  show_payments_table: false,
+  only_clients_with_invoices: false,
+  status: 'all',
+  entity: 'invoice',
+  entity_id: '',
+  report_name: '',
+  date_key: '',
+  start_date: '',
+  end_date: '',
+  report_keys: [],
+  product_keys: [],
+  send_email: false,
+};
 
 export function useHandleChange(params: Params) {
   const { data: blankSchedule } = useBlankScheduleQuery();
@@ -38,15 +57,7 @@ export function useHandleChange(params: Params) {
         frequency_id: Frequency.Monthly,
         remaining_cycles: -1,
         parameters: {
-          clients: [],
-          date_range: 'last7_days',
-          show_aging_table: false,
-          show_credits_table: false,
-          show_payments_table: false,
-          only_clients_with_invoices: false,
-          status: 'all',
-          entity: 'invoice',
-          entity_id: '',
+          ...DEFAULT_SCHEDULE_PARAMETERS,
         },
       }));
     } else {
