@@ -31,13 +31,17 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   status: 'all',
   entity: 'invoice',
   entity_id: '',
-  report_name: '',
+  report_name: 'activity',
   date_key: '',
   start_date: '',
   end_date: '',
   report_keys: [],
-  product_keys: [],
+  product_key: '',
   send_email: false,
+  is_expense_billed: false,
+  is_income_billed: false,
+  include_tax: false,
+  client_id: '',
 };
 
 export function useHandleChange(params: Params) {

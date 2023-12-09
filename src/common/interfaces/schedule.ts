@@ -23,8 +23,12 @@ export interface Parameters {
   start_date: string;
   end_date: string;
   report_keys: string[];
-  product_keys: string[];
+  product_key: string;
   send_email: boolean;
+  is_expense_billed: boolean;
+  is_income_billed: boolean;
+  include_tax: boolean;
+  client_id: string;
 }
 
 export interface Schedule {

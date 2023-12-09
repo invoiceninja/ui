@@ -9,22 +9,23 @@
  */
 
 import { useProductsQuery } from '$app/common/queries/products';
+import { Spinner } from '$app/components/Spinner';
 import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
-import { Report } from '../useReports';
 
 interface Props {
-  setReport: Dispatch<SetStateAction<Report>>;
+  defaultValue?: string;
+  onValueChange: (productsKeys: string) => void;
 }
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
 
-  const { setReport } = props;
+  const { defaultValue, onValueChange } = props;
 
-  const [productItems, setProductItems] = useState<SelectOption[]>([]);
+  const [productItems, setProductItems] = useState<SelectOption[]>();
 
   const { data: products } = useProductsQuery();
 
@@ -44,14 +45,9 @@ export function ProductItemsSelector(props: Props) {
   const handleChange = (
     products: MultiValue<{ value: string; label: string }>
   ) => {
-    const values: Array<string> = (products as SelectOption[]).map(
-      (option: { value: string; label: string }) => option.value
-    );
-
-    setReport((current) => ({
-      ...current,
-      payload: { ...current.payload, product_key: values.join(',') },
-    }));
+    return (products as SelectOption[])
+      .map((option: { value: string; label: string }) => option.value)
+      .join(',');
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -77,15 +73,27 @@ export function ProductItemsSelector(props: Props) {
   };
 
   return (
-    <Element leftSide={t('products')}>
-      <Select
-        styles={customStyles}
-        defaultValue={null}
-        onChange={(options) => handleChange(options)}
-        placeholder={t('products')}
-        options={productItems}
-        isMulti={true}
-      />
-    </Element>
+    <>
+      {productItems ? (
+        <Element leftSide={t('products')}>
+          <Select
+            styles={customStyles}
+            defaultValue={
+              defaultValue
+                ? productItems.filter((option) =>
+                    defaultValue.includes(option.value)
+                  )
+                : null
+            }
+            onChange={(options) => onValueChange(handleChange(options))}
+            placeholder={t('products')}
+            options={productItems}
+            isMulti={true}
+          />
+        </Element>
+      ) : (
+        <Spinner />
+      )}
+    </>
   );
 }
