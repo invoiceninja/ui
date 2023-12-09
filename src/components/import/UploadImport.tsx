@@ -87,6 +87,7 @@ export function UploadImport(props: Props) {
     }
 
     toast.processing();
+    setErrors(undefined);
 
     let endPointUrl = '/api/v1/import';
     let params = {};
@@ -119,13 +120,18 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    request('POST', endpoint(endPointUrl, params), requestData).then(
-      (response) => {
+    request('POST', endpoint(endPointUrl, params), requestData)
+      .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
         props.onFileImported?.();
         props.onSuccess;
-      }
-    );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        }
+      });
   };
 
   const formik = useFormik({
@@ -363,6 +369,7 @@ export function UploadImport(props: Props) {
                         bank_integration_id: '',
                       }))
                     }
+                    errorMessage={errors?.errors.bank_integration_id}
                   />
                 </Td>
               </Tr>
