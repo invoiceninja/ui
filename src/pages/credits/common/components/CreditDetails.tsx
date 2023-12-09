@@ -56,6 +56,7 @@ export function CreditDetails(props: Props) {
           <InputField
             id="partial"
             type="number"
+            changeOverride={true}
             onValueChange={(value) =>
               handleChange('partial', parseFloat(value))
             }
