@@ -27,7 +27,7 @@ export function ProductItemsSelector(props: Props) {
 
   const [productItems, setProductItems] = useState<SelectOption[]>();
 
-  const { data: products } = useProductsQuery();
+  const { data: products } = useProductsQuery({ status: ['active'] });
 
   useEffect(() => {
     if (products && !productItems) {
