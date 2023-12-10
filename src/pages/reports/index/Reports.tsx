@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -38,6 +38,11 @@ import {
 } from '../common/components/Preview';
 import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
 import { StatusSelector } from '../common/components/StatusSelector';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MdOutlinePreview, MdSchedule } from 'react-icons/md';
+import { useScheduleReport } from '../common/hooks/useScheduleReport';
 interface Range {
   identifier: string;
   label: string;
@@ -78,6 +83,7 @@ export default function Reports() {
 
   const reports = useReports();
   const queryClient = useQueryClient();
+  const scheduleReport = useScheduleReport();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -282,11 +288,23 @@ export default function Reports() {
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
       navigationTopRight={
-        report.supports_previews ? (
-          <Button type="secondary" onClick={handlePreview}>
-            {t('preview')}
-          </Button>
-        ) : null
+        <Dropdown label={t('more_actions')}>
+          {report.supports_previews && (
+            <DropdownElement
+              icon={<Icon element={MdOutlinePreview} />}
+              onClick={handlePreview}
+            >
+              {t('preview')}
+            </DropdownElement>
+          )}
+
+          <DropdownElement
+            icon={<Icon element={MdSchedule} />}
+            onClick={() => scheduleReport(report)}
+          >
+            {t('schedule')}
+          </DropdownElement>
+        </Dropdown>
       }
       withoutBackButton
     >

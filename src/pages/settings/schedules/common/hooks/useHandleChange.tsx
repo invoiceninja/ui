@@ -32,7 +32,6 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   entity: 'invoice',
   entity_id: '',
   report_name: 'activity',
-  date_key: '',
   start_date: '',
   end_date: '',
   report_keys: [],
@@ -64,6 +63,20 @@ export function useHandleChange(params: Params) {
           ...DEFAULT_SCHEDULE_PARAMETERS,
         },
       }));
+    } else if (
+      property === ('parameters.report_name' as keyof Schedule) &&
+      blankSchedule
+    ) {
+      setSchedule(
+        (current) =>
+          current && {
+            ...current,
+            parameters: {
+              ...DEFAULT_SCHEDULE_PARAMETERS,
+              report_name: value as string,
+            },
+          }
+      );
     } else {
       if (property === ('parameters.entity' as keyof Schedule)) {
         setSchedule(set(schedule as Schedule, 'parameters.entity_id', ''));

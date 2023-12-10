@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
@@ -38,15 +37,22 @@ type ReportFiled =
   | 'client'
   | 'expense_billed'
   | 'income_billed'
+  | 'start_date'
+  | 'end_date'
   | 'include_tax';
 
-const DEFAULT_REPORT_FIELDS: ReportFiled[] = ['send_email', 'range'];
+export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
+  'send_email',
+  'range',
+  'start_date',
+  'end_date',
+];
 
-const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
+export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
   invoice: [...DEFAULT_REPORT_FIELDS, 'status'],
   invoice_item: [...DEFAULT_REPORT_FIELDS, 'products'],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
-  profit_and_loss: [
+  profitloss: [
     ...DEFAULT_REPORT_FIELDS,
     'expense_billed',
     'income_billed',
@@ -56,12 +62,8 @@ const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
 
 export function EmailReport(props: Props) {
   const [t] = useTranslation();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const formatMoney = useFormatMoney();
-
   const reports = useReports();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { schedule, handleChange, errors } = props;
 
   const showReportFiled = (field: ReportFiled) => {
@@ -78,6 +80,7 @@ export function EmailReport(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.report_name' as keyof Schedule, value)
           }
+          errorMessage={errors?.errors['parameters.report_name']}
         >
           {reports.map((report, i) => (
             <option value={report.identifier} key={i}>
@@ -160,10 +163,11 @@ export function EmailReport(props: Props) {
       {showReportFiled('range') && (
         <Element leftSide={t('range')}>
           <SelectField
-            value={schedule.parameters.date_key}
+            value={schedule.parameters.date_range}
             onValueChange={(value) =>
-              handleChange('parameters.date_key' as keyof Schedule, value)
+              handleChange('parameters.date_range' as keyof Schedule, value)
             }
+            errorMessage={errors?.errors['parameters.date_range']}
           >
             {ranges.map((range, i) => (
               <option value={range.identifier} key={i}>
@@ -175,7 +179,7 @@ export function EmailReport(props: Props) {
       )}
 
       {showReportFiled('range') &&
-        schedule.parameters.date_key === 'custom' && (
+        schedule.parameters.date_range === 'custom' && (
           <>
             <Element leftSide={t('start_date')}>
               <InputField
@@ -184,6 +188,7 @@ export function EmailReport(props: Props) {
                 onValueChange={(value) =>
                   handleChange('parameters.start_date' as keyof Schedule, value)
                 }
+                errorMessage={errors?.errors['parameters.start_date']}
               />
             </Element>
 
@@ -194,13 +199,14 @@ export function EmailReport(props: Props) {
                 onValueChange={(value) =>
                   handleChange('parameters.end_date' as keyof Schedule, value)
                 }
+                errorMessage={errors?.errors['parameters.end_date']}
               />
             </Element>
           </>
         )}
 
-      {showReportFiled('range') && (
-        <Element leftSide={t('range')}>
+      {showReportFiled('client') && (
+        <Element leftSide={t('client')}>
           <ClientSelector
             value={schedule.parameters.client_id}
             onChange={(client) =>
@@ -211,6 +217,7 @@ export function EmailReport(props: Props) {
               handleChange('parameters.client_id' as keyof Schedule, '')
             }
             withoutAction={true}
+            errorMessage={errors?.errors['parameters.client_id']}
           />
         </Element>
       )}

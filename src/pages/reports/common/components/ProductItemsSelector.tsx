@@ -30,7 +30,7 @@ export function ProductItemsSelector(props: Props) {
   const { data: products } = useProductsQuery();
 
   useEffect(() => {
-    if (products) {
+    if (products && !productItems) {
       setProductItems(
         products.map((product) => ({
           value: product.product_key,
@@ -74,14 +74,16 @@ export function ProductItemsSelector(props: Props) {
 
   return (
     <>
-      {productItems ? (
+      {productItems || !defaultValue || !defaultValue?.length ? (
         <Element leftSide={t('products')}>
           <Select
             styles={customStyles}
             defaultValue={
               defaultValue
-                ? productItems.filter((option) =>
-                    defaultValue.includes(option.value)
+                ? productItems?.filter((option) =>
+                    defaultValue
+                      .split(',')
+                      .find((value) => value === option.value)
                   )
                 : null
             }
@@ -92,7 +94,9 @@ export function ProductItemsSelector(props: Props) {
           />
         </Element>
       ) : (
-        <Spinner />
+        <div className="flex justify-center items-center">
+          <Spinner />
+        </div>
       )}
     </>
   );

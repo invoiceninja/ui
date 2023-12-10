@@ -62,7 +62,7 @@ export function Create() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayload = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload({ schedule });
 
   useEffect(() => {
     if (blankSchedule) {
@@ -91,9 +91,11 @@ export function Create() {
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
-
-      request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
+      request(
+        'POST',
+        endpoint('/api/v1/task_schedulers'),
+        formatSchedulePayload()
+      )
         .then((response: GenericSingleResourceResponse<Schedule>) => {
           toast.success('created_schedule');
 
