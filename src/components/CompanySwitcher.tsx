@@ -107,11 +107,11 @@ export function CompanySwitcher() {
           <div className="flex items-center justify-center space-x-3">
             <img className="w-8" src={logo} alt="Company logo" />
             <div className="flex flex-col items-between">
-              <span className="text-white text-sm text-start w-28 truncate">
+              <span className="text-sm text-start w-28 truncate">
                 {companyName}
               </span>
               {(user?.first_name || user?.last_name) && (
-                <span className="text-white text-xs text-start w-28 truncate">
+                <span className="text-xs text-start w-28 truncate">
                   {user.first_name} {user.last_name}
                 </span>
               )}
