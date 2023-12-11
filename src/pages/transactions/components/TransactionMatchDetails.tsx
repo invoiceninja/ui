@@ -23,6 +23,7 @@ import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 export interface TransactionDetails {
   base_type: string;
@@ -217,6 +218,8 @@ export function TransactionMatchDetails(props: Props) {
     }
   }, [transactionRule]);
 
+  const colors = useColorScheme();
+
   return (
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1">
@@ -230,6 +233,7 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   transactionDetails={props.transactionDetails}
                   dataKey="invoices"
                   setSelectedIds={setInvoiceIds}
@@ -238,12 +242,14 @@ export function TransactionMatchDetails(props: Props) {
               ) : (
                 <>
                   <ListBox
+                    style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                     transactionDetails={props.transactionDetails}
                     dataKey="vendors"
                     setSelectedIds={setVendorIds}
                     selectedIds={vendorIds}
                   />
                   <ListBox
+                    style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                     transactionDetails={props.transactionDetails}
                     dataKey="categories"
                     setSelectedIds={setExpenseCategoryIds}
@@ -254,6 +260,7 @@ export function TransactionMatchDetails(props: Props) {
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType
@@ -286,6 +293,7 @@ export function TransactionMatchDetails(props: Props) {
             <div>
               {props.isCreditTransactionType ? (
                 <ListBox
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   transactionDetails={props.transactionDetails}
                   dataKey="payments"
                   setSelectedIds={setPaymentIds}
@@ -293,6 +301,7 @@ export function TransactionMatchDetails(props: Props) {
                 />
               ) : (
                 <ListBox
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   transactionDetails={props.transactionDetails}
                   dataKey="expenses"
                   setSelectedIds={setExpenseIds}
@@ -302,6 +311,7 @@ export function TransactionMatchDetails(props: Props) {
 
               <div className="px-3 py-3 w-full border-t border-gray-200">
                 <Button
+                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                   className="w-full"
                   onClick={
                     props.isCreditTransactionType

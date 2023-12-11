@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { Report } from '../useReports';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   setReport: Dispatch<SetStateAction<Report>>;
@@ -27,6 +28,7 @@ export function ProductItemsSelector(props: Props) {
   const [productItems, setProductItems] = useState<SelectOption[]>([]);
 
   const { data: products } = useProductsQuery();
+  const colors = useColorScheme();
 
   useEffect(() => {
     if (products) {
@@ -34,8 +36,8 @@ export function ProductItemsSelector(props: Props) {
         products.map((product) => ({
           value: product.product_key,
           label: product.product_key,
-          color: 'black',
-          backgroundColor: '#e4e4e4',
+          color: colors.$3,
+          backgroundColor: colors.$1,
         }))
       );
     }
@@ -67,6 +69,7 @@ export function ProductItemsSelector(props: Props) {
       ...styles,
       color: data.color,
     }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
@@ -74,7 +77,29 @@ export function ProductItemsSelector(props: Props) {
       },
       color: '#999999',
     }),
+    menu: (base) => ({
+      ...base,
+      width: 'max-content',
+      minWidth: '100%',
+      backgroundColor: colors.$4,
+      borderColor: colors.$4,
+    }),
+    control: (base) => ({
+      ...base,
+      borderRadius: '3px',
+      backgroundColor: colors.$1,
+      color: colors.$3,
+      borderColor: colors.$5,
+    }),
+    option: (base) => ({
+      ...base,
+      backgroundColor: colors.$1,
+      ':hover': {
+        backgroundColor: colors.$7,
+      },
+    }),
   };
+
 
   return (
     <Element leftSide={t('products')}>

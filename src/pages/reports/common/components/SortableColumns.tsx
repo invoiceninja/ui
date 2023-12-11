@@ -33,6 +33,7 @@ import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-inv
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { Identifier } from '../useReports';
 import { contactMap } from '$app/common/constants/exports/contact-map';
+import { useColorScheme } from '$app/common/colors';
 
 export const reportColumn = 11;
 
@@ -58,6 +59,7 @@ export function Column({
 
     return `${t(`${parts[0]}`)} - ${t(`${record.trans}`)}`;
   };
+  const colors = useColorScheme();
 
   return (
     <div>
@@ -68,6 +70,7 @@ export function Column({
       <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
         {(provided) => (
           <div
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-80 flex-column"
             ref={provided.innerRef}
             {...provided.droppableProps}
@@ -87,13 +90,15 @@ export function Column({
                         {...provided.dragHandleProps}
                       >
                         <span
-                          className="p-2 flex justify-between items-center bg-white cursor-move ml-2 text-sm"
+                          style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                          className="p-2 flex justify-between items-center cursor-move ml-2 text-sm"
                           key={i}
                         >
                           {translateLabel(record)}
 
                           {droppableId === reportColumn.toString() && (
                             <button
+                              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                               type="button"
                               onClick={() =>
                                 onRemove ? onRemove(record) : null
@@ -251,19 +256,20 @@ export function SortableColumns({ report, columns }: Props) {
 
     update(`preferences.reports.columns.${report}`, [...$data]);
   };
+  const colors = useColorScheme();
 
   return (
-    <div className="min-w-min">
+    <div className="min-w-min" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
       <Card className="my-6">
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex w-full py-2 px-6 space-x-4">
+          <div className="flex w-full py-2 px-6 space-x-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
             {columns.includes('client') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('client')}</p>
 
-                    <button type="button" onClick={() => onAddAll(0)}>
+                    <button type="button" onClick={() => onAddAll(0)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -280,7 +286,7 @@ export function SortableColumns({ report, columns }: Props) {
                   <div className="flex justify-between items-center">
                     <p>{t('invoice')}</p>
 
-                    <button type="button" onClick={() => onAddAll(1)}>
+                    <button type="button" onClick={() => onAddAll(1)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -294,10 +300,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('credit') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('credit')}</p>
 
-                    <button type="button" onClick={() => onAddAll(2)}>
+                    <button type="button" onClick={() => onAddAll(2)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -311,7 +317,7 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('quote') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('quote')}</p>
 
                     <button type="button" onClick={() => onAddAll(3)}>
@@ -328,10 +334,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('payment') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('payment')}</p>
 
-                    <button type="button" onClick={() => onAddAll(4)}>
+                    <button type="button" onClick={() => onAddAll(4)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -345,10 +351,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('vendor') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('vendor')}</p>
 
-                    <button type="button" onClick={() => onAddAll(5)}>
+                    <button type="button" onClick={() => onAddAll(5)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -362,7 +368,7 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('purchase_order') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('purchase_order')}</p>
 
                     <button type="button" onClick={() => onAddAll(6)}>
@@ -379,10 +385,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('task') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('task')}</p>
 
-                    <button type="button" onClick={() => onAddAll(7)}>
+                    <button type="button" onClick={() => onAddAll(7)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -396,7 +402,7 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('expense') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('expense')}</p>
 
                     <button type="button" onClick={() => onAddAll(8)}>
@@ -413,10 +419,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('recurring_invoice') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('recurring_invoice')}</p>
 
-                    <button type="button" onClick={() => onAddAll(9)}>
+                    <button type="button" onClick={() => onAddAll(9)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -430,10 +436,10 @@ export function SortableColumns({ report, columns }: Props) {
             {columns.includes('contact') && (
               <Column
                 title={() => (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                     <p>{t('contact')}</p>
 
-                    <button type="button" onClick={() => onAddAll(10)}>
+                    <button type="button" onClick={() => onAddAll(10)} style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                       <ChevronsRight size={16} />
                     </button>
                   </div>
@@ -446,12 +452,13 @@ export function SortableColumns({ report, columns }: Props) {
 
             <Column
               title={() => (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                   <p>
                     {t('report')} {t('columns')}
                   </p>
 
                   <div
+                    style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                     className="flex items-end space-x-1 cursor-pointer"
                     onClick={onRemoveAll}
                   >

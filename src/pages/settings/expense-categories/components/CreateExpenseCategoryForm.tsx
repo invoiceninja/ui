@@ -15,6 +15,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   errors: ValidationBag | undefined;
@@ -27,6 +28,8 @@ export function CreateExpenseCategoryForm(props: Props) {
   const [t] = useTranslation();
 
   const { errors, setErrors, setExpenseCategory, expenseCategory } = props;
+
+  const colors = useColorScheme();
 
   const handleChange = (
     property: keyof ExpenseCategory,
@@ -46,6 +49,7 @@ export function CreateExpenseCategoryForm(props: Props) {
   return (
     <CardContainer>
       <InputField
+        style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
         required
         label={t('name')}
         value={expenseCategory?.name}

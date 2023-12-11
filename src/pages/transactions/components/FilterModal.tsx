@@ -12,6 +12,7 @@ import { InputField } from '$app/components/forms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchInput } from './ListBox';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   searchParams: SearchInput;
@@ -20,6 +21,7 @@ interface Props {
 
 export function FilterModal(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const handleChangeSearchParams = (
     property: keyof SearchInput,
@@ -29,10 +31,11 @@ export function FilterModal(props: Props) {
   };
 
   return (
-    <div className="absolute w-full top-full left-0 mt-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10">
-      <div className="flex flex-col items-center p-3">
-        <div className="flex justify-evenly w-full">
+    <div className="absolute w-full top-full left-0 mt-1 text-center pb-2 z-10" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+      <div className="flex flex-col items-center p-3" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+        <div className="flex justify-evenly w-full" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={`${t('min')} ${t('amount')}`}
             value={props.searchParams.minAmount}
@@ -41,6 +44,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={`${t('max')} ${t('amount')}`}
             value={props.searchParams.maxAmount}
@@ -51,6 +55,7 @@ export function FilterModal(props: Props) {
         </div>
         <div className="flex justify-evenly mt-3 w-full">
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={t('start')}
             type="date"
@@ -60,6 +65,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={t('end')}
             type="date"

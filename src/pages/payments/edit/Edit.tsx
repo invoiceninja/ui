@@ -24,6 +24,7 @@ import { useOutletContext } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useColorScheme } from '$app/common/colors';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -46,6 +47,8 @@ export default function Edit() {
 
   const company = useCurrentCompany();
 
+  const colors = useColorScheme();
+
   const handleChange = <
     TField extends keyof Payment,
     TValue extends Payment[TField]
@@ -65,6 +68,7 @@ export default function Edit() {
 
       <Element leftSide={t('payment_number')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="number"
           value={payment?.number}
           onValueChange={(value) => handleChange('number', value)}
@@ -74,6 +78,7 @@ export default function Edit() {
 
       <Element leftSide={t('payment_date')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="date"
           type="date"
           value={payment?.date}
@@ -84,6 +89,7 @@ export default function Edit() {
 
       <Element leftSide={t('payment_type')}>
         <SelectField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="type_id"
           value={payment?.type_id}
           onValueChange={(value) => handleChange('type_id', value)}
@@ -102,6 +108,7 @@ export default function Edit() {
 
       <Element leftSide={t('transaction_reference')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           id="transaction_reference"
           onValueChange={(value) =>
             handleChange('transaction_reference', value)
@@ -113,6 +120,7 @@ export default function Edit() {
 
       <Element leftSide={t('private_notes')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           element="textarea"
           id="private_notes"
           value={payment?.private_notes}
@@ -167,6 +175,7 @@ export default function Edit() {
 
       <Element leftSide={t('convert_currency')}>
         <Toggle
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           checked={Boolean(payment?.exchange_currency_id)}
           onChange={(value) => {
             setConvertCurrency(value);

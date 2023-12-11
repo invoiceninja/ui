@@ -78,6 +78,7 @@ export function App() {
 
   useEffect(() => {
     document.body.style.backgroundColor = colorScheme.$2;
+    document.body.style.colorScheme = colorScheme.$0;
   }, [colorScheme]);
 
   useEffect(() => {
