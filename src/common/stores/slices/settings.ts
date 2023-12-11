@@ -23,7 +23,6 @@ interface SettingsState {
     secondary?: string;
   };
   darkMode: boolean;
-  isMiniSidebar: boolean;
   activeSettings: ActiveSettings;
 }
 
@@ -32,7 +31,6 @@ const initialState: SettingsState = {
     primary: '#117DC0',
   },
   darkMode: false,
-  isMiniSidebar: false,
   activeSettings: {
     name: '',
     level: 'company',
@@ -49,9 +47,6 @@ export const settingsSlice = createSlice({
     setDarkMode: (state, action: PayloadAction<{ status: boolean }>) => {
       state.darkMode = action.payload.status;
     },
-    setIsMiniSidebar: (state, action: PayloadAction<{ status: boolean }>) => {
-      state.isMiniSidebar = action.payload.status;
-    },
     setActiveSettings: (
       state,
       action: PayloadAction<{ status: ActiveSettings }>
@@ -61,9 +56,5 @@ export const settingsSlice = createSlice({
   },
 });
 
-export const {
-  updatePrimaryColor,
-  setDarkMode,
-  setIsMiniSidebar,
-  setActiveSettings,
-} = settingsSlice.actions;
+export const { updatePrimaryColor, setDarkMode, setActiveSettings } =
+  settingsSlice.actions;
