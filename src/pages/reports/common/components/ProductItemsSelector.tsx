@@ -18,14 +18,14 @@ import Select, { MultiValue, StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
-  defaultValue?: string;
+  value?: string;
   onValueChange: (productsKeys: string) => void;
 }
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const { defaultValue, onValueChange } = props;
+  const { value, onValueChange } = props;
 
   const [productItems, setProductItems] = useState<SelectOption[]>();
 
@@ -65,7 +65,6 @@ export function ProductItemsSelector(props: Props) {
       ...styles,
       color: data.color,
     }),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
@@ -98,23 +97,21 @@ export function ProductItemsSelector(props: Props) {
 
   return (
     <>
-      {productItems || !defaultValue || !defaultValue?.length ? (
+      {productItems || !value || !value?.length ? (
         <Element leftSide={t('products')}>
           <Select
-            styles={customStyles}
-            defaultValue={
-              defaultValue
-                ? productItems?.filter((option) =>
-                    defaultValue
-                      .split(',')
-                      .find((value) => value === option.value)
-                  )
-                : null
-            }
-            onChange={(options) => onValueChange(handleChange(options))}
             placeholder={t('products')}
+            {...(value && {
+              value: productItems?.filter((option) =>
+                value
+                  .split(',')
+                  .find((productKey) => productKey === option.value)
+              ),
+            })}
+            onChange={(options) => onValueChange(handleChange(options))}
             options={productItems}
             isMulti={true}
+            styles={customStyles}
           />
         </Element>
       ) : (

@@ -27,7 +27,7 @@ export function useScheduleReport() {
       end_date: report.payload.end_date,
       client_id: report.payload.client_id || '',
       date_range: report.payload.date_range,
-      send_email: report.payload.send_email,
+      send_email: true,
       is_income_billed: report.payload.is_income_billed ?? false,
       is_expense_billed: report.payload.is_expense_billed ?? false,
       include_tax: report.payload.include_tax ?? false,

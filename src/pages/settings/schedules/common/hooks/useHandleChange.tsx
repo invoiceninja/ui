@@ -36,7 +36,7 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   end_date: '',
   report_keys: [],
   product_key: '',
-  send_email: false,
+  send_email: true,
   is_expense_billed: false,
   is_income_billed: false,
   include_tax: false,

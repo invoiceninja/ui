@@ -97,6 +97,7 @@ export function EmailReport(props: Props) {
             onValueChange={(value) =>
               handleChange('parameters.send_email' as keyof Schedule, value)
             }
+            disabled
           />
         </Element>
       )}
@@ -153,7 +154,7 @@ export function EmailReport(props: Props) {
 
       {showReportFiled('products') && (
         <ProductItemsSelector
-          defaultValue={schedule.parameters.product_key}
+          value={schedule.parameters.product_key}
           onValueChange={(value) =>
             handleChange('parameters.product_key' as keyof Schedule, value)
           }
