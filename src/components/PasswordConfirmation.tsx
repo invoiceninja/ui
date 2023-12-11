@@ -128,6 +128,7 @@ export function PasswordConfirmation(props: Props) {
           type="password"
           label={t('current_password')}
           required
+          changeOverride={true}
           value={currentPassword}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setCurrentPassword(event.target.value)
