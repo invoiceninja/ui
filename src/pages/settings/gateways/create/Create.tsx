@@ -329,7 +329,11 @@ export function Create() {
                     <Button
                       behavior="button"
                       onClick={() => {
-                        setCreateBySetup(true);
+                        
+                        if(gateway.key !== '80af24a6a691230bbec33e930ab40666' ){
+                          setCreateBySetup(true);
+                        }
+
                         handleChange(gateway.id);
                       }}
                     >
