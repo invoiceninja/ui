@@ -37,6 +37,7 @@ interface Props extends CommonProps {
   maxLength?: number;
   autoComplete?: string;
   withoutLabelWrapping?: boolean;
+  changeOverride?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -101,11 +102,12 @@ export function InputField(props: Props) {
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}
-          // onChange={(event) => {
-          //   props.onValueChange && props.onValueChange(event.target.value);
-          //   props.onChange && props.onChange(event);
-          // }}
-          onChange={() => {}}
+          onChange={(event) => {
+            if (props.changeOverride && props.changeOverride === true) {
+                props.onValueChange && props.onValueChange(event.target.value);
+                props.onChange && props.onChange(event);
+            }
+          }}
           value={props.value}
           list={props.list}
           rows={props.textareaRows || 5}

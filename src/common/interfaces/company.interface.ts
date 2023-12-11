@@ -63,13 +63,6 @@ export interface Company {
   fill_products: boolean;
 }
 
-export interface CompanyInput {
-  name: string;
-  subdomain: string;
-  language_id: string;
-  currency_id: string;
-}
-
 export interface Settings {
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;

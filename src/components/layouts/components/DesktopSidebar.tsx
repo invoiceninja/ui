@@ -9,14 +9,15 @@
  */
 
 import { useLogo } from '$app/common/hooks/useLogo';
-import { RootState } from '$app/common/stores/store';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
-import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
 import { Tooltip } from '$app/components/Tooltip';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import classNames from 'classnames';
+
 
 export interface NavigationItem {
   name: string;
@@ -38,8 +39,10 @@ interface Props {
 }
 
 export function DesktopSidebar(props: Props) {
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
+  const user = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
   );
 
   const logo = useLogo();
@@ -47,8 +50,14 @@ export function DesktopSidebar(props: Props) {
 
   return (
     <div
-      className={`hidden md:flex z-10 ${isMiniSidebar ? 'md:w-16' : 'md:w-64'
-        } md:flex-col md:fixed md:inset-y-0`}
+
+      className={classNames(
+        'hidden md:flex z-10 md:flex-col md:fixed md:inset-y-0',
+        {
+          'md:w-16': isMiniSidebar,
+          'md:w-64': !isMiniSidebar,
+        }
+      )}
     >
       <div
         style={{ backgroundColor: colors.$6, borderColor: colors.$4 }}
@@ -56,7 +65,13 @@ export function DesktopSidebar(props: Props) {
       >
         <div
           style={{ borderColor: colors.$5 }}
-          className="flex items-center flex-shrink-0 pl-3 pr-6 h-16 border-b"
+          className={classNames(
+            'flex items-center flex-shrink-0 h-16 border-b',
+            {
+              'pl-3 pr-6': !isMiniSidebar,
+              'justify-center': isMiniSidebar,
+            }
+          )}
         >
           {isMiniSidebar ? (
             <img className="w-8" src={logo} alt="Company logo" />

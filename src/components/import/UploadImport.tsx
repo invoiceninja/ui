@@ -23,6 +23,10 @@ import Toggle from '$app/components/forms/Toggle';
 import { MdClose } from 'react-icons/md';
 import { BankAccountSelector } from '$app/pages/transactions/components/BankAccountSelector';
 import { useColorScheme } from '$app/common/colors';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
+import { Alert } from '../Alert';
+
 
 interface Props {
   entity: string;
@@ -57,6 +61,7 @@ export function UploadImport(props: Props) {
     skip_header: true,
     column_map: { [props.entity]: { mapping: {} } },
   });
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     payload.column_map[props.entity].mapping[event.target.id] =
@@ -84,6 +89,7 @@ export function UploadImport(props: Props) {
     }
 
     toast.processing();
+    setErrors(undefined);
 
     let endPointUrl = '/api/v1/import';
     let params = {};
@@ -116,13 +122,18 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    request('POST', endpoint(endPointUrl, params), requestData).then(
-      (response) => {
+    request('POST', endpoint(endPointUrl, params), requestData)
+      .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
         props.onFileImported?.();
         props.onSuccess;
-      }
-    );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        }
+      });
   };
 
   const formik = useFormik({
@@ -130,9 +141,10 @@ export function UploadImport(props: Props) {
     initialValues: {},
     onSubmit: () => {
       toast.processing();
+      setErrors(undefined);
 
-      request('POST', endpoint('/api/v1/preimport'), formData).then(
-        (response) => {
+      request('POST', endpoint('/api/v1/preimport'), formData)
+        .then((response) => {
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();
@@ -146,8 +158,13 @@ export function UploadImport(props: Props) {
               }
             );
           }
-        }
-      );
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        });
     },
   });
 
@@ -237,6 +254,13 @@ export function UploadImport(props: Props) {
                     : t('dropzone_default_message')}
                 </span>
               </div>
+
+              {errors &&
+                Object.keys(errors.errors).map((key, index) => (
+                  <Alert key={index} type="danger">
+                    {errors.errors[key]}
+                  </Alert>
+                ))}
             </div>
           ) : (
             <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
@@ -347,6 +371,7 @@ export function UploadImport(props: Props) {
                         bank_integration_id: '',
                       }))
                     }
+                    errorMessage={errors?.errors.bank_integration_id}
                   />
                 </Td>
               </Tr>

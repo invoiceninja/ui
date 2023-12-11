@@ -29,8 +29,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { useSelector } from 'react-redux';
-import { RootState } from '$app/common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import {
@@ -42,7 +40,6 @@ import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -56,6 +53,7 @@ import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 export interface SaveOption {
   label: string;
@@ -86,18 +84,18 @@ export function Default(props: Props) {
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
-  );
-
   const [t] = useTranslation();
-  const user = useCurrentUser();
+  const user = useInjectUserChanges();
 
   const hasPermission = useHasPermission();
   const location = useLocation();
   const navigate = useNavigate();
   const companyUser = useCurrentCompanyUser();
   const enabled = useEnabled();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
+  );
 
   const navigation: NavigationItem[] = [
     {
