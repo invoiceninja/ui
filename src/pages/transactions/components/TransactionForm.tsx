@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { EntityStatus } from './EntityStatus';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   transaction: Transaction;
@@ -38,6 +39,8 @@ interface Props {
 export function TransactionForm(props: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   return (
     <>
       {props.page === 'edit' && (
@@ -48,6 +51,7 @@ export function TransactionForm(props: Props) {
 
       <Element required leftSide={t('type')}>
         <SelectField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           value={
             props.transaction.base_type === ApiTransactionType.Credit
               ? TransactionType.Deposit
@@ -73,6 +77,7 @@ export function TransactionForm(props: Props) {
 
       <Element leftSide={t('date')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           type="date"
           value={props.transaction.date}
           onValueChange={(value) => props.handleChange('date', value)}
@@ -118,6 +123,7 @@ export function TransactionForm(props: Props) {
 
       <Element leftSide={t('description')}>
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           element="textarea"
           value={props.transaction.description}
           onValueChange={(value) => props.handleChange('description', value)}

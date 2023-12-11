@@ -30,9 +30,11 @@ import {
   availableGatewayLogos,
   GatewayTypeIcon,
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { isHosted } from '$app/common/helpers';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
+
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -47,6 +49,7 @@ const gatewaysStyles = [
 export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
+  { name: 'paypal', key: '80af24a6a691230bbec33e930ab40666' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
   { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666'},
   { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
@@ -59,8 +62,12 @@ export const gatewaysDetails = [
   { name: 'checkoutcom', key: '3758e7f7c6f4cecf0f4f348b9a00f456' },
   { name: 'payfast', key: 'd6814fc83f45d2935e7777071e629ef9' },
   { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
-  { name: 'wepay', key: '8fdeed552015b3c7b44ed6c8ebd9e992' },
-  { name: 'paypal_express', key: '38f2c48af60c7dd69e04248cbb24c36e' },
+];
+
+const hostedGatewayFilter = [
+  '38f2c48af60c7dd69e04248cbb24c36e', //do not allow express to be created in hosted
+  '80af24a6a691230bbec33e930ab40665', //do not allow pp rest to be created in hosted
+  '8fdeed552015b3c7b44ed6c8ebd9e992', //do not allow wepay to be created in hosted
 ];
 
 export function Create() {
@@ -165,7 +172,17 @@ export function Create() {
 
   useEffect(() => {
     if (gateways) {
-      setFilteredGateways(gateways);
+
+      if(isHosted()){
+      const mutated_gateways = gateways.filter((gateway) => {
+        return !hostedGatewayFilter.includes(gateway.key);   
+      });
+      setFilteredGateways(mutated_gateways);  
+      }
+      else {
+        setFilteredGateways(gateways);
+      }
+      
     }
   }, [gateways]);
 
@@ -329,7 +346,11 @@ export function Create() {
                     <Button
                       behavior="button"
                       onClick={() => {
-                        setCreateBySetup(true);
+                        
+                        if(gateway.key !== '80af24a6a691230bbec33e930ab40666' ){
+                          setCreateBySetup(true);
+                        }
+
                         handleChange(gateway.id);
                       }}
                     >

@@ -9,12 +9,11 @@
  */
 
 import { classNames } from '$app/common/helpers';
-import { RootState } from '$app/common/stores/store';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { NavigationItem } from './DesktopSidebar';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -31,8 +30,10 @@ interface Props {
 export function SidebarItem(props: Props) {
   const { item, colors } = props;
 
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
+  const user = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
   );
 
   if (!item.visible) {
@@ -78,5 +79,6 @@ export function SidebarItem(props: Props) {
         </Link>
       )}
     </Div>
+
   );
 }

@@ -136,7 +136,7 @@ export function InputField(props: Props) {
       </div>
 
       {props.errorMessage && (
-        <Alert className="mt-2" type="danger">
+        <Alert className="mt-2" type="danger" >
           {props.errorMessage}
         </Alert>
       )}
