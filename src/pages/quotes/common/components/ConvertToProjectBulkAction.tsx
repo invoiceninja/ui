@@ -16,6 +16,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSwitchRight } from 'react-icons/md';
 import { useBulkAction } from '../hooks/useBulkAction';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   selectedIds: string[];
@@ -27,7 +28,7 @@ export const ConvertToProjectBulkAction = (props: Props) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { selectedIds, setSelected } = props;
-
+  const colors = useColorScheme();
   const bulk = useBulkAction();
 
   return (
@@ -44,7 +45,9 @@ export const ConvertToProjectBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg"
+          style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+        >{t('are_you_sure')}</span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button
