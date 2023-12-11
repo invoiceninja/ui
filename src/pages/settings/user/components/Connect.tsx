@@ -101,20 +101,19 @@ export function Connect() {
 
   return (
     <Card title={t('oneclick_login')}>
-      {!user?.oauth_provider_id && (
+      {!user?.oauth_provider_id && isHosted() &&(
         <>
-          {isHosted() && (
-            <div className="grid grid-cols-3 text-sm mt-4">
-              <Element leftSide="Google">
-                <GoogleLogin
-                  onSuccess={(response) =>
-                    response.credential && handleGoogle(response.credential)
-                  }
-                  onError={() => toast.error()}
-                />
-              </Element>
-            </div>
-          )}
+          <div className="grid grid-cols-3 text-sm mt-4">
+            <Element leftSide="Google">
+              <GoogleLogin
+                onSuccess={(response) =>
+                  response.credential && handleGoogle(response.credential)
+                }
+                onError={() => toast.error()}
+              />
+            </Element>
+          </div>
+          
           <div
             className={classNames('grid grid-cols-3 text-sm', {
               'mt-4': isHosted(),
@@ -145,7 +144,7 @@ export function Connect() {
                   <path fill="#ffba08" d="M12 12h10v10H12z"></path>
                 </svg>
 
-                <p>Log in with Microsoft</p>
+                <p style={{ color: "#000" }}>Log in with Microsoft</p>
               </SignInProviderButton>
             </Element>
           </div>

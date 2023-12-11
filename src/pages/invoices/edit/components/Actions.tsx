@@ -59,6 +59,7 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import {useDownloadEInvoice} from "$app/pages/invoices/common/hooks/useDownloadEInvoice";
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -89,6 +90,7 @@ export function useActions(params?: Params) {
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
+  const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
 
@@ -312,6 +314,20 @@ export function useActions(params?: Params) {
           }
         >
           {t('download')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      showActionByPreferences('invoice', 'download_e_invoice') && (
+        <DropdownElement
+          {...(!dropdown && { behavior: 'tooltipButton',
+              tooltipText: t('download_e_invoice'),
+              key: 'download', })}
+          onClick={() => downloadEInvoice(invoice)}
+          icon={
+            <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
+          }
+        >
+          {t('download_e_invoice')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>

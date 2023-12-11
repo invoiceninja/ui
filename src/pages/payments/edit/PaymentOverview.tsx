@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Payment } from '$app/common/interfaces/payment';
 import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
 import { PaymentStatus } from '../common/components/PaymentStatus';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   payment: Payment;
@@ -21,12 +22,13 @@ interface Props {
 export function PaymentOverview(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+  const colors = useColorScheme();
 
   return (
     <div>
       <div className="grid grid-cols-2 gap-4 my-4">
         <div className="flex items-center justify-center">
-          <span className="text-gray-800">
+          <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
             {`${t('amount')}: ${formatMoney(
               props?.payment?.amount || 0,
               props.payment.client?.country_id,
@@ -36,7 +38,7 @@ export function PaymentOverview(props: Props) {
         </div>
 
         <div className="flex items-center justify-center">
-          <span className="text-gray-800">
+          <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
             {`${t('applied')}: ${formatMoney(
               props?.payment?.applied || 0,
               props.payment.client?.country_id,
@@ -50,7 +52,7 @@ export function PaymentOverview(props: Props) {
         </div>
 
         <div className="flex items-center justify-center">
-          <span className="text-gray-800">
+          <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
             {`${t('refunded')}: ${formatMoney(
               props?.payment?.refunded || 0,
               props.payment.client?.country_id,
@@ -64,7 +66,7 @@ export function PaymentOverview(props: Props) {
             <div className="flex items-center justify-center"></div>
 
             <div className="flex items-center justify-center">
-              <span className="text-gray-800">
+              <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
                 {`${t('unapplied')}: ${formatMoney(
                   props?.payment?.amount - props?.payment?.applied || 0,
                   props.payment.client?.country_id,

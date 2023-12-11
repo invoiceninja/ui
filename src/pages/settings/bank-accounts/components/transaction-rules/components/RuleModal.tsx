@@ -143,6 +143,7 @@ export function RuleModal(props: Props) {
       </SelectField>
 
       <InputField
+        changeOverride={true}
         required
         label={t('value')}
         value={rule?.value}

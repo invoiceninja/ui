@@ -26,6 +26,7 @@ import { Fragment } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
+import { useColorScheme } from '$app/common/colors';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -52,6 +53,7 @@ interface Props {
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const { resource, items, columns, relationType } = props;
 
@@ -156,6 +158,7 @@ export function ProductsTable(props: Props) {
 
                                 {resource && (
                                   <button
+                                    style={{ color: colors.$3 }}
                                     className="ml-2 text-gray-600 hover:text-red-600"
                                     onClick={() => {
                                       setIsDeleteActionTriggered(true);

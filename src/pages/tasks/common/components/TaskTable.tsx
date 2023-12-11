@@ -25,6 +25,7 @@ import {
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   task: Task;
@@ -42,6 +43,8 @@ export function TaskTable(props: Props) {
   const { task, handleChange } = props;
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
 
   const company = useCurrentCompany();
 
@@ -189,6 +192,7 @@ export function TaskTable(props: Props) {
                 <Tr>
                   <Td>
                     <InputField
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="date"
                       value={parseTimeToDate(start)}
                       onValueChange={(value) =>
@@ -199,6 +203,7 @@ export function TaskTable(props: Props) {
 
                   <Td>
                     <InputField
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
                       value={parseTime(start)}
@@ -211,6 +216,7 @@ export function TaskTable(props: Props) {
                   {company?.show_task_end_date && (
                     <Td>
                       <InputField
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
                         type="date"
                         value={parseTimeToDate(stop)}
                         onValueChange={(value) =>
@@ -222,6 +228,7 @@ export function TaskTable(props: Props) {
 
                   <Td>
                     <InputField
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
                       value={parseTime(stop) || 0}
@@ -244,6 +251,7 @@ export function TaskTable(props: Props) {
                   {company?.settings.allow_billable_task_items && (
                     <Td>
                       <Checkbox
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
                         checked={billable || typeof billable === 'undefined'}
                         onValueChange={(value, checked) =>
                           handleBillableChange(
@@ -262,6 +270,7 @@ export function TaskTable(props: Props) {
                     }
                   >
                     <button
+                      style={{ color: colors.$3 }}
                       className="ml-2 text-gray-600 hover:text-red-600"
                       onClick={() => deleteTableRow(index)}
                     >

@@ -12,12 +12,9 @@ import Tippy from '@tippyjs/react';
 import { endpoint, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
-import { setIsMiniSidebar } from '$app/common/stores/slices/settings';
-import { RootState } from '$app/common/stores/store';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Facebook,
   GitHub,
@@ -33,31 +30,45 @@ import {
   ChevronRight,
 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
+import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import classNames from 'classnames';
 
 interface Props {
   docsLink?: string;
+  mobileNavbar?: boolean;
 }
 
 export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
-  const user = useCurrentUser();
+  const user = useInjectUserChanges();
+  const currentUser = useCurrentUser();
   const account = useCurrentAccount();
 
+  const colors = useColorScheme();
+
+  const { mobileNavbar } = props;
+
   const dispatch = useDispatch();
+  const updateCompanyUser = useUpdateCompanyUser();
+  const handleUserChange = useHandleCurrentUserChangeProperty();
 
-  const [isContactVisible, setIsContactVisible] = useState(false);
-  const [isAboutVisible, setIsAboutVisible] = useState(false);
-  const [cronsNotEnabledModal, setCronsNotEnabledModal] = useState(false);
-  const [disabledButton, setDisabledButton] = useState(false);
+  const [isContactVisible, setIsContactVisible] = useState<boolean>(false);
+  const [isAboutVisible, setIsAboutVisible] = useState<boolean>(false);
+  const [cronsNotEnabledModal, setCronsNotEnabledModal] =
+    useState<boolean>(false);
+  const [disabledButton, setDisabledButton] = useState<boolean>(false);
 
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
   );
 
   const formik = useFormik({
@@ -88,7 +99,19 @@ export function HelpSidebarIcons(props: Props) {
     });
   };
 
-  const colors = useColorScheme();
+  useEffect(() => {
+    const showMiniSidebar =
+      user?.company_user?.react_settings?.show_mini_sidebar;
+
+    if (
+      user &&
+      typeof showMiniSidebar !== 'undefined' &&
+      currentUser?.company_user?.react_settings?.show_mini_sidebar !==
+        showMiniSidebar
+    ) {
+      updateCompanyUser(user);
+    }
+  }, [user?.company_user?.react_settings.show_mini_sidebar]);
 
   return (
     <>
@@ -208,9 +231,12 @@ export function HelpSidebarIcons(props: Props) {
 
       <nav
         style={{ borderColor: colors.$5 }}
-        className="flex p-2 justify-around text-white border-t"
+        className={classNames('flex p-2 text-white border-t', {
+          'justify-end': mobileNavbar,
+          'justify-around': !mobileNavbar,
+        })}
       >
-        {!isMiniSidebar && (
+        {!isMiniSidebar && !mobileNavbar && (
           <>
             {isSelfHosted() && account && !account.is_scheduler_running && (
               <button
@@ -275,7 +301,7 @@ export function HelpSidebarIcons(props: Props) {
             </a>
 
             <button
-              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              className="p-2 hover:bg-ninja-gray-darker rounded-full overflow-visible"
               onClick={() => setIsAboutVisible(true)}
             >
               <Tippy
@@ -290,13 +316,22 @@ export function HelpSidebarIcons(props: Props) {
         )}
 
         <button
-          className="p-2 hover:bg-ninja-gray-darker rounded-full"
-          onClick={() => dispatch(setIsMiniSidebar({ status: !isMiniSidebar }))}
+          className="p-2 rounded-full"
+          onClick={() =>
+            handleUserChange(
+              'company_user.react_settings.show_mini_sidebar',
+              !isMiniSidebar
+            )
+          }
         >
           <Tippy
             duration={0}
-            content={isMiniSidebar ? t('show_menu') : t('hide_menu')}
-            className="text-white rounded text-xs mb-2"
+            content={
+              <span style={{ fontSize: isMiniSidebar ? '0.6rem' : '0.75rem' }}>
+                {isMiniSidebar ? t('show_menu') : t('hide_menu')}
+              </span>
+            }
+            className="text-white rounded mb-1.5"
           >
             {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}
           </Tippy>

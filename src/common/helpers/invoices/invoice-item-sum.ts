@@ -131,14 +131,17 @@ export class InvoiceItemSum {
       );
     }
 
-    this.item.gross_line_total = this.item.line_total + itemTax;
+    this.item.gross_line_total = this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
 
-    this.totalTaxes += itemTax;
+    this.totalTaxes += (isNaN(itemTax) ? 0 : itemTax);
 
     return this;
   }
 
   protected groupTax(name: string, rate: number, total: number) {
+
+    if(name.length === 0) return;
+    
     let group = {};
 
     const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
@@ -180,12 +183,7 @@ export class InvoiceItemSum {
         this.item = item;
 
         if (item.line_total != 0) {
-          // const amount =
-          //   this.subTotal > 0
-          //     ? this.item.line_total -
-          //     this.invoice.discount * (this.item.line_total / this.subTotal)
-          //     : 0;
-
+          
           const amount =
             this.item.line_total -
             this.item.line_total * (this.invoice.discount / this.subTotal);
@@ -239,12 +237,12 @@ export class InvoiceItemSum {
             );
           }
 
-          this.item.gross_line_total = this.item.line_total + itemTax;
-          this.item.tax_amount = itemTax;
+          this.item.gross_line_total = this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
+          this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
         }
 
         this.lineItems[index] = this.item;
-        this.totalTaxes += itemTax;
+        this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
       });
   }
 }
