@@ -29,6 +29,10 @@ export function Link(props: Props) {
     color: accentColor,
   };
 
+  if (disableNavigation) {
+    return <span>{props.children}</span>;
+  }
+
   if (props.external) {
     return (
       <a
@@ -46,7 +50,7 @@ export function Link(props: Props) {
   return (
     <RouterLink
       className={`text-sm hover:underline ${props.className}`}
-      style={{ ...css, pointerEvents: !disableNavigation ? 'all' : 'none' }}
+      style={css}
       to={props.to}
     >
       {props.children}
