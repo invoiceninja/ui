@@ -23,13 +23,13 @@ interface Props {
 }
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const { defaultValue, onValueChange } = props;
 
   const [productItems, setProductItems] = useState<SelectOption[]>();
 
   const { data: products } = useProductsQuery({ status: ['active'] });
-  const colors = useColorScheme();
 
   useEffect(() => {
     if (products && !productItems) {
