@@ -21,6 +21,7 @@ import {
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useCreditsFilters } from '../common/hooks/useCreditsFilters';
 
 export default function Credits() {
   useTitle('credits');
@@ -31,6 +32,7 @@ export default function Credits() {
 
   const actions = useActions();
   const columns = useCreditColumns();
+  const filters = useCreditsFilters();
 
   const creditColumns = useAllCreditColumns();
 
@@ -52,6 +54,8 @@ export default function Credits() {
         linkToEdit="/credits/:id/edit"
         customActions={actions}
         customBulkActions={customBulkActions}
+        customFilters={filters}
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker

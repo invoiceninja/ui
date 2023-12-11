@@ -36,7 +36,7 @@ export function PayPalPPCP(props: Props) {
 
     const handleSetup = () => {
         request('POST', endpoint('/api/v1/one_time_token'), {
-            context: 'stripe_connect',
+            context: 'paypal_ppcp',
         }).then((response) =>
             window
                 .open(
@@ -80,7 +80,7 @@ export function PayPalPPCP(props: Props) {
                 <ul className="list-none">
                     <li><b>Merchant id:</b> {resolveConfigValue('merchantId')}</li>
                     <li><b>{t('status')}:</b> {resolveConfigValue('status')}</li>
-                    <li><b>{t('email')}:</b> {resolveConfigValue('email_verified')}</li>
+                    <li><b>{t('email')}:</b> {resolveConfigValue('emailVerified')}</li>
                     <li><b>{t('permissions')}:</b> {resolveConfigValue('permissions')}</li>
                     <li><b>{t('notifications')}:</b> {resolveConfigValue('returnMessage')}</li>
                 </ul>
@@ -110,11 +110,3 @@ export function PayPalPPCP(props: Props) {
     
 }
 
-
-// +"merchantId": "XYPBKP4R2HMAN",
-//     +"status": "activated",
-//         +"trackingId": "nFwZNEsLc8pQgQ6r",
-//             +"consent": "Consented",
-//                 +"email_verified": "Confirmed",
-//                     +"permissions": "Granted",
-//                         +"returnMessage": "",

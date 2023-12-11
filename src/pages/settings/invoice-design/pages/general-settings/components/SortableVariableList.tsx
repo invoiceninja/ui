@@ -28,12 +28,15 @@ import { useDispatch } from 'react-redux';
 interface Props {
   defaultVariables: { value: string; label: string }[];
   for: string;
+  disabled?: boolean;
 }
 
 export function SortableVariableList(props: Props) {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const dispatch = useDispatch();
+
+  const { disabled } = props;
 
   const defaultVariables = props.defaultVariables;
 
@@ -107,7 +110,7 @@ export function SortableVariableList(props: Props) {
   return (
     <>
       <Element leftSide={t('fields')}>
-        <SelectField onChange={handleSelectChange}>
+        <SelectField onChange={handleSelectChange} disabled={disabled}>
           <option></option>
 
           {defaultVariablesFiltered.map((option, index) => (
@@ -120,12 +123,17 @@ export function SortableVariableList(props: Props) {
 
       <Element leftSide={t('variables')}>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={props.for}>
+          <Droppable droppableId={props.for} isDropDisabled={disabled}>
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {company?.settings?.pdf_variables?.[props.for]?.map(
                   (label: string, index: number) => (
-                    <Draggable key={label} draggableId={label} index={index}>
+                    <Draggable
+                      key={label}
+                      draggableId={label}
+                      index={index}
+                      isDragDisabled={disabled}
+                    >
                       {(provided) => (
                         <div
                           {...provided.draggableProps}
@@ -139,6 +147,8 @@ export function SortableVariableList(props: Props) {
                               type="minimal"
                               onClick={() => remove(label)}
                               behavior="button"
+                              disableWithoutIcon={disabled}
+                              disabled={disabled}
                             >
                               <X />
                             </Button>

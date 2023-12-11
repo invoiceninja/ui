@@ -33,13 +33,14 @@ export function useUpdateTask(params: Params) {
       toast.processing();
 
       if (isOverlapping(task)) {
+        setIsFormBusy(false);
         return toast.error('task_errors');
       }
 
       request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
         .then(() => {
+          
           toast.success('updated_task');
-
           $refetch(['tasks']);
         })
         .catch((error: AxiosError<ValidationBag>) => {

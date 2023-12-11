@@ -57,6 +57,7 @@ import {
 } from '../common/components/CreateTaskModal';
 import { TaskClock } from './components/TaskClock';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 interface CardItem {
   id: string;
@@ -257,6 +258,8 @@ export default function Kanban() {
         );
   }, [projectId]);
 
+  const colors = useColorScheme();
+  
   return (
     <Default
       title={documentTitle}
@@ -280,11 +283,11 @@ export default function Kanban() {
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
         actionChildren={
-          <div className="flex w-full divide-x-2">
+          <div className="flex w-full divide-x-2" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
             {sliderType === 'view' && (
               <ReactRouterLink
                 to={route('/tasks/:id/edit', { id: currentTask?.id })}
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
               >
                 <Edit size={18} />
                 <span>{t('edit_task')}</span>
@@ -298,7 +301,8 @@ export default function Kanban() {
 
             {currentTask && !isTaskRunning(currentTask) && (
               <button
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
                 onClick={() => startTask(currentTask)}
               >
                 <Play size={18} />
@@ -308,7 +312,8 @@ export default function Kanban() {
 
             {currentTask && isTaskRunning(currentTask) && (
               <button
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
                 onClick={() => stopTask(currentTask)}
               >
                 <Pause size={18} />
@@ -324,7 +329,7 @@ export default function Kanban() {
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
         <Card className="col-span-12 xl:col-span-4">
           <Element leftSide={t('project')}>
             <ProjectSelector
@@ -339,8 +344,8 @@ export default function Kanban() {
 
       {board && (
         <div
+          style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4, paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
           className="flex pb-6 space-x-4 overflow-x-auto mt-4"
-          style={{ paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
             {board.columns.map((board) => (
@@ -348,15 +353,16 @@ export default function Kanban() {
                 {(provided) => (
                   <div
                     className="bg-white rounded shadow select-none h-max"
-                    style={{ minWidth: 360 }}
+                    style={{ minWidth: 360, color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+
                   >
-                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
-                      <h3 className="leading-6 font-medium text-gray-900">
+                    <div className="flex items-center justify-between border-b px-4 py-5" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+                      <h3 className="leading-6 font-medium ">
                         {board.title}
                       </h3>
 
                       <MdAddCircle
-                        className="cursor-pointer text-gray-500 hover:text-gray-800"
+                        className="cursor-pointer"
                         fontSize={22}
                         onClick={() => {
                           setTaskDetails({
@@ -372,6 +378,7 @@ export default function Kanban() {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       className="p-4 space-y-4"
+                      style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                     >
                       {board.cards.map((card, i) => (
                         <div
@@ -388,7 +395,8 @@ export default function Kanban() {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
+                                className="px-4 sm:px-6 py-4"
+                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
                               >
                                 <p>{card.title}</p>
                                 <small>
@@ -402,16 +410,18 @@ export default function Kanban() {
                             )}
                           </Draggable>
 
-                          <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
+                          <div className="hidden group-hover:flex border-t justify-center items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
                             <button
-                              className="w-full hover:bg-gray-200 py-2 rounded-bl"
+                              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                              className="w-full py-2 rounded-bl"
                               onClick={() => handleCurrentTask(card.id, 'view')}
                             >
                               {t('view')}
                             </button>
 
                             <button
-                              className="w-full text-center hover:bg-gray-200 py-2"
+                              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                              className="w-full text-center py-2"
                               onClick={() => handleCurrentTask(card.id, 'edit')}
                             >
                               {t('edit')}
@@ -419,7 +429,8 @@ export default function Kanban() {
 
                             {isTaskRunning(card.task) && (
                               <button
-                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                                className="w-full py-2 rounded-br"
                                 onClick={() => stopTask(card.task)}
                               >
                                 {t('stop')}
@@ -428,7 +439,8 @@ export default function Kanban() {
 
                             {!isTaskRunning(card.task) && (
                               <button
-                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                                className="w-full py-2 rounded-br"
                                 onClick={() => startTask(card.task)}
                               >
                                 {t('start')}
@@ -447,9 +459,10 @@ export default function Kanban() {
           </DragDropContext>
 
           <div>
-            <div className="bg-white shadow rounded p-1">
+            <div className="shadow rounded p-1" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
               <MdAdd
-                className="cursor-pointer text-gray-500 hover:text-gray-800"
+                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                className="cursor-pointer"
                 fontSize={28}
                 onClick={() => setIsTaskStatusModalOpened(true)}
               />

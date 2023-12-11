@@ -53,6 +53,7 @@ export interface ReactSettings {
   preferences: Preferences;
   table_filters?: Record<string, TableFiltersPreference>;
   common_actions?: Record<Entity, string[]>;
+  show_mini_sidebar?: boolean;
 }
 
 export type ReactTableColumns =

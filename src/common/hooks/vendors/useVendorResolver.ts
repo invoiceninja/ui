@@ -11,29 +11,21 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Vendor } from '$app/common/interfaces/vendor';
-
-export class VendorResolver {
-  protected declare vendor: Vendor;
-
-  public find(id: string): Promise<Vendor> {
-    return new Promise((resolve, reject) => {
-      if (id === this.vendor?.id) {
-        return resolve(this.vendor);
-      }
-
-      request('GET', endpoint('/api/v1/vendors/:id', { id }))
-        .then((response) => {
-          this.vendor = response.data.data;
-
-          return resolve(this.vendor);
-        })
-        .catch((error) => reject(error));
-    });
-  }
-}
-
-export const vendorResolver = new VendorResolver();
+import { useQueryClient } from 'react-query';
 
 export function useVendorResolver() {
-  return vendorResolver;
+  const queryClient = useQueryClient();
+
+  const find = (id: string) => {
+    return queryClient.fetchQuery<Vendor>(
+      ['/api/v1/vendors', id],
+      () =>
+        request('GET', endpoint('/api/v1/vendors/:id', { id })).then(
+          (response) => response.data.data
+        ),
+      { staleTime: Infinity }
+    );
+  };
+
+  return { find };
 }

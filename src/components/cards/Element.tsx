@@ -41,18 +41,19 @@ export function Element(props: Props) {
         }
       )}
       onClick={props.onClick}
+      style={{ color: colors.$3, colorScheme: colors.$0 }}
     >
       <dt
         className={classNames('text-sm flex flex-col', {
           'opacity-75': props.disabledLabels,
         })}
-        style={{ color: colors.$3 }}
+        style={{ color: colors.$3, colorScheme: colors.$0 }}
       >
         <span
           className={classNames('font-medium', {
             'whitespace-nowrap': props.withoutWrappingLeftSide,
           })}
-          style={{ color: colors.$3 }}
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
         >
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
@@ -66,7 +67,7 @@ export function Element(props: Props) {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
-              style={{ color: colors.$3, opacity: 0.8 }}
+              style={{ color: colors.$3, colorScheme: colors.$0, opacity: 0.8 }}
             ></span>
           ))}
       </dt>
@@ -74,7 +75,7 @@ export function Element(props: Props) {
         className={classNames('mt-4 text-sm sm:mt-0 sm:col-span-2', {
           'flex flex-col sm:flex-row sm:justify-end': props.pushContentToRight,
         })}
-        style={{ color: colors.$3 }}
+        style={{ color: colors.$3, colorScheme: colors.$0 }}
       >
         {props.children}
       </dd>

@@ -16,6 +16,7 @@ import { useDesignUtilities } from '../common/hooks';
 import { useDebounce } from 'react-use';
 import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
+import { useColorScheme } from '$app/common/colors';
 
 export function Header() {
   const [payload] = useAtom(payloadAtom);
@@ -25,10 +26,12 @@ export function Header() {
   const { handleBlockChange } = useDesignUtilities();
 
   useDebounce(() => value && handleBlockChange('header', value), 1000, [value]);
+  const colors = useColorScheme();
 
   return (
     <Card title={t('header')} padding="small" collapsed={true}>
       <Editor
+        theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.header}

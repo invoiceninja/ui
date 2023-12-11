@@ -44,7 +44,7 @@ export function SignInProviderButton(props: SignInProviderButtonProps) {
     <button
       disabled={props.disabled}
       onClick={props.onClick}
-      className="rounded px-4 py-2 bg-white shadow-md flex justify-center items-center space-x-2 text-center hover:bg-gray-50 cursor-pointer text-sm disabled:cursor-not-allowed"
+      className="rounded px-4 py-2 bg-white border border-gray-200 flex justify-center items-center space-x-2 text-center hover:bg-gray-50 cursor-pointer text-sm disabled:cursor-not-allowed"
     >
       {props.children}
     </button>

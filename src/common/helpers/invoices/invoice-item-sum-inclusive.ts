@@ -234,7 +234,7 @@ export class InvoiceItemSumInclusive {
           }
 
           this.item.gross_line_total = this.item.line_total;
-          this.item.tax_amount = itemTax;
+          this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
         }
 
         this.lineItems[index] = this.item;
