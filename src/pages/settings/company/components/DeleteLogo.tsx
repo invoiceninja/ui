@@ -26,7 +26,10 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
-export function DeleteLogo() {
+interface Props {
+  isSettingsPage?: boolean;
+}
+export function DeleteLogo({ isSettingsPage = true }: Props) {
   const [t] = useTranslation();
 
   const companyChanges = useCompanyChanges();
@@ -102,11 +105,15 @@ export function DeleteLogo() {
     formik.submitForm();
   };
 
-  return (
+  return isSettingsPage ? (
     <Element>
       <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
         {t('remove_logo')}
       </Button>
     </Element>
+  ) : (
+    <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
+      {t('remove_logo')}
+    </Button>
   );
 }
