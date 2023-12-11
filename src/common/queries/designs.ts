@@ -17,17 +17,26 @@ import { AxiosResponse } from 'axios';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
+import { enterprisePlan } from '../guards/guards/enterprise-plan';
+import { proPlan } from '../guards/guards/pro-plan';
 
 export function useDesignsQuery() {
+  const freePlanDesigns = useFreePlanDesigns();
+
   return useQuery<Design[]>(
     ['/api/v1/designs'],
     () =>
       request(
         'GET',
         endpoint('/api/v1/designs?status=active&sort=name|asc')
-      ).then(
-        (response: AxiosResponse<GenericManyResponse<Design>>) =>
-          response.data.data
+      ).then((response: AxiosResponse<GenericManyResponse<Design>>) =>
+        response.data.data.filter(
+          (design) =>
+            freePlanDesigns.includes(design.name) ||
+            proPlan() ||
+            enterprisePlan()
+        )
       ),
     { staleTime: Infinity }
   );

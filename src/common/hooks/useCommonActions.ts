@@ -25,6 +25,7 @@ export function useAllCommonActions() {
       { value: 'schedule', label: t('schedule') },
       { value: 'delivery_note', label: `${t('delivery_note')} ${t('pdf')}` },
       { value: 'download', label: t('download') },
+      { value: 'download_e_invoice', label: t('download_e_invoice') },
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'mark_paid', label: t('mark_paid') },
       { value: 'auto_bill', label: t('auto_bill') },

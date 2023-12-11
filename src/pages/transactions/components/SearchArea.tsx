@@ -17,6 +17,7 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   searchParams: SearchInput;
@@ -51,6 +52,7 @@ export function SearchArea(props: Props) {
       [property]: value,
     }));
   };
+  const colors = useColorScheme();
 
   return (
     <>
@@ -68,8 +70,10 @@ export function SearchArea(props: Props) {
         onChange={() => {}}
       />
 
-      <div className="flex items-center">
+      <div className="flex items-center" style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0  }}>
         <InputField
+          changeOverride={true}
+          style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
           placeholder={trans(`search_${props.dataKey}`, {
             count: '',
           })}
@@ -81,6 +85,7 @@ export function SearchArea(props: Props) {
 
         {isInvoicesDataKey || isPaymentsDataKey || isExpensesDataKey ? (
           <MdFilterAlt
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="ml-3 cursor-pointer"
             fontSize={28}
             onClick={() =>
@@ -89,6 +94,7 @@ export function SearchArea(props: Props) {
           />
         ) : (
           <BiPlusCircle
+            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="ml-3 cursor-pointer"
             fontSize={28}
             onClick={() =>

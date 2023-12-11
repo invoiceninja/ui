@@ -23,6 +23,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { $refetch } from '../hooks/useRefetch';
 import { useAdmin } from '../hooks/permissions/useHasPermission';
+import { enterprisePlan } from '../guards/guards/enterprise-plan';
+import { proPlan } from '../guards/guards/pro-plan';
+import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
@@ -30,14 +33,19 @@ interface Props extends GenericSelectorProps<Design> {
 }
 
 export function DesignSelector(props: Props) {
+  const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const freePlanDesigns = useFreePlanDesigns();
+
+  const { actionVisibility = true } = props;
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
-  const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
-
-  const { isAdmin, isOwner } = useAdmin();
 
   useEffect(() => {
     if (data) {
@@ -105,9 +113,7 @@ export function DesignSelector(props: Props) {
           action={{
             label: t('new_design'),
             onClick: () => setIsModalVisible(true),
-            visible:
-              typeof props.actionVisibility === 'undefined' ||
-              props.actionVisibility,
+            visible: actionVisibility,
           }}
           sortBy="name|asc"
           onDismiss={() => setDesign(null)}
@@ -141,14 +147,19 @@ export function DesignSelector(props: Props) {
           label: t('new_design'),
           onClick: () => setIsModalVisible(true),
           visible:
-            (typeof props.actionVisibility === 'undefined' ||
-              props.actionVisibility) &&
-            (isAdmin || isOwner),
+            actionVisibility &&
+            (isAdmin || isOwner) &&
+            (proPlan() || enterprisePlan()),
         }}
         sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
         disableWithQueryParameter={props.disableWithQueryParameter}
         errorMessage={props.errorMessage}
+        {...(!proPlan() &&
+          !enterprisePlan() && {
+            includeOnly: freePlanDesigns,
+            includeByLabel: true,
+          })}
       />
     </>
   );

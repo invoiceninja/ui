@@ -93,7 +93,7 @@ export function TaskStatus(props: Props) {
   }
 
   return (
-    <div ref={ref}>
+    <div ref={ref}> 
       <StatusBadge
         for={{}}
         code="logged"

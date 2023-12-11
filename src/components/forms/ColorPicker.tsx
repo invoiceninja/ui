@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
@@ -29,6 +30,8 @@ export function ColorPicker(props: Props) {
 
   useDebounce(() => props.onValueChange?.(color), 500, [color]);
 
+  const colors = useColorScheme();
+
   useEffect(() => {
     props.value && setColor(props.value);
   }, [props.value]);
@@ -46,6 +49,7 @@ export function ColorPicker(props: Props) {
           color={color}
           onChange={setColor}
           className="border rounded-md my-2 p-2 border-gray-300"
+          style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
         />
       </Modal>
 
