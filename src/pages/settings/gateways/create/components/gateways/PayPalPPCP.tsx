@@ -80,7 +80,7 @@ export function PayPalPPCP(props: Props) {
                 <ul className="list-none">
                     <li><b>Merchant id:</b> {resolveConfigValue('merchantId')}</li>
                     <li><b>{t('status')}:</b> {resolveConfigValue('status')}</li>
-                    <li><b>{t('email')}:</b> {resolveConfigValue('email_verified')}</li>
+                    <li><b>{t('email')}:</b> {resolveConfigValue('emailVerified')}</li>
                     <li><b>{t('permissions')}:</b> {resolveConfigValue('permissions')}</li>
                     <li><b>{t('notifications')}:</b> {resolveConfigValue('returnMessage')}</li>
                 </ul>
@@ -109,3 +109,4 @@ export function PayPalPPCP(props: Props) {
     );
     
 }
+

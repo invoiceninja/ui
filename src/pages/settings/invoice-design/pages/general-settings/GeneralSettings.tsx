@@ -33,6 +33,8 @@ import { updatingRecordsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -99,17 +101,22 @@ export default function GeneralSettings() {
           {isCompanySettingsActive && (
             <>
               <ClientDetails />
-              <CompanyDetails />
-              <CompanyAddress />
-              <InvoiceDetails />
-              <QuoteDetails />
-              <CreditDetails />
-              <VendorDetails />
-              <PurchaseOrderDetails />
-              <ProductColumns />
-              <ProductQuoteColumns />
-              <TaskColumns />
-              <TotalFields />
+
+              {(proPlan() || enterprisePlan()) && (
+                <>
+                  <CompanyDetails />
+                  <CompanyAddress />
+                  <InvoiceDetails />
+                  <QuoteDetails />
+                  <CreditDetails />
+                  <VendorDetails />
+                  <PurchaseOrderDetails />
+                  <ProductColumns />
+                  <ProductQuoteColumns />
+                  <TaskColumns />
+                  <TotalFields />
+                </>
+              )}
             </>
           )}
         </div>

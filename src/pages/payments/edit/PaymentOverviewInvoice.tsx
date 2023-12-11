@@ -17,6 +17,7 @@ import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { MdOutlineFileOpen } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   payment: Payment;
@@ -35,20 +36,21 @@ export function PaymentOverviewInvoice(props: Props) {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const colors = useColorScheme();
 
   return (
     <>
       {props.paymentable.invoice_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
-            <span className="flex item-center text-gray-800 gap-2">
+            <span className="flex item-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
               {`${t('invoice')} `}
               <Link
                 to={route('/invoices/:id/edit', {
                   id: props.paymentable.invoice_id,
                 })}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
                   {setLabel(props.payment, props.paymentable)}{' '}
                   <MdOutlineFileOpen />
                 </span>
@@ -56,14 +58,14 @@ export function PaymentOverviewInvoice(props: Props) {
             </span>
           </div>
           <div className="flex items-center justify-center">
-            <span className="text-gray-400">
+            <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
               {formatMoney(
                 props?.paymentable?.amount || 0,
                 props.payment.client?.country_id,
                 props.payment?.currency_id
               )}
             </span>
-            <span className="text-gray-400 mx-5">
+            <span className="mx-5" style={{ color: colors.$3, colorScheme: colors.$0 }}>
               {formatDate(
                 new Date(props.paymentable.created_at * 1000).toString(),
                 dateFormat
@@ -76,7 +78,7 @@ export function PaymentOverviewInvoice(props: Props) {
       {props.paymentable.credit_id && (
         <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
           <div className="flex items-center justify-center">
-            <span className="text-gray-800">
+            <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
               <Link
                 to={route('/credits/:id/edit', {
                   id: props.paymentable.credit_id,
@@ -87,14 +89,14 @@ export function PaymentOverviewInvoice(props: Props) {
             </span>
           </div>
           <div className="flex items-center justify-center">
-            <span className="text-gray-400">
+            <span style={{ color: colors.$3, colorScheme: colors.$0 }}>
               {formatMoney(
                 props?.paymentable?.amount || 0,
                 props.payment.client?.country_id,
                 props.payment?.currency_id
               )}
             </span>
-            <span className="text-gray-400 mx-5">
+            <span className="mx-5" style={{ color: colors.$3, colorScheme: colors.$0 }}>
               {formatDate(
                 new Date(props.paymentable.created_at * 1000).toString(),
                 dateFormat
