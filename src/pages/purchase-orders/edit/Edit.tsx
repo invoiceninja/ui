@@ -41,6 +41,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');

@@ -355,7 +355,7 @@ export default function Reports() {
       }
       withoutBackButton
     >
-      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$2, borderColor: colors.$4 }}>
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
             <SelectField
