@@ -72,6 +72,7 @@ export function SearchArea(props: Props) {
 
       <div className="flex items-center" style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0  }}>
         <InputField
+          changeOverride={true}
           style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
           placeholder={trans(`search_${props.dataKey}`, {
             count: '',

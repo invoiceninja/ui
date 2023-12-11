@@ -35,6 +35,7 @@ export function FilterModal(props: Props) {
       <div className="flex flex-col items-center p-3" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
         <div className="flex justify-evenly w-full" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
           <InputField
+            changeOverride={true}
             style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={`${t('min')} ${t('amount')}`}
@@ -44,6 +45,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            changeOverride={true}
             style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={`${t('max')} ${t('amount')}`}
@@ -65,6 +67,7 @@ export function FilterModal(props: Props) {
             }
           />
           <InputField
+            changeOverride={true}
             style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
             className="w-52"
             label={t('end')}
