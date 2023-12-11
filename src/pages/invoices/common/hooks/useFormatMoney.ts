@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Number } from '$app/common/helpers/number';
+import { Number as NumberHelper } from '$app/common/helpers/number';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -23,7 +23,6 @@ import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
-import { isNaN } from 'lodash';
 
 interface Props {
   resource: ProductTableResource | undefined;
@@ -94,7 +93,11 @@ export function useFormatMoney(props: Props) {
 
   return (value: number | string) => {
     if (currency && country) {
-      return Number.formatMoney(isNaN(value) ? 0 : value, currency, country);
+      return NumberHelper.formatMoney(
+        isNaN(Number(value)) ? 0 : value,
+        currency,
+        country
+      );
     }
 
     return value;
