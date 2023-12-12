@@ -49,18 +49,22 @@ export function useTabs(params: Params) {
     {
       name: t('apply'),
       href: route('/payments/:id/apply', { id }),
+      enabled: canOnlyEdit,
     },
     {
       name: t('refund'),
       href: route('/payments/:id/refund', { id }),
+      enabled: canOnlyEdit,
     },
     {
       name: t('documents'),
       href: route('/payments/:id/documents', { id }),
+      enabled: canEditAndView,
     },
     {
       name: t('custom_fields'),
       href: route('/payments/:id/payment_fields', { id }),
+      enabled: isAdmin || isOwner,
     },
   ];
 
@@ -71,20 +75,6 @@ export function useTabs(params: Params) {
 
     if (!(payment.amount !== payment.refunded && !payment.is_deleted)) {
       tabs = tabs.filter(({ name }) => name !== t('refund'));
-    }
-
-    if (!canOnlyEdit) {
-      tabs = tabs.filter(
-        ({ name }) => name !== t('refund') && name !== t('apply')
-      );
-    }
-
-    if (!canEditAndView) {
-      tabs = tabs.filter(({ name }) => name !== t('documents'));
-    }
-
-    if (!isAdmin && !isOwner) {
-      tabs = tabs.filter(({ name }) => name !== t('custom_fields'));
     }
   }
 
