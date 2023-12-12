@@ -34,7 +34,6 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   report_name: 'activity',
   start_date: '',
   end_date: '',
-  report_keys: [],
   product_key: '',
   send_email: true,
   is_expense_billed: false,

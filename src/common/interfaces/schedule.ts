@@ -21,7 +21,6 @@ export interface Parameters {
   report_name: string;
   start_date: string;
   end_date: string;
-  report_keys: string[];
   product_key: string;
   send_email: boolean;
   is_expense_billed: boolean;
