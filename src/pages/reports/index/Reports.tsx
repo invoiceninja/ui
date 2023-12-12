@@ -356,6 +356,7 @@ export default function Reports() {
                 setPreview(null);
               }}
               value={report.identifier}
+              cypressRef="reportNameSelector"
             >
               {reports.map((report, i) => (
                 <option value={report.identifier} key={i}>
@@ -392,6 +393,7 @@ export default function Reports() {
                   onValueChange={(value) =>
                     handlePayloadChange('is_expense_billed', value)
                   }
+                  cypressRef="expenseBilled"
                 />
               </Element>
 
@@ -407,6 +409,7 @@ export default function Reports() {
                   onValueChange={(value) =>
                     handlePayloadChange('is_income_billed', value)
                   }
+                  cypressRef="incomeBilled"
                 />
               </Element>
 
@@ -422,6 +425,7 @@ export default function Reports() {
                   onValueChange={(value) =>
                     handlePayloadChange('include_tax', value)
                   }
+                  cypressRef="includeTax"
                 />
               </Element>
             </>
@@ -457,6 +461,7 @@ export default function Reports() {
               }}
               onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
+              cypressRef="reportDateRange"
             >
               {ranges.map((range, i) => (
                 <option value={range.identifier} key={i}>
@@ -475,6 +480,7 @@ export default function Reports() {
                   handleCustomDateChange('start_date', value)
                 }
                 errorMessage={errors?.errors?.start_date}
+                cypressRef="reportStartDate"
               />
             </Element>
           )}
@@ -494,6 +500,7 @@ export default function Reports() {
                   handleCustomDateChange('end_date', value)
                 }
                 errorMessage={errors?.errors?.end_date}
+                cypressRef="reportEndDate"
               />
             </Element>
           )}

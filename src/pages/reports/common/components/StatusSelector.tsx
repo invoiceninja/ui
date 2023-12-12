@@ -65,6 +65,7 @@ export function StatusSelector(props: Props) {
         placeholder={t('status')}
         options={filters}
         isMulti={true}
+        id="status_selector"
       />
 
       {errorMessage && (

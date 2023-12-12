@@ -81,6 +81,7 @@ export function EmailReport(props: Props) {
             handleChange('parameters.report_name' as keyof Schedule, value)
           }
           errorMessage={errors?.errors['parameters.report_name']}
+          cypressRef="scheduleReportName"
         >
           {reports.map((report, i) => (
             <option value={report.identifier} key={i}>
@@ -98,6 +99,7 @@ export function EmailReport(props: Props) {
               handleChange('parameters.send_email' as keyof Schedule, value)
             }
             disabled
+            cypressRef="scheduleSendEmail"
           />
         </Element>
       )}
@@ -112,6 +114,7 @@ export function EmailReport(props: Props) {
                 value
               )
             }
+            cypressRef="expenseBilled"
           />
         </Element>
       )}
@@ -126,6 +129,7 @@ export function EmailReport(props: Props) {
                 value
               )
             }
+            cypressRef="incomeBilled"
           />
         </Element>
       )}
@@ -137,6 +141,7 @@ export function EmailReport(props: Props) {
             onValueChange={(value) =>
               handleChange('parameters.include_tax' as keyof Schedule, value)
             }
+            cypressRef="includeTax"
           />
         </Element>
       )}
@@ -171,6 +176,7 @@ export function EmailReport(props: Props) {
               handleChange('parameters.date_range' as keyof Schedule, value)
             }
             errorMessage={errors?.errors['parameters.date_range']}
+            cypressRef="scheduleDateRange"
           >
             {ranges.map((range, i) => (
               <option value={range.scheduleIdentifier} key={i}>
@@ -192,6 +198,7 @@ export function EmailReport(props: Props) {
                   handleChange('parameters.start_date' as keyof Schedule, value)
                 }
                 errorMessage={errors?.errors['parameters.start_date']}
+                cypressRef="scheduleStartDate"
               />
             </Element>
 
@@ -203,6 +210,7 @@ export function EmailReport(props: Props) {
                   handleChange('parameters.end_date' as keyof Schedule, value)
                 }
                 errorMessage={errors?.errors['parameters.end_date']}
+                cypressRef="scheduleEndDate"
               />
             </Element>
           </>
