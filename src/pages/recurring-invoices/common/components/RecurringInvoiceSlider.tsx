@@ -45,6 +45,7 @@ import frequencies from '$app/common/constants/frequency';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -282,15 +283,15 @@ export const RecurringInvoiceSlider = () => {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link
+                    <DynamicLink
                       to={`/clients/${activity.client_id}`}
-                      disableNavigation={disableNavigation(
+                      renderSpan={disableNavigation(
                         'client',
                         recurringInvoice?.client
                       )}
                     >
                       {recurringInvoice?.client?.display_name}
-                    </Link>
+                    </DynamicLink>
                   </div>
 
                   <div className="inline-flex items-center space-x-1">

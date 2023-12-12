@@ -12,7 +12,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms/Link';
 import { Payment } from '$app/common/interfaces/payment';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
@@ -20,6 +19,7 @@ import { Badge } from '$app/components/Badge';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
@@ -33,12 +33,12 @@ export function RecentPayments() {
       label: t('number'),
       format: (value, payment) => {
         return (
-          <Link
+          <DynamicLink
             to={route('/payments/:id/edit', { id: payment.id })}
-            disableNavigation={disableNavigation('payment', payment)}
+            renderSpan={disableNavigation('payment', payment)}
           >
             {payment.number}
-          </Link>
+          </DynamicLink>
         );
       },
     },
@@ -46,12 +46,12 @@ export function RecentPayments() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: payment.client_id })}
-          disableNavigation={disableNavigation('client', payment.client)}
+          renderSpan={disableNavigation('client', payment.client)}
         >
           {payment.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -60,17 +60,14 @@ export function RecentPayments() {
       format: (value, payment) =>
         payment.invoices &&
         payment.invoices[0] && (
-          <Link
+          <DynamicLink
             to={generatePath('/invoices/:id/edit', {
               id: payment.invoices[0].id,
             })}
-            disableNavigation={disableNavigation(
-              'invoice',
-              payment.invoices[0]
-            )}
+            renderSpan={disableNavigation('invoice', payment.invoices[0])}
           >
             {payment.invoices[0].number}
-          </Link>
+          </DynamicLink>
         ),
     },
     {

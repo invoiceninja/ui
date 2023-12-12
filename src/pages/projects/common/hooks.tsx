@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { EntityState } from '$app/common/enums/entity-state';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -50,6 +49,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const defaultColumns: string[] = [
   'name',
@@ -120,12 +120,12 @@ export function useProjectColumns() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link
+        <DynamicLink
           to={route('/projects/:id', { id: project.id })}
-          disableNavigation={disableNavigation('project', project)}
+          renderSpan={disableNavigation('project', project)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -134,12 +134,12 @@ export function useProjectColumns() {
       label: t('client'),
       format: (value, project) =>
         project.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('client', project.client)}
+            renderSpan={disableNavigation('client', project.client)}
           >
             {project.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
