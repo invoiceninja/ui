@@ -41,6 +41,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -106,6 +107,7 @@ export default function Edit() {
   const onSave = useSave(setErrors);
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -126,7 +128,9 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {purchaseOrder && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm"
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+              >{t('status')}</span>
               <PurchaseOrderStatus entity={purchaseOrder} />
             </div>
           )}

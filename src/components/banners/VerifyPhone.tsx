@@ -31,6 +31,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 
 interface VerificationProps {
   visible: boolean;
@@ -136,6 +137,7 @@ function Verification({ visible, onClose }: VerificationProps) {
         }
       });
   };
+  const colors = useColorScheme();
 
   return (
     <>
@@ -144,7 +146,9 @@ function Verification({ visible, onClose }: VerificationProps) {
         visible={visible}
         onClose={onClose}
       >
-        <div className="flex flex-col text-gray-900 mb-1">
+        <div className="flex flex-col mb-1"
+          style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+        >
           <PhoneInput
             international
             placeholder={t('phone')}

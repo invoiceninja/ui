@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isModalOpen: boolean;
@@ -37,6 +38,7 @@ export function CompanyCreate(props: Props) {
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const colors = useColorScheme();
 
   const switchCompany = (
     index: number,
@@ -109,7 +111,10 @@ export function CompanyCreate(props: Props) {
       onClose={() => props.setIsModalOpen(false)}
       backgroundColor="white"
     >
-      <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+      <span className="text-lg"
+        style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+
+      >{t('are_you_sure')}</span>
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button

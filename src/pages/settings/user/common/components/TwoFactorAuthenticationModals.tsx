@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useDispatch } from 'react-redux';
 import { SmsVerificationModal } from '../../components/SmsVerificationModal';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   checkVerification: boolean;
@@ -159,6 +160,9 @@ export function TwoFactorAuthenticationModals(props: Props) {
     }
   }, [isSmsModalOpen, isEnableModalOpen]);
 
+  const colors = useColorScheme();
+
+  
   return (
     <>
       <SmsVerificationModal
@@ -175,7 +179,10 @@ export function TwoFactorAuthenticationModals(props: Props) {
       >
         <div className="flex flex-col items-center pb-8 space-y-4">
           <QRCode size={156} value={qrCode} />
-          <p className="text-gray-900 font-semibold">{qrCodeSecret}</p>
+          <p className="font-semibold"
+            style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+
+          >{qrCodeSecret}</p>
         </div>
 
         <InputField
