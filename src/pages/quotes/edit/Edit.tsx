@@ -40,6 +40,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -102,6 +103,7 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -124,7 +126,16 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {quote && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <QuoteStatusBadge entity={quote} />
             </div>
           )}
