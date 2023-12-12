@@ -34,7 +34,6 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
@@ -62,6 +61,11 @@ import {
 } from '$app/common/hooks/useAdjustColorDarkness';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'status',
@@ -112,10 +116,15 @@ export function useAllTaskColumns() {
 export function useTaskColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const accentColor = useAccentColor();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const navigate = useNavigate();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -131,23 +140,53 @@ export function useTaskColumns() {
       id: 'project_id',
       label: t('project'),
       format: (value, task) => (
-        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
-          {task?.project?.name}
-        </Link>
+        <Assigned
+          entityId={task.project_id}
+          cacheEndpoint="/api/v1/projects"
+          apiEndpoint="/api/v1/projects/:id"
+          preCheck={
+            hasPermission('view_project') || hasPermission('edit_project')
+          }
+          component={
+            <Link to={route('/projects/:id', { id: task?.project?.id })}>
+              {task?.project?.name}
+            </Link>
+          }
+        />
       ),
     },
     {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, task) => <TaskStatus entity={task} />,
+      format: (value, task) => (
+        <div className="flex items-center space-x-2">
+          <TaskStatus entity={task} />
+
+          {task.invoice_id && (
+            <MdTextSnippet
+              className="cursor-pointer"
+              fontSize={19}
+              color={accentColor}
+              onClick={() =>
+                navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+              }
+            />
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link to={route('/tasks/:id/edit', { id: task.id })}>{value}</Link>
+        <Link
+          to={route('/tasks/:id/edit', { id: task.id })}
+          disableNavigation={disableNavigation('task', task)}
+        >
+          {value}
+        </Link>
       ),
     },
     {
@@ -156,7 +195,10 @@ export function useTaskColumns() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', task.client)}
+          >
             {task.client.display_name}
           </Link>
         ),
@@ -289,24 +331,12 @@ export function useTaskColumns() {
 }
 
 export function useSave() {
-  const queryClient = useQueryClient();
-
   return (task: Task) => {
     request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
       () => {
         toast.success('updated_task');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
-        );
-
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
+        $refetch(['tasks']);
       }
     );
   };
@@ -334,6 +364,12 @@ export function useTaskFilters() {
       color: 'white',
       backgroundColor: '#22C55E',
     },
+    {
+      label: t('uninvoiced'),
+      value: 'uninvoiced',
+      color: 'white',
+      backgroundColor: '#F87171',
+    },
   ];
 
   taskStatuses?.data.forEach((taskStatus) => {
@@ -357,6 +393,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
@@ -401,7 +439,8 @@ export function useActions() {
       ),
     (task: Task) =>
       !isTaskRunning(task) &&
-      !task.invoice_id && (
+      !task.invoice_id &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceTask([task])}
           icon={<Icon element={MdTextSnippet} />}
@@ -410,14 +449,15 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) => <AddTasksOnInvoiceAction tasks={[task]} />,
-    (task: Task) => (
-      <DropdownElement
-        onClick={() => cloneToTask(task)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    (task: Task) =>
+      hasPermission('create_task') && (
+        <DropdownElement
+          onClick={() => cloneToTask(task)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (task: Task) =>
       isEditPage &&
@@ -461,6 +501,8 @@ export const useCustomBulkActions = () => {
   const invoiceTask = useInvoiceTask();
 
   const bulk = useBulk();
+
+  const hasPermission = useHasPermission();
 
   const documentsBulk = useDocumentsBulk();
 
@@ -507,53 +549,60 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Task>[] = [
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStartAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStartAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'start');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
       ),
-    (selectedIds, selectedTasks, setSelected) =>
-      selectedTasks &&
-      showStopAction(selectedTasks) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showStopAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'stop');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
       ),
-    (_, selectedTasks) =>
-      selectedTasks &&
-      showAddToInvoiceAction(selectedTasks) && (
-        <AddTasksOnInvoiceAction tasks={selectedTasks} isBulkAction />
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showAddToInvoiceAction(selectedResources) && (
+        <AddTasksOnInvoiceAction
+          tasks={selectedResources}
+          isBulkAction
+          setSelected={setSelected}
+        />
       ),
-    (_, selectedTasks) =>
-      selectedTasks && showInvoiceTaskAction(selectedTasks) ? (
+    ({ selectedResources, setSelected }) =>
+      selectedResources &&
+      showInvoiceTaskAction(selectedResources) &&
+      hasPermission('create_invoice') ? (
         <DropdownElement
-          onClick={() => invoiceTask(selectedTasks)}
+          onClick={() => {
+            invoiceTask(selectedResources);
+            setSelected([]);
+          }}
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_task')}
         </DropdownElement>
       ) : null,
-    (_, selectedTasks, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedTasks && shouldDownloadDocuments(selectedTasks)
-            ? handleDownloadDocuments(selectedTasks, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}

@@ -37,6 +37,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -93,21 +94,6 @@ export default function Create() {
       ) {
         const _quote = cloneDeep(data);
 
-        if (company && company.enabled_tax_rates > 0) {
-          _quote.tax_name1 = company.settings.tax_name1;
-          _quote.tax_rate1 = company.settings.tax_rate1;
-        }
-
-        if (company && company.enabled_tax_rates > 1) {
-          _quote.tax_name2 = company.settings.tax_name2;
-          _quote.tax_rate2 = company.settings.tax_rate2;
-        }
-
-        if (company && company.enabled_tax_rates > 2) {
-          _quote.tax_name3 = company.settings.tax_name3;
-          _quote.tax_rate3 = company.settings.tax_rate3;
-        }
-
         if (typeof _quote.line_items === 'string') {
           _quote.line_items = [];
         }
@@ -125,6 +111,19 @@ export default function Create() {
       return value;
     });
   }, [data]);
+
+  const settingResolver = (client: Client, prop: string) => {
+    if (client?.settings && client?.settings[prop]) {
+      return client.settings[prop];
+    }
+
+    if (client?.group_settings && client?.group_settings?.settings[prop]) {
+      return client?.group_settings?.settings[prop];
+    }
+
+    return company?.settings[prop as keyof CompanySettings];
+  };
+
 
   useEffect(() => {
     quote &&
@@ -144,6 +143,22 @@ export default function Create() {
         });
 
         handleChange('invitations', invitations);
+
+        if (company && company.enabled_tax_rates > 0) {
+          handleChange('tax_name1', settingResolver(client, 'tax_name1'));
+          handleChange('tax_rate1', settingResolver(client, 'tax_rate1'));
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          handleChange('tax_name2', settingResolver(client, 'tax_name2'));
+          handleChange('tax_rate2', settingResolver(client, 'tax_rate2'));
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          handleChange('tax_name3', settingResolver(client, 'tax_name3'));
+          handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
+        }
+
       });
   }, [quote?.client_id]);
 
@@ -152,7 +167,7 @@ export default function Create() {
   }, [quote]);
 
   const save = useCreate({ setErrors });
-  const taskColumns = useTaskColumns()
+  const taskColumns = useTaskColumns();
 
   return (
     <Default

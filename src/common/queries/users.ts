@@ -11,13 +11,18 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '../helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '../atoms/password-confirmation';
+import { useRefetch } from '../hooks/useRefetch';
 
 export function useUsersQuery() {
-  return useQuery('/api/v1/users', () =>
-    request('GET', endpoint('/api/v1/users'))
+  return useQuery(
+    ['/api/v1/users'],
+    () => request('GET', endpoint('/api/v1/users')),
+    { staleTime: Infinity }
   );
 }
 
@@ -27,7 +32,7 @@ interface UserQueryProps extends GenericQueryOptions {
 
 export function useUserQuery(options: UserQueryProps) {
   return useQuery(
-    route('/api/v1/users/:id', { id: options.id }),
+    ['/api/v1/users', options.id],
     () =>
       request(
         'GET',
@@ -41,8 +46,43 @@ export function useBlankUserQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/users/create'),
+    ['/api/v1/users/create'],
     () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity, enabled: isAdmin }
   );
+}
+
+export function useBulk() {
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+
+  const $refetch = useRefetch();
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete',
+    password: string
+  ) => {
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/users/bulk'),
+      {
+        action,
+        ids,
+      },
+      { headers: { 'X-Api-Password': password } }
+    )
+      .then(() => {
+        toast.success(`${action}d_user`);
+
+        $refetch(['users']);
+      })
+      .catch((error) => {
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        }
+      });
+  };
 }

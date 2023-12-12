@@ -29,8 +29,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { useSelector } from 'react-redux';
-import { RootState } from '$app/common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import {
@@ -42,7 +40,6 @@ import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -56,6 +53,7 @@ import { VerifyPhone } from '../banners/VerifyPhone';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 export interface SaveOption {
   label: string;
@@ -86,12 +84,8 @@ export function Default(props: Props) {
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
-  const isMiniSidebar = useSelector(
-    (state: RootState) => state.settings.isMiniSidebar
-  );
-
   const [t] = useTranslation();
-  const user = useCurrentUser();
+  const user = useInjectUserChanges();
 
   const hasPermission = useHasPermission();
   const location = useLocation();
@@ -99,13 +93,17 @@ export function Default(props: Props) {
   const companyUser = useCurrentCompanyUser();
   const enabled = useEnabled();
 
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
+  );
+
   const navigation: NavigationItem[] = [
     {
       name: t('dashboard'),
       href: '/dashboard',
       icon: Home,
       current: location.pathname.startsWith('/dashboard'),
-      visible: true,
+      visible: hasPermission('view_dashboard'),
     },
     {
       name: t('clients'),
@@ -396,9 +394,15 @@ export function Default(props: Props) {
             <span className="sr-only">Open sidebar</span>
             <MenuIcon className="dark:text-gray-100" />
           </button>
-          <div className="flex-1 px-4 md:px-8 flex items-center">
+          <div
+            className="flex-1 px-4 md:px-8 flex items-center"
+            data-cy="topNavbar"
+          >
             <div className="flex flex-1 items-center space-x-4">
-              <h2 style={{ color: colors.$3 }} className="text-sm md:text-lg whitespace-nowrap">
+              <h2
+                style={{ color: colors.$3 }}
+                className="text-sm md:text-lg whitespace-nowrap"
+              >
                 {props.title}
               </h2>
 
@@ -495,9 +499,11 @@ export function Default(props: Props) {
                 </div>
               )}
 
-              <div className="space-x-3 items-center hidden lg:flex">
-                {props.navigationTopRight}
-              </div>
+              {props.navigationTopRight && (
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
+              )}
             </div>
           </div>
         </div>

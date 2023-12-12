@@ -12,13 +12,11 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { useQuery } from '$app/common/hooks/useQuery';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +27,10 @@ import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useQueryClient } from 'react-query';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationAlert } from '$app/components/ValidationAlert';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useBlankClientQuery } from '$app/common/queries/clients';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_client');
@@ -39,8 +38,6 @@ export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const queryClient = useQueryClient();
 
   const saveCompany = useHandleCompanySave();
 
@@ -65,14 +62,12 @@ export default function Create() {
     },
   ]);
 
-  const { data: blankClient, isLoading } = useQuery('/api/v1/clients/create', {
-    refetchOnWindowFocus: false,
-  });
+  const { data: blankClient } = useBlankClientQuery({});
 
   useEffect(() => {
     if (blankClient) {
       setClient({
-        ...blankClient.data?.data,
+        ...blankClient.data,
         group_settings_id: searchParams.get('group') || '',
       });
     }
@@ -105,7 +100,7 @@ export default function Create() {
       .then((response) => {
         toast.success('created_client');
 
-        queryClient.invalidateQueries('/api/v1/clients');
+        $refetch(['clients']);
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
@@ -119,8 +114,6 @@ export default function Create() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
-      {isLoading && <Spinner />}
-
       {errors ? <ValidationAlert errors={errors} /> : null}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">

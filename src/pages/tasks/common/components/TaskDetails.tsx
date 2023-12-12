@@ -23,6 +23,13 @@ import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
+import { PauseCircle, PlayCircle } from 'react-feather';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useStart } from '../hooks/useStart';
+import { useStop } from '../hooks/useStop';
+import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { TaskClock } from '../../kanban/components/TaskClock';
+import { calculateTime } from '../helpers/calculate-time';
 
 interface Props {
   task: Task;
@@ -39,13 +46,45 @@ export function TaskDetails(props: Props) {
 
   const company = useCurrentCompany();
   const location = useLocation();
+  const accent = useAccentColor();
+  const start = useStart();
+  const stop = useStop();
+
+  const calculation = calculateTime(task.time_log, {
+    inSeconds: true,
+    calculateLastTimeLog: false,
+  });
 
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 xl:col-span-4 h-max">
         {task && page === 'edit' && (
           <Element leftSide={t('status')}>
-            <TaskStatusBadge entity={task} />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="flex items-center">
+                <TaskStatusBadge entity={task} />
+              </div>
+              {isTaskRunning(task) && (
+                <div className='flex items-center'>
+                  <TaskClock task={task} />
+                </div>)}
+
+              {!isTaskRunning(task) && (
+                <div className='flex items-center'>
+                  {!isTaskRunning(task) && calculation && (<p>{new Date(Number(calculation) * 1000).toISOString().slice(11, 19)}</p>)}
+                </div>)}
+
+              <div>
+                {!isTaskRunning(task) && !task.invoice_id && (
+                  <PlayCircle className="mr-0 ml-auto" color="#808080" size={60} stroke={accent} strokeWidth="1" onClick={() => start(task)} />
+                )}
+
+                {isTaskRunning(task) &&
+                  !task.invoice_id && (
+                    <PauseCircle className="mr-0 ml-auto" color="#808080" size={60} stroke={accent} strokeWidth="1" onClick={() => stop(task)} />
+                  )}
+              </div>
+            </div>
           </Element>
         )}
 

@@ -9,10 +9,13 @@
  */
 
 import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Design } from '$app/common/interfaces/design';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -24,14 +27,12 @@ import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { CustomDesignsPlanAlert } from '../../components/CustomDesignsPlanAlert';
 
 export default function Create() {
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery();
-
-  const queryClient = useQueryClient();
 
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -60,7 +61,7 @@ export default function Create() {
           .then((response: GenericSingleResourceResponse<Design>) => {
             toast.success('design_created');
 
-            queryClient.invalidateQueries(['/api/v1/designs']);
+            $refetch(['designs']);
 
             navigate(
               route('/settings/invoice_design/custom_designs/:id/edit', {
@@ -75,12 +76,15 @@ export default function Create() {
             }
           });
       },
+      disableSaveButton: !proPlan() && !enterprisePlan(),
     },
     [design]
   );
 
   return (
     <Container>
+      <CustomDesignsPlanAlert />
+
       <Card title={t('new_design')}>
         <Element leftSide={t('name')}>
           <InputField

@@ -26,6 +26,7 @@ import { Fragment } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
+import { useColorScheme } from '$app/common/colors';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -52,6 +53,7 @@ interface Props {
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const { resource, items, columns, relationType } = props;
 
@@ -156,6 +158,7 @@ export function ProductsTable(props: Props) {
 
                                 {resource && (
                                   <button
+                                    style={{ color: colors.$3 }}
                                     className="ml-2 text-gray-600 hover:text-red-600"
                                     onClick={() => {
                                       setIsDeleteActionTriggered(true);
@@ -180,6 +183,8 @@ export function ProductsTable(props: Props) {
                 <Fragment />
               )}
 
+              {provided.placeholder}
+
               {resource?.[relationType] ? (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
@@ -190,7 +195,11 @@ export function ProductsTable(props: Props) {
                       className="w-full py-2 inline-flex justify-center items-center space-x-2"
                     >
                       <Plus size={18} />
-                      <span>{t('add_item')}</span>
+                      <span>
+                        {props.type === 'product'
+                          ? t('add_item')
+                          : t('add_line')}
+                      </span>
                     </button>
                   </Td>
                 </Tr>
@@ -210,8 +219,6 @@ export function ProductsTable(props: Props) {
               ) : (
                 <Fragment />
               )}
-
-              {provided.placeholder}
             </Tbody>
           )}
         </Droppable>

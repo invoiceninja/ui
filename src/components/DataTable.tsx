@@ -24,14 +24,13 @@ import React, {
 } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
-import { Inline } from './Inline';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -43,8 +42,7 @@ import {
   Thead,
   Tr,
 } from './tables';
-import { atomWithStorage } from 'jotai/utils';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -52,10 +50,12 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
-import collect from 'collect.js';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
+import { useLocation } from 'react-router-dom';
+import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
+import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
+import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -63,10 +63,14 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
+type CustomBulkActionContext<T> = {
+  selectedIds: string[];
+  selectedResources: T[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
+};
+
 export type CustomBulkAction<T> = (
-  selectedIds: string[],
-  selectedResources?: T[],
-  setSelected?: Dispatch<SetStateAction<string[]>>
+  ctx: CustomBulkActionContext<T>
 ) => ReactNode;
 
 interface StyleOptions {
@@ -110,14 +114,21 @@ interface Props<T> extends CommonProps {
     resource: T[],
     action: 'archive' | 'delete' | 'restore'
   ) => void;
+  onBulkActionCall?: (
+    selectedIds: string[],
+    action: 'archive' | 'restore' | 'delete'
+  ) => void;
+  hideEditableOptions?: boolean;
 }
 
-type ResourceAction<T> = (resource: T) => ReactElement;
+export type ResourceAction<T> = (resource: T) => ReactElement;
 
-export const datatablePerPageAtom = atomWithStorage('perPage', '100');
+export type PerPage = '10' | '50' | '100';
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+  const location = useLocation();
+  const options = useDataTableOptions();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -126,18 +137,28 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
+  const tableKey = `${location.pathname}${props.endpoint.replace('.', '')}`;
+
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
-  setInvalidationQueryAtom(apiEndpoint.pathname);
 
-  const queryClient = useQueryClient();
+  const {
+    styleOptions,
+    customFilters,
+    onBulkActionCall,
+    hideEditableOptions = false,
+  } = props;
 
-  const { styleOptions, customFilters } = props;
+  const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [filter, setFilter] = useState<string>('');
-  const [customFilter, setCustomFilter] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
-  const [sort, setSort] = useState(
+  const [customFilter, setCustomFilter] = useState<string[] | undefined>(
+    undefined
+  );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<PerPage>(
+    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
+  );
+  const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
@@ -145,49 +166,58 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
+  const [isInitialConfiguration, setIsInitialConfiguration] =
+    useState<boolean>(true);
+
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
-  const handleChangingCustomFilters = () => {
-    if (customFilters) {
-      const queryKeys: string[] = collect(props.customFilters)
-        .pluck('queryKey')
-        .unique()
-        .toArray();
+  const { handleUpdateTableFilters } = useDataTablePreferences({
+    apiEndpoint,
+    isInitialConfiguration,
+    customFilter,
+    setCurrentPage,
+    setCustomFilter,
+    setFilter,
+    setPerPage,
+    setSort,
+    setSortedBy,
+    setStatus,
+    tableKey,
+    customFilters,
+  });
 
-      queryKeys.forEach((queryKey) => {
-        const currentQueryKey = queryKey || 'client_status';
-        const selectedFiltersByKey: string[] = [];
-
-        customFilters.forEach((filter, index) => {
-          const customFilterQueryKey = filter.queryKey || null;
-
-          if (
-            customFilterQueryKey === queryKey &&
-            customFilter.includes(filter.value)
-          ) {
-            selectedFiltersByKey.push(filter.value);
-          }
-
-          if (index === customFilters.length - 1) {
-            apiEndpoint.searchParams.set(
-              currentQueryKey,
-              selectedFiltersByKey.join(',')
-            );
-          }
-        });
-      });
-    }
-  };
+  const {
+    defaultOptions,
+    defaultCustomFilterOptions,
+    handleChangingCustomFilters,
+  } = useDataTableUtilities({
+    apiEndpoint,
+    isInitialConfiguration,
+    tableKey,
+    customFilter,
+    customFilters,
+  });
 
   useEffect(() => {
-    const perPageParameter = apiEndpoint.searchParams.get('perPage');
+    if (!isInitialConfiguration) {
+      clearTimeout(companyUpdateTimeOut.current);
 
-    if (perPageParameter) {
-      setPerPage(perPageParameter);
+      const currentTimeout = setTimeout(
+        () =>
+          handleUpdateTableFilters(
+            filter,
+            sortedBy,
+            sort,
+            currentPage,
+            status,
+            perPage
+          ),
+        1500
+      );
+
+      companyUpdateTimeOut.current = currentTimeout;
     }
-  }, []);
 
-  useEffect(() => {
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
@@ -198,6 +228,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
+
+    isInitialConfiguration && setIsInitialConfiguration(false);
 
     return () => {
       isProduction() && setInvalidationQueryAtom(undefined);
@@ -217,30 +249,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     ],
     () => request('GET', apiEndpoint.href),
     {
-      staleTime: props.staleTime || 5000,
+      staleTime: props.staleTime ?? Infinity,
     }
   );
-
-  const options: SelectOption[] = [
-    {
-      value: 'active',
-      label: t('active'),
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
-      value: 'archived',
-      label: t('archived'),
-      color: 'white',
-      backgroundColor: '#e6b05c',
-    },
-    {
-      value: 'deleted',
-      label: t('deleted'),
-      color: 'white',
-      backgroundColor: '#c95f53',
-    },
-  ];
 
   const showRestoreBulkAction = () => {
     return selectedResources.every(
@@ -272,15 +283,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           })
         );
       })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 401) {
-          toast.error(error.response?.data.message);
-        }
-      })
       .finally(() => {
-        queryClient.invalidateQueries([props.endpoint]);
-        queryClient.invalidateQueries([apiEndpoint.pathname]);
-
+        refetchByUrl([props.endpoint, apiEndpoint.pathname]);
         setSelected([]);
       });
   };
@@ -288,10 +292,28 @@ export function DataTable<T extends object>(props: Props<T>) {
   const showCustomBulkActionDivider = useMemo(() => {
     return props.customBulkActions
       ? props.customBulkActions.some((action) =>
-          React.isValidElement(action(selected, selectedResources))
+          React.isValidElement(
+            action({
+              selectedIds: selected,
+              selectedResources,
+              setSelected,
+            })
+          )
         )
       : false;
   }, [props.customBulkActions, selected, selectedResources]);
+
+  const showCustomActionDivider = (resource: T) => {
+    return props.customActions
+      ? props.customActions.some((action: ResourceAction<T>) =>
+          React.isValidElement(action(resource))
+        )
+      : false;
+  };
+
+  useEffect(() => {
+    setInvalidationQueryAtom(apiEndpoint.pathname);
+  }, [apiEndpoint.pathname]);
 
   useEffect(() => {
     if (data) {
@@ -303,20 +325,28 @@ export function DataTable<T extends object>(props: Props<T>) {
     }
   }, [selected]);
 
+  useEffect(() => {
+    if (data && !data.data.data.length) {
+      setCurrentPage(1);
+    }
+  }, [data]);
+
   return (
-    <>
+    <div data-cy="dataTable">
       {!props.withoutActions && (
         <Actions
+          filter={filter}
           onFilterChange={setFilter}
           optionsMultiSelect={true}
           options={options}
-          defaultOption={options[0]}
+          defaultOptions={defaultOptions}
+          defaultCustomFilterOptions={defaultCustomFilterOptions}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={
-            <Inline>
+            <>
               {props.rightSide}
 
               {props.linkToCreate && (
@@ -330,47 +360,75 @@ export function DataTable<T extends object>(props: Props<T>) {
                   }
                 />
               )}
-            </Inline>
+            </>
           }
           beforeFilter={props.beforeFilter}
         >
-          <Dropdown label={t('more_actions')} disabled={!selected.length}>
-            {props.customBulkActions &&
-              props.customBulkActions.map(
-                (bulkAction: CustomBulkAction<T>, index: number) => (
-                  <div key={index}>
-                    {bulkAction(selected, selectedResources, setSelected)}
-                  </div>
-                )
+          {!hideEditableOptions && (
+            <Dropdown
+              label={t('more_actions')}
+              disabled={!selected.length}
+              cypressRef="bulkActionsDropdown"
+            >
+              {props.customBulkActions &&
+                props.customBulkActions.map(
+                  (bulkAction: CustomBulkAction<T>, index: number) => (
+                    <div key={index}>
+                      {bulkAction({
+                        selectedIds: selected,
+                        selectedResources,
+                        setSelected,
+                      })}
+                    </div>
+                  )
+                )}
+
+              {props.customBulkActions && showCustomBulkActionDivider && (
+                <Divider withoutPadding />
               )}
 
-            {props.customBulkActions && showCustomBulkActionDivider && (
-              <Divider withoutPadding />
-            )}
-
-            <DropdownElement
-              onClick={() => bulk('archive')}
-              icon={<Icon element={MdArchive} />}
-            >
-              {t('archive')}
-            </DropdownElement>
-
-            <DropdownElement
-              onClick={() => bulk('delete')}
-              icon={<Icon element={MdDelete} />}
-            >
-              {t('delete')}
-            </DropdownElement>
-
-            {showRestoreBulkAction() && (
               <DropdownElement
-                onClick={() => bulk('restore')}
-                icon={<Icon element={MdRestore} />}
+                onClick={() => {
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'archive');
+                  } else {
+                    bulk('archive');
+                  }
+                }}
+                icon={<Icon element={MdArchive} />}
               >
-                {t('restore')}
+                {t('archive')}
               </DropdownElement>
-            )}
-          </Dropdown>
+
+              <DropdownElement
+                onClick={() => {
+                  if (onBulkActionCall) {
+                    onBulkActionCall(selected, 'delete');
+                  } else {
+                    bulk('delete');
+                  }
+                }}
+                icon={<Icon element={MdDelete} />}
+              >
+                {t('delete')}
+              </DropdownElement>
+
+              {showRestoreBulkAction() && (
+                <DropdownElement
+                  onClick={() => {
+                    if (onBulkActionCall) {
+                      onBulkActionCall(selected, 'restore');
+                    } else {
+                      bulk('restore');
+                    }
+                  }}
+                  icon={<Icon element={MdRestore} />}
+                >
+                  {t('restore')}
+                </DropdownElement>
+              )}
+            </Dropdown>
+          )}
         </Actions>
       )}
 
@@ -390,7 +448,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         style={props.style}
       >
         <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
-          {!props.withoutActions && (
+          {!props.withoutActions && !hideEditableOptions && (
             <Th className={styleOptions?.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
@@ -407,6 +465,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         );
                   });
                 }}
+                cypressRef="dataTableCheckbox"
               />
             </Th>
           )}
@@ -427,7 +486,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           ))}
 
-          {props.withResourcefulActions && <Th></Th>}
+          {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
 
         <Tbody style={styleOptions?.tBodyStyle}>
@@ -479,7 +538,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'last:border-b-0': hasVerticalOverflow,
                 })}
               >
-                {!props.withoutActions && (
+                {!props.withoutActions && !hideEditableOptions && (
                   <Td
                     className="cursor-pointer"
                     onClick={() =>
@@ -495,6 +554,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       className="child-checkbox"
                       value={resource.id}
                       id={resource.id}
+                      cypressRef="dataTableCheckbox"
                     />
                   </Td>
                 )}
@@ -505,6 +565,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     className={classNames(
                       {
                         'cursor-pointer': index < 3,
+                        'py-4': hideEditableOptions,
                       },
                       styleOptions?.tdClassName
                     )}
@@ -522,7 +583,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 ))}
 
-                {props.withResourcefulActions && (
+                {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
                       {props.linkToEdit &&
@@ -539,6 +600,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.linkToEdit &&
                         props.customActions &&
+                        showCustomActionDivider(resource) &&
                         (props.showEdit?.(resource) || !props.showEdit) && (
                           <Divider withoutPadding />
                         )}
@@ -549,7 +611,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key !== 'purge' && (
+                            action(resource)?.key !== 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}
@@ -593,7 +655,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource).key === 'purge' && (
+                            action(resource)?.key === 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
                         )}
@@ -607,6 +669,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       {data && !props.withoutPagination && (
         <Pagination
+          currentPerPage={perPage}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
@@ -615,6 +678,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           leftSideChevrons={props.leftSideChevrons}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -23,7 +23,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Notifications } from './components/Notifications';
@@ -31,6 +31,7 @@ import { Permissions } from './components/Permissions';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Edit() {
   const [passwordValidated, setPasswordValidated] = useState(false);
@@ -86,7 +87,7 @@ export function Edit() {
       .then(() => {
         toast.success('updated_user');
 
-        queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
+        $refetch(['users']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -100,13 +101,16 @@ export function Edit() {
     toast.processing();
 
     queryClient
-      .fetchQuery(generatePath('/api/v1/users/:id', { id: id! }), () =>
-        request(
-          'GET',
-          endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
-          {},
-          { headers: { 'X-Api-Password': password } }
-        )
+      .fetchQuery(
+        ['/api/v1/users', id],
+        () =>
+          request(
+            'GET',
+            endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
+            {},
+            { headers: { 'X-Api-Password': password } }
+          ),
+        { staleTime: Infinity }
       )
       .then(() => {
         setPasswordValidated(true);

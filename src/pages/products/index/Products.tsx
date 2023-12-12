@@ -25,11 +25,14 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Products() {
   useTitle('products');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('products'), href: '/products' }];
 
@@ -75,6 +78,7 @@ export default function Products() {
           />
         }
         linkToCreateGuards={[permission('create_product')]}
+        hideEditableOptions={!hasPermission('edit_product')}
       />
     </Default>
   );

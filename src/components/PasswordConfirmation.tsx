@@ -22,6 +22,7 @@ interface Props {
   show?: boolean;
   onSave: (password: string, isRequired: boolean) => any;
   onClose: (visible: boolean) => any;
+  tableActions?: boolean;
 }
 
 export function usePasswordConfirmation() {
@@ -110,11 +111,13 @@ export function PasswordConfirmation(props: Props) {
 
   return (
     <Modal
-      onClose={() =>
-        location.pathname.startsWith('/settings/users')
+      onClose={() => {
+        location.pathname.startsWith('/settings/users') && !props.tableActions
           ? navigate('/settings/users')
-          : props.onClose(false)
-      }
+          : props.onClose(false);
+
+        setCurrentPassword('');
+      }}
       visible={isModalOpen && isPasswordTimeoutExpired}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
@@ -125,6 +128,7 @@ export function PasswordConfirmation(props: Props) {
           type="password"
           label={t('current_password')}
           required
+          changeOverride={true}
           value={currentPassword}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setCurrentPassword(event.target.value)

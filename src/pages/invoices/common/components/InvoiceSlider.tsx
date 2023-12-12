@@ -47,6 +47,9 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -122,6 +125,10 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
+
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const queryClient = useQueryClient();
@@ -146,18 +153,21 @@ export function InvoiceSlider() {
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const fetchEmailHistory = async () => {
-    const response = await queryClient.fetchQuery(
-      ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-      () =>
-        request('POST', endpoint('/api/v1/emails/entityHistory'), {
-          entity: 'invoice',
-          entity_id: invoice?.id,
-        }).then((response) => response.data),
-      { staleTime: Infinity }
-    );
+    const response = await queryClient
+      .fetchQuery(
+        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+        () =>
+          request('POST', endpoint('/api/v1/emails/entityHistory'), {
+            entity: 'invoice',
+            entity_id: invoice?.id,
+          }),
+        { staleTime: Infinity }
+      )
+      .then((response) => response.data);
 
     setEmailRecords(response);
   };
@@ -193,6 +203,7 @@ export function InvoiceSlider() {
           response.data.data
       ),
     enabled: invoice !== null && isVisible,
+    staleTime: Infinity,
   });
 
   const activityElement = useGenerateActivityElement();
@@ -207,7 +218,8 @@ export function InvoiceSlider() {
       size="regular"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
-        invoice ? (
+        invoice &&
+        (hasPermission('edit_invoice') || entityAssigned(invoice)) ? (
           <ResourceActions
             label={t('more_actions')}
             resource={invoice}
@@ -338,6 +350,7 @@ export function InvoiceSlider() {
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
+                  disableNavigation={disableNavigation('payment', payment)}
                 >
                   <div className="flex flex-col space-y-2">
                     <p className="font-semibold">
@@ -390,7 +403,13 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <Link
+                      to={`/clients/${activity.client_id}`}
+                      disableNavigation={disableNavigation(
+                        'client',
+                        invoice?.client
+                      )}
+                    >
                       {invoice?.client?.display_name}
                     </Link>
                   </div>

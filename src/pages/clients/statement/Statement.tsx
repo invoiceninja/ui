@@ -31,6 +31,8 @@ import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
 import { useClientQuery } from '$app/common/queries/clients';
 import { Client } from '$app/common/interfaces/client';
 import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
+import { Spinner } from '$app/components/Spinner';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 dayjs.extend(quarter);
 
@@ -54,11 +56,15 @@ export default function Statement() {
   const { t } = useTranslation();
   const { id } = useParams();
 
+  const { isAdmin, isOwner } = useAdmin();
+
   const user = useCurrentUser();
 
   const { data: clientResponse } = useClientQuery({ id, enabled: true });
 
   const scheduleStatement = useScheduleStatement();
+
+  const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -200,20 +206,20 @@ export default function Statement() {
   }, [clientResponse]);
 
   useEffect(() => {
-    toast.processing();
+    setIsLoadingPdf(true);
 
     request('POST', endpoint('/api/v1/client_statement'), statement, {
       responseType: 'arraybuffer',
-    }).then((response) => {
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+    })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
 
-      if (iframeRef.current) {
-        iframeRef.current.src = url;
-      }
-
-      toast.dismiss();
-    });
+        if (iframeRef.current) {
+          iframeRef.current.src = url;
+        }
+      })
+      .finally(() => setIsLoadingPdf(false));
   }, [statement]);
 
   return (
@@ -236,12 +242,14 @@ export default function Statement() {
           >
             {t('download')}
           </DropdownElement>
-          <DropdownElement
-            onClick={() => scheduleStatement(statement)}
-            icon={<Icon element={MdSchedule} />}
-          >
-            {t('schedule')}
-          </DropdownElement>
+          {(isAdmin || isOwner) && (
+            <DropdownElement
+              onClick={() => scheduleStatement(statement)}
+              icon={<Icon element={MdSchedule} />}
+            >
+              {t('schedule')}
+            </DropdownElement>
+          )}
         </Dropdown>
       }
     >
@@ -340,7 +348,22 @@ export default function Statement() {
         </Card>
       </div>
 
-      <iframe className="my-6" ref={iframeRef} width="100%" height={1500} />
+      <iframe
+        className="my-6"
+        ref={iframeRef}
+        width="100%"
+        height={1500}
+        style={{ display: !isLoadingPdf ? 'block' : 'none' }}
+      />
+
+      {isLoadingPdf && (
+        <div
+          className="flex justify-center items-center mt-6"
+          style={{ height: 1500 }}
+        >
+          <Spinner />
+        </div>
+      )}
     </Default>
   );
 }

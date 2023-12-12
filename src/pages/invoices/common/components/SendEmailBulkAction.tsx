@@ -22,6 +22,7 @@ import { route } from '$app/common/helpers/route';
 
 interface Props {
   invoices: Invoice[];
+  setSelected: (id: string[]) => void;
 }
 
 export function SendEmailBulkAction(props: Props) {
@@ -52,6 +53,7 @@ export function SendEmailBulkAction(props: Props) {
         visible={isModalVisible}
         setVisible={setIsModalVisible}
         invoiceIds={invoices.map(({ id }) => id)}
+        setSelected={props.setSelected}
       />
 
       <DropdownElement

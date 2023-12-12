@@ -46,6 +46,11 @@ import { Card } from '$app/components/cards';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import {
+  ConfirmActionModal,
+  confirmActionModalAtom,
+} from '../common/components/ConfirmActionModal';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -100,12 +105,14 @@ export default function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
+  const [, setSendConfirmationVisible] = useAtom(confirmActionModalAtom);
+
   const initializeSaveOptions = (recurringInvoice: RecurringInvoice) => {
     let currentSaveOptions: SaveOption[] | undefined;
 
     if (recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT) {
       const sendNowOption = {
-        onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
+        onClick: () => setSendConfirmationVisible(true),
         label: t('send_now'),
         icon: <Icon element={MdSend} />,
       };
@@ -143,6 +150,7 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -164,7 +172,10 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {recurringInvoice && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm"
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+
+              >{t('status')}</span>
               <RecurringInvoiceStatusBadge entity={recurringInvoice} />
             </div>
           )}
@@ -267,6 +278,12 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      {recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT ? (
+        <ConfirmActionModal
+          onClick={() => save(recurringInvoice as RecurringInvoice, 'send_now')}
+        />
+      ) : null}
     </Default>
   );
 }

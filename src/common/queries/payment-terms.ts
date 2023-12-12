@@ -12,7 +12,6 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from '$app/common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
@@ -20,24 +19,29 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function usePaymentTermsQuery(params: Params) {
-  return useQuery(['/api/v1/payment_terms', params], () =>
-    request(
-      'GET',
-      endpoint(
-        '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
-        {
-          perPage: params.perPage ?? 1000,
-          currentPage: params.currentPage,
-          sort: params.sort ?? 'id|asc',
-        }
-      )
-    )
+  return useQuery(
+    ['/api/v1/payment_terms', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
+          {
+            perPage: params.perPage ?? 1000,
+            currentPage: params.currentPage,
+            sort: params.sort ?? 'id|asc',
+          }
+        )
+      ),
+    {
+      staleTime: Infinity,
+    }
   );
 }
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/payment_terms/:id', params),
+    ['/api/v1/payment_terms', params],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/:id', params), {
         headers: defaultHeaders(),
@@ -60,7 +64,7 @@ export function useBlankPaymentTermQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery<PaymentTerm>(
-    '/api/v1/payment_terms/create',
+    ['/api/v1/payment_terms/create'],
     () =>
       request('GET', endpoint('/api/v1/payment_terms/create')).then(
         (response: GenericSingleResourceResponse<PaymentTerm>) =>

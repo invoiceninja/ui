@@ -34,6 +34,10 @@ export function useShowActionByPreferences(params: Params) {
     const commonActionsPreferences =
       user?.company_user?.react_settings.common_actions;
 
+    if (!commonActionsPreferences) {
+      return true;
+    }
+
     if (
       !commonActionsSection &&
       commonActionsPreferences?.[entity] &&

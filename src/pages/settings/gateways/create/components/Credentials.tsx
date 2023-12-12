@@ -18,6 +18,7 @@ import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { StripeConnect } from './gateways/StripeConnect';
 import { WePay } from './gateways/WePay';
+import { PayPalPPCP } from './gateways/PayPalPPCP';
 
 interface Props {
   gateway: Gateway;
@@ -38,8 +39,9 @@ export function Credentials(props: Props) {
 
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
+  const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
 
-  const hostedGateways = [STRIPE_CONNECT, WEPAY];
+  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
   return (
     <Card title={t('credentials')}>
@@ -56,6 +58,14 @@ export function Credentials(props: Props) {
       )}
 
       {props.gateway && props.gateway.key === WEPAY && <WePay />}
+
+      {props.gateway && props.gateway.key === PAYPAL_PPCP && 
+        <PayPalPPCP 
+          gateway={props.gateway} 
+          companyGateway={props.companyGateway} 
+          setCompanyGateway={props.setCompanyGateway}
+          errors={props.errors}
+          />}
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&

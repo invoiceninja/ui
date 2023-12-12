@@ -47,7 +47,6 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -87,6 +86,12 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { useMarkPaid } from './hooks/useMarkPaid';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk } from '$app/common/queries/credits';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -221,6 +226,8 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Credit>) => {
         toast.success('created_credit');
 
+        $refetch(['credits']);
+
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -240,8 +247,6 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
-  const queryClient = useQueryClient();
-
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   const saveCompany = useHandleCompanySave();
@@ -257,9 +262,7 @@ export function useSave(props: CreateProps) {
       .then(() => {
         toast.success('updated_credit');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/credits/:id', { id: credit.id })
-        );
+        $refetch(['credits']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -279,6 +282,10 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
+
+  const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const navigate = useNavigate();
 
@@ -426,14 +433,15 @@ export function useActions() {
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => scheduleEmailRecord(credit.id)}
-        icon={<Icon element={MdSchedule} />}
-      >
-        {t('schedule')}
-      </DropdownElement>
-    ),
+    (credit) =>
+      (isAdmin || isOwner) && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(credit.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
+        </DropdownElement>
+      ),
     (credit) => (
       <DropdownElement
         to={route('/credits/:id/email', { id: credit.id })}
@@ -452,7 +460,8 @@ export function useActions() {
     ),
     (credit) =>
       credit.client_id &&
-      credit.amount > 0 && (
+      credit.amount > 0 &&
+      hasPermission('create_payment') && (
         <DropdownElement
           to={route(
             '/payments/create?client=:clientId&credit=:creditId&type=1',
@@ -489,46 +498,51 @@ export function useActions() {
         </div>
       ),
     () => <Divider withoutPadding />,
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToCredit(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToInvoice(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToQuote(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToRecurringInvoice(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_recurring_invoice')}
-      </DropdownElement>
-    ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(credit)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
+    (credit) =>
+      hasPermission('create_credit') && (
+        <DropdownElement
+          onClick={() => cloneToCredit(credit)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToInvoice(credit)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_invoice')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      hasPermission('create_quote') && (
+        <DropdownElement
+          onClick={() => cloneToQuote(credit)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_quote')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      hasPermission('create_recurring_invoice') && (
+        <DropdownElement
+          onClick={() => cloneToRecurringInvoice(credit)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_recurring_invoice')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(credit)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (credit) =>
       isEditPage &&
@@ -627,6 +641,8 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const creditColumns = useAllCreditColumns();
   type CreditColumns = (typeof creditColumns)[number];
 
@@ -652,7 +668,12 @@ export function useCreditColumns() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>{field}</Link>
+        <Link
+          to={route('/credits/:id/edit', { id: credit.id })}
+          disableNavigation={disableNavigation('credit', credit)}
+        >
+          {field}
+        </Link>
       ),
     },
     {
@@ -660,7 +681,10 @@ export function useCreditColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link to={route('/clients/:id', { id: credit.client_id })}>
+        <Link
+          to={route('/clients/:id', { id: credit.client_id })}
+          disableNavigation={disableNavigation('client', credit.client)}
+        >
           {credit.client?.display_name}
         </Link>
       ),

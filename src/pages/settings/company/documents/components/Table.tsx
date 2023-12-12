@@ -49,6 +49,7 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { AxiosResponse } from 'axios';
 import { DocumentUrl } from '$app/components/DocumentsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Table() {
   const { t } = useTranslation();
@@ -80,14 +81,14 @@ export function Table() {
   };
 
   const invalidateDocumentsQuery = () => {
-    queryClient.invalidateQueries('/api/v1/documents');
+    $refetch(['documents']);
   };
 
   const downloadDocument = async (doc: Document, inline: boolean) => {
     toast.processing();
 
     const response: AxiosResponse = await queryClient.fetchQuery(
-      endpoint('/documents/:hash', { hash: doc.hash }),
+      ['/api/v1/documents', doc.hash],
       () =>
         request(
           'GET',
@@ -152,7 +153,7 @@ export function Table() {
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
           const response: AxiosResponse = await queryClient.fetchQuery(
-            ['documents', hash],
+            ['/api/v1/documents', hash],
             () =>
               request(
                 'GET',

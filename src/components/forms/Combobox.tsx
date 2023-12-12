@@ -13,7 +13,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -53,6 +53,8 @@ export interface ComboboxStaticProps<T = any> {
   nullable?: boolean;
   initiallyVisible?: boolean;
   exclude?: (string | number | boolean)[];
+  includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
@@ -89,6 +91,8 @@ export function Combobox<T = any>({
   nullable,
   initiallyVisible = false,
   exclude = [],
+  includeOnly = [],
+  includeByLabel,
   action,
   onChange,
   onDismiss,
@@ -122,6 +126,12 @@ export function Combobox<T = any>({
 
   filteredOptions = filteredOptions.filter((entry) =>
     exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
+
+  filteredOptions = filteredOptions.filter((entry) =>
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
   );
 
   useEffect(() => {
@@ -423,6 +433,8 @@ export function ComboboxStatic<T = any>({
   nullable,
   initiallyVisible = false,
   exclude = [],
+  includeOnly = [],
+  includeByLabel,
   action,
   onEmptyValues,
   onChange,
@@ -451,6 +463,12 @@ export function ComboboxStatic<T = any>({
 
   filteredValues = filteredValues.filter((entry) =>
     exclude.length > 0 ? !exclude.includes(entry.value) : true
+  );
+
+  filteredValues = filteredValues.filter((entry) =>
+    includeOnly.length > 0
+      ? includeOnly.includes(entry[includeByLabel ? 'label' : 'value'])
+      : true
   );
 
   const comboboxRef = useRef<HTMLDivElement>(null);
@@ -580,9 +598,15 @@ export function ComboboxStatic<T = any>({
                   if (onDismiss) {
                     e.preventDefault();
 
-                    setIsOpen(false);
+                    setQuery('');
+
+                    selectedValue && setIsOpen(false);
+
+                    !selectedValue && setIsOpen((current) => !current);
 
                     return onDismiss();
+                  } else {
+                    setIsOpen((current) => !current);
                   }
                 }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
@@ -725,6 +749,8 @@ export interface ComboboxAsyncProps<T> {
   querySpecificEntry?: string;
   sortBy?: string | null;
   exclude?: (string | number | boolean)[];
+  includeOnly?: (string | number | boolean)[];
+  includeByLabel?: boolean;
   action?: Action;
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
@@ -743,6 +769,8 @@ export function ComboboxAsync<T = any>({
   initiallyVisible,
   sortBy = 'created_at|desc',
   exclude,
+  includeOnly,
+  includeByLabel,
   action,
   nullable,
   onChange,
@@ -753,46 +781,32 @@ export function ComboboxAsync<T = any>({
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
-
-  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
   const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
-  const $url = useMemo(() => {
-    const currentUrl = new URL(url);
-
-    if (sortBy) {
-      currentUrl.searchParams.set('sort', sortBy);
-    }
-
-    currentUrl.searchParams.set('status', 'active');
-
-    return currentUrl;
-  }, []);
-
   useEffect(() => {
-    if (!enableQuery) {
-      clearTimeout(enableQueryTimeOut.current);
+    setUrl(endpoint);
+  }, [endpoint]);
 
-      const currentTimeout = setTimeout(() => setEnableQuery(true), 50);
+  const enableQueryTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
-      enableQueryTimeOut.current = currentTimeout;
+  const isEntryAvailable = () => {
+    if (entries.length) {
+      const entry = entries.find(
+        (entry) =>
+          entry.value === inputOptions.value ||
+          entry.label === inputOptions.value
+      );
+
+      return Boolean(entry);
     }
-  }, [inputOptions.value]);
 
-  useEffect(() => {
-    if (enableQuery && inputOptions.value && !disableWithQueryParameter) {
-      $url.searchParams.set('with', inputOptions.value.toString());
-    }
-  }, [enableQuery]);
+    return false;
+  };
 
   const { data } = useQuery(
-    [
-      new URL(url).pathname,
-      new URL(url).searchParams.toString(),
-      'comboboxQuery',
-    ],
+    [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
     () =>
-      request('GET', $url.href).then(
+      request('GET', new URL(url).href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -817,26 +831,63 @@ export function ComboboxAsync<T = any>({
   );
 
   useEffect(() => {
+    if (!enableQuery) {
+      clearTimeout(enableQueryTimeOut.current);
+
+      const currentTimeout = setTimeout(() => setEnableQuery(true), 100);
+
+      enableQueryTimeOut.current = currentTimeout;
+    }
+  }, [inputOptions.value]);
+
+  useEffect(() => {
+    if (
+      enableQuery &&
+      inputOptions.value &&
+      !disableWithQueryParameter &&
+      !isEntryAvailable()
+    ) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        if (inputOptions.value && inputOptions.value.toString().length > 0) {
+          currentUrl.searchParams.set('with', inputOptions.value.toString());
+        }
+
+        return currentUrl.href;
+      });
+    }
+  }, [enableQuery, inputOptions.value]);
+
+  useEffect(() => {
     if (data) {
       setEntries([...data]);
     }
   }, [data]);
 
   useEffect(() => {
+    setUrl((c) => {
+      const currentUrl = new URL(c);
+
+      if (sortBy) {
+        currentUrl.searchParams.set('sort', sortBy);
+      }
+
+      currentUrl.searchParams.set('status', 'active');
+
+      currentUrl.searchParams.set('filter', '');
+
+      return currentUrl.href;
+    });
+
     return () => {
       setEntries([]);
       setEnableQuery(false);
-      enableQueryTimeOut.current && clearTimeout(enableQueryTimeOut.current);
+      enableQueryTimeOut.current = undefined;
     };
   }, []);
 
   const onEmptyValues = (query: string) => {
-    const $url = new URL(url);
-
-    if (query === '' && !$url.searchParams.has('filter')) {
-      return;
-    }
-
     setUrl((c) => {
       const url = new URL(c);
 
@@ -857,6 +908,8 @@ export function ComboboxAsync<T = any>({
         onDismiss={onDismiss}
         initiallyVisible={initiallyVisible}
         exclude={exclude}
+        includeOnly={includeOnly}
+        includeByLabel={includeByLabel}
         action={action}
         nullable={nullable}
         entryOptions={entryOptions}
@@ -876,6 +929,8 @@ export function ComboboxAsync<T = any>({
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
       exclude={exclude}
+      includeOnly={includeOnly}
+      includeByLabel={includeByLabel}
       action={action}
       nullable={nullable}
       entryOptions={entryOptions}

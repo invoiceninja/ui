@@ -18,6 +18,7 @@ interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   invoiceIds: string[];
+  setSelected: (id: string[]) => void;
 }
 
 export type EmailType =
@@ -58,7 +59,10 @@ export function SendEmailModal(props: Props) {
           <div
             key={index}
             className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 pl-2"
-            onClick={() => bulk(invoiceIds, 'email', type.value)}
+            onClick={() => {
+              bulk(invoiceIds, 'email', type.value);
+              props.setSelected([]);
+            }}
           >
             {t(type.label)}
           </div>

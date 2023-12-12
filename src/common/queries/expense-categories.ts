@@ -10,13 +10,13 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
+import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
@@ -33,7 +33,7 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
           {
             perPage: params.perPage ?? '100',
             currentPage: params.currentPage ?? '1',
-            sort: params.sort ?? 'id|asc',
+            sort: params.sort ?? 'name|asc',
             filter: params.filter ?? '',
             status: params.status?.join(',') ?? '',
           }
@@ -53,7 +53,7 @@ interface Props {
 
 export function useExpenseCategoryQuery(props: Props) {
   return useQuery(
-    route('/api/v1/expense_categories/:id', { id: props.id }),
+    ['/api/v1/expense_categories', props.id],
     () =>
       request(
         'GET',
@@ -64,8 +64,6 @@ export function useExpenseCategoryQuery(props: Props) {
 }
 
 export function useBulkAction() {
-  const queryClient = useQueryClient();
-
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
@@ -75,11 +73,7 @@ export function useBulkAction() {
     }).then(() => {
       toast.success(`${action}d_expense_category`);
 
-      queryClient.invalidateQueries('/api/v1/expense_categories');
-
-      queryClient.invalidateQueries(
-        route('/api/v1/expense_categories/:id', { id })
-      );
+      $refetch(['expense_categories']);
     });
   };
 }

@@ -50,7 +50,8 @@ export function InvoiceTotals(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map(
         (variable, index) =>
-          (variable === '$subtotal' || (variable === '$discount' && props.invoiceSum && props.invoiceSum.totalDiscount != 0) || variable === '$taxes') && (
+          (variable === '$subtotal'  ||
+            variable === '$taxes') && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )
       )}

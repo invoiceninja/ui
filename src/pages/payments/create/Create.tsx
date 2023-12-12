@@ -204,8 +204,6 @@ export default function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
-
-    console.log(payment);
   };
 
   const onSubmit = useSave(setErrors);
@@ -366,7 +364,7 @@ export default function Create() {
                 entryOptions={{
                   id: 'id',
                   value: 'id',
-                  label: 'name',
+                  label: 'number',
                   searchable: 'number',
                   dropdownLabelFn: (invoice) =>
                     `${t('invoice_number_short')}${invoice.number} - ${t(
@@ -402,7 +400,7 @@ export default function Create() {
                         label: t('credit') ?? '',
                       }}
                       endpoint={endpoint(
-                        `/api/v1/credits?client_id=${payment.client_id}&per_page=100`
+                        `/api/v1/credits?client_id=${payment.client_id}&per_page=100&applicable=true`
                       )}
                       entryOptions={{
                         id: 'id',
@@ -475,7 +473,7 @@ export default function Create() {
             <Element leftSide={t('credits')}>
               <ComboboxAsync<Credit>
                 endpoint={endpoint(
-                  `/api/v1/credits?client_id=${payment.client_id}`
+                  `/api/v1/credits?client_id=${payment.client_id}&applicable=true`
                 )}
                 inputOptions={{
                   value: null,

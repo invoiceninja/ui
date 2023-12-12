@@ -12,6 +12,7 @@ import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { InputField, SelectField } from '.';
 import Toggle from './Toggle';
+import { useColorScheme } from '$app/common/colors';
 
 export interface Props {
   defaultValue: any;
@@ -22,6 +23,7 @@ export interface Props {
 
 export function InputCustomField(props: Props) {
   const [type, setType] = useState('single_line_text');
+  const colors = useColorScheme();
 
   useEffect(() => {
     const [, fieldType] = props.value.includes('|')
@@ -35,6 +37,7 @@ export function InputCustomField(props: Props) {
     <>
       {type === AvailableTypes.SingleLineText && (
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           type="text"
           id={props.field}
           onValueChange={props.onValueChange}
@@ -44,6 +47,7 @@ export function InputCustomField(props: Props) {
 
       {type === AvailableTypes.MultiLineText && (
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           element="textarea"
           id={props.field}
           onValueChange={props.onValueChange}
@@ -53,6 +57,7 @@ export function InputCustomField(props: Props) {
 
       {type === AvailableTypes.Switch && (
         <Toggle
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           onChange={props.onValueChange}
           checked={
             typeof props.defaultValue === 'string'
@@ -64,6 +69,7 @@ export function InputCustomField(props: Props) {
 
       {type === AvailableTypes.Date && (
         <InputField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           type="date"
           id={props.field}
           onValueChange={props.onValueChange}
@@ -73,6 +79,7 @@ export function InputCustomField(props: Props) {
 
       {!Object.values(AvailableTypes).includes(type as AvailableTypes) && (
         <SelectField
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
           defaultValue={props.defaultValue || ''}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             props.onValueChange(event.target.value)

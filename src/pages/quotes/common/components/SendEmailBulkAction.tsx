@@ -22,7 +22,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 interface Props {
   selectedIds: string[];
   selectedQuotes: Quote[];
-  setSelected?: Dispatch<SetStateAction<string[]>> | undefined;
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
@@ -67,9 +67,7 @@ export const SendEmailBulkAction = (props: Props) => {
             behavior="button"
             onClick={() => {
               bulk(selectedIds, 'email');
-
-              setSelected?.([]);
-
+              setSelected([]);
               setIsModalOpen(false);
             }}
           >

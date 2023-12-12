@@ -32,7 +32,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
-import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
@@ -42,6 +41,9 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { BiPlusCircle } from 'react-icons/bi';
 import { useInvoiceProducts } from './hooks/useInvoiceProducts';
 import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -94,6 +96,8 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -112,7 +116,10 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link to={route('/products/:id/edit', { id: product.id })}>
+          <Link
+            to={route('/products/:id/edit', { id: product.id })}
+            disableNavigation={disableNavigation('product', product)}
+          >
             {value}
           </Link>
         </span>
@@ -246,7 +253,8 @@ export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+
+  const hasPermission = useHasPermission();
 
   const setProduct = useSetAtom(productAtom);
 
@@ -274,14 +282,14 @@ export function useActions() {
     bulk([id], action).then(() => {
       toast.success(`${action}d_product`);
 
-      queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
-      queryClient.invalidateQueries('/api/v1/products');
+      $refetch(['products']);
     });
   };
 
   const actions = [
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => invoiceProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -290,7 +298,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_purchase_order') && (
         <DropdownElement
           onClick={() => purchaseOrderProducts([product])}
           icon={<Icon element={BiPlusCircle} />}
@@ -299,7 +308,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (product: Product) =>
-      !product.is_deleted && (
+      !product.is_deleted &&
+      hasPermission('create_product') && (
         <DropdownElement
           onClick={() => cloneToProduct(product)}
           icon={<Icon element={MdControlPointDuplicate} />}

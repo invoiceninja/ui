@@ -32,11 +32,15 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const hasPermission = useHasPermission();
 
   const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdfs = useDownloadPdfs({ entity: 'quote' });
@@ -83,57 +87,66 @@ export function useCustomBulkActions() {
   };
 
   const customBulkActions: CustomBulkAction<Quote>[] = [
-    (selectedIds, selectedQuotes, setSelected) =>
-      selectedQuotes && (
-        <SendEmailBulkAction
-          selectedIds={selectedIds}
-          selectedQuotes={selectedQuotes}
-          setSelected={setSelected}
-        />
-      ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, selectedResources, setSelected }) => (
+      <SendEmailBulkAction
+        selectedIds={selectedIds}
+        selectedQuotes={selectedResources}
+        setSelected={setSelected}
+      />
+    ),
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           printPdf(selectedIds);
-
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdPrint} />}
       >
         {t('print_pdf')}
       </DropdownElement>
     ),
-    (selectedIds, _, setSelected) => (
+    ({ selectedIds, setSelected }) => (
       <DropdownElement
         onClick={() => {
           downloadPdfs(selectedIds);
-
-          setSelected?.([]);
+          setSelected([]);
         }}
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (_, selectedQuotes) =>
-      selectedQuotes?.length &&
-      selectedQuotes[0].invoice_id && (
-        <DropdownElement
-          onClick={() =>
-            navigate(
-              route('/invoices/:id/edit', { id: selectedQuotes[0].invoice_id })
-            )
+    ({ selectedResources }) =>
+      selectedResources?.length &&
+      selectedResources[0].invoice_id && (
+        <Assigned
+          entityId={selectedResources[0].invoice_id}
+          cacheEndpoint="/api/v1/invoices"
+          apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+          preCheck={
+            hasPermission('view_invoice') || hasPermission('edit_invoice')
           }
-          icon={<Icon element={MdContactPage} />}
-        >
-          {t('view_invoice')}
-        </DropdownElement>
+          component={
+            <DropdownElement
+              onClick={() =>
+                navigate(
+                  route('/invoices/:id/edit', {
+                    id: selectedResources[0].invoice_id,
+                  })
+                )
+              }
+              icon={<Icon element={MdContactPage} />}
+            >
+              {t('view_invoice')}
+            </DropdownElement>
+          }
+        />
       ),
-    (_, selectedQuotes, setSelected) => (
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedQuotes && shouldDownloadDocuments(selectedQuotes)
-            ? handleDownloadDocuments(selectedQuotes, setSelected)
+          selectedResources && shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
@@ -141,45 +154,45 @@ export function useCustomBulkActions() {
         {t('documents')}
       </DropdownElement>
     ),
-    (selectedIds, selectedQuotes, setSelected) =>
-      selectedQuotes &&
-      showMarkSentAction(selectedQuotes) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showMarkSentAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'sent');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdMarkEmailRead} />}
         >
           {t('mark_sent')}
         </DropdownElement>
       ),
-    (selectedIds, selectedQuotes, setSelected) =>
-      selectedQuotes &&
-      showApproveAction(selectedQuotes) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showApproveAction(selectedResources) && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'approve');
-
-            setSelected?.([]);
+            setSelected([]);
           }}
           icon={<Icon element={MdDone} />}
         >
           {t('approve')}
         </DropdownElement>
       ),
-    (selectedIds, selectedQuotes, setSelected) =>
-      selectedQuotes &&
-      showConvertToInvoiceAction(selectedQuotes) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showConvertToInvoiceAction(selectedResources) &&
+      hasPermission('create_invoice') && (
         <ConvertToInvoiceBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}
         />
       ),
-    (selectedIds, selectedQuotes, setSelected) =>
-      selectedQuotes &&
-      showConvertToProjectAction(selectedQuotes) && (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showConvertToProjectAction(selectedResources) &&
+      hasPermission('create_project') && (
         <ConvertToProjectBulkAction
           selectedIds={selectedIds}
           setSelected={setSelected}

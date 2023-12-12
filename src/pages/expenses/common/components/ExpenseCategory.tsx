@@ -100,7 +100,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div>
+        <div className="cursor-pointer">
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}

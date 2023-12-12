@@ -43,24 +43,10 @@ interface Props {
 }
 
 export function InvoicePreview(props: Props) {
-  const [render, setRender] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    timeoutRef.current = setTimeout(() => {
-      setRender(props.initiallyVisible ?? true);
-    }, 1000);
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!props.observable) {
@@ -71,13 +57,12 @@ export function InvoicePreview(props: Props) {
       entries.forEach(
         (entry) => {
           if (entry.isIntersecting) {
-            setRender(true);
             setIsIntersecting(true);
           } else {
             setIsIntersecting(false);
           }
         },
-        { threshold: 1 }
+        { threshold: 0.1 }
       );
     });
 
@@ -94,22 +79,18 @@ export function InvoicePreview(props: Props) {
     if (!props.observable) {
       return;
     }
-
-    setRender(isIntersecting);
   }, [props.resource]);
 
   if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
       <div ref={divRef}>
-        {render ? (
-          <InvoiceViewer
-            link={previewEndpoint(endpoint, {
-              entity: props.entity,
-            })}
-            resource={props.resource}
-            method="POST"
-          />
-        ) : null}
+        <InvoiceViewer
+          link={previewEndpoint(endpoint, {
+            entity: props.entity,
+          })}
+          resource={props.resource}
+          method="POST"
+        />
       </div>
     );
   }
@@ -141,20 +122,18 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <div ref={divRef}>
-        {render ? (
-          <InvoiceViewer
-            link={previewEndpoint(
-              '/api/v1/live_preview?entity=:entity&entity_id=:id',
-              {
-                entity: props.entity,
-                id: props.resource?.id,
-              }
-            )}
-            method="POST"
-            resource={props.resource}
-            enabled={props.observable ? isIntersecting : true}
-          />
-        ) : null}
+        <InvoiceViewer
+          link={previewEndpoint(
+            '/api/v1/live_preview?entity=:entity&entity_id=:id',
+            {
+              entity: props.entity,
+              id: props.resource?.id,
+            }
+          )}
+          method="POST"
+          resource={props.resource}
+          enabled={props.observable ? isIntersecting : true}
+        />
       </div>
     );
   }

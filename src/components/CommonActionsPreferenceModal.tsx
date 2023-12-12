@@ -13,7 +13,7 @@ import { Modal } from './Modal';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { Icon } from './icons/Icon';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdDragHandle } from 'react-icons/md';
 import { SearchableSelect } from './SearchableSelect';
 import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
@@ -25,6 +25,14 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { cloneDeep, isEqual, set } from 'lodash';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
 
 export interface CommonAction {
   value: string;
@@ -41,8 +49,8 @@ interface Props {
 
 export function CommonActionsPreferenceModal(props: Props) {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const user = useCurrentUser();
+  const dispatch = useDispatch();
 
   const commonActions = useAllCommonActions();
 
@@ -87,6 +95,8 @@ export function CommonActionsPreferenceModal(props: Props) {
     ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
       set(updatedUser, 'company_user', response.data.data);
 
+      $refetch(['company_users']);
+
       dispatch(updateUser(updatedUser));
     });
   };
@@ -105,6 +115,22 @@ export function CommonActionsPreferenceModal(props: Props) {
           }
       );
     }
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    const sortedActions: string[] = arrayMoveImmutable(
+      commonActionsPreferences?.[entity] as string[],
+      result.source.index,
+      result.destination?.index as unknown as number
+    );
+
+    setCommonActionsPreferences(
+      (current) =>
+        current && {
+          ...current,
+          [entity]: sortedActions,
+        }
+    );
   };
 
   useEffect(() => {
@@ -162,7 +188,6 @@ export function CommonActionsPreferenceModal(props: Props) {
           value={selectedAction}
           onValueChange={(value) => setSelectedAction(value)}
           label={t('actions')}
-          disabled={commonActionsPreferences?.[entity].length === 3}
           clearAfterSelection
         >
           {availableActions.map(({ label, value }) => (
@@ -179,22 +204,93 @@ export function CommonActionsPreferenceModal(props: Props) {
         )}
 
         {Boolean(commonActionsPreferences?.[entity].length) && (
-          <div className="flex flex-col space-y-3">
-            {commonActionsPreferences?.[entity].map((actionKey) => (
-              <div key={actionKey} className="flex justify-between">
-                <span className="font-medium">{getActionLabel(actionKey)}</span>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable
+              droppableId="preference-actions"
+              renderClone={(provided, _, rubric) => (
+                <div
+                  className="flex items-center justify-between text-sm"
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  ref={provided.innerRef}
+                >
+                  <div className="flex items-center space-x-2">
+                    <Icon
+                      className="cursor-pointer"
+                      element={MdClose}
+                      size={25}
+                    />
 
-                <div>
-                  <Icon
-                    className="cursor-pointer"
-                    element={MdClose}
-                    size={25}
-                    onClick={() => handleRemoveAction(actionKey)}
-                  />
+                    <span className="font-medium">
+                      {getActionLabel(
+                        commonActionsPreferences?.[entity][
+                          rubric.source.index
+                        ] as string
+                      )}
+                    </span>
+                  </div>
+
+                  <div>
+                    <Icon
+                      className="cursor-pointer"
+                      element={MdDragHandle}
+                      size={25}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            >
+              {(droppableProvided) => (
+                <div
+                  className="flex flex-col"
+                  {...droppableProvided.droppableProps}
+                  ref={droppableProvided.innerRef}
+                >
+                  {commonActionsPreferences?.[entity].map(
+                    (actionKey, index) => (
+                      <Draggable
+                        key={index}
+                        draggableId={index.toString()}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            className="flex items-center justify-between py-1.5"
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            key={index}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <Icon
+                                className="cursor-pointer"
+                                element={MdClose}
+                                size={25}
+                                onClick={() => handleRemoveAction(actionKey)}
+                              />
+
+                              <span className="font-medium">
+                                {getActionLabel(actionKey)}
+                              </span>
+                            </div>
+
+                            <div {...provided.dragHandleProps}>
+                              <Icon
+                                className="cursor-pointer"
+                                element={MdDragHandle}
+                                size={25}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    )
+                  )}
+
+                  {droppableProvided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
 
         <Button

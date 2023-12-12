@@ -94,7 +94,7 @@ export function DecimalNumberInput(props: Props) {
                 )
               : null
           }
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          style={{ backgroundColor: colors.$1, borderColor: colors.$5, color: colors.$3, colorScheme: colors.$0 }}
         />
       )}
 

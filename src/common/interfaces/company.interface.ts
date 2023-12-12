@@ -63,13 +63,6 @@ export interface Company {
   fill_products: boolean;
 }
 
-export interface CompanyInput {
-  name: string;
-  subdomain: string;
-  language_id: string;
-  currency_id: string;
-}
-
 export interface Settings {
   accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
@@ -297,8 +290,9 @@ export interface Settings {
   e_invoice_type: string;
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
-  mark_paid_payment_email: boolean;
+  send_email_on_mark_paid: boolean;
   classification: string;
+  payment_email_all_contacts: boolean;
 }
 
 export interface TaxData {

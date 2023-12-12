@@ -18,11 +18,12 @@ export function useClientResolver() {
 
   const find = (id: string) => {
     return queryClient.fetchQuery<Client>({
-      queryKey: ['client', id],
+      queryKey: ['/api/v1/clients', id],
       queryFn: () =>
-        request('GET', endpoint('/api/v1/clients/:id', { id })).then(
-          (response) => response.data.data
-        ),
+        request(
+          'GET',
+          endpoint('/api/v1/clients/:id?include=group_settings', { id })
+        ).then((response) => response.data.data),
       staleTime: Infinity,
     });
   };

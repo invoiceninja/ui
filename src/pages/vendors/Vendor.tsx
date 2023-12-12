@@ -28,6 +28,7 @@ import { useTabs } from './show/hooks/useTabs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date } from '$app/common/helpers';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -55,10 +56,10 @@ export default function Vendor() {
   const tabs = useTabs();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const lastLogin =(last_login: number | undefined) => {
+  const lastLogin = (last_login: number | undefined) => {
     return last_login ? date(last_login, dateFormat) : t('never');
   };
-
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -84,7 +85,9 @@ export default function Vendor() {
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
           {vendor && (
             <div className="flex space-x-20 my-3">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm"
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+              >{t('status')}</span>
               <EntityStatus entity={vendor} />
             </div>
           )}

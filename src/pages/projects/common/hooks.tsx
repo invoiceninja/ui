@@ -48,6 +48,8 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export const defaultColumns: string[] = [
   'name',
@@ -67,7 +69,7 @@ export function useAllProjectColumns() {
 
   const projectColumns = [
     'name',
-    //   'client', @Todo: Need to resolve translation
+    'client',
     'task_rate',
     'due_date',
     'public_notes',
@@ -98,6 +100,8 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
 
   const reactSettings = useReactSettings();
@@ -116,8 +120,27 @@ export function useProjectColumns() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={route('/projects/:id', { id: project.id })}>{value}</Link>
+        <Link
+          to={route('/projects/:id', { id: project.id })}
+          disableNavigation={disableNavigation('project', project)}
+        >
+          {value}
+        </Link>
       ),
+    },
+    {
+      column: 'client',
+      id: 'client_id',
+      label: t('client'),
+      format: (value, project) =>
+        project.client && (
+          <Link
+            to={route('/clients/:id', { id: value.toString() })}
+            disableNavigation={disableNavigation('client', project.client)}
+          >
+            {project.client.display_name}
+          </Link>
+        ),
     },
     {
       column: 'task_rate',
@@ -253,6 +276,8 @@ export function useActions() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
+
   const queryClient = useQueryClient();
 
   const bulk = useBulkAction();
@@ -275,36 +300,42 @@ export function useActions() {
   const handleInvoiceProject = (project: Project) => {
     toast.processing();
 
-    queryClient.fetchQuery(
-      route(
-        '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-        {
-          projectId: project.id,
+    queryClient
+      .fetchQuery(
+        [
+          '/api/v1/tasks',
+          'project_tasks',
+          project.id,
+          'per_page',
+          100,
+          'status',
+          'active',
+        ],
+        () =>
+          request(
+            'GET',
+            endpoint(
+              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+              {
+                projectId: project.id,
+              }
+            )
+          ),
+        { staleTime: Infinity }
+      )
+      .then((response: GenericSingleResourceResponse<Task[]>) => {
+        toast.dismiss();
+
+        const unInvoicedTasks = response.data.data.filter(
+          (task) => !task.invoice_id
+        );
+
+        if (!response.data.data.length) {
+          return toast.error('no_assigned_tasks');
         }
-      ),
-      () =>
-        request(
-          'GET',
-          endpoint(
-            '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
-            {
-              projectId: project.id,
-            }
-          )
-        ).then((response: GenericSingleResourceResponse<Task[]>) => {
-          toast.dismiss();
 
-          const unInvoicedTasks = response.data.data.filter(
-            (task) => !task.invoice_id
-          );
-
-          if (!response.data.data.length) {
-            return toast.error('no_assigned_tasks');
-          }
-
-          invoiceProject(unInvoicedTasks);
-        })
-    );
+        invoiceProject(unInvoicedTasks);
+      });
   };
 
   const actions = [
@@ -320,22 +351,24 @@ export function useActions() {
         </DropdownElement>
       ),
     () => isShowPage && <Divider withoutPadding />,
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => handleInvoiceProject(project)}
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => cloneToProject(project)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    (project: Project) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => handleInvoiceProject(project)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      hasPermission('create_project') && (
+        <DropdownElement
+          onClick={() => cloneToProject(project)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
+      ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -379,6 +412,8 @@ export const useCustomBulkActions = () => {
   const invoiceProject = useInvoiceProject();
   const combineProjectsTasks = useCombineProjectsTasks();
 
+  const hasPermission = useHasPermission();
+
   const documentsBulk = useDocumentsBulk();
 
   const handleInvoiceProjects = (tasks: Task[] | null) => {
@@ -403,32 +438,35 @@ export const useCustomBulkActions = () => {
 
   const handleDownloadDocuments = (
     selectedProjects: Project[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected: Dispatch<SetStateAction<string[]>>
   ) => {
     const projectIds = getDocumentsIds(selectedProjects);
 
     documentsBulk(projectIds, 'download');
-    setSelected?.([]);
+    setSelected([]);
   };
 
   const customBulkActions: CustomBulkAction<Project>[] = [
-    (selectedIds, selectedProjects) => (
-      <DropdownElement
-        onClick={async () =>
-          handleInvoiceProjects(
-            await combineProjectsTasks(selectedIds, selectedProjects)
-          )
-        }
-        icon={<Icon element={MdTextSnippet} />}
-      >
-        {t('invoice_project')}
-      </DropdownElement>
-    ),
-    (_, selectedProjects, setSelected) => (
+    ({ selectedIds, selectedResources, setSelected }) =>
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={async () => {
+            handleInvoiceProjects(
+              await combineProjectsTasks(selectedIds, selectedResources)
+            );
+
+            setSelected([]);
+          }}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_project')}
+        </DropdownElement>
+      ),
+    ({ selectedResources, setSelected }) => (
       <DropdownElement
         onClick={() =>
-          selectedProjects && shouldDownloadDocuments(selectedProjects)
-            ? handleDownloadDocuments(selectedProjects, setSelected)
+          shouldDownloadDocuments(selectedResources)
+            ? handleDownloadDocuments(selectedResources, setSelected)
             : toast.error('no_documents_to_download')
         }
         icon={<Icon element={MdDownload} />}
