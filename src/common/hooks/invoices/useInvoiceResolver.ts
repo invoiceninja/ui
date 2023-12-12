@@ -22,7 +22,7 @@ export function useInvoiceResolver() {
       () =>
         request(
           'GET',
-          endpoint('/api/v1/invoices/:id?include=client.group_settings', { id })
+          endpoint('/api/v1/invoices/:id?include=client.group_settings&sort=id|asc', { id })
         ).then((response) => response.data.data),
       { staleTime: Infinity }
     );
