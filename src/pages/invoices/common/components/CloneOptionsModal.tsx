@@ -162,7 +162,6 @@ export function CloneOptionsModal(props: Props) {
         <>
           {showActionByPreferences('invoice', 'clone') && (
             <DropdownElement
-              behavior="button"
               onClick={cloneToInvoice}
               icon={<Icon element={MdControlPointDuplicate} color="white" />}
             >
@@ -173,7 +172,6 @@ export function CloneOptionsModal(props: Props) {
         <>
           {showActionByPreferences('invoice', 'clone_to_quote') && (
             <DropdownElement
-              behavior="button"
               onClick={cloneToQuote}
               icon={<Icon element={MdControlPointDuplicate} color="white" />}
             >
@@ -184,7 +182,6 @@ export function CloneOptionsModal(props: Props) {
         <>
           {showActionByPreferences('invoice', 'clone_to_credit') && (
             <DropdownElement
-              behavior="button"
               onClick={cloneToCredit}
               icon={<Icon element={MdControlPointDuplicate} color="white" />}
             >
@@ -195,7 +192,6 @@ export function CloneOptionsModal(props: Props) {
         <>
           {showActionByPreferences('invoice', 'clone_to_recurring') && (
             <DropdownElement
-              behavior="button"
               onClick={cloneToRecurringInvoice}
               icon={<Icon element={MdControlPointDuplicate} color="white" />}
             >
@@ -206,7 +202,6 @@ export function CloneOptionsModal(props: Props) {
         <>
           {showActionByPreferences('invoice', 'clone_to_purchase_order') && (
             <DropdownElement
-              behavior="button"
               onClick={cloneToPurchaseOrder}
               icon={<Icon element={MdControlPointDuplicate} color="white" />}
             >
