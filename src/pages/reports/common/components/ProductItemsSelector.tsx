@@ -16,16 +16,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
+import { Alert } from '$app/components/Alert';
 
 interface Props {
   value?: string;
   onValueChange: (productsKeys: string) => void;
+  errorMessage?: string[] | string;
 }
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const { value, onValueChange } = props;
+  const { value, onValueChange, errorMessage } = props;
 
   const [productItems, setProductItems] = useState<SelectOption[]>();
 
@@ -118,6 +120,12 @@ export function ProductItemsSelector(props: Props) {
         <div className="flex justify-center items-center">
           <Spinner />
         </div>
+      )}
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
       )}
     </>
   );

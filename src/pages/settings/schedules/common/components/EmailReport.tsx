@@ -148,6 +148,7 @@ export function EmailReport(props: Props) {
             onValueChange={(value) =>
               handleChange('parameters.status' as keyof Schedule, value)
             }
+            errorMessage={errors?.errors['parameters.status']}
           />
         </Element>
       )}
@@ -158,6 +159,7 @@ export function EmailReport(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.product_key' as keyof Schedule, value)
           }
+          errorMessage={errors?.errors['parameters.product_key']}
         />
       )}
 
@@ -171,7 +173,7 @@ export function EmailReport(props: Props) {
             errorMessage={errors?.errors['parameters.date_range']}
           >
             {ranges.map((range, i) => (
-              <option value={range.identifier} key={i}>
+              <option value={range.scheduleIdentifier} key={i}>
                 {t(range.label)}
               </option>
             ))}
