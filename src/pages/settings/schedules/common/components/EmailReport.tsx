@@ -144,7 +144,7 @@ export function EmailReport(props: Props) {
       {showReportFiled('status') && (
         <Element leftSide={t('status')}>
           <StatusSelector
-            defaultValue={schedule.parameters.status}
+            value={schedule.parameters.status}
             onValueChange={(value) =>
               handleChange('parameters.status' as keyof Schedule, value)
             }

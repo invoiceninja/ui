@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 
 interface Props {
-  defaultValue?: string;
+  value?: string;
   onValueChange: (status: string) => void;
   errorMessage?: string[] | string;
 }
@@ -23,7 +23,7 @@ export function StatusSelector(props: Props) {
   const [t] = useTranslation();
   const filters = useInvoiceFilters();
 
-  const { defaultValue, onValueChange, errorMessage } = props;
+  const { value, onValueChange, errorMessage } = props;
 
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
@@ -58,11 +58,9 @@ export function StatusSelector(props: Props) {
     <>
       <Select
         styles={customStyles}
-        defaultValue={
-          defaultValue
-            ? filters.filter((option) => defaultValue.includes(option.value))
-            : null
-        }
+        {...(value && {
+          value: filters.filter((option) => value.includes(option.value)),
+        })}
         onChange={(options) => onValueChange(handleStatusChange(options))}
         placeholder={t('status')}
         options={filters}
