@@ -47,18 +47,47 @@ import { useColorScheme } from '$app/common/colors';
 interface Range {
   identifier: string;
   label: string;
+  scheduleIdentifier: string;
 }
 
 export const ranges: Range[] = [
-  { identifier: 'all', label: 'all' },
-  { identifier: 'last7', label: 'last_7_days' },
-  { identifier: 'last30', label: 'last_30_days' },
-  { identifier: 'this_month', label: 'this_month' },
-  { identifier: 'last_month', label: 'last_month' },
-  { identifier: 'this_quarter', label: 'this_quarter' },
-  { identifier: 'last_quarter', label: 'last_quarter' },
-  { identifier: 'this_year', label: 'this_year' },
-  { identifier: 'custom', label: 'custom' },
+  { identifier: 'all', label: 'all', scheduleIdentifier: 'all' },
+  {
+    identifier: 'last7',
+    label: 'last_7_days',
+    scheduleIdentifier: 'last7_days',
+  },
+  {
+    identifier: 'last30',
+    label: 'last_30_days',
+    scheduleIdentifier: 'last30_days',
+  },
+  {
+    identifier: 'this_month',
+    label: 'this_month',
+    scheduleIdentifier: 'this_month',
+  },
+  {
+    identifier: 'last_month',
+    label: 'last_month',
+    scheduleIdentifier: 'last_month',
+  },
+  {
+    identifier: 'this_quarter',
+    label: 'this_quarter',
+    scheduleIdentifier: 'this_quarter',
+  },
+  {
+    identifier: 'last_quarter',
+    label: 'last_quarter',
+    scheduleIdentifier: 'last_quarter',
+  },
+  {
+    identifier: 'this_year',
+    label: 'this_year',
+    scheduleIdentifier: 'this_year',
+  },
+  { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
 const download = (data: BlobPart, identifier: string) => {
