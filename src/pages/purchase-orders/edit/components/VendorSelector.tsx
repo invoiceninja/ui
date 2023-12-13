@@ -27,17 +27,25 @@ interface Props {
 
 export function VendorSelector(props: Props) {
   const { t } = useTranslation();
-  const [vendor, setVendor] = useState<Vendor>();
+
+  const { resource } = props;
 
   const vendorResolver = useVendorResolver();
 
+  const [vendor, setVendor] = useState<Vendor>();
+  const [vendorId, setVendorId] = useState<string>('');
+
   useEffect(() => {
-    if (props.resource && props.resource.vendor_id.length > 0) {
-      vendorResolver
-        .find(props.resource.vendor_id)
-        .then((vendor) => setVendor(vendor));
+    if (vendorId) {
+      vendorResolver.find(vendorId).then((vendor) => setVendor(vendor));
     }
-  }, [props.resource?.vendor_id]);
+  }, [vendorId]);
+
+  useEffect(() => {
+    if (resource) {
+      setVendorId(resource.vendor_id ?? (resource.vendor?.id || ''));
+    }
+  }, [resource?.vendor_id, resource?.vendor?.id]);
 
   const isChecked = (id: string) => {
     const potential = props.resource?.invitations.find(
@@ -53,15 +61,14 @@ export function VendorSelector(props: Props) {
         <Selector
           inputLabel={t('vendor')}
           onChange={(vendor) => props.onChange(vendor.id)}
-          value={props.resource?.vendor_id}
+          value={vendorId}
           readonly={props.readonly}
-          clearButton={Boolean(props.resource?.vendor_id)}
           onClearButtonClick={props.onClearButtonClick}
           errorMessage={props.errorMessage}
         />
       </div>
 
-      {props.resource?.vendor_id &&
+      {vendorId &&
         vendor &&
         vendor.contacts.map((contact, index) => (
           <div key={index}>
