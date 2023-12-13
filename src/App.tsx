@@ -152,7 +152,7 @@ export function App() {
     if (
       user &&
       Object.keys(user).length &&
-      location.pathname === '/dashboard' &&
+      location.pathname.endsWith('/dashboard') &&
       !hasPermission('view_dashboard')
     ) {
       navigate('/settings/user_details');
