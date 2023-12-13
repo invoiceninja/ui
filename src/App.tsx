@@ -26,7 +26,7 @@ import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel'
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
-import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import { useAdmin, useHasPermission } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
@@ -65,6 +65,7 @@ export function App() {
 
   const user = useCurrentUser();
   const refetch = useRefetch();
+  const hasPermission = useHasPermission();
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -150,6 +151,17 @@ export function App() {
       navigate('/settings/company_details');
     }
   }, [location]);
+
+  useEffect(() => {
+    if (
+      user &&
+      Object.keys(user).length &&
+      location.pathname.endsWith('/dashboard') &&
+      !hasPermission('view_dashboard')
+    ) {
+      navigate('/settings/user_details');
+    }
+  }, [location, user]);
 
   return (
     <>
