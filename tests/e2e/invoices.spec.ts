@@ -191,12 +191,12 @@ test('can edit invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['edit_invoice'],
+    permissions: ['edit_invoice', 'view_client'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('edit_invoice');
+  await set('edit_invoice', 'view_client');
   await save();
 
   await createInvoice({ page });
@@ -238,32 +238,20 @@ test('can create a invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
-    permissions: ['create_invoice'],
+    permissions: ['create_invoice', 'create_client', 'view_client'],
   });
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice');
+  await set('create_invoice', 'create_client', 'view_client');
   await save();
-
-  await createInvoice({ page });
-
   await logout(page);
 
   await login(page, 'invoices@example.com', 'password');
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Invoices', exact: true })
-    .click();
+  await createInvoice({ page, isTableEditable: false });
 
-  await checkTableEditability(page, false);
-
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-  await tableRow.getByRole('link').first().click();
-
-  await checkEditPage(page, true, false);
+  await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -335,7 +323,7 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -383,7 +371,7 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -436,7 +424,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -457,11 +445,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createInvoice({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.waitForURL('**/invoices/**/edit**');
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -469,11 +453,11 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+
+    await page.waitForURL('**/invoices/**/edit');
   }
-
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-
-  await page.waitForURL('**/invoices/**/edit');
 
   await page
     .getByRole('button', {
@@ -490,7 +474,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -511,11 +495,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   if (!doRecordsExist) {
     await createInvoice({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.waitForURL('**/invoices/**/edit**');
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -523,10 +503,11 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
-  await page.waitForURL('**/invoices/**/edit');
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+
+    await page.waitForURL('**/invoices/**/edit');
+  }
 
   await page
     .getByRole('button', {
@@ -587,6 +568,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
       'create_credit',
       'create_recurring_invoice',
       'create_purchase_order',
+      'create_client',
     ],
   });
 
@@ -599,7 +581,8 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     'create_credit',
     'create_recurring_invoice',
     'create_purchase_order',
-    'view_client'
+    'view_client',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -622,7 +605,7 @@ test('cloning invoice', async ({ page }) => {
 
   await login(page);
   await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client');
+  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
   await save();
   await logout(page);
 
@@ -673,9 +656,7 @@ test('cloning invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Enter Payment displayed displayed with admin permission', async ({
-  page,
-}) => {
+test('Enter Payment displayed with admin permission', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomInvoiceActions({
@@ -698,6 +679,8 @@ test('Enter Payment displayed displayed with admin permission', async ({
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
@@ -722,6 +705,7 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
       'create_credit',
       'create_recurring_invoice',
       'create_purchase_order',
+      'create_client',
     ],
   });
 
@@ -735,7 +719,8 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
     'create_recurring_invoice',
     'create_purchase_order',
     'view_client',
-    'edit_invoice'
+    'edit_invoice',
+    'create_client'
   );
   await save();
   await logout(page);
@@ -750,6 +735,8 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

@@ -591,12 +591,10 @@ test('client documents preview with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page
+      .getByRole('link')
+      .filter({ has: page.getByText('Edit Client') })
+      .click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -604,9 +602,9 @@ test('client documents preview with edit_client', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await checkEditPage(page);
 
@@ -646,12 +644,10 @@ test('client documents uploading with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page
+      .getByRole('link')
+      .filter({ has: page.getByText('Edit Client') })
+      .click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -659,8 +655,9 @@ test('client documents uploading with edit_client', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await checkEditPage(page);
 

@@ -9,6 +9,8 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { DocumentsTable } from '$app/components/DocumentsTable';
@@ -19,6 +21,9 @@ export default function Documents() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const invalidateQuery = () => {
     $refetch(['payments']);
   };
@@ -28,12 +33,16 @@ export default function Documents() {
       <Upload
         endpoint={endpoint('/api/v1/payments/:id/upload', { id })}
         onSuccess={invalidateQuery}
+        disableUpload={
+          !hasPermission('edit_payment') && !entityAssigned(payment)
+        }
       />
 
       {payment && (
         <DocumentsTable
           documents={payment.documents ?? []}
           onDocumentDelete={invalidateQuery}
+          disableEditableOptions={!entityAssigned(payment, true)}
         />
       )}
     </>

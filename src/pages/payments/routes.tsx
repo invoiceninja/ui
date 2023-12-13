@@ -14,6 +14,7 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { admin } from '$app/common/guards/guards/admin';
 
 const Payment = lazy(() => import('$app/pages/payments/Payment'));
 const Payments = lazy(() => import('$app/pages/payments/index/Payments'));
@@ -54,6 +55,20 @@ export const paymentRoutes = (
       element={
         <Guard
           guards={[
+            or(permission('edit_payment'), assigned('/api/v1/payments/:id')),
+          ]}
+          component={<Payment />}
+        />
+      }
+    >
+      <Route path="apply" element={<Apply />} />
+      <Route path="refund" element={<Refund />} />
+    </Route>
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
             or(
               permission('view_payment'),
               permission('edit_payment'),
@@ -66,9 +81,12 @@ export const paymentRoutes = (
     >
       <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
+    </Route>
+    <Route
+      path=":id"
+      element={<Guard guards={[admin()]} component={<Payment />} />}
+    >
       <Route path="payment_fields" element={<PaymentFields />} />
-      <Route path="apply" element={<Apply />} />
-      <Route path="refund" element={<Refund />} />
     </Route>
   </Route>
 );

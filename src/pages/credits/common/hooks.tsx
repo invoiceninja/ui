@@ -51,7 +51,6 @@ import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useMarkSent } from './hooks/useMarkSent';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -92,6 +91,7 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -668,12 +668,12 @@ export function useCreditColumns() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link
+        <DynamicLink
           to={route('/credits/:id/edit', { id: credit.id })}
-          disableNavigation={disableNavigation('credit', credit)}
+          renderSpan={disableNavigation('credit', credit)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -681,12 +681,12 @@ export function useCreditColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: credit.client_id })}
-          disableNavigation={disableNavigation('client', credit.client)}
+          renderSpan={disableNavigation('client', credit.client)}
         >
           {credit.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
