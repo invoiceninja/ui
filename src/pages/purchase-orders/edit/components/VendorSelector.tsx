@@ -43,7 +43,7 @@ export function VendorSelector(props: Props) {
 
   useEffect(() => {
     if (resource) {
-      setVendorId(resource.vendor_id ?? (resource.vendor?.id || ''));
+      setVendorId(resource.vendor_id || resource.vendor?.id || '');
     }
   }, [resource?.vendor_id, resource?.vendor?.id]);
 
