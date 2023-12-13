@@ -44,4 +44,10 @@ export const purchaseorderMap: Record[] = [
   { trans: 'tax_amount', value: 'purchase_order.total_taxes', map: 'purchase_order' },
   { trans: 'assigned_user', value: 'purchase_order.assigned_user_id', map: 'purchase_order' },
   { trans: 'user', value: 'purchase_order.user_id', map: 'purchase_order' },
+  { trans: 'tax_name1', value: 'purchase_order.tax_name1', map: 'purchase_order' },
+  { trans: 'tax_rate1', value: 'purchase_order.tax_rate1', map: 'purchase_order' },
+  { trans: 'tax_name2', value: 'purchase_order.tax_name2', map: 'purchase_order' },
+  { trans: 'tax_rate2', value: 'purchase_order.tax_rate2', map: 'purchase_order' },
+  { trans: 'tax_name3', value: 'purchase_order.tax_name3', map: 'purchase_order' },
+  { trans: 'tax_rate3', value: 'purchase_order.tax_rate3', map: 'purchase_order' },
 ];

@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { EntityState } from '$app/common/enums/entity-state';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -44,6 +43,7 @@ import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -116,12 +116,12 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link
+          <DynamicLink
             to={route('/products/:id/edit', { id: product.id })}
-            disableNavigation={disableNavigation('product', product)}
+            renderSpan={disableNavigation('product', product)}
           >
             {value}
-          </Link>
+          </DynamicLink>
         </span>
       ),
     },

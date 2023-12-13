@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -25,6 +24,7 @@ import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -138,12 +138,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link
+        <DynamicLink
           to={route('/invoices/:id/edit', { id: invoice.id })}
-          disableNavigation={disableNavigation('invoice', invoice)}
+          renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -162,12 +162,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: invoice.client_id })}
-          disableNavigation={disableNavigation('client', invoice.client)}
+          renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {

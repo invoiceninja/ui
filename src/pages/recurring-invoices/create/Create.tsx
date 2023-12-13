@@ -136,6 +136,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setRecurringInvoice(undefined);
+    };
   }, [data]);
 
   useEffect(() => {

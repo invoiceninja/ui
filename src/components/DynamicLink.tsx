@@ -9,41 +9,29 @@
  */
 
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   to: string;
   children: ReactNode;
-  external?: boolean;
+  renderSpan?: boolean;
 }
 
-export function Link(props: Props) {
+export function DynamicLink(props: Props) {
   const accentColor = useAccentColor();
 
-  const css: React.CSSProperties = {
-    color: accentColor,
-  };
+  const { renderSpan } = props;
 
-  if (props.external) {
-    return (
-      <a
-        target="_blank"
-        href={props.to}
-        className={`text-center text-sm hover:underline ${props.className}`}
-        style={css}
-        rel="noreferrer"
-      >
-        {props.children}
-      </a>
-    );
+  if (renderSpan) {
+    return <span>{props.children}</span>;
   }
 
   return (
     <RouterLink
       className={`text-sm hover:underline ${props.className}`}
-      style={css}
+      style={{ color: accentColor }}
       to={props.to}
     >
       {props.children}
