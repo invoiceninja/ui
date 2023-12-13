@@ -8,7 +8,7 @@ type AdminPermission = 'admin';
 export type Permission = TPermissions | AdminPermission;
 
 export async function logout(page: Page) {
-  await page.goto('/#/logout');
+  await page.goto('/logout');
 
   await page.waitForURL('**/login');
 }
@@ -43,7 +43,7 @@ export function permissions(page: Page) {
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     const tableBody = page.locator('tbody').first();
 
@@ -51,7 +51,7 @@ export function permissions(page: Page) {
 
     await page.getByLabel('Current password*').fill('password');
     await page.locator('#current_password').press('Tab');
-    
+
     await page.getByLabel('Current password*').click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Permissions' }).click();

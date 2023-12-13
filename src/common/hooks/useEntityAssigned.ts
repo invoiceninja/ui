@@ -20,6 +20,7 @@ import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { Task } from '../interfaces/task';
 import { Vendor } from '../interfaces/vendor';
+import { useAdmin } from './permissions/useHasPermission';
 import { useCurrentUser } from './useCurrentUser';
 
 type Entity =
@@ -38,12 +39,24 @@ type Entity =
 
 export function useEntityAssigned() {
   const user = useCurrentUser();
+  const { isAdmin, isOwner } = useAdmin();
 
-  return (entity: Entity | undefined | null) => {
+  return (entity: Entity | undefined | null, creationOnly?: boolean) => {
+    if (creationOnly) {
+      return (
+        Boolean(user && entity && entity.user_id === user.id) ||
+        isAdmin ||
+        isOwner
+      );
+    }
+
     return Boolean(
       user &&
         entity &&
-        (entity.user_id === user.id || entity.assigned_user_id === user.id)
+        (entity.user_id === user.id ||
+          entity.assigned_user_id === user.id ||
+          isAdmin ||
+          isOwner)
     );
   };
 }

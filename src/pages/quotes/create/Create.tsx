@@ -110,6 +110,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setQuote(undefined);
+    };
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
@@ -123,7 +127,6 @@ export default function Create() {
 
     return company?.settings[prop as keyof CompanySettings];
   };
-
 
   useEffect(() => {
     quote &&
@@ -158,7 +161,6 @@ export default function Create() {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }
-
       });
   }, [quote?.client_id]);
 
