@@ -53,6 +53,7 @@ import {
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
+import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -280,7 +281,7 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="my-4">
+        <div className="flex flex-col space-y-3 my-4">
           {recurringInvoice && (
             <InvoicePreview
               for="invoice"
@@ -290,6 +291,8 @@ export default function Edit() {
               endpoint="/api/v1/live_preview?entity=:entity"
             />
           )}
+
+          <RemoveLogoCTA />
         </div>
       )}
 
