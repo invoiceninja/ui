@@ -13,7 +13,7 @@ import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { route } from '$app/common/helpers/route';
@@ -33,16 +33,14 @@ interface Props {
 }
 
 export function ClientSelector(props: Props) {
-  const { resource } = props;
-
   const [t] = useTranslation();
-  const hasPermission = useHasPermission();
-
-  const clientResolver = useClientResolver();
-
   const [client, setClient] = useState<Client>();
 
-  const resolveClientTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+  const hasPermission = useHasPermission();
+
+  const { resource } = props;
+
+  const clientResolver = useClientResolver();
 
   const handleCheckedState = (contactId: string) => {
     const potential = resource?.invitations.find(
@@ -53,19 +51,10 @@ export function ClientSelector(props: Props) {
   };
 
   useEffect(() => {
-    if (resource?.client_id) {
-      clearTimeout(resolveClientTimeOut.current);
-
-      const currentTimeout = setTimeout(
-        () =>
-          clientResolver
-            .find(resource.client_id)
-            .then((client) => setClient(client)),
-        25
-      );
-
-      resolveClientTimeOut.current = currentTimeout;
-    }
+    resource?.client_id &&
+      clientResolver
+        .find(resource.client_id)
+        .then((client) => setClient(client));
   }, [resource?.client_id]);
 
   const colors = useColorScheme();

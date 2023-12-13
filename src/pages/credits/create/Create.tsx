@@ -130,6 +130,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setCredit(undefined);
+    };
   }, [data]);
 
   useEffect(() => {
