@@ -94,7 +94,7 @@ export function Modal(props: Props) {
             >
               <div
                 className="flex flex-col justify-between items-start"
-                style={{ color: colors.$3 }}
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
               >
                 <div className="flex w-full justify-between">
                   <Dialog.Title

@@ -50,6 +50,7 @@ import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '../common/components/ConfirmActionModal';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -149,6 +150,7 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
+  const colors = useColorScheme();
 
   return (
     <Default
@@ -170,7 +172,10 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {recurringInvoice && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm"
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+
+              >{t('status')}</span>
               <RecurringInvoiceStatusBadge entity={recurringInvoice} />
             </div>
           )}

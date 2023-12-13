@@ -44,6 +44,7 @@ import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOpti
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { useColorScheme } from '$app/common/colors';
 
 dayjs.extend(duration);
 
@@ -83,6 +84,7 @@ export default function Show() {
   const customBulkActions = useCustomBulkActions();
 
   const showEditOption = useShowEditOption();
+  const colors = useColorScheme();
 
   if (!project) {
     return (
@@ -108,7 +110,9 @@ export default function Show() {
         <InfoCard title={t('details')}>
           {project && (
             <div className="flex space-x-20 my-3">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span className="text-sm"
+                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+              >{t('status')}</span>
               <EntityStatus entity={project} />
             </div>
           )}
