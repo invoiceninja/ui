@@ -142,6 +142,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setInvoice(undefined);
+    };
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {

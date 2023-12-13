@@ -172,4 +172,12 @@ export const recurringinvoiceMap: Record[] = [
     value: 'recurring_invoice.auto_bill_enabled',
     map: 'recurring_invoice',
   },
+
+  { trans: 'tax_name1', value: 'recurring_invoice.tax_name1', map: 'recurring_invoice' },
+  { trans: 'tax_rate1', value: 'recurring_invoice.tax_rate1', map: 'recurring_invoice' },
+  { trans: 'tax_name2', value: 'recurring_invoice.tax_name2', map: 'recurring_invoice' },
+  { trans: 'tax_rate2', value: 'recurring_invoice.tax_rate2', map: 'recurring_invoice' },
+  { trans: 'tax_name3', value: 'recurring_invoice.tax_name3', map: 'recurring_invoice' },
+  { trans: 'tax_rate3', value: 'recurring_invoice.tax_rate3', map: 'recurring_invoice' },
+
 ];

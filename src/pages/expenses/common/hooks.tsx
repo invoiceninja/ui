@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -51,6 +50,7 @@ import { ExpenseCategory } from './components/ExpenseCategory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -252,14 +252,14 @@ export function useExpenseColumns() {
       label: t('status'),
       format: (value, expense) => (
         <div className="flex items-center space-x-2">
-          <Link
+          <DynamicLink
             to={route('/expenses/:id/edit', { id: expense.id })}
-            disableNavigation={disableNavigation('expense', expense)}
+            renderSpan={disableNavigation('expense', expense)}
           >
             <span className="inline-flex items-center space-x-4">
               <ExpenseStatus entity={expense} />
             </span>
-          </Link>
+          </DynamicLink>
 
           {expense.invoice_id && (
             <Assigned
@@ -290,12 +290,12 @@ export function useExpenseColumns() {
       id: 'number',
       label: t('number'),
       format: (field, expense) => (
-        <Link
+        <DynamicLink
           to={route('/expenses/:id/edit', { id: expense.id })}
-          disableNavigation={disableNavigation('expense', expense)}
+          renderSpan={disableNavigation('expense', expense)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -304,12 +304,12 @@ export function useExpenseColumns() {
       label: t('vendor'),
       format: (value, expense) =>
         expense.vendor && (
-          <Link
+          <DynamicLink
             to={route('/vendors/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('vendor', expense.vendor)}
+            renderSpan={disableNavigation('vendor', expense.vendor)}
           >
             {expense.vendor.name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -318,12 +318,12 @@ export function useExpenseColumns() {
       label: t('client'),
       format: (value, expense) =>
         expense.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('client', expense.client)}
+            renderSpan={disableNavigation('client', expense.client)}
           >
             {expense.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {

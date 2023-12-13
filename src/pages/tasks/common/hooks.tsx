@@ -66,6 +66,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const defaultColumns: string[] = [
   'status',
@@ -181,12 +182,12 @@ export function useTaskColumns() {
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link
+        <DynamicLink
           to={route('/tasks/:id/edit', { id: task.id })}
-          disableNavigation={disableNavigation('task', task)}
+          renderSpan={disableNavigation('task', task)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -195,12 +196,12 @@ export function useTaskColumns() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('client', task.client)}
+            renderSpan={disableNavigation('client', task.client)}
           >
             {task.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {

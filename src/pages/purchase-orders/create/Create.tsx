@@ -112,6 +112,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setPurchaseOrder(undefined);
+    };
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<

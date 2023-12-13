@@ -49,7 +49,6 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -94,6 +93,7 @@ import {
 } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -692,12 +692,12 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <Link
+        <DynamicLink
           to={route('/quotes/:id/edit', { id: quote.id })}
-          disableNavigation={disableNavigation('quote', quote)}
+          renderSpan={disableNavigation('quote', quote)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -705,12 +705,12 @@ export function useQuoteColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, quote) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: quote.client_id })}
-          disableNavigation={disableNavigation('client', quote.client)}
+          renderSpan={disableNavigation('client', quote.client)}
         >
           {quote.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {

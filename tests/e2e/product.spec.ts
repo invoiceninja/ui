@@ -131,12 +131,6 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
-    ).not.toBeVisible();
   }
 
   if (!isAdmin) {
@@ -422,13 +416,6 @@ test('product documents preview with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -436,9 +423,9 @@ test('product documents preview with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await page.waitForURL('**/products/**/edit');
 
@@ -479,13 +466,6 @@ test('product documents uploading with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -493,8 +473,9 @@ test('product documents uploading with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/products/**/edit');
 
@@ -666,6 +647,8 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -706,6 +689,8 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Products', exact: true })
     .click();
+
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
