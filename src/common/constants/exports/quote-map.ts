@@ -40,4 +40,10 @@ export const quoteMap: Record[] = [
   { trans: 'tax_amount', value: 'quote.total_taxes', map: 'quote' },
   { trans: 'assigned_user', value: 'quote.assigned_user_id', map: 'quote' },
   { trans: 'user', value: 'quote.user_id', map: 'quote' },
+  { trans: 'tax_name1', value: 'quote.tax_name1', map: 'quote' },
+  { trans: 'tax_rate1', value: 'quote.tax_rate1', map: 'quote' },
+  { trans: 'tax_name2', value: 'quote.tax_name2', map: 'quote' },
+  { trans: 'tax_rate2', value: 'quote.tax_rate2', map: 'quote' },
+  { trans: 'tax_name3', value: 'quote.tax_name3', map: 'quote' },
+  { trans: 'tax_rate3', value: 'quote.tax_rate3', map: 'quote' },
 ];

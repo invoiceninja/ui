@@ -40,4 +40,10 @@ export const creditMap: Record[] = [
   { trans: 'tax_amount', value: 'credit.total_taxes', map: 'credit' },
   { trans: 'assigned_user', value: 'credit.assigned_user_id', map: 'credit' },
   { trans: 'user', value: 'credit.user_id', map: 'credit' },
+  { trans: 'tax_name1', value: 'credit.tax_name1', map: 'credit' },
+  { trans: 'tax_rate1', value: 'credit.tax_rate1', map: 'credit' },
+  { trans: 'tax_name2', value: 'credit.tax_name2', map: 'credit' },
+  { trans: 'tax_rate2', value: 'credit.tax_rate2', map: 'credit' },
+  { trans: 'tax_name3', value: 'credit.tax_name3', map: 'credit' },
+  { trans: 'tax_rate3', value: 'credit.tax_rate3', map: 'credit' },
 ];
