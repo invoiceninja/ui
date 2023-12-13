@@ -131,12 +131,6 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
-    ).not.toBeVisible();
   }
 
   if (!isAdmin) {

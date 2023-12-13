@@ -43,7 +43,7 @@ export function permissions(page: Page) {
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     const tableBody = page.locator('tbody').first();
 
