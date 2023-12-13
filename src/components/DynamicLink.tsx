@@ -24,10 +24,6 @@ export function DynamicLink(props: Props) {
 
   const { renderSpan } = props;
 
-  const css: React.CSSProperties = {
-    color: accentColor,
-  };
-
   if (renderSpan) {
     return <span>{props.children}</span>;
   }
@@ -35,7 +31,7 @@ export function DynamicLink(props: Props) {
   return (
     <RouterLink
       className={`text-sm hover:underline ${props.className}`}
-      style={css}
+      style={{ color: accentColor }}
       to={props.to}
     >
       {props.children}

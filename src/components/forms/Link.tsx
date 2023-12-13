@@ -17,21 +17,14 @@ interface Props extends CommonProps {
   to: string;
   children: ReactNode;
   external?: boolean;
-  disableNavigation?: boolean;
 }
 
 export function Link(props: Props) {
   const accentColor = useAccentColor();
 
-  const { disableNavigation } = props;
-
   const css: React.CSSProperties = {
     color: accentColor,
   };
-
-  if (disableNavigation) {
-    return <span>{props.children}</span>;
-  }
 
   if (props.external) {
     return (
