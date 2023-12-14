@@ -23,8 +23,8 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
+import { useAtom, useSetAtom } from 'jotai';
+import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -41,6 +41,7 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { preventClosingTabOrBrowserAtom } from '$app/App';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -66,6 +67,12 @@ export default function Create() {
   const taskColumns = useTaskColumns();
 
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
+
+  const setPreventClosingTabOrBrowser = useSetAtom(
+    preventClosingTabOrBrowserAtom
+  );
+
+  const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -145,6 +152,7 @@ export default function Create() {
 
     return () => {
       setInvoice(undefined);
+      setPreventClosingTabOrBrowser(false);
     };
   }, [data]);
 
@@ -200,6 +208,16 @@ export default function Create() {
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
+
+    if (invoice && initialInvoiceValue) {
+      setPreventClosingTabOrBrowser(!isEqual(invoice, initialInvoiceValue));
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (invoice && !initialInvoiceValue) {
+      setInitialInvoiceValue(invoice);
+    }
   }, [invoice]);
 
   return (

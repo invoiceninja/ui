@@ -21,8 +21,8 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
+import { useAtom, useSetAtom } from 'jotai';
+import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -44,6 +44,8 @@ import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/Invoic
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { preventClosingTabOrBrowserAtom } from '$app/App';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -69,8 +71,14 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
+  const setPreventClosingTabOrBrowser = useSetAtom(
+    preventClosingTabOrBrowserAtom
+  );
+
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -101,10 +109,24 @@ export default function Edit() {
         setClient(_invoice.client);
       }
     }
+
+    return () => {
+      setPreventClosingTabOrBrowser(false);
+    };
   }, [data]);
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
+
+    if (invoice && initialInvoiceValue) {
+      setPreventClosingTabOrBrowser(!isEqual(invoice, initialInvoiceValue));
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (invoice && !initialInvoiceValue) {
+      setInitialInvoiceValue(invoice);
+    }
   }, [invoice]);
 
   const actions = useActions();

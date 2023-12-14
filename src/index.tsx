@@ -57,17 +57,15 @@ const queryClient = new QueryClient({
 const container = document.getElementById('root') as HTMLElement;
 
 createRoot(container).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <GoogleOAuth>
-          <Router>
-            <ScrollToTop>
-              <App />
-            </ScrollToTop>
-          </Router>
-        </GoogleOAuth>
-      </Provider>
-    </QueryClientProvider>
-  </React.StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <GoogleOAuth>
+        <Router>
+          <ScrollToTop>
+            <App />
+          </ScrollToTop>
+        </Router>
+      </GoogleOAuth>
+    </Provider>
+  </QueryClientProvider>
 );

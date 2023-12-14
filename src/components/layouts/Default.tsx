@@ -54,6 +54,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export interface SaveOption {
   label: string;
@@ -77,25 +78,29 @@ interface Props extends CommonProps {
 }
 
 export function Default(props: Props) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const company = useCurrentCompany();
-
-  const shouldShowUnlockButton =
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
-
   const [t] = useTranslation();
-  const user = useInjectUserChanges();
 
-  const hasPermission = useHasPermission();
   const location = useLocation();
   const navigate = useNavigate();
-  const companyUser = useCurrentCompanyUser();
+  const hasPermission = useHasPermission();
+
+  const saveBtn = useSaveBtn();
+  const { isOwner } = useAdmin();
+  const colors = useColorScheme();
+  const preventNavigation = usePreventNavigation();
+
   const enabled = useEnabled();
+  const user = useInjectUserChanges();
+  const company = useCurrentCompany();
+  const companyUser = useCurrentCompanyUser();
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
+  const shouldShowUnlockButton =
+    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const navigation: NavigationItem[] = [
     {
@@ -359,10 +364,6 @@ export function Default(props: Props) {
     },
   ];
 
-  const { isOwner } = useAdmin();
-  const saveBtn = useSaveBtn();
-  const colors = useColorScheme();
-
   return (
     <div>
       <ActivateCompany />
@@ -439,7 +440,10 @@ export function Default(props: Props) {
               )}
 
               {!props.withoutBackButton && (
-                <Button onClick={() => navigate(-1)} type="secondary">
+                <Button
+                  onClick={() => preventNavigation() && navigate(-1)}
+                  type="secondary"
+                >
                   {t('back')}
                 </Button>
               )}

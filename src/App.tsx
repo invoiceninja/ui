@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { useAtom, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -31,6 +31,7 @@ import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
 
+export const preventClosingTabOrBrowserAtom = atom<boolean>(false);
 export function App() {
   const [t] = useTranslation();
   const { i18n } = useTranslation();
@@ -57,6 +58,10 @@ export function App() {
   const resolveDayJSLocale = useResolveDayJSLocale();
 
   const resolveAntdLocale = useResolveAntdLocale();
+
+  const preventClosingTabOrBrowser = useAtomValue(
+    preventClosingTabOrBrowserAtom
+  );
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -121,6 +126,20 @@ export function App() {
       refetch(property);
     });
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (preventClosingTabOrBrowser) {
+        event.preventDefault();
+
+        return true;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [preventClosingTabOrBrowser]);
 
   useEffect(() => {
     const companyName = company?.settings?.name;
