@@ -31,6 +31,7 @@ export function Icon(props: Props) {
       color: props.color || accentColor,
       className: props.className,
       onClick: props.onClick,
+      style: props.style,
     });
   }
 
