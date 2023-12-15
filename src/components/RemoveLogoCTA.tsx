@@ -15,14 +15,17 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function RemoveLogoCTA() {
   const [t] = useTranslation();
   const user = useCurrentUser();
 
+  const { isOwner } = useAdmin();
+
   return (
     <>
-      {!proPlan() && !enterprisePlan() ? (
+      {!proPlan() && !enterprisePlan() && isOwner ? (
         <div className="flex text-base space-x-1">
           <Link
             className="capitalize"
