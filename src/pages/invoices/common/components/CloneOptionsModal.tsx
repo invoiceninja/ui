@@ -8,71 +8,70 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { CloneOption } from '$app/components/CloneOption';
 import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
+import { creditAtom } from '$app/pages/credits/common/atoms';
+import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
+import { quoteAtom } from '$app/pages/quotes/common/atoms';
+import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
+import { File, FileText, Repeat } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { BiFile } from 'react-icons/bi';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { invoiceAtom } from '../atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { creditAtom } from '$app/pages/credits/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { ClickableElement } from '$app/components/cards';
 
 interface Props {
   invoice: Invoice;
-  visible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
-  dropdown?: boolean;
+  dropdown: boolean;
 }
+
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const setInvoice = useSetAtom(invoiceAtom);
-  const setQuote = useSetAtom(quoteAtom);
-  const setCredit = useSetAtom(creditAtom);
-  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
-  const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
+  const { invoice, dropdown } = props;
 
-  const { invoice, visible, setVisible, dropdown } = props;
+  const hasPermission = useHasPermission();
 
   const showActionByPreferences = useShowActionByPreferences({
     commonActionsSection: Boolean(!dropdown),
     entity: 'invoice',
   });
 
-  const cloneToInvoice = () => {
-    setInvoice({
-      ...invoice,
-      id: '',
-      number: '',
-      documents: [],
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
+  const showRIActionByPreferenceAndPermission =
+    hasPermission('create_recurring_invoice') &&
+    showActionByPreferences('invoice', 'clone_to_recurring');
 
-    navigate('/invoices/create?action=clone');
-  };
+  const showQuoteActionByPreferenceAndPermission =
+    hasPermission('create_quote') &&
+    showActionByPreferences('invoice', 'clone_to_quote');
+
+  const showCreditActionByPreferenceAndPermission =
+    hasPermission('create_credit') &&
+    showActionByPreferences('invoice', 'clone_to_credit');
+
+  const showPRActionByPreferenceAndPermission =
+    hasPermission('create_purchase_order') &&
+    showActionByPreferences('invoice', 'clone_to_purchase_order');
+
+  const setQuote = useSetAtom(quoteAtom);
+  const setCredit = useSetAtom(creditAtom);
+  const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
+  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const cloneToQuote = () => {
     setQuote({
@@ -156,78 +155,65 @@ export function CloneOptionsModal(props: Props) {
     navigate('/purchase_orders/create?action=clone');
   };
 
-  if (!dropdown) {
-    return (
-      <>
-        <>
-          {showActionByPreferences('invoice', 'clone') && (
-            <DropdownElement
-              onClick={cloneToInvoice}
-              icon={<Icon element={MdControlPointDuplicate} color="white" />}
-            >
-              {t('clone')}
-            </DropdownElement>
-          )}
-        </>
-        <>
-          {showActionByPreferences('invoice', 'clone_to_quote') && (
-            <DropdownElement
-              onClick={cloneToQuote}
-              icon={<Icon element={MdControlPointDuplicate} color="white" />}
-            >
-              {t('clone_to_quote')}
-            </DropdownElement>
-          )}
-        </>
-        <>
-          {showActionByPreferences('invoice', 'clone_to_credit') && (
-            <DropdownElement
-              onClick={cloneToCredit}
-              icon={<Icon element={MdControlPointDuplicate} color="white" />}
-            >
-              {t('clone_to_credit')}
-            </DropdownElement>
-          )}
-        </>
-        <>
-          {showActionByPreferences('invoice', 'clone_to_recurring') && (
-            <DropdownElement
-              onClick={cloneToRecurringInvoice}
-              icon={<Icon element={MdControlPointDuplicate} color="white" />}
-            >
-              {t('clone_to_recurring')}
-            </DropdownElement>
-          )}
-        </>
-        <>
-          {showActionByPreferences('invoice', 'clone_to_purchase_order') && (
-            <DropdownElement
-              onClick={cloneToPurchaseOrder}
-              icon={<Icon element={MdControlPointDuplicate} color="white" />}
-            >
-              {t('clone_to_purchase_order')}
-            </DropdownElement>
-          )}
-        </>
-      </>
-    );
-  }
-
   return (
     <>
-      <DropdownElement
-        onClick={cloneToPurchaseOrder}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
+      {(showRIActionByPreferenceAndPermission ||
+        showQuoteActionByPreferenceAndPermission ||
+        showCreditActionByPreferenceAndPermission ||
+        showPRActionByPreferenceAndPermission) && (
+        <DropdownElement
+          onClick={() => setIsModalVisible(true)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_other')}
+        </DropdownElement>
+      )}
 
       <Modal
-        title={t('clone_options')}
-        visible={visible}
-        onClose={() => setVisible(false)}
+        title={t('clone_to')}
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        closeButtonCypressRef="cloneOptionsModalXButton"
       >
-        <ClickableElement></ClickableElement>
+        <div className="flex justify-center">
+          <div className="flex flex-col">
+            {showRIActionByPreferenceAndPermission && (
+              <CloneOption
+                label={t('recurring_invoice')}
+                icon={Repeat}
+                onClick={cloneToRecurringInvoice}
+                commonActionsSection={!dropdown}
+              />
+            )}
+
+            {showQuoteActionByPreferenceAndPermission && (
+              <CloneOption
+                label={t('quote')}
+                icon={File}
+                onClick={cloneToQuote}
+                commonActionsSection={!dropdown}
+              />
+            )}
+
+            {showCreditActionByPreferenceAndPermission && (
+              <CloneOption
+                label={t('credit')}
+                icon={FileText}
+                onClick={cloneToCredit}
+                commonActionsSection={!dropdown}
+              />
+            )}
+
+            {showPRActionByPreferenceAndPermission && (
+              <CloneOption
+                label={t('purchase_order')}
+                icon={BiFile}
+                onClick={cloneToPurchaseOrder}
+                commonActionsSection={!dropdown}
+              />
+            )}
+          </div>
+        </div>
       </Modal>
     </>
   );

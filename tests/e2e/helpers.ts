@@ -138,13 +138,35 @@ export async function checkDropdownActions(
 
   const dropDown = page.locator(`[data-cy=${dropdownId}]`);
 
-  actions.forEach(async ({ label, visible }) => {
+  for (const { label, visible, modal } of actions) {
     if (visible) {
       await expect(dropDown.getByText(label).first()).toBeVisible();
+
+      if (modal) {
+        await page.getByText(label).first().click();
+
+        await expect(page.getByText(modal.title).first()).toBeVisible();
+
+        for (const modalAction of modal.actions) {
+          if (modalAction.visible) {
+            await expect(
+              page.getByText(modalAction.label).first()
+            ).toBeVisible();
+          } else {
+            await expect(
+              page.getByText(modalAction.label).first()
+            ).not.toBeVisible();
+          }
+        }
+
+        await page.locator(`[data-cy=${modal.dataCyXButton}]`).click();
+
+        await expect(page.getByText(modal.title).first()).not.toBeVisible();
+      }
     } else {
       await expect(dropDown.getByText(label).first()).not.toBeVisible();
     }
-  });
+  }
 }
 
 export function useHasPermission({

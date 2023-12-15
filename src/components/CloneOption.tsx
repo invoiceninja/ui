@@ -18,6 +18,7 @@ interface Props {
   onClick: () => void;
   icon: IconType | ReactFeatherIcon;
   label: string;
+  commonActionsSection?: boolean;
 }
 
 const CloneOptionStyled = styled.div`

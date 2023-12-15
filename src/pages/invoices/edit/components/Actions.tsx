@@ -10,22 +10,14 @@
 
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
-import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { useAtom } from 'jotai';
-import { creditAtom } from '$app/pages/credits/common/atoms';
+import { useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
@@ -59,7 +51,8 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import {useDownloadEInvoice} from "$app/pages/invoices/common/hooks/useDownloadEInvoice";
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -105,11 +98,7 @@ export function useActions(params?: Params) {
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const setInvoice = useSetAtom(invoiceAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({
@@ -130,88 +119,6 @@ export function useActions(params?: Params) {
     });
 
     navigate('/invoices/create?action=clone');
-  };
-
-  const cloneToQuote = (invoice: Invoice) => {
-    setQuote({
-      ...(invoice as unknown as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToCredit = (invoice: Invoice) => {
-    setCredit({
-      ...(invoice as unknown as Credit),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/credits/create?action=clone');
-  };
-
-  const cloneToRecurringInvoice = (invoice: Invoice) => {
-    setRecurringInvoice({
-      ...(invoice as unknown as RecurringInvoice),
-      id: '',
-      number: '',
-      documents: [],
-      frequency_id: '5',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (invoice: Invoice) => {
-    setPurchaseOrder({
-      ...(invoice as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/purchase_orders/create?action=clone');
   };
 
   return [
@@ -319,9 +226,11 @@ export function useActions(params?: Params) {
     (invoice: Invoice) =>
       showActionByPreferences('invoice', 'download_e_invoice') && (
         <DropdownElement
-          {...(!dropdown && { behavior: 'tooltipButton',
-              tooltipText: t('download_e_invoice'),
-              key: 'download', })}
+          {...(!dropdown && {
+            behavior: 'tooltipButton',
+            tooltipText: t('download_e_invoice'),
+            key: 'download',
+          })}
           onClick={() => downloadEInvoice(invoice)}
           icon={
             <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
@@ -472,89 +381,12 @@ export function useActions(params?: Params) {
             />
           }
         >
-          {t('clone')}
+          {t('clone_to_invoice')}
         </DropdownElement>
       ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_quote') &&
-      hasPermission('create_quote') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_quote'),
-            key: 'clone_to_quote',
-          })}
-          onClick={() => cloneToQuote(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_quote')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_credit') &&
-      hasPermission('create_credit') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_credit'),
-            key: 'clone_to_credit',
-          })}
-          onClick={() => cloneToCredit(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_credit')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_recurring') &&
-      hasPermission('create_recurring_invoice') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_recurring'),
-            key: 'clone_to_recurring',
-          })}
-          onClick={() => cloneToRecurringInvoice(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_recurring')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_purchase_order') &&
-      hasPermission('create_purchase_order') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_purchase_order'),
-            key: 'clone_to_purchase_order',
-          })}
-          onClick={() => cloneToPurchaseOrder(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_purchase_order')}
-        </DropdownElement>
-      ),
+    (invoice: Invoice) => (
+      <CloneOptionsModal dropdown={dropdown} invoice={invoice} />
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       dropdown && <Divider withoutPadding />,

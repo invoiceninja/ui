@@ -9,6 +9,8 @@
  */
 
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
@@ -19,38 +21,58 @@ import { Icon } from '$app/components/icons/Icon';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
+import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { FileText, Repeat } from 'react-feather';
+import { File, FileText } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { BiFile } from 'react-icons/bi';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
-  quote: Quote;
+  recurringInvoice: RecurringInvoice;
 }
 
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const { quote } = props;
+  const { recurringInvoice } = props;
 
   const hasPermission = useHasPermission();
 
   const setInvoice = useSetAtom(invoiceAtom);
+  const setQuote = useSetAtom(quoteAtom);
   const setCredit = useSetAtom(creditAtom);
-  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
   const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const cloneToCredit = () => {
-    setCredit({
-      ...quote,
+  const cloneToInvoice = () => {
+    setInvoice({
+      ...(recurringInvoice as unknown as Invoice),
+      id: '',
+      documents: [],
+      number: '',
+      due_date: '',
+      date: dayjs().format('YYYY-MM-DD'),
+      total_taxes: 0,
+      exchange_rate: 1,
+      last_sent_date: '',
+      project_id: '',
+      subscription_id: '',
+      status_id: '',
+      vendor_id: '',
+    });
+
+    navigate('/invoices/create?action=clone');
+  };
+
+  const cloneToQuote = () => {
+    setQuote({
+      ...(recurringInvoice as unknown as Quote),
       id: '',
       number: '',
       documents: [],
@@ -63,19 +85,18 @@ export function CloneOptionsModal(props: Props) {
       subscription_id: '',
       status_id: '',
       vendor_id: '',
-      paid_to_date: 0,
     });
 
-    navigate('/credits/create?action=clone');
+    navigate('/quotes/create?action=clone');
   };
 
-  const cloneToRecurringInvoice = () => {
-    setRecurringInvoice({
-      ...(quote as unknown as RecurringInvoice),
+  const cloneToCredit = () => {
+    setCredit({
+      ...(recurringInvoice as unknown as Credit),
       id: '',
       number: '',
       documents: [],
-      frequency_id: '5',
+      date: dayjs().format('YYYY-MM-DD'),
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -85,12 +106,12 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
     });
 
-    navigate('/recurring_invoices/create?action=clone');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToPurchaseOrder = () => {
     setPurchaseOrder({
-      ...(quote as unknown as PurchaseOrder),
+      ...(recurringInvoice as unknown as PurchaseOrder),
       id: '',
       number: '',
       documents: [],
@@ -102,36 +123,17 @@ export function CloneOptionsModal(props: Props) {
       subscription_id: '',
       status_id: '1',
       vendor_id: '',
+      paid_to_date: 0,
     });
 
     navigate('/purchase_orders/create?action=clone');
   };
 
-  const cloneToInvoice = () => {
-    setInvoice({
-      ...quote,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-    navigate('/invoices/create?action=clone');
-  };
-
   return (
     <>
       {(hasPermission('create_invoice') ||
+        hasPermission('create_quote') ||
         hasPermission('create_credit') ||
-        hasPermission('create_recurring_invoice') ||
         hasPermission('create_purchase_order')) && (
         <DropdownElement
           onClick={() => setIsModalVisible(true)}
@@ -159,17 +161,17 @@ export function CloneOptionsModal(props: Props) {
 
             {hasPermission('create_quote') && (
               <CloneOption
-                label={t('credit')}
-                icon={FileText}
-                onClick={cloneToCredit}
+                label={t('quote')}
+                icon={File}
+                onClick={cloneToQuote}
               />
             )}
 
-            {hasPermission('create_recurring_invoice') && (
+            {hasPermission('create_credit') && (
               <CloneOption
-                label={t('recurring_invoice')}
-                icon={Repeat}
-                onClick={cloneToRecurringInvoice}
+                label={t('credit')}
+                icon={FileText}
+                onClick={cloneToCredit}
               />
             )}
 

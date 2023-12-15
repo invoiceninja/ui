@@ -152,6 +152,7 @@ export function CloneOptionsModal(props: Props) {
         title={t('clone_to')}
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
+        closeButtonCypressRef="cloneOptionsModalXButton"
       >
         <div className="flex justify-center">
           <div className="flex flex-col">
