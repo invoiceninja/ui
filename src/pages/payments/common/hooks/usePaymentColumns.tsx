@@ -158,19 +158,12 @@ export function usePaymentColumns() {
       id: 'id',
       label: t('invoice_number'),
       format: (value, payment) => (
-        <div className="flex space-x-2">
-          {payment.invoices?.map((invoice) => (
-            <DynamicLink
-              key={invoice.id}
-              to={route('/invoices/:id/edit', {
-                id: invoice.id,
-              })}
-              renderSpan={disableNavigation('invoice', invoice)}
-            >
-              {invoice.number}
-            </DynamicLink>
-          ))}
-        </div>
+        <DynamicLink
+          to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
+          renderSpan={disableNavigation('invoice', payment.invoices?.[0])}
+        >
+          {payment.invoices?.[0]?.number}
+        </DynamicLink>
       ),
     },
     {
