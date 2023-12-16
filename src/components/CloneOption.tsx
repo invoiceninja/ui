@@ -18,7 +18,6 @@ interface Props {
   onClick: () => void;
   icon: IconType | ReactFeatherIcon;
   label: string;
-  commonActionsSection?: boolean;
 }
 
 const CloneOptionStyled = styled.div`
@@ -29,8 +28,7 @@ const CloneOptionStyled = styled.div`
 export function CloneOption(props: Props) {
   const colors = useColorScheme();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onClick, icon, label, commonActionsSection } = props;
+  const { onClick, icon, label } = props;
 
   return (
     <CloneOptionStyled

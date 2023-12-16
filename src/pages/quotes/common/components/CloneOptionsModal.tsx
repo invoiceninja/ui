@@ -157,7 +157,7 @@ export function CloneOptionsModal(props: Props) {
               />
             )}
 
-            {hasPermission('create_quote') && (
+            {hasPermission('create_credit') && (
               <CloneOption
                 label={t('credit')}
                 icon={FileText}

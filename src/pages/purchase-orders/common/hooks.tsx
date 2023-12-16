@@ -511,7 +511,7 @@ export function useActions() {
         onClick={() => cloneToPurchaseOrder(purchaseOrder)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone')}
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
     (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,

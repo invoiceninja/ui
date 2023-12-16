@@ -42,10 +42,10 @@ export function CloneOptionsModal(props: Props) {
 
   const hasPermission = useHasPermission();
 
-  const setInvoice = useSetAtom(invoiceAtom);
   const setQuote = useSetAtom(quoteAtom);
-  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
   const setCredit = useSetAtom(creditAtom);
+  const setInvoice = useSetAtom(invoiceAtom);
+  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 

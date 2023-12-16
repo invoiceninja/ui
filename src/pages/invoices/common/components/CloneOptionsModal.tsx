@@ -134,16 +134,21 @@ export function CloneOptionsModal(props: Props) {
 
   return (
     <>
-      <EntityActionElement
-        entity="invoice"
-        actionKey="clone_to_other"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('clone_to_other')}
-        onClick={() => setIsModalVisible(true)}
-        icon={MdControlPointDuplicate}
-      >
-        {t('clone_to_other')}
-      </EntityActionElement>
+      {(hasPermission('create_purchase_order') ||
+        hasPermission('create_quote') ||
+        hasPermission('create_recurring_invoice') ||
+        hasPermission('create_credit')) && (
+        <EntityActionElement
+          entity="invoice"
+          actionKey="clone_to_other"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_other')}
+          onClick={() => setIsModalVisible(true)}
+          icon={MdControlPointDuplicate}
+        >
+          {t('clone_to_other')}
+        </EntityActionElement>
+      )}
 
       <Modal
         title={t('clone_to')}
@@ -158,7 +163,6 @@ export function CloneOptionsModal(props: Props) {
                 label={t('recurring_invoice')}
                 icon={Repeat}
                 onClick={cloneToRecurringInvoice}
-                commonActionsSection={!dropdown}
               />
             )}
 
@@ -167,7 +171,6 @@ export function CloneOptionsModal(props: Props) {
                 label={t('quote')}
                 icon={File}
                 onClick={cloneToQuote}
-                commonActionsSection={!dropdown}
               />
             )}
 
@@ -176,7 +179,6 @@ export function CloneOptionsModal(props: Props) {
                 label={t('credit')}
                 icon={FileText}
                 onClick={cloneToCredit}
-                commonActionsSection={!dropdown}
               />
             )}
 
@@ -185,7 +187,6 @@ export function CloneOptionsModal(props: Props) {
                 label={t('purchase_order')}
                 icon={BiFile}
                 onClick={cloneToPurchaseOrder}
-                commonActionsSection={!dropdown}
               />
             )}
           </div>

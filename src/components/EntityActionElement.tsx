@@ -42,6 +42,7 @@ export function EntityActionElement(props: Props) {
     entity,
     actionKey,
     excludePreferences,
+    setVisible,
   } = props;
 
   const showActionByPreferences = useShowActionByPreferences({
@@ -73,6 +74,7 @@ export function EntityActionElement(props: Props) {
       to={to}
       icon={<Icon element={props.icon} />}
       onClick={onClick}
+      setVisible={setVisible}
     >
       {props.children}
     </DropdownElement>
