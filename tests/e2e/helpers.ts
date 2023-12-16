@@ -21,20 +21,10 @@ export async function login(
   await page.waitForTimeout(500);
   await page.goto('/login');
   await page.locator('input[name="email"]').fill(email);
-  // await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
-  await page.waitForTimeout(500);
-
-  const isDashboardAvailable = await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Dashboard', exact: true })
-    .isVisible();
-
-  await page.waitForURL(
-    isDashboardAvailable ? '**/dashboard' : '**/settings/user_details'
-  );
+  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible();
 }
 
 export function permissions(page: Page) {

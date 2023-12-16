@@ -400,7 +400,6 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) => <CloneOptionsModal quote={quote} />,
-
     () => isEditPage && <Divider withoutPadding />,
     (quote) =>
       isEditPage &&

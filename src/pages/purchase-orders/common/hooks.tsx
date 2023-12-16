@@ -61,6 +61,7 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -504,6 +505,7 @@ export function useActions() {
         {t('vendor_portal')}
       </DropdownElement>
     ),
+    () => <Divider withoutPadding />,
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => cloneToPurchaseOrder(purchaseOrder)}
@@ -512,6 +514,7 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&
