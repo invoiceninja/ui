@@ -9,16 +9,13 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { ChevronRight, Home } from 'react-feather';
-import { Link } from 'react-router-dom';
+import { Link } from './forms';
 
 export type Page = { name: string; href: string };
 
 export function Breadcrumbs(props: { pages: Page[] }) {
   const colors = useColorScheme();
-
-  const preventNavigation = usePreventNavigation();
 
   return (
     <nav
@@ -29,7 +26,7 @@ export function Breadcrumbs(props: { pages: Page[] }) {
       <ol role="list" className="flex items-center space-x-4">
         <li>
           <div>
-            <Link to={!preventNavigation() ? '/dashboard' : ''}>
+            <Link to="/dashboard" withoutDefaultStyling>
               <Home className="flex-shrink-0 h-5 w-5" aria-hidden="true" />
               <span className="sr-only">Home</span>
             </Link>
@@ -44,8 +41,9 @@ export function Breadcrumbs(props: { pages: Page[] }) {
                 aria-hidden="true"
               />
               <Link
-                to={!preventNavigation() ? page.href : ''}
+                to={page.href}
                 className="ml-4 text-sm font-medium"
+                withoutDefaultStyling
               >
                 {page.name}
               </Link>

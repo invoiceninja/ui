@@ -30,6 +30,7 @@ import { useAdmin } from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
+import { PreventNavigationModal } from './components/PreventNavigationModal';
 
 export const preventClosingTabOrBrowserAtom = atom<boolean>(false);
 export function App() {
@@ -182,6 +183,8 @@ export function App() {
         isModalOpen={isCompanyEditModalOpened && isOwner}
         setIsModalOpen={setIsCompanyEditModalOpened}
       />
+
+      <PreventNavigationModal />
     </>
   );
 }

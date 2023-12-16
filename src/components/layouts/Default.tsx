@@ -26,7 +26,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
@@ -81,7 +81,6 @@ export function Default(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
-  const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
   const saveBtn = useSaveBtn();
@@ -416,13 +415,14 @@ export function Default(props: Props) {
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                   onClick={() =>
-                    window.open(
-                      isSelfHosted()
+                    preventNavigation({
+                      url: (isSelfHosted()
                         ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
-                            'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
-                        : user?.company_user?.ninja_portal_url,
-                      '_blank'
-                    )
+                          'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
+                        : user?.company_user?.ninja_portal_url) as string,
+                      externalLink: true,
+                      buttonComponent: true,
+                    })
                   }
                 >
                   <span>
@@ -441,7 +441,9 @@ export function Default(props: Props) {
 
               {!props.withoutBackButton && (
                 <Button
-                  onClick={() => preventNavigation() && navigate(-1)}
+                  onClick={() =>
+                    preventNavigation({ url: 'back', buttonComponent: true })
+                  }
                   type="secondary"
                 >
                   {t('back')}
