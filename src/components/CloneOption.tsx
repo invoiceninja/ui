@@ -29,7 +29,8 @@ const CloneOptionStyled = styled.div`
 export function CloneOption(props: Props) {
   const colors = useColorScheme();
 
-  const { onClick, icon, label } = props;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { onClick, icon, label, commonActionsSection } = props;
 
   return (
     <CloneOptionStyled

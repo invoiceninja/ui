@@ -9,16 +9,14 @@
  */
 
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { creditAtom } from '$app/pages/credits/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
@@ -44,27 +42,6 @@ export function CloneOptionsModal(props: Props) {
   const { invoice, dropdown } = props;
 
   const hasPermission = useHasPermission();
-
-  const showActionByPreferences = useShowActionByPreferences({
-    commonActionsSection: Boolean(!dropdown),
-    entity: 'invoice',
-  });
-
-  const showRIActionByPreferenceAndPermission =
-    hasPermission('create_recurring_invoice') &&
-    showActionByPreferences('invoice', 'clone_to_recurring');
-
-  const showQuoteActionByPreferenceAndPermission =
-    hasPermission('create_quote') &&
-    showActionByPreferences('invoice', 'clone_to_quote');
-
-  const showCreditActionByPreferenceAndPermission =
-    hasPermission('create_credit') &&
-    showActionByPreferences('invoice', 'clone_to_credit');
-
-  const showPRActionByPreferenceAndPermission =
-    hasPermission('create_purchase_order') &&
-    showActionByPreferences('invoice', 'clone_to_purchase_order');
 
   const setQuote = useSetAtom(quoteAtom);
   const setCredit = useSetAtom(creditAtom);
@@ -157,17 +134,16 @@ export function CloneOptionsModal(props: Props) {
 
   return (
     <>
-      {(showRIActionByPreferenceAndPermission ||
-        showQuoteActionByPreferenceAndPermission ||
-        showCreditActionByPreferenceAndPermission ||
-        showPRActionByPreferenceAndPermission) && (
-        <DropdownElement
-          onClick={() => setIsModalVisible(true)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_other')}
-        </DropdownElement>
-      )}
+      <EntityActionElement
+        entity="invoice"
+        actionKey="clone_to_other"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('clone_to_other')}
+        onClick={() => setIsModalVisible(true)}
+        icon={MdControlPointDuplicate}
+      >
+        {t('clone_to_other')}
+      </EntityActionElement>
 
       <Modal
         title={t('clone_to')}
@@ -177,7 +153,7 @@ export function CloneOptionsModal(props: Props) {
       >
         <div className="flex justify-center">
           <div className="flex flex-col">
-            {showRIActionByPreferenceAndPermission && (
+            {hasPermission('create_recurring_invoice') && (
               <CloneOption
                 label={t('recurring_invoice')}
                 icon={Repeat}
@@ -186,7 +162,7 @@ export function CloneOptionsModal(props: Props) {
               />
             )}
 
-            {showQuoteActionByPreferenceAndPermission && (
+            {hasPermission('create_quote') && (
               <CloneOption
                 label={t('quote')}
                 icon={File}
@@ -195,7 +171,7 @@ export function CloneOptionsModal(props: Props) {
               />
             )}
 
-            {showCreditActionByPreferenceAndPermission && (
+            {hasPermission('create_credit') && (
               <CloneOption
                 label={t('credit')}
                 icon={FileText}
@@ -204,7 +180,7 @@ export function CloneOptionsModal(props: Props) {
               />
             )}
 
-            {showPRActionByPreferenceAndPermission && (
+            {hasPermission('create_purchase_order') && (
               <CloneOption
                 label={t('purchase_order')}
                 icon={BiFile}
