@@ -67,8 +67,6 @@ export function Link(props: Props) {
       style={!withoutDefaultStyling ? css : undefined}
       to={props.to}
       onClick={(event) => {
-        console.log(preventLeavingPage);
-
         if (preventLeavingPage) {
           event.preventDefault();
 

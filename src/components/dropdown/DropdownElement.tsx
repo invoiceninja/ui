@@ -15,6 +15,9 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { Tooltip } from '../Tooltip';
+import { useAtomValue } from 'jotai';
+import { preventLeavingPageAtom } from '$app/App';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 interface Props extends CommonProps {
   to?: string;
@@ -42,6 +45,10 @@ export function DropdownElement(props: Props) {
   const navigate = useNavigate();
   const colors = useColorScheme();
 
+  const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
+
+  const preventNavigation = usePreventNavigation();
+
   const { behavior, tooltipText } = props;
 
   if (props.to && behavior !== 'tooltipButton') {
@@ -58,6 +65,13 @@ export function DropdownElement(props: Props) {
           },
           `w-full text-left z-50 block px-4 py-2 text-sm text-gray-700 rounded-lg ${props.className}`
         )}
+        onClick={(event) => {
+          if (preventLeavingPage) {
+            event.preventDefault();
+
+            preventNavigation({ url: props.to });
+          }
+        }}
       >
         {props.icon}
         <div
@@ -80,10 +94,11 @@ export function DropdownElement(props: Props) {
         withoutArrow
       >
         <div
-          onClick={() => {
-            props.to && navigate(props.to);
-            !props.to && props.onClick?.(event);
-          }}
+          onClick={() =>
+            preventNavigation({
+              fn: () => (props.to ? navigate(props.to) : props.onClick?.()),
+            })
+          }
         >
           {props.icon}
         </div>
@@ -98,10 +113,14 @@ export function DropdownElement(props: Props) {
         hoverColor: colors.$7,
       }}
       type="button"
-      onClick={(event) => {
-        props.onClick?.(event);
-        props.setVisible?.(false);
-      }}
+      onClick={(event) =>
+        preventNavigation({
+          fn: () => {
+            props.onClick?.(event);
+            props.setVisible?.(false);
+          },
+        })
+      }
       ref={props.innerRef}
       className={classNames(
         {

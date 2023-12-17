@@ -57,6 +57,13 @@ export function PreventNavigationModal() {
     }
   };
 
+  const handleContinueEditing = () => {
+    setPreventLeavingPage(
+      (current) => current && { ...current, actionKey: undefined }
+    );
+    setIsNavigationModalVisible(false);
+  };
+
   useEffect(() => {
     setIsModalVisible(isNavigationModalVisible);
   }, [isNavigationModalVisible]);
@@ -69,10 +76,7 @@ export function PreventNavigationModal() {
         </span>
 
         <div className="flex justify-between">
-          <Button
-            type="secondary"
-            onClick={() => setIsNavigationModalVisible(false)}
-          >
+          <Button type="secondary" onClick={handleContinueEditing}>
             {t('continue_editing')}
           </Button>
           <Button onClick={handleDiscardChanges}>{t('discard_changes')}</Button>
