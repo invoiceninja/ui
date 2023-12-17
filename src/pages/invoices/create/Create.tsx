@@ -41,7 +41,7 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
-import { preventClosingTabOrBrowserAtom } from '$app/App';
+import { preventLeavingPageAtom } from '$app/App';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -68,9 +68,7 @@ export default function Create() {
 
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
-  const setPreventClosingTabOrBrowser = useSetAtom(
-    preventClosingTabOrBrowserAtom
-  );
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
 
   const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
@@ -147,12 +145,14 @@ export default function Create() {
         value = _invoice;
       }
 
+      setInitialInvoiceValue(value);
+
       return value;
     });
 
     return () => {
       setInvoice(undefined);
-      setPreventClosingTabOrBrowser(false);
+      setPreventLeavingPage({ prevent: false, actionKey: undefined });
     };
   }, [data]);
 
@@ -210,13 +210,10 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
 
     if (invoice && initialInvoiceValue) {
-      setPreventClosingTabOrBrowser(!isEqual(invoice, initialInvoiceValue));
-    }
-  }, [invoice]);
-
-  useEffect(() => {
-    if (invoice && !initialInvoiceValue) {
-      setInitialInvoiceValue(invoice);
+      setPreventLeavingPage({
+        prevent: !isEqual(invoice, initialInvoiceValue),
+        actionKey: undefined,
+      });
     }
   }, [invoice]);
 

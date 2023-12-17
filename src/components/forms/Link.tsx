@@ -9,11 +9,13 @@
  */
 
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import classNames from 'classnames';
+import { useAtomValue } from 'jotai';
+import { preventLeavingPageAtom } from '$app/App';
 
 interface Props extends CommonProps {
   to: string;
@@ -26,11 +28,11 @@ interface Props extends CommonProps {
 export function Link(props: Props) {
   const accentColor = useAccentColor();
 
+  const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
+
   const preventNavigation = usePreventNavigation();
 
   const { withoutDefaultStyling, withoutUnderlineStyling } = props;
-
-  const [currentLink, setCurrentLink] = useState<string>('');
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -40,17 +42,17 @@ export function Link(props: Props) {
     return (
       <a
         target="_blank"
-        href={currentLink}
+        href={props.to}
         className={`text-center text-sm hover:underline ${props.className}`}
         style={!withoutDefaultStyling ? css : undefined}
         rel="noreferrer"
-        onClick={() =>
-          setCurrentLink(
-            !preventNavigation({ url: props.to, externalLink: true })
-              ? props.to
-              : ''
-          )
-        }
+        onClick={(event) => {
+          if (preventLeavingPage) {
+            event.preventDefault();
+
+            preventNavigation({ url: props.to, externalLink: true });
+          }
+        }}
       >
         {props.children}
       </a>
@@ -63,10 +65,16 @@ export function Link(props: Props) {
         'hover:underline': !withoutUnderlineStyling,
       })}
       style={!withoutDefaultStyling ? css : undefined}
-      to={currentLink}
-      onClick={() =>
-        setCurrentLink(!preventNavigation({ url: props.to }) ? props.to : '')
-      }
+      to={props.to}
+      onClick={(event) => {
+        console.log(preventLeavingPage);
+
+        if (preventLeavingPage) {
+          event.preventDefault();
+
+          preventNavigation({ url: props.to });
+        }
+      }}
     >
       {props.children}
     </RouterLink>

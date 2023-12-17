@@ -45,7 +45,7 @@ import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { preventClosingTabOrBrowserAtom } from '$app/App';
+import { preventLeavingPageAtom } from '$app/App';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -71,9 +71,7 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
-  const setPreventClosingTabOrBrowser = useSetAtom(
-    preventClosingTabOrBrowserAtom
-  );
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -103,6 +101,7 @@ export default function Edit() {
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
+      setInitialInvoiceValue(_invoice);
       setInvoice(_invoice);
 
       if (_invoice?.client) {
@@ -111,7 +110,10 @@ export default function Edit() {
     }
 
     return () => {
-      setPreventClosingTabOrBrowser(false);
+      setPreventLeavingPage({
+        prevent: false,
+        actionKey: undefined,
+      });
     };
   }, [data]);
 
@@ -119,13 +121,10 @@ export default function Edit() {
     invoice && calculateInvoiceSum(invoice);
 
     if (invoice && initialInvoiceValue) {
-      setPreventClosingTabOrBrowser(!isEqual(invoice, initialInvoiceValue));
-    }
-  }, [invoice]);
-
-  useEffect(() => {
-    if (invoice && !initialInvoiceValue) {
-      setInitialInvoiceValue(invoice);
+      setPreventLeavingPage({
+        prevent: !isEqual(invoice, initialInvoiceValue),
+        actionKey: undefined,
+      });
     }
   }, [invoice]);
 

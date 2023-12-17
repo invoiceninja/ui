@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
 import { SearchRecord, SearchResponse } from '$app/common/interfaces/search';
-import { useNavigate } from 'react-router-dom';
 import { Entry } from '$app/components/forms/Combobox';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
@@ -24,6 +23,7 @@ import { styled } from 'styled-components';
 import { Combobox } from '@headlessui/react';
 import { useClickAway } from 'react-use';
 import collect from 'collect.js';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export function useSearch() {
   const [t] = useTranslation();
@@ -71,9 +71,10 @@ export function Search$() {
   const [query, setQuery] = useState('');
   const [isVisible, setIsVisible] = useState(false);
 
+  const preventNavigation = usePreventNavigation();
+
   const data = useSearch();
   const colors = useColorScheme();
-  const navigate = useNavigate();
 
   const comboboxRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -115,7 +116,11 @@ export function Search$() {
     <Combobox
       as="div"
       onChange={(value: Entry<SearchRecord>) =>
-        value.resource ? navigate(value.resource.path) : null
+        value.resource
+          ? preventNavigation({
+              url: value.resource.path,
+            })
+          : null
       }
       className="w-full"
       ref={comboboxRef}

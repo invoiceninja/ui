@@ -11,15 +11,22 @@
 import { useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './forms';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { isNavigationModalVisibleAtom } from '$app/common/hooks/usePreventNavigation';
-import { preventClosingTabOrBrowserAtom } from '$app/App';
+import {
+  blockedNavigationActionAtom,
+  isNavigationModalVisibleAtom,
+} from '$app/common/hooks/usePreventNavigation';
+import { preventLeavingPageAtom } from '$app/App';
+import { useNavigate } from 'react-router-dom';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
-  const setPreventNavigation = useSetAtom(preventClosingTabOrBrowserAtom);
+  const blockedNavigationAction = useAtomValue(blockedNavigationActionAtom);
+
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -27,9 +34,27 @@ export function PreventNavigationModal() {
     isNavigationModalVisibleAtom
   );
 
-  const handleCloseModal = () => {
-    setPreventNavigation(false);
+  const handleDiscardChanges = () => {
+    setPreventLeavingPage({ prevent: false, actionKey: undefined });
     setIsNavigationModalVisible(false);
+
+    if (blockedNavigationAction) {
+      const { url, externalLink, fn } = blockedNavigationAction;
+
+      if (url) {
+        if (url === 'back') {
+          navigate(-1);
+        } else {
+          if (externalLink) {
+            window.open(url, '_blank');
+          } else {
+            navigate(url);
+          }
+        }
+      }
+
+      fn?.();
+    }
   };
 
   useEffect(() => {
@@ -37,14 +62,22 @@ export function PreventNavigationModal() {
   }, [isNavigationModalVisible]);
 
   return (
-    <Modal
-      visible={isModalVisible}
-      onClose={() => handleCloseModal()}
-      overflowVisible
-    >
-      <span>{t('error_unsaved_changes')}</span>
+    <Modal visible={isModalVisible} onClose={() => {}} disableClosing>
+      <div className="flex flex-col space-y-8">
+        <span className="font-medium text-lg text-center">
+          {t('error_unsaved_changes')}
+        </span>
 
-      <Button>{t('save')}</Button>
+        <div className="flex justify-between">
+          <Button
+            type="secondary"
+            onClick={() => setIsNavigationModalVisible(false)}
+          >
+            {t('continue_editing')}
+          </Button>
+          <Button onClick={handleDiscardChanges}>{t('discard_changes')}</Button>
+        </div>
+      </div>
     </Modal>
   );
 }

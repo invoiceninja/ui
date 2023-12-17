@@ -8,41 +8,41 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { preventClosingTabOrBrowserAtom } from '$app/App';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { preventLeavingPageAtom } from '$app/App';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
-interface URLInfo {
-  url: string;
+interface NavigationAction {
+  url?: string;
   externalLink?: boolean;
-  buttonComponent?: boolean;
-}
-interface NavigationURL {
-  url: string;
-  externalLink?: boolean;
+  fn?: () => void;
+  actionKey?: 'switchCompany';
 }
 export const isNavigationModalVisibleAtom = atom<boolean>(false);
-export const blockedNavigationURLAtom = atom<NavigationURL | undefined>(
+export const blockedNavigationActionAtom = atom<NavigationAction | undefined>(
   undefined
 );
 export function usePreventNavigation() {
   const navigate = useNavigate();
 
-  const preventNavigation = useAtomValue(preventClosingTabOrBrowserAtom);
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
   const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
-  const setBlockedNavigationURL = useSetAtom(blockedNavigationURLAtom);
+  const setBlockedNavigationAction = useSetAtom(blockedNavigationActionAtom);
 
-  return ({ url, externalLink = false, buttonComponent = false }: URLInfo) => {
-    if (preventNavigation) {
-      setBlockedNavigationURL({
+  return ({ url, externalLink = false, fn, actionKey }: NavigationAction) => {
+    if (preventLeavingPage.prevent) {
+      setBlockedNavigationAction({
         url,
         externalLink,
+        fn,
       });
-      setIsNavigationModalVisible(true);
+      setPreventLeavingPage((current) => current && { ...current, actionKey });
 
-      console.log('okkk', url);
+      setIsNavigationModalVisible(true);
     } else {
-      if (buttonComponent) {
+      if (url) {
         if (url === 'back') {
           navigate(-1);
         } else {
@@ -53,8 +53,10 @@ export function usePreventNavigation() {
           }
         }
       }
+
+      fn?.();
     }
 
-    return preventNavigation;
+    return preventLeavingPage.prevent;
   };
 }

@@ -108,7 +108,6 @@ export function QuickCreatePopover() {
                                       preventNavigation({
                                         url: action.url,
                                         externalLink: action.externalLink,
-                                        buttonComponent: true,
                                       })
                                     }
                                   >

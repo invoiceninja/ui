@@ -32,7 +32,14 @@ import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 
-export const preventClosingTabOrBrowserAtom = atom<boolean>(false);
+interface PreventLeavingPage {
+  prevent: boolean;
+  actionKey?: 'switchCompany';
+}
+export const preventLeavingPageAtom = atom<PreventLeavingPage>({
+  prevent: false,
+  actionKey: undefined,
+});
 export function App() {
   const [t] = useTranslation();
   const { i18n } = useTranslation();
@@ -60,9 +67,7 @@ export function App() {
 
   const resolveAntdLocale = useResolveAntdLocale();
 
-  const preventClosingTabOrBrowser = useAtomValue(
-    preventClosingTabOrBrowserAtom
-  );
+  const preventLeavingPage = useAtomValue(preventLeavingPageAtom);
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -130,7 +135,10 @@ export function App() {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (preventClosingTabOrBrowser) {
+      if (
+        preventLeavingPage.prevent &&
+        preventLeavingPage.actionKey !== 'switchCompany'
+      ) {
         event.preventDefault();
 
         return true;
@@ -140,7 +148,7 @@ export function App() {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [preventClosingTabOrBrowser]);
+  }, [preventLeavingPage]);
 
   useEffect(() => {
     const companyName = company?.settings?.name;

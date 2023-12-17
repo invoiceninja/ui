@@ -31,6 +31,7 @@ import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useColorScheme } from '$app/common/colors';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -38,6 +39,8 @@ export function CompanySwitcher() {
   const { isAdmin, isOwner } = useAdmin();
 
   const user = useCurrentUser();
+
+  const preventNavigation = usePreventNavigation();
 
   const state = useSelector((state: RootState) => state.companyUsers);
 
@@ -146,7 +149,14 @@ export function CompanySwitcher() {
               {state?.api?.length >= 1 &&
                 state?.api?.map((record: any, index: number) => (
                   <Menu.Item key={index}>
-                    <DropdownElement onClick={() => switchCompany(index)}>
+                    <DropdownElement
+                      onClick={() =>
+                        preventNavigation({
+                          fn: () => switchCompany(index),
+                          actionKey: 'switchCompany',
+                        })
+                      }
+                    >
                       <div className="flex items-center space-x-3">
                         <span>
                           {record.company.settings.name ||

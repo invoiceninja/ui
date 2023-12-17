@@ -421,7 +421,6 @@ export function Default(props: Props) {
                           'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                         : user?.company_user?.ninja_portal_url) as string,
                       externalLink: true,
-                      buttonComponent: true,
                     })
                   }
                 >
@@ -441,9 +440,7 @@ export function Default(props: Props) {
 
               {!props.withoutBackButton && (
                 <Button
-                  onClick={() =>
-                    preventNavigation({ url: 'back', buttonComponent: true })
-                  }
+                  onClick={() => preventNavigation({ url: 'back' })}
                   type="secondary"
                 >
                   {t('back')}
