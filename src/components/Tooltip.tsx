@@ -99,7 +99,7 @@ export function Tooltip(props: Props) {
                   {props.containsUnsafeHTMLTags ? (
                     <span dangerouslySetInnerHTML={{ __html: message }} />
                   ) : (
-                    props.message
+                    message
                   )}
                 </>
               )}
