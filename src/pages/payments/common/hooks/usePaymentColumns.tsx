@@ -157,21 +157,44 @@ export function usePaymentColumns() {
       column: 'invoice_number',
       id: 'id',
       label: t('invoice_number'),
-      format: (value, payment) => (
-        <div className="w-96 truncate">
-          {payment.invoices?.map((invoice) => (
-            <DynamicLink
-              key={invoice.id}
-              className="mr-1.5"
-              to={route('/invoices/:id/edit', {
-                id: invoice.id,
-              })}
-              renderSpan={disableNavigation('invoice', invoice)}
-            >
-              {invoice.number}
-            </DynamicLink>
-          ))}
-        </div>
+      format: (_, payment) => (
+        <Tooltip
+          placement="top"
+          tooltipElement={
+            <div className="flex space-x-2">
+              {payment.invoices?.map((invoice) => (
+                <DynamicLink
+                  key={invoice.id}
+                  to={route('/invoices/:id/edit', {
+                    id: invoice.id,
+                  })}
+                  renderSpan={disableNavigation('invoice', invoice)}
+                >
+                  {invoice.number}
+                </DynamicLink>
+              ))}
+            </div>
+          }
+          width="auto"
+          disabled={Boolean((payment.invoices?.length ?? 0) < 4)}
+        >
+          <div className="flex space-x-2">
+            {payment.invoices?.map(
+              (invoice, index) =>
+                index < 3 && (
+                  <DynamicLink
+                    key={invoice.id}
+                    to={route('/invoices/:id/edit', {
+                      id: invoice.id,
+                    })}
+                    renderSpan={disableNavigation('invoice', invoice)}
+                  >
+                    {invoice.number}
+                  </DynamicLink>
+                )
+            )}
+          </div>
+        </Tooltip>
       ),
     },
     {
