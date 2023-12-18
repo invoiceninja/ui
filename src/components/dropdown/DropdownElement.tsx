@@ -25,6 +25,7 @@ interface Props extends CommonProps {
   icon?: ReactElement;
   behavior?: 'tooltipButton';
   tooltipText?: string | null;
+  actionKey?: 'switchCompany';
 }
 
 const Button = styled.button`
@@ -49,7 +50,7 @@ export function DropdownElement(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { behavior, tooltipText } = props;
+  const { behavior, tooltipText, actionKey } = props;
 
   if (props.to && behavior !== 'tooltipButton') {
     return (
@@ -119,6 +120,7 @@ export function DropdownElement(props: Props) {
             props.onClick?.(event);
             props.setVisible?.(false);
           },
+          actionKey,
         })
       }
       ref={props.innerRef}
