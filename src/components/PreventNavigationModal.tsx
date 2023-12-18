@@ -17,13 +17,14 @@ import {
   blockedNavigationActionAtom,
   isNavigationModalVisibleAtom,
 } from '$app/common/hooks/usePreventNavigation';
-import { preventLeavingPageAtom } from '$app/App';
+import { lastHistoryLocationAtom, preventLeavingPageAtom } from '$app/App';
 import { useNavigate } from 'react-router-dom';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const { nonPreventedLocations } = useAtomValue(lastHistoryLocationAtom);
   const blockedNavigationAction = useAtomValue(blockedNavigationActionAtom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
@@ -47,7 +48,10 @@ export function PreventNavigationModal() {
 
       if (url) {
         if (url === 'back') {
-          navigate(-1);
+          const lastNonPreventedLocation =
+            nonPreventedLocations[nonPreventedLocations.length - 2];
+
+          lastNonPreventedLocation && navigate(lastNonPreventedLocation);
         } else {
           if (externalLink) {
             window.open(url, '_blank');

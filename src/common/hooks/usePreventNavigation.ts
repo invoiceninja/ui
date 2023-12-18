@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { preventLeavingPageAtom } from '$app/App';
-import { atom, useAtom, useSetAtom } from 'jotai';
+import { lastHistoryLocationAtom, preventLeavingPageAtom } from '$app/App';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
 interface NavigationAction {
@@ -24,6 +24,8 @@ export const blockedNavigationActionAtom = atom<NavigationAction | undefined>(
 );
 export function usePreventNavigation() {
   const navigate = useNavigate();
+
+  const { nonPreventedLocations } = useAtomValue(lastHistoryLocationAtom);
 
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
@@ -44,7 +46,10 @@ export function usePreventNavigation() {
     } else {
       if (url) {
         if (url === 'back') {
-          navigate(-1);
+          const lastNonPreventedLocation =
+            nonPreventedLocations[nonPreventedLocations.length - 2];
+
+          lastNonPreventedLocation && navigate(lastNonPreventedLocation);
         } else {
           if (externalLink) {
             window.open(url, '_blank');

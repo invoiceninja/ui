@@ -37,9 +37,20 @@ interface PreventLeavingPage {
   prevent: boolean;
   actionKey?: 'switchCompany' | 'browserBack';
 }
+
+interface HistoryLocation {
+  lastLocation: string;
+  nonPreventedLocations: string[];
+}
+
 export const preventLeavingPageAtom = atom<PreventLeavingPage>({
   prevent: false,
   actionKey: undefined,
+});
+
+export const lastHistoryLocationAtom = atom<HistoryLocation>({
+  lastLocation: '',
+  nonPreventedLocations: [],
 });
 export function App() {
   const [t] = useTranslation();
@@ -79,7 +90,9 @@ export function App() {
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
 
-  const [lastHistoryPush, setLastHistoryPush] = useState<string>('');
+  const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
+    lastHistoryLocationAtom
+  );
 
   const user = useCurrentUser();
   const refetch = useRefetch();
@@ -152,17 +165,22 @@ export function App() {
       }
     };
 
-    const isLastPushDifferent = lastHistoryPush !== window.location.href;
+    const isLastPushDifferent =
+      lastHistoryLocation.lastLocation !== window.location.href;
 
     if (isLastPushDifferent) {
-      setLastHistoryPush(window.location.href);
+      setLastHistoryLocation((current) => ({
+        ...current,
+        lastLocation: window.location.href,
+      }));
       history.pushState(null, document.title, window.location.href);
     }
 
     const handlePopState = () => {
       if (preventLeavingPage.prevent) {
-        isLastPushDifferent &&
+        if (isLastPushDifferent) {
           history.pushState(null, document.title, window.location.href);
+        }
 
         setPreventLeavingPage(
           (current) => current && { ...current, actionKey: 'browserBack' }
@@ -209,6 +227,15 @@ export function App() {
     ) {
       navigate('/settings/company_details');
     }
+
+    !preventLeavingPage.prevent &&
+      setLastHistoryLocation((current) => ({
+        ...current,
+        nonPreventedLocations: [
+          ...current.nonPreventedLocations,
+          location.pathname,
+        ],
+      }));
   }, [location]);
 
   return (
