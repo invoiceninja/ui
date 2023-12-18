@@ -24,11 +24,14 @@ import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
@@ -70,6 +73,7 @@ export default function Payments() {
           />
         }
         linkToCreateGuards={[permission('create_payment')]}
+        hideEditableOptions={!hasPermission('edit_payment')}
       />
     </Default>
   );

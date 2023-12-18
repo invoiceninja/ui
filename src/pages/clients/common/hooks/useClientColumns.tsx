@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const defaultColumns: string[] = [
   'name',
@@ -132,12 +133,12 @@ export function useClientColumns() {
       id: 'display_name',
       label: t('name'),
       format: (value, client) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: client.id })}
-          disableNavigation={disableNavigation('client', client)}
+          renderSpan={disableNavigation('client', client)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -168,12 +169,12 @@ export function useClientColumns() {
       label: t('contact_name'),
       format: (value, resource) =>
         resource.contacts.length > 0 && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: resource.id })}
-            disableNavigation={disableNavigation('client', resource)}
+            renderSpan={disableNavigation('client', resource)}
           >
             {resource.contacts[0].first_name} {resource.contacts[0].last_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {

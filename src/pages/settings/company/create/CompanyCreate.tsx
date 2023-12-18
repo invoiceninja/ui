@@ -13,7 +13,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
@@ -57,7 +56,7 @@ export function CompanyCreate(props: Props) {
 
     queryClient.invalidateQueries();
 
-    window.location.href = route('/');
+    window.location.reload();
   };
 
   const handleSave = async () => {
@@ -111,10 +110,16 @@ export function CompanyCreate(props: Props) {
       onClose={() => props.setIsModalOpen(false)}
       backgroundColor="white"
     >
-      <span className="text-lg"
-        style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-
-      >{t('are_you_sure')}</span>
+      <span
+        className="text-lg"
+        style={{
+          backgroundColor: colors.$2,
+          color: colors.$3,
+          colorScheme: colors.$0,
+        }}
+      >
+        {t('are_you_sure')}
+      </span>
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button

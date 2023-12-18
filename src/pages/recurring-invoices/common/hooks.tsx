@@ -47,7 +47,6 @@ import { Credit } from '$app/common/interfaces/credit';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { StatusBadge } from '$app/components/StatusBadge';
@@ -81,6 +80,7 @@ import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -652,17 +652,14 @@ export function useRecurringInvoiceColumns() {
       id: 'number',
       label: t('number'),
       format: (value, recurringInvoice) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
-          disableNavigation={disableNavigation(
-            'recurring_invoice',
-            recurringInvoice
-          )}
+          renderSpan={disableNavigation('recurring_invoice', recurringInvoice)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -670,15 +667,12 @@ export function useRecurringInvoiceColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, recurringInvoice) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: recurringInvoice.client_id })}
-          disableNavigation={disableNavigation(
-            'client',
-            recurringInvoice.client
-          )}
+          renderSpan={disableNavigation('client', recurringInvoice.client)}
         >
           {recurringInvoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {

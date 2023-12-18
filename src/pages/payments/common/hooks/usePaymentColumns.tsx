@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -25,6 +24,7 @@ import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const defaultColumns: string[] = [
   'status',
@@ -121,12 +121,12 @@ export function usePaymentColumns() {
       id: 'number',
       label: t('number'),
       format: (value, payment) => (
-        <Link
+        <DynamicLink
           to={route('/payments/:id/edit', { id: payment.id })}
-          disableNavigation={disableNavigation('payment', payment)}
+          renderSpan={disableNavigation('payment', payment)}
         >
           {payment.number}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -134,12 +134,12 @@ export function usePaymentColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: payment.client_id })}
-          disableNavigation={disableNavigation('client', payment.client)}
+          renderSpan={disableNavigation('client', payment.client)}
         >
           {payment.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -157,16 +157,44 @@ export function usePaymentColumns() {
       column: 'invoice_number',
       id: 'id',
       label: t('invoice_number'),
-      format: (value, payment) => (
-        <Link
-          to={route('/invoices/:id/edit', { id: payment.invoices?.[0]?.id })}
-          disableNavigation={disableNavigation(
-            'invoice',
-            payment.invoices?.[0]
-          )}
+      format: (_, payment) => (
+        <Tooltip
+          placement="top"
+          tooltipElement={
+            <div className="flex space-x-2">
+              {payment.invoices?.map((invoice) => (
+                <DynamicLink
+                  key={invoice.id}
+                  to={route('/invoices/:id/edit', {
+                    id: invoice.id,
+                  })}
+                  renderSpan={disableNavigation('invoice', invoice)}
+                >
+                  {invoice.number}
+                </DynamicLink>
+              ))}
+            </div>
+          }
+          width="auto"
+          disabled={Boolean((payment.invoices?.length ?? 0) < 4)}
         >
-          {payment.invoices?.[0]?.number}
-        </Link>
+          <div className="flex space-x-2">
+            {payment.invoices?.map(
+              (invoice, index) =>
+                index < 3 && (
+                  <DynamicLink
+                    key={invoice.id}
+                    to={route('/invoices/:id/edit', {
+                      id: invoice.id,
+                    })}
+                    renderSpan={disableNavigation('invoice', invoice)}
+                  >
+                    {invoice.number}
+                  </DynamicLink>
+                )
+            )}
+          </div>
+        </Tooltip>
       ),
     },
     {

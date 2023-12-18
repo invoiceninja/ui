@@ -50,6 +50,7 @@ import { EmailRecord } from '$app/components/EmailRecord';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -307,7 +308,6 @@ export function InvoiceSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                placement="top"
                 containsUnsafeHTMLTags
                 message={(resource?.reminder_schedule as string) ?? ''}
               >
@@ -403,15 +403,12 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link
+                    <DynamicLink
                       to={`/clients/${activity.client_id}`}
-                      disableNavigation={disableNavigation(
-                        'client',
-                        invoice?.client
-                      )}
+                      renderSpan={disableNavigation('client', invoice?.client)}
                     >
                       {invoice?.client?.display_name}
-                    </Link>
+                    </DynamicLink>
                   </div>
 
                   <div className="inline-flex items-center space-x-1">
