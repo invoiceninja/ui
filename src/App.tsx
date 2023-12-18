@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -31,10 +31,11 @@ import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { isNavigationModalVisibleAtom } from './common/hooks/usePreventNavigation';
 
 interface PreventLeavingPage {
   prevent: boolean;
-  actionKey?: 'switchCompany';
+  actionKey?: 'switchCompany' | 'browserBack';
 }
 export const preventLeavingPageAtom = atom<PreventLeavingPage>({
   prevent: false,
@@ -67,12 +68,18 @@ export function App() {
 
   const resolveAntdLocale = useResolveAntdLocale();
 
-  const preventLeavingPage = useAtomValue(preventLeavingPageAtom);
+  const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
+
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
+
+  const [lastHistoryPush, setLastHistoryPush] = useState<string>('');
 
   const user = useCurrentUser();
   const refetch = useRefetch();
@@ -145,9 +152,34 @@ export function App() {
       }
     };
 
+    const isLastPushDifferent = lastHistoryPush !== window.location.href;
+
+    if (isLastPushDifferent) {
+      setLastHistoryPush(window.location.href);
+      history.pushState(null, document.title, window.location.href);
+    }
+
+    const handlePopState = () => {
+      if (preventLeavingPage.prevent) {
+        isLastPushDifferent &&
+          history.pushState(null, document.title, window.location.href);
+
+        setPreventLeavingPage(
+          (current) => current && { ...current, actionKey: 'browserBack' }
+        );
+
+        setIsNavigationModalVisible(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [preventLeavingPage]);
 
   useEffect(() => {

@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './forms';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import {
   blockedNavigationActionAtom,
@@ -26,7 +26,9 @@ export function PreventNavigationModal() {
 
   const blockedNavigationAction = useAtomValue(blockedNavigationActionAtom);
 
-  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -35,8 +37,12 @@ export function PreventNavigationModal() {
   );
 
   const handleDiscardChanges = () => {
+    const isBrowserBackAction = preventLeavingPage.actionKey === 'browserBack';
+
     setPreventLeavingPage({ prevent: false, actionKey: undefined });
     setIsNavigationModalVisible(false);
+
+    isBrowserBackAction && history.back();
 
     if (blockedNavigationAction) {
       const { url, externalLink, fn } = blockedNavigationAction;
@@ -58,10 +64,20 @@ export function PreventNavigationModal() {
   };
 
   const handleContinueEditing = () => {
+    const isBrowserBackAction = preventLeavingPage.actionKey === 'browserBack';
+
     setPreventLeavingPage(
-      (current) => current && { ...current, actionKey: undefined }
+      (current) =>
+        current && {
+          ...current,
+          actionKey:
+            current.actionKey !== 'browserBack' ? undefined : current.actionKey,
+        }
     );
     setIsNavigationModalVisible(false);
+
+    isBrowserBackAction &&
+      history.pushState(null, document.title, window.location.href);
   };
 
   useEffect(() => {
