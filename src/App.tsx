@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -79,6 +79,14 @@ export function App() {
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+
+  const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
+  const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
+    lastHistoryLocationAtom
+  );
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
