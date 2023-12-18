@@ -14,6 +14,7 @@ import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { Link } from '$app/components/forms';
+import { hexToRGB } from '$app/common/hooks/useAdjustColorDarkness';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -24,9 +25,15 @@ const Div = styled.div`
 
 const LinkStyled = styled(Link)`
   &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-    background-opacity: ${(props) => props.theme.hoverOpacity};
-  }: 
+    background-color: ${(props) => {
+      if (props.theme.hoverColor) {
+        const rgbColor = hexToRGB(props.theme.hoverColor);
+        return `rgba(${rgbColor.red}, ${rgbColor.green}, ${rgbColor.blue}, 0.2)`;
+      }
+
+      return props.theme.hoverColor;
+    }};
+  }
 `;
 
 interface Props {
@@ -86,7 +93,6 @@ export function SidebarItem(props: Props) {
         <LinkStyled
           theme={{
             hoverColor: colors.$13,
-            hoverOpacity: 0.1,
           }}
           to={item.rightButton.to}
           className="rounded-full p-1.5"
