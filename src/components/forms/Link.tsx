@@ -22,7 +22,6 @@ interface Props extends CommonProps {
   children: ReactNode;
   external?: boolean;
   withoutDefaultStyling?: boolean;
-  withoutUnderlineStyling?: boolean;
 }
 
 export function Link(props: Props) {
@@ -32,7 +31,7 @@ export function Link(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { withoutDefaultStyling, withoutUnderlineStyling } = props;
+  const { withoutDefaultStyling } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -62,7 +61,7 @@ export function Link(props: Props) {
   return (
     <RouterLink
       className={classNames(`text-sm ${props.className}`, {
-        'hover:underline': !withoutUnderlineStyling,
+        'hover:underline': !withoutDefaultStyling,
       })}
       style={!withoutDefaultStyling ? css : undefined}
       to={props.to}

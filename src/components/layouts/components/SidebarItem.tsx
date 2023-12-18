@@ -69,12 +69,7 @@ export function SidebarItem(props: Props) {
           : 'text-gray-300 border-l-4 border-transparent'
       )}
     >
-      <LinkStyled
-        to={item.href}
-        className="w-full"
-        withoutDefaultStyling
-        withoutUnderlineStyling
-      >
+      <LinkStyled to={item.href} className="w-full" withoutDefaultStyling>
         <div className="flex justify-start items-center my-2">
           <item.icon
             className={classNames(
@@ -97,7 +92,6 @@ export function SidebarItem(props: Props) {
           to={item.rightButton.to}
           className="rounded-full p-1.5"
           withoutDefaultStyling
-          withoutUnderlineStyling
         >
           <item.rightButton.icon className="h-5 w-5" />
         </LinkStyled>

@@ -25,16 +25,14 @@ export function PreventNavigationModal() {
   const navigate = useNavigate();
 
   const blockedNavigationAction = useAtomValue(blockedNavigationActionAtom);
-
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
   );
-
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
   const [isNavigationModalVisible, setIsNavigationModalVisible] = useAtom(
     isNavigationModalVisibleAtom
   );
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const handleDiscardChanges = () => {
     const isBrowserBackAction = preventLeavingPage.actionKey === 'browserBack';
