@@ -8,51 +8,70 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdLink } from 'react-icons/md';
 import yodleeLogo from '/dap-logos/yodlee.svg';
-import classNames from 'classnames';
+import nordigenLogo from '/dap-logos/nordigen.png';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useClickAway } from 'react-use';
+import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export function ConnectAccountsModal() {
   const [t] = useTranslation();
-
   const accentColor = useAccentColor();
+
+  const colors = useColorScheme();
+
+  const divRef = useRef<HTMLDivElement>(null);
 
   const [account, setAccount] = useState<'yodlee' | 'nordigen'>();
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const handleConnectYodlee = async () => {
-    const tokenResponse = await request(
-      'POST',
-      endpoint('/api/v1/one_time_token'),
-      { context: 'yodlee', platform: 'react' }
-    );
-    window.open(
-      route('https://invoicing.co/yodlee/onboard/:hash', {
-        hash: tokenResponse?.data?.hash,
-      })
-    );
+  useClickAway(divRef, () => {
+    setAccount(undefined);
+  });
+
+  const handleClose = () => {
+    setIsModalVisible(false);
+    setAccount(undefined);
   };
 
-  const handleConnectNordigen = async () => {
-    const tokenResponse = await request(
-      'POST',
-      endpoint('/api/v1/one_time_token'),
-      { context: 'nordigen', platform: 'react' }
-    );
-    window.open(
-      route('https://invoicing.co/yodlee/onboard/:hash', {
-        hash: tokenResponse?.data?.hash,
-      })
-    );
+  const handleConnectYodlee = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'yodlee',
+      platform: 'react',
+    }).then((tokenResponse) => {
+      handleClose();
+
+      window.open(
+        route('https://invoicing.co/yodlee/onboard/:hash', {
+          hash: tokenResponse?.data?.hash,
+        })
+      );
+    });
+  };
+
+  const handleConnectNordigen = () => {
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'nordigen',
+      platform: 'react',
+    }).then((tokenResponse) => {
+      handleClose();
+
+      window.open(
+        route('https://invoicing.co/yodlee/onboard/:hash', {
+          hash: tokenResponse?.data?.hash,
+        })
+      );
+    });
   };
 
   const handleConnectAccount = () => {
@@ -75,21 +94,32 @@ export function ConnectAccountsModal() {
       <Modal
         title={t('connect_accounts')}
         visible={isModalVisible}
-        onClose={() => {
-          setIsModalVisible(false);
-          setAccount(undefined);
-        }}
+        onClose={handleClose}
       >
-        <div className="flex flex-col space-y-6">
-          <div
-            className={classNames('flex cursor-pointer', {
-              'border-4': account === 'yodlee',
-            })}
-            style={{ borderColor: accentColor }}
-            onClick={() => setAccount('yodlee')}
-          >
-            <img className="flex-1" src={yodleeLogo} />
-          </div>
+        <div ref={divRef} className="flex flex-col space-y-6">
+          {isHosted() && enterprisePlan() && (
+            <div
+              className="flex cursor-pointer h-44 border-4"
+              style={{
+                borderColor: account === 'yodlee' ? accentColor : colors.$5,
+              }}
+              onClick={() => setAccount('yodlee')}
+            >
+              <img className="flex-1" src={yodleeLogo} />
+            </div>
+          )}
+
+          {((isHosted() && enterprisePlan()) || isSelfHosted()) && (
+            <div
+              className="flex cursor-pointer py-14 px-10 h-44 border-4"
+              style={{
+                borderColor: account === 'nordigen' ? accentColor : colors.$5,
+              }}
+              onClick={() => setAccount('nordigen')}
+            >
+              <img className="flex-1" src={nordigenLogo} />
+            </div>
+          )}
 
           <Button
             onClick={handleConnectAccount}
