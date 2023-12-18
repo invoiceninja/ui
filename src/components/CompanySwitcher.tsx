@@ -18,7 +18,6 @@ import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { route } from '$app/common/helpers/route';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { useCompanyName } from '$app/common/hooks/useLogo';
@@ -76,7 +75,7 @@ export function CompanySwitcher() {
 
     queryClient.invalidateQueries();
 
-    window.location.href = route('/');
+    window.location.reload();
   };
 
   useEffect(() => {

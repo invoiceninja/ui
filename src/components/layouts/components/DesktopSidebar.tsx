@@ -95,10 +95,10 @@ export function DesktopSidebar(props: Props) {
                   size="large"
                   withoutArrow={true}
                 >
-                  <SidebarItem key={index} item={item} />
+                  <SidebarItem key={index} item={item} colors={colors} />
                 </Tooltip>
               ) : (
-                <SidebarItem key={index} item={item} />
+                <SidebarItem key={index} item={item} colors={colors} />
               )
             )}
           </nav>

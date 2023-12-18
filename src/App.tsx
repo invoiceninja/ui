@@ -19,14 +19,17 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useAtom, useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
-import { useAdmin } from './common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from './common/hooks/permissions/useHasPermission';
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
@@ -54,48 +57,34 @@ export const lastHistoryLocationAtom = atom<HistoryLocation>({
 });
 export function App() {
   const [t] = useTranslation();
+  const { isOwner } = useAdmin();
   const { i18n } = useTranslation();
 
-  const { isOwner } = useAdmin();
-
-  const company = useCurrentCompany();
+  const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   const navigate = useNavigate();
 
+  const user = useCurrentUser();
   const location = useLocation();
+  const company = useCurrentCompany();
 
+  const refetch = useRefetch();
+  const hasPermission = useHasPermission();
+  const resolveLanguage = useResolveLanguage();
+  const resolveAntdLocale = useResolveAntdLocale();
+  const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
 
+  const colorScheme = useAtomValue(colorSchemeAtom);
+
+  const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
 
-  const updateAntdLocale = useSetAtom(antdLocaleAtom);
-
-  const resolveLanguage = useResolveLanguage();
-
-  const resolveDayJSLocale = useResolveDayJSLocale();
-
-  const resolveAntdLocale = useResolveAntdLocale();
-
-  const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
-
-  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
-    preventLeavingPageAtom
-  );
-
-  const darkMode = useSelector((state: RootState) => state.settings.darkMode);
-
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
-
-  const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
-    lastHistoryLocationAtom
-  );
-
-  const user = useCurrentUser();
-  const refetch = useRefetch();
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -104,8 +93,6 @@ export function App() {
           : company.settings.language_id
       )
     : undefined;
-
-  const [colorScheme] = useAtom(colorSchemeAtom);
 
   useEffect(() => {
     document.body.style.backgroundColor = colorScheme.$2;
@@ -237,6 +224,17 @@ export function App() {
         ],
       }));
   }, [location]);
+
+  useEffect(() => {
+    if (
+      user &&
+      Object.keys(user).length &&
+      location.pathname.endsWith('/dashboard') &&
+      !hasPermission('view_dashboard')
+    ) {
+      navigate('/settings/user_details');
+    }
+  }, [location, user]);
 
   return (
     <>
