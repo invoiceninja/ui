@@ -42,7 +42,6 @@ import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { useColorScheme } from '$app/common/colors';
-import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -210,7 +209,7 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="flex flex-col space-y-3 my-4">
+        <div className="my-4">
           {purchaseOrder && (
             <InvoicePreview
               for="invoice"
@@ -218,10 +217,9 @@ export default function Edit() {
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
-
-          <RemoveLogoCTA />
         </div>
       )}
     </Default>

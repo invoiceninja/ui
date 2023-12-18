@@ -41,7 +41,6 @@ import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns'
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
-import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -222,7 +221,7 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="flex flex-col space-y-3 my-4">
+        <div className="my-4">
           {quote && (
             <InvoicePreview
               for="invoice"
@@ -230,10 +229,9 @@ export default function Edit() {
               entity="quote"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
-
-          <RemoveLogoCTA />
         </div>
       )}
     </Default>

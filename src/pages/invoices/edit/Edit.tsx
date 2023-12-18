@@ -44,7 +44,6 @@ import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/Invoic
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -242,7 +241,7 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="flex flex-col space-y-3 my-4">
+        <div className="my-4">
           {invoice && (
             <InvoicePreview
               for="invoice"
@@ -252,10 +251,9 @@ export default function Edit() {
               endpoint="/api/v1/live_preview?entity=:entity"
               observable={true}
               initiallyVisible={false}
+              withRemoveLogoCTA
             />
           )}
-
-          <RemoveLogoCTA />
         </div>
       )}
     </Default>

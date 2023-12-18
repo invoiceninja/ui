@@ -36,7 +36,6 @@ import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { RemoveLogoCTA } from '$app/components/RemoveLogoCTA';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -172,7 +171,7 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="flex flex-col space-y-3 my-4">
+        <div className="my-4">
           {credit && (
             <InvoicePreview
               for="invoice"
@@ -180,10 +179,9 @@ export default function Edit() {
               entity="credit"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
-
-          <RemoveLogoCTA />
         </div>
       )}
     </Default>

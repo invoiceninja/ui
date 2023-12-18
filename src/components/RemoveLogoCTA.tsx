@@ -23,32 +23,30 @@ export function RemoveLogoCTA() {
 
   const { isOwner } = useAdmin();
 
-  return (
-    <>
-      {!proPlan() && !enterprisePlan() && isOwner ? (
-        <div className="flex text-base space-x-1">
-          <Link
-            className="capitalize"
-            to={
-              user?.company_user?.ninja_portal_url ||
-              route('/settings/account_management')
-            }
-            setBaseFont
-            external={Boolean(user?.company_user?.ninja_portal_url)}
-          >
-            {t('click_here')}
-          </Link>
+  if (!proPlan() && !enterprisePlan() && isOwner) {
+    return (
+      <div className="flex text-base space-x-1">
+        <Link
+          className="capitalize"
+          to={
+            user?.company_user?.ninja_portal_url ||
+            route('/settings/account_management')
+          }
+          setBaseFont
+          external={Boolean(user?.company_user?.ninja_portal_url)}
+        >
+          {t('click_here')}
+        </Link>
 
-          <span>
-            {trans('pro_plan_remove_logo', {
-              link: '',
-            })}
-            .
-          </span>
-        </div>
-      ) : (
-        <></>
-      )}
-    </>
-  );
+        <span>
+          {trans('pro_plan_remove_logo', {
+            link: '',
+          })}
+          .
+        </span>
+      </div>
+    );
+  }
+
+  return null;
 }
