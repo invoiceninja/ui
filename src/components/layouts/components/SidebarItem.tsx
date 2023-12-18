@@ -28,7 +28,7 @@ const LinkStyled = styled(Link)`
     background-color: ${(props) => {
       if (props.theme.hoverColor) {
         const rgbColor = hexToRGB(props.theme.hoverColor);
-        return `rgba(${rgbColor.red}, ${rgbColor.green}, ${rgbColor.blue}, 0.2)`;
+        return `rgba(${rgbColor.red}, ${rgbColor.green}, ${rgbColor.blue}, 0.1)`;
       }
 
       return props.theme.hoverColor;
