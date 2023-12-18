@@ -43,11 +43,16 @@ export function PreventNavigationModal() {
   const handleDiscardChanges = () => {
     const isBrowserBackAction = preventLeavingPage.actionKey === 'browserBack';
 
-    setLastHistoryLocation((current) => ({
-      ...current,
-      lastLocation: '',
-    }));
-    setPreventLeavingPage({ prevent: false, actionKey: undefined });
+    const { url, externalLink, fn } = blockedNavigationAction || {};
+
+    if (!externalLink) {
+      setLastHistoryLocation((current) => ({
+        ...current,
+        lastLocation: '',
+      }));
+      setPreventLeavingPage({ prevent: false, actionKey: undefined });
+    }
+
     setIsNavigationModalVisible(false);
 
     const numberOfNonPreventedLocations = nonPreventedLocations.length;
@@ -65,8 +70,6 @@ export function PreventNavigationModal() {
     }
 
     if (blockedNavigationAction) {
-      const { url, externalLink, fn } = blockedNavigationAction;
-
       if (url) {
         if (url === 'back') {
           lastNonPreventedLocation && navigate(lastNonPreventedLocation);
