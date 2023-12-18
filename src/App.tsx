@@ -163,7 +163,7 @@ export function App() {
     const isLastPushDifferent =
       lastHistoryLocation.lastLocation !== window.location.href;
 
-    if (isLastPushDifferent) {
+    if (isLastPushDifferent && preventLeavingPage.prevent) {
       setLastHistoryLocation((current) => ({
         ...current,
         lastLocation: window.location.href,

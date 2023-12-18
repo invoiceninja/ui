@@ -18,13 +18,16 @@ import {
   isNavigationModalVisibleAtom,
 } from '$app/common/hooks/usePreventNavigation';
 import { lastHistoryLocationAtom, preventLeavingPageAtom } from '$app/App';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { nonPreventedLocations } = useAtomValue(lastHistoryLocationAtom);
+  const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
+    lastHistoryLocationAtom
+  );
   const blockedNavigationAction = useAtomValue(blockedNavigationActionAtom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
@@ -35,22 +38,37 @@ export function PreventNavigationModal() {
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
+  const { nonPreventedLocations } = lastHistoryLocation;
+
   const handleDiscardChanges = () => {
     const isBrowserBackAction = preventLeavingPage.actionKey === 'browserBack';
 
+    setLastHistoryLocation((current) => ({
+      ...current,
+      lastLocation: '',
+    }));
     setPreventLeavingPage({ prevent: false, actionKey: undefined });
     setIsNavigationModalVisible(false);
 
-    isBrowserBackAction && history.back();
+    const numberOfNonPreventedLocations = nonPreventedLocations.length;
+
+    let lastNonPreventedLocation =
+      nonPreventedLocations[numberOfNonPreventedLocations - 1];
+
+    lastNonPreventedLocation =
+      lastNonPreventedLocation !== location.pathname
+        ? lastNonPreventedLocation
+        : nonPreventedLocations[numberOfNonPreventedLocations - 2];
+
+    if (isBrowserBackAction && lastNonPreventedLocation) {
+      navigate(lastNonPreventedLocation);
+    }
 
     if (blockedNavigationAction) {
       const { url, externalLink, fn } = blockedNavigationAction;
 
       if (url) {
         if (url === 'back') {
-          const lastNonPreventedLocation =
-            nonPreventedLocations[nonPreventedLocations.length - 2];
-
           lastNonPreventedLocation && navigate(lastNonPreventedLocation);
         } else {
           if (externalLink) {
@@ -73,13 +91,14 @@ export function PreventNavigationModal() {
         current && {
           ...current,
           actionKey:
-            current.actionKey !== 'browserBack' ? undefined : current.actionKey,
+            current.actionKey !== 'browserBack' ? undefined : 'browserBack',
         }
     );
     setIsNavigationModalVisible(false);
 
-    isBrowserBackAction &&
+    if (isBrowserBackAction) {
       history.pushState(null, document.title, window.location.href);
+    }
   };
 
   useEffect(() => {
