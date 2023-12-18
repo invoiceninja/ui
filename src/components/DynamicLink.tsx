@@ -25,7 +25,7 @@ export function DynamicLink(props: Props) {
   const { renderSpan } = props;
 
   if (renderSpan) {
-    return <span>{props.children}</span>;
+    return <span className={props.className}>{props.children}</span>;
   }
 
   return (

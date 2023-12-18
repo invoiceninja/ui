@@ -308,7 +308,6 @@ export function InvoiceSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                placement="top"
                 containsUnsafeHTMLTags
                 message={(resource?.reminder_schedule as string) ?? ''}
               >
