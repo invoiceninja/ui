@@ -61,7 +61,7 @@ export function useTranslationAlias() {
     return customFields[updatedField]
       ? customField(customFields[updatedField]).label()
       : `${
-          isVendorContactField ? 'contact_custom' : 'custom'
+          isVendorContactField ? 'contact_custom_value' : 'custom'
         }${updatedField.charAt(updatedField.length - 1)}`;
   };
 
