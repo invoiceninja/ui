@@ -12,7 +12,7 @@ import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
@@ -23,11 +23,13 @@ import {
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Modal } from '$app/components/Modal';
 
 export function Connect() {
   const [t] = useTranslation();
-
   const user = useCurrentUser();
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const handleConnectMailer = (
     event: FormEvent<HTMLButtonElement>,
@@ -100,110 +102,122 @@ export function Connect() {
   };
 
   return (
-    <Card title={t('oneclick_login')}>
-      {!user?.oauth_provider_id && isHosted() &&(
-        <>
-          <div className="grid grid-cols-3 text-sm mt-4">
-            <Element leftSide="Google">
-              <GoogleLogin
-                onSuccess={(response) =>
-                  response.credential && handleGoogle(response.credential)
-                }
-                onError={() => toast.error()}
-              />
-            </Element>
-          </div>
-          
-          <div
-            className={classNames('grid grid-cols-3 text-sm', {
-              'mt-4': isHosted(),
-            })}
-          >
-            <Element leftSide="Microsoft">
-              <SignInProviderButton
-                onClick={async () => {
-                  await msal.handleRedirectPromise();
+    <>
+      <Modal
+        title={t('update_settings')}
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      >
+        <></>
+      </Modal>
 
-                  msal
-                    .loginPopup({
-                      scopes: ['user.read'],
-                    })
-                    .then((response) => handleMicrosoft(response.accessToken));
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 23 23"
+      <Card title={t('oneclick_login')}>
+        {!user?.oauth_provider_id && isHosted() && (
+          <>
+            <div className="grid grid-cols-3 text-sm mt-4">
+              <Element leftSide="Google">
+                <GoogleLogin
+                  onSuccess={(response) =>
+                    response.credential && handleGoogle(response.credential)
+                  }
+                  onError={() => toast.error()}
+                />
+              </Element>
+            </div>
+
+            <div
+              className={classNames('grid grid-cols-3 text-sm', {
+                'mt-4': isHosted(),
+              })}
+            >
+              <Element leftSide="Microsoft">
+                <SignInProviderButton
+                  onClick={async () => {
+                    await msal.handleRedirectPromise();
+
+                    msal
+                      .loginPopup({
+                        scopes: ['user.read'],
+                      })
+                      .then((response) =>
+                        handleMicrosoft(response.accessToken)
+                      );
+                  }}
                 >
-                  <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
-                  <path fill="#f35325" d="M1 1h10v10H1z"></path>
-                  <path fill="#81bc06" d="M12 1h10v10H12z"></path>
-                  <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
-                  <path fill="#ffba08" d="M12 12h10v10H12z"></path>
-                </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 23 23"
+                  >
+                    <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+                    <path fill="#f35325" d="M1 1h10v10H1z"></path>
+                    <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+                    <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+                    <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+                  </svg>
 
-                <p style={{ color: "#000" }}>Log in with Microsoft</p>
-              </SignInProviderButton>
+                  <p style={{ color: '#000' }}>Log in with Microsoft</p>
+                </SignInProviderButton>
+              </Element>
+            </div>
+          </>
+        )}
+
+        {user?.oauth_provider_id === 'google' && (
+          <>
+            <Element leftSide="Google">
+              <Button type="minimal" onClick={handleDisconnectOauth}>
+                {t('disconnect_google')}
+              </Button>
             </Element>
-          </div>
-        </>
-      )}
 
-      {user?.oauth_provider_id === 'google' && (
-        <>
-          <Element leftSide="Google">
-            <Button type="minimal" onClick={handleDisconnectOauth}>
-              {t('disconnect_google')}
-            </Button>
-          </Element>
+            <Element leftSide="Gmail">
+              {user?.oauth_user_token ? (
+                <Button type="minimal" onClick={handleDisconnectMailer}>
+                  {t('disconnect_gmail')}
+                </Button>
+              ) : (
+                <Button
+                  type="minimal"
+                  onClick={(event: FormEvent<HTMLButtonElement>) =>
+                    handleConnectMailer(event, 'google')
+                  }
+                >
+                  {t('connect_gmail')}
+                </Button>
+              )}
+            </Element>
+          </>
+        )}
 
-          <Element leftSide="Gmail">
-            {user?.oauth_user_token ? (
-              <Button type="minimal" onClick={handleDisconnectMailer}>
-                {t('disconnect_gmail')}
+        {user?.oauth_provider_id === 'microsoft' && (
+          <>
+            <Element leftSide="Microsoft">
+              <Button type="minimal" onClick={handleDisconnectOauth}>
+                {t('disconnect_microsoft')}
               </Button>
-            ) : (
-              <Button
-                type="minimal"
-                onClick={(event: FormEvent<HTMLButtonElement>) =>
-                  handleConnectMailer(event, 'google')
-                }
-              >
-                {t('connect_gmail')}
-              </Button>
-            )}
-          </Element>
-        </>
-      )}
+            </Element>
 
-      {user?.oauth_provider_id === 'microsoft' && (
-        <>
-          <Element leftSide="Microsoft">
-            <Button type="minimal" onClick={handleDisconnectOauth}>
-              {t('disconnect_microsoft')}
-            </Button>
-          </Element>
-
-          <Element leftSide="Email">
-            {user?.oauth_user_token ? (
-              <Button type="minimal" onClick={handleDisconnectMailer}>
-                {t('disconnect_email')}
-              </Button>
-            ) : (
-              <Button
-                type="minimal"
-                onClick={(event: FormEvent<HTMLButtonElement>) =>
-                  handleConnectMailer(event, 'microsoft')
-                }
-              >
-                {t('connect_email')}
-              </Button>
-            )}
-          </Element>
-        </>
-      )}
-    </Card>
+            <Element leftSide="Email">
+              {user?.oauth_user_token ? (
+                <Button type="minimal" onClick={handleDisconnectMailer}>
+                  {t('disconnect_email')}
+                </Button>
+              ) : (
+                <Button
+                  type="minimal"
+                  onClick={(event: FormEvent<HTMLButtonElement>) =>
+                    handleConnectMailer(event, 'microsoft')
+                  }
+                >
+                  {t('connect_email')}
+                </Button>
+              )}
+            </Element>
+          </>
+        )}
+      </Card>
+    </>
   );
 }
