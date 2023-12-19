@@ -16,7 +16,6 @@ import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { preventLeavingPageAtom } from '$app/App';
-import classNames from 'classnames';
 
 interface Props extends CommonProps {
   to: string;
@@ -33,9 +32,7 @@ export function Link(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { withoutDefaultStyling } = props;
-
-  const { setBaseFont } = props;
+  const { withoutDefaultStyling, setBaseFont } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -46,13 +43,11 @@ export function Link(props: Props) {
       <a
         target="_blank"
         href={props.to}
-        className={classNames(
-          `text-center hover:underline ${props.className}`,
-          {
-            'text-sm': !setBaseFont,
-            'text-base': setBaseFont,
-          }
-        )}
+        className={classNames(`text-center ${props.className}`, {
+          'text-sm': !setBaseFont,
+          'text-base': setBaseFont,
+          'hover:underline': !withoutDefaultStyling,
+        })}
         style={!withoutDefaultStyling ? css : undefined}
         rel="noreferrer"
         onClick={(event) => {
@@ -70,11 +65,12 @@ export function Link(props: Props) {
 
   return (
     <RouterLink
-      className={classNames(`hover:underline ${props.className}`, {
+      className={classNames(`${props.className}`, {
         'text-sm': !setBaseFont,
         'text-base': setBaseFont,
+        'hover:underline': !withoutDefaultStyling,
       })}
-      style={css}
+      style={!withoutDefaultStyling ? css : undefined}
       to={props.to}
       onClick={(event) => {
         if (preventLeavingPage) {
