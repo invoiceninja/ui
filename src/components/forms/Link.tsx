@@ -12,15 +12,19 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import classNames from 'classnames';
 
 interface Props extends CommonProps {
   to: string;
   children: ReactNode;
   external?: boolean;
+  setBaseFont?: boolean;
 }
 
 export function Link(props: Props) {
   const accentColor = useAccentColor();
+
+  const { setBaseFont } = props;
 
   const css: React.CSSProperties = {
     color: accentColor,
@@ -31,7 +35,13 @@ export function Link(props: Props) {
       <a
         target="_blank"
         href={props.to}
-        className={`text-center text-sm hover:underline ${props.className}`}
+        className={classNames(
+          `text-center hover:underline ${props.className}`,
+          {
+            'text-sm': !setBaseFont,
+            'text-base': setBaseFont,
+          }
+        )}
         style={css}
         rel="noreferrer"
       >
@@ -42,7 +52,10 @@ export function Link(props: Props) {
 
   return (
     <RouterLink
-      className={`text-sm hover:underline ${props.className}`}
+      className={classNames(`hover:underline ${props.className}`, {
+        'text-sm': !setBaseFont,
+        'text-base': setBaseFont,
+      })}
       style={css}
       to={props.to}
     >

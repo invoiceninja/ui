@@ -288,6 +288,7 @@ export default function Edit() {
               entity="recurring_invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>
