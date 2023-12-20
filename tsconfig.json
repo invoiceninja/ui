@@ -23,7 +23,8 @@
       "$app": ["src"],
       "$app/*": ["src/*"],
       "$tests": ["tests"],
-      "$tests/*": ["tests/*"]
+      "$tests/*": ["tests/*"],
+      "~/*": ["./*"]
     }
   },
   "exclude": ["node_modules", "public/tinymce_6.4.2"]
