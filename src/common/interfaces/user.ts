@@ -32,6 +32,7 @@ export interface User extends Timestamps {
   signature: string;
   verified_phone_number: boolean;
   company_user?: CompanyUser;
+  company_users?: CompanyUser[];
   language_id: string;
   user_logged_in_notification: boolean;
 }

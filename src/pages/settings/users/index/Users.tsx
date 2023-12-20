@@ -64,7 +64,7 @@ export function Users() {
           resource="user"
           columns={columns}
           endpoint={route(
-            '/api/v1/users?without=:userId&sort=id|desc&status=active',
+            '/api/v1/users?include=company_users&without=:userId&sort=id|desc&status=active',
             {
               userId: currentUser?.id,
             }
@@ -76,6 +76,9 @@ export function Users() {
             setAction(action);
             setIsPasswordConfirmModalOpen(true);
           }}
+          excludeResource={(resource: User) =>
+            Boolean(resource.company_users?.[0]?.is_owner)
+          }
         />
       </Settings>
 
