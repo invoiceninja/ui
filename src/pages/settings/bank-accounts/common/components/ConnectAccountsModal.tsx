@@ -67,7 +67,7 @@ export function ConnectAccountsModal() {
       handleClose();
 
       window.open(
-        route('https://invoicing.co/yodlee/onboard/:hash', {
+        endpoint('/nordigen/connect/:hash', {
           hash: tokenResponse?.data?.hash,
         })
       );
