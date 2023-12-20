@@ -28,6 +28,7 @@ import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
 import { useColorScheme } from '$app/common/colors';
+import { version } from '$app/common/helpers/version';
 
 export function Login() {
   useTitle('login');
@@ -171,6 +172,8 @@ export function Login() {
             </div>
           </>
         )}
+
+        <p className="mt-4 text-xs">{version}</p>
       </div>
 
       <Disable2faModal

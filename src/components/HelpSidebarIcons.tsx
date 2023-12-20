@@ -41,6 +41,7 @@ import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleC
 import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
+import { version } from '$app/common/helpers/version';
 
 interface Props {
   docsLink?: string;
@@ -184,6 +185,7 @@ export function HelpSidebarIcons(props: Props) {
           </p>
 
           <p>{user?.email}</p>
+          <p className="mt-4">{version}</p>
         </section>
 
         <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
