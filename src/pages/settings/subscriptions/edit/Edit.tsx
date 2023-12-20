@@ -42,7 +42,7 @@ export function Edit() {
 
   const { data } = useSubscriptionQuery({ id });
 
-  const { data: productsData } = useProductsQuery();
+  const { data: productsData } = useProductsQuery({ status: ['active'] });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
