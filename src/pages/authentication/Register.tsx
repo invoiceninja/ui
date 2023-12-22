@@ -198,12 +198,11 @@ export function Register() {
           }
         </div>
 
-        <div className="flex justify-center">
-          <TurnstileWidget
-            visible={isTurnstileVisible}
-            onVerified={form.handleSubmit}
-          />
-        </div>
+        {isTurnstileVisible && (
+          <div className="flex justify-center">
+            <TurnstileWidget onVerified={form.handleSubmit} />
+          </div>
+        )}
       </div>
     </>
   );

@@ -11,19 +11,12 @@
 import Turnstile from 'react-turnstile';
 
 interface Props {
-  visible: boolean;
   onVerified: () => void;
 }
 export function TurnstileWidget(props: Props) {
-  const { onVerified, visible } = props;
+  const { onVerified } = props;
 
   const siteKey = import.meta.env.VITE_CLOUDFLARE_SITE_ID;
 
-  return (
-    <Turnstile
-      execution={visible ? 'execute' : undefined}
-      sitekey={siteKey}
-      onVerify={onVerified}
-    />
-  );
+  return <Turnstile sitekey={siteKey} onVerify={onVerified} />;
 }
