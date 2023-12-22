@@ -34,7 +34,10 @@ export function VerifyEmail() {
     if (user) {
       request(
         'POST',
-        endpoint('/api/v1/user/:id/reconfirm', { id: user.id, token })
+        endpoint('/api/v1/user/:id/reconfirm', {
+          id: user.id,
+          'cf-turnstile': token,
+        })
       ).then((response) => toast.success(response.data.message));
     }
   };
