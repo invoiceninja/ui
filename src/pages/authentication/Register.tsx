@@ -33,15 +33,21 @@ import {
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
 import { useSearchParams } from 'react-router-dom';
+import { TurnstileWidget } from './components/TurnstileWidget';
+import { useTurnstile } from 'react-turnstile';
 
 export function Register() {
   useTitle('register');
 
   const [t] = useTranslation();
 
+  const turnstile = useTurnstile();
+
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
     undefined
   );
+
+  const [isTurnstileVisible, setIsTrunstileVisible] = useState<boolean>(false);
 
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -91,6 +97,8 @@ export function Register() {
 
       request('POST', endpoint.href, values)
         .then((response: AxiosResponse) => {
+          turnstile.reset();
+
           dispatch(
             register({
               token: response.data.data[0].token.token,
@@ -117,92 +125,86 @@ export function Register() {
   const colors = useColorScheme();
 
   return (
-    <div className="h-screen">
-      <Header />
-      <div className="flex flex-col items-center">
-        <div
-          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        >
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>
-            {t('register_label')}
-          </h2>
+    <>
+      <div className="h-screen">
+        <Header />
 
-          <form onSubmit={form.handleSubmit} className="my-6">
-            <section>
+        <div className="flex flex-col items-center">
+          <div
+            className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <h2 className="text-2xl" style={{ color: colors.$3 }}>
+              {t('register_label')}
+            </h2>
+
+            <div className="space-y-5 my-6">
               <InputField
                 type="email"
                 autoComplete="on"
                 label={t('email_address')}
                 id="email"
                 onChange={form.handleChange}
+                errorMessage={errors?.email}
               />
 
-              {errors?.email && (
-                <Alert className="mt-2" type="danger">
-                  {errors.email}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password')}
                 id="password"
                 onChange={form.handleChange}
+                errorMessage={errors?.password}
               />
 
-              {errors?.password && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password_confirmation')}
                 id="password_confirmation"
                 onChange={form.handleChange}
+                errorMessage={errors?.password_confirmation}
               />
 
-              {errors?.password_confirmation && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password_confirmation}
+              {message && (
+                <Alert className="mt-4" type="danger">
+                  {message}
                 </Alert>
               )}
-            </section>
 
-            {message && (
-              <Alert className="mt-4" type="danger">
-                {message}
-              </Alert>
-            )}
+              <Button
+                disabled={isFormBusy}
+                className="mt-4"
+                variant="block"
+                onClick={() => setIsTrunstileVisible(true)}
+              >
+                {t('register')}
+              </Button>
+            </div>
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t('register')}
-            </Button>
-          </form>
-
-          <div className="flex justify-center">
-            {isHosted() && <Link to="/login">{t('login')}</Link>}
+            <div className="flex justify-center">
+              {isHosted() && <Link to="/login">{t('login')}</Link>}
+            </div>
           </div>
+
+          {
+            <>
+              <SignInProviders />
+
+              <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+                <HostedLinks />
+              </div>
+            </>
+          }
         </div>
 
-        {
-          <>
-            <SignInProviders />
-
-            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-              <HostedLinks />
-            </div>
-          </>
-        }
+        <div className="flex justify-center">
+          <TurnstileWidget
+            visible={isTurnstileVisible}
+            onVerified={form.handleSubmit}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
