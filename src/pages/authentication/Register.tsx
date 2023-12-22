@@ -47,6 +47,7 @@ export function Register() {
     undefined
   );
 
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [isTurnstileVisible, setIsTrunstileVisible] = useState<boolean>(false);
 
   const [isFormBusy, setIsFormBusy] = useState(false);
@@ -95,9 +96,13 @@ export function Register() {
         }
       });
 
-      request('POST', endpoint.href, values)
+      request('POST', endpoint.href, {
+        ...values,
+        ['cf-turnstile']: turnstileToken,
+      })
         .then((response: AxiosResponse) => {
           turnstile.reset();
+          setIsTrunstileVisible(false);
 
           dispatch(
             register({
@@ -172,6 +177,14 @@ export function Register() {
                 </Alert>
               )}
 
+              {isTurnstileVisible && (
+                <div className="flex justify-center">
+                  <TurnstileWidget
+                    onVerified={(token) => setTurnstileToken(token)}
+                  />
+                </div>
+              )}
+
               <Button
                 disabled={isFormBusy}
                 className="mt-4"
@@ -197,12 +210,6 @@ export function Register() {
             </>
           }
         </div>
-
-        {isTurnstileVisible && (
-          <div className="flex justify-center">
-            <TurnstileWidget onVerified={form.handleSubmit} />
-          </div>
-        )}
       </div>
     </>
   );
