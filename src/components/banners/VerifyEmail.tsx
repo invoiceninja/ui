@@ -32,13 +32,12 @@ export function VerifyEmail() {
     toast.processing();
 
     if (user) {
-      request(
-        'POST',
-        endpoint('/api/v1/user/:id/reconfirm', {
-          id: user.id,
-          'cf-turnstile': token,
-        })
-      ).then((response) => toast.success(response.data.message));
+      request('POST', endpoint(`/api/v1/user/${user.id}/reconfirm`), {
+        'cf-turnstile': token,
+      }).then((response) => {
+        toast.success(response.data.message);
+        setIsModalVisible(false);
+      });
     }
   };
 
