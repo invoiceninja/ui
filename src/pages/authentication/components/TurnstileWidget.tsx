@@ -19,6 +19,10 @@ export function TurnstileWidget(props: Props) {
   const siteKey = import.meta.env.VITE_CLOUDFLARE_SITE_ID;
 
   return (
-    <Turnstile sitekey={siteKey} onVerify={(token) => onVerified(token)} />
+    <Turnstile
+      appearance="interaction-only"
+      sitekey={siteKey}
+      onVerify={(token) => onVerified(token)}
+    />
   );
 }
