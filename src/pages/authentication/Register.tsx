@@ -101,9 +101,6 @@ export function Register() {
         ['cf-turnstile']: turnstileToken,
       })
         .then((response: AxiosResponse) => {
-          turnstile.reset();
-          setIsTrunstileVisible(false);
-
           dispatch(
             register({
               token: response.data.data[0].token.token,
@@ -123,7 +120,12 @@ export function Register() {
             setMessage(error.response?.data.message as string);
             setIsFormBusy(false);
           }
-        );
+        )
+        .finally(() => {
+          turnstile.reset();
+          setIsTrunstileVisible(false);
+          setTurnstileToken('');
+        });
     },
   });
 
