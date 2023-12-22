@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -128,6 +128,12 @@ export function Register() {
   });
 
   const colors = useColorScheme();
+
+  useEffect(() => {
+    if (turnstileToken) {
+      form.handleSubmit();
+    }
+  }, [turnstileToken]);
 
   return (
     <>
