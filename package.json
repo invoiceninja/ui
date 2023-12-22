@@ -48,6 +48,7 @@
     "react-router-dom": "^6.4.4",
     "react-select": "^5.7.0",
     "react-string-replace": "^1.1.0",
+    "react-turnstile": "^1.1.2",
     "react-use": "^17.4.0",
     "react-verification-input": "^3.3.0",
     "recharts": "^2.1.16",
