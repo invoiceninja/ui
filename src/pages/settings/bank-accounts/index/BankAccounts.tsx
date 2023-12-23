@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Icon } from '$app/components/icons/Icon';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { ConnectAccountsModal } from '../common/components/ConnectAccountsModal';
+import { ConnectAccounts } from '../common/components/ConnectAccounts';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -72,7 +72,7 @@ export function BankAccounts() {
         withResourcefulActions
         rightSide={
           <div className="flex space-x-2">
-            <ConnectAccountsModal />
+            <ConnectAccounts />
 
             {isHosted() && enterprisePlan() && (
               <Button type="secondary" onClick={handleRefresh}>

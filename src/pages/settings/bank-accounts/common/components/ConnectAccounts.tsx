@@ -24,7 +24,7 @@ import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
-export function ConnectAccountsModal() {
+export function ConnectAccounts() {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
 
