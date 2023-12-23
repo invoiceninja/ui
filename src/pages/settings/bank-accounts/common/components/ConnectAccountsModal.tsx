@@ -111,6 +111,7 @@ export function ConnectAccountsModal() {
 
           {((isHosted() && enterprisePlan()) || isSelfHosted()) && (
             <div
+              data-cy="nordigenBox"
               className="flex cursor-pointer py-14 px-10 h-44 border-4"
               style={{
                 borderColor: account === 'nordigen' ? accentColor : colors.$5,
