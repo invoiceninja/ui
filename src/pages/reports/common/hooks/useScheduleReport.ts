@@ -14,7 +14,7 @@ import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Report } from '../useReports';
 
-export const DATE_RANGES_ALIASES = {
+const DATE_RANGES_ALIASES = {
   last7: 'last7_days',
   last30: 'last30_days',
 };

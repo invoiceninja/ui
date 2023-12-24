@@ -19,9 +19,8 @@ export async function login(
   password = 'password'
 ) {
   await page.waitForTimeout(500);
-  await page.goto('/#/login');
+  await page.goto('/login');
   await page.locator('input[name="email"]').fill(email);
-  // await page.locator('input[name="email"]').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
