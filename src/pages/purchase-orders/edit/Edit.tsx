@@ -128,9 +128,16 @@ export default function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {purchaseOrder && (
             <div className="flex space-x-20">
-              <span className="text-sm"
-                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-              >{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <PurchaseOrderStatus entity={purchaseOrder} />
             </div>
           )}
@@ -210,6 +217,7 @@ export default function Edit() {
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>
