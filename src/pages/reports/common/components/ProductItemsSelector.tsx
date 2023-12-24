@@ -102,6 +102,7 @@ export function ProductItemsSelector(props: Props) {
       {productItems || !value || !value?.length ? (
         <Element leftSide={t('products')}>
           <Select
+            id="productItemSelector"
             placeholder={t('products')}
             {...(value && {
               value: productItems?.filter((option) =>
