@@ -697,7 +697,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={totalPages ?? 2}
+          totalPages={totalPages ?? 1}
           totalRecords={totalRecords}
           leftSideChevrons={props.leftSideChevrons}
         />
