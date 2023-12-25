@@ -19,7 +19,7 @@ export function useResolveCurrency(params?: Params) {
   const { resolveBy } = params || {};
 
   if (resolveBy === 'code') {
-    return (code: string) => {
+    return (code: string | number) => {
       return currencies.find((currency) => currency.code === code);
     };
   }
