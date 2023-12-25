@@ -19,7 +19,7 @@ import { RootState } from './common/stores/store';
 import dayjs from 'dayjs';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
@@ -34,27 +34,8 @@ import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
-import { isNavigationModalVisibleAtom } from './common/hooks/usePreventNavigation';
+import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 
-interface PreventLeavingPage {
-  prevent: boolean;
-  actionKey?: 'switchCompany' | 'browserBack';
-}
-
-interface HistoryLocation {
-  lastLocation: string;
-  nonPreventedLocations: string[];
-}
-
-export const preventLeavingPageAtom = atom<PreventLeavingPage>({
-  prevent: false,
-  actionKey: undefined,
-});
-
-export const lastHistoryLocationAtom = atom<HistoryLocation>({
-  lastLocation: '',
-  nonPreventedLocations: [],
-});
 export function App() {
   const [t] = useTranslation();
   const { isOwner } = useAdmin();
@@ -67,6 +48,7 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+  useAddPreventNavigationEvents();
 
   const refetch = useRefetch();
   const hasPermission = useHasPermission();
@@ -79,14 +61,6 @@ export function App() {
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
-
-  const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
-  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
-    preventLeavingPageAtom
-  );
-  const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
-    lastHistoryLocationAtom
-  );
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
@@ -149,53 +123,6 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (
-        preventLeavingPage.prevent &&
-        preventLeavingPage.actionKey !== 'switchCompany'
-      ) {
-        event.preventDefault();
-
-        return true;
-      }
-    };
-
-    const isLastPushDifferent =
-      lastHistoryLocation.lastLocation !== window.location.href;
-
-    if (isLastPushDifferent && preventLeavingPage.prevent) {
-      setLastHistoryLocation((current) => ({
-        ...current,
-        lastLocation: window.location.href,
-      }));
-      history.pushState(null, document.title, window.location.href);
-    }
-
-    const handlePopState = () => {
-      if (preventLeavingPage.prevent) {
-        if (isLastPushDifferent) {
-          history.pushState(null, document.title, window.location.href);
-        }
-
-        setPreventLeavingPage(
-          (current) => current && { ...current, actionKey: 'browserBack' }
-        );
-
-        setIsNavigationModalVisible(true);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [preventLeavingPage]);
-
-  useEffect(() => {
     const companyName = company?.settings?.name;
 
     if (
@@ -222,15 +149,6 @@ export function App() {
     ) {
       navigate('/settings/company_details');
     }
-
-    !preventLeavingPage.prevent &&
-      setLastHistoryLocation((current) => ({
-        ...current,
-        nonPreventedLocations: [
-          ...current.nonPreventedLocations,
-          location.pathname,
-        ],
-      }));
   }, [location]);
 
   useEffect(() => {

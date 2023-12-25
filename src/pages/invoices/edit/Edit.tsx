@@ -45,7 +45,7 @@ import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { preventLeavingPageAtom } from '$app/App';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 export default function Edit() {
   const { t } = useTranslation();

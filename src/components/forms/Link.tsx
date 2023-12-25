@@ -15,7 +15,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
-import { preventLeavingPageAtom } from '$app/App';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 interface Props extends CommonProps {
   to: string;

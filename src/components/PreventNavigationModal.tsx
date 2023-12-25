@@ -17,8 +17,11 @@ import {
   blockedNavigationActionAtom,
   isNavigationModalVisibleAtom,
 } from '$app/common/hooks/usePreventNavigation';
-import { lastHistoryLocationAtom, preventLeavingPageAtom } from '$app/App';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  lastHistoryLocationAtom,
+  preventLeavingPageAtom,
+} from '$app/common/hooks/useAddPreventNavigationEvents';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();

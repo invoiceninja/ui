@@ -41,7 +41,7 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
-import { preventLeavingPageAtom } from '$app/App';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,

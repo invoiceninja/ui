@@ -8,9 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { lastHistoryLocationAtom, preventLeavingPageAtom } from '$app/App';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
+import {
+  lastHistoryLocationAtom,
+  preventLeavingPageAtom,
+} from './useAddPreventNavigationEvents';
 
 interface NavigationAction {
   url?: string;

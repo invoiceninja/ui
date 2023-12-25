@@ -16,8 +16,8 @@ import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { Tooltip } from '../Tooltip';
 import { useAtomValue } from 'jotai';
-import { preventLeavingPageAtom } from '$app/App';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 interface Props extends CommonProps {
   to?: string;
