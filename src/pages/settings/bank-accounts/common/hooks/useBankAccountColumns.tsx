@@ -15,13 +15,14 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 export const useBankAccountColumns = () => {
   const { t } = useTranslation();
-
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+  const resolveCurrency = useResolveCurrency({ resolveBy: 'code' });
 
   const columns: DataTableColumns<BankAccount> = [
     {
@@ -41,11 +42,11 @@ export const useBankAccountColumns = () => {
     {
       id: 'balance',
       label: t('balance'),
-      format: (value) =>
+      format: (value, bankAccount) =>
         formatMoney(
           value,
           company?.settings?.country_id,
-          company?.settings?.currency_id
+          resolveCurrency(bankAccount.currency)?.id
         ),
     },
   ];
