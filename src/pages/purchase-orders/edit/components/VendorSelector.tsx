@@ -78,7 +78,7 @@ export function VendorSelector(props: Props) {
               label={
                 contact.first_name.length >= 1
                   ? `${contact.first_name} ${contact.last_name}`
-                  : t('blank_contact')
+                  : contact.email || vendor.name
               }
               checked={isChecked(contact.id)}
               onValueChange={(value, checked) =>
@@ -86,7 +86,9 @@ export function VendorSelector(props: Props) {
               }
             />
 
-            <span className="text-sm text-gray-700">{contact.email}</span>
+            {contact.first_name && (
+              <span className="text-sm">{contact.email}</span>
+            )}
           </div>
         ))}
     </>
