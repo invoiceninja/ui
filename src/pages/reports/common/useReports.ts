@@ -20,6 +20,7 @@ export interface Payload {
   is_expense_billed?: boolean;
   include_tax?: boolean;
   status?: string;
+  product_key?: string;
 }
 
 export interface Report {

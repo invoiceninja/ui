@@ -55,6 +55,7 @@ export function SelectField(props: Props) {
           color: colors.$3,
           ...props.style,
         }}
+        data-cy={props.cypressRef}
       >
         {props.withBlank && (
           <option value={props.blankOptionValue ?? ''}></option>

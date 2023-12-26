@@ -28,6 +28,12 @@ export function useScheduleColumns() {
           )}`;
         }
 
+        if (schedule.template === Templates.EMAIL_REPORT) {
+          return `${t(schedule.template as string)}: ${t(
+            schedule.parameters.report_name
+          )} | ${t(schedule.parameters.date_range)}`;
+        }
+
         return `${t(schedule.template as string)}: ${t(
           schedule.parameters.date_range
         )}`;
