@@ -46,9 +46,9 @@ export function DropdownElement(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const { behavior, tooltipText, actionKey } = props;
+  const { actionKey } = props;
 
-  if (props.to && behavior !== 'tooltipButton') {
+  if (props.to) {
     return (
       <StyledLink
         theme={{
