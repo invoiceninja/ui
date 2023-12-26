@@ -23,24 +23,38 @@ function useInvoiceActions({ permissions }: Params) {
       visible: hasPermission('create_payment'),
     },
     {
-      label: 'Clone',
+      label: 'Clone to Invoice',
       visible: hasPermission('create_invoice'),
     },
     {
-      label: 'Clone to Quote',
-      visible: hasPermission('create_quote'),
-    },
-    {
-      label: 'Clone to Credit',
-      visible: hasPermission('create_credit'),
-    },
-    {
-      label: 'Clone to Recurring',
-      visible: hasPermission('create_recurring_invoice'),
-    },
-    {
-      label: 'Clone to PO',
-      visible: hasPermission('create_purchase_order'),
+      label: 'Clone to Other',
+      visible:
+        hasPermission('create_recurring_invoice') ||
+        hasPermission('create_quote') ||
+        hasPermission('create_credit') ||
+        hasPermission('create_purchase_order'),
+      modal: {
+        title: 'Clone To',
+        dataCyXButton: 'cloneOptionsModalXButton',
+        actions: [
+          {
+            label: 'Recurring Invoice',
+            visible: hasPermission('create_recurring_invoice'),
+          },
+          {
+            label: 'Quote',
+            visible: hasPermission('create_quote'),
+          },
+          {
+            label: 'Credit',
+            visible: hasPermission('create_credit'),
+          },
+          {
+            label: 'Purchase Order',
+            visible: hasPermission('create_purchase_order'),
+          },
+        ],
+      },
     },
   ];
 
@@ -641,7 +655,7 @@ test('cloning invoice', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone').first().click();
+  await page.getByText('Clone to Invoice').first().click();
 
   await page.waitForURL('**/invoices/create?action=clone');
 

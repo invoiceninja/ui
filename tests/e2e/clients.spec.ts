@@ -9,9 +9,21 @@ import {
 } from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
 
+interface ModalAction {
+  label: string;
+  visible: boolean;
+}
+
+interface Modal {
+  title: string;
+  actions: ModalAction[];
+  dataCyXButton: string;
+}
+
 export interface Action {
   label: string;
   visible: boolean;
+  modal?: Modal;
 }
 
 interface Params {
