@@ -25,6 +25,7 @@ interface Props {
   backgroundColor?: 'white' | 'gray';
   disableClosing?: boolean;
   overflowVisible?: boolean;
+  closeButtonCypressRef?: string;
 }
 
 export function Modal(props: Props) {
@@ -122,6 +123,7 @@ export function Modal(props: Props) {
                       className="cursor-pointer"
                       onClick={() => props.onClose(false)}
                       fontSize={22}
+                      data-cy={props.closeButtonCypressRef}
                     />
                   )}
                 </div>

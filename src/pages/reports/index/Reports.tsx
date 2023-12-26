@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -22,9 +22,6 @@ import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
-import Select, { MultiValue, StylesConfig } from 'react-select';
-import { SelectOption } from '$app/components/datatables/Actions';
 import {
   SortableColumns,
   reportColumn,
@@ -40,22 +37,57 @@ import {
   previewAtom,
 } from '../common/components/Preview';
 import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
+import { StatusSelector } from '../common/components/StatusSelector';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MdOutlinePreview, MdSchedule } from 'react-icons/md';
+import { useScheduleReport } from '../common/hooks/useScheduleReport';
 import { useColorScheme } from '$app/common/colors';
 interface Range {
   identifier: string;
   label: string;
+  scheduleIdentifier: string;
 }
 
-const ranges: Range[] = [
-  { identifier: 'all', label: 'all' },
-  { identifier: 'last7', label: 'last_7_days' },
-  { identifier: 'last30', label: 'last_30_days' },
-  { identifier: 'this_month', label: 'this_month' },
-  { identifier: 'last_month', label: 'last_month' },
-  { identifier: 'this_quarter', label: 'this_quarter' },
-  { identifier: 'last_quarter', label: 'last_quarter' },
-  { identifier: 'this_year', label: 'this_year' },
-  { identifier: 'custom', label: 'custom' },
+export const ranges: Range[] = [
+  { identifier: 'all', label: 'all', scheduleIdentifier: 'all' },
+  {
+    identifier: 'last7',
+    label: 'last_7_days',
+    scheduleIdentifier: 'last7_days',
+  },
+  {
+    identifier: 'last30',
+    label: 'last_30_days',
+    scheduleIdentifier: 'last30_days',
+  },
+  {
+    identifier: 'this_month',
+    label: 'this_month',
+    scheduleIdentifier: 'this_month',
+  },
+  {
+    identifier: 'last_month',
+    label: 'last_month',
+    scheduleIdentifier: 'last_month',
+  },
+  {
+    identifier: 'this_quarter',
+    label: 'this_quarter',
+    scheduleIdentifier: 'this_quarter',
+  },
+  {
+    identifier: 'last_quarter',
+    label: 'last_quarter',
+    scheduleIdentifier: 'last_quarter',
+  },
+  {
+    identifier: 'this_year',
+    label: 'this_year',
+    scheduleIdentifier: 'this_year',
+  },
+  { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
 const download = (data: BlobPart, identifier: string) => {
@@ -81,6 +113,7 @@ export default function Reports() {
 
   const reports = useReports();
   const queryClient = useQueryClient();
+  const scheduleReport = useScheduleReport();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -120,21 +153,6 @@ export default function Reports() {
         payload: { ...current.payload, date_range: range.identifier },
       }));
     }
-  };
-
-  const handleStatusChange = (
-    statuses: MultiValue<{ value: string; label: string }>
-  ) => {
-    const values: Array<string> = [];
-
-    (statuses as SelectOption[]).map(
-      (option: { value: string; label: string }) => values.push(option.value)
-    );
-
-    setReport((current) => ({
-      ...current,
-      payload: { ...current.payload, status: values.join(',') },
-    }));
   };
 
   const handleCustomDateChange = (
@@ -282,52 +300,6 @@ export default function Reports() {
     );
   };
 
-  const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles, { data }) => {
-      return {
-        ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
-        borderRadius: '3px',
-      };
-    },
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-    }),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    multiValueRemove: (styles) => ({
-      ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-    }),
-    control: (base) => ({
-      ...base,
-      borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-    }),
-    option: (base) => ({
-      ...base,
-      backgroundColor: colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-    }),
-  };
-
-  const filters = useInvoiceFilters();
-
   useEffect(() => {
     return () => {
       queryClient.cancelQueries(['reports']);
@@ -347,15 +319,35 @@ export default function Reports() {
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
       navigationTopRight={
-        report.supports_previews ? (
-          <Button type="secondary" onClick={handlePreview}>
-            {t('preview')}
-          </Button>
-        ) : null
+        <Dropdown label={t('more_actions')}>
+          {report.supports_previews && (
+            <DropdownElement
+              icon={<Icon element={MdOutlinePreview} />}
+              onClick={handlePreview}
+            >
+              {t('preview')}
+            </DropdownElement>
+          )}
+
+          <DropdownElement
+            icon={<Icon element={MdSchedule} />}
+            onClick={() => scheduleReport(report)}
+          >
+            {t('schedule')}
+          </DropdownElement>
+        </Dropdown>
       }
       withoutBackButton
     >
-      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$2, borderColor: colors.$4 }}>
+      <div
+        className="grid grid-cols-12 gap-4"
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
+      >
         <Card className="col-span-6 h-max">
           <Element leftSide={t('report')}>
             <SelectField
@@ -364,6 +356,7 @@ export default function Reports() {
                 setPreview(null);
               }}
               value={report.identifier}
+              cypressRef="reportNameSelector"
             >
               {reports.map((report, i) => (
                 <option value={report.identifier} key={i}>
@@ -375,7 +368,12 @@ export default function Reports() {
 
           <Element leftSide={t('send_email')}>
             <Toggle
-              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+              style={{
+                color: colors.$3,
+                colorScheme: colors.$0,
+                backgroundColor: colors.$1,
+                borderColor: colors.$4,
+              }}
               checked={report.payload.send_email}
               onValueChange={handleSendEmailChange}
             />
@@ -385,31 +383,49 @@ export default function Reports() {
             <>
               <Element leftSide={t('expense_paid_report')}>
                 <Toggle
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   checked={report.payload.is_expense_billed}
                   onValueChange={(value) =>
                     handlePayloadChange('is_expense_billed', value)
                   }
+                  cypressRef="expenseBilled"
                 />
               </Element>
 
               <Element leftSide={t('cash_vs_accrual')}>
                 <Toggle
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   checked={report.payload.is_income_billed}
                   onValueChange={(value) =>
                     handlePayloadChange('is_income_billed', value)
                   }
+                  cypressRef="incomeBilled"
                 />
               </Element>
 
               <Element leftSide={t('include_tax')}>
                 <Toggle
-                  style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
                   checked={report.payload.include_tax}
                   onValueChange={(value) =>
                     handlePayloadChange('include_tax', value)
                   }
+                  cypressRef="includeTax"
                 />
               </Element>
             </>
@@ -417,29 +433,35 @@ export default function Reports() {
 
           {report.identifier === 'invoice' && (
             <Element leftSide={t('status')} className={'mb-50 py-50'}>
-              <Select
-                styles={customStyles}
-                defaultValue={null}
-                onChange={(options) => handleStatusChange(options)}
-                placeholder={t('status')}
-                options={filters}
-                isMulti={true}
+              <StatusSelector
+                onValueChange={(statuses) =>
+                  handlePayloadChange('status', statuses)
+                }
               />
             </Element>
           )}
 
           {(report.identifier === 'product_sales' ||
             report.identifier === 'invoice_item') && (
-            <ProductItemsSelector setReport={setReport} />
+            <ProductItemsSelector
+              onValueChange={(productsKeys) =>
+                handlePayloadChange('product_key', productsKeys)
+              }
+            />
           )}
         </Card>
 
         <Card className="col-span-6 h-max">
           <Element leftSide={t('range')}>
             <SelectField
-              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1 }}
+              style={{
+                color: colors.$3,
+                colorScheme: colors.$0,
+                backgroundColor: colors.$1,
+              }}
               onValueChange={(value) => handleRangeChange(value)}
               value={report.payload.date_range}
+              cypressRef="reportDateRange"
             >
               {ranges.map((range, i) => (
                 <option value={range.identifier} key={i}>
@@ -458,6 +480,7 @@ export default function Reports() {
                   handleCustomDateChange('start_date', value)
                 }
                 errorMessage={errors?.errors?.start_date}
+                cypressRef="reportStartDate"
               />
             </Element>
           )}
@@ -465,13 +488,19 @@ export default function Reports() {
           {report.payload.date_range === 'custom' && (
             <Element leftSide={t('end_date')}>
               <InputField
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
                 type="date"
                 value={report.payload.end_date}
                 onValueChange={(value) =>
                   handleCustomDateChange('end_date', value)
                 }
                 errorMessage={errors?.errors?.end_date}
+                cypressRef="reportEndDate"
               />
             </Element>
           )}
@@ -493,7 +522,12 @@ export default function Reports() {
           {report.allow_custom_column && (
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
                 checked={showCustomColumns}
                 onValueChange={(value) => setShowCustomColumns(Boolean(value))}
               />

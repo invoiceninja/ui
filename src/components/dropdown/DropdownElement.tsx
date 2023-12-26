@@ -10,11 +10,10 @@
 
 import classNames from 'classnames';
 import { ReactElement } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
-import { Tooltip } from '../Tooltip';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
@@ -23,8 +22,6 @@ interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
-  behavior?: 'tooltipButton';
-  tooltipText?: string | null;
   actionKey?: 'switchCompany';
 }
 
@@ -43,7 +40,6 @@ const StyledLink = styled(Link)`
 `;
 
 export function DropdownElement(props: Props) {
-  const navigate = useNavigate();
   const colors = useColorScheme();
 
   const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
@@ -83,27 +79,6 @@ export function DropdownElement(props: Props) {
           {props.children}
         </div>
       </StyledLink>
-    );
-  }
-
-  if (behavior === 'tooltipButton') {
-    return (
-      <Tooltip
-        width="auto"
-        placement="bottom"
-        message={tooltipText as string}
-        withoutArrow
-      >
-        <div
-          onClick={() =>
-            preventNavigation({
-              fn: () => (props.to ? navigate(props.to) : props.onClick?.()),
-            })
-          }
-        >
-          {props.icon}
-        </div>
-      </Tooltip>
     );
   }
 

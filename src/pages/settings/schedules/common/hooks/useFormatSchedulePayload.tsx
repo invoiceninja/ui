@@ -9,57 +9,63 @@
  */
 
 import { Parameters, Schedule } from '$app/common/interfaces/schedule';
-import { Templates } from '$app/pages/settings/schedules/common/components/ScheduleForm';
+import { useTemplateParametersProperties } from './useTemplateParametersProperties';
+
+interface Params {
+  schedule: Schedule | undefined;
+}
 
 const TemplateProperties = {
-  EMAIL_STATEMENT: [
+  email_statement: [
     'template',
     'next_run',
     'frequency_id',
     'remaining_cycles',
     'parameters',
   ],
-  EMAIL_RECORD: ['template', 'next_run', 'parameters'],
-};
-
-const TemplateParametersProperties = {
-  EMAIL_STATEMENT: [
-    'date_range',
-    'status',
-    'show_aging_table',
-    'show_credits_table',
-    'show_payments_table',
-    'only_clients_with_invoices',
-    'clients',
+  email_record: ['template', 'next_run', 'parameters'],
+  email_report: [
+    'template',
+    'next_run',
+    'frequency_id',
+    'remaining_cycles',
+    'parameters',
   ],
-  EMAIL_RECORD: ['entity', 'entity_id'],
 };
 
-export function useFormatSchedulePayload() {
-  return (schedule: Schedule) => {
-    let formattedSchedule = {};
+export function useFormatSchedulePayload(params: Params) {
+  const { schedule } = params;
 
-    let scheduleMainProperties = TemplateProperties.EMAIL_STATEMENT;
-    let scheduleParametersProperties =
-      TemplateParametersProperties.EMAIL_STATEMENT;
+  const templateParametersProperties = useTemplateParametersProperties({
+    schedule,
+  });
 
-    if (schedule?.template === Templates.EMAIL_RECORD) {
-      scheduleMainProperties = TemplateProperties.EMAIL_RECORD;
-      scheduleParametersProperties = TemplateParametersProperties.EMAIL_RECORD;
+  return () => {
+    if (schedule) {
+      let formattedSchedule = {};
+
+      const scheduleMainProperties =
+        TemplateProperties[
+          schedule.template as keyof typeof TemplateProperties
+        ];
+      const scheduleParametersProperties =
+        templateParametersProperties[
+          schedule.template as keyof typeof templateParametersProperties
+        ];
+
+      Object.entries(schedule.parameters).forEach(([property]) => {
+        if (!scheduleParametersProperties.includes(property)) {
+          delete schedule.parameters[property as keyof Parameters];
+        }
+      });
+
+      Object.entries(schedule).forEach(([property, value]) => {
+        if (scheduleMainProperties.includes(property)) {
+          formattedSchedule = { ...formattedSchedule, [property]: value };
+        }
+      });
+
+      return formattedSchedule;
     }
-
-    Object.entries(schedule.parameters).forEach(([property]) => {
-      if (!scheduleParametersProperties.includes(property)) {
-        delete schedule.parameters[property as keyof Parameters];
-      }
-    });
-
-    Object.entries(schedule).forEach(([property, value]) => {
-      if (scheduleMainProperties.includes(property)) {
-        formattedSchedule = { ...formattedSchedule, [property]: value };
-      }
-    });
-
-    return formattedSchedule;
   };
 }

@@ -25,12 +25,15 @@ import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { AxiosError } from 'axios';
 import { useAtom } from 'jotai';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
-import { useHandleChange } from '../common/hooks/useHandleChange';
+import {
+  DEFAULT_SCHEDULE_PARAMETERS,
+  useHandleChange,
+} from '../common/hooks/useHandleChange';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
@@ -59,7 +62,7 @@ export function Create() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayload = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload({ schedule });
 
   useEffect(() => {
     if (blankSchedule) {
@@ -76,33 +79,23 @@ export function Create() {
           template: searchParams.get('template') || 'email_statement',
           frequency_id: Frequency.Monthly,
           remaining_cycles: -1,
-          parameters: currentParameters || {
-            clients: [],
-            date_range: 'last7_days',
-            show_aging_table: false,
-            show_credits_table: false,
-            show_payments_table: false,
-            only_clients_with_invoices: false,
-            status: 'all',
-            entity: 'invoice',
-            entity_id: '',
-          },
+          parameters: currentParameters || { ...DEFAULT_SCHEDULE_PARAMETERS },
         };
       });
     }
   }, [blankSchedule]);
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
-
-      request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
+      request(
+        'POST',
+        endpoint('/api/v1/task_schedulers'),
+        formatSchedulePayload()
+      )
         .then((response: GenericSingleResourceResponse<Schedule>) => {
           toast.success('created_schedule');
 
