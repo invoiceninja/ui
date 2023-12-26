@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { endpoint, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Modal } from '$app/components/Modal';
@@ -18,7 +18,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdLink } from 'react-icons/md';
 import yodleeLogo from '/dap-logos/yodlee.svg';
-import nordigenLogo from '/dap-logos/nordigen.png';
+import goCardlessLogo from '/dap-logos/goCardless.png';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
@@ -86,7 +86,12 @@ export function ConnectAccounts() {
 
   return (
     <>
-      <Button type="secondary" onClick={() => setIsModalVisible(true)}>
+      <Button
+        type="secondary"
+        onClick={() =>
+          isSelfHosted() ? handleConnectNordigen() : setIsModalVisible(true)
+        }
+      >
         <span className="mr-2">{<Icon element={MdLink} size={20} />}</span>
         {t('connect_accounts')}
       </Button>
@@ -97,7 +102,7 @@ export function ConnectAccounts() {
         onClose={handleClose}
       >
         <div ref={divRef} className="flex flex-col space-y-6">
-          {isHosted() && enterprisePlan() && (
+          {enterprisePlan() && (
             <div
               className="flex cursor-pointer h-44 border-4"
               style={{
@@ -109,16 +114,16 @@ export function ConnectAccounts() {
             </div>
           )}
 
-          {((isHosted() && enterprisePlan()) || isSelfHosted()) && (
+          {enterprisePlan() && (
             <div
               data-cy="nordigenBox"
-              className="flex cursor-pointer py-14 px-10 h-44 border-4"
+              className="flex cursor-pointer py-14 px-12 h-44 border-4"
               style={{
                 borderColor: account === 'nordigen' ? accentColor : colors.$5,
               }}
               onClick={() => setAccount('nordigen')}
             >
-              <img className="flex-1" src={nordigenLogo} />
+              <img className="flex-1" src={goCardlessLogo} />
             </div>
           )}
 
