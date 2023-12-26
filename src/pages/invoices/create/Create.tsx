@@ -210,10 +210,13 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
 
     if (invoice && initialInvoiceValue) {
-      setPreventLeavingPage({
-        prevent: !isEqual(invoice, initialInvoiceValue),
-        actionKey: undefined,
-      });
+      setPreventLeavingPage(
+        (current) =>
+          current && {
+            ...current,
+            prevent: !isEqual(invoice, initialInvoiceValue),
+          }
+      );
     }
   }, [invoice]);
 

@@ -33,6 +33,7 @@ export function QuickCreatePopover() {
       {() => (
         <>
           <Popover.Button
+            data-cy="quickPopoverButton"
             style={{ backgroundColor: colors.$1, color: colors.$3 }}
             className={classNames(
               'group inline-flex items-center rounded text-base font-medium  focus:outline-none focus:ring-1 focus:ring-gray-200 focus:ring-offset-2'
