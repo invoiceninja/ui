@@ -111,6 +111,7 @@ export function MergeClientModal(props: Props) {
         onClearButtonClick={() => setMergeIntoClientId('')}
         withoutAction
         exclude={[props.mergeFromClientId]}
+        customSearchableValue={(client) => client.contacts[0].email}
       />
 
       <div className="self-end pt-2">

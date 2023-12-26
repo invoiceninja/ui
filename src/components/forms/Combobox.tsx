@@ -737,6 +737,7 @@ interface EntryOptions<T = any> {
   searchable?: string;
   dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
+  customSearchableValue?: (resource: T) => string;
 }
 
 export interface ComboboxAsyncProps<T> {
@@ -817,7 +818,9 @@ export function ComboboxAsync<T = any>({
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
-              searchable: entry[entryOptions.searchable || entryOptions.id],
+              searchable:
+                entryOptions.customSearchableValue?.(entry) ||
+                entry[entryOptions.searchable || entryOptions.id],
             })
           );
 

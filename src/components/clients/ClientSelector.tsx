@@ -26,6 +26,7 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
+  customSearchableValue?: (client: Client) => string;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -33,6 +34,8 @@ export function ClientSelector(props: ClientSelectorProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasPermission = useHasPermission();
+
+  const { customSearchableValue } = props;
 
   return (
     <>
@@ -52,7 +55,12 @@ export function ClientSelector(props: ClientSelectorProps) {
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
         initiallyVisible={props.initiallyVisible}
-        entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
+        entryOptions={{
+          id: 'id',
+          label: 'display_name',
+          value: 'id',
+          customSearchableValue,
+        }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}
         sortBy={null}
