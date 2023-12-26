@@ -10,18 +10,15 @@
 
 import classNames from 'classnames';
 import { ReactElement } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
-import { Tooltip } from '../Tooltip';
 
 interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
-  behavior?: 'tooltipButton';
-  tooltipText?: string | null;
 }
 
 const Button = styled.button`
@@ -39,12 +36,9 @@ const StyledLink = styled(Link)`
 `;
 
 export function DropdownElement(props: Props) {
-  const navigate = useNavigate();
   const colors = useColorScheme();
 
-  const { behavior, tooltipText } = props;
-
-  if (props.to && behavior !== 'tooltipButton') {
+  if (props.to) {
     return (
       <StyledLink
         theme={{
@@ -68,26 +62,6 @@ export function DropdownElement(props: Props) {
           {props.children}
         </div>
       </StyledLink>
-    );
-  }
-
-  if (behavior === 'tooltipButton') {
-    return (
-      <Tooltip
-        width="auto"
-        placement="bottom"
-        message={tooltipText as string}
-        withoutArrow
-      >
-        <div
-          onClick={() => {
-            props.to && navigate(props.to);
-            !props.to && props.onClick?.(event);
-          }}
-        >
-          {props.icon}
-        </div>
-      </Tooltip>
     );
   }
 

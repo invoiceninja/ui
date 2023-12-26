@@ -18,6 +18,15 @@ export interface Parameters {
   clients: string[];
   entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
   entity_id: string;
+  report_name: string;
+  start_date: string;
+  end_date: string;
+  product_key: string;
+  send_email: boolean;
+  is_expense_billed: boolean;
+  is_income_billed: boolean;
+  include_tax: boolean;
+  client_id: string;
 }
 
 export interface Schedule {

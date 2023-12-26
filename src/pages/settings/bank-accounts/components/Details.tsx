@@ -13,6 +13,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 interface Props {
   accountDetails?: BankAccount;
@@ -24,6 +25,7 @@ export function Details(props: Props) {
     bank_account_type: bankAccountType,
     provider_name: providerName,
     bank_account_status: bankAccountStatus,
+    currency = '',
   } = props?.accountDetails || {};
 
   const [t] = useTranslation();
@@ -31,6 +33,7 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+  const resolveCurrency = useResolveCurrency({ resolveBy: 'code' });
 
   return (
     <Card title={t('details')}>
@@ -38,7 +41,7 @@ export function Details(props: Props) {
         {formatMoney(
           balance || 0,
           company.settings.country_id,
-          company.settings.currency_id
+          resolveCurrency(currency)?.id
         )}
       </Element>
       <Element leftSide={t('type')}>{bankAccountType}</Element>
