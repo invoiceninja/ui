@@ -33,20 +33,39 @@ function useQuotesActions({ permissions }: Params) {
       visible: hasPermission('create_project'),
     },
     {
-      label: 'Clone',
+      label: 'Clone to Quote',
       visible: hasPermission('create_quote'),
     },
+
     {
-      label: 'Clone to Invoice',
-      visible: hasPermission('create_invoice'),
-    },
-    {
-      label: 'Clone to Recurring Invoice',
-      visible: hasPermission('create_recurring_invoice'),
-    },
-    {
-      label: 'Clone to PO',
-      visible: hasPermission('create_purchase_order'),
+      label: 'Clone to Other',
+      visible:
+        hasPermission('create_invoice') ||
+        hasPermission('create_credit') ||
+        hasPermission('create_recurring_invoice') ||
+        hasPermission('create_purchase_order'),
+      modal: {
+        title: 'Clone To',
+        dataCyXButton: 'cloneOptionsModalXButton',
+        actions: [
+          {
+            label: 'Invoice',
+            visible: hasPermission('create_invoice'),
+          },
+          {
+            label: 'Credit',
+            visible: hasPermission('create_credit'),
+          },
+          {
+            label: 'Recurring Invoice',
+            visible: hasPermission('create_recurring_invoice'),
+          },
+          {
+            label: 'Purchase Order',
+            visible: hasPermission('create_purchase_order'),
+          },
+        ],
+      },
     },
   ];
 
@@ -660,7 +679,7 @@ test('cloning quote', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone').first().click();
+  await page.getByText('Clone to Quote').first().click();
 
   await page.waitForURL('**/quotes/create?action=clone');
 
