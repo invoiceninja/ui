@@ -219,15 +219,24 @@ test('Product sales report test', async ({ page }) => {
     .locator('[data-cy="reportNameSelector"]')
     .selectOption({ label: 'Product Sales' });
 
-  await page.locator('[id="productItemSelector"]').click();
+  await page
+    .locator('[class=" css-1xc3v61-indicatorContainer"]')
+    .last()
+    .click();
 
-  await page.getByText('Nam.', { exact: true }).click();
+  await page.getByText('test create product', { exact: true }).first().click();
 
-  await page.waitForTimeout(200);
+  await page.getByText('Products', { exact: true }).last().click();
 
-  await page.locator('[id="productItemSelector"]').click();
+  await page
+    .locator('[class=" css-1xc3v61-indicatorContainer"]')
+    .last()
+    .click();
 
-  await page.getByText('Quod.', { exact: true }).first().click();
+  await page
+    .getByText('test dropdown product', { exact: true })
+    .first()
+    .click();
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
@@ -272,7 +281,7 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'Nam.Quod.'
+    'test create producttest dropdown product'
   );
 
   await page
@@ -296,7 +305,7 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'Nam.Quod.'
+    'test create producttest dropdown product'
   );
   await expect(
     page.locator('[data-testid="combobox-input-field"]')
