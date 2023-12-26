@@ -56,8 +56,6 @@ export function PreventNavigationModal() {
       setPreventLeavingPage({ prevent: false, actionKey: undefined });
     }
 
-    setIsNavigationModalVisible(false);
-
     const numberOfNonPreventedLocations = nonPreventedLocations.length;
 
     let lastNonPreventedLocation =
@@ -87,6 +85,8 @@ export function PreventNavigationModal() {
 
       fn?.();
     }
+
+    setIsNavigationModalVisible(false);
   };
 
   const handleContinueEditing = () => {

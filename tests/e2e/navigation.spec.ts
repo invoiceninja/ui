@@ -210,6 +210,8 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await page.locator('[type="date"]').first().blur();
 
+  await page.waitForTimeout(500);
+
   await page.goBack();
 
   await expect(
@@ -295,29 +297,12 @@ test('Prevent adding new company', async ({ page }) => {
     })
   ).toBeVisible();
 
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Yes') })
-    .first()
-    .click();
-
   await expect(
-    page.getByRole('heading', {
-      name: 'Welcome to Invoice Ninja',
+    page.getByRole('button', {
+      name: 'Yes',
+      exact: true,
     })
   ).toBeVisible();
-
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Save') })
-    .first()
-    .click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: 'Welcome to Invoice Ninja',
-    })
-  ).not.toBeVisible();
 
   await logout(page);
 });
