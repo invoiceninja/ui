@@ -10,6 +10,7 @@ import {
 import test, { expect, Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import dayjs from 'dayjs';
 
 interface Params {
   permissions: Permission[];
@@ -746,6 +747,192 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
     'bulkActionsDropdown',
     'dataTable'
   );
+
+  await logout(page);
+});
+
+test('Prevent navigation in the main navbar', async ({ page }) => {
+  await login(page);
+
+  await createInvoice({ page });
+
+  await page.waitForURL('**/invoices/**/edit**');
+
+  await page
+    .locator('[type="date"]')
+    .first()
+    .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').first().blur();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Projects', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Continue Editing', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).not.toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Projects', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Discard Changes', exact: true })
+    .click();
+
+  await page.waitForURL('**/projects');
+
+  await logout(page);
+});
+
+test('Prevent archive invoice action', async ({ page }) => {
+  await login(page);
+
+  await createInvoice({ page });
+
+  await page.waitForURL('**/invoices/**/edit**');
+
+  await page
+    .locator('[type="date"]')
+    .first()
+    .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').first().blur();
+
+  await page.locator('[data-cy="chevronDownButton"]').click();
+
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Continue Editing', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).not.toBeVisible();
+
+  await page.locator('[data-cy="chevronDownButton"]').click();
+
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Discard Changes', exact: true })
+    .click();
+
+  await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+
+  await logout(page);
+});
+
+test('Prevent email invoice action', async ({ page }) => {
+  await login(page);
+
+  await createInvoice({ page });
+
+  await page.waitForURL('**/invoices/**/edit**');
+
+  await page
+    .locator('[type="date"]')
+    .first()
+    .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').first().blur();
+
+  await page.locator('[data-cy="chevronDownButton"]').click();
+
+  await page.getByRole('link', { name: 'Email Invoice', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Continue Editing', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).not.toBeVisible();
+
+  await page.locator('[data-cy="chevronDownButton"]').click();
+
+  await page.getByRole('link', { name: 'Email Invoice', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Discard Changes', exact: true })
+    .click();
+
+  await page.waitForURL('**/invoices/**/email');
+
+  await logout(page);
+});
+
+test('Prevent back button', async ({ page }) => {
+  await login(page);
+
+  await createInvoice({ page });
+
+  await page.waitForURL('**/invoices/**/edit**');
+
+  await page
+    .locator('[type="date"]')
+    .first()
+    .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').first().blur();
+
+  await page.getByRole('button', { name: 'Back', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Continue Editing', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).not.toBeVisible();
+
+  await page.getByRole('button', { name: 'Back', exact: true }).click();
+
+  await expect(
+    page.getByText('Please save or cancel your changes')
+  ).toBeVisible();
+
+  await page
+    .getByRole('button', { name: 'Discard Changes', exact: true })
+    .click();
+
+  await page.waitForURL('**/invoices/create');
 
   await logout(page);
 });
