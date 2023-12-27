@@ -119,7 +119,6 @@ interface Props<T> extends CommonProps {
     action: 'archive' | 'restore' | 'delete'
   ) => void;
   hideEditableOptions?: boolean;
-  excludeResource?: (resource: T) => boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -147,7 +146,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     onBulkActionCall,
     hideEditableOptions = false,
-    excludeResource,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -167,8 +165,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
-  const [totalRecords, setTotalRecords] = useState<number>();
-  const [totalPages, setTotalPages] = useState<number>();
 
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
@@ -334,20 +330,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
-
-  useEffect(() => {
-    if (data) {
-      const numberOfExcludedResources = data.data.data.filter((resource: T) =>
-        excludeResource?.(resource)
-      ).length;
-
-      const numberOfTotalRecords =
-        data.data.meta.pagination.total - numberOfExcludedResources;
-
-      setTotalRecords(numberOfTotalRecords);
-      setTotalPages(Math.ceil(numberOfTotalRecords / Number(perPage)));
-    }
-  }, [data, perPage]);
 
   return (
     <div data-cy="dataTable">
@@ -548,146 +530,140 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {data &&
-            data?.data?.data?.map(
-              (resource: any, index: number) =>
-                !excludeResource?.(resource) && (
-                  <Tr
-                    key={index}
-                    className={classNames({
-                      'border-b border-gray-200': styleOptions?.addRowSeparator,
-                      'last:border-b-0': hasVerticalOverflow,
-                    })}
+            data?.data?.data?.map((resource: any, index: number) => (
+              <Tr
+                key={index}
+                className={classNames({
+                  'border-b border-gray-200': styleOptions?.addRowSeparator,
+                  'last:border-b-0': hasVerticalOverflow,
+                })}
+              >
+                {!props.withoutActions && !hideEditableOptions && (
+                  <Td
+                    className="cursor-pointer"
+                    onClick={() =>
+                      selected.includes(resource.id)
+                        ? setSelected((current) =>
+                            current.filter((v) => v !== resource.id)
+                          )
+                        : setSelected((current) => [...current, resource.id])
+                    }
                   >
-                    {!props.withoutActions && !hideEditableOptions && (
-                      <Td
-                        className="cursor-pointer"
-                        onClick={() =>
-                          selected.includes(resource.id)
-                            ? setSelected((current) =>
-                                current.filter((v) => v !== resource.id)
-                              )
-                            : setSelected((current) => [
-                                ...current,
-                                resource.id,
-                              ])
-                        }
-                      >
-                        <Checkbox
-                          checked={selected.includes(resource.id)}
-                          className="child-checkbox"
-                          value={resource.id}
-                          id={resource.id}
-                          cypressRef="dataTableCheckbox"
-                        />
-                      </Td>
-                    )}
+                    <Checkbox
+                      checked={selected.includes(resource.id)}
+                      className="child-checkbox"
+                      value={resource.id}
+                      id={resource.id}
+                      cypressRef="dataTableCheckbox"
+                    />
+                  </Td>
+                )}
 
-                    {props.columns.map((column, index) => (
-                      <Td
-                        key={index}
-                        className={classNames(
-                          {
-                            'cursor-pointer': index < 3,
-                            'py-4': hideEditableOptions,
-                          },
-                          styleOptions?.tdClassName
+                {props.columns.map((column, index) => (
+                  <Td
+                    key={index}
+                    className={classNames(
+                      {
+                        'cursor-pointer': index < 3,
+                        'py-4': hideEditableOptions,
+                      },
+                      styleOptions?.tdClassName
+                    )}
+                    onClick={() => {
+                      if (index < 3) {
+                        props.onTableRowClick
+                          ? props.onTableRowClick(resource)
+                          : document.getElementById(resource.id)?.click();
+                      }
+                    }}
+                  >
+                    {column.format
+                      ? column.format(resource[column.id], resource)
+                      : resource[column.id]}
+                  </Td>
+                ))}
+
+                {props.withResourcefulActions && !hideEditableOptions && (
+                  <Td>
+                    <Dropdown label={t('more_actions')}>
+                      {props.linkToEdit &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <DropdownElement
+                            to={route(props.linkToEdit, {
+                              id: resource?.id,
+                            })}
+                            icon={<Icon element={MdEdit} />}
+                          >
+                            {t('edit')}
+                          </DropdownElement>
                         )}
-                        onClick={() => {
-                          if (index < 3) {
-                            props.onTableRowClick
-                              ? props.onTableRowClick(resource)
-                              : document.getElementById(resource.id)?.click();
-                          }
-                        }}
-                      >
-                        {column.format
-                          ? column.format(resource[column.id], resource)
-                          : resource[column.id]}
-                      </Td>
-                    ))}
 
-                    {props.withResourcefulActions && !hideEditableOptions && (
-                      <Td>
-                        <Dropdown label={t('more_actions')}>
-                          {props.linkToEdit &&
-                            (props.showEdit?.(resource) || !props.showEdit) && (
-                              <DropdownElement
-                                to={route(props.linkToEdit, {
-                                  id: resource?.id,
-                                })}
-                                icon={<Icon element={MdEdit} />}
-                              >
-                                {t('edit')}
-                              </DropdownElement>
-                            )}
+                      {props.linkToEdit &&
+                        props.customActions &&
+                        showCustomActionDivider(resource) &&
+                        (props.showEdit?.(resource) || !props.showEdit) && (
+                          <Divider withoutPadding />
+                        )}
 
-                          {props.linkToEdit &&
-                            props.customActions &&
-                            showCustomActionDivider(resource) &&
-                            (props.showEdit?.(resource) || !props.showEdit) && (
-                              <Divider withoutPadding />
-                            )}
+                      {props.customActions &&
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            action(resource)?.key !== 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
+                        )}
 
-                          {props.customActions &&
-                            props.customActions.map(
-                              (
-                                action: ResourceAction<typeof resource>,
-                                index: number
-                              ) =>
-                                action(resource)?.key !== 'purge' && (
-                                  <div key={index}>{action(resource)}</div>
-                                )
-                            )}
+                      {props.customActions &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && <Divider withoutPadding />}
 
-                          {props.customActions &&
-                            (props.showRestore?.(resource) ||
-                              !props.showRestore) && <Divider withoutPadding />}
+                      {resource?.archived_at === 0 && (
+                        <DropdownElement
+                          onClick={() => bulk('archive', resource.id)}
+                          icon={<Icon element={MdArchive} />}
+                        >
+                          {t('archive')}
+                        </DropdownElement>
+                      )}
 
-                          {resource?.archived_at === 0 && (
-                            <DropdownElement
-                              onClick={() => bulk('archive', resource.id)}
-                              icon={<Icon element={MdArchive} />}
-                            >
-                              {t('archive')}
-                            </DropdownElement>
-                          )}
+                      {resource?.archived_at > 0 &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && (
+                          <DropdownElement
+                            onClick={() => bulk('restore', resource.id)}
+                            icon={<Icon element={MdRestore} />}
+                          >
+                            {t('restore')}
+                          </DropdownElement>
+                        )}
 
-                          {resource?.archived_at > 0 &&
-                            (props.showRestore?.(resource) ||
-                              !props.showRestore) && (
-                              <DropdownElement
-                                onClick={() => bulk('restore', resource.id)}
-                                icon={<Icon element={MdRestore} />}
-                              >
-                                {t('restore')}
-                              </DropdownElement>
-                            )}
+                      {!resource?.is_deleted && (
+                        <DropdownElement
+                          onClick={() => bulk('delete', resource.id)}
+                          icon={<Icon element={MdDelete} />}
+                        >
+                          {t('delete')}
+                        </DropdownElement>
+                      )}
 
-                          {!resource?.is_deleted && (
-                            <DropdownElement
-                              onClick={() => bulk('delete', resource.id)}
-                              icon={<Icon element={MdDelete} />}
-                            >
-                              {t('delete')}
-                            </DropdownElement>
-                          )}
-
-                          {props.customActions &&
-                            props.customActions.map(
-                              (
-                                action: ResourceAction<typeof resource>,
-                                index: number
-                              ) =>
-                                action(resource)?.key === 'purge' && (
-                                  <div key={index}>{action(resource)}</div>
-                                )
-                            )}
-                        </Dropdown>
-                      </Td>
-                    )}
-                  </Tr>
-                )
-            )}
+                      {props.customActions &&
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            action(resource)?.key === 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
+                        )}
+                    </Dropdown>
+                  </Td>
+                )}
+              </Tr>
+            ))}
         </Tbody>
       </Table>
 
@@ -697,8 +673,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={totalPages ?? 1}
-          totalRecords={totalRecords}
+          totalPages={data.data.meta.pagination.total_pages}
+          totalRecords={data.data.meta.pagination.total}
           leftSideChevrons={props.leftSideChevrons}
         />
       )}
