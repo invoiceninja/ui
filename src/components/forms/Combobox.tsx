@@ -62,7 +62,7 @@ export interface ComboboxStaticProps<T = any> {
   onDismiss?: () => unknown;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
-  isDataLoading: boolean;
+  isDataLoading?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -656,7 +656,7 @@ export function ComboboxStatic<T = any>({
               </ActionButtonStyled>
             )}
 
-            {isDataLoading && (
+            {Boolean(isDataLoading) && (
               <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
                 <Spinner />
               </div>
