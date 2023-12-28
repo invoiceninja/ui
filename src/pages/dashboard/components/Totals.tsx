@@ -92,9 +92,10 @@ export function Totals() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
   const chartScale =
-    settings.preferences.dashboard_charts.default_view || 'month';
-  const currency = settings.preferences.dashboard_charts.currency || 1;
-  const dateRange = settings.preferences.dashboard_charts.range || 'this_month';
+    settings.preferences.dashboard_charts?.default_view || 'month';
+  const currency = settings.preferences.dashboard_charts?.currency || 1;
+  const dateRange =
+    settings.preferences.dashboard_charts?.range || 'this_month';
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -118,7 +119,7 @@ export function Totals() {
       ...current,
       date_range: dateRange,
     }));
-  }, [settings.preferences.dashboard_charts.range]);
+  }, [settings.preferences.dashboard_charts?.range]);
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
