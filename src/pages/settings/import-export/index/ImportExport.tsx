@@ -10,9 +10,10 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../components/cards';
-import { InputField, SelectField } from '../../../components/forms';
-import { Settings } from '../../../components/layouts/Settings';
+import { Card, Element } from '../../../../components/cards';
+import { InputField, SelectField } from '../../../../components/forms';
+import { Settings } from '../../../../components/layouts/Settings';
+import { Export } from '../common/components/Export';
 
 export function ImportExport() {
   useTitle('import_export');
@@ -56,9 +57,7 @@ export function ImportExport() {
         </Element>
       </Card>
 
-      <Card withSaveButton saveButtonLabel={t('export')} title={t('export')}>
-        <Element>{t('export')}</Element>
-      </Card>
+      <Export />
     </Settings>
   );
 }
