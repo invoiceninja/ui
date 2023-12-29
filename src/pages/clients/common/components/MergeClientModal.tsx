@@ -121,6 +121,7 @@ export function MergeClientModal(props: Props) {
             )}
           </div>
         )}
+        initiallyVisible
       />
 
       <div className="self-end pt-2">
