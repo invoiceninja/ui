@@ -553,7 +553,10 @@ export function ComboboxStatic<T = any>({
   }, [initiallyVisible]);
 
   useEffect(() => {
-    if (comboboxInputRef.current === document.activeElement) {
+    if (
+      comboboxInputRef &&
+      comboboxInputRef.current === document.activeElement
+    ) {
       !isOpen && setIsOpen(true);
     }
   }, [comboboxInputRef.current]);
