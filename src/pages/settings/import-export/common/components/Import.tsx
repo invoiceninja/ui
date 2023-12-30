@@ -45,33 +45,34 @@ export function Import() {
 
   const [files, setFiles] = useState<ImportedFile[]>([]);
   const [errors, setErrors] = useState<ValidationBag>();
-  const [formData, setFormData] = useState(new FormData());
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
-  const handleAddFilesToFormData = () => {
-    formData.append('import_type', importType);
-
-    files.forEach(({ file }) => {
-      formData.append('files', file);
-    });
-
-    setFormData(formData);
-  };
 
   const handleImportFiles = () => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/import', formData))
-        .then(() => toast.success('started_import'))
+      const formData = new FormData();
+
+      formData.append('import_type', importType);
+
+      files.forEach(({ file }) => {
+        formData.append(`files[${importType}]`, file);
+      });
+
+      request('POST', endpoint('/api/v1/import'), formData)
+        .then((response) => toast.success(response.data.message))
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
           }
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => {
+          setIsFormBusy(false);
+          setErrors(undefined);
+          setFiles([]);
+        });
     }
   };
 
@@ -85,13 +86,8 @@ export function Import() {
 
   useEffect(() => {
     setErrors(undefined);
-    setFormData(new FormData());
     setFiles([]);
   }, [importType]);
-
-  useEffect(() => {
-    handleAddFilesToFormData();
-  }, [files]);
 
   return (
     <Card
