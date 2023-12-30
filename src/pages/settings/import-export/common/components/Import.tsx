@@ -70,7 +70,6 @@ export function Import() {
         })
         .finally(() => {
           setIsFormBusy(false);
-          setErrors(undefined);
           setFiles([]);
         });
     }
