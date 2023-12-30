@@ -15,13 +15,10 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Alert } from '$app/components/Alert';
 import { ImportedFile } from './Import';
 
 interface Props {
   group: string;
-  errors: ValidationBag | undefined;
   files: ImportedFile[];
   setFiles: Dispatch<SetStateAction<ImportedFile[]>>;
 }
@@ -30,7 +27,7 @@ export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const { errors, group, files, setFiles } = props;
+  const { group, files, setFiles } = props;
 
   const [currentFiles, setCurrentFiles] = useState<File[]>([]);
 
@@ -79,13 +76,6 @@ export function UploadImport(props: Props) {
                 : t('dropzone_default_message')}
             </span>
           </div>
-
-          {errors &&
-            Object.keys(errors.errors).map((key, index) => (
-              <Alert key={index} type="danger">
-                {errors.errors[key]}
-              </Alert>
-            ))}
         </div>
       ) : (
         <ul className="grid xs:grid-rows-6 lg:grid-cols-2">

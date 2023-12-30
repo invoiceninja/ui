@@ -18,6 +18,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
+import { Alert } from '$app/components/Alert';
 
 const IMPORTS: Record<ImportType, string[]> = {
   freshbooks: ['clients', 'invoices'],
@@ -115,14 +116,20 @@ export function Import() {
       </Element>
 
       {IMPORTS[importType].map((key) => (
-        <UploadImport
-          key={key}
-          group={key}
-          errors={errors}
-          files={files}
-          setFiles={setFiles}
-        />
+        <UploadImport key={key} group={key} files={files} setFiles={setFiles} />
       ))}
+
+      <Element>
+        {errors &&
+          Object.keys(errors.errors).map(
+            (key, index) =>
+              key !== 'import_type' && (
+                <Alert key={index} type="danger">
+                  {errors.errors[key]}
+                </Alert>
+              )
+          )}
+      </Element>
     </Card>
   );
 }
