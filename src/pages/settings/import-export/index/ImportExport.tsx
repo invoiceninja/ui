@@ -10,10 +10,9 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Export } from '../common/components/Export';
+import { Import } from '../common/components/Import';
 
 export function ImportExport() {
   useTitle('import_export');
@@ -31,31 +30,7 @@ export function ImportExport() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#import_export"
     >
-      <Card withSaveButton saveButtonLabel={t('import')} title={t('import')}>
-        <Element leftSide={t('import_type')}>
-          <SelectField>
-            <option value="csv">CSV</option>
-          </SelectField>
-        </Element>
-        <Element leftSide={t('clients')}>
-          <InputField id="clients" type="file" />
-        </Element>
-        <Element leftSide={t('invoices')}>
-          <InputField id="invoices" type="file" />
-        </Element>
-        <Element leftSide={t('payments')}>
-          <InputField id="payments" type="file" />
-        </Element>
-        <Element leftSide={t('products')}>
-          <InputField id="products" type="file" />
-        </Element>
-        <Element leftSide={t('vendors')}>
-          <InputField id="vendors" type="file" />
-        </Element>
-        <Element leftSide={t('expenses')}>
-          <InputField id="expenses" type="file" />
-        </Element>
-      </Card>
+      <Import />
 
       <Export />
     </Settings>
