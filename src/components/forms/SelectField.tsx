@@ -16,6 +16,7 @@ import CommonProps from '$app/common/interfaces/common-props.interface';
 import React, { isValidElement } from 'react';
 import Select, { StylesConfig } from 'react-select';
 import { SelectOption } from '../datatables/Actions';
+import { CustomSelectFieldOption } from './CustomSelectFieldOption';
 
 interface Props extends CommonProps {
   defaultValue?: any;
@@ -116,6 +117,8 @@ export function SelectField({
         }}
         isDisabled={disabled}
         styles={customStyles}
+        isSearchable={false}
+        components={{ Option: CustomSelectFieldOption }}
       />
 
       <select
