@@ -35,7 +35,7 @@ export function Settings(props: Props) {
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
   const handleExport = useCallback(() => {
-    if (payload.design) {
+    if (payload.design && navigator.clipboard) {
       navigator.clipboard.writeText(JSON.stringify(payload.design.design));
 
       toast.success(
