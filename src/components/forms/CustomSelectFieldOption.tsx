@@ -39,17 +39,7 @@ export function CustomSelectFieldOption({
         backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
       }}
     >
-      {React.Children.toArray(children).map((element, index) =>
-        element ? (
-          React.isValidElement(element) ? (
-            React.cloneElement(element)
-          ) : (
-            element
-          )
-        ) : (
-          <div key={index}>{element}</div>
-        )
-      )}
+      {children}
     </Option>
   );
 }

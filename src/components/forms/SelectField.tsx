@@ -13,10 +13,9 @@ import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import { useColorScheme } from '$app/common/colors';
 import CommonProps from '$app/common/interfaces/common-props.interface';
-import React, { isValidElement } from 'react';
+import React, { ReactNode, isValidElement } from 'react';
 import Select, { StylesConfig } from 'react-select';
 import { SelectOption } from '../datatables/Actions';
-import { CustomSelectFieldOption } from './CustomSelectFieldOption';
 
 interface Props extends CommonProps {
   defaultValue?: any;
@@ -48,8 +47,12 @@ export function SelectField({
 }: Props) {
   const colors = useColorScheme();
 
+  const blankEntry: ReactNode = (
+    <option value={blankOptionValue ?? ''}></option>
+  );
+
   const $entries = React.Children.map(
-    children,
+    [withBlank ? blankEntry : [], children],
     (child) =>
       isValidElement(child) && {
         label: Array.isArray(child.props.children)
@@ -58,6 +61,9 @@ export function SelectField({
         value: child.props.value,
       }
   );
+
+  const selectedEntry = $entries?.find((entry) => entry.value === value);
+  const defaultEntry = $entries?.find((entry) => entry.value === defaultValue);
 
   const customStyles: StylesConfig<SelectOption, false> = {
     input: (styles) => ({
@@ -86,11 +92,14 @@ export function SelectField({
     }),
     option: (base, { isSelected, isFocused }) => ({
       ...base,
+      display: 'flex',
+      alignItems: 'center',
       color: colors.$3,
       backgroundColor: isSelected || isFocused ? colors.$7 : colors.$1,
       ':hover': {
         backgroundColor: colors.$7,
       },
+      minHeight: '1.875rem',
     }),
   };
 
@@ -104,21 +113,26 @@ export function SelectField({
       )}
 
       <Select
+        className={className}
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         options={$entries}
-        value={value}
+        defaultValue={defaultEntry}
+        value={selectedEntry}
         onChange={(v) => {
           if (v === null) {
-            return onValueChange?.('');
+            return onValueChange?.((blankOptionValue as string) ?? '');
           }
 
           return onValueChange?.(v.value as string);
         }}
         isDisabled={disabled}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         styles={customStyles}
         isSearchable={false}
-        components={{ Option: CustomSelectFieldOption }}
+        isClearable
+        data-cy={cypressRef}
       />
 
       <select

@@ -265,9 +265,10 @@ export function Details() {
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>
               <option value="partnership">
-                <div className="flex space-x-5">
+                <div className="flex flex-col space-y-5">
                   <p>{t('partnership')}</p>
-                  <p>alsdasdaslmdasdmalsmdlads</p>
+                  <p>test middle</p>
+                  <p>test end</p>
                 </div>
               </option>
               <option value="trust">{t('trust')}</option>
