@@ -31,6 +31,12 @@ export function useGenerateActivityElement() {
   const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
+    if(activity.activity_type_id === 10 && activity.contact)
+      text = trans(`activity_10_online`, {});
+
+    if (activity.activity_type_id === 54 && activity.contact)
+      text = text.replace(':user', ':contact');
+  
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
