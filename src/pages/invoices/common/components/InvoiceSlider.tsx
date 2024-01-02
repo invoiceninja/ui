@@ -63,13 +63,6 @@ export function useGenerateActivityElement() {
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
-    if (activity.activity_type_id === 4) {
-      text = text.replace(
-        ':user',
-        `${t('recurring_invoice')} :recurring_invoice`
-      );
-    }
-
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
