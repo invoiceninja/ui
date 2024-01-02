@@ -30,11 +30,13 @@ import { useShowEditOption } from '../common/hooks/useShowEditOption';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
@@ -69,9 +71,7 @@ export default function Tasks() {
           <Guard
             type="component"
             component={<ImportButton route="/tasks/import" />}
-            guards={[
-              or(permission('create_task'), permission('edit_task')),
-            ]}
+            guards={[or(permission('create_task'), permission('edit_task'))]}
           />
         }
         leftSideChevrons={
@@ -82,14 +82,17 @@ export default function Tasks() {
           />
         }
         beforeFilter={
-          <Link to="/tasks/kanban">
-            <Inline>
-              <BsKanban size={20} />
-              <span>Kanban</span>
-            </Inline>
-          </Link>
+          hasPermission('edit_task') && (
+            <Link to="/tasks/kanban">
+              <Inline>
+                <BsKanban size={20} />
+                <span>Kanban</span>
+              </Inline>
+            </Link>
+          )
         }
         linkToCreateGuards={[permission('create_task')]}
+        hideEditableOptions={!hasPermission('edit_task')}
       />
     </Default>
   );
