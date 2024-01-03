@@ -129,6 +129,7 @@ export function CreditFooter(props: Props) {
                   value={credit?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
                   errorMessage={errors?.errors.assigned_user_id}
+                  readonly={!hasPermission('edit_credit')}
                 />
               </div>
 

@@ -175,6 +175,7 @@ export function TaskDetails(props: Props) {
             onChange={(user) => handleChange('assigned_user_id', user.id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
             errorMessage={errors?.errors.assigned_user_id}
+            readonly={!hasPermission('edit_task')}
           />
         </Element>
 

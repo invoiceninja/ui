@@ -82,12 +82,14 @@ export default function Tasks() {
           />
         }
         beforeFilter={
-          <Link to="/tasks/kanban">
-            <Inline>
-              <BsKanban size={20} />
-              <span>Kanban</span>
-            </Inline>
-          </Link>
+          (hasPermission('view_task') || hasPermission('edit_task')) && (
+            <Link to="/tasks/kanban">
+              <Inline>
+                <BsKanban size={20} />
+                <span>Kanban</span>
+              </Inline>
+            </Link>
+          )
         }
         linkToCreateGuards={[permission('create_task')]}
         hideEditableOptions={!hasPermission('edit_task')}
