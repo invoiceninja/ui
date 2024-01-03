@@ -104,6 +104,7 @@ export default function Project() {
             resource={projectValue}
             label={t('more_actions')}
             actions={actions}
+            cypressRef="projectActionDropdown"
           />
         )
       }
