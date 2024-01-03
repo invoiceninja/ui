@@ -154,7 +154,7 @@ const createProject = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created project')).toBeVisible();
 };
 
-test.skip("can't view projects without permission", async ({ page }) => {
+test("can't view projects without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -171,7 +171,7 @@ test.skip("can't view projects without permission", async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view project', async ({ page }) => {
+test('can view project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -192,16 +192,17 @@ test.skip('can view project', async ({ page }) => {
 
   await checkTableEditability(page, false);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-  await tableRow.getByRole('link').first().click();
+  await page
+    .getByRole('link', { name: 'test viewing project', exact: true })
+    .first()
+    .click();
 
   await checkShowPage(page, false);
 
   await logout(page);
 });
 
-test.skip('can edit project', async ({ page }) => {
+test('can edit project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
@@ -213,7 +214,7 @@ test.skip('can edit project', async ({ page }) => {
   await set('edit_project', 'view_client');
   await save();
 
-  await createProject({ page });
+  await createProject({ page, name: 'test editing project' });
 
   await logout(page);
 
@@ -226,9 +227,10 @@ test.skip('can edit project', async ({ page }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-  await tableRow.getByRole('link').first().click();
+  await page
+    .getByRole('link', { name: 'test editing project', exact: true })
+    .first()
+    .click();
 
   await checkShowPage(page, true);
 
@@ -257,7 +259,7 @@ test.skip('can edit project', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can create a project', async ({ page }) => {
+test('can create a project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
@@ -295,7 +297,7 @@ test.skip('can create a project', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view and edit assigned project with create_project', async ({
+test('can view and edit assigned project with create_project', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -360,7 +362,7 @@ test.skip('can view and edit assigned project with create_project', async ({
   await logout(page);
 });
 
-test.skip('deleting project with edit_project', async ({ page }) => {
+test('deleting project with edit_project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -408,7 +410,7 @@ test.skip('deleting project with edit_project', async ({ page }) => {
   }
 });
 
-test.skip('archiving project withe edit_project', async ({ page }) => {
+test('archiving project withe edit_project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -461,7 +463,7 @@ test.skip('archiving project withe edit_project', async ({ page }) => {
   }
 });
 
-test.skip('project documents preview with edit_project', async ({ page }) => {
+test('project documents preview with edit_project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -509,7 +511,7 @@ test.skip('project documents preview with edit_project', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('project documents uploading with edit_project', async ({ page }) => {
+test('project documents uploading with edit_project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -565,7 +567,7 @@ test.skip('project documents uploading with edit_project', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('Invoice project and clone action in dropdown displayed with admin permission', async ({
+test('Invoice project and clone action in dropdown displayed with admin permission', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -596,7 +598,7 @@ test.skip('Invoice project and clone action in dropdown displayed with admin per
   await logout(page);
 });
 
-test.skip('Invoice project and clone action displayed with creation permissions', async ({
+test('Invoice project and clone action displayed with creation permissions', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -627,7 +629,7 @@ test.skip('Invoice project and clone action displayed with creation permissions'
   await logout(page);
 });
 
-test.skip('cloning project', async ({ page }) => {
+test('cloning project', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -685,9 +687,7 @@ test.skip('cloning project', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('Invoice Project displayed with admin permission', async ({
-  page,
-}) => {
+test('Invoice Project displayed with admin permission', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
