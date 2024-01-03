@@ -79,9 +79,17 @@ export function Permissions(props: Props) {
     permission: PermissionsType,
     value: boolean
   ) => {
-    const permissions = clone(user?.company_user?.permissions ?? '')
+    let permissions = clone(user?.company_user?.permissions ?? '')
       .split(',')
       .filter((value) => value !== permission);
+
+    const [permissionType, entity] = permission.split('_');
+
+    if (entity === 'all') {
+      permissions = permissions.filter(
+        (currentPermission) => !currentPermission.startsWith(permissionType)
+      );
+    }
 
     if (value) {
       permissions.push(permission);
