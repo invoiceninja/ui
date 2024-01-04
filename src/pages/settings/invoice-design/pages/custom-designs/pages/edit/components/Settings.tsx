@@ -34,7 +34,32 @@ export function Settings(props: Props) {
   const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
+  const handleExportToTxtFile = () => {
+    if (payload.design) {
+      const blob = new Blob([JSON.stringify(payload.design.design)], {
+        type: 'text/plain',
+      });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+
+      link.download = `${payload.design.name}_${t('export').toLowerCase()}`;
+      link.href = url;
+      link.target = '_blank';
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+    }
+  };
+
   const handleExport = useCallback(() => {
+    if (!navigator.clipboard) {
+      return handleExportToTxtFile();
+    }
+
     if (payload.design) {
       navigator.clipboard
         .writeText(JSON.stringify(payload.design.design))
@@ -45,28 +70,7 @@ export function Settings(props: Props) {
             })
           )
         )
-        .catch(() => {
-          if (payload.design) {
-            const blob = new Blob([JSON.stringify(payload.design.design)], {
-              type: 'text/plain',
-            });
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-
-            link.download = `${payload.design.name}_${t(
-              'export'
-            ).toLowerCase()}`;
-            link.href = url;
-            link.target = '_blank';
-
-            document.body.appendChild(link);
-
-            link.click();
-
-            document.body.removeChild(link);
-          }
-        });
+        .catch(() => handleExportToTxtFile());
     }
   }, [payload.design]);
 
