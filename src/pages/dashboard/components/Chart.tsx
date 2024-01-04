@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
+import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
 
 type Props = {
   data: ChartData;
@@ -49,6 +50,8 @@ export function Chart(props: Props) {
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const generateWeekDateRange = useGenerateWeekDateRange();
+
   const formatMoney = useFormatMoney();
 
   const [chartData, setChartData] = useState<LineChartData>([]);
@@ -60,29 +63,26 @@ export function Chart(props: Props) {
   ) => {
     const start = dayjs(startDate);
     const end = dayjs(endDate);
-    const result = [];
+    let dates = [];
 
-    let current = start.clone();
+    let currentDate = start.clone();
 
     switch (rangeKey) {
       case 'day':
-        while (current.isBefore(end) || current.isSame(end, 'day')) {
-          result.push(current.toDate());
-          current = current.add(1, 'day');
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          dates.push(currentDate.toDate());
+          currentDate = currentDate.add(1, 'day');
         }
         break;
 
       case 'week':
-        while (current.isBefore(end) || current.isSame(end, 'day')) {
-          result.push(current.endOf('week').toDate());
-          current = current.add(1, 'week');
-        }
+        dates = generateWeekDateRange(startDate, endDate);
         break;
 
       case 'month':
-        while (current.isBefore(end) || current.isSame(end, 'day')) {
-          result.push(current.endOf('month').toDate());
-          current = current.add(1, 'month');
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          dates.push(currentDate.endOf('month').toDate());
+          currentDate = currentDate.add(1, 'month');
         }
         break;
 
@@ -90,7 +90,13 @@ export function Chart(props: Props) {
         return [];
     }
 
-    return result;
+    const lengthOfDates = dates.length;
+
+    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(end)) {
+      dates[lengthOfDates - 1] = end.toDate();
+    }
+
+    return dates;
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
