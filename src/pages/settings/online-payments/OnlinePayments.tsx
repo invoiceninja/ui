@@ -91,7 +91,7 @@ export function OnlinePayments() {
       withoutBackButton
     >
       <Gateways />
-      
+
       <Card title={t('settings')}>
         <Element
           leftSide={
@@ -288,8 +288,8 @@ export function OnlinePayments() {
               propertyKey="send_email_on_mark_paid"
               labelElement={
                 <SettingsLabel
-                  label={t('send_email_on_mark_paid')}
-                  helpLabel={t('send_email_on_mark_paid_help')}
+                  label={t('mark_paid_payment_email')}
+                  helpLabel={t('mark_paid_payment_email_help')}
                 />
               }
               defaultValue={false}
@@ -474,12 +474,7 @@ export function OnlinePayments() {
             disabled={disableSettingsField('payment_email_all_contacts')}
           />
         </Element>
-
-        
-
       </Card>
-
-      
     </Settings>
   );
 }
