@@ -56,6 +56,7 @@ interface CreateParams {
   clientName?: string;
   assignTo?: string;
   withNavigation?: boolean;
+  email?: string;
 }
 
 const createClient = async (params: CreateParams) => {
@@ -65,6 +66,7 @@ const createClient = async (params: CreateParams) => {
     assignTo,
     withNavigation = true,
     isTableEditable = true,
+    email,
   } = params;
 
   if (withNavigation) {
@@ -84,7 +86,7 @@ const createClient = async (params: CreateParams) => {
   await page.locator('#name').fill(clientName || 'Company Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
-  await page.locator('#email_0').fill('first@example.com');
+  await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
     await page
@@ -758,6 +760,62 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
   await checkShowPage(page, true);
 
   await checkDropdownActions(page, actions, 'clientActionDropdown');
+
+  await logout(page);
+});
+
+test('Merge client action', async ({ page }) => {
+  await login(page);
+
+  await createClient({
+    page,
+    clientName: 'test merge one',
+    email: 'firstMerge@example.com',
+  });
+
+  await createClient({
+    page,
+    clientName: 'test merge two',
+    email: 'secondMerge@example.com',
+  });
+
+  await page
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('button', { name: 'Merge', exact: true })
+    .first()
+    .click();
+
+  await expect(page.getByText('Merge Into')).toBeVisible();
+
+  await page.locator('[data-testid="combobox-input-field"]').click();
+
+  await page
+    .locator('[data-testid="combobox-input-field"]')
+    .fill('firstMerge@example.com');
+
+  await page.getByRole('option').first().click();
+
+  await page.getByRole('button', { name: 'Merge' }).click();
+
+  if (await page.getByRole('heading', { name: 'Confirmation' }).isVisible()) {
+    await page.getByLabel('Current password*').fill('password');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  }
+
+  await expect(page.getByText('Merge Into')).not.toBeVisible();
+  await expect(page.getByText('Successfully merged client')).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await expect(page.getByText('firstMerge@example.com')).toBeVisible();
+  await expect(page.getByText('secondMerge@example.com')).not.toBeVisible();
 
   await logout(page);
 });
