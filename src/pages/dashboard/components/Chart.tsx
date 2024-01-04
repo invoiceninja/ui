@@ -59,15 +59,16 @@ export function Chart(props: Props) {
   const generateDateRange = (
     startDate: Date,
     endDate: Date,
-    rangeKey: 'day' | 'week' | 'month'
+    period: 'day' | 'week' | 'month'
   ) => {
+    let dates = [];
+
     const start = dayjs(startDate);
     const end = dayjs(endDate);
-    let dates = [];
 
     let currentDate = start.clone();
 
-    switch (rangeKey) {
+    switch (period) {
       case 'day':
         while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
           dates.push(currentDate.toDate());
