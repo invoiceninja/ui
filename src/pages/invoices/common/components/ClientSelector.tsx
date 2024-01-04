@@ -110,7 +110,7 @@ export function ClientSelector(props: Props) {
               label={
                 contact.first_name.length >= 1
                   ? `${contact.first_name} ${contact.last_name}`
-                  : t('blank_contact')
+                  : contact.email || client.display_name
               }
               checked={handleCheckedState(contact.id)}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -122,9 +122,11 @@ export function ClientSelector(props: Props) {
             />
 
             <div>
-              <p className="text-sm" style={{ color: colors.$3 }}>
-                {contact.email}
-              </p>
+              {contact.first_name && (
+                <p className="text-sm" style={{ color: colors.$3 }}>
+                  {contact.email}
+                </p>
+              )}
 
               {resource.invitations.length >= 1 && (
                 <>
