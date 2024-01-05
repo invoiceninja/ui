@@ -14,16 +14,16 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '$app/components/forms';
-import { MdLink, MdRefresh, MdRuleFolder } from 'react-icons/md';
+import { MdRefresh, MdRuleFolder } from 'react-icons/md';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Icon } from '$app/components/icons/Icon';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { ConnectAccounts } from '../common/components/ConnectAccounts';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -38,19 +38,6 @@ export function BankAccounts() {
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
-
-  const handleConnectAccounts = async () => {
-    const tokenResponse = await request(
-      'POST',
-      endpoint('/api/v1/one_time_token'),
-      { context: 'yodlee', platform: 'react' }
-    );
-    window.open(
-      route('https://invoicing.co/yodlee/onboard/:hash', {
-        hash: tokenResponse?.data?.hash,
-      })
-    );
-  };
 
   const handleRefresh = () => {
     request(
@@ -85,14 +72,7 @@ export function BankAccounts() {
         withResourcefulActions
         rightSide={
           <div className="flex space-x-2">
-            {isHosted() && enterprisePlan() && (
-              <Button type="secondary" onClick={handleConnectAccounts}>
-                <span className="mr-2">
-                  {<Icon element={MdLink} size={20} />}
-                </span>
-                {t('connect_accounts')}
-              </Button>
-            )}
+            <ConnectAccounts />
 
             {isHosted() && enterprisePlan() && (
               <Button type="secondary" onClick={handleRefresh}>
