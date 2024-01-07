@@ -20,6 +20,13 @@ import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import { Alert } from '$app/components/Alert';
 
+const FILE_KEY = {
+  clients: 'client',
+  invoices: 'invoice',
+  accounting: 'invoice',
+  contacts: 'client',
+};
+
 const IMPORTS: Record<ImportType, string[]> = {
   freshbooks: ['clients', 'invoices'],
   invoice2go: ['invoices'],
@@ -57,8 +64,11 @@ export function Import() {
 
       formData.append('import_type', importType);
 
-      files.forEach(({ file }) => {
-        formData.append(`files[${importType}]`, file);
+      files.forEach(({ file, group }) => {
+        formData.append(
+          `files[${FILE_KEY[group as keyof typeof FILE_KEY]}]`,
+          file
+        );
       });
 
       request('POST', endpoint('/api/v1/import'), formData)
