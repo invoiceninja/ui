@@ -111,12 +111,11 @@ export default function Edit() {
       breadcrumbs={pages}
       {...((hasPermission('edit_quote') || entityAssigned(quote)) &&
         quote && {
-          onSaveClick: () => save(quote),
           navigationTopRight: (
             <ResourceActions
               resource={quote}
-              label={t('more_actions')}
               actions={actions}
+              onSaveClick={() => quote && save(quote)}
               cypressRef="quoteActionDropdown"
             />
           ),

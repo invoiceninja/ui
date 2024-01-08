@@ -116,6 +116,7 @@ export function Pagination(props: Props) {
         </button>
 
         <button
+          data-cy="dataTableChevronRight"
           onClick={() => goToPage(props.currentPage + 1)}
           className="py-1.5 px-2 bg-white border-b border-t border-r hover:bg-gray-50"
           style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
