@@ -25,7 +25,6 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
-  dropdownLabelFn?: (client: Client) => string | JSX.Element;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -33,8 +32,6 @@ export function ClientSelector(props: ClientSelectorProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasPermission = useHasPermission();
-
-  const { dropdownLabelFn } = props;
 
   return (
     <>
@@ -60,7 +57,6 @@ export function ClientSelector(props: ClientSelectorProps) {
           value: 'id',
           customSearchableValue: (client) =>
             client.contacts.map(({ email }) => email).join(','),
-          dropdownLabelFn,
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}
