@@ -10,7 +10,6 @@
 
 import { Client } from '$app/common/interfaces/client';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +25,7 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
+  dropdownLabelFn?: (client: Client) => string | JSX.Element;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -33,6 +33,8 @@ export function ClientSelector(props: ClientSelectorProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasPermission = useHasPermission();
+
+  const { dropdownLabelFn } = props;
 
   return (
     <>
@@ -52,7 +54,14 @@ export function ClientSelector(props: ClientSelectorProps) {
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
         initiallyVisible={props.initiallyVisible}
-        entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
+        entryOptions={{
+          id: 'id',
+          label: 'display_name',
+          value: 'id',
+          customSearchableValue: (client) =>
+            client.contacts.map(({ email }) => email).join(','),
+          dropdownLabelFn,
+        }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}
         sortBy={null}
