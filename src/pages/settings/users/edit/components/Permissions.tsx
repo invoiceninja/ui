@@ -90,7 +90,7 @@ export function Permissions(props: Props) {
         (currentPermission) => !currentPermission.startsWith(permissionType)
       );
     } else if (currentPermissions.includes(`${permissionType}_all`)) {
-      const entityPermissions = permissions
+      const typePermissions = permissions
         .map((currentPermission) => `${permissionType}_${currentPermission}`)
         .filter((currentPermission) => currentPermission !== permission);
 
@@ -99,7 +99,7 @@ export function Permissions(props: Props) {
           !currentPermission.endsWith(`${permissionType}_all`)
       );
 
-      currentPermissions = [...currentPermissions, ...entityPermissions];
+      currentPermissions = [...currentPermissions, ...typePermissions];
     }
 
     if (value) {
