@@ -102,23 +102,11 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
   }
 
@@ -258,10 +246,7 @@ test('can edit quote', async ({ page }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
@@ -296,10 +281,7 @@ test('can create a quote', async ({ page }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
@@ -346,10 +328,7 @@ test('can view and edit assigned quote with create_quote', async ({ page }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
@@ -582,10 +561,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
@@ -626,10 +602,7 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await checkEditPage(page, true, false);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 

@@ -111,7 +111,6 @@ export function MergeClientModal(props: Props) {
         onClearButtonClick={() => setMergeIntoClientId('')}
         withoutAction
         exclude={[props.mergeFromClientId]}
-        customSearchableValue={(client) => client.contacts[0].email}
         dropdownLabelFn={(client) => (
           <div className="flex items-center space-x-1">
             <span>{client.display_name}</span>

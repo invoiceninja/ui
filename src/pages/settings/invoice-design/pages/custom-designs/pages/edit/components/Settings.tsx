@@ -34,15 +34,43 @@ export function Settings(props: Props) {
   const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
-  const handleExport = useCallback(() => {
+  const handleExportToTxtFile = () => {
     if (payload.design) {
-      navigator.clipboard.writeText(JSON.stringify(payload.design.design));
+      const blob = new Blob([JSON.stringify(payload.design.design)], {
+        type: 'text/plain',
+      });
+      const url = URL.createObjectURL(blob);
 
-      toast.success(
-        trans('copied_to_clipboard', {
-          value: t('design').toLowerCase(),
-        })
-      );
+      const link = document.createElement('a');
+
+      link.download = `${payload.design.name}_${t('export').toLowerCase()}`;
+      link.href = url;
+      link.target = '_blank';
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleExport = useCallback(() => {
+    if (!navigator.clipboard) {
+      return handleExportToTxtFile();
+    }
+
+    if (payload.design) {
+      navigator.clipboard
+        .writeText(JSON.stringify(payload.design.design))
+        .then(() =>
+          toast.success(
+            trans('copied_to_clipboard', {
+              value: t('design').toLowerCase(),
+            })
+          )
+        )
+        .catch(() => handleExportToTxtFile());
     }
   }, [payload.design]);
 

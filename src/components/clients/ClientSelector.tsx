@@ -26,7 +26,6 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
-  customSearchableValue?: (client: Client) => string;
   dropdownLabelFn?: (client: Client) => string | JSX.Element;
 }
 
@@ -36,7 +35,7 @@ export function ClientSelector(props: ClientSelectorProps) {
 
   const hasPermission = useHasPermission();
 
-  const { customSearchableValue, dropdownLabelFn } = props;
+  const { dropdownLabelFn } = props;
 
   return (
     <>
@@ -60,7 +59,8 @@ export function ClientSelector(props: ClientSelectorProps) {
           id: 'id',
           label: 'display_name',
           value: 'id',
-          customSearchableValue,
+          customSearchableValue: (client) =>
+            client.contacts.map(({ email }) => email).join(','),
           dropdownLabelFn,
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
