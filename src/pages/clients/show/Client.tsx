@@ -16,7 +16,7 @@ import { Spinner } from '$app/components/Spinner';
 import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
@@ -28,7 +28,6 @@ import { Gateways } from './components/Gateways';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
-import { Button } from '$app/components/forms';
 import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -40,9 +39,9 @@ export default function Client() {
   const { data: client, isLoading } = useClientQuery({ id, enabled: true });
 
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
-
   const entityAssigned = useEntityAssigned();
 
   const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
@@ -76,21 +75,15 @@ export default function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
+        client &&
         (hasPermission('edit_client') || entityAssigned(client)) && (
-          <div className="flex space-x-3">
-            <Button to={route('/clients/:id/edit', { id })}>
-              {t('edit_client')}
-            </Button>
-
-            {client && (
-              <ResourceActions
-                label={t('more_actions')}
-                resource={client}
-                actions={actions}
-                cypressRef="clientActionDropdown"
-              />
-            )}
-          </div>
+          <ResourceActions
+            resource={client}
+            actions={actions}
+            saveButtonLabel={t('edit')}
+            onSaveClick={() => navigate(route('/clients/:id/edit', { id }))}
+            cypressRef="clientActionDropdown"
+          />
         )
       }
     >
