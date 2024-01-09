@@ -40,9 +40,9 @@ export function ClientSelector(props: ClientSelectorProps) {
     contacts.forEach(({ first_name, last_name, email }, index) => {
       if (
         keyword &&
-        (first_name.includes(keyword) ||
-          last_name.includes(keyword) ||
-          email.includes(keyword))
+        (first_name?.includes(keyword) ||
+          last_name?.includes(keyword) ||
+          email?.includes(keyword))
       ) {
         contactIndex = index;
       }
