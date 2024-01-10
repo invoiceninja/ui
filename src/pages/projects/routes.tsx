@@ -86,8 +86,22 @@ export const projectRoutes = (
         />
       }
     >
-      <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
+    </Route>
+
+    <Route
+      path="/projects/:id/edit"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Projects),
+            or(permission('edit_project'), assigned('/api/v1/projects/:id')),
+          ]}
+          component={<Project />}
+        />
+      }
+    >
+      <Route path="" element={<Edit />} />
     </Route>
   </Route>
 );

@@ -21,6 +21,8 @@ import { ResourceActions } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
 import { useUpdateTask } from '../common/hooks/useUpdateTask';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
@@ -28,6 +30,9 @@ export default function Edit() {
   const { data } = useTaskQuery({ id });
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const [task, setTask] = useState<Task>();
 
@@ -52,16 +57,18 @@ export default function Edit() {
     <Default
       title={documentTitle}
       disableSaveButton={isFormBusy}
-      onSaveClick={() => task && handleSave(task)}
-      navigationTopRight={
-        task && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={task}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_task') || entityAssigned(task)) &&
+        task && {
+          onSaveClick: () => handleSave(task),
+          navigationTopRight: (
+            <ResourceActions
+              resource={task}
+              label={t('more_actions')}
+              actions={actions}
+              cypressRef="taskActionDropdown"
+            />
+          ),
+        })}
     >
       {task && (
         <TaskDetails
