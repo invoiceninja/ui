@@ -27,11 +27,16 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
   const { id } = useParams();
   const { data } = useProjectQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
 
@@ -61,6 +66,10 @@ export default function Project() {
     {
       name: t('documents'),
       href: route('/projects/:id/documents', { id }),
+      enabled:
+        hasPermission('view_project') ||
+        hasPermission('edit_project') ||
+        entityAssigned(projectValue),
     },
   ];
 
@@ -95,6 +104,7 @@ export default function Project() {
             resource={projectValue}
             label={t('more_actions')}
             actions={actions}
+            cypressRef="projectActionDropdown"
           />
         )
       }

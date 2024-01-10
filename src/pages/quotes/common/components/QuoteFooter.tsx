@@ -129,6 +129,7 @@ export function QuoteFooter(props: Props) {
                   value={quote?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
                   errorMessage={errors?.errors.assigned_user_id}
+                  readonly={!hasPermission('edit_quote')}
                 />
               </div>
 
