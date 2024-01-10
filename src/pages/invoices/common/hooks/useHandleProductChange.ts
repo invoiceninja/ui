@@ -9,6 +9,7 @@
  */
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { ProductTableResource } from '../components/ProductsTable';
@@ -21,6 +22,8 @@ interface Props {
 
 export function useHandleProductChange(props: Props) {
   const company = useCurrentCompany();
+
+  const resolveCurrency = useResolveCurrency();
 
   const resource = props.resource;
 
@@ -39,7 +42,19 @@ export function useHandleProductChange(props: Props) {
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
     if (company.fill_products) {
-      lineItem.cost = product?.price || 0;
+      if (company.convert_products) {
+        const currentClient = resource['client' as keyof typeof resource];
+
+        const clientCurrency = resolveCurrency(
+          //currentClient.settings.currency_id
+          '1'
+        );
+
+        console.log(clientCurrency);
+        //
+      } else {
+        lineItem.cost = product?.price || 0;
+      }
     }
 
     if (!product) {

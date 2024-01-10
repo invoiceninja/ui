@@ -61,6 +61,7 @@ export interface Company {
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
+  convert_products: boolean;
 }
 
 export interface Settings {
