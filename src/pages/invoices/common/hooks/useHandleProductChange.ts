@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
@@ -24,6 +25,7 @@ export function useHandleProductChange(props: Props) {
   const company = useCurrentCompany();
 
   const resolveCurrency = useResolveCurrency();
+  const resolveClient = useClientResolver();
 
   const resource = props.resource;
 
@@ -42,24 +44,28 @@ export function useHandleProductChange(props: Props) {
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
     if (company.fill_products) {
-      const currentClient = resource['client' as keyof typeof resource];
+      if (resource.client_id) {
+        resolveClient.find(resource.client_id).then((client) => {
+          const clientCurrencyId = client.settings.currency_id;
 
-      const clientCurrencyId =
-        currentClient['settings' as keyof typeof currentClient]['currency_id'];
+          if (
+            company.convert_products &&
+            clientCurrencyId !== company.settings.currency_id
+          ) {
+            const clientCurrency = resolveCurrency(clientCurrencyId);
+            const companyCurrency = resolveCurrency(
+              company.settings.currency_id
+            );
 
-      if (
-        company.convert_products &&
-        clientCurrencyId &&
-        clientCurrencyId !== company.settings.currency_id
-      ) {
-        const clientCurrency = resolveCurrency(clientCurrencyId);
-        const companyCurrency = resolveCurrency(company.settings.currency_id);
-
-        if (clientCurrency && companyCurrency) {
-          lineItem.cost =
-            (product?.price || 0) /
-            (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
-        }
+            if (clientCurrency && companyCurrency) {
+              lineItem.cost =
+                (product?.price || 0) /
+                (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
+            }
+          } else {
+            lineItem.cost = product?.price || 0;
+          }
+        });
       } else {
         lineItem.cost = product?.price || 0;
       }
