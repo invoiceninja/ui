@@ -59,7 +59,7 @@ export function useHandleProductChange(props: Props) {
 
             if (clientCurrency && companyCurrency) {
               lineItem.cost =
-                (product?.price || 0) /
+                (product?.price || 0) *
                 (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
             }
           } else {
