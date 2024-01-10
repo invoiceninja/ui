@@ -22,12 +22,13 @@ interface Props {
   onSaveClick?: () => void;
   disableSaveButton?: boolean;
   cypressRef?: string;
+  saveButtonLabel?: string | null;
 }
 
 export function ResourceActions(props: Props) {
   const [t] = useTranslation();
 
-  const { onSaveClick, disableSaveButton, label } = props;
+  const { onSaveClick, disableSaveButton, label, saveButtonLabel } = props;
 
   return (
     <>
@@ -40,7 +41,7 @@ export function ResourceActions(props: Props) {
             disabled={disableSaveButton}
             disableWithoutIcon
           >
-            {t('save')}
+            {saveButtonLabel ?? t('save')}
           </Button>
 
           <Dropdown
