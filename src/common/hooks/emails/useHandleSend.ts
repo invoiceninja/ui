@@ -16,6 +16,7 @@ import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { $refetch, keys } from '../useRefetch';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
@@ -46,6 +47,8 @@ export function useHandleSend({ setErrors }: Params) {
       cc_email: ccEmail,
     })
       .then(() => {
+        $refetch([`${entity}s` as keyof typeof keys]);
+
         toast.success(t(`emailed_${entity}`) || '');
         navigate(redirectUrl);
       })
