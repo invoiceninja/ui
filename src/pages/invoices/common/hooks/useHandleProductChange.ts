@@ -42,16 +42,24 @@ export function useHandleProductChange(props: Props) {
     lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
 
     if (company.fill_products) {
-      if (company.convert_products) {
-        const currentClient = resource['client' as keyof typeof resource];
+      const currentClient = resource['client' as keyof typeof resource];
 
-        const clientCurrency = resolveCurrency(
-          //currentClient.settings.currency_id
-          '1'
-        );
+      const clientCurrencyId =
+        currentClient['settings' as keyof typeof currentClient]['currency_id'];
 
-        console.log(clientCurrency);
-        //
+      if (
+        company.convert_products &&
+        clientCurrencyId &&
+        clientCurrencyId !== company.settings.currency_id
+      ) {
+        const clientCurrency = resolveCurrency(clientCurrencyId);
+        const companyCurrency = resolveCurrency(company.settings.currency_id);
+
+        if (clientCurrency && companyCurrency) {
+          lineItem.cost =
+            (product?.price || 0) /
+            (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
+        }
       } else {
         lineItem.cost = product?.price || 0;
       }
