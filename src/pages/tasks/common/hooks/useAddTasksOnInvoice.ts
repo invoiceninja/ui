@@ -26,6 +26,7 @@ import { route } from '$app/common/helpers/route';
 import { Task } from '$app/common/interfaces/task';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { t } from 'i18next';
+import { cloneDeep } from 'lodash';
 
 interface Params {
   tasks: Task[];
@@ -43,6 +44,8 @@ export function useAddTasksOnInvoice(params: Params) {
   const setInvoiceAtom = useSetAtom(invoiceAtom);
 
   return (invoice: Invoice) => {
+    const updatedInvoice = cloneDeep(invoice);
+
     if (tasks) {
       tasks.forEach((task: Task) => {
         const logs = parseTimeLog(task.time_log);
@@ -122,18 +125,18 @@ export function useAddTasksOnInvoice(params: Params) {
           item.notes = projectName + task?.description + ' ' + parsed.join(' ');
         }
 
-        if (typeof invoice.line_items === 'string') {
-          invoice.line_items = [];
+        if (typeof updatedInvoice.line_items === 'string') {
+          updatedInvoice.line_items = [];
         }
 
-        invoice.line_items.push(item);
+        updatedInvoice.line_items.push(item);
       });
 
-      setInvoiceAtom(invoice);
+      setInvoiceAtom(updatedInvoice);
 
       navigate(
         route('/invoices/:id/edit?action=add_tasks&table=tasks', {
-          id: invoice.id,
+          id: updatedInvoice.id,
         })
       );
     }
