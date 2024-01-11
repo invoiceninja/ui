@@ -22,11 +22,13 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
@@ -56,6 +58,7 @@ export default function Vendors() {
           />
         }
         linkToCreateGuards={[permission('create_vendor')]}
+        hideEditableOptions={!hasPermission('edit_vendor')}
       />
     </Default>
   );

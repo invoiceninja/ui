@@ -29,6 +29,8 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date } from '$app/common/helpers';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -41,6 +43,9 @@ export default function Vendor() {
   const actions = useActions();
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   useEffect(() => {
     if (vendor && vendor.name.length >= 1) {
@@ -65,29 +70,39 @@ export default function Vendor() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <Inline>
-          <Button to={route('/vendors/:id/edit', { id })}>
-            {t('edit_vendor')}
-          </Button>
+      {...((hasPermission('edit_vendor') || entityAssigned(vendor)) &&
+        vendor && {
+          navigationTopRight: (
+            <Inline>
+              <Button to={route('/vendors/:id/edit', { id })}>
+                {t('edit_vendor')}
+              </Button>
 
-          {vendor && (
-            <ResourceActions
-              label={t('more_actions')}
-              resource={vendor}
-              actions={actions}
-            />
-          )}
-        </Inline>
-      }
+              {vendor && (
+                <ResourceActions
+                  label={t('more_actions')}
+                  resource={vendor}
+                  actions={actions}
+                />
+              )}
+            </Inline>
+          ),
+        })}
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
           {vendor && (
             <div className="flex space-x-20 my-3">
-              <span className="text-sm"
-                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-              >{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <EntityStatus entity={vendor} />
             </div>
           )}
