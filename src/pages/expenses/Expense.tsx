@@ -23,6 +23,8 @@ import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useSave } from './edit/hooks/useSave';
 import { Spinner } from '$app/components/Spinner';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -32,6 +34,9 @@ export default function Expense() {
   const { id } = useParams();
 
   const { data } = useExpenseQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
@@ -72,16 +77,17 @@ export default function Expense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => expense && save(expense)}
-      navigationTopRight={
-        expense && (
-          <ResourceActions
-            resource={expense}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_purchase_order') || entityAssigned(expense)) &&
+        expense && {
+          onSaveClick: () => save(expense),
+          navigationTopRight: (
+            <ResourceActions
+              resource={expense}
+              label={t('more_actions')}
+              actions={actions}
+            />
+          ),
+        })}
       disableSaveButton={!expense}
     >
       {expense ? (

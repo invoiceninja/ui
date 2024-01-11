@@ -23,11 +23,13 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Expenses() {
   useTitle('expenses');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('expenses'), href: '/expenses' }];
 
@@ -69,6 +71,7 @@ export default function Expenses() {
           />
         }
         linkToCreateGuards={[permission('create_expense')]}
+        hideEditableOptions={!hasPermission('edit_expense')}
       />
     </Default>
   );
