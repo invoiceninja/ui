@@ -97,6 +97,12 @@ export function useSettingsRoutes() {
       current: location.pathname.startsWith('/settings/backup_restore'),
       enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
+    {
+      name: t('import_export'),
+      href: '/settings/import_export',
+      current: location.pathname.startsWith('/settings/import_export'),
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+    },
   ];
 
   const advanced: SettingsRoute[] = [

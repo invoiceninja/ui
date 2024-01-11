@@ -136,25 +136,13 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Client', exact: true })
-    ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Client', exact: true })
-    ).toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).toBeVisible();
   }
 };
@@ -269,7 +257,7 @@ test('can edit client', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -283,7 +271,9 @@ test('can edit client', async ({ page }) => {
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -325,7 +315,7 @@ test('can create a client', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -339,7 +329,9 @@ test('can create a client', async ({ page }) => {
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -382,7 +374,7 @@ test('can view and edit assigned client with create_client', async ({
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -396,7 +388,9 @@ test('can view and edit assigned client with create_client', async ({
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -427,12 +421,7 @@ test('deleting client with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page, withNavigation: false });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -480,12 +469,7 @@ test('archiving client withe edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page, withNavigation: false });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -536,7 +520,9 @@ test("can't purge client without admin permission", async ({ page }) => {
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -560,10 +546,7 @@ test('can purge client with admin permission', async ({ page }) => {
 
   await checkShowPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await page.getByText('Purge', { exact: true }).click();
 
@@ -606,8 +589,8 @@ test('client documents preview with edit_client', async ({ page }) => {
     await createClient({ page });
 
     await page
-      .getByRole('link')
-      .filter({ has: page.getByText('Edit Client') })
+      .getByRole('button')
+      .filter({ has: page.getByText('Edit') })
       .click();
   } else {
     const moreActionsButton = tableRow
@@ -659,8 +642,8 @@ test('client documents uploading with edit_client', async ({ page }) => {
     await createClient({ page });
 
     await page
-      .getByRole('link')
-      .filter({ has: page.getByText('Edit Client') })
+      .getByRole('button')
+      .filter({ has: page.getByText('Edit') })
       .click();
   } else {
     const moreActionsButton = tableRow
@@ -718,7 +701,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -759,7 +744,9 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -779,10 +766,7 @@ test('Merge client action', async ({ page }) => {
     email: 'secondMerge@example.com',
   });
 
-  await page
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .first()
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await page
     .getByRole('button', { name: 'Merge', exact: true })

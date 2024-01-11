@@ -41,7 +41,7 @@ export const taskRoutes = (
         />
       }
     />
-    
+
     <Route
       path="kanban"
       element={

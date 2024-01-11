@@ -10,10 +10,8 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router';
 
 export function Logout() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // const { signOut } = useGoogleLogout({
@@ -21,9 +19,6 @@ export function Logout() {
   // });
 
   useEffect(() => {
-    localStorage.removeItem('X-NINJA-TOKEN');
-    localStorage.removeItem('X-CURRENT-INDEX');
-
     // if (isHosted() && user?.oauth_provider_id === 'microsoft' && msal) {
     //   msal.logoutPopup();
     // }
@@ -32,9 +27,12 @@ export function Logout() {
     //   // signOut();
     // }
 
-    queryClient.invalidateQueries();
+    localStorage.clear();
 
-    navigate('/');
+    queryClient.invalidateQueries();
+    queryClient.removeQueries();
+
+    window.location.href = '/';
   }, []);
 
   return <></>;

@@ -25,11 +25,13 @@ import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function TaskStatusSelector(props: GenericSelectorProps<TaskStatus>) {
   const [t] = useTranslation();
-
   const accentColor = useAccentColor();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -132,7 +134,7 @@ export function TaskStatusSelector(props: GenericSelectorProps<TaskStatus>) {
         action={{
           label: t('new_task_status'),
           onClick: () => setIsModalVisible(true),
-          visible: true,
+          visible: isAdmin || isOwner,
         }}
         onDismiss={props.onClearButtonClick}
         readonly={props.readonly}

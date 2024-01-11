@@ -156,6 +156,7 @@ export function InvoiceFooter(props: Props) {
                   value={recurringInvoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
                   errorMessage={errors?.errors.assigned_user_id}
+                  readonly={!hasPermission('edit_recurring_invoice')}
                 />
               </div>
 

@@ -21,11 +21,13 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Projects() {
   useTitle('projects');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
@@ -62,6 +64,7 @@ export default function Projects() {
           />
         }
         linkToCreateGuards={[permission('create_project')]}
+        hideEditableOptions={!hasPermission('edit_project')}
       />
     </Default>
   );
