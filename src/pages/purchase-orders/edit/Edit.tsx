@@ -42,12 +42,17 @@ import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
   const { t } = useTranslation();
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -113,16 +118,18 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
-      navigationTopRight={
-        purchaseOrder && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={purchaseOrder}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_purchase_order') ||
+        entityAssigned(purchaseOrder)) &&
+        purchaseOrder && {
+          onSaveClick: () => onSave(purchaseOrder),
+          navigationTopRight: (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={purchaseOrder}
+              actions={actions}
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
