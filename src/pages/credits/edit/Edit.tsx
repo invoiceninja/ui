@@ -104,11 +104,10 @@ export default function Edit() {
       breadcrumbs={pages}
       {...((hasPermission('edit_credit') || entityAssigned(credit)) &&
         credit && {
-          onSaveClick: () => save(credit),
           navigationTopRight: (
             <ResourceActions
               resource={credit}
-              label={t('more_actions')}
+              onSaveClick={() => save(credit)}
               actions={actions}
               cypressRef="creditActionDropdown"
             />
