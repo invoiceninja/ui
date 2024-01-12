@@ -23,10 +23,15 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function ConnectAccounts() {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
+
+  const company = useCurrentCompany();
+
+  console.log(company.bank_integrations[0].disabled_upstream);
 
   const colors = useColorScheme();
 
