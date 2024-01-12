@@ -34,7 +34,7 @@ export function ProductItemsSelector(props: Props) {
   const { data: products } = useProductsQuery({ status: ['active'] });
 
   useEffect(() => {
-    if (products && !productItems) {
+    if (products) {
       setProductItems(
         products.map((product) => ({
           value: product.product_key,
