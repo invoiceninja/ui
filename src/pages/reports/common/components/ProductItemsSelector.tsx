@@ -99,7 +99,7 @@ export function ProductItemsSelector(props: Props) {
 
   return (
     <>
-      {productItems || !value || !value?.length ? (
+      {productItems ? (
         <Element leftSide={t('products')}>
           <Select
             id="productItemSelector"
