@@ -743,3 +743,30 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await logout(page);
 });
+
+test('Product selector list gets updated on the report page when it is created', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createProduct({ page, name: 'test product selector' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Reports', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="reportNameSelector"]')
+    .selectOption({ label: 'Product Sales' });
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[id="productItemSelector"]').click();
+
+  await expect(
+    page.getByText('test product selector', { exact: true })
+  ).toBeVisible();
+
+  await logout(page);
+});
