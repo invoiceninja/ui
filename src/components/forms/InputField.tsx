@@ -38,6 +38,7 @@ interface Props extends CommonProps {
   autoComplete?: string;
   withoutLabelWrapping?: boolean;
   changeOverride?: boolean;
+  readOnly?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -104,8 +105,8 @@ export function InputField(props: Props) {
           }}
           onChange={(event) => {
             if (props.changeOverride && props.changeOverride === true) {
-                props.onValueChange && props.onValueChange(event.target.value);
-                props.onChange && props.onChange(event);
+              props.onValueChange && props.onValueChange(event.target.value);
+              props.onChange && props.onChange(event);
             }
           }}
           value={props.value}
@@ -114,6 +115,7 @@ export function InputField(props: Props) {
           step={props.step}
           data-cy={props.cypressRef}
           name={props.name}
+          readOnly={props.readOnly}
         />
 
         {isInitialTypePassword && (
@@ -136,7 +138,7 @@ export function InputField(props: Props) {
       </div>
 
       {props.errorMessage && (
-        <Alert className="mt-2" type="danger" >
+        <Alert className="mt-2" type="danger">
           {props.errorMessage}
         </Alert>
       )}
