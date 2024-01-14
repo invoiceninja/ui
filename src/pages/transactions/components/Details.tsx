@@ -179,13 +179,17 @@ export function Details(props: Props) {
           </Link>
         </Element>
 
-        <Element leftSide={t('participant')}>
-          {transaction?.participant}
-        </Element>
+        {transaction?.participant && (
+          <Element leftSide={t('participant')}>
+            {transaction.participant}
+          </Element>
+        )}
 
-        <Element leftSide={t('participant_name')}>
-          {transaction?.participant_name}
-        </Element>
+        {transaction?.participant_name && (
+          <Element leftSide={t('participant_name')}>
+            {transaction.participant_name}
+          </Element>
+        )}
       </div>
 
       {!showTransactionMatchDetails ? (

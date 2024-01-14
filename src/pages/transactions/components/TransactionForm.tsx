@@ -133,13 +133,17 @@ export function TransactionForm(props: Props) {
 
       {props.page === 'edit' && (
         <>
-          <Element leftSide={t('participant')}>
-            <InputField value={props.transaction.participant} readOnly />
-          </Element>
+          {props.transaction.participant && (
+            <Element leftSide={t('participant')}>
+              <InputField value={props.transaction.participant} readOnly />
+            </Element>
+          )}
 
-          <Element leftSide={t('participant_name')}>
-            <InputField value={props.transaction.participant_name} readOnly />
-          </Element>
+          {props.transaction.participant_name && (
+            <Element leftSide={t('participant_name')}>
+              <InputField value={props.transaction.participant_name} readOnly />
+            </Element>
+          )}
         </>
       )}
     </>
