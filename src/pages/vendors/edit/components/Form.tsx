@@ -110,6 +110,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('name')}>
             <InputField
+              id="name"
               value={vendor.name || ''}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
@@ -276,6 +277,7 @@ export function Form(props: Props) {
             <div key={index}>
               <Element leftSide={t('first_name')}>
                 <InputField
+                  id={`first_name_${index}`}
                   value={contact.first_name}
                   onValueChange={(value) =>
                     handleContactChange('first_name', value, index)
@@ -288,6 +290,7 @@ export function Form(props: Props) {
 
               <Element leftSide={t('last_name')}>
                 <InputField
+                  id={`last_name_${index}`}
                   value={contact.last_name}
                   onValueChange={(value) =>
                     handleContactChange('last_name', value, index)
@@ -300,6 +303,7 @@ export function Form(props: Props) {
 
               <Element leftSide={t('email')}>
                 <InputField
+                  id={`email_${index}`}
                   value={contact.email}
                   onValueChange={(value) =>
                     handleContactChange('email', value, index)
