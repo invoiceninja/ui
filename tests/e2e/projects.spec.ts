@@ -54,11 +54,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
   } else {
     await expect(
       page
@@ -67,9 +63,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]')
     ).not.toBeVisible();
   }
 };
@@ -249,10 +243,7 @@ test('can edit project', async ({ page }) => {
     page.getByText('Successfully updated project', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
@@ -287,10 +278,7 @@ test('can create a project', async ({ page }) => {
     page.getByText('Successfully updated project', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
@@ -352,10 +340,7 @@ test('can view and edit assigned project with create_project', async ({
     page.getByText('Successfully updated project', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
@@ -388,11 +373,7 @@ test('deleting project with edit_project', async ({ page }) => {
   if (!doRecordsExist) {
     await createProject({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -588,10 +569,7 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   await checkEditPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
@@ -619,10 +597,7 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   await checkEditPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
@@ -658,11 +633,7 @@ test('cloning project', async ({ page }) => {
   if (!doRecordsExist) {
     await createProject({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true });
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
