@@ -24,7 +24,9 @@ import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEnabled } from '$app/common/guards/guards/enabled';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 
 export default function Expenses() {
@@ -32,8 +34,6 @@ export default function Expenses() {
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
-
-  const enabled = useEnabled();
 
   const pages = [{ name: t('expenses'), href: '/expenses' }];
 
@@ -67,12 +67,13 @@ export default function Expenses() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <ImportButton
-            route="/expenses/import"
-            showButton={
-              enabled(ModuleBitmask.Expenses) &&
-              (hasPermission('create_expense') || hasPermission('edit_expense'))
-            }
+          <Guard
+            type="component"
+            guards={[
+              enabled(ModuleBitmask.Expenses),
+              or(permission('create_expense'), permission('edit_expense')),
+            ]}
+            component={<ImportButton route="/expenses/import" />}
           />
         }
         leftSideChevrons={

@@ -38,6 +38,8 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -108,6 +110,7 @@ export default function RecurringInvoices() {
           <Guard
             type="component"
             guards={[
+              enabled(ModuleBitmask.RecurringInvoices),
               or(
                 permission('create_recurring_invoice'),
                 permission('edit_recurring_invoice')

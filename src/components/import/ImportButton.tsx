@@ -14,17 +14,10 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 
 interface Props {
   route: string;
-  showButton?: boolean;
 }
 
 export function ImportButton(props: Props) {
   const { t } = useTranslation();
-
-  const { showButton = true } = props;
-
-  if (!showButton) {
-    return <></>;
-  }
 
   return (
     <ReactRouterLink to={props.route}>

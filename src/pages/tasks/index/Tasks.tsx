@@ -31,6 +31,8 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -71,7 +73,10 @@ export default function Tasks() {
           <Guard
             type="component"
             component={<ImportButton route="/tasks/import" />}
-            guards={[or(permission('create_task'), permission('edit_task'))]}
+            guards={[
+              enabled(ModuleBitmask.Tasks),
+              or(permission('create_task'), permission('edit_task')),
+            ]}
           />
         }
         leftSideChevrons={

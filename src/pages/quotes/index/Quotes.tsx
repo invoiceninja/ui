@@ -28,6 +28,8 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -65,7 +67,10 @@ export default function Quotes() {
         rightSide={
           <Guard
             type="component"
-            guards={[or(permission('create_quote'), permission('edit_quote'))]}
+            guards={[
+              enabled(ModuleBitmask.Quotes),
+              or(permission('create_quote'), permission('edit_quote')),
+            ]}
             component={<ImportButton route="/quotes/import" />}
           />
         }

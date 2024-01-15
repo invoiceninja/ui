@@ -23,15 +23,14 @@ import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings';
+import { or } from '$app/common/guards/guards/or';
+import { Guard } from '$app/common/guards/Guard';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
 
   const [t] = useTranslation();
 
-  const enabled = useEnabled();
   const hasPermission = useHasPermission();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
@@ -54,12 +53,12 @@ export default function Vendors() {
         withResourcefulActions
         customBulkActions={customBulkActions}
         rightSide={
-          <ImportButton
-            route="/vendors/import"
-            showButton={
-              enabled(ModuleBitmask.Vendors) &&
-              (hasPermission('create_vendor') || hasPermission('edit_vendor'))
-            }
+          <Guard
+            type="component"
+            guards={[
+              or(permission('create_vendor'), permission('edit_vendor')),
+            ]}
+            component={<ImportButton route="/vendors/import" />}
           />
         }
         leftSideChevrons={
