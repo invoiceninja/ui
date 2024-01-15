@@ -29,10 +29,13 @@ interface Props {
   placeholder: string;
   onChange?: (value: string, field: string, type: AvailableTypes) => unknown;
   noExternalPadding?: boolean;
+  withDateRangeField?: boolean;
 }
 
 export function Field(props: Props) {
   const [t] = useTranslation();
+
+  const { withDateRangeField } = props;
 
   const [initialValue, setInitialValue] = useState('');
   const [dropdownInitialValue, setDropdownInitialValue] = useState('');
@@ -116,7 +119,9 @@ export function Field(props: Props) {
           <option value="switch">{t('switch')}</option>
           <option value="dropdown">{t('dropdown')}</option>
           <option value="date">{t('date')}</option>
-          <option value="date_range">{t('date_range')}</option>
+          {withDateRangeField && (
+            <option value="date_range">{t('date_range')}</option>
+          )}
         </SelectField>
       </Element>
 

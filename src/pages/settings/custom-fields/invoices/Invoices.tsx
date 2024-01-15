@@ -58,6 +58,7 @@ export function Invoices() {
           placeholder={t('invoice_field')}
           onChange={(value) => handleChange(field, value)}
           initialValue={company.custom_fields[field]}
+          withDateRangeField
         />
       ))}
 
