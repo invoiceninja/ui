@@ -31,8 +31,6 @@ export function ConnectAccounts() {
 
   const company = useCurrentCompany();
 
-  console.log(company.bank_integrations[0].disabled_upstream);
-
   const colors = useColorScheme();
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -89,6 +87,10 @@ export function ConnectAccounts() {
     }
   };
 
+  const isUpstreamDisabled = () => {
+    return company.bank_integrations[0].disabled_upstream;
+  };
+
   return (
     <>
       <Button
@@ -98,7 +100,9 @@ export function ConnectAccounts() {
         }
       >
         <span className="mr-2">{<Icon element={MdLink} size={20} />}</span>
-        {t('connect_accounts')}
+        {isUpstreamDisabled() && isSelfHosted()
+          ? t('reconnect_account')
+          : t('connect_accounts')}
       </Button>
 
       <Modal
@@ -137,7 +141,9 @@ export function ConnectAccounts() {
             disableWithoutIcon
             disabled={!account}
           >
-            {t('connect')}
+            {account === 'nordigen' && isUpstreamDisabled()
+              ? t('reconnect')
+              : t('connect')}
           </Button>
         </div>
       </Modal>
