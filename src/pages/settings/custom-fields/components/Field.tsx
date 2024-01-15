@@ -20,6 +20,7 @@ export enum AvailableTypes {
   Switch = 'switch',
   Dropdown = 'dropdown',
   Date = 'date',
+  DateRange = 'date_range',
 }
 
 interface Props {
@@ -114,6 +115,7 @@ export function Field(props: Props) {
           <option value="switch">{t('switch')}</option>
           <option value="dropdown">{t('dropdown')}</option>
           <option value="date">{t('date')}</option>
+          <option value="date_range">{t('date_range')}</option>
         </SelectField>
       </Element>
 

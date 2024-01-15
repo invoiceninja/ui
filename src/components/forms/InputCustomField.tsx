@@ -93,6 +93,34 @@ export function InputCustomField(props: Props) {
           ))}
         </SelectField>
       )}
+
+      {type === AvailableTypes.DateRange && (
+        <div className="flex flex-col space-y-2">
+          <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
+            type="date"
+            id={props.field}
+            onValueChange={(value) =>
+              props.onValueChange(
+                [value, props.defaultValue.split(',')[1] || ''].join(',')
+              )
+            }
+            value={props.defaultValue.split(',')[0] || ''}
+          />
+
+          <InputField
+            style={{ color: colors.$3, colorScheme: colors.$0 }}
+            type="date"
+            id={props.field}
+            onValueChange={(value) =>
+              props.onValueChange(
+                [props.defaultValue.split(',')[0] || '', value].join(',')
+              )
+            }
+            value={props.defaultValue.split(',')[1] || ''}
+          />
+        </div>
+      )}
     </>
   );
 }
