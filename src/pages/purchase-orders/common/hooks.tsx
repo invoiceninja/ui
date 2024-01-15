@@ -62,6 +62,11 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -368,12 +373,15 @@ export function usePurchaseOrderFilters() {
 
 export function useActions() {
   const [t] = useTranslation();
-
   const navigate = useNavigate();
 
   const bulk = useBulk();
-
   const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+
+  const disableNavigation = useDisableNavigation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
 
@@ -441,7 +449,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) =>
-      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
+      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => scheduleEmailRecord(purchaseOrder.id)}
           icon={<Icon element={MdSchedule} />}
@@ -485,7 +494,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) =>
-      Boolean(purchaseOrder.expense_id.length) && (
+      Boolean(purchaseOrder.expense_id.length) &&
+      !disableNavigation('expense', purchaseOrder.expense) && (
         <DropdownElement
           onClick={() =>
             navigate(
@@ -506,14 +516,15 @@ export function useActions() {
       </DropdownElement>
     ),
     () => <Divider withoutPadding />,
-    (purchaseOrder) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(purchaseOrder)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone_to_purchase_order')}
-      </DropdownElement>
-    ),
+    (purchaseOrder) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(purchaseOrder)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
     (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
