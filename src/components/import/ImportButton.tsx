@@ -14,10 +14,18 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 
 interface Props {
   route: string;
+  showButton?: boolean;
 }
 
 export function ImportButton(props: Props) {
   const { t } = useTranslation();
+
+  const { showButton = true } = props;
+
+  if (!showButton) {
+    return <></>;
+  }
+
   return (
     <ReactRouterLink to={props.route}>
       <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">

@@ -77,7 +77,7 @@ export default function Expense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      {...((hasPermission('edit_purchase_order') || entityAssigned(expense)) &&
+      {...((hasPermission('edit_expense') || entityAssigned(expense)) &&
         expense && {
           onSaveClick: () => save(expense),
           navigationTopRight: (
