@@ -49,6 +49,7 @@ export function Field(props: Props) {
     AvailableTypes.Switch,
     AvailableTypes.Dropdown,
     AvailableTypes.Date,
+    AvailableTypes.DateRange,
   ];
 
   const inputRef = useRef<HTMLInputElement>();
