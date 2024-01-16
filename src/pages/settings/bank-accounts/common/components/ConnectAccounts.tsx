@@ -23,13 +23,10 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function ConnectAccounts() {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
-
-  const company = useCurrentCompany();
 
   const colors = useColorScheme();
 
@@ -87,10 +84,6 @@ export function ConnectAccounts() {
     }
   };
 
-  const isUpstreamDisabled = () => {
-    return Boolean(company.bank_integrations[0]?.disabled_upstream);
-  };
-
   return (
     <>
       <Button
@@ -100,9 +93,7 @@ export function ConnectAccounts() {
         }
       >
         <span className="mr-2">{<Icon element={MdLink} size={20} />}</span>
-        {isUpstreamDisabled() && isSelfHosted()
-          ? t('reconnect_account')
-          : t('connect_accounts')}
+        {t('connect_accounts')}
       </Button>
 
       <Modal
@@ -141,9 +132,7 @@ export function ConnectAccounts() {
             disableWithoutIcon
             disabled={!account}
           >
-            {account === 'nordigen' && isUpstreamDisabled()
-              ? t('reconnect')
-              : t('connect')}
+            {t('connect')}
           </Button>
         </div>
       </Modal>
