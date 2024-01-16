@@ -37,9 +37,10 @@ const createVendor = async (params: CreateParams) => {
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Vendor' })
+    .first()
     .click();
 
-  await page.locator('#name').fill(vendorName || 'New Vendor');
+  await page.locator('#name').fill(vendorName || 'Vendor Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(email || 'first@example.com');
@@ -441,11 +442,13 @@ test('vendor documents preview with view_vendor', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createVendor({ page });
+
+    await checkShowPage(page, true);
   } else {
     await tableRow.getByRole('link').first().click();
-  }
 
-  await checkShowPage(page, false);
+    await checkShowPage(page, false);
+  }
 
   await page
     .getByRole('link', {
