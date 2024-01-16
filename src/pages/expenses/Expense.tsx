@@ -85,6 +85,7 @@ export default function Expense() {
               resource={expense}
               label={t('more_actions')}
               actions={actions}
+              cypressRef="expenseActionDropdown"
             />
           ),
         })}
