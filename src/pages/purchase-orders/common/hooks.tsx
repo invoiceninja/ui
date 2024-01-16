@@ -411,6 +411,7 @@ export function useActions() {
       status_id: '1',
       client_id: '',
       paid_to_date: 0,
+      vendor: undefined,
     });
 
     navigate('/purchase_orders/create?action=clone');
