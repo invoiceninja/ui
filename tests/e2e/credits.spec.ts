@@ -367,7 +367,7 @@ test('deleting credit with edit_credit', async ({ page }) => {
   }
 });
 
-test('archiving quote withe edit_quote', async ({ page }) => {
+test('archiving credit withe edit_credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -416,7 +416,7 @@ test('archiving quote withe edit_quote', async ({ page }) => {
   }
 });
 
-test('quote documents preview with edit_quote', async ({ page }) => {
+test('credit documents preview with edit_credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -464,7 +464,7 @@ test('quote documents preview with edit_quote', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('quote documents uploading with edit_quote', async ({ page }) => {
+test('credit documents uploading with edit_credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
