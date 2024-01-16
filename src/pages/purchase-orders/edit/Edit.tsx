@@ -127,6 +127,7 @@ export default function Edit() {
               label={t('more_actions')}
               resource={purchaseOrder}
               actions={actions}
+              cypressRef="purchaseOrderActionDropdown"
             />
           ),
         })}
