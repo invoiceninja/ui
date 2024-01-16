@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -16,10 +16,10 @@ import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { Icon } from '$app/components/icons/Icon';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { MdLink } from 'react-icons/md';
+import { MdWarning } from 'react-icons/md';
+import { Tooltip } from '$app/components/Tooltip';
 
 enum IntegrationType {
   Yodlee = 'YODLEE',
@@ -61,15 +61,17 @@ export const useBankAccountColumns = () => {
 
           {bankAccount.integration_type === IntegrationType.Nordigen &&
             bankAccount.disabled_upstream && (
-              <Button
-                className="py-1"
-                type="minimal"
-                behavior="button"
-                onClick={handleConnectNordigen}
+              <Tooltip
+                message={t('reconnect_account') as string}
+                width="auto"
+                placement="top"
               >
-                <Icon element={MdLink} size={18} />
-                <span>{t('reconnect_account')}</span>
-              </Button>
+                <MdWarning
+                  color="red"
+                  size={22}
+                  onClick={handleConnectNordigen}
+                />
+              </Tooltip>
             )}
         </div>
       ),
