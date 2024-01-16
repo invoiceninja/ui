@@ -409,7 +409,7 @@ export function useActions() {
       project_id: '',
       subscription_id: '',
       status_id: '1',
-      vendor_id: '',
+      client_id: '',
       paid_to_date: 0,
     });
 
