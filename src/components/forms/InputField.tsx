@@ -39,6 +39,7 @@ interface Props extends CommonProps {
   withoutLabelWrapping?: boolean;
   changeOverride?: boolean;
   readOnly?: boolean;
+  width?: string | number;
 }
 
 export function InputField(props: Props) {
@@ -61,7 +62,7 @@ export function InputField(props: Props) {
   const colors = useColorScheme();
 
   return (
-    <section>
+    <section style={{ width: props.width }}>
       {props.label && (
         <InputLabel
           className={classNames('mb-2', {
