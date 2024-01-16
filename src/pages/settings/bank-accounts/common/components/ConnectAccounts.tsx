@@ -88,7 +88,7 @@ export function ConnectAccounts() {
   };
 
   const isUpstreamDisabled = () => {
-    return company.bank_integrations[0].disabled_upstream;
+    return Boolean(company.bank_integrations[0]?.disabled_upstream);
   };
 
   return (
