@@ -82,6 +82,7 @@ export function InvoiceDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('custom_value1', value.toString())
             }
+            withDateRangeField
           />
         )}
 
@@ -93,6 +94,7 @@ export function InvoiceDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('custom_value2', value.toString())
             }
+            withDateRangeField
           />
         )}
       </Card>
@@ -152,6 +154,7 @@ export function InvoiceDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('custom_value3', value.toString())
             }
+            withDateRangeField
           />
         )}
 
@@ -163,6 +166,7 @@ export function InvoiceDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('custom_value4', value.toString())
             }
+            withDateRangeField
           />
         )}
       </Card>
