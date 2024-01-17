@@ -35,35 +35,32 @@ import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useDateRangeProperties } from '../common/hooks/useDateRangeProperties';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
 
+  const pages = [{ name: t('invoices'), href: '/invoices' }];
+
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
   const [sliderInvoiceId, setSliderInvoiceId] = useState<string>('');
-
-  const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
-
-  const actions = useActions();
-
-  const filters = useInvoiceFilters();
-
-  const invoiceColumns = useAllInvoiceColumns();
-
-  const columns = useInvoiceColumns();
-
-  const pages = [{ name: t('invoices'), href: '/invoices' }];
-
-  const customBulkActions = useCustomBulkActions();
-
   const [invoiceSlider, setInvoiceSlider] = useAtom(invoiceSliderAtom);
   const [invoiceSliderVisibility, setInvoiceSliderVisibility] = useAtom(
     invoiceSliderVisibilityAtom
   );
+
+  const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
+
+  const actions = useActions();
+  const filters = useInvoiceFilters();
+  const columns = useInvoiceColumns();
+  const invoiceColumns = useAllInvoiceColumns();
+  const customBulkActions = useCustomBulkActions();
+  const dateRangeProperties = useDateRangeProperties();
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -117,7 +114,7 @@ export default function Invoices() {
           setInvoiceSliderVisibility(true);
         }}
         withDateRangeSelector
-        dateRangeSelectorColumn="date,due_date"
+        dateRangeProperties={dateRangeProperties}
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}

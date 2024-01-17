@@ -58,6 +58,11 @@ import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import dayjs from 'dayjs';
 
+export interface DateRangeProperty {
+  value: string;
+  label: string;
+}
+
 export type DataTableColumns<T = any> = {
   id: string;
   label: string;
@@ -121,7 +126,7 @@ interface Props<T> extends CommonProps {
   ) => void;
   hideEditableOptions?: boolean;
   withDateRangeSelector?: boolean;
-  dateRangeSelectorColumn?: string;
+  dateRangeProperties?: DateRangeProperty[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -149,7 +154,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     onBulkActionCall,
     hideEditableOptions = false,
-    dateRangeSelectorColumn,
+    dateRangeProperties,
     withDateRangeSelector,
   } = props;
 
@@ -173,6 +178,9 @@ export function DataTable<T extends object>(props: Props<T>) {
       dayjs().add(-7, 'day').format('YYYY-MM-DD'),
       dayjs().format('YYYY-MM-DD'),
     ].join(',')
+  );
+  const [dateRangeProperty, setDateRangeProperty] = useState<string>(
+    dateRangeProperties?.[0].value || ''
   );
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
@@ -238,10 +246,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (withDateRangeSelector && dateRangeSelectorColumn) {
+    if (withDateRangeSelector && dateRangeProperty) {
       apiEndpoint.searchParams.set(
         'date_range',
-        [dateRangeSelectorColumn, dateRange].join(',')
+        [dateRangeProperty, dateRange].join(',')
       );
     }
 
@@ -252,7 +260,16 @@ export function DataTable<T extends object>(props: Props<T>) {
     return () => {
       isProduction() && setInvalidationQueryAtom(undefined);
     };
-  }, [perPage, currentPage, filter, sort, status, customFilter, dateRange]);
+  }, [
+    perPage,
+    currentPage,
+    filter,
+    sort,
+    status,
+    customFilter,
+    dateRange,
+    dateRangeProperty,
+  ]);
 
   const { data, isLoading, isError } = useQuery(
     [
@@ -265,6 +282,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       status,
       customFilter,
       dateRange,
+      dateRangeProperty,
     ],
     () => request('GET', apiEndpoint.href),
     {
@@ -382,9 +400,12 @@ export function DataTable<T extends object>(props: Props<T>) {
             </>
           }
           beforeFilter={props.beforeFilter}
-          withDateRangeSelector={props.withDateRangeSelector}
           dateRange={dateRange}
           setDateRange={setDateRange}
+          dateRangeProperties={dateRangeProperties}
+          setDateRangeProperty={setDateRangeProperty}
+          dateRangeProperty={dateRangeProperty}
+          withDateRangeSelector={withDateRangeSelector}
         >
           {!hideEditableOptions && (
             <Dropdown
