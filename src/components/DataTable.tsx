@@ -193,6 +193,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
+    setDateRange,
     tableKey,
     customFilters,
   });
@@ -209,8 +210,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
   });
 
-  console.log(dateRange);
-
   useEffect(() => {
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
@@ -223,7 +222,8 @@ export function DataTable<T extends object>(props: Props<T>) {
             sort,
             currentPage,
             status,
-            perPage
+            perPage,
+            withDateRangeSelector ? dateRange : undefined
           ),
         1500
       );

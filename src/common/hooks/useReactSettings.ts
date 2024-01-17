@@ -26,6 +26,7 @@ export interface TableFiltersPreference {
   status: string[];
   sortedBy?: string;
   perPage?: PerPage;
+  dateRange?: string;
 }
 
 export interface Preferences {

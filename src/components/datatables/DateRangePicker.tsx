@@ -39,7 +39,7 @@ export function DateRangePicker(props: Props) {
   useClickAway(divRef, () => {
     setTimeout(() => {
       isVisible && setIsVisible(false);
-    }, 300);
+    }, 200);
   });
 
   const handleChangeValue = (value: [string, string]) => {
