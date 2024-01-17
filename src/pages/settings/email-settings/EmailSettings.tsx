@@ -56,7 +56,7 @@ export function EmailSettings() {
     { name: t('email_settings'), href: '/settings/email_settings' },
   ];
 
-  const emailProvider = useEmailProviders();
+  const emailProviders = useEmailProviders();
 
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
@@ -342,7 +342,7 @@ export function EmailSettings() {
             disabled={disableSettingsField('email_sending_method')}
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
-            {emailProvider.map(({ value, label }) => (
+            {emailProviders.map(({ value, label }) => (
               <option key={value} value={value}>
                 {label}
               </option>
