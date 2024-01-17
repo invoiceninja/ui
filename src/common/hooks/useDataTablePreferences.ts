@@ -22,7 +22,6 @@ import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../stores/slices/user';
-import dayjs from 'dayjs';
 
 interface Params {
   apiEndpoint: URL;
@@ -37,7 +36,6 @@ interface Params {
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
-  setDateRange: Dispatch<SetStateAction<string>>;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -57,7 +55,6 @@ export function useDataTablePreferences(params: Params) {
     setSortedBy,
     setStatus,
     setPerPage,
-    setDateRange,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -82,8 +79,7 @@ export function useDataTablePreferences(params: Params) {
     sort: string,
     currentPage: number,
     status: string[],
-    perPage: PerPage,
-    dateRange: string | undefined
+    perPage: PerPage
   ) => {
     if (!customFilter) {
       return;
@@ -104,7 +100,6 @@ export function useDataTablePreferences(params: Params) {
       ...(filter && { filter }),
       ...(sortedBy && { sortedBy }),
       ...(customFilters && { customFilter }),
-      ...(dateRange && { dateRange }),
       sort,
       currentPage,
       status,
@@ -153,13 +148,6 @@ export function useDataTablePreferences(params: Params) {
       } else {
         setStatus(['active']);
       }
-      setDateRange(
-        (getPreference('dateRange') as string) ||
-          [
-            dayjs().add(-7, 'day').format('YYYY-MM-DD'),
-            dayjs().format('YYYY-MM-DD'),
-          ].join(',')
-      );
     }
   }, [isInitialConfiguration]);
 

@@ -193,7 +193,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     setSort,
     setSortedBy,
     setStatus,
-    setDateRange,
     tableKey,
     customFilters,
   });
@@ -222,8 +221,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             sort,
             currentPage,
             status,
-            perPage,
-            withDateRangeSelector ? dateRange : undefined
+            perPage
           ),
         1500
       );
