@@ -20,7 +20,6 @@ export enum AvailableTypes {
   Switch = 'switch',
   Dropdown = 'dropdown',
   Date = 'date',
-  DateRange = 'date_range',
 }
 
 interface Props {
@@ -29,13 +28,10 @@ interface Props {
   placeholder: string;
   onChange?: (value: string, field: string, type: AvailableTypes) => unknown;
   noExternalPadding?: boolean;
-  withDateRangeField?: boolean;
 }
 
 export function Field(props: Props) {
   const [t] = useTranslation();
-
-  const { withDateRangeField } = props;
 
   const [initialValue, setInitialValue] = useState('');
   const [dropdownInitialValue, setDropdownInitialValue] = useState('');
@@ -52,7 +48,6 @@ export function Field(props: Props) {
     AvailableTypes.Switch,
     AvailableTypes.Dropdown,
     AvailableTypes.Date,
-    AvailableTypes.DateRange,
   ];
 
   const inputRef = useRef<HTMLInputElement>();
@@ -119,9 +114,6 @@ export function Field(props: Props) {
           <option value="switch">{t('switch')}</option>
           <option value="dropdown">{t('dropdown')}</option>
           <option value="date">{t('date')}</option>
-          {withDateRangeField && (
-            <option value="date_range">{t('date_range')}</option>
-          )}
         </SelectField>
       </Element>
 

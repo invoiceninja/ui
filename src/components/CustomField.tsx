@@ -16,12 +16,10 @@ import {
 } from './forms/InputCustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Entity } from '$app/common/hooks/useEntityCustomFields';
-import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
   noExternalPadding?: boolean;
-  withDateRangeField?: boolean;
 }
 
 export function customField(value: string) {
@@ -56,13 +54,6 @@ export function CustomField(props: Props) {
       : [props.value, ''];
     setLabel(fieldLabel || '');
   }, []);
-
-  if (
-    !props.withDateRangeField &&
-    props.value.split('|')[1] === AvailableTypes.DateRange
-  ) {
-    return <></>;
-  }
 
   if (props.fieldOnly) {
     return <InputCustomField {...props} />;
