@@ -116,6 +116,8 @@ export default function Invoices() {
           setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);
         }}
+        withDateRangeSelector
+        dateRangeSelectorColumn="date,due_date"
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
