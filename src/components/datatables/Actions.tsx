@@ -175,7 +175,7 @@ export function Actions(props: Props) {
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.beforeFilter}
 
-        {props.withDateRangeSelector && (
+        {props.dateRangeProperties?.length && (
           <DateRangePicker
             dateRange={props.dateRange}
             setDateRange={props.setDateRange}

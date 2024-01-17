@@ -113,7 +113,6 @@ export default function Invoices() {
           setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);
         }}
-        withDateRangeSelector
         dateRangeProperties={dateRangeProperties}
       />
 

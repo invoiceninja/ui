@@ -26,7 +26,7 @@ import { useColorScheme } from '$app/common/colors';
 interface Props {
   dateRange: string;
   setDateRange: Dispatch<SetStateAction<string>>;
-  dateRangeProperties?: DateRangeProperty[];
+  dateRangeProperties: DateRangeProperty[];
   dateRangeProperty: string;
   setDateRangeProperty: Dispatch<SetStateAction<string>>;
 }

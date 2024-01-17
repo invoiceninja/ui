@@ -125,7 +125,6 @@ interface Props<T> extends CommonProps {
     action: 'archive' | 'restore' | 'delete'
   ) => void;
   hideEditableOptions?: boolean;
-  withDateRangeSelector?: boolean;
   dateRangeProperties?: DateRangeProperty[];
 }
 
@@ -155,7 +154,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeProperties,
-    withDateRangeSelector,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -246,7 +244,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (withDateRangeSelector && dateRangeProperty) {
+    if (dateRangeProperties?.length && dateRangeProperty) {
       apiEndpoint.searchParams.set(
         'date_range',
         [dateRangeProperty, dateRange].join(',')
@@ -405,7 +403,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           dateRangeProperties={dateRangeProperties}
           setDateRangeProperty={setDateRangeProperty}
           dateRangeProperty={dateRangeProperty}
-          withDateRangeSelector={withDateRangeSelector}
         >
           {!hideEditableOptions && (
             <Dropdown
