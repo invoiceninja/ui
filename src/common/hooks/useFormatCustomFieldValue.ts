@@ -19,7 +19,7 @@ export function useFormatCustomFieldValue() {
   const customFields = company?.custom_fields;
 
   return (fieldKey: string, value: string) => {
-    if (customFields && customFields[fieldKey]) {
+    if (customFields && customFields[fieldKey] && value) {
       const currentField = customFields[fieldKey];
 
       if (currentField.split('|')[1] === 'date') {
