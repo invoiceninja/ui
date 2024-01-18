@@ -241,9 +241,12 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     if (dateRangeColumns.length && dateRangeProperty) {
+      const startDate = dateRange.split(',')[0];
+      const endDate = dateRange.split(',')[1];
+
       apiEndpoint.searchParams.set(
         'date_range',
-        [dateRangeProperty, dateRange].join(',')
+        [dateRangeProperty, startDate && endDate ? dateRange : ''].join(',')
       );
     }
 

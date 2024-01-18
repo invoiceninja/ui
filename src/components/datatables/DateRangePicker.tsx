@@ -49,15 +49,15 @@ export function DateRangePicker(props: Props) {
   const handleChangeValue = (value: [string, string]) => {
     dayjs.extend(customParseFormat);
 
-    if (value[0] === '' || value[1] === '') {
-      return;
-    }
+    const start = value[0]
+      ? dayjs(value[0], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
+      : '';
 
-    setDateRange(
-      dayjs(value[0], dateFormat, antdLocale?.locale).format('YYYY-MM-DD') +
-        ',' +
-        dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
-    );
+    const end = value[1]
+      ? dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
+      : '';
+
+    setDateRange([start, end].join(','));
 
     onValueChanged();
   };
@@ -81,11 +81,17 @@ export function DateRangePicker(props: Props) {
               <RangePicker
                 size="large"
                 value={[
-                  dayjs(dateRange.split(',')[0]),
-                  dayjs(dateRange.split(',')[1]),
+                  dateRange.split(',')[0]
+                    ? dayjs(dateRange.split(',')[0])
+                    : null,
+                  dateRange.split(',')[1]
+                    ? dayjs(dateRange.split(',')[1])
+                    : null,
                 ]}
                 format={dateFormat}
-                onChange={(_, dateString) => handleChangeValue(dateString)}
+                onCalendarChange={(_, dateString) =>
+                  handleChangeValue(dateString)
+                }
               />
             </ConfigProvider>
           </div>
