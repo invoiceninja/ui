@@ -57,11 +57,7 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import dayjs from 'dayjs';
-
-export interface DateRangeProperty {
-  value: string;
-  label: string;
-}
+import { DateRangePicker } from './datatables/DateRangePicker';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -125,7 +121,7 @@ interface Props<T> extends CommonProps {
     action: 'archive' | 'restore' | 'delete'
   ) => void;
   hideEditableOptions?: boolean;
-  dateRangeProperties?: DateRangeProperty[];
+  dateRangeColumns?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -153,7 +149,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     onBulkActionCall,
     hideEditableOptions = false,
-    dateRangeProperties,
+    dateRangeColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -178,7 +174,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     ].join(',')
   );
   const [dateRangeProperty, setDateRangeProperty] = useState<string>(
-    dateRangeProperties?.[0].value || ''
+    dateRangeColumns[0] || ''
   );
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
@@ -244,7 +240,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (dateRangeProperties?.length && dateRangeProperty) {
+    if (dateRangeColumns.length && dateRangeProperty) {
       apiEndpoint.searchParams.set(
         'date_range',
         [dateRangeProperty, dateRange].join(',')
@@ -398,11 +394,6 @@ export function DataTable<T extends object>(props: Props<T>) {
             </>
           }
           beforeFilter={props.beforeFilter}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          dateRangeProperties={dateRangeProperties}
-          setDateRangeProperty={setDateRangeProperty}
-          dateRangeProperty={dateRangeProperty}
         >
           {!hideEditableOptions && (
             <Dropdown
@@ -522,7 +513,19 @@ export function DataTable<T extends object>(props: Props<T>) {
               }}
               childrenClassName={styleOptions?.thChildrenClassName}
             >
-              {column.label}
+              <div className="flex items-center space-x-3">
+                {dateRangeColumns.includes(column.id) && (
+                  <DateRangePicker
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
+                    onValueChanged={() => {
+                      dateRangeProperty !== column.id &&
+                        setDateRangeProperty(column.id);
+                    }}
+                  />
+                )}
+                <span>{column.label}</span>
+              </div>
             </Th>
           ))}
 

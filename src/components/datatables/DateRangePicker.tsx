@@ -19,16 +19,12 @@ import Tippy from '@tippyjs/react/headless';
 import { Icon } from '../icons/Icon';
 import { Calendar } from 'react-feather';
 import { useClickAway } from 'react-use';
-import { DateRangeProperty } from '../DataTable';
-import { Button } from '../forms';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   dateRange: string;
   setDateRange: Dispatch<SetStateAction<string>>;
-  dateRangeProperties: DateRangeProperty[];
-  dateRangeProperty: string;
-  setDateRangeProperty: Dispatch<SetStateAction<string>>;
+  onValueChanged: () => void;
 }
 export function DateRangePicker(props: Props) {
   const divRef = useRef(null);
@@ -37,13 +33,7 @@ export function DateRangePicker(props: Props) {
 
   const colors = useColorScheme();
 
-  const {
-    dateRange,
-    setDateRange,
-    dateRangeProperties,
-    dateRangeProperty,
-    setDateRangeProperty,
-  } = props;
+  const { dateRange, setDateRange, onValueChanged } = props;
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -68,6 +58,8 @@ export function DateRangePicker(props: Props) {
         ',' +
         dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
     );
+
+    onValueChanged();
   };
 
   return (
@@ -78,25 +70,13 @@ export function DateRangePicker(props: Props) {
         interactive={true}
         render={() => (
           <div
-            className="flex flex-col space-y-4 p-4"
+            className="flex flex-col p-3"
             style={{
               backgroundColor: colors.$2,
               border: `1px solid ${colors.$5}`,
             }}
+            onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex justify-between">
-              {dateRangeProperties?.map(({ value, label }) => (
-                <Button
-                  key={value}
-                  behavior="button"
-                  type={dateRangeProperty === value ? 'primary' : 'secondary'}
-                  onClick={() => setDateRangeProperty(value)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-
             <ConfigProvider locale={antdLocale?.default}>
               <RangePicker
                 size="large"
@@ -113,9 +93,17 @@ export function DateRangePicker(props: Props) {
       >
         <div
           className="cursor-pointer"
-          onClick={() => setIsVisible((current) => !current)}
+          onClick={(event) => {
+            event.stopPropagation();
+
+            setIsVisible((current) => !current);
+          }}
         >
-          <Icon element={Calendar} />
+          <Icon
+            element={Calendar}
+            color="white"
+            style={{ width: '1.4rem', height: '1.4rem' }}
+          />
         </div>
       </Tippy>
     </div>

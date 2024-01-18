@@ -14,8 +14,6 @@ import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
-import { DateRangePicker } from './DateRangePicker';
-import { DateRangeProperty } from '../DataTable';
 
 export interface SelectOption {
   value: string;
@@ -39,12 +37,6 @@ interface Props extends CommonProps {
   beforeFilter?: ReactNode;
   defaultCustomFilterOptions?: SelectOption[];
   filter: string;
-  withDateRangeSelector?: boolean;
-  dateRange: string;
-  setDateRange: Dispatch<SetStateAction<string>>;
-  dateRangeProperties?: DateRangeProperty[];
-  dateRangeProperty: string;
-  setDateRangeProperty: Dispatch<SetStateAction<string>>;
 }
 
 export function Actions(props: Props) {
@@ -174,16 +166,6 @@ export function Actions(props: Props) {
       </div>
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.beforeFilter}
-
-        {props.dateRangeProperties?.length && (
-          <DateRangePicker
-            dateRange={props.dateRange}
-            setDateRange={props.setDateRange}
-            dateRangeProperties={props.dateRangeProperties}
-            dateRangeProperty={props.dateRangeProperty}
-            setDateRangeProperty={props.setDateRangeProperty}
-          />
-        )}
 
         <InputField
           id="filter"
