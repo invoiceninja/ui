@@ -74,23 +74,6 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     setTemplateId(id);
   };
 
-  const showTemplate = (templateId: string) => {
-    if (templateId.includes('custom')) {
-      const companySettings = company?.settings;
-
-      return Boolean(
-        companySettings?.[
-          templateId.replace(
-            'template',
-            'subject'
-          ) as keyof typeof companySettings
-        ]
-      );
-    }
-
-    return true;
-  };
-
   const template = useResolveTemplate(
     body,
     props.resourceType,
@@ -144,29 +127,28 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               errorMessage={errors?.errors.template}
             >
               {Object.entries(props.list).map(
-                ([templateId, translation], index) =>
-                  showTemplate(templateId) && (
-                    <option key={index} value={templateId}>
-                      {t(translation)}
-                    </option>
-                  )
+                ([templateId, translation], index) => (
+                  <option key={index} value={templateId}>
+                    {t(translation)}
+                  </option>
+                )
               )}
 
-              {company?.settings.email_template_custom1 && (
+              {company?.settings.email_subject_custom1 && (
                 <option value="email_template_custom1">
-                  {company?.settings.email_subject_custom1}
+                  {t('first_custom')}
                 </option>
               )}
 
-              {company?.settings.email_template_custom2 && (
+              {company?.settings.email_subject_custom2 && (
                 <option value="email_template_custom2">
-                  {company?.settings.email_subject_custom2}
+                  {t('second_custom')}
                 </option>
               )}
 
-              {company?.settings.email_template_custom3 && (
+              {company?.settings.email_subject_custom3 && (
                 <option value="email_template_custom3">
-                  {company?.settings.email_subject_custom3}
+                  {t('third_custom')}
                 </option>
               )}
             </SelectField>
