@@ -32,4 +32,6 @@ export interface Transaction {
   transaction_id: number;
   updated_at: number;
   vendor_id: string;
+  participant: string;
+  participant_name: string;
 }
