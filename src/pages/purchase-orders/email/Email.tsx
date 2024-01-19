@@ -34,6 +34,9 @@ export default function Email() {
 
   const list = {
     email_template_purchase_order: 'initial_email',
+    email_template_custom1: 'first_custom',
+    email_template_custom2: 'second_custom',
+    email_template_custom3: 'third_custom',
   };
 
   const pages: Page[] = [

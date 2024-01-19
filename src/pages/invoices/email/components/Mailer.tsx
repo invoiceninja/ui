@@ -74,6 +74,23 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     setTemplateId(id);
   };
 
+  const showTemplate = (templateId: string) => {
+    if (templateId.includes('custom')) {
+      const companySettings = company?.settings;
+
+      return Boolean(
+        companySettings?.[
+          templateId.replace(
+            'template',
+            'subject'
+          ) as keyof typeof companySettings
+        ]
+      );
+    }
+
+    return true;
+  };
+
   const template = useResolveTemplate(
     body,
     props.resourceType,
@@ -127,11 +144,12 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               errorMessage={errors?.errors.template}
             >
               {Object.entries(props.list).map(
-                ([templateId, translation], index) => (
-                  <option key={index} value={templateId}>
-                    {t(translation)}
-                  </option>
-                )
+                ([templateId, translation], index) =>
+                  showTemplate(templateId) && (
+                    <option key={index} value={templateId}>
+                      {t(translation)}
+                    </option>
+                  )
               )}
 
               {company?.settings.email_template_custom1 && (
