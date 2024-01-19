@@ -49,7 +49,7 @@ export function Details(props: Props) {
     field: string,
     value: string | number | boolean
   ) => {
-    props.setClient((client) => client && set(client, field, value));
+    props.setClient((client) => client && set({ ...client }, field, value));
   };
 
   const company = useCurrentCompany();

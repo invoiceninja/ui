@@ -76,23 +76,11 @@ const checkEditPage = async (
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
   }
 
@@ -242,10 +230,7 @@ test('can edit credit', async ({ page }) => {
     page.getByText('Successfully updated credit', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
@@ -280,10 +265,7 @@ test('can create a credit', async ({ page }) => {
     page.getByText('Successfully updated credit', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
@@ -334,10 +316,7 @@ test('can view and edit assigned credit with create_credit', async ({
     page.getByText('Successfully updated credit', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
@@ -370,11 +349,7 @@ test('deleting credit with edit_credit', async ({ page }) => {
   if (!doRecordsExist) {
     await createCredit({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -418,11 +393,7 @@ test('archiving quote withe edit_quote', async ({ page }) => {
   if (!doRecordsExist) {
     await createCredit({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="chevronDownButton"]')
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -570,10 +541,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
@@ -614,10 +582,7 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkEditPage(page, true, false);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
@@ -653,11 +618,7 @@ test('cloning credit', async ({ page }) => {
   if (!doRecordsExist) {
     await createCredit({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true });
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')

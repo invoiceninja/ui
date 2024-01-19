@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { BankAccount } from './bank-accounts';
+
 export interface Company {
   id: string;
   size_id: string;
@@ -61,6 +63,8 @@ export interface Company {
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
+  convert_products: boolean;
+  bank_integrations: BankAccount[];
 }
 
 export interface Settings {
