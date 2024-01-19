@@ -56,7 +56,6 @@ import { useLocation } from 'react-router-dom';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
-import dayjs from 'dayjs';
 import { DateRangePicker } from './datatables/DateRangePicker';
 
 export type DataTableColumns<T = any> = {
@@ -167,12 +166,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
-  const [dateRange, setDateRange] = useState<string>(
-    [
-      dayjs().add(-7, 'day').format('YYYY-MM-DD'),
-      dayjs().format('YYYY-MM-DD'),
-    ].join(',')
-  );
+  const [dateRange, setDateRange] = useState<string>('');
   const [dateRangeProperty, setDateRangeProperty] = useState<string>(
     dateRangeColumns[0] || ''
   );

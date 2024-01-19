@@ -36,14 +36,13 @@ export function DateRangePicker(props: Props) {
   const { dateRange, setDateRange, onValueChanged } = props;
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
 
   const antdLocale = useAtomValue(antdLocaleAtom);
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   useClickAway(divRef, () => {
-    setTimeout(() => {
-      isVisible && setIsVisible(false);
-    }, 200);
+    isVisible && !isCalendarVisible && setIsVisible(false);
   });
 
   const handleChangeValue = (value: [string, string]) => {
@@ -92,6 +91,7 @@ export function DateRangePicker(props: Props) {
                 onCalendarChange={(_, dateString) =>
                   handleChangeValue(dateString)
                 }
+                onOpenChange={(value) => setIsCalendarVisible(value)}
               />
             </ConfigProvider>
           </div>
