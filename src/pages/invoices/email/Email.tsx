@@ -34,9 +34,6 @@ export default function Email() {
     email_template_reminder1: 'first_reminder',
     email_template_reminder2: 'second_reminder',
     email_template_reminder3: 'third_reminder',
-    email_template_custom1: 'first_custom',
-    email_template_custom2: 'second_custom',
-    email_template_custom3: 'third_custom',
   };
 
   const pages: Page[] = [
