@@ -13,7 +13,7 @@ import { useAtomValue } from 'jotai';
 import { antdLocaleAtom } from '../DropdownDateRangePicker';
 import dayjs from 'dayjs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Tippy from '@tippyjs/react/headless';
 import { Icon } from '../icons/Icon';
@@ -22,9 +22,8 @@ import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
-  dateRange: string;
   setDateRange: Dispatch<SetStateAction<string>>;
-  onValueChanged: () => void;
+  onClick: () => void;
 }
 export function DateRangePicker(props: Props) {
   const divRef = useRef(null);
@@ -33,10 +32,12 @@ export function DateRangePicker(props: Props) {
 
   const colors = useColorScheme();
 
-  const { dateRange, setDateRange, onValueChanged } = props;
+  const { setDateRange, onClick } = props;
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
+
+  const [currentDateRange, setCurrentDateRange] = useState<string>('');
 
   const antdLocale = useAtomValue(antdLocaleAtom);
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -56,10 +57,21 @@ export function DateRangePicker(props: Props) {
       ? dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
       : '';
 
-    setDateRange([start, end].join(','));
+    setCurrentDateRange([start, end].join(','));
 
-    onValueChanged();
+    setDateRange([start, end].join(','));
   };
+
+  useEffect(() => {
+    if (isVisible) {
+      const startDate = currentDateRange?.split(',')?.[0];
+      const endDate = currentDateRange?.split(',')?.[1];
+
+      setDateRange(
+        currentDateRange.length > 1 ? [startDate, endDate].join(',') : ''
+      );
+    }
+  }, [isVisible]);
 
   return (
     <div ref={divRef}>
@@ -80,11 +92,11 @@ export function DateRangePicker(props: Props) {
               <RangePicker
                 size="large"
                 value={[
-                  dateRange.split(',')[0]
-                    ? dayjs(dateRange.split(',')[0])
+                  currentDateRange.split(',')[0]
+                    ? dayjs(currentDateRange.split(',')[0])
                     : null,
-                  dateRange.split(',')[1]
-                    ? dayjs(dateRange.split(',')[1])
+                  currentDateRange.split(',')[1]
+                    ? dayjs(currentDateRange.split(',')[1])
                     : null,
                 ]}
                 format={dateFormat}
@@ -101,6 +113,8 @@ export function DateRangePicker(props: Props) {
           className="cursor-pointer"
           onClick={(event) => {
             event.stopPropagation();
+
+            onClick();
 
             setIsVisible((current) => !current);
           }}

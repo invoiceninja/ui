@@ -513,9 +513,8 @@ export function DataTable<T extends object>(props: Props<T>) {
               <div className="flex items-center space-x-3">
                 {dateRangeColumns.includes(column.id) && (
                   <DateRangePicker
-                    dateRange={dateRange}
                     setDateRange={setDateRange}
-                    onValueChanged={() => {
+                    onClick={() => {
                       dateRangeProperty !== column.id &&
                         setDateRangeProperty(column.id);
                     }}
