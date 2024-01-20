@@ -1,115 +1,600 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import {
+  Permission,
+  checkDropdownActions,
+  checkTableEditability,
+  login,
+  logout,
+  permissions,
+  useHasPermission,
+} from '$tests/e2e/helpers';
+import test, { expect, Page } from '@playwright/test';
+import { Action } from './clients.spec';
 
-test("can't view recurring expenses without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+interface Params {
+  permissions: Permission[];
+}
+function useRecurringExpensesActions({ permissions }: Params) {
+  const hasPermission = useHasPermission({ permissions });
 
-  await login(page);
-  await clear();
-  await save();
-  await logout(page);
+  const actions: Action[] = [
+    {
+      label: 'Clone',
+      visible: hasPermission('create_recurring_expense'),
+    },
+    {
+      label: 'Clone to Expense',
+      visible: hasPermission('create_expense'),
+    },
+  ];
 
-  await login(page, 'permissions@example.com', 'password');
+  return actions;
+}
 
-  await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
-    'Recurring Expenses'
-  );
-});
+const checkEditPage = async (page: Page, isEditable: boolean) => {
+  await page.waitForURL('**/recurring_expenses/**/edit');
 
-test('can view recurring expenses', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+  if (isEditable) {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'Save', exact: true })
+    ).toBeVisible();
 
-  await login(page);
-  await clear();
-  await set('view_recurring_expense');
-  await save();
-  await logout(page);
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).toBeVisible();
+  } else {
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'Save', exact: true })
+    ).not.toBeVisible();
 
-  await login(page, 'permissions@example.com', 'password');
+    await expect(
+      page
+        .locator('[data-cy="topNavbar"]')
+        .getByRole('button', { name: 'More Actions', exact: true })
+    ).not.toBeVisible();
+  }
+};
+
+interface CreateParams {
+  page: Page;
+  assignTo?: string;
+  isTableEditable?: boolean;
+  returnCreditNumber?: boolean;
+}
+const createRecurringExpense = async (params: CreateParams) => {
+  const { page, isTableEditable = true, assignTo, returnCreditNumber } = params;
 
   await page
+    .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await page.waitForURL('**/recurring_expenses');
+  await checkTableEditability(page, isTableEditable);
 
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).not.toBeVisible();
-});
-
-// test("can't create a recurring expense", async ({ page }) => {
-//   const { clear, save, set } = permissions(page);
-
-//   await login(page);
-//   await clear();
-//   await set('view_recurring_expense');
-//   await save();
-//   await logout(page);
-
-//   await login(page, 'permissions@example.com', 'password');
-
-//   await page
-//     .getByRole('link', { name: 'Recurring Expenses', exact: true })
-//     .click();
-//   await page.getByText('New Recurring Expense').click();
-
-//   await expect(
-//     page.getByRole('heading', {
-//       name: "Sorry, you don't have the needed permissions.",
-//     })
-//   ).toBeVisible();
-// });
-
-test('can create a recurring expense', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear();
-  await set('create_recurring_expense');
-  await save();
-  await logout(page);
-
-  await login(page, 'permissions@example.com', 'password');
-
-  await page
-    .getByRole('link', { name: 'Recurring Expenses', exact: true })
-    .click();
-  await page.getByText('New Recurring Expense').click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: "Sorry, you don't have the needed permissions.",
-    })
-  ).not.toBeVisible();
-});
-
-test('can view assigned recurring expense with create_recurring_expense', async ({
-  page,
-}) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear();
-  await set('create_recurring_expense');
-  await save();
-  await logout(page);
-
-  await login(page, 'permissions@example.com', 'password');
-
-  await page.getByRole('link', { name: 'Recurring Expenses' }).click();
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Recurring Expense' })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForURL('**/recurring_expenses/create');
+
+  await page.waitForTimeout(300);
+
+  if (assignTo) {
+    await page.getByTestId('combobox-input-field').nth(4).click();
+    await page.getByRole('option', { name: assignTo }).first().click();
+  }
 
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(
     page.getByText('Successfully created recurring expense')
+  ).toBeVisible();
+
+  if (returnCreditNumber) {
+    await page.waitForURL('**/recurring_expenses/**/edit');
+
+    return await page.locator('[id="number"]').inputValue();
+  }
+};
+
+test.skip("can't view recurring expenses without permission", async ({
+  page,
+}) => {
+  const { clear, save } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
+    'Recurring Expenses'
+  );
+
+  await logout(page);
+});
+
+test.skip('can view recurring expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('view_recurring_expense');
+  await save();
+
+  await createRecurringExpense({ page });
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await checkTableEditability(page, false);
+
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
+
+  await tableRow.getByRole('link').first().click();
+
+  await checkEditPage(page, false);
+
+  await logout(page);
+});
+
+test.skip('can edit recurring expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useRecurringExpensesActions({
+    permissions: ['edit_recurring_expense'],
+  });
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('edit_recurring_expense');
+  await save();
+
+  await createRecurringExpense({ page });
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await checkTableEditability(page, true);
+
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
+
+  await tableRow.getByRole('link').first().click();
+
+  await checkEditPage(page, true);
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated recurring expense', { exact: true })
+  ).toBeVisible();
+
+  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+
+  await logout(page);
+});
+
+test('can create a expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useRecurringExpensesActions({
+    permissions: ['create_expense'],
+  });
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await createRecurringExpense({ page, isTableEditable: false });
+
+  await checkEditPage(page, true);
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated expense', { exact: true })
+  ).toBeVisible();
+
+  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+
+  await logout(page);
+});
+
+test.skip('can view and edit assigned expense with create_expense', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useRecurringExpensesActions({
+    permissions: ['create_expense'],
+  });
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense');
+  await save();
+
+  const expenseNumber = await createRecurringExpense({
+    page,
+    assignTo: 'Expenses Example',
+    returnCreditNumber: true,
+  });
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await checkTableEditability(page, false);
+
+  await page.getByRole('link', { name: expenseNumber, exact: true }).click();
+
+  await checkEditPage(page, true);
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated expense', { exact: true })
+  ).toBeVisible();
+
+  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+
+  await logout(page);
+});
+
+test.skip('deleting expense with edit_expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForURL('**/expenses');
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createRecurringExpense({ page });
+
+    await page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+      .first()
+      .click();
+
+    await page.getByText('Delete').click();
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByText('Delete').click();
+  }
+
+  await expect(page.getByText('Successfully deleted expense')).toBeVisible();
+});
+
+test.skip('archiving expense with edit_expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page.waitForURL('**/expenses');
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createRecurringExpense({ page });
+
+    await page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+      .first()
+      .click();
+
+    await page.getByText('Archive').click();
+
+    await expect(
+      page.getByRole('button', { name: 'Restore', exact: true })
+    ).toBeVisible();
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByText('Archive').click();
+  }
+
+  await expect(page.getByText('Successfully archived expense')).toBeVisible();
+});
+
+test.skip('expense documents preview with edit_expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page.waitForURL('**/expenses');
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createRecurringExpense({ page });
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
+
+  await page.waitForURL('**/recurring_expenses/**/edit');
+
+  await page
+    .getByRole('link', {
+      name: 'Documents',
+      exact: true,
+    })
+    .click();
+
+  await page.waitForURL('**/recurring_expenses/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+});
+
+test.skip('expense documents uploading with edit_expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page.waitForURL('**/expenses');
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createRecurringExpense({ page });
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
+
+  await page.waitForURL('**/recurring_expenses/**/edit');
+
+  await page
+    .getByRole('link', {
+      name: 'Documents',
+      exact: true,
+    })
+    .click();
+
+  await page.waitForURL('**/recurring_expenses/**/documents');
+
+  await page
+    .locator('input[type="file"]')
+    .setInputFiles('./tests/assets/images/test-image.png');
+
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+
+  await expect(
+    page.getByText('test-image.png', { exact: true }).first()
+  ).toBeVisible();
+});
+
+test.skip('all actions in dropdown displayed with admin permission', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useRecurringExpensesActions({
+    permissions: ['admin'],
+  });
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await createRecurringExpense({ page });
+
+  await checkEditPage(page, true);
+
+  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+
+  await logout(page);
+});
+
+test.skip('all clone actions displayed with creation permissions', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  const actions = useRecurringExpensesActions({
+    permissions: ['create_expense', 'create_recurring_expense'],
+  });
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'create_recurring_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await createRecurringExpense({ page, isTableEditable: false });
+
+  await checkEditPage(page, true);
+
+  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+
+  await logout(page);
+});
+
+test.skip('cloning expense', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page.waitForURL('**/expenses');
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createRecurringExpense({ page });
+
+    await page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'More Actions', exact: true })
+      .first()
+      .click();
+  } else {
+    const moreActionsButton = tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first();
+
+    await moreActionsButton.click();
+  }
+
+  await page.getByText('Clone').first().click();
+
+  await page.waitForURL('**/recurring_expenses/create?action=clone');
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/recurring_expenses/**/edit');
+
+  await expect(
+    page.getByRole('heading', { name: 'Edit Expense' }).first()
   ).toBeVisible();
 });

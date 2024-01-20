@@ -61,6 +61,7 @@ export function Details(props: Props) {
 
           <Element leftSide={t('number')}>
             <InputField
+              id="number"
               value={recurringExpense.number}
               onValueChange={(value) => handleChange('number', value)}
               errorMessage={errors?.errors.number}
