@@ -17,7 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
@@ -35,8 +35,6 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -90,8 +88,6 @@ export default function Edit() {
         toast.success('updated_transaction');
 
         $refetch(['bank_transactions']);
-
-        navigate('/transactions');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
