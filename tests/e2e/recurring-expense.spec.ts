@@ -103,9 +103,7 @@ const createRecurringExpense = async (params: CreateParams) => {
   }
 };
 
-test.skip("can't view recurring expenses without permission", async ({
-  page,
-}) => {
+test("can't view recurring expenses without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -122,7 +120,7 @@ test.skip("can't view recurring expenses without permission", async ({
   await logout(page);
 });
 
-test.skip('can view recurring expense', async ({ page }) => {
+test('can view recurring expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -152,7 +150,7 @@ test.skip('can view recurring expense', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can edit recurring expense', async ({ page }) => {
+test('can edit recurring expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringExpensesActions({
@@ -197,16 +195,16 @@ test.skip('can edit recurring expense', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a expense', async ({ page }) => {
+test('can create a recurring expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringExpensesActions({
-    permissions: ['create_expense'],
+    permissions: ['create_recurring_expense'],
   });
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense');
+  await set('create_recurring_expense');
   await save();
   await logout(page);
 
@@ -222,7 +220,7 @@ test('can create a expense', async ({ page }) => {
     .click();
 
   await expect(
-    page.getByText('Successfully updated expense', { exact: true })
+    page.getByText('Successfully updated recurring expense', { exact: true })
   ).toBeVisible();
 
   await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
@@ -230,21 +228,21 @@ test('can create a expense', async ({ page }) => {
   await logout(page);
 });
 
-test.skip('can view and edit assigned expense with create_expense', async ({
+test('can view and edit assigned recurring expense with create_recurring_expense', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useRecurringExpensesActions({
-    permissions: ['create_expense'],
+    permissions: ['create_recurring_expense'],
   });
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense');
+  await set('create_recurring_expense');
   await save();
 
-  const expenseNumber = await createRecurringExpense({
+  const recurringExpenseNumber = await createRecurringExpense({
     page,
     assignTo: 'Expenses Example',
     returnCreditNumber: true,
@@ -261,7 +259,9 @@ test.skip('can view and edit assigned expense with create_expense', async ({
 
   await checkTableEditability(page, false);
 
-  await page.getByRole('link', { name: expenseNumber, exact: true }).click();
+  await page
+    .getByRole('link', { name: recurringExpenseNumber, exact: true })
+    .click();
 
   await checkEditPage(page, true);
 
@@ -271,7 +271,7 @@ test.skip('can view and edit assigned expense with create_expense', async ({
     .click();
 
   await expect(
-    page.getByText('Successfully updated expense', { exact: true })
+    page.getByText('Successfully updated recurring expense', { exact: true })
   ).toBeVisible();
 
   await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
@@ -279,12 +279,14 @@ test.skip('can view and edit assigned expense with create_expense', async ({
   await logout(page);
 });
 
-test.skip('deleting expense with edit_expense', async ({ page }) => {
+test('deleting recurring expense with edit_recurring_expense', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
+  await set('create_recurring_expense', 'edit_recurring_expense');
   await save();
   await logout(page);
 
@@ -298,7 +300,7 @@ test.skip('deleting expense with edit_expense', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForURL('**/expenses');
+  await page.waitForURL('**/recurring_expenses');
 
   await page.waitForTimeout(200);
 
@@ -324,15 +326,19 @@ test.skip('deleting expense with edit_expense', async ({ page }) => {
     await page.getByText('Delete').click();
   }
 
-  await expect(page.getByText('Successfully deleted expense')).toBeVisible();
+  await expect(
+    page.getByText('Successfully deleted recurring expense')
+  ).toBeVisible();
 });
 
-test.skip('archiving expense with edit_expense', async ({ page }) => {
+test('archiving recurring expense with edit_recurring_expense', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
+  await set('create_recurring_expense', 'edit_recurring_expense');
   await save();
   await logout(page);
 
@@ -344,7 +350,7 @@ test.skip('archiving expense with edit_expense', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await page.waitForURL('**/expenses');
+  await page.waitForURL('**/recurring_expenses');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -376,15 +382,19 @@ test.skip('archiving expense with edit_expense', async ({ page }) => {
     await page.getByText('Archive').click();
   }
 
-  await expect(page.getByText('Successfully archived expense')).toBeVisible();
+  await expect(
+    page.getByText('Successfully archived recurring expense')
+  ).toBeVisible();
 });
 
-test.skip('expense documents preview with edit_expense', async ({ page }) => {
+test('recurring expense documents preview with edit_recurring_expense', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
+  await set('create_recurring_expense', 'edit_recurring_expense');
   await save();
   await logout(page);
 
@@ -396,7 +406,7 @@ test.skip('expense documents preview with edit_expense', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await page.waitForURL('**/expenses');
+  await page.waitForURL('**/recurring_expenses');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -430,12 +440,14 @@ test.skip('expense documents preview with edit_expense', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test.skip('expense documents uploading with edit_expense', async ({ page }) => {
+test('recurring expense documents uploading with edit_recurring_expense', async ({
+  page,
+}) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
+  await set('create_recurring_expense', 'edit_recurring_expense');
   await save();
   await logout(page);
 
@@ -447,7 +459,7 @@ test.skip('expense documents uploading with edit_expense', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await page.waitForURL('**/expenses');
+  await page.waitForURL('**/recurring_expenses');
 
   const tableRow = tableBody.getByRole('row').first();
 
@@ -489,7 +501,7 @@ test.skip('expense documents uploading with edit_expense', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('all actions in dropdown displayed with admin permission', async ({
+test('all actions in dropdown displayed with admin permission', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -515,7 +527,7 @@ test.skip('all actions in dropdown displayed with admin permission', async ({
   await logout(page);
 });
 
-test.skip('all clone actions displayed with creation permissions', async ({
+test('all clone actions displayed with creation permissions', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);
@@ -541,12 +553,12 @@ test.skip('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test.skip('cloning expense', async ({ page }) => {
+test('cloning recurring expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
   await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
+  await set('create_recurring_expense', 'edit_recurring_expense');
   await save();
   await logout(page);
 
@@ -557,7 +569,7 @@ test.skip('cloning expense', async ({ page }) => {
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await page.waitForURL('**/expenses');
+  await page.waitForURL('**/recurring_expenses');
 
   const tableBody = page.locator('tbody').first();
 
@@ -590,11 +602,13 @@ test.skip('cloning expense', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(
+    page.getByText('Successfully created recurring expense')
+  ).toBeVisible();
 
   await page.waitForURL('**/recurring_expenses/**/edit');
 
   await expect(
-    page.getByRole('heading', { name: 'Edit Expense' }).first()
+    page.getByRole('heading', { name: 'Edit Recurring Expense' }).first()
   ).toBeVisible();
 });
