@@ -35,6 +35,7 @@ import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -58,6 +59,7 @@ export default function Invoices() {
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
   const invoiceColumns = useAllInvoiceColumns();
+  const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function Invoices() {
           setSliderInvoiceId(invoice.id);
           setInvoiceSliderVisibility(true);
         }}
-        dateRangeColumns={['date', 'due_date']}
+        dateRangeColumns={dateRangeColumns}
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}

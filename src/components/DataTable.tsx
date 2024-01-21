@@ -58,6 +58,11 @@ import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
 
+export interface DateRangeColumn {
+  column: string;
+  queryParameterKey: string;
+}
+
 export type DataTableColumns<T = any> = {
   id: string;
   label: string;
@@ -120,7 +125,7 @@ interface Props<T> extends CommonProps {
     action: 'archive' | 'restore' | 'delete'
   ) => void;
   hideEditableOptions?: boolean;
-  dateRangeColumns?: string[];
+  dateRangeColumns?: DateRangeColumn[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -167,9 +172,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
   const [dateRange, setDateRange] = useState<string>('');
-  const [dateRangeProperty, setDateRangeProperty] = useState<string>(
-    dateRangeColumns[0] || ''
-  );
+  const [dateRangeQueryParameter, setDateRangeQueryParameter] =
+    useState<string>(dateRangeColumns[0]?.queryParameterKey || '');
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
@@ -234,13 +238,13 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (dateRangeColumns.length && dateRangeProperty) {
+    if (dateRangeColumns.length && dateRangeQueryParameter) {
       const startDate = dateRange.split(',')[0];
       const endDate = dateRange.split(',')[1];
 
       apiEndpoint.searchParams.set(
-        'date_range',
-        [dateRangeProperty, startDate && endDate ? dateRange : ''].join(',')
+        dateRangeQueryParameter,
+        startDate && endDate ? dateRange : ''
       );
     }
 
@@ -259,7 +263,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     status,
     customFilter,
     dateRange,
-    dateRangeProperty,
+    dateRangeQueryParameter,
   ]);
 
   const { data, isLoading, isError } = useQuery(
@@ -273,7 +277,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       status,
       customFilter,
       dateRange,
-      dateRangeProperty,
+      dateRangeQueryParameter,
     ],
     () => request('GET', apiEndpoint.href),
     {
@@ -511,12 +515,29 @@ export function DataTable<T extends object>(props: Props<T>) {
               childrenClassName={styleOptions?.thChildrenClassName}
             >
               <div className="flex items-center space-x-3">
-                {dateRangeColumns.includes(column.id) && (
+                {dateRangeColumns.some(
+                  (dateRangeColumn) => column.id === dateRangeColumn.column
+                ) && (
                   <DateRangePicker
                     setDateRange={setDateRange}
                     onClick={() => {
-                      dateRangeProperty !== column.id &&
-                        setDateRangeProperty(column.id);
+                      const columnOfCurrentQueryParameter =
+                        dateRangeColumns.find(
+                          (dateRangeColumn) =>
+                            dateRangeQueryParameter === dateRangeColumn.column
+                        )?.column;
+
+                      const queryParameterOfCurrentColumn =
+                        dateRangeColumns.find(
+                          (dateRangeColumn) =>
+                            column.id === dateRangeColumn.column
+                        )?.queryParameterKey;
+
+                      columnOfCurrentQueryParameter !== column.id &&
+                        queryParameterOfCurrentColumn &&
+                        setDateRangeQueryParameter(
+                          queryParameterOfCurrentColumn
+                        );
                     }}
                   />
                 )}

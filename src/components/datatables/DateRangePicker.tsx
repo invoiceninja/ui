@@ -57,9 +57,9 @@ export function DateRangePicker(props: Props) {
       ? dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
       : '';
 
-    setCurrentDateRange([start, end].join(','));
+    setCurrentDateRange(start || end ? [start, end].join(',') : '');
 
-    setDateRange([start, end].join(','));
+    setDateRange(start || end ? [start, end].join(',') : '');
   };
 
   useEffect(() => {
