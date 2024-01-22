@@ -26,8 +26,6 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
-import { enabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -70,7 +68,6 @@ export default function Expenses() {
           <Guard
             type="component"
             guards={[
-              enabled(ModuleBitmask.Expenses),
               or(permission('create_expense'), permission('edit_expense')),
             ]}
             component={<ImportButton route="/expenses/import" />}

@@ -36,8 +36,6 @@ import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
-import { enabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -98,7 +96,6 @@ export default function Invoices() {
             type="component"
             component={<ImportButton route="/invoices/import" />}
             guards={[
-              enabled(ModuleBitmask.Invoices),
               or(permission('create_invoice'), permission('edit_invoice')),
             ]}
           />

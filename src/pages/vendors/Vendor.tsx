@@ -78,13 +78,11 @@ export default function Vendor() {
                 {t('edit_vendor')}
               </Button>
 
-              {vendor && (
-                <ResourceActions
-                  label={t('more_actions')}
-                  resource={vendor}
-                  actions={actions}
-                />
-              )}
+              <ResourceActions
+                label={t('more_actions')}
+                resource={vendor}
+                actions={actions}
+              />
             </Inline>
           ),
         })}
