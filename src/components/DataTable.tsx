@@ -173,7 +173,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [status, setStatus] = useState<string[]>(['active']);
   const [dateRange, setDateRange] = useState<string>('');
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
-    useState<string>(dateRangeColumns[0]?.queryParameterKey || '');
+    useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
