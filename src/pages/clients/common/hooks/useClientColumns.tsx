@@ -30,6 +30,7 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'name',
@@ -103,6 +104,7 @@ export function useClientColumns() {
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const resolveLanguage = useResolveLanguage();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const getContactsColumns = useCallback((client: Client) => {
     const names: string[] = [];
@@ -250,21 +252,25 @@ export function useClientColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('client1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('client2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('client3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('client4', value?.toString()),
     },
     {
       column: 'documents',

@@ -67,6 +67,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'status',
@@ -121,6 +122,7 @@ export function useTaskColumns() {
 
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -258,21 +260,25 @@ export function useTaskColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('task1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('task2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('task3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('task4', value?.toString()),
     },
     {
       column: 'date',
