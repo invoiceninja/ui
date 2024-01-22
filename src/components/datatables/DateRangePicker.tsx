@@ -63,8 +63,8 @@ export function DateRangePicker(props: Props) {
   };
 
   const isCurrentDateRangeActive = () => {
-    const startDate = currentDateRange.split(',')?.[0];
-    const endDate = currentDateRange.split(',')?.[1];
+    const startDate = currentDateRange?.split(',')?.[0];
+    const endDate = currentDateRange?.split(',')?.[1];
 
     return Boolean(startDate && endDate);
   };
@@ -75,7 +75,7 @@ export function DateRangePicker(props: Props) {
       const endDate = currentDateRange?.split(',')?.[1];
 
       setDateRange(
-        currentDateRange.length > 1 ? [startDate, endDate].join(',') : ''
+        currentDateRange?.length > 1 ? [startDate, endDate].join(',') : ''
       );
     }
   }, [isVisible]);
@@ -99,10 +99,10 @@ export function DateRangePicker(props: Props) {
               <RangePicker
                 size="large"
                 value={[
-                  currentDateRange.split(',')?.[0]
+                  currentDateRange?.split(',')?.[0]
                     ? dayjs(currentDateRange.split(',')[0])
                     : null,
-                  currentDateRange.split(',')?.[1]
+                  currentDateRange?.split(',')?.[1]
                     ? dayjs(currentDateRange.split(',')[1])
                     : null,
                 ]}
