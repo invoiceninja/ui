@@ -25,6 +25,7 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'status',
@@ -84,9 +85,9 @@ export function usePaymentColumns() {
   type PaymentColumns = (typeof paymentColumns)[number];
 
   const formatMoney = useFormatMoney();
-  const resolveCurrency = useResolveCurrency();
-
   const reactSettings = useReactSettings();
+  const resolveCurrency = useResolveCurrency();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const calculateConvertedAmount = (payment: Payment) => {
     if (payment.exchange_rate) {
@@ -243,21 +244,25 @@ export function usePaymentColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('payment1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('payment2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('payment3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('payment4', value?.toString()),
     },
     {
       column: 'entity_state',
