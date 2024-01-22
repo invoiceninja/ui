@@ -71,6 +71,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -501,6 +502,7 @@ export function useRecurringInvoiceColumns() {
 
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -610,21 +612,25 @@ export function useRecurringInvoiceColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',
