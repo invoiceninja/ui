@@ -60,6 +60,7 @@ export interface ComboboxStaticProps<T = any> {
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
+  onFocus?: () => any;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
   isDataLoading?: boolean;
@@ -102,6 +103,7 @@ export function Combobox<T = any>({
   errorMessage,
   clearInputAfterSelection,
   onEmptyValues,
+  onFocus,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -320,7 +322,13 @@ export function Combobox<T = any>({
             type="text"
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              setIsOpen(true);
+
+              if (onFocus) {
+                onFocus();
+              }
+            }}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
             defaultValue={
@@ -850,6 +858,10 @@ export function ComboboxAsync<T = any>({
   );
 
   useEffect(() => {
+    if (url.includes('/api/v1/products')) {
+      return;
+    }
+
     if (!enableQuery) {
       clearTimeout(enableQueryTimeOut.current);
 
@@ -935,6 +947,7 @@ export function ComboboxAsync<T = any>({
         errorMessage={errorMessage}
         clearInputAfterSelection={clearInputAfterSelection}
         isDataLoading={isLoading}
+        onFocus={() => setEnableQuery(true)}
       />
     );
   }
