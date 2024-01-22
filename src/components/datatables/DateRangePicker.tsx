@@ -62,6 +62,13 @@ export function DateRangePicker(props: Props) {
     setDateRange(start || end ? [start, end].join(',') : '');
   };
 
+  const isCurrentDateRangeActive = () => {
+    const startDate = currentDateRange.split(',')?.[0];
+    const endDate = currentDateRange.split(',')?.[1];
+
+    return Boolean(startDate && endDate);
+  };
+
   useEffect(() => {
     if (isVisible) {
       const startDate = currentDateRange?.split(',')?.[0];
@@ -92,10 +99,10 @@ export function DateRangePicker(props: Props) {
               <RangePicker
                 size="large"
                 value={[
-                  currentDateRange.split(',')[0]
+                  currentDateRange.split(',')?.[0]
                     ? dayjs(currentDateRange.split(',')[0])
                     : null,
-                  currentDateRange.split(',')[1]
+                  currentDateRange.split(',')?.[1]
                     ? dayjs(currentDateRange.split(',')[1])
                     : null,
                 ]}
@@ -121,7 +128,7 @@ export function DateRangePicker(props: Props) {
         >
           <Icon
             element={Calendar}
-            color="white"
+            color={isCurrentDateRangeActive() ? 'lightgreen' : 'white'}
             style={{ width: '1.4rem', height: '1.4rem' }}
           />
         </div>

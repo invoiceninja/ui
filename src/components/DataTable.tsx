@@ -343,6 +343,20 @@ export function DataTable<T extends object>(props: Props<T>) {
       : false;
   };
 
+  const handleDateRangeColumnClick = (columnId: string) => {
+    const columnOfCurrentQueryParameter = dateRangeColumns.find(
+      (dateRangeColumn) => dateRangeQueryParameter === dateRangeColumn.column
+    )?.column;
+
+    const queryParameterOfCurrentColumn = dateRangeColumns.find(
+      (dateRangeColumn) => columnId === dateRangeColumn.column
+    )?.queryParameterKey;
+
+    columnOfCurrentQueryParameter !== columnId &&
+      queryParameterOfCurrentColumn &&
+      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+  };
+
   useEffect(() => {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
@@ -520,25 +534,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 ) && (
                   <DateRangePicker
                     setDateRange={setDateRange}
-                    onClick={() => {
-                      const columnOfCurrentQueryParameter =
-                        dateRangeColumns.find(
-                          (dateRangeColumn) =>
-                            dateRangeQueryParameter === dateRangeColumn.column
-                        )?.column;
-
-                      const queryParameterOfCurrentColumn =
-                        dateRangeColumns.find(
-                          (dateRangeColumn) =>
-                            column.id === dateRangeColumn.column
-                        )?.queryParameterKey;
-
-                      columnOfCurrentQueryParameter !== column.id &&
-                        queryParameterOfCurrentColumn &&
-                        setDateRangeQueryParameter(
-                          queryParameterOfCurrentColumn
-                        );
-                    }}
+                    onClick={() => handleDateRangeColumnClick(column.id)}
                   />
                 )}
                 <span>{column.label}</span>
