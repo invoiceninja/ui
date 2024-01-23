@@ -66,8 +66,7 @@ export default function Create() {
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone' &&
-        taskStatuses
+        searchParams.get('action') !== 'clone'
       ) {
         const _task = cloneDeep(data);
 
