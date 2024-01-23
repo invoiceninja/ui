@@ -16,7 +16,7 @@ import { connectMailerAtom } from '../../components';
 import { Button } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { useDispatch } from 'react-redux';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
@@ -59,29 +59,7 @@ export function ConnectMailerModal() {
     });
   };
 
-  console.log(user);
-
-  console.log(
-    'provider',
-    user?.oauth_provider_id === 'microsoft' ||
-      user?.oauth_provider_id === 'google'
-  );
-
-  console.log(Boolean(user?.oauth_user_token));
-
-  console.log(isMailerConnected === 'true');
-
-  console.log(isMailerConnected);
-
   useEffect(() => {
-    console.log(
-      'useEffect',
-      (user?.oauth_provider_id === 'microsoft' ||
-        user?.oauth_provider_id === 'google') &&
-        user?.oauth_user_token &&
-        isMailerConnected === 'true'
-    );
-
     if (
       (user?.oauth_provider_id === 'microsoft' ||
         user?.oauth_provider_id === 'google') &&
@@ -99,7 +77,9 @@ export function ConnectMailerModal() {
       onClose={handleOnClose}
     >
       <span className="text-base font-medium">
-        Gmail now connected, would like you to select this account to send from?
+        {trans('select_email_provider', {
+          provider: user?.oauth_provider_id === 'google' ? 'Gmail' : 'Outlook',
+        })}
       </span>
 
       <div className="flex justify-between">
