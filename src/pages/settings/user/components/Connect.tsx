@@ -12,7 +12,7 @@ import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
@@ -23,7 +23,6 @@ import {
 import { GoogleLogin } from '@react-oauth/google';
 import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Modal } from '$app/components/Modal';
 import { atomWithStorage } from 'jotai/utils';
 import { useSetAtom } from 'jotai';
 import { ConnectMailerModal } from '../common/components/ConnectMailerModal';
@@ -32,8 +31,6 @@ export const connectMailerAtom = atomWithStorage('connectMailer', 'false');
 export function Connect() {
   const [t] = useTranslation();
   const user = useCurrentUser();
-
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const setIsMailerConnected = useSetAtom(connectMailerAtom);
 
@@ -117,14 +114,6 @@ export function Connect() {
   return (
     <>
       <ConnectMailerModal />
-
-      <Modal
-        title={t('update_settings')}
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-      >
-        <></>
-      </Modal>
 
       <Card title={t('oneclick_login')}>
         {!user?.oauth_provider_id && isHosted() && (
