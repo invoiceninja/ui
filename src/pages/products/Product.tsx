@@ -21,7 +21,7 @@ import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
@@ -63,9 +63,7 @@ export default function Product() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = async () => {
     if (!isFormBusy) {
       setErrors(undefined);
       setIsFormBusy(true);
@@ -105,10 +103,9 @@ export default function Product() {
       {...(productData &&
         (hasPermission('edit_product') ||
           entityAssigned(productData.data.data)) && {
-          onSaveClick: handleSave,
           navigationTopRight: (
             <ResourceActions
-              label={t('more_actions')}
+              onSaveClick={handleSave}
               resource={productData.data.data}
               actions={actions}
               cypressRef="productActionDropdown"
