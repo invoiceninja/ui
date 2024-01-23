@@ -61,6 +61,8 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -147,9 +149,9 @@ export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const reactSettings = useReactSettings();
-
   const formatMoney = useFormatMoney();
+  const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
   type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
@@ -270,21 +272,29 @@ export function usePurchaseOrderColumns() {
         column: firstCustom,
         id: 'custom_value1',
         label: firstCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice1', value?.toString()),
       },
       {
         column: secondCustom,
         id: 'custom_value2',
         label: secondCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice2', value?.toString()),
       },
       {
         column: thirdCustom,
         id: 'custom_value3',
         label: thirdCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice3', value?.toString()),
       },
       {
         column: fourthCustom,
         id: 'custom_value4',
         label: fourthCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice4', value?.toString()),
       },
       {
         column: 'discount',
@@ -504,14 +514,16 @@ export function useActions() {
         {t('vendor_portal')}
       </DropdownElement>
     ),
+    () => <Divider withoutPadding />,
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => cloneToPurchaseOrder(purchaseOrder)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone')}
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
+    (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

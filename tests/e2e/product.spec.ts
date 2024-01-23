@@ -108,11 +108,7 @@ const checkEditPage = async (
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
     await expect(
       page
@@ -127,9 +123,7 @@ const checkEditPage = async (
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]')
     ).not.toBeVisible();
   }
 
@@ -242,7 +236,9 @@ test('can edit product', async ({ page }) => {
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -279,7 +275,9 @@ test('can create a product', async ({ page }) => {
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -520,7 +518,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -550,7 +550,9 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await checkEditPage(page, true, false);
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -739,6 +741,33 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await expect(
     page.getByRole('link', { name: 'Documents', exact: true })
+  ).toBeVisible();
+
+  await logout(page);
+});
+
+test('Product selector list gets updated on the report page when it is created', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createProduct({ page, name: 'test product selector' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Reports', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="reportNameSelector"]')
+    .selectOption({ label: 'Product Sales' });
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[id="productItemSelector"]').click();
+
+  await expect(
+    page.getByText('test product selector', { exact: true })
   ).toBeVisible();
 
   await logout(page);

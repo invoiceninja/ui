@@ -21,6 +21,7 @@ import { useClickAway, useDebounce } from 'react-use';
 import { Alert } from '../Alert';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { Spinner } from '../Spinner';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -59,8 +60,10 @@ export interface ComboboxStaticProps<T = any> {
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
+  onFocus?: () => any;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  isDataLoading?: boolean;
 }
 
 export type Nullable<T> = T | null;
@@ -100,6 +103,7 @@ export function Combobox<T = any>({
   errorMessage,
   clearInputAfterSelection,
   onEmptyValues,
+  onFocus,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -318,7 +322,13 @@ export function Combobox<T = any>({
             type="text"
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              setIsOpen(true);
+
+              if (onFocus) {
+                onFocus();
+              }
+            }}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
             defaultValue={
@@ -442,6 +452,7 @@ export function ComboboxStatic<T = any>({
   entryOptions,
   errorMessage,
   clearInputAfterSelection,
+  isDataLoading,
 }: ComboboxStaticProps<T>) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -581,7 +592,7 @@ export function ComboboxStatic<T = any>({
               onChange={(event) => setQuery(event.target.value)}
               displayValue={(entry: Nullable<Entry>) =>
                 entryOptions.inputLabelFn?.(entry?.resource) ??
-                (entry?.label || '')
+                (entry?.label || query)
               }
               onClick={() => setIsOpen(true)}
               placeholder={inputOptions.placeholder}
@@ -653,7 +664,19 @@ export function ComboboxStatic<T = any>({
               </ActionButtonStyled>
             )}
 
-            {nullable && query.length > 0 && (
+            {Boolean(isDataLoading) && (
+              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                <Spinner />
+              </div>
+            )}
+
+            {!isDataLoading && !filteredValues.length && (
+              <div className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9">
+                {t('no_records_found')}
+              </div>
+            )}
+
+            {nullable && query.length > 0 && !isDataLoading && (
               <HeadlessCombobox.Option
                 key="combobox-not-found"
                 className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
@@ -679,6 +702,7 @@ export function ComboboxStatic<T = any>({
             )}
 
             {filteredValues.length > 0 &&
+              !isDataLoading &&
               filteredValues.map((entry) => (
                 <HeadlessOptionStyled
                   theme={{
@@ -737,6 +761,7 @@ interface EntryOptions<T = any> {
   searchable?: string;
   dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
+  customSearchableValue?: (resource: T) => string;
 }
 
 export interface ComboboxAsyncProps<T> {
@@ -803,7 +828,7 @@ export function ComboboxAsync<T = any>({
     return false;
   };
 
-  const { data } = useQuery(
+  const { data, isLoading } = useQuery(
     [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
     () =>
       request('GET', new URL(url).href).then(
@@ -817,7 +842,9 @@ export function ComboboxAsync<T = any>({
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
-              searchable: entry[entryOptions.searchable || entryOptions.id],
+              searchable:
+                entryOptions.customSearchableValue?.(entry) ||
+                entry[entryOptions.searchable || entryOptions.id],
             })
           );
 
@@ -831,6 +858,10 @@ export function ComboboxAsync<T = any>({
   );
 
   useEffect(() => {
+    if (url.includes('/api/v1/products')) {
+      return;
+    }
+
     if (!enableQuery) {
       clearTimeout(enableQueryTimeOut.current);
 
@@ -915,6 +946,8 @@ export function ComboboxAsync<T = any>({
         entryOptions={entryOptions}
         errorMessage={errorMessage}
         clearInputAfterSelection={clearInputAfterSelection}
+        isDataLoading={isLoading}
+        onFocus={() => setEnableQuery(true)}
       />
     );
   }
@@ -936,6 +969,7 @@ export function ComboboxAsync<T = any>({
       entryOptions={entryOptions}
       errorMessage={errorMessage}
       clearInputAfterSelection={clearInputAfterSelection}
+      isDataLoading={isLoading}
     />
   );
 }

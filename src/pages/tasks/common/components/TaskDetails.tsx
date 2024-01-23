@@ -30,6 +30,11 @@ import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { TaskClock } from '../../kanban/components/TaskClock';
 import { calculateTime } from '../helpers/calculate-time';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface Props {
   task: Task;
@@ -41,6 +46,11 @@ interface Props {
 
 export function TaskDetails(props: Props) {
   const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { task, handleChange, errors, page } = props;
 
@@ -65,24 +75,61 @@ export function TaskDetails(props: Props) {
                 <TaskStatusBadge entity={task} />
               </div>
               {isTaskRunning(task) && (
-                <div className='flex items-center'>
+                <div className="flex items-center">
                   <TaskClock task={task} />
-                </div>)}
+                </div>
+              )}
 
               {!isTaskRunning(task) && (
-                <div className='flex items-center'>
-                  {!isTaskRunning(task) && calculation && (<p>{new Date(Number(calculation) * 1000).toISOString().slice(11, 19)}</p>)}
-                </div>)}
+                <div className="flex items-center">
+                  {!isTaskRunning(task) && calculation && (
+                    <p>
+                      {new Date(Number(calculation) * 1000)
+                        .toISOString()
+                        .slice(11, 19)}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 {!isTaskRunning(task) && !task.invoice_id && (
-                  <PlayCircle className="mr-0 ml-auto" color="#808080" size={60} stroke={accent} strokeWidth="1" onClick={() => start(task)} />
+                  <PlayCircle
+                    className="mr-0 ml-auto"
+                    color="#808080"
+                    size={60}
+                    stroke={accent}
+                    strokeWidth="1"
+                    onClick={() =>
+                      (hasPermission('edit_task') || entityAssigned(task)) &&
+                      start(task)
+                    }
+                    cursor={
+                      hasPermission('edit_task') || entityAssigned(task)
+                        ? 'pointer'
+                        : 'not-allowed'
+                    }
+                  />
                 )}
 
-                {isTaskRunning(task) &&
-                  !task.invoice_id && (
-                    <PauseCircle className="mr-0 ml-auto" color="#808080" size={60} stroke={accent} strokeWidth="1" onClick={() => stop(task)} />
-                  )}
+                {isTaskRunning(task) && !task.invoice_id && (
+                  <PauseCircle
+                    className="mr-0 ml-auto cursor-pointer"
+                    color="#808080"
+                    size={60}
+                    stroke={accent}
+                    strokeWidth="1"
+                    onClick={() =>
+                      (hasPermission('edit_task') || entityAssigned(task)) &&
+                      stop(task)
+                    }
+                    cursor={
+                      hasPermission('edit_task') || entityAssigned(task)
+                        ? 'pointer'
+                        : 'not-allowed'
+                    }
+                  />
+                )}
               </div>
             </div>
           </Element>
@@ -128,6 +175,7 @@ export function TaskDetails(props: Props) {
             onChange={(user) => handleChange('assigned_user_id', user.id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
             errorMessage={errors?.errors.assigned_user_id}
+            readonly={!hasPermission('edit_task')}
           />
         </Element>
 
@@ -201,7 +249,12 @@ export function TaskDetails(props: Props) {
 
       {location.pathname.endsWith('/edit') && (
         <Card className="col-span-12 xl:col-span-4 h-max px-6">
-          <TabGroup tabs={[t('description'), t('custom_fields')]}>
+          <TabGroup
+            tabs={[
+              t('description'),
+              ...(isAdmin || isOwner ? [t('custom_fields')] : []),
+            ]}
+          >
             <div>
               <InputField
                 element="textarea"

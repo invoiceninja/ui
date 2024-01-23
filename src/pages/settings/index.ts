@@ -18,7 +18,7 @@ export * from './products/ProductSettings';
 export * from './task-settings/TaskSettings';
 export * from './expense-settings/ExpenseSettings';
 export * from './workflow-settings/WorkflowSettings';
-export * from './import-export/ImportExport';
+export * from './import-export/index/ImportExport';
 export * from './account-management';
 export * from './custom-fields';
 export * from './generated-numbers';

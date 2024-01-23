@@ -79,16 +79,34 @@ export function Permissions(props: Props) {
     permission: PermissionsType,
     value: boolean
   ) => {
-    const permissions = clone(user?.company_user?.permissions ?? '')
+    let currentPermissions = clone(user?.company_user?.permissions ?? '')
       .split(',')
       .filter((value) => value !== permission);
 
-    if (value) {
-      permissions.push(permission);
+    const [permissionType, entity] = permission.split('_');
+
+    if (entity === 'all') {
+      currentPermissions = currentPermissions.filter(
+        (currentPermission) => !currentPermission.startsWith(permissionType)
+      );
+    } else if (currentPermissions.includes(`${permissionType}_all`)) {
+      const permissionsByType = permissions
+        .map((currentPermission) => `${permissionType}_${currentPermission}`)
+        .filter((currentPermission) => currentPermission !== permission);
+
+      currentPermissions = currentPermissions.filter(
+        (currentPermission) => currentPermission !== `${permissionType}_all`
+      );
+
+      currentPermissions = [...currentPermissions, ...permissionsByType];
     }
 
-    if (permissions[0] === '') {
-      permissions.shift();
+    if (value) {
+      currentPermissions.push(permission);
+    }
+
+    if (currentPermissions[0] === '') {
+      currentPermissions.shift();
     }
 
     setUser(
@@ -97,7 +115,7 @@ export function Permissions(props: Props) {
           ...user,
           company_user: user.company_user && {
             ...user.company_user,
-            permissions: permissions.join(','),
+            permissions: currentPermissions.join(','),
           },
         }
     );

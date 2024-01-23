@@ -36,11 +36,16 @@ import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -97,16 +102,17 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => credit && save(credit)}
-      navigationTopRight={
-        credit && (
-          <ResourceActions
-            resource={credit}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_credit') || entityAssigned(credit)) &&
+        credit && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={credit}
+              onSaveClick={() => save(credit)}
+              actions={actions}
+              cypressRef="creditActionDropdown"
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

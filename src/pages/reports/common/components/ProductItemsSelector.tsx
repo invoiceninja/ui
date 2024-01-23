@@ -9,26 +9,29 @@
  */
 
 import { useProductsQuery } from '$app/common/queries/products';
+import { Spinner } from '$app/components/Spinner';
 import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
-import { Report } from '../useReports';
 import { useColorScheme } from '$app/common/colors';
+import { Alert } from '$app/components/Alert';
 
 interface Props {
-  setReport: Dispatch<SetStateAction<Report>>;
+  value?: string;
+  onValueChange: (productsKeys: string) => void;
+  errorMessage?: string[] | string;
 }
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
-
-  const { setReport } = props;
-
-  const [productItems, setProductItems] = useState<SelectOption[]>([]);
-
-  const { data: products } = useProductsQuery();
   const colors = useColorScheme();
+
+  const { value, onValueChange, errorMessage } = props;
+
+  const [productItems, setProductItems] = useState<SelectOption[]>();
+
+  const { data: products } = useProductsQuery({ status: ['active'] });
 
   useEffect(() => {
     if (products) {
@@ -46,14 +49,9 @@ export function ProductItemsSelector(props: Props) {
   const handleChange = (
     products: MultiValue<{ value: string; label: string }>
   ) => {
-    const values: Array<string> = (products as SelectOption[]).map(
-      (option: { value: string; label: string }) => option.value
-    );
-
-    setReport((current) => ({
-      ...current,
-      payload: { ...current.payload, product_key: values.join(',') },
-    }));
+    return (products as SelectOption[])
+      .map((option: { value: string; label: string }) => option.value)
+      .join(',');
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -69,7 +67,6 @@ export function ProductItemsSelector(props: Props) {
       ...styles,
       color: data.color,
     }),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiValueRemove: (styles) => ({
       ...styles,
       ':hover': {
@@ -100,17 +97,37 @@ export function ProductItemsSelector(props: Props) {
     }),
   };
 
-
   return (
-    <Element leftSide={t('products')}>
-      <Select
-        styles={customStyles}
-        defaultValue={null}
-        onChange={(options) => handleChange(options)}
-        placeholder={t('products')}
-        options={productItems}
-        isMulti={true}
-      />
-    </Element>
+    <>
+      {productItems ? (
+        <Element leftSide={t('products')}>
+          <Select
+            id="productItemSelector"
+            placeholder={t('products')}
+            {...(value && {
+              value: productItems?.filter((option) =>
+                value
+                  .split(',')
+                  .find((productKey) => productKey === option.value)
+              ),
+            })}
+            onChange={(options) => onValueChange(handleChange(options))}
+            options={productItems}
+            isMulti={true}
+            styles={customStyles}
+          />
+        </Element>
+      ) : (
+        <div className="flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
+
+      {errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {errorMessage}
+        </Alert>
+      )}
+    </>
   );
 }

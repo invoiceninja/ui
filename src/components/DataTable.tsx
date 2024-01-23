@@ -56,6 +56,12 @@ import { useLocation } from 'react-router-dom';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
+import { DateRangePicker } from './datatables/DateRangePicker';
+
+export interface DateRangeColumn {
+  column: string;
+  queryParameterKey: string;
+}
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -119,6 +125,7 @@ interface Props<T> extends CommonProps {
     action: 'archive' | 'restore' | 'delete'
   ) => void;
   hideEditableOptions?: boolean;
+  dateRangeColumns?: DateRangeColumn[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -146,6 +153,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     onBulkActionCall,
     hideEditableOptions = false,
+    dateRangeColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -163,6 +171,9 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
+  const [dateRange, setDateRange] = useState<string>('');
+  const [dateRangeQueryParameter, setDateRangeQueryParameter] =
+    useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
@@ -227,6 +238,16 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
+    if (dateRangeColumns.length && dateRangeQueryParameter) {
+      const startDate = dateRange?.split(',')[0];
+      const endDate = dateRange?.split(',')[1];
+
+      apiEndpoint.searchParams.set(
+        dateRangeQueryParameter,
+        startDate && endDate ? dateRange : ''
+      );
+    }
+
     setApiEndpoint(apiEndpoint);
 
     isInitialConfiguration && setIsInitialConfiguration(false);
@@ -234,7 +255,16 @@ export function DataTable<T extends object>(props: Props<T>) {
     return () => {
       isProduction() && setInvalidationQueryAtom(undefined);
     };
-  }, [perPage, currentPage, filter, sort, status, customFilter]);
+  }, [
+    perPage,
+    currentPage,
+    filter,
+    sort,
+    status,
+    customFilter,
+    dateRange,
+    dateRangeQueryParameter,
+  ]);
 
   const { data, isLoading, isError } = useQuery(
     [
@@ -246,6 +276,8 @@ export function DataTable<T extends object>(props: Props<T>) {
       sort,
       status,
       customFilter,
+      dateRange,
+      dateRangeQueryParameter,
     ],
     () => request('GET', apiEndpoint.href),
     {
@@ -309,6 +341,20 @@ export function DataTable<T extends object>(props: Props<T>) {
           React.isValidElement(action(resource))
         )
       : false;
+  };
+
+  const handleDateRangeColumnClick = (columnId: string) => {
+    const columnOfCurrentQueryParameter = dateRangeColumns.find(
+      (dateRangeColumn) => dateRangeQueryParameter === dateRangeColumn.column
+    )?.column;
+
+    const queryParameterOfCurrentColumn = dateRangeColumns.find(
+      (dateRangeColumn) => columnId === dateRangeColumn.column
+    )?.queryParameterKey;
+
+    columnOfCurrentQueryParameter !== columnId &&
+      queryParameterOfCurrentColumn &&
+      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
   };
 
   useEffect(() => {
@@ -482,7 +528,17 @@ export function DataTable<T extends object>(props: Props<T>) {
               }}
               childrenClassName={styleOptions?.thChildrenClassName}
             >
-              {column.label}
+              <div className="flex items-center space-x-3">
+                {dateRangeColumns.some(
+                  (dateRangeColumn) => column.id === dateRangeColumn.column
+                ) && (
+                  <DateRangePicker
+                    setDateRange={setDateRange}
+                    onClick={() => handleDateRangeColumnClick(column.id)}
+                  />
+                )}
+                <span>{column.label}</span>
+              </div>
             </Th>
           ))}
 

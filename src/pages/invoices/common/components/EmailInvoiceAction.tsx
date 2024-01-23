@@ -11,18 +11,17 @@
 import { route } from '$app/common/helpers/route';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { Button } from '$app/components/forms';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from '$app/components/Modal';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 interface Props {
   invoice: Invoice;
-  dropdown?: boolean;
+  isDropdown?: boolean;
 }
 export function EmailInvoiceAction(props: Props) {
   const [t] = useTranslation();
@@ -30,7 +29,7 @@ export function EmailInvoiceAction(props: Props) {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, dropdown = false } = props;
+  const { invoice, isDropdown = false } = props;
 
   const hasClientEmailContacts = (client?: Client) => {
     return client?.contacts.some(({ email }) => email);
@@ -43,20 +42,20 @@ export function EmailInvoiceAction(props: Props) {
           !hasClientEmailContacts(invoice.client) && setIsModalOpen(true)
         }
       >
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('email_invoice'),
-          })}
+        <EntityActionElement
+          entity="invoice"
+          actionKey="email_invoice"
+          isCommonActionSection={!isDropdown}
+          tooltipText={t('email_invoice')}
           {...(hasClientEmailContacts(invoice.client) && {
             to: route('/invoices/:id/email', {
               id: invoice.id,
             }),
           })}
-          icon={<Icon element={MdSend} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdSend}
         >
           {t('email_invoice')}
-        </DropdownElement>
+        </EntityActionElement>
       </div>
 
       <Modal

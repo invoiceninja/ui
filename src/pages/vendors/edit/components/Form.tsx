@@ -55,7 +55,7 @@ export function Form(props: Props) {
   ) => {
     set(contacts[index], property, value);
 
-    setContacts(contacts);
+    setContacts([...contacts]);
   };
 
   const handleDelete = (index: number) => {

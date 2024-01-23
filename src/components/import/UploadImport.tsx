@@ -27,7 +27,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { Alert } from '../Alert';
 
-
 interface Props {
   entity: string;
   onSuccess: boolean;
@@ -226,7 +225,7 @@ export function UploadImport(props: Props) {
       }
     },
   });
-  
+
   const colors = useColorScheme();
 
   useEffect(() => {
@@ -247,8 +246,14 @@ export function UploadImport(props: Props) {
             >
               <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <input {...getInputProps()} />
-                <Image className="mx-auto h-12 w-12" style={{ color: colors.$3, colorScheme: colors.$0 }} />
-                <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+                <Image
+                  className="mx-auto h-12 w-12"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                />
+                <span
+                  className="mt-2 block text-sm font-medium"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                >
                   {isDragActive
                     ? t('drop_file_here')
                     : t('dropzone_default_message')}

@@ -45,6 +45,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 dayjs.extend(duration);
 
@@ -53,6 +55,9 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const enabled = useEnabled();
 
@@ -98,21 +103,32 @@ export default function Show() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <ResourceActions
-          resource={project}
-          label={t('more_actions')}
-          actions={projectActions}
-        />
-      }
+      {...((hasPermission('edit_project') || entityAssigned(project)) &&
+        project && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={project}
+              label={t('more_actions')}
+              actions={projectActions}
+              cypressRef="projectActionDropdown"
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-3 gap-4">
         <InfoCard title={t('details')}>
           {project && (
             <div className="flex space-x-20 my-3">
-              <span className="text-sm"
-                style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-              >{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <EntityStatus entity={project} />
             </div>
           )}
@@ -182,6 +198,7 @@ export default function Show() {
               />
             }
             linkToCreateGuards={[permission('create_task')]}
+            hideEditableOptions={!hasPermission('edit_task')}
           />
         </div>
       )}

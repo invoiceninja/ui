@@ -47,7 +47,7 @@ export function Contacts(props: Props) {
 
     set(props.contacts[contactIndex], propertyId, value);
 
-    props.setContacts(props.contacts);
+    props.setContacts([...props.contacts]);
   };
 
   const destroy = (index: number) => {

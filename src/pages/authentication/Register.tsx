@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -33,15 +33,22 @@ import {
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
 import { useSearchParams } from 'react-router-dom';
+import { TurnstileWidget } from './components/TurnstileWidget';
+import { useTurnstile } from 'react-turnstile';
 
 export function Register() {
   useTitle('register');
 
   const [t] = useTranslation();
 
+  const turnstile = useTurnstile();
+
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
     undefined
   );
+
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [isTurnstileVisible, setIsTrunstileVisible] = useState<boolean>(false);
 
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -89,7 +96,10 @@ export function Register() {
         }
       });
 
-      request('POST', endpoint.href, values)
+      request('POST', endpoint.href, {
+        ...values,
+        ['cf-turnstile']: turnstileToken,
+      })
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -110,99 +120,105 @@ export function Register() {
             setMessage(error.response?.data.message as string);
             setIsFormBusy(false);
           }
-        );
+        )
+        .finally(() => {
+          turnstile.reset();
+          setIsTrunstileVisible(false);
+          setTurnstileToken('');
+        });
     },
   });
 
   const colors = useColorScheme();
 
-  return (
-    <div className="h-screen">
-      <Header />
-      <div className="flex flex-col items-center">
-        <div
-          className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
-        >
-          <h2 className="text-2xl" style={{ color: colors.$3 }}>
-            {t('register_label')}
-          </h2>
+  useEffect(() => {
+    if (turnstileToken) {
+      form.handleSubmit();
+    }
+  }, [turnstileToken]);
 
-          <form onSubmit={form.handleSubmit} className="my-6">
-            <section>
+  return (
+    <>
+      <div className="h-screen">
+        <Header />
+
+        <div className="flex flex-col items-center">
+          <div
+            className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
+            style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
+          >
+            <h2 className="text-2xl" style={{ color: colors.$3 }}>
+              {t('register_label')}
+            </h2>
+
+            <div className="space-y-5 my-6">
               <InputField
                 type="email"
                 autoComplete="on"
                 label={t('email_address')}
                 id="email"
                 onChange={form.handleChange}
+                errorMessage={errors?.email}
               />
 
-              {errors?.email && (
-                <Alert className="mt-2" type="danger">
-                  {errors.email}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password')}
                 id="password"
                 onChange={form.handleChange}
+                errorMessage={errors?.password}
               />
 
-              {errors?.password && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password}
-                </Alert>
-              )}
-            </section>
-
-            <section className="mt-4">
               <InputField
                 type="password"
                 autoComplete="on"
                 label={t('password_confirmation')}
                 id="password_confirmation"
                 onChange={form.handleChange}
+                errorMessage={errors?.password_confirmation}
               />
 
-              {errors?.password_confirmation && (
-                <Alert className="mt-2" type="danger">
-                  {errors.password_confirmation}
+              {message && (
+                <Alert className="mt-4" type="danger">
+                  {message}
                 </Alert>
               )}
-            </section>
 
-            {message && (
-              <Alert className="mt-4" type="danger">
-                {message}
-              </Alert>
-            )}
+              {isTurnstileVisible && (
+                <div className="flex justify-center">
+                  <TurnstileWidget
+                    onVerified={(token) => setTurnstileToken(token)}
+                  />
+                </div>
+              )}
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t('register')}
-            </Button>
-          </form>
-
-          <div className="flex justify-center">
-            {isHosted() && <Link to="/login">{t('login')}</Link>}
-          </div>
-        </div>
-
-        {
-          <>
-            <SignInProviders />
-
-            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-              <HostedLinks />
+              <Button
+                disabled={isFormBusy}
+                className="mt-4"
+                variant="block"
+                onClick={() => setIsTrunstileVisible(true)}
+              >
+                {t('register')}
+              </Button>
             </div>
-          </>
-        }
+
+            <div className="flex justify-center">
+              {isHosted() && <Link to="/login">{t('login')}</Link>}
+            </div>
+          </div>
+
+          {
+            <>
+              <SignInProviders />
+
+              <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+                <HostedLinks />
+              </div>
+            </>
+          }
+        </div>
       </div>
-    </div>
+    </>
   );
 }

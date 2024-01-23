@@ -9,6 +9,7 @@
  */
 
 import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
+import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/common/hooks/useHandleChange';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,13 +24,7 @@ export function useScheduleEmailRecord({ entity }: Props) {
 
   return (entityId: string) => {
     setScheduleParameters({
-      clients: [],
-      show_aging_table: false,
-      show_credits_table: false,
-      show_payments_table: false,
-      only_clients_with_invoices: false,
-      status: 'all',
-      date_range: 'last7_days',
+      ...DEFAULT_SCHEDULE_PARAMETERS,
       entity,
       entity_id: entityId,
     });

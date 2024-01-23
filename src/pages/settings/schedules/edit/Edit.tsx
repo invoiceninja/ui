@@ -53,7 +53,7 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayload = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload({ schedule });
 
   useEffect(() => {
     if (scheduleResponse) {
@@ -69,12 +69,10 @@ export function Edit() {
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
-
       request(
         'PUT',
         endpoint('/api/v1/task_schedulers/:id', { id }),
-        formattedSchedule
+        formatSchedulePayload()
       )
         .then(() => {
           toast.success('updated_schedule');
