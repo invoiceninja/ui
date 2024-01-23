@@ -61,7 +61,27 @@ export function ConnectMailerModal() {
 
   console.log(user);
 
+  console.log(
+    'provider',
+    user?.oauth_provider_id === 'microsoft' ||
+      user?.oauth_provider_id === 'google'
+  );
+
+  console.log(Boolean(user?.oauth_user_token));
+
+  console.log(isMailerConnected === 'true');
+
+  console.log(isMailerConnected);
+
   useEffect(() => {
+    console.log(
+      'useEffect',
+      (user?.oauth_provider_id === 'microsoft' ||
+        user?.oauth_provider_id === 'google') &&
+        user?.oauth_user_token &&
+        isMailerConnected === 'true'
+    );
+
     if (
       (user?.oauth_provider_id === 'microsoft' ||
         user?.oauth_provider_id === 'google') &&
@@ -70,7 +90,7 @@ export function ConnectMailerModal() {
     ) {
       setIsModalVisible(true);
     }
-  }, [user]);
+  }, [user, isMailerConnected]);
 
   return (
     <Modal
