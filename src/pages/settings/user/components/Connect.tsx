@@ -12,7 +12,6 @@ import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
@@ -104,12 +103,6 @@ export function Connect() {
       })
       .finally(() => setIsMailerConnected('false'));
   };
-
-  useEffect(() => {
-    return () => {
-      setIsMailerConnected('false');
-    };
-  }, []);
 
   return (
     <>
