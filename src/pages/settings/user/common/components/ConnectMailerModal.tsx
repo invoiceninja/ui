@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Modal } from '$app/components/Modal';
 import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
@@ -21,12 +20,13 @@ import { endpoint } from '$app/common/helpers';
 import { useDispatch } from 'react-redux';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 export function ConnectMailerModal() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const user = useCurrentUser();
+  const user = useInjectUserChanges();
   const company = useCurrentCompany();
 
   const [isMailerConnected, setIsMailerConnected] = useAtom(connectMailerAtom);
@@ -59,16 +59,16 @@ export function ConnectMailerModal() {
     });
   };
 
+  console.log(user);
+
   useEffect(() => {
-    if (user && Object.entries(user).length) {
-      if (
-        (user.oauth_provider_id === 'microsoft' ||
-          user.oauth_provider_id === 'google') &&
-        user.oauth_user_token &&
-        isMailerConnected === 'true'
-      ) {
-        setIsModalVisible(true);
-      }
+    if (
+      (user?.oauth_provider_id === 'microsoft' ||
+        user?.oauth_provider_id === 'google') &&
+      user?.oauth_user_token &&
+      isMailerConnected === 'true'
+    ) {
+      setIsModalVisible(true);
     }
   }, [user]);
 
