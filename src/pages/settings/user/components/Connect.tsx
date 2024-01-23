@@ -24,7 +24,7 @@ import classNames from 'classnames';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { atomWithStorage } from 'jotai/utils';
 import { useSetAtom } from 'jotai';
-import { ConnectMailerModal } from '../common/components/ConnectMailerModal';
+import { SelectProviderModal } from '../common/components/SelectProviderModal';
 
 export const connectMailerAtom = atomWithStorage('connectMailer', 'false');
 export function Connect() {
@@ -106,7 +106,7 @@ export function Connect() {
 
   return (
     <>
-      <ConnectMailerModal />
+      <SelectProviderModal />
 
       <Card title={t('oneclick_login')}>
         {!user?.oauth_provider_id && isHosted() && (

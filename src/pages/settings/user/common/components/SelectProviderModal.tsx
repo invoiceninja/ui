@@ -22,7 +22,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
-export function ConnectMailerModal() {
+export function SelectProviderModal() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
