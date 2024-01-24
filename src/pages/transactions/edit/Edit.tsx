@@ -123,7 +123,6 @@ export default function Edit() {
       {...((hasPermission('edit_bank_transaction') ||
         entityAssigned(transaction)) &&
         transaction && {
-          onSaveClick: onSave,
           navigationTopRight: (
             <ResourceActions
               resource={transaction}
