@@ -916,10 +916,6 @@ export function ComboboxAsync<T = any>({
     }
   }, [data]);
 
-  const currentUrl = new URL(url);
-
-  console.log(currentUrl.searchParams.get('with'));
-
   useEffect(() => {
     setUrl((c) => {
       const currentUrl = new URL(c);
