@@ -103,16 +103,17 @@ export default function RecurringExpense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      onSaveClick={handleSave}
       navigationTopRight={
         recurringExpense && (
           <ResourceActions
             resource={recurringExpense}
+            label={t('more_actions')}
             actions={actions}
-            onSaveClick={handleSave}
-            disableSaveButton={!recurringExpense}
           />
         )
       }
+      disableSaveButton={!recurringExpense}
     >
       {recurringExpense ? (
         <div className="space-y-4">
