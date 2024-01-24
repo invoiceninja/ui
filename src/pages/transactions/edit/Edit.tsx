@@ -14,7 +14,7 @@ import { endpoint } from '$app/common/helpers';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -69,9 +69,7 @@ export default function Edit() {
     },
   ];
 
-  const onSave = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const onSave = async () => {
     setErrors(undefined);
 
     setIsFormBusy(true);
@@ -121,14 +119,13 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!transaction || isFormBusy}
-      onSaveClick={onSave}
       navigationTopRight={
         transaction && (
           <ResourceActions
             resource={transaction}
-            label={t('more_actions')}
             actions={actions}
+            onSaveClick={onSave}
+            disableSaveButton={!transaction || isFormBusy}
           />
         )
       }
