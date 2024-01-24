@@ -825,7 +825,7 @@ export function ComboboxAsync<T = any>({
       return Boolean(entry);
     }
 
-    return false;
+    return true;
   };
 
   const { data, isLoading } = useQuery(
@@ -908,7 +908,7 @@ export function ComboboxAsync<T = any>({
         return currentUrl.href;
       });
     }
-  }, [enableQuery, inputOptions.value]);
+  }, [entries, enableQuery, inputOptions.value]);
 
   useEffect(() => {
     if (data) {
