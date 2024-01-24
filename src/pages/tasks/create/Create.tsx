@@ -47,7 +47,7 @@ export default function Create() {
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
 
-  const { data: taskStatuses } = useTaskStatusesQuery();
+  const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
   const { data } = useBlankTaskQuery({ enabled: typeof task === 'undefined' });
 
   const pages = [
