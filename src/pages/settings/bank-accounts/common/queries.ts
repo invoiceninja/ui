@@ -13,6 +13,7 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -20,6 +21,8 @@ interface BankAccountParams {
 }
 
 export function useBankAccountQuery(params: BankAccountParams) {
+  const { isAdmin, isOwner } = useAdmin();
+
   return useQuery<BankAccount>(
     ['/api/v1/bank_integrations', params.id],
     () =>
@@ -30,7 +33,10 @@ export function useBankAccountQuery(params: BankAccountParams) {
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
+    {
+      enabled: (params.enabled ?? true) && (isAdmin || isOwner),
+      staleTime: Infinity,
+    }
   );
 }
 
@@ -47,6 +53,8 @@ export function useBankAccountsQuery() {
 }
 
 export function useBlankBankAccountQuery() {
+  const { isAdmin, isOwner } = useAdmin();
+
   return useQuery<BankAccount>(
     ['/api/v1/bank_integrations', 'create'],
     () =>
@@ -54,6 +62,6 @@ export function useBlankBankAccountQuery() {
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }

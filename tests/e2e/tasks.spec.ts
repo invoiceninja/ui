@@ -58,11 +58,7 @@ const checkEditPage = async (
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
   } else {
     await expect(
       page
@@ -71,9 +67,7 @@ const checkEditPage = async (
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]')
     ).not.toBeVisible();
   }
 
@@ -214,10 +208,7 @@ test('can edit task', async ({ page }) => {
     page.getByText('Successfully updated task', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
@@ -252,10 +243,7 @@ test('can create a task', async ({ page }) => {
     page.getByText('Successfully updated task', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
@@ -302,10 +290,7 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
     page.getByText('Successfully updated task', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
@@ -348,11 +333,11 @@ test('deleting task with edit_task', async ({ page }) => {
 
     await expect(page.getByText('Successfully deleted task')).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
-
-    await moreActionsButton.click();
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
 
     await page.getByText('Delete').click();
 
@@ -400,12 +385,11 @@ test('archiving task withe edit_task', async ({ page }) => {
       page.getByRole('button', { name: 'Restore', exact: true })
     ).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
 
     await page.getByText('Archive').click();
 
@@ -434,10 +418,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
@@ -465,10 +446,7 @@ test('invoice_task and clone action displayed with creation permissions', async 
 
   await checkEditPage(page, true, false);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
@@ -504,18 +482,13 @@ test('cloning task', async ({ page }) => {
   if (!doRecordsExist) {
     await createTask({ page });
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true });
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
   }
 
   await page.getByText('Clone').first().click();

@@ -47,7 +47,7 @@ export default function Create() {
   const [isInitialConfiguration, setIsInitialConfiguration] =
     useState<boolean>(true);
 
-  const { data: taskStatuses } = useTaskStatusesQuery();
+  const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
   const { data } = useBlankTaskQuery({ enabled: typeof task === 'undefined' });
 
   const pages = [
@@ -66,8 +66,7 @@ export default function Create() {
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone' &&
-        taskStatuses
+        searchParams.get('action') !== 'clone'
       ) {
         const _task = cloneDeep(data);
 
