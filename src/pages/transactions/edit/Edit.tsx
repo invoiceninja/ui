@@ -124,12 +124,12 @@ export default function Edit() {
         entityAssigned(transaction)) &&
         transaction && {
           onSaveClick: onSave,
-          disableSaveButton: !transaction || isFormBusy,
           navigationTopRight: (
             <ResourceActions
               resource={transaction}
-              label={t('more_actions')}
               actions={actions}
+              onSaveClick={onSave}
+              disableSaveButton={!transaction || isFormBusy}
               cypressRef="transactionActionDropdown"
             />
           ),
