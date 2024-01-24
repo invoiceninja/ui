@@ -34,4 +34,5 @@ export interface Transaction {
   vendor_id: string;
   participant: string;
   participant_name: string;
+  user_id: string;
 }
