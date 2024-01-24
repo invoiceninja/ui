@@ -103,12 +103,11 @@ export default function RecurringExpense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSave}
       navigationTopRight={
         recurringExpense && (
           <ResourceActions
+            onSaveClick={handleSave}
             resource={recurringExpense}
-            label={t('more_actions')}
             actions={actions}
           />
         )
