@@ -14,11 +14,16 @@ import { Upload } from '$app/pages/settings/company/documents/components';
 import { useOutletContext } from 'react-router-dom';
 import { Context } from '../edit/Edit';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Documents() {
   const context: Context = useOutletContext();
 
   const { expense } = context;
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const invalidateCache = () => {
     $refetch(['expenses']);
@@ -30,11 +35,15 @@ export default function Documents() {
         widgetOnly
         endpoint={endpoint('/api/v1/expenses/:id/upload', { id: expense.id })}
         onSuccess={invalidateCache}
+        disableUpload={
+          !hasPermission('edit_expense') && !entityAssigned(expense)
+        }
       />
 
       <DocumentsTable
         documents={expense?.documents || []}
         onDocumentDelete={invalidateCache}
+        disableEditableOptions={!entityAssigned(expense, true)}
       />
     </div>
   );

@@ -53,6 +53,7 @@ export function Details(props: Props) {
 
           <Element leftSide={t('expense_number')}>
             <InputField
+              id="number"
               value={expense.number}
               onValueChange={(value) => handleChange('number', value)}
               errorMessage={errors?.errors.number}
