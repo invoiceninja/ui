@@ -487,13 +487,11 @@ test('vendor documents uploading with edit_vendor', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createVendor({ page });
-
-    await checkShowPage(page, true);
   } else {
     await tableRow.getByRole('link').first().click();
-
-    await checkShowPage(page, false);
   }
+
+  await checkShowPage(page, true);
 
   await page
     .getByRole('link', {
