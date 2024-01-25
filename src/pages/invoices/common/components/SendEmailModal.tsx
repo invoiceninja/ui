@@ -77,6 +77,7 @@ export function SendEmailModal(props: Props) {
       title={trans('email_count_invoices', { count: invoiceIds.length })}
       visible={visible}
       onClose={() => setVisible(false)}
+      closeButtonCypressRef="sendEmailModalXButton"
     >
       <div>
         {availableTypes.map((type, index) => (
