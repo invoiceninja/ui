@@ -111,13 +111,12 @@ export default function RecurringExpense() {
       {...((hasPermission('edit_recurring_expense') ||
         entityAssigned(recurringExpense)) &&
         recurringExpense && {
-          onSaveClick: handleSave,
-          disableSaveButton: !recurringExpense,
           navigationTopRight: (
             <ResourceActions
               resource={recurringExpense}
-              label={t('more_actions')}
               actions={actions}
+              onSaveClick={handleSave}
+              disableSaveButton={!recurringExpense}
               cypressRef="recurringExpenseActionDropdown"
             />
           ),

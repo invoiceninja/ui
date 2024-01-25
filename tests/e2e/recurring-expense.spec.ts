@@ -41,9 +41,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
@@ -53,9 +51,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 };
@@ -190,7 +186,15 @@ test('can edit recurring expense', async ({ page }) => {
     page.getByText('Successfully updated recurring expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringExpenseActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -223,7 +227,15 @@ test('can create a recurring expense', async ({ page }) => {
     page.getByText('Successfully updated recurring expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringExpenseActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -274,7 +286,15 @@ test('can view and edit assigned recurring expense with create_recurring_expense
     page.getByText('Successfully updated recurring expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringExpenseActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -309,11 +329,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
   } else {
@@ -361,11 +377,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -522,7 +534,15 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringExpenseActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -548,7 +568,15 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'recurringExpenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'recurringExpenseActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -582,18 +610,13 @@ test('cloning recurring expense', async ({ page }) => {
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
   }
 
   await page.getByText('Clone').first().click();
