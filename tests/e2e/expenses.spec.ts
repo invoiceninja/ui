@@ -623,7 +623,6 @@ test('Expense categories endpoint contains sort but not with parameter', async (
   await page.reload();
 
   await page.route('**/api/v1/expense_categories?status=active**', (route) => {
-    console.log(route.request().url());
     expect(route.request().url()).toContain('sort=name');
     expect(route.request().url()).not.toContain('with=');
 
@@ -675,7 +674,6 @@ test('Expense categories endpoint contains with but not sort parameter', async (
   await page.reload();
 
   await page.route('**/api/v1/expense_categories?status=active**', (route) => {
-    console.log(route.request().url());
     expect(route.request().url()).not.toContain('sort=name');
     expect(route.request().url()).toContain('with=');
 
