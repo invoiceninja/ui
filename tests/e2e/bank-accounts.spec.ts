@@ -1,7 +1,7 @@
 import { login, logout } from '$tests/e2e/helpers';
 import test from '@playwright/test';
 
-test.skip('Connecting Nordigen', async ({ page }) => {
+test('Connecting Nordigen', async ({ page }) => {
   await login(page);
 
   await page

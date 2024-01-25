@@ -2,7 +2,7 @@ import { login } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 import dayjs from 'dayjs';
 
-test.skip('Activity report test', async ({ page }) => {
+test('Activity report test', async ({ page }) => {
   await login(page);
 
   await page
@@ -52,7 +52,7 @@ test.skip('Activity report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('Invoice report test', async ({ page }) => {
+test('Invoice report test', async ({ page }) => {
   await login(page);
 
   await page
@@ -143,7 +143,7 @@ test.skip('Invoice report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('Profit and loss report test', async ({ page }) => {
+test('Profit and loss report test', async ({ page }) => {
   await login(page);
 
   await page
@@ -207,7 +207,7 @@ test.skip('Profit and loss report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('Product sales report test', async ({ page }) => {
+test('Product sales report test', async ({ page }) => {
   await login(page);
 
   await page
