@@ -23,9 +23,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export function Footer(props: PurchaseOrderCardProps) {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { id } = useParams();
 
@@ -141,11 +146,16 @@ export function Footer(props: PurchaseOrderCardProps) {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={
+                !hasPermission('edit_purchase_order') &&
+                !entityAssigned(purchaseOrder)
+              }
             />
 
             <DocumentsTable
               documents={purchaseOrder.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={!entityAssigned(purchaseOrder, true)}
             />
           </div>
         )}

@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -23,6 +22,8 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
@@ -77,6 +78,8 @@ export function useVendorColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const disableNavigation = useDisableNavigation();
+
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
@@ -106,7 +109,12 @@ export function useVendorColumns() {
       id: 'number',
       label: t('number'),
       format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/vendors/:id', { id: vendor.id })}
+          renderSpan={disableNavigation('vendor', vendor)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {
@@ -114,7 +122,12 @@ export function useVendorColumns() {
       id: 'name',
       label: t('name'),
       format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>{value}</Link>
+        <DynamicLink
+          to={route('/vendors/:id', { id: vendor.id })}
+          renderSpan={disableNavigation('vendor', vendor)}
+        >
+          {value}
+        </DynamicLink>
       ),
     },
     {

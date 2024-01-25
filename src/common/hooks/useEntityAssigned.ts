@@ -15,6 +15,7 @@ import { Invoice } from '../interfaces/invoice';
 import { Payment } from '../interfaces/payment';
 import { Product } from '../interfaces/product';
 import { Project } from '../interfaces/project';
+import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Quote } from '../interfaces/quote';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
@@ -37,6 +38,7 @@ type Entity =
   | Vendor
   | RecurringExpense
   | Product
+  | PurchaseOrder
   | Transaction;
 
 export function useEntityAssigned() {

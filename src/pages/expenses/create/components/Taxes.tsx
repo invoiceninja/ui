@@ -9,11 +9,13 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Link, Radio } from '$app/components/forms';
+import { Radio } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props extends ExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';
@@ -22,6 +24,8 @@ interface Props extends ExpenseCardProps {
 
 export function TaxSettings(props: Props) {
   const [t] = useTranslation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const { expense, handleChange, taxInputType, setTaxInputType } = props;
 
@@ -39,7 +43,12 @@ export function TaxSettings(props: Props) {
     <Card title={t('taxes')} isLoading={!expense}>
       {company?.enabled_expense_tax_rates === 0 && (
         <Element leftSide={t('expense_tax_help')}>
-          <Link to="/settings/tax_settings">{t('settings')}</Link>
+          <DynamicLink
+            to="/settings/tax_settings"
+            renderSpan={!isAdmin && !isOwner}
+          >
+            {t('settings')}
+          </DynamicLink>
         </Element>
       )}
 
