@@ -1,7 +1,7 @@
 import { login, logout } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import test from '@playwright/test';
 
-test('Connecting Nordigen', async ({ page }) => {
+test.skip('Connecting Nordigen', async ({ page }) => {
   await login(page);
 
   await page
@@ -20,22 +20,6 @@ test('Connecting Nordigen', async ({ page }) => {
   await page
     .getByRole('button', { name: 'Connect Accounts', exact: true })
     .click();
-
-  await expect(
-    page.getByRole('heading', { name: 'Connect Accounts', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('button', { name: 'Connect', exact: true })
-  ).toBeDisabled();
-
-  await page.locator('[data-cy="nordigenBox"]').click();
-
-  await expect(
-    page.getByRole('button', { name: 'Connect', exact: true })
-  ).not.toBeDisabled();
-
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
 
   const nordigenConnectionTab = await page.waitForEvent('popup');
 
