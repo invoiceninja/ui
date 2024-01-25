@@ -82,15 +82,9 @@ export function SelectProviderModal() {
         })}
       </span>
 
-      <div className="flex justify-between">
-        <Button behavior="button" type="secondary" onClick={handleOnClose}>
-          {t('no')}
-        </Button>
-
-        <Button behavior="button" type="primary" onClick={handleUpdateCompany}>
-          {t('yes')}
-        </Button>
-      </div>
+      <Button behavior="button" type="primary" onClick={handleUpdateCompany}>
+        {t('yes')}
+      </Button>
     </Modal>
   );
 }
