@@ -18,7 +18,6 @@ import { useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useTranslation } from 'react-i18next';
 import { useActions } from '../common/hooks';
 import { useUpdateTask } from '../common/hooks/useUpdateTask';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -28,8 +27,6 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
   const { id } = useParams();
   const { data } = useTaskQuery({ id });
-
-  const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -59,11 +56,10 @@ export default function Edit() {
       disableSaveButton={isFormBusy}
       {...((hasPermission('edit_task') || entityAssigned(task)) &&
         task && {
-          onSaveClick: () => handleSave(task),
           navigationTopRight: (
             <ResourceActions
               resource={task}
-              label={t('more_actions')}
+              onSaveClick={() => handleSave(task)}
               actions={actions}
               cypressRef="taskActionDropdown"
             />
