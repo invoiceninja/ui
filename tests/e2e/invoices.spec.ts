@@ -762,3 +762,90 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
 
   await logout(page);
 });
+
+test('Second and Third Custom email sending template is displayed', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="dataTableCheckbox"]').nth(1).click();
+
+  await page
+    .locator("[data-cy='dataTable']")
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .first()
+    .click();
+
+  await page.getByRole('button', { name: 'Send Email', exact: true }).click();
+
+  await expect(page.getByText('Second Custom')).not.toBeVisible();
+  await expect(page.getByText('Third Custom')).not.toBeVisible();
+
+  await page.locator('[data-cy="sendEmailModalXButton"]').click();
+
+  await page.waitForTimeout(200);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Templates & Reminders', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="templateSelector"]')
+    .selectOption({ label: 'Second Custom' });
+
+  await page.locator('#subject').fill('testing subject second custom');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+
+  await page
+    .locator('[data-cy="templateSelector"]')
+    .selectOption({ label: 'Third Custom' });
+
+  await page.locator('#subject').fill('testing subject third custom');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="dataTableCheckbox"]').nth(1).click();
+
+  await page
+    .locator("[data-cy='dataTable']")
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .first()
+    .click();
+
+  await page.getByRole('button', { name: 'Send Email', exact: true }).click();
+
+  await expect(page.getByText('Second Custom')).toBeVisible();
+  await expect(page.getByText('Third Custom')).toBeVisible();
+
+  await logout(page);
+});
