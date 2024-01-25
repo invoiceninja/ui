@@ -56,9 +56,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
@@ -68,9 +66,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 };
@@ -217,11 +213,7 @@ test('deleting transaction with edit_bank_transaction', async ({ page }) => {
   if (!doRecordsExist) {
     await createBankTransaction({ page, withNavigation: false });
 
-    await page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -272,11 +264,7 @@ test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
   if (!doRecordsExist) {
     await createBankTransaction({ page, withNavigation: false });
 
-    await page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
