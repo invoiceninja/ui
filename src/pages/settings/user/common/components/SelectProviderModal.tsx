@@ -82,7 +82,12 @@ export function SelectProviderModal() {
         })}
       </span>
 
-      <Button behavior="button" type="primary" onClick={handleUpdateCompany}>
+      <Button
+        className="self-end"
+        behavior="button"
+        type="primary"
+        onClick={handleUpdateCompany}
+      >
         {t('yes')}
       </Button>
     </Modal>
