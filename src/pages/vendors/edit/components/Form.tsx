@@ -28,6 +28,7 @@ import { useLanguages } from '$app/common/hooks/useLanguages';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction } from 'react';
 import { LanguageSelector } from '$app/components/LanguageSelector';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   vendor: Vendor;
@@ -43,6 +44,8 @@ export function Form(props: Props) {
   const { vendor, setVendor, errors, page, setContacts, contacts } = props;
 
   const company = useCurrentCompany();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -107,6 +110,7 @@ export function Form(props: Props) {
 
           <Element leftSide={t('name')}>
             <InputField
+              id="name"
               value={vendor.name || ''}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
@@ -273,6 +277,7 @@ export function Form(props: Props) {
             <div key={index}>
               <Element leftSide={t('first_name')}>
                 <InputField
+                  id={`first_name_${index}`}
                   value={contact.first_name}
                   onValueChange={(value) =>
                     handleContactChange('first_name', value, index)
@@ -285,6 +290,7 @@ export function Form(props: Props) {
 
               <Element leftSide={t('last_name')}>
                 <InputField
+                  id={`last_name_${index}`}
                   value={contact.last_name}
                   onValueChange={(value) =>
                     handleContactChange('last_name', value, index)
@@ -297,6 +303,7 @@ export function Form(props: Props) {
 
               <Element leftSide={t('email')}>
                 <InputField
+                  id={`email_${index}`}
                   value={contact.email}
                   onValueChange={(value) =>
                     handleContactChange('email', value, index)
@@ -398,7 +405,13 @@ export function Form(props: Props) {
         </Card>
 
         <Card title={t('additional_info')}>
-          <TabGroup className="px-5" tabs={[t('settings'), t('custom_fields')]}>
+          <TabGroup
+            className="px-5"
+            tabs={[
+              t('settings'),
+              ...(isAdmin || isOwner ? [t('custom_fields')] : []),
+            ]}
+          >
             <div className="flex flex-col space-y-4">
               <Element leftSide={t('currency')} noExternalPadding>
                 <CurrencySelector
