@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ApiTransactionType } from '$app/common/enums/transactions';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
@@ -23,7 +24,17 @@ interface Props {
 export function CreateExpenseBulkAction(props: Props) {
   const [t] = useTranslation();
 
-  const { setSelected } = props;
+  const { transactions, setSelected } = props;
+
+  const showAction = () => {
+    return transactions.every(
+      (transaction) => transaction.base_type === ApiTransactionType.Debit
+    );
+  };
+
+  if (!showAction()) {
+    return null;
+  }
 
   return (
     <DropdownElement
