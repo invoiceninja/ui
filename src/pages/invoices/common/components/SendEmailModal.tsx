@@ -9,6 +9,7 @@
  */
 
 import { trans } from '$app/common/helpers';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useBulk } from '$app/common/queries/invoices';
 import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
@@ -26,20 +27,41 @@ export type EmailType =
   | 'reminder1'
   | 'reminder2'
   | 'reminder3'
-  | 'reminder_endless';
+  | 'reminder_endless'
+  | 'custom1'
+  | 'custom2'
+  | 'custom3';
 
 interface Type {
   label: string;
   value: EmailType;
 }
 
-const TYPES: Type[] = [
-  { label: 'initial_email', value: 'invoice' },
-  { label: 'first_reminder', value: 'reminder1' },
-  { label: 'second_reminder', value: 'reminder2' },
-  { label: 'third_reminder', value: 'reminder3' },
-  { label: 'endless_reminder', value: 'reminder_endless' },
-];
+function useAvailableTypes() {
+  const company = useCurrentCompany();
+
+  const types: Type[] = [
+    { label: 'initial_email', value: 'invoice' },
+    { label: 'first_reminder', value: 'reminder1' },
+    { label: 'second_reminder', value: 'reminder2' },
+    { label: 'third_reminder', value: 'reminder3' },
+    { label: 'endless_reminder', value: 'reminder_endless' },
+  ];
+
+  if (company?.settings.email_subject_custom1) {
+    types.push({ label: 'first_custom', value: 'custom1' });
+  }
+
+  if (company?.settings.email_subject_custom2) {
+    types.push({ label: 'second_custom', value: 'custom2' });
+  }
+
+  if (company?.settings.email_subject_custom3) {
+    types.push({ label: 'third_custom', value: 'custom3' });
+  }
+
+  return types;
+}
 
 export function SendEmailModal(props: Props) {
   const { visible, setVisible, invoiceIds } = props;
@@ -48,14 +70,17 @@ export function SendEmailModal(props: Props) {
 
   const bulk = useBulk({ onSuccess: () => setVisible(false) });
 
+  const availableTypes = useAvailableTypes();
+
   return (
     <Modal
       title={trans('email_count_invoices', { count: invoiceIds.length })}
       visible={visible}
       onClose={() => setVisible(false)}
+      closeButtonCypressRef="sendEmailModalXButton"
     >
       <div>
-        {TYPES.map((type, index) => (
+        {availableTypes.map((type, index) => (
           <div
             key={index}
             className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 pl-2"
