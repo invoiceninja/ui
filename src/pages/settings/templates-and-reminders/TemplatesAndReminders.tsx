@@ -335,6 +335,7 @@ export function TemplatesAndReminders() {
               setTemplateId(value);
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
+            cypressRef="templateSelector"
           >
             {statics &&
               Object.keys(statics.templates).map((template, index) => (
