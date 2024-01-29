@@ -66,6 +66,7 @@ export function TransactionForm(props: Props) {
             )
           }
           errorMessage={props.errors?.errors.base_type}
+          cypressRef="transactionTypeSelector"
         >
           {Object.values(transactionTypes).map((transactionType) => (
             <option key={transactionType} value={transactionType}>

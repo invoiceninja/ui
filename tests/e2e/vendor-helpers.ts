@@ -5,9 +5,15 @@ interface VendorCreateParams {
   page: Page;
   withNavigation?: boolean;
   createIfNotExist?: boolean;
+  name?: string;
 }
 export const createVendor = async (params: VendorCreateParams) => {
-  const { page, withNavigation = true, createIfNotExist = false } = params;
+  const {
+    page,
+    withNavigation = true,
+    createIfNotExist = false,
+    name,
+  } = params;
 
   if (withNavigation) {
     await page
@@ -29,7 +35,7 @@ export const createVendor = async (params: VendorCreateParams) => {
     .getByRole('link', { name: 'New Vendor' })
     .click();
 
-  await page.locator('#name').fill('New Vendor');
+  await page.locator('#name').fill(name || 'New Vendor');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill('first@example.com');
