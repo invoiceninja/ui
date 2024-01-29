@@ -315,8 +315,6 @@ export default function Reports() {
   }, []);
   const colors = useColorScheme();
 
-  console.log(report.payload.clients);
-
   return (
     <Default
       title={documentTitle}
@@ -458,6 +456,13 @@ export default function Reports() {
 
           {report.identifier === 'expense' && (
             <>
+              <MultiClientSelector
+                value={report.payload.clients}
+                onValueChange={(clientIds) =>
+                  handlePayloadChange('clients', clientIds)
+                }
+              />
+
               <MultiVendorSelector
                 value={report.payload.vendors}
                 onValueChange={(vendorIds) =>
@@ -476,13 +481,6 @@ export default function Reports() {
                 value={report.payload.categories}
                 onValueChange={(expenseCategoryIds) =>
                   handlePayloadChange('categories', expenseCategoryIds)
-                }
-              />
-
-              <MultiClientSelector
-                value={report.payload.clients}
-                onValueChange={(clientIds) =>
-                  handlePayloadChange('clients', clientIds)
                 }
               />
             </>

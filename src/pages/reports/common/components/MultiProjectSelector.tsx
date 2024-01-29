@@ -13,10 +13,11 @@ import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue, StylesConfig } from 'react-select';
+import Select, { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
 import { useProjectsQuery } from '$app/common/queries/projects';
+import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
 
 interface Props {
   value?: string;
@@ -26,6 +27,8 @@ interface Props {
 export function MultiProjectSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
+  const customStyles = useSelectorCustomStyles();
 
   const { value, onValueChange, errorMessage } = props;
 
@@ -52,49 +55,6 @@ export function MultiProjectSelector(props: Props) {
     return (products as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
-  };
-
-  const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles, { data }) => {
-      return {
-        ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
-        borderRadius: '3px',
-      };
-    },
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-    }),
-    multiValueRemove: (styles) => ({
-      ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
-    }),
-    menu: (base) => ({
-      ...base,
-      width: 'max-content',
-      minWidth: '100%',
-      backgroundColor: colors.$4,
-      borderColor: colors.$4,
-    }),
-    control: (base) => ({
-      ...base,
-      borderRadius: '3px',
-      backgroundColor: colors.$1,
-      color: colors.$3,
-      borderColor: colors.$5,
-    }),
-    option: (base) => ({
-      ...base,
-      backgroundColor: colors.$1,
-      ':hover': {
-        backgroundColor: colors.$7,
-      },
-    }),
   };
 
   return (
