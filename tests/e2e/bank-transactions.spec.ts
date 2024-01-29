@@ -5,14 +5,17 @@ import {
   permissions,
 } from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
+import { createExpenseCategory } from './expense-categories-helpers';
+import { createVendor } from './vendor-helpers';
 
 interface CreateParams {
   page: Page;
   isTableEditable?: boolean;
   withNavigation?: boolean;
+  type?: 'withdrawal';
 }
 const createBankTransaction = async (params: CreateParams) => {
-  const { page, withNavigation = true, isTableEditable = true } = params;
+  const { page, withNavigation = true, isTableEditable = true, type } = params;
 
   if (withNavigation) {
     await page
@@ -27,6 +30,12 @@ const createBankTransaction = async (params: CreateParams) => {
     .getByRole('main')
     .getByRole('link', { name: 'New Transaction' })
     .click();
+
+  if (type === 'withdrawal') {
+    await page
+      .locator('[data-cy="transactionTypeSelector"]')
+      .selectOption({ label: 'Withdrawal' });
+  }
 
   await page.getByRole('main').locator('[type="text"]').nth(0).fill('100');
 
@@ -288,4 +297,95 @@ test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
       page.getByText('Successfully archived transaction')
     ).toBeVisible();
   }
+});
+
+test('Create expense bulk action', async ({ page }) => {
+  await login(page);
+
+  await createVendor({ page, name: 'testing create expense' });
+
+  await createExpenseCategory({ page, categoryName: 'testing create expense' });
+
+  await createBankTransaction({ page, type: 'withdrawal' });
+
+  await createBankTransaction({ page, type: 'withdrawal' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Transactions', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  const numberOfCheckBoxes = (
+    await page.locator('[data-cy="dataTableCheckbox"]').all()
+  ).length;
+
+  await page
+    .locator('[data-cy="dataTableCheckbox"]')
+    .nth(numberOfCheckBoxes - 2)
+    .click();
+  await page.locator('[data-cy="dataTableCheckbox"]').last().click();
+
+  await page
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('button', { name: 'Create Expense', exact: true })
+    .click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Create Expense' })
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('button', { name: 'Create Expense', exact: true })
+  ).toBeDisabled();
+
+  await page.getByTestId('combobox-input-field').first().click();
+
+  await page
+    .getByTestId('combobox-input-field')
+    .first()
+    .fill('testing create expense');
+
+  await page.waitForTimeout(200);
+
+  await page.getByText('testing create expense').first().click();
+
+  await page.getByTestId('combobox-input-field').last().click();
+
+  await page
+    .getByTestId('combobox-input-field')
+    .last()
+    .fill('testing create expense');
+
+  await page.waitForTimeout(200);
+
+  await page.getByText('testing create expense').first().click();
+
+  await expect(
+    page.getByRole('button', { name: 'Create Expense', exact: true })
+  ).not.toBeDisabled();
+
+  await page
+    .getByRole('button', { name: 'Create Expense', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully converted transaction')
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('heading', { name: 'Create Expense' })
+  ).not.toBeVisible();
+
+  await expect(page.getByRole('row').last()).toContainText('Converted');
+  await expect(page.getByRole('row').nth(numberOfCheckBoxes - 2)).toContainText(
+    'Converted'
+  );
+
+  await logout(page);
 });
