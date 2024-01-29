@@ -44,6 +44,10 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdOutlinePreview, MdSchedule } from 'react-icons/md';
 import { useScheduleReport } from '../common/hooks/useScheduleReport';
 import { useColorScheme } from '$app/common/colors';
+import { MultiClientSelector } from '../common/components/MultiClientSelector';
+import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseCategorySelector';
+import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
+import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
 interface Range {
   identifier: string;
   label: string;
@@ -311,6 +315,8 @@ export default function Reports() {
   }, []);
   const colors = useColorScheme();
 
+  console.log(report.payload.clients);
+
   return (
     <Default
       title={documentTitle}
@@ -448,6 +454,38 @@ export default function Reports() {
                 handlePayloadChange('product_key', productsKeys)
               }
             />
+          )}
+
+          {report.identifier === 'expense' && (
+            <>
+              <MultiVendorSelector
+                value={report.payload.vendors}
+                onValueChange={(vendorIds) =>
+                  handlePayloadChange('vendors', vendorIds)
+                }
+              />
+
+              <MultiProjectSelector
+                value={report.payload.projects}
+                onValueChange={(projectIds) =>
+                  handlePayloadChange('projects', projectIds)
+                }
+              />
+
+              <MultiExpenseCategorySelector
+                value={report.payload.categories}
+                onValueChange={(expenseCategoryIds) =>
+                  handlePayloadChange('categories', expenseCategoryIds)
+                }
+              />
+
+              <MultiClientSelector
+                value={report.payload.clients}
+                onValueChange={(clientIds) =>
+                  handlePayloadChange('clients', clientIds)
+                }
+              />
+            </>
           )}
         </Card>
 

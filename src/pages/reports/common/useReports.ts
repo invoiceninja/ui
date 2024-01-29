@@ -21,6 +21,10 @@ export interface Payload {
   include_tax?: boolean;
   status?: string;
   product_key?: string;
+  clients?: string;
+  categories?: string;
+  projects?: string;
+  vendors?: string;
 }
 
 export interface Report {
