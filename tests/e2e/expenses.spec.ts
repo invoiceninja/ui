@@ -9,6 +9,7 @@ import {
 } from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
 import { Action } from './clients.spec';
+import { createExpenseCategory } from './expense-categories-helpers';
 
 interface Params {
   permissions: Permission[];
@@ -585,4 +586,99 @@ test('cloning expense', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Edit Expense' }).first()
   ).toBeVisible();
+});
+
+test('Expense categories endpoint contains sort but not with parameter', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createExpenseCategory({
+    page,
+    categoryName: 'testing expense category 1',
+  });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await page.getByTestId('combobox-input-field').nth(3).click();
+  await page
+    .getByRole('option', { name: 'testing expense category 1' })
+    .first()
+    .click();
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/**/edit');
+
+  await page.reload();
+
+  await page.route('**/api/v1/expense_categories?status=active**', (route) => {
+    expect(route.request().url()).toContain('sort=name');
+    expect(route.request().url()).not.toContain('with=');
+
+    route.continue();
+  });
+
+  await logout(page);
+});
+
+test('Expense categories endpoint contains with but not sort parameter', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createExpenseCategory({
+    page,
+    categoryName: 'testing expense category 2',
+  });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await page.getByTestId('combobox-input-field').nth(3).click();
+  await page
+    .getByTestId('combobox-input-field')
+    .nth(3)
+    .fill('testing expense category 2');
+
+  await page.waitForTimeout(300);
+
+  await page
+    .getByRole('option', { name: 'testing expense category 2' })
+    .first()
+    .click();
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/**/edit');
+
+  await page.reload();
+
+  await page.route('**/api/v1/expense_categories?status=active**', (route) => {
+    expect(route.request().url()).not.toContain('sort=name');
+    expect(route.request().url()).toContain('with=');
+
+    route.continue();
+  });
+
+  await logout(page);
 });

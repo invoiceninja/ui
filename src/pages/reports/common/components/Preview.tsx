@@ -172,7 +172,7 @@ export function Preview() {
               return 'No';
             }
 
-            return cell.display_value;
+            return `"${cell.display_value}"`;
           })
           .join(',')
       );

@@ -32,6 +32,9 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
 
   const { isAdmin, isOwner } = useAdmin();
 
+  const perPageParameter =
+    import.meta.env.VITE_IS_TEST === 'true' ? '&per_page=1' : '';
+
   return (
     <>
       <CreateExpenseCategoryModal
@@ -45,7 +48,9 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
 
       {!props.setSelectedIds && (
         <ComboboxAsync<ExpenseCategory>
-          endpoint={endpoint('/api/v1/expense_categories?status=active')}
+          endpoint={endpoint(
+            `/api/v1/expense_categories?status=active${perPageParameter}`
+          )}
           onChange={(category: Entry<ExpenseCategory>) =>
             category.resource && props.onChange(category.resource)
           }
