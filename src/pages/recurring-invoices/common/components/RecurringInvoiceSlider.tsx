@@ -109,7 +109,7 @@ export const RecurringInvoiceSlider = () => {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: resource } = useQuery({
-    queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id],
+    queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
