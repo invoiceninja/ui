@@ -409,6 +409,7 @@ export default function Reports() {
                 onValueChange={(value) =>
                   handlePayloadChange('document_email_attachment', value)
                 }
+                cypressRef="scheduleDocumentEmailAttachment"
               />
             </Element>
           )}

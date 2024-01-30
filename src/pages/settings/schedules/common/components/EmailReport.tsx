@@ -131,6 +131,7 @@ export function EmailReport(props: Props) {
                 value
               )
             }
+            cypressRef="scheduleDocumentEmailAttachment"
           />
         </Element>
       )}
