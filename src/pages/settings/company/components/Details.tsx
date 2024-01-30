@@ -42,8 +42,6 @@ export function Details() {
     (state: RootState) => state.companyUsers.changes.company
   );
 
-  console.log(companyChanges?.settings);
-
   return (
     <>
       {companyChanges?.settings && (
