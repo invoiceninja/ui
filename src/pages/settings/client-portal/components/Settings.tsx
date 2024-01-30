@@ -239,6 +239,29 @@ export function Settings() {
         />
       </Element>
 
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="show_pdfhtml_on_mobile"
+            labelElement={
+              <SettingsLabel
+                label={t('show_pdfhtml_on_mobile')}
+                helpLabel={t('show_pdfhtml_on_mobile_help')}
+              />
+            }
+            defaultValue={false}
+          />
+        }
+      >
+        <Toggle
+          checked={Boolean(company?.settings?.show_pdfhtml_on_mobile)}
+          onValueChange={(value) =>
+            handleChange('settings.show_pdfhtml_on_mobile', value)
+          }
+          disabled={disableSettingsField('show_pdfhtml_on_mobile')}
+        />
+      </Element>
+
       {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
       </Element> */}

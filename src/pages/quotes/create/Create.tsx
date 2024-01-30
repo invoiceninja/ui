@@ -38,7 +38,6 @@ import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
-import classNames from 'classnames';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -261,11 +260,7 @@ export default function Create() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div
-          className={classNames('sm:block', {
-            hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
-          })}
-        >
+        <div className="my-4">
           {quote && (
             <InvoicePreview
               for="create"

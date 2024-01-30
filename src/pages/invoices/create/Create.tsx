@@ -41,7 +41,6 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
-import classNames from 'classnames';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -312,11 +311,7 @@ export default function Create() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div
-          className={classNames('my-4 sm:block', {
-            hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
-          })}
-        >
+        <div className="my-4">
           {invoice && (
             <InvoicePreview
               for="create"
