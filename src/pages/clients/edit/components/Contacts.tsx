@@ -21,6 +21,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
+import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 
 interface Props {
   contacts: Partial<ClientContact>[];
@@ -233,9 +234,17 @@ export function Contacts(props: Props) {
             />
           )}
 
-          <Element>
+          <Element
+            {...(!contact.is_locked && {
+              leftSide: (
+                <div className="flex">
+                  <UserUnsubscribedTooltip size={25} />
+                </div>
+              ),
+            })}
+          >
             <div className="flex items-center">
-              <div className="w-1/2">
+              <div className="flex items-center justify-between w-1/2">
                 {props.contacts.length >= 2 && (
                   <button
                     type="button"
