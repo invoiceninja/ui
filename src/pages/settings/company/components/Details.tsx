@@ -9,7 +9,6 @@
  */
 
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { RootState } from '$app/common/stores/store';
 import { Card } from '$app/components/cards/Card';
 import { Element } from '$app/components/cards/Element';
@@ -18,19 +17,20 @@ import { InputField } from '$app/components/forms/InputField';
 import { SelectField } from '$app/components/forms/SelectField';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function Details() {
   const [t] = useTranslation();
 
-  const dispatch = useDispatch();
-
   const disableSettingsField = useDisableSettingsField();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -42,14 +42,7 @@ export function Details() {
     (state: RootState) => state.companyUsers.changes.company
   );
 
-  const handleChange = (property: string, value: string) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: property,
-        value: value,
-      })
-    );
+  console.log(companyChanges?.settings);
 
   return (
     <>
@@ -270,6 +263,28 @@ export function Details() {
               <option value="government">{t('government')}</option>
               <option value="other">{t('other')}</option>
             </SelectField>
+          </Element>
+
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="show_pdfhtml_on_mobile"
+                labelElement={
+                  <SettingsLabel label={t('show_pdfhtml_on_mobile')} />
+                }
+                defaultValue={false}
+              />
+            }
+          >
+            <Toggle
+              checked={Boolean(
+                companyChanges?.settings?.show_pdfhtml_on_mobile
+              )}
+              onValueChange={(value) =>
+                handleChange('settings.show_pdfhtml_on_mobile', value)
+              }
+              disabled={disableSettingsField('show_pdfhtml_on_mobile')}
+            />
           </Element>
 
           {companyChanges?.custom_fields?.company1 && (
