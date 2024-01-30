@@ -185,7 +185,7 @@ export default function Create() {
         <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {credit && client ? (
+          {credit ? (
             <ProductsTable
               type="product"
               resource={credit}

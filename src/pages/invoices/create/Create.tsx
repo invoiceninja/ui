@@ -234,7 +234,7 @@ export default function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="product"
                   resource={invoice}
@@ -265,7 +265,7 @@ export default function Create() {
             </div>
 
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="task"
                   resource={invoice}

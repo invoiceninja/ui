@@ -198,7 +198,7 @@ export default function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="product"
                   resource={quote}
@@ -221,7 +221,7 @@ export default function Create() {
             </div>
 
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="task"
                   resource={quote}
