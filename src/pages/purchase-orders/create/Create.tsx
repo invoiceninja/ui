@@ -45,6 +45,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Card } from '$app/components/cards';
 import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import classNames from 'classnames';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
@@ -243,7 +244,11 @@ export default function Create() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="my-4">
+        <div
+          className={classNames('sm:block', {
+            hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
+          })}
+        >
           {purchaseOrder && (
             <InvoicePreview
               for="create"

@@ -31,6 +31,7 @@ import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import classNames from 'classnames';
 
 export type MailerResourceType =
   | 'invoice'
@@ -194,7 +195,16 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
       <div className="my-4 lg:my-0 col-span-12 lg:col-span-7 h-max">
         {props.resource && reactSettings?.show_pdf_preview && (
-          <InvoiceViewer method="GET" link={pdfUrl(props.resource) as string} />
+          <div
+            className={classNames('sm:block', {
+              hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
+            })}
+          >
+            <InvoiceViewer
+              method="GET"
+              link={pdfUrl(props.resource) as string}
+            />
+          </div>
         )}
       </div>
     </div>

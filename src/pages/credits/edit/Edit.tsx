@@ -38,11 +38,15 @@ import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import classNames from 'classnames';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const company = useCurrentCompany();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -177,7 +181,11 @@ export default function Edit() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="my-4">
+        <div
+          className={classNames('my-4 sm:block', {
+            hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
+          })}
+        >
           {credit && (
             <InvoicePreview
               for="invoice"

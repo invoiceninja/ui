@@ -35,6 +35,7 @@ import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
+import classNames from 'classnames';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');
@@ -163,6 +164,8 @@ export default function Create() {
 
   const save = useCreate({ setErrors });
 
+  console.log(Boolean(!company?.settings.show_pdfhtml_on_mobile));
+
   return (
     <Default
       title={documentTitle}
@@ -225,7 +228,11 @@ export default function Create() {
       </div>
 
       {reactSettings?.show_pdf_preview && (
-        <div className="my-4">
+        <div
+          className={classNames('my-4 sm:block', {
+            hidden: Boolean(!company?.settings.show_pdfhtml_on_mobile),
+          })}
+        >
           {credit && (
             <InvoicePreview
               for="create"
