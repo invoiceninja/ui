@@ -50,9 +50,9 @@ export function MultiProjectSelector(props: Props) {
   }, [projectsResponse]);
 
   const handleChange = (
-    products: MultiValue<{ value: string; label: string }>
+    projects: MultiValue<{ value: string; label: string }>
   ) => {
-    return (products as SelectOption[])
+    return (projects as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
   };

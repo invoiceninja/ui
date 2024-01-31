@@ -52,9 +52,9 @@ export function MultiExpenseCategorySelector(props: Props) {
   }, [expenseCategoriesResponse]);
 
   const handleChange = (
-    products: MultiValue<{ value: string; label: string }>
+    expenseCategories: MultiValue<{ value: string; label: string }>
   ) => {
-    return (products as SelectOption[])
+    return (expenseCategories as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
   };

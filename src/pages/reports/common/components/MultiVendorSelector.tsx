@@ -50,9 +50,9 @@ export function MultiVendorSelector(props: Props) {
   }, [vendorsResponse]);
 
   const handleChange = (
-    products: MultiValue<{ value: string; label: string }>
+    vendors: MultiValue<{ value: string; label: string }>
   ) => {
-    return (products as SelectOption[])
+    return (vendors as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
   };

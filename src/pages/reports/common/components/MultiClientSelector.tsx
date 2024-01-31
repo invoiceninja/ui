@@ -50,9 +50,9 @@ export function MultiClientSelector(props: Props) {
   }, [clientsResponse]);
 
   const handleChange = (
-    products: MultiValue<{ value: string; label: string }>
+    clients: MultiValue<{ value: string; label: string }>
   ) => {
-    return (products as SelectOption[])
+    return (clients as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
   };
