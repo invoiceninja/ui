@@ -13,5 +13,6 @@
   ],
   "prHourlyLimit": 1,
   "prConcurrentLimit": 1,
-  "rangeStrategy": "auto"
+  "rangeStrategy": "auto",
+  "dependencyDashboard": false
 }
