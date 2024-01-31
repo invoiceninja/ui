@@ -40,6 +40,9 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   is_income_billed: false,
   include_tax: false,
   client_id: '',
+  vendors: '',
+  projects: '',
+  categories: '',
 };
 
 export function useHandleChange(params: Params) {

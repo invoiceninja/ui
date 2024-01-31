@@ -19,6 +19,10 @@ import { useReports } from '$app/pages/reports/common/useReports';
 import { ranges } from '$app/pages/reports/index/Reports';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { MultiClientSelector } from '$app/pages/reports/common/components/MultiClientSelector';
+import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
+import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
+import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
 
 interface Props {
   schedule: Schedule;
@@ -39,7 +43,11 @@ type ReportFiled =
   | 'income_billed'
   | 'start_date'
   | 'end_date'
-  | 'include_tax';
+  | 'include_tax'
+  | 'clients'
+  | 'vendors'
+  | 'categories'
+  | 'projects';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
   'send_email',
@@ -57,6 +65,13 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'expense_billed',
     'income_billed',
     'include_tax',
+  ],
+  expense: [
+    ...DEFAULT_REPORT_FIELDS,
+    'clients',
+    'projects',
+    'categories',
+    'vendors',
   ],
 };
 
@@ -231,6 +246,56 @@ export function EmailReport(props: Props) {
             errorMessage={errors?.errors['parameters.client_id']}
           />
         </Element>
+      )}
+
+      {showReportFiled('clients') && (
+        <MultiClientSelector
+          value={schedule.parameters.clients.join(',')}
+          onValueChange={(clientIds) => {
+            const updatedParameters = { ...schedule.parameters };
+
+            updatedParameters.clients = [
+              ...updatedParameters.clients,
+              ...clientIds.split(','),
+            ];
+
+            handleChange('parameters', updatedParameters);
+          }}
+          errorMessage={errors?.errors['parameters.clients']}
+        />
+      )}
+
+      {showReportFiled('vendors') && (
+        <MultiVendorSelector
+          value={schedule.parameters.vendors}
+          onValueChange={(vendorIds) =>
+            handleChange('parameters.vendors' as keyof Schedule, vendorIds)
+          }
+          errorMessage={errors?.errors['parameters.vendors']}
+        />
+      )}
+
+      {showReportFiled('projects') && (
+        <MultiProjectSelector
+          value={schedule.parameters.projects}
+          onValueChange={(projectIds) =>
+            handleChange('parameters.projects' as keyof Schedule, projectIds)
+          }
+          errorMessage={errors?.errors['parameters.projects']}
+        />
+      )}
+
+      {showReportFiled('categories') && (
+        <MultiExpenseCategorySelector
+          value={schedule.parameters.categories}
+          onValueChange={(expenseCategoryIds) =>
+            handleChange(
+              'parameters.categories' as keyof Schedule,
+              expenseCategoryIds
+            )
+          }
+          errorMessage={errors?.errors['parameters.categories']}
+        />
       )}
     </>
   );

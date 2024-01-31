@@ -27,6 +27,9 @@ export interface Parameters {
   is_income_billed: boolean;
   include_tax: boolean;
   client_id: string;
+  vendors: string;
+  categories: string;
+  projects: string;
 }
 
 export interface Schedule {

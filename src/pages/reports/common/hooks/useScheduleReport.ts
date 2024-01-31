@@ -40,6 +40,10 @@ export function useScheduleReport() {
       include_tax: report.payload.include_tax ?? false,
       status: report.payload.status || '',
       product_key: report.payload.product_key || '',
+      clients: report.payload.clients?.split(',') || [],
+      vendors: report.payload.vendors || '',
+      projects: report.payload.projects || '',
+      categories: report.payload.categories || '',
     });
 
     navigate('/settings/schedules/create?template=email_report');
