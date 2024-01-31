@@ -235,7 +235,7 @@ export function Contacts(props: Props) {
           )}
 
           <Element
-            {...(!contact.is_locked && {
+            {...(contact.is_locked && {
               leftSide: (
                 <div className="flex">
                   <UserUnsubscribedTooltip size={25} />
