@@ -194,12 +194,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
       <div className="my-4 lg:my-0 col-span-12 lg:col-span-7 h-max">
         {props.resource && reactSettings?.show_pdf_preview && (
-          <div className="my-4">
-            <InvoiceViewer
-              method="GET"
-              link={pdfUrl(props.resource) as string}
-            />
-          </div>
+          <InvoiceViewer method="GET" link={pdfUrl(props.resource) as string} />
         )}
       </div>
     </div>
