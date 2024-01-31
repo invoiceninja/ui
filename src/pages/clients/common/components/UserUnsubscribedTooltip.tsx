@@ -22,8 +22,6 @@ export function UserUnsubscribedTooltip(props?: Props) {
 
   const { size = 22 } = props || {};
 
-  ('User unsubscribed from emails :link');
-
   return (
     <Tooltip
       tooltipElement={reactStringReplace(
