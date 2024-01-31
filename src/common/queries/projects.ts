@@ -57,7 +57,7 @@ export function useProjectsQuery(params?: Params) {
       request(
         'GET',
         endpoint('/api/v1/projects?status=:status', {
-          status: params?.status?.join(',') ?? '',
+          status: params?.status?.join(',') ?? 'all',
         })
       ).then(
         (response: GenericSingleResourceResponse<Project[]>) =>
