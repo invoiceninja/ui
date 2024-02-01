@@ -104,12 +104,11 @@ export function Edit() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={onSave}
       navigationTopRight={
         companyGateway && (
           <ResourceActions
             resource={companyGateway}
-            label={t('more_actions')}
+            onSaveClick={onSave}
             actions={actions}
           />
         )
