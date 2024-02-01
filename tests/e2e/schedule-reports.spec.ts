@@ -377,7 +377,9 @@ test('Expense report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Expense report test', async ({ page }) => {
+test('Expense report test with clients, project and categories selectors', async ({
+  page,
+}) => {
   await login(page);
 
   await page
