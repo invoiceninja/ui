@@ -117,10 +117,6 @@ const createPurchaseOrder = async (params: CreateParams) => {
 
   await page.waitForTimeout(900);
 
-  await page.getByTestId('combobox-input-field').first().click();
-
-  await page.waitForTimeout(200);
-
   await page.getByRole('option').first().click();
 
   if (assignTo) {
@@ -671,4 +667,36 @@ test('cloning purchase_order', async ({ page }) => {
       .getByRole('heading', { name: 'Edit Purchase Order', exact: true })
       .first()
   ).toBeVisible();
+});
+
+test('Select vendor message', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Purchase Orders', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Purchase Order' })
+    .click();
+
+  await page.waitForTimeout(900);
+
+  await expect(
+    page.getByText('Please select a vendor.', { exact: true }).first()
+  ).toBeVisible();
+
+  await page.getByTestId('combobox-input-field').first().click();
+
+  await page.waitForTimeout(200);
+
+  await page.getByRole('option').first().click();
+
+  await expect(
+    page.getByText('Please select a vendor.', { exact: true })
+  ).not.toBeVisible();
+
+  await logout(page);
 });
