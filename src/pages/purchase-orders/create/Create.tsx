@@ -185,6 +185,7 @@ export default function Create() {
               purchaseOrder &&
               handleInvitationChange(purchaseOrder, id, checked)
             }
+            initiallyVisible
             errorMessage={errors?.errors.vendor_id}
           />
         </Card>

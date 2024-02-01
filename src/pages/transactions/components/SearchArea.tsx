@@ -65,7 +65,7 @@ export function SearchArea(props: Props) {
       />
 
       <VendorSelector
-        initiallyVisible={isCreateVendorModalOpen}
+        initiallyVisibleModal={isCreateVendorModalOpen}
         setVisible={setIsCreateVendorModalOpen}
         setSelectedIds={props.setSelectedIds}
         onChange={() => {}}

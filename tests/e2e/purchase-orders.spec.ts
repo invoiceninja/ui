@@ -117,10 +117,6 @@ const createPurchaseOrder = async (params: CreateParams) => {
 
   await page.waitForTimeout(900);
 
-  await page.getByTestId('combobox-input-field').first().click();
-
-  await page.waitForTimeout(200);
-
   await page.getByRole('option').first().click();
 
   if (assignTo) {

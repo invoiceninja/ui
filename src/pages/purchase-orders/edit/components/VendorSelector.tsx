@@ -23,12 +23,13 @@ interface Props {
   onContactCheckboxChange: (id: string, checked: boolean) => unknown;
   readonly?: boolean;
   errorMessage?: string | string[];
+  initiallyVisible?: boolean;
 }
 
 export function VendorSelector(props: Props) {
   const { t } = useTranslation();
 
-  const { resource } = props;
+  const { resource, initiallyVisible } = props;
 
   const vendorResolver = useVendorResolver();
 
@@ -64,6 +65,7 @@ export function VendorSelector(props: Props) {
           value={vendorId}
           readonly={props.readonly}
           onClearButtonClick={props.onClearButtonClick}
+          initiallyVisible={initiallyVisible}
           errorMessage={props.errorMessage}
         />
       </div>
