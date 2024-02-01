@@ -87,6 +87,8 @@ test('Invoice report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
 
+  await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
+
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'More Actions', exact: true })
@@ -113,6 +115,9 @@ test('Invoice report test', async ({ page }) => {
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'DraftPaid'
   );
+  await expect(
+    page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
+  ).toBeChecked();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -137,6 +142,9 @@ test('Invoice report test', async ({ page }) => {
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'DraftPaid'
   );
+  await expect(
+    page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
+  ).toBeChecked();
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -301,6 +309,68 @@ test('Product sales report test', async ({ page }) => {
   await expect(
     page.locator('[data-testid="combobox-input-field"]')
   ).not.toBeEmpty();
+
+  await expect(
+    page.locator('h2').filter({ hasText: 'Edit Schedule' })
+  ).toBeVisible();
+});
+
+test('Expense report test', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Reports', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="reportNameSelector"]')
+    .selectOption({ label: 'Expense' });
+
+  await page
+    .locator('[data-cy="reportDateRange"]')
+    .selectOption({ label: 'This Month' });
+
+  await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Schedule', exact: true })
+    .click();
+
+  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
+    'expense'
+  );
+  await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
+  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
+    'this_month'
+  );
+  await expect(
+    page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
+  ).toBeChecked();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await page.waitForURL('**/settings/schedules/**/edit');
+
+  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
+    'expense'
+  );
+  await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
+  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
+    'this_month'
+  );
+  await expect(
+    page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
+  ).toBeChecked();
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })

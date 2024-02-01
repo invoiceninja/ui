@@ -13,6 +13,7 @@ import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/commo
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Report } from '../useReports';
+import { EXPORT_DOCUMENTS_REPORTS } from '../../index/Reports';
 
 const DATE_RANGES_ALIASES = {
   last7: 'last7_days',
@@ -40,6 +41,10 @@ export function useScheduleReport() {
       include_tax: report.payload.include_tax ?? false,
       status: report.payload.status || '',
       product_key: report.payload.product_key || '',
+      ...(EXPORT_DOCUMENTS_REPORTS.includes(report.identifier) && {
+        document_email_attachment:
+          report.payload.document_email_attachment ?? false,
+      }),
       clients: report.payload.clients?.split(',') || [],
       vendors: report.payload.vendors || '',
       projects: report.payload.projects || '',

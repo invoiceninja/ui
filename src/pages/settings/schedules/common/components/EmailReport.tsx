@@ -44,6 +44,7 @@ type ReportFiled =
   | 'start_date'
   | 'end_date'
   | 'include_tax'
+  | 'document_email_attachment'
   | 'clients'
   | 'vendors'
   | 'categories'
@@ -57,8 +58,12 @@ export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
 ];
 
 export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
-  invoice: [...DEFAULT_REPORT_FIELDS, 'status'],
-  invoice_item: [...DEFAULT_REPORT_FIELDS, 'products'],
+  invoice: [...DEFAULT_REPORT_FIELDS, 'status', 'document_email_attachment'],
+  invoice_item: [
+    ...DEFAULT_REPORT_FIELDS,
+    'products',
+    'document_email_attachment',
+  ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
     ...DEFAULT_REPORT_FIELDS,
@@ -66,13 +71,18 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'income_billed',
     'include_tax',
   ],
-  expense: [
-    ...DEFAULT_REPORT_FIELDS,
-    'clients',
-    'projects',
-    'categories',
-    'vendors',
-  ],
+  client: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  quote: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  quote_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  credit: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  payment: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  expense: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  task: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  vendor: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  purchase_order: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  purchase_order_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
 };
 
 export function EmailReport(props: Props) {
@@ -115,6 +125,21 @@ export function EmailReport(props: Props) {
             }
             disabled
             cypressRef="scheduleSendEmail"
+          />
+        </Element>
+      )}
+
+      {showReportFiled('document_email_attachment') && (
+        <Element leftSide={t('document_email_attachment')}>
+          <Toggle
+            checked={schedule.parameters.document_email_attachment}
+            onValueChange={(value) =>
+              handleChange(
+                'parameters.document_email_attachment' as keyof Schedule,
+                value
+              )
+            }
+            cypressRef="scheduleDocumentEmailAttachment"
           />
         </Element>
       )}

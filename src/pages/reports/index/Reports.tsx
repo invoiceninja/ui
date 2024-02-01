@@ -94,6 +94,23 @@ export const ranges: Range[] = [
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
+export const EXPORT_DOCUMENTS_REPORTS: Identifier[] = [
+  'client',
+  'invoice',
+  'invoice_item',
+  'quote',
+  'quote_item',
+  'credit',
+  'document',
+  'payment',
+  'expense',
+  'task',
+  'product',
+  'vendor',
+  'purchase_order',
+  'purchase_order_item',
+];
+
 const download = (data: BlobPart, identifier: string) => {
   const blob = new Blob([data], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -382,6 +399,24 @@ export default function Reports() {
               onValueChange={handleSendEmailChange}
             />
           </Element>
+
+          {EXPORT_DOCUMENTS_REPORTS.includes(report.identifier) && (
+            <Element leftSide={t('document_email_attachment')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.document_email_attachment}
+                onValueChange={(value) =>
+                  handlePayloadChange('document_email_attachment', value)
+                }
+                cypressRef="scheduleDocumentEmailAttachment"
+              />
+            </Element>
+          )}
 
           {report.identifier === 'profitloss' && (
             <>
