@@ -297,6 +297,7 @@ export interface Settings {
   send_email_on_mark_paid: boolean;
   classification: string;
   payment_email_all_contacts: boolean;
+  show_pdfhtml_on_mobile: boolean;
 }
 
 export interface TaxData {

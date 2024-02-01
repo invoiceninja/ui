@@ -131,7 +131,7 @@ export function Search$() {
           onChange={(event) => setQuery(event.target.value)}
           ref={inputRef}
           onFocus={() => setIsVisible(true)}
-          placeholder="Search..."
+          placeholder={`${t('search')}...`}
           style={{ backgroundColor: colors.$1, color: colors.$3 }}
         />
 

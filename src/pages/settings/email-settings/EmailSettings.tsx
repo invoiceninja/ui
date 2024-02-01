@@ -42,6 +42,7 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useEmailProviders } from './common/hooks/useEmailProviders';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -54,6 +55,8 @@ export function EmailSettings() {
     { name: t('settings'), href: '/settings' },
     { name: t('email_settings'), href: '/settings/email_settings' },
   ];
+
+  const emailProviders = useEmailProviders();
 
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
@@ -339,13 +342,11 @@ export function EmailSettings() {
             disabled={disableSettingsField('email_sending_method')}
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
-            <option defaultChecked value="default">
-              {t('default')}
-            </option>
-            {isHosted() && <option value="gmail">Gmail</option>}
-            {isHosted() && <option value="office365">Microsoft</option>}
-            <option value="client_postmark">Postmark</option>
-            <option value="client_mailgun">Mailgun</option>
+            {emailProviders.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </SelectField>
         </Element>
 
