@@ -85,13 +85,21 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Vendor', exact: true })
+        .getByRole('button', { name: 'Edit Vendor', exact: true })
+    ).not.toBeVisible();
+
+    await expect(
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Vendor', exact: true })
+        .getByRole('button', { name: 'Edit Vendor', exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   }
 };
@@ -106,9 +114,7 @@ const checkEditPage = async (page: Page) => {
   ).toBeVisible();
 
   await expect(
-    page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
+    page.locator('[data-cy="chevronDownButton"]').first()
   ).toBeVisible();
 
   await expect(
@@ -202,7 +208,7 @@ test('can edit vendor', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Vendor', exact: true })
+    .getByRole('button', { name: 'Edit Vendor', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -252,7 +258,7 @@ test('can create a vendor', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Vendor', exact: true })
+    .getByRole('button', { name: 'Edit Vendor', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -303,7 +309,7 @@ test('can view and edit assigned vendor with create_vendor', async ({
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Vendor', exact: true })
+    .getByRole('button', { name: 'Edit Vendor', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -356,11 +362,11 @@ test('deleting vendor with edit_vendor', async ({ page }) => {
       page.getByRole('button', { name: 'Restore', exact: true })
     ).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
-
-    await moreActionsButton.click();
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
 
     await page.getByText('Delete').click();
 
@@ -404,12 +410,11 @@ test('archiving vendor withe edit_vendor', async ({ page }) => {
       page.getByRole('button', { name: 'Restore', exact: true })
     ).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
 
     await page.getByText('Archive').click();
 
@@ -487,13 +492,11 @@ test('vendor documents uploading with edit_vendor', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createVendor({ page });
-
-    await checkShowPage(page, true);
   } else {
     await tableRow.getByRole('link').first().click();
-
-    await checkShowPage(page, false);
   }
+
+  await checkShowPage(page, true);
 
   await page
     .getByRole('link', {
