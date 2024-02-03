@@ -18,7 +18,7 @@ import { Body } from './components/Body';
 import { Header } from './components/Headers';
 import { Footer } from './components/Footer';
 import { Includes } from './components/Includes';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
@@ -27,6 +27,10 @@ import { Variables } from './components/Variables';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
+import Toggle from '$app/components/forms/Toggle';
+import { useTranslation } from 'react-i18next';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -41,12 +45,54 @@ export const payloadAtom = atom<PreviewPayload>({
 });
 
 export default function Edit() {
-  const [payload, setPayload] = useAtom(payloadAtom);
+  const [t] = useTranslation();
+
+  const actions = useActions();
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
 
+  const [payload, setPayload] = useAtom(payloadAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
+
+  const handleSaveInvoiceDesign = () => {
+    toast.processing();
+
+    request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
+      .then(() => {
+        $refetch(['designs']);
+
+        toast.success('updated_design');
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
+      });
+  };
+
+  useNavigationTopRightElement(
+    {
+      element: payload?.design && (
+        <div className="flex space-x-3">
+          <Toggle
+            label={t('render_html')}
+            checked={shouldRenderHTML}
+            onChange={(value) => setShouldRenderHTML(value)}
+          />
+
+          <ResourceActions
+            resource={payload?.design}
+            onSaveClick={handleSaveInvoiceDesign}
+            actions={actions}
+          />
+        </div>
+      ),
+    },
+    [payload.design]
+  );
 
   useEffect(() => {
     if (data) {
@@ -59,28 +105,6 @@ export default function Edit() {
     return () =>
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
-
-  useSaveBtn(
-    {
-      onClick() {
-        toast.processing();
-
-        request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
-          .then(() => {
-            $refetch(['designs']);
-
-            toast.success('updated_design');
-          })
-          .catch((error: AxiosError<ValidationBag>) => {
-            if (error.response?.status === 422) {
-              setErrors(error.response.data);
-              toast.dismiss();
-            }
-          });
-      },
-    },
-    [payload.design]
-  );
 
   return (
     <div className="flex flex-col lg:flex-row gap-4">
@@ -98,10 +122,13 @@ export default function Edit() {
       <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
         {payload.design ? (
           <InvoiceViewer
-            link={endpoint('/api/v1/preview')}
+            link={endpoint('/api/v1/preview?html=:renderHTML', {
+              renderHTML: shouldRenderHTML,
+            })}
             resource={payload}
             method="POST"
             withToast
+            renderAsHTML={shouldRenderHTML}
           />
         ) : null}
       </div>
