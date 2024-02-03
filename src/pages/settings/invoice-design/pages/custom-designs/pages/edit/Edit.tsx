@@ -54,23 +54,28 @@ export default function Edit() {
 
   const [payload, setPayload] = useAtom(payloadAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
 
   const handleSaveInvoiceDesign = () => {
-    toast.processing();
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
 
-    request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
-      .then(() => {
-        $refetch(['designs']);
+      request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
+        .then(() => {
+          $refetch(['designs']);
 
-        toast.success('updated_design');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
-        }
-      });
+          toast.success('updated_design');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   useNavigationTopRightElement(
@@ -81,17 +86,21 @@ export default function Edit() {
             label={t('render_html')}
             checked={shouldRenderHTML}
             onChange={(value) => setShouldRenderHTML(value)}
+            disabled={isFormBusy}
           />
 
-          <ResourceActions
-            resource={payload?.design}
-            onSaveClick={handleSaveInvoiceDesign}
-            actions={actions}
-          />
+          {payload.design && (
+            <ResourceActions
+              resource={payload.design}
+              onSaveClick={handleSaveInvoiceDesign}
+              actions={actions}
+              disableSaveButton={isFormBusy}
+            />
+          )}
         </div>
       ),
     },
-    [payload.design]
+    [payload.design, isFormBusy]
   );
 
   useEffect(() => {
