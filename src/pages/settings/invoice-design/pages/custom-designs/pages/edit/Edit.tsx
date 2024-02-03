@@ -89,14 +89,12 @@ export default function Edit() {
             disabled={isFormBusy}
           />
 
-          {payload.design && (
-            <ResourceActions
-              resource={payload.design}
-              onSaveClick={handleSaveInvoiceDesign}
-              actions={actions}
-              disableSaveButton={isFormBusy}
-            />
-          )}
+          <ResourceActions
+            resource={payload.design}
+            onSaveClick={handleSaveInvoiceDesign}
+            actions={actions}
+            disableSaveButton={isFormBusy}
+          />
         </div>
       ),
     },
