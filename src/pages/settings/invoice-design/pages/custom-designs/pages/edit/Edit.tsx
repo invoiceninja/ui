@@ -29,8 +29,6 @@ import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
-import Toggle from '$app/components/forms/Toggle';
-import { useTranslation } from 'react-i18next';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -45,8 +43,6 @@ export const payloadAtom = atom<PreviewPayload>({
 });
 
 export default function Edit() {
-  const [t] = useTranslation();
-
   const actions = useActions();
 
   const { id } = useParams();
@@ -81,21 +77,12 @@ export default function Edit() {
   useNavigationTopRightElement(
     {
       element: payload?.design && (
-        <div className="flex space-x-3">
-          <Toggle
-            label={t('render_html')}
-            checked={shouldRenderHTML}
-            onChange={(value) => setShouldRenderHTML(value)}
-            disabled={isFormBusy}
-          />
-
-          <ResourceActions
-            resource={payload.design}
-            onSaveClick={handleSaveInvoiceDesign}
-            actions={actions}
-            disableSaveButton={isFormBusy}
-          />
-        </div>
+        <ResourceActions
+          resource={payload.design}
+          onSaveClick={handleSaveInvoiceDesign}
+          actions={actions}
+          disableSaveButton={isFormBusy}
+        />
       ),
     },
     [payload.design, isFormBusy]
@@ -117,7 +104,12 @@ export default function Edit() {
     <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-          <Settings errors={errors} />
+          <Settings
+            errors={errors}
+            isFormBusy={isFormBusy}
+            shouldRenderHTML={shouldRenderHTML}
+            setShouldRenderHTML={setShouldRenderHTML}
+          />
           <Body />
           <Header />
           <Footer />
