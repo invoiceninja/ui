@@ -11,7 +11,7 @@
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { MdChevronRight, MdLaunch, MdPayment, MdPerson2 } from 'react-icons/md';
+import { MdChevronRight, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
@@ -78,12 +78,27 @@ export function Gateways(props: Props) {
                 <div>
                   <MdPayment fontSize={22} />
                 </div>
-                <div className="inline-flex items-center">
-                  <span> {t('gateway')}</span>
+                <div className="flex items-center">
+                  <span>{t('gateway')}</span>
                   <MdChevronRight size={20} />
                   <span>
-                    {getCompanyGatewayLabel(token.company_gateway_id)}
+                    {getCompanyGatewayLabel(token.company_gateway_id) ||
+                      'Stripe'}
                   </span>
+                  {showCustomerStripeLink(token.company_gateway_id) && (
+                    <Link
+                      className="ml-1"
+                      external
+                      to={route(
+                        'https://dashboard.stripe.com/customers/:customerReference',
+                        {
+                          customerReference: token.gateway_customer_reference,
+                        }
+                      )}
+                    >
+                      <Icon element={MdLaunch} size={18} />
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -101,7 +116,7 @@ export function Gateways(props: Props) {
               </div>
             </div>
 
-            <div className="flex flex-col justify-between">
+            <div>
               <Link
                 to={route('/settings/gateways/:id/edit', {
                   id: token.company_gateway_id,
@@ -109,20 +124,6 @@ export function Gateways(props: Props) {
               >
                 <Icon element={MdLaunch} size={18} />
               </Link>
-
-              {showCustomerStripeLink(token.company_gateway_id) && (
-                <Link
-                  external
-                  to={route(
-                    'https://dashboard.stripe.com/customers/:customerReference',
-                    {
-                      customerReference: token.gateway_customer_reference,
-                    }
-                  )}
-                >
-                  <Icon element={MdPerson2} size={20} />
-                </Link>
-              )}
             </div>
           </div>
         ))}
