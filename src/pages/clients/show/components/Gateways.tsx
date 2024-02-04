@@ -78,12 +78,11 @@ export function Gateways(props: Props) {
                 <div>
                   <MdPayment fontSize={22} />
                 </div>
-                <div className="flex items-center">
+                <div className="inline-flex items-center">
                   <span>{t('gateway')}</span>
                   <MdChevronRight size={20} />
                   <span>
-                    {getCompanyGatewayLabel(token.company_gateway_id) ||
-                      'Stripe'}
+                    {getCompanyGatewayLabel(token.company_gateway_id)}
                   </span>
                   {showCustomerStripeLink(token.company_gateway_id) && (
                     <Link
