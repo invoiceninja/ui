@@ -90,6 +90,7 @@ export function Default(props: Props) {
   const { isOwner } = useAdmin();
   const colors = useColorScheme();
   const preventNavigation = usePreventNavigation();
+  const navigationTopRightElement = useNavigationTopRightElement();
 
   const enabled = useEnabled();
   const user = useInjectUserChanges();
@@ -365,11 +366,6 @@ export function Default(props: Props) {
       visible: Boolean(company),
     },
   ];
-
-  const { isOwner } = useAdmin();
-  const saveBtn = useSaveBtn();
-  const navigationTopRightElement = useNavigationTopRightElement();
-  const colors = useColorScheme();
 
   return (
     <div>
