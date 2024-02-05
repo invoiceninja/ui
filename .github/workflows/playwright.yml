@@ -108,6 +108,7 @@ jobs:
         git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
         cd ui
         git checkout develop
+        cp .env.example .env
         npm i
         npm run build
         
