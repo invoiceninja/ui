@@ -71,7 +71,6 @@ export function Gateways(props: Props) {
                     getCompanyGateway(token.company_gateway_id)?.gateway_key
                   ) ? (
                     <Link
-                      className="ml-1"
                       external
                       to={route(
                         'https://dashboard.stripe.com/customers/:customerReference',
