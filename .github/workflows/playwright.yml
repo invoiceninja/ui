@@ -38,6 +38,10 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
+      PLAYWRIGHT_BASE_URL: http://localhost:4173
+      VITE_IS_TEST: true
+      VITE_ROUTER: browser
+
 
     services:
       mariadb:
@@ -108,6 +112,7 @@ jobs:
         git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
         cd ui
         git checkout develop
+        cp .env.example .env
         npm i
         npm run build
         
