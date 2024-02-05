@@ -608,7 +608,6 @@ test('client documents preview with edit_client', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -661,7 +660,6 @@ test('client documents uploading with edit_client', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
