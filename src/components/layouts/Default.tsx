@@ -46,7 +46,10 @@ import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import {
+  useNavigationTopRightElement,
+  useSaveBtn,
+} from '$app/components/layouts/common/hooks';
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
@@ -361,6 +364,7 @@ export function Default(props: Props) {
 
   const { isOwner } = useAdmin();
   const saveBtn = useSaveBtn();
+  const navigationTopRightElement = useNavigationTopRightElement();
   const colors = useColorScheme();
 
   return (
@@ -499,9 +503,10 @@ export function Default(props: Props) {
                 </div>
               )}
 
-              {props.navigationTopRight && (
+              {(navigationTopRightElement || props.navigationTopRight) && (
                 <div className="space-x-3 items-center hidden lg:flex">
-                  {props.navigationTopRight}
+                  {navigationTopRightElement?.element ||
+                    props.navigationTopRight}
                 </div>
               )}
             </div>

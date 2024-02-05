@@ -74,9 +74,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
@@ -86,9 +84,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 };
@@ -219,7 +215,15 @@ test('can edit purchase_order', async ({ page }) => {
     page.getByText('Successfully updated purchase order', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'purchaseOrderActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'purchaseOrderActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -252,7 +256,15 @@ test('can create a purchase_order', async ({ page }) => {
     page.getByText('Successfully updated purchase order', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'purchaseOrderActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'purchaseOrderActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -299,7 +311,15 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
     page.getByText('Successfully updated purchase order', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'purchaseOrderActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'purchaseOrderActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -332,11 +352,7 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
   if (!doRecordsExist) {
     await createPurchaseOrder({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -344,11 +360,11 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
       page.getByText('Successfully deleted purchase order')
     ).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') });
-
-    await moreActionsButton.click();
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
 
     await page.getByText('Delete').click();
 
@@ -391,11 +407,7 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
   if (!doRecordsExist) {
     await createPurchaseOrder({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -407,12 +419,11 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
       page.getByRole('button', { name: 'Restore', exact: true })
     ).toBeVisible();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
 
     await page.getByText('Archive').click();
 
@@ -457,12 +468,11 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   if (!doRecordsExist) {
     await createPurchaseOrder({ page });
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
 
     await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
@@ -514,12 +524,11 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   if (!doRecordsExist) {
     await createPurchaseOrder({ page });
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
 
     await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
@@ -565,7 +574,15 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'purchaseOrderActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'purchaseOrderActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -604,7 +621,15 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'purchaseOrderActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(
+    page,
+    actions,
+    'purchaseOrderActionDropdown',
+    '',
+    true
+  );
 
   await logout(page);
 });
@@ -638,10 +663,7 @@ test('cloning purchase_order', async ({ page }) => {
   if (!doRecordsExist) {
     await createPurchaseOrder({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     await tableRow
       .getByRole('button')
