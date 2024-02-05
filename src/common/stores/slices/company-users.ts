@@ -22,7 +22,9 @@ interface CompanyUser {
 type AvailableResources = 'company';
 
 const initialState: CompanyUser = {
-  currentIndex: 0,
+  currentIndex: localStorage.getItem('X-CURRENT-INDEX')
+    ? parseInt(localStorage.getItem('X-CURRENT-INDEX') as string)
+    : 0,
   api: {},
   changes: {
     company: undefined,
