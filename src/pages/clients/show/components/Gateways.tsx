@@ -32,31 +32,16 @@ export function Gateways(props: Props) {
 
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
-  const getCompanyGatewayLabel = (gatewayId: string) => {
-    const filteredGateways = companyGateways?.filter(
-      ({ id }) => id === gatewayId
-    );
-
-    return (
-      filteredGateways &&
-      filteredGateways.length >= 1 &&
-      filteredGateways[0].label
-    );
+  const getCompanyGateway = (gatewayId: string) => {
+    return companyGateways?.find(({ id }) => id === gatewayId);
   };
 
-  const showCustomerStripeLink = (companyGatewayId: string) => {
-    const companyGateway = companyGateways?.find(
-      ({ id }) => id === companyGatewayId
+  const isStripeGateway = (gatewayKey: string | undefined) => {
+    return Boolean(
+      gatewayKey &&
+        (gatewayKey === 'd14dd26a37cecc30fdd65700bfb55b23' ||
+          gatewayKey === 'd14dd26a47cecc30fdd65700bfb67b34')
     );
-
-    if (companyGateway) {
-      return Boolean(
-        companyGateway.gateway_key === 'd14dd26a37cecc30fdd65700bfb55b23' ||
-          companyGateway.gateway_key === 'd14dd26a47cecc30fdd65700bfb67b34'
-      );
-    }
-
-    return false;
   };
 
   useEffect(() => {
@@ -81,10 +66,10 @@ export function Gateways(props: Props) {
                 <div className="inline-flex items-center">
                   <span>{t('gateway')}</span>
                   <MdChevronRight size={20} />
-                  <span>
-                    {getCompanyGatewayLabel(token.company_gateway_id)}
-                  </span>
-                  {showCustomerStripeLink(token.company_gateway_id) && (
+
+                  {isStripeGateway(
+                    getCompanyGateway(token.company_gateway_id)?.gateway_key
+                  ) ? (
                     <Link
                       className="ml-1"
                       external
@@ -95,8 +80,12 @@ export function Gateways(props: Props) {
                         }
                       )}
                     >
-                      <Icon element={MdLaunch} size={18} />
+                      {getCompanyGateway(token.company_gateway_id)?.label}
                     </Link>
+                  ) : (
+                    <span>
+                      {getCompanyGateway(token.company_gateway_id)?.label}
+                    </span>
                   )}
                 </div>
               </div>
