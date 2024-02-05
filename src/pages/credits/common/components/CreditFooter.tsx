@@ -68,7 +68,21 @@ export function CreditFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <div className="flex space-x-1">
+                <span>{t('documents')}</span>
+                <span className="font-bold text-xs mt-1">
+                  ({credit?.documents.length || 0})
+                </span>
+              </div>
+            );
+          }
+        }}
+      >
         <div>
           <MarkdownEditor
             value={credit?.terms || ''}
