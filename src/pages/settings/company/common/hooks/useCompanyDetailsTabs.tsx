@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useCompanyDetailsTabs() {
   const { t } = useTranslation();
+
+  const currentCompany = useCurrentCompany();
 
   const { isGroupSettingsActive, isClientSettingsActive } =
     useCurrentSettingsLevel();
@@ -32,6 +36,11 @@ export function useCompanyDetailsTabs() {
     {
       name: t('documents'),
       href: '/settings/company_details/documents',
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={currentCompany?.documents.length}
+        />
+      ),
     },
     {
       name: t('custom_fields'),

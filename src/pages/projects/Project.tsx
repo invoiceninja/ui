@@ -29,6 +29,7 @@ import { useActions } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
@@ -70,6 +71,11 @@ export default function Project() {
         hasPermission('view_project') ||
         hasPermission('edit_project') ||
         entityAssigned(projectValue),
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={projectValue?.documents?.length}
+        />
+      ),
     },
   ];
 

@@ -25,6 +25,7 @@ import { PurchaseOrderCardProps } from './Details';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function Footer(props: PurchaseOrderCardProps) {
   const [t] = useTranslation();
@@ -53,7 +54,18 @@ export function Footer(props: PurchaseOrderCardProps) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 5) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={purchaseOrder?.documents.length}
+              />
+            );
+          }
+        }}
+      >
         <div>
           <MarkdownEditor
             value={purchaseOrder.terms || ''}

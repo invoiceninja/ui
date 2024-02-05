@@ -30,6 +30,7 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   client: Client | undefined;
@@ -104,12 +105,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
         formatTabLabel={(tabIndex) => {
           if (tabIndex === 3) {
             return (
-              <div className="flex space-x-1">
-                <span>{t('documents')}</span>
-                <span className="font-bold text-xs mt-1">
-                  ({client?.documents.length || 0})
-                </span>
-              </div>
+              <DocumentsTabLabel numberOfDocuments={client?.documents.length} />
             );
           }
         }}

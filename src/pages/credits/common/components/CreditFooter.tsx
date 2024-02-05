@@ -32,6 +32,7 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -73,12 +74,7 @@ export function CreditFooter(props: Props) {
         formatTabLabel={(tabIndex) => {
           if (tabIndex === 4) {
             return (
-              <div className="flex space-x-1">
-                <span>{t('documents')}</span>
-                <span className="font-bold text-xs mt-1">
-                  ({credit?.documents.length || 0})
-                </span>
-              </div>
+              <DocumentsTabLabel numberOfDocuments={credit?.documents.length} />
             );
           }
         }}

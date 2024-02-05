@@ -58,7 +58,7 @@ export default function Vendor() {
     { name: documentTitle || '', href: route('/vendors/:id', { id }) },
   ];
 
-  const tabs = useTabs();
+  const tabs = useTabs({ vendor });
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const lastLogin = (last_login: number | undefined) => {
