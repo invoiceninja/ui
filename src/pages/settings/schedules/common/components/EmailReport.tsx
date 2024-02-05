@@ -116,7 +116,10 @@ export function EmailReport(props: Props) {
           cypressRef="scheduleReportName"
         >
           {reports.map((report, i) => (
-            <option value={report.identifier} key={i}>
+            <option
+              value={report.schedule_identifier || report.identifier}
+              key={i}
+            >
               {t(report.label)}
             </option>
           ))}
@@ -286,10 +289,9 @@ export function EmailReport(props: Props) {
           onValueChange={(clientIds) => {
             const updatedParameters = { ...schedule.parameters };
 
-            updatedParameters.clients = [
-              ...updatedParameters.clients,
-              ...clientIds.split(','),
-            ];
+            updatedParameters.clients = clientIds
+              ? [...clientIds.split(',')]
+              : [];
 
             handleChange('parameters', updatedParameters);
           }}

@@ -30,6 +30,7 @@ export interface Payload {
 
 export interface Report {
   identifier: Identifier;
+  schedule_identifier?: string;
   label: string;
   endpoint: string;
   payload: Payload;
@@ -417,6 +418,7 @@ export function useReports() {
     },
     {
       identifier: 'aged_receivable_detailed_report',
+      schedule_identifier: 'ar_detailed',
       label: 'aged_receivable_detailed_report',
       endpoint: '/api/v1/reports/ar_detail_report',
       allow_custom_column: false,
@@ -437,6 +439,7 @@ export function useReports() {
     },
     {
       identifier: 'aged_receivable_summary_report',
+      schedule_identifier: 'ar_summary',
       label: 'aged_receivable_summary_report',
       endpoint: '/api/v1/reports/ar_summary_report',
       allow_custom_column: false,
@@ -458,6 +461,7 @@ export function useReports() {
     {
       identifier: 'client_balance_report',
       label: 'client_balance_report',
+      schedule_identifier: 'client_balance',
       endpoint: '/api/v1/reports/client_balance_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -478,6 +482,7 @@ export function useReports() {
     {
       identifier: 'client_sales_report',
       label: 'client_sales_report',
+      schedule_identifier: 'client_sales',
       endpoint: '/api/v1/reports/client_sales_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -498,6 +503,7 @@ export function useReports() {
     {
       identifier: 'tax_summary_report',
       label: 'tax_summary_report',
+      schedule_identifier: 'tax_summary',
       endpoint: '/api/v1/reports/tax_summary_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -518,6 +524,7 @@ export function useReports() {
     {
       identifier: 'user_sales_report',
       label: 'user_sales_report',
+      schedule_identifier: 'user_sales',
       endpoint: '/api/v1/reports/user_sales_report',
       allow_custom_column: false,
       custom_columns: [],
