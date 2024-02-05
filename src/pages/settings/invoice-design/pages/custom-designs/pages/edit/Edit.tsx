@@ -18,7 +18,7 @@ import { Body } from './components/Body';
 import { Header } from './components/Headers';
 import { Footer } from './components/Footer';
 import { Includes } from './components/Includes';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
@@ -27,6 +27,8 @@ import { Variables } from './components/Variables';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -41,12 +43,50 @@ export const payloadAtom = atom<PreviewPayload>({
 });
 
 export default function Edit() {
-  const [payload, setPayload] = useAtom(payloadAtom);
+  const actions = useActions();
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
 
+  const [payload, setPayload] = useAtom(payloadAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
+
+  const handleSaveInvoiceDesign = () => {
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+
+      request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
+        .then(() => {
+          $refetch(['designs']);
+
+          toast.success('updated_design');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  useNavigationTopRightElement(
+    {
+      element: payload?.design && (
+        <ResourceActions
+          resource={payload.design}
+          onSaveClick={handleSaveInvoiceDesign}
+          actions={actions}
+          disableSaveButton={isFormBusy}
+        />
+      ),
+    },
+    [payload.design, isFormBusy]
+  );
 
   useEffect(() => {
     if (data) {
@@ -60,33 +100,16 @@ export default function Edit() {
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
 
-  useSaveBtn(
-    {
-      onClick() {
-        toast.processing();
-
-        request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
-          .then(() => {
-            $refetch(['designs']);
-
-            toast.success('updated_design');
-          })
-          .catch((error: AxiosError<ValidationBag>) => {
-            if (error.response?.status === 422) {
-              setErrors(error.response.data);
-              toast.dismiss();
-            }
-          });
-      },
-    },
-    [payload.design]
-  );
-
   return (
     <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-          <Settings errors={errors} />
+          <Settings
+            errors={errors}
+            isFormBusy={isFormBusy}
+            shouldRenderHTML={shouldRenderHTML}
+            setShouldRenderHTML={setShouldRenderHTML}
+          />
           <Body />
           <Header />
           <Footer />
@@ -98,10 +121,13 @@ export default function Edit() {
       <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
         {payload.design ? (
           <InvoiceViewer
-            link={endpoint('/api/v1/preview')}
+            link={endpoint('/api/v1/preview?html=:renderHTML', {
+              renderHTML: shouldRenderHTML,
+            })}
             resource={payload}
             method="POST"
             withToast
+            renderAsHTML={shouldRenderHTML}
           />
         ) : null}
       </div>
