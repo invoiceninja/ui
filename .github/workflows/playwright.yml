@@ -38,6 +38,10 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
+      PLAYWRIGHT_BASE_URL: http://localhost:4173
+      VITE_IS_TEST: true
+      VITE_ROUTER: browser
+
 
     services:
       mariadb:
