@@ -11,7 +11,7 @@
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -207,4 +207,31 @@ export function useSaveBtn(options?: SaveButton, deps: unknown[] = []) {
   }, deps);
 
   return saveBtn;
+}
+
+interface NavigationTopRight {
+  element: ReactNode;
+}
+
+export const navigationTopRightAtom = atom<NavigationTopRight | null>(null);
+
+export function useNavigationTopRightElement(
+  options?: NavigationTopRight,
+  deps: unknown[] = []
+) {
+  const [navigationTopRightElement, setNavigationTopRightElement] = useAtom(
+    navigationTopRightAtom
+  );
+
+  useEffect(() => {
+    if (options) {
+      setNavigationTopRightElement(options);
+    }
+
+    return () => {
+      setNavigationTopRightElement(null);
+    };
+  }, deps);
+
+  return navigationTopRightElement;
 }

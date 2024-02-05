@@ -121,11 +121,10 @@ export default function Edit() {
       {...((hasPermission('edit_purchase_order') ||
         entityAssigned(purchaseOrder)) &&
         purchaseOrder && {
-          onSaveClick: () => onSave(purchaseOrder),
           navigationTopRight: (
             <ResourceActions
-              label={t('more_actions')}
               resource={purchaseOrder}
+              onSaveClick={() => onSave(purchaseOrder)}
               actions={actions}
               cypressRef="purchaseOrderActionDropdown"
             />

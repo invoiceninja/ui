@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCountries } from '$app/common/hooks/useCountries';
@@ -20,10 +20,9 @@ import { Default } from '$app/components/layouts/Default';
 import { Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
-import { Inline } from '$app/components/Inline';
 import { useTabs } from './show/hooks/useTabs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date } from '$app/common/helpers';
@@ -43,6 +42,7 @@ export default function Vendor() {
   const actions = useActions();
 
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -73,17 +73,12 @@ export default function Vendor() {
       {...((hasPermission('edit_vendor') || entityAssigned(vendor)) &&
         vendor && {
           navigationTopRight: (
-            <Inline>
-              <Button to={route('/vendors/:id/edit', { id })}>
-                {t('edit_vendor')}
-              </Button>
-
-              <ResourceActions
-                label={t('more_actions')}
-                resource={vendor}
-                actions={actions}
-              />
-            </Inline>
+            <ResourceActions
+              saveButtonLabel={t('edit_vendor')}
+              onSaveClick={() => navigate(route('/vendors/:id/edit', { id }))}
+              resource={vendor}
+              actions={actions}
+            />
           ),
         })}
     >
