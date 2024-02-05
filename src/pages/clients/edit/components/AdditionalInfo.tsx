@@ -98,7 +98,22 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
   return (
     <Card title={t('additional_info')}>
-      <TabGroup className="px-5" tabs={tabs}>
+      <TabGroup
+        className="px-5"
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 3) {
+            return (
+              <div className="flex space-x-1">
+                <span>{t('documents')}</span>
+                <span className="font-bold text-xs mt-1">
+                  ({client?.documents.length || 0})
+                </span>
+              </div>
+            );
+          }
+        }}
+      >
         <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
