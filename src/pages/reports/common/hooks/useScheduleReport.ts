@@ -64,9 +64,7 @@ export function useScheduleReport() {
       vendors: report.payload.vendors || '',
       projects: report.payload.projects || '',
       categories: report.payload.categories || '',
-      ...(typeof report.payload.report_keys !== 'undefined' && {
-        report_keys: reportKeys,
-      }),
+      report_keys: reportKeys,
     });
 
     navigate('/settings/schedules/create?template=email_report');
