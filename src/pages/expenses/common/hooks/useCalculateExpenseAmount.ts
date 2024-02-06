@@ -9,9 +9,10 @@
  */
 
 import { Expense } from '$app/common/interfaces/expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 
 export function useCalculateExpenseAmount() {
-  return (expense: Expense) => {
+  return (expense: Expense | RecurringExpense) => {
     if (expense.calculate_tax_by_amount) {
       return (
         expense.amount +
