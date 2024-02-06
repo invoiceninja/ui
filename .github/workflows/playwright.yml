@@ -41,7 +41,7 @@ jobs:
       PLAYWRIGHT_BASE_URL: http://localhost:4173
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-
+      VITE_API_URL: http://ninja.test
 
     services:
       mariadb:
