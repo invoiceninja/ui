@@ -15,7 +15,7 @@ test('should create a bug report', async ({ request }) => {
 
   const result = await request.get(`${endpoint}/api/v1/ping`);
 
-  expect(result.ok()).toBeTruthy();
+  expect(result.ok());
 
 });
 
