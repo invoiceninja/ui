@@ -120,23 +120,6 @@ jobs:
         git checkout develop
         cp .env.example .env
         npm ci
-        npm run build
-        
-        mkdir -p ../public/react/${{ github.event.release.tag_name }}/
-        cp -r dist/react/* ../public/react/${{ github.event.release.tag_name }}/
-        cp -r dist/react/* ../public/react/
-
-        mkdir -p ../public/tinymce_6.4.2/tinymce/js/
-        cp -r node_modules/tinymce ../public/tinymce_6.4.2/tinymce/js/
-        cd ..
-
-    - uses: actions/setup-node@v3
-    - name: Run Playwright
-      run: |
-        cd invoiceninja
-        php artisan ninja:react
-        cd ..
-        cd ui
         npx playwright install --with-deps
         npx playwright test --workers=1 --reporter=list --max-failures=1
         env:
