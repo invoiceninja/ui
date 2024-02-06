@@ -49,6 +49,10 @@ export default function Project() {
 
   useEffect(() => {
     data?.name && setDocumentTitle(data.name);
+
+    if (data) {
+      setProjectValue(data);
+    }
   }, [data]);
 
   const pages: Page[] = [
