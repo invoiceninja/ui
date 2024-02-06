@@ -17,6 +17,8 @@ jobs:
         phpunit-versions: ['latest']
         laravel: [10.*]
         dependency-version: [prefer-stable]
+        ports:
+          - 80:80
 
     env:
       DB_CONNECTION: mysql
