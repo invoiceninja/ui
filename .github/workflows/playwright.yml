@@ -38,7 +38,6 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
-      PLAYWRIGHT_BASE_URL: http://localhost:4173
       VITE_IS_TEST: true
       VITE_ROUTER: browser
       VITE_API_URL: http://ninja.test
@@ -124,7 +123,7 @@ jobs:
         npx playwright test --workers=1 --reporter=list --max-failures=1
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:4173
-          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
           VITE_IS_TEST: true
           VITE_ROUTER: browser
           VITE_API_URL: http://ninja.test
