@@ -67,25 +67,13 @@ export function Gateways(props: Props) {
                   <span>{t('gateway')}</span>
                   <MdChevronRight size={20} />
 
-                  {isStripeGateway(
-                    getCompanyGateway(token.company_gateway_id)?.gateway_key
-                  ) ? (
-                    <Link
-                      external
-                      to={route(
-                        'https://dashboard.stripe.com/customers/:customerReference',
-                        {
-                          customerReference: token.gateway_customer_reference,
-                        }
-                      )}
-                    >
-                      {getCompanyGateway(token.company_gateway_id)?.label}
-                    </Link>
-                  ) : (
-                    <span>
-                      {getCompanyGateway(token.company_gateway_id)?.label}
-                    </span>
-                  )}
+                  <Link
+                    to={route('/settings/gateways/:id/edit', {
+                      id: token.company_gateway_id,
+                    })}
+                  >
+                    {getCompanyGateway(token.company_gateway_id)?.label}
+                  </Link>
                 </div>
               </div>
 
@@ -103,15 +91,21 @@ export function Gateways(props: Props) {
               </div>
             </div>
 
-            <div>
+            {isStripeGateway(
+              getCompanyGateway(token.company_gateway_id)?.gateway_key
+            ) && (
               <Link
-                to={route('/settings/gateways/:id/edit', {
-                  id: token.company_gateway_id,
-                })}
+                external
+                to={route(
+                  'https://dashboard.stripe.com/customers/:customerReference',
+                  {
+                    customerReference: token.gateway_customer_reference,
+                  }
+                )}
               >
                 <Icon element={MdLaunch} size={18} />
               </Link>
-            </div>
+            )}
           </div>
         ))}
       </InfoCard>
