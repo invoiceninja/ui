@@ -123,6 +123,14 @@ jobs:
         npx playwright install --with-deps
         npx playwright test --workers=1 --reporter=list --max-failures=1
         env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
           VITE_IS_TEST: true
           VITE_ROUTER: browser
           VITE_API_URL: http://ninja.test
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
