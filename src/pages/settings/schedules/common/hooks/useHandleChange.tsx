@@ -45,6 +45,7 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   vendors: '',
   projects: '',
   categories: '',
+  report_keys: [],
 };
 
 export function useHandleChange(params: Params) {

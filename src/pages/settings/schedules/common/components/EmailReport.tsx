@@ -48,7 +48,8 @@ type ReportFiled =
   | 'clients'
   | 'vendors'
   | 'categories'
-  | 'projects';
+  | 'projects'
+  | 'report_keys';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
   'send_email',
@@ -58,11 +59,17 @@ export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
 ];
 
 export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
-  invoice: [...DEFAULT_REPORT_FIELDS, 'status', 'document_email_attachment'],
+  invoice: [
+    ...DEFAULT_REPORT_FIELDS,
+    'status',
+    'document_email_attachment',
+    'report_keys',
+  ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
     'products',
     'document_email_attachment',
+    'report_keys',
   ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
@@ -71,12 +78,30 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'income_billed',
     'include_tax',
   ],
-  client: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  quote: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  quote_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  credit: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  client: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
+  contact: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
+  recurring_invoice: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
+  quote: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment', 'report_keys'],
+  quote_item: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
+  credit: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  payment: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  payment: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
   expense: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
@@ -84,12 +109,25 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'vendors',
     'projects',
     'categories',
+    'report_keys',
   ],
-  task: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  task: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment', 'report_keys'],
   product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  vendor: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  purchase_order: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  purchase_order_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  vendor: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
+  purchase_order: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
+  purchase_order_item: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
 };
 
 export function EmailReport(props: Props) {

@@ -31,6 +31,7 @@ export interface Parameters {
   vendors: string;
   categories: string;
   projects: string;
+  report_keys: string[];
 }
 
 export interface Schedule {

@@ -352,7 +352,7 @@ export default function Reports() {
 
           <DropdownElement
             icon={<Icon element={MdSchedule} />}
-            onClick={() => scheduleReport(report)}
+            onClick={() => scheduleReport(report, showCustomColumns)}
           >
             {t('schedule')}
           </DropdownElement>
