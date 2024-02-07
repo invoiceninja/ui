@@ -65,6 +65,8 @@ export interface Company {
   fill_products: boolean;
   convert_products: boolean;
   bank_integrations: BankAccount[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
 }
 
 export interface Settings {

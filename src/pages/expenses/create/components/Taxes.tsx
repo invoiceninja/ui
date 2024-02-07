@@ -31,12 +31,22 @@ export function TaxSettings(props: Props) {
 
   const company = useCurrentCompany();
 
+  const handleResetTaxValues = () => {
+    handleChange('tax_name1', '');
+    handleChange('tax_name2', '');
+    handleChange('tax_name3', '');
+    handleChange('tax_rate1', 0);
+    handleChange('tax_rate2', 0);
+    handleChange('tax_rate3', 0);
+    handleChange('tax_amount1', 0);
+    handleChange('tax_amount2', 0);
+    handleChange('tax_amount3', 0);
+  };
+
   const taxTypeChange = (value: string) => {
     setTaxInputType(value as 'by_rate' | 'by_amount');
-    handleChange(
-      'calculate_tax_by_amount',
-      value === 'by_amount' ? true : false
-    );
+    handleResetTaxValues();
+    handleChange('calculate_tax_by_amount', value === 'by_amount');
   };
 
   return (

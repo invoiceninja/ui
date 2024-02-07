@@ -13,6 +13,10 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 
 export function useCalculateExpenseAmount() {
   return (expense: Expense | RecurringExpense) => {
+    if (expense.uses_inclusive_taxes) {
+      return expense.amount;
+    }
+
     if (expense.calculate_tax_by_amount) {
       return (
         expense.amount +
