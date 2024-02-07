@@ -72,7 +72,6 @@ export function TaxSettings(props: Props) {
             ]}
             defaultSelected={taxInputType}
             onValueChange={(value) => taxTypeChange(value)}
-            cypressRef="taxByRadio"
           />
         </Element>
       )}
