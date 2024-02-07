@@ -92,6 +92,7 @@ export function ExpenseSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('convert_expense_currency', value)
             }
+            cypressRef="convertCurrencyToggle"
           />
         </Element>
 

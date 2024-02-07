@@ -90,6 +90,7 @@ export function TaxSettings(props: Props) {
           <Toggle
             checked={recurringExpense.uses_inclusive_taxes}
             onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+            cypressRef="inclusiveTaxesToggle"
           />
         </Element>
       )}

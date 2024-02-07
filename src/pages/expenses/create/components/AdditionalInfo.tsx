@@ -229,6 +229,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Toggle
             checked={convertCurrency || false}
             onChange={(value: boolean) => setConvertCurrency(value)}
+            cypressRef="convertCurrencyToggle"
           />
         </Element>
       )}
