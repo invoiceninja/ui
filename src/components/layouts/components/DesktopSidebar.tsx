@@ -89,15 +89,16 @@ export function DesktopSidebar(props: Props) {
                 <Tooltip
                   key={index}
                   message={item.name as string}
-                  placement="right"
-                  withoutArrow
-                  withoutWrapping
                   width="auto"
+                  placement="right"
+                  truncate={false}
+                  size="large"
+                  withoutArrow={true}
                 >
-                  <SidebarItem key={index} item={item} colors={colors} />
+                  <SidebarItem key={index} item={item} />
                 </Tooltip>
               ) : (
-                <SidebarItem key={index} item={item} colors={colors} />
+                <SidebarItem key={index} item={item} />
               )
             )}
           </nav>

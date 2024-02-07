@@ -21,8 +21,8 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
+import { useAtom, useSetAtom } from 'jotai';
+import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -44,6 +44,8 @@ import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/Invoic
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -69,8 +71,12 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
+
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -95,16 +101,34 @@ export default function Edit() {
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
+      setInitialInvoiceValue(_invoice);
       setInvoice(_invoice);
 
       if (_invoice?.client) {
         setClient(_invoice.client);
       }
     }
+
+    return () => {
+      setPreventLeavingPage({
+        prevent: false,
+        actionKey: undefined,
+      });
+    };
   }, [data]);
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
+
+    if (invoice && initialInvoiceValue) {
+      setPreventLeavingPage(
+        (current) =>
+          current && {
+            ...current,
+            prevent: !isEqual(invoice, initialInvoiceValue),
+          }
+      );
+    }
   }, [invoice]);
 
   const actions = useActions();

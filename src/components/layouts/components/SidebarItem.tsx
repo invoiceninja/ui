@@ -9,11 +9,12 @@
  */
 
 import { classNames } from '$app/common/helpers';
-import { Link } from 'react-router-dom';
 import { NavigationItem } from './DesktopSidebar';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { Link } from '$app/components/forms';
+import { hexToRGB } from '$app/common/hooks/useAdjustColorDarkness';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -22,13 +23,27 @@ const Div = styled.div`
   }
 `;
 
+const LinkStyled = styled(Link)`
+  &:hover {
+    background-color: ${(props) => {
+      if (props.theme.hoverColor) {
+        const rgbColor = hexToRGB(props.theme.hoverColor);
+        return `rgba(${rgbColor.red}, ${rgbColor.green}, ${rgbColor.blue}, 0.1)`;
+      }
+
+      return props.theme.hoverColor;
+    }};
+  }
+`;
+
 interface Props {
   item: NavigationItem;
-  colors: ReturnType<typeof useColorScheme>;
 }
 
 export function SidebarItem(props: Props) {
-  const { item, colors } = props;
+  const { item } = props;
+
+  const colors = useColorScheme();
 
   const user = useInjectUserChanges();
 
@@ -54,7 +69,7 @@ export function SidebarItem(props: Props) {
           : 'text-gray-300 border-l-4 border-transparent'
       )}
     >
-      <Link to={item.href} className="w-full">
+      <LinkStyled to={item.href} className="w-full" withoutDefaultStyling>
         <div className="flex justify-start items-center my-2">
           <item.icon
             className={classNames(
@@ -67,18 +82,20 @@ export function SidebarItem(props: Props) {
           />
           {!isMiniSidebar && item.name}
         </div>
-      </Link>
+      </LinkStyled>
 
       {item.rightButton && !isMiniSidebar && item.rightButton.visible && (
-        <Link
+        <LinkStyled
+          theme={{
+            hoverColor: colors.$13,
+          }}
           to={item.rightButton.to}
-          title={item.rightButton.label}
-          className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
+          className="rounded-full p-1.5"
+          withoutDefaultStyling
         >
           <item.rightButton.icon className="h-5 w-5" />
-        </Link>
+        </LinkStyled>
       )}
     </Div>
-
   );
 }
