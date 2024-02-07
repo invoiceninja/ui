@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: ['ubuntu-22.04']
+        operating-system: ['ubuntu-latest']
         php-versions: ['8.2']
         phpunit-versions: ['latest']
         laravel: [10.*]
@@ -38,10 +38,9 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
-      PLAYWRIGHT_BASE_URL: http://localhost:4173
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-
+      VITE_API_URL: http://ninja.test
 
     services:
       mariadb:
@@ -65,6 +64,12 @@ jobs:
     - name: Add hosts to /etc/hosts
       run: |
         sudo echo "127.0.0.1 ninja.test" | sudo tee -a /etc/hosts
+    
+    - name: Install Apache
+      run: sudo apt-get update && sudo apt-get install -y apache2
+    
+    - name: Start Apache
+      run: sudo service apache2 start
 
     - name: Start MariaDB service
       run: |
@@ -113,23 +118,19 @@ jobs:
         cd ui
         git checkout develop
         cp .env.example .env
-        npm i
-        npm run build
-        
-        mkdir -p ../public/react/${{ github.event.release.tag_name }}/
-        cp -r dist/react/* ../public/react/${{ github.event.release.tag_name }}/
-        cp -r dist/react/* ../public/react/
-
-        mkdir -p ../public/tinymce_6.4.2/tinymce/js/
-        cp -r node_modules/tinymce ../public/tinymce_6.4.2/tinymce/js/
-        cd ..
-
-    - name: Run Playwright
-      run: |
-        cd invoiceninja
-        php artisan ninja:react
-        cd ..
-        cd ui
-        npx playwright install
-        npx playwright test --workers=1 --reporter=list
-        
+        npm ci
+        npx playwright install --with-deps
+        npm run preview &
+        npx playwright test --workers=1 --reporter=list --max-failures=1
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
+          VITE_IS_TEST: true
+          VITE_ROUTER: browser
+          VITE_API_URL: http://ninja.test
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

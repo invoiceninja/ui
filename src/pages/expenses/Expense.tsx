@@ -83,17 +83,16 @@ export default function Expense() {
       breadcrumbs={pages}
       {...((hasPermission('edit_expense') || entityAssigned(expense)) &&
         expense && {
-          onSaveClick: () => save(expense),
           navigationTopRight: (
             <ResourceActions
               resource={expense}
-              label={t('more_actions')}
+              onSaveClick={() => save(expense)}
               actions={actions}
+              disableSaveButton={!expense}
               cypressRef="expenseActionDropdown"
             />
           ),
         })}
-      disableSaveButton={!expense}
     >
       {expense ? (
         <div className="space-y-4">
