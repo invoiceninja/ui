@@ -674,3 +674,81 @@ test('Checking should_be_invoiced expense settings value on recurring expense cr
 
   await logout(page);
 });
+
+test('Checking mark_paid expense settings value on recurring_expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="markPaidToggle"]').isChecked())) {
+    await page.locator('[data-cy="markPaidToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking add_documents_to_invoice expense settings value on recurring_expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (
+    !(await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').isChecked())
+  ) {
+    await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});
