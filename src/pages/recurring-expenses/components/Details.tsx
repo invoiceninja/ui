@@ -51,8 +51,6 @@ export function Details(props: Props) {
 
   const [searchParams] = useSearchParams();
 
-  console.log(recurringExpense);
-
   return (
     <Card title={t('details')} isLoading={!recurringExpense}>
       {recurringExpense && pageType === 'edit' && (

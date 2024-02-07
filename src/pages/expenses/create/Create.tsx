@@ -94,8 +94,8 @@ export default function Create() {
             : '',
           should_be_invoiced: company?.mark_expenses_invoiceable,
           invoice_documents: company?.invoice_expense_documents,
-          calculate_tax_by_amount: taxInputType === 'by_amount' ? true : false,
-          uses_inclusive_taxes: company.expense_inclusive_taxes ? true : false,
+          calculate_tax_by_amount: taxInputType === 'by_amount',
+          uses_inclusive_taxes: company.expense_inclusive_taxes,
         };
       }
 
