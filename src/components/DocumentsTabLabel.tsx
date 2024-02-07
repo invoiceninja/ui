@@ -21,7 +21,9 @@ export function DocumentsTabLabel(props: Props) {
   return (
     <div className="flex space-x-1">
       <span>{t('documents')}</span>
-      <span className="font-bold">({numberOfDocuments ?? 0})</span>
+      {Boolean(numberOfDocuments) && (
+        <span className="font-bold">({numberOfDocuments})</span>
+      )}
     </div>
   );
 }
