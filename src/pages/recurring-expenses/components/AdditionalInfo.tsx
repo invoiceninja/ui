@@ -101,13 +101,18 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <Toggle
             checked={recurringExpense.should_be_invoiced}
             onChange={(value) => handleChange('should_be_invoiced', value)}
+            cypressRef="shouldBeInvoicedToggle"
           />
         </Element>
       )}
 
       {recurringExpense && (
         <Element leftSide={t('mark_paid')} leftSideHelp={t('mark_paid_help')}>
-          <Toggle checked={isMarkPaid()} onChange={onMarkPaid} />
+          <Toggle
+            checked={isMarkPaid()}
+            onChange={onMarkPaid}
+            cypressRef="markPaidToggle"
+          />
         </Element>
       )}
 
@@ -191,6 +196,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
           <Toggle
             checked={recurringExpense.invoice_documents}
             onChange={(value) => handleChange('invoice_documents', value)}
+            cypressRef="addDocumentsToInvoiceToggle"
           />
         </Element>
       )}

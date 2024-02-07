@@ -635,3 +635,42 @@ test('cloning recurring expense', async ({ page }) => {
     page.getByRole('heading', { name: 'Edit Recurring Expense' }).first()
   ).toBeVisible();
 });
+
+test('Checking should_be_invoiced expense settings value on recurring expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="shouldBeInvoicedToggle"]').isChecked())) {
+    await page.locator('[data-cy="shouldBeInvoicedToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="shouldBeInvoicedToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});

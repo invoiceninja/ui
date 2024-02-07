@@ -72,6 +72,7 @@ export function TaxSettings(props: Props) {
             ]}
             defaultSelected={taxInputType}
             onValueChange={(value) => taxTypeChange(value)}
+            cypressRef="taxByRadio"
           />
         </Element>
       )}
@@ -89,6 +90,7 @@ export function TaxSettings(props: Props) {
           <Toggle
             onChange={(value) => handleChange('uses_inclusive_taxes', value)}
             checked={expense.uses_inclusive_taxes}
+            cypressRef="inclusiveTaxesToggle"
           />
         </Element>
       )}

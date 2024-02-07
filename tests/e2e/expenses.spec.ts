@@ -682,3 +682,41 @@ test('Expense categories endpoint contains with but not sort parameter', async (
 
   await logout(page);
 });
+test('Checking should_be_invoiced expense settings value on expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="shouldBeInvoicedToggle"]').isChecked())) {
+    await page.locator('[data-cy="shouldBeInvoicedToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="shouldBeInvoicedToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});

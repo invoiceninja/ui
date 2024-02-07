@@ -69,6 +69,7 @@ export function ExpenseSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('mark_expenses_invoiceable', value)
             }
+            cypressRef="shouldBeInvoicedToggle"
           />
         </Element>
 
@@ -78,6 +79,7 @@ export function ExpenseSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('mark_expenses_paid', value)
             }
+            cypressRef="markPaidToggle"
           />
         </Element>
 
@@ -102,6 +104,7 @@ export function ExpenseSettings() {
             onChange={(value: boolean) =>
               handleToggleChange('invoice_expense_documents', value)
             }
+            cypressRef="addDocumentsToInvoiceToggle"
           />
         </Element>
 
@@ -136,6 +139,7 @@ export function ExpenseSettings() {
             ]}
             name="calculate_expense_tax_by_amount"
             defaultSelected={companyChanges?.calculate_expense_tax_by_amount.toString()}
+            cypressRef="taxByRadio"
           />
         </Element>
 
@@ -153,6 +157,7 @@ export function ExpenseSettings() {
               handleToggleChange('expense_inclusive_taxes', value)
             }
             checked={companyChanges?.expense_inclusive_taxes || false}
+            cypressRef="inclusiveTaxesToggle"
           />
         </Element>
       </Card>
