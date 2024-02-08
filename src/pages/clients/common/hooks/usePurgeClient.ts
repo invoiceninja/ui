@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosError } from 'axios';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
@@ -22,8 +21,6 @@ export function usePurgeClient(clientId: string | undefined) {
   const queryClient = useQueryClient();
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
-
-  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (password: string) => {
     toast.processing();
@@ -37,8 +34,7 @@ export function usePurgeClient(clientId: string | undefined) {
       .then(() => {
         toast.success('purged_client');
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries();
 
         navigate('/clients');
       })

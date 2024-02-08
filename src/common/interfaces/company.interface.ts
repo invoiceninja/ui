@@ -9,6 +9,7 @@
  */
 
 import { BankAccount } from './bank-accounts';
+import { Document } from './document.interface';
 
 export interface Company {
   id: string;
@@ -65,6 +66,7 @@ export interface Company {
   fill_products: boolean;
   convert_products: boolean;
   bank_integrations: BankAccount[];
+  documents: Document[];
 }
 
 export interface Settings {
