@@ -298,6 +298,7 @@ export interface Settings {
   classification: string;
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
+  custom_sending_email: string;
 }
 
 export interface TaxData {

@@ -463,6 +463,27 @@ export function EmailSettings() {
           </>
         )}
 
+        {(company?.settings.email_sending_method === 'client_mailgun' ||
+          company?.settings.email_sending_method === 'client_postmark') && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="custom_sending_email"
+                labelElement={<SettingsLabel label={t('from_email')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.custom_sending_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.custom_sending_email', value)
+              }
+              disabled={disableSettingsField('custom_sending_email')}
+              errorMessage={errors?.errors['settings.custom_sending_email']}
+            />
+          </Element>
+        )}
+
         <Element
           leftSide={
             <PropertyCheckbox
