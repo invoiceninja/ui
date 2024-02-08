@@ -16,6 +16,7 @@ import { InputField, SelectField } from '$app/components/forms';
 import { Inline } from '$app/components/Inline';
 import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';
+import { trans } from '$app/common/helpers';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
@@ -151,14 +152,30 @@ export function Settings(props: SubscriptionProps) {
 
       {subscription.allow_cancellation && (
         <Element>
-          <InputField
+          <SelectField
             label={t('refund_period')}
             value={subscription.refund_period}
             onValueChange={(value) =>
               handleChange('refund_period', parseFloat(value) || 0)
             }
+            withBlank
+            blankOptionValue={0}
             errorMessage={errors?.errors.refund_period}
-          />
+          >
+            <option value={86400}>{t('count_day')}</option>
+            <option value={172800}>{trans('count_days', { count: 2 })}</option>
+            <option value={259200}>{trans('count_days', { count: 3 })}</option>
+            <option value={604800}>{trans('count_days', { count: 7 })}</option>
+            <option value={1209600}>
+              {trans('count_days', { count: 14 })}
+            </option>
+            <option value={2592000}>
+              {trans('count_days', { count: 30 })}
+            </option>
+            <option value={5184000}>
+              {trans('count_days', { count: 60 })}
+            </option>
+          </SelectField>
         </Element>
       )}
 
@@ -171,14 +188,30 @@ export function Settings(props: SubscriptionProps) {
 
       {subscription.trial_enabled && (
         <Element>
-          <InputField
+          <SelectField
             label={t('trial_duration')}
             value={subscription.trial_duration}
             onValueChange={(value) =>
               handleChange('trial_duration', parseFloat(value) || 0)
             }
+            withBlank
+            blankOptionValue={0}
             errorMessage={errors?.errors.trial_duration}
-          />
+          >
+            <option value={86400}>{t('count_day')}</option>
+            <option value={172800}>{trans('count_days', { count: 2 })}</option>
+            <option value={259200}>{trans('count_days', { count: 3 })}</option>
+            <option value={604800}>{trans('count_days', { count: 7 })}</option>
+            <option value={1209600}>
+              {trans('count_days', { count: 14 })}
+            </option>
+            <option value={2592000}>
+              {trans('count_days', { count: 30 })}
+            </option>
+            <option value={5184000}>
+              {trans('count_days', { count: 60 })}
+            </option>
+          </SelectField>
         </Element>
       )}
 
