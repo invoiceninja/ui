@@ -482,7 +482,6 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -538,7 +537,6 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

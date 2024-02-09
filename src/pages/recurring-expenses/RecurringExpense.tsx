@@ -29,6 +29,7 @@ import { Spinner } from '$app/components/Spinner';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export default function RecurringExpense() {
   const [t] = useTranslation();
@@ -60,6 +61,11 @@ export default function RecurringExpense() {
     {
       name: t('documents'),
       href: route('/recurring_expenses/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={recurringExpense?.documents.length}
+        />
+      ),
     },
   ];
 

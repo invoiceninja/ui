@@ -407,7 +407,6 @@ test('expense documents preview with edit_expense', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -456,7 +455,6 @@ test('expense documents uploading with edit_expense', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

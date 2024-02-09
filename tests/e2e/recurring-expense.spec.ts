@@ -443,7 +443,6 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -496,7 +495,6 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
