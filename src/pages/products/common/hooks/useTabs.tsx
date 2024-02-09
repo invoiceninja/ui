@@ -15,6 +15,7 @@ import {
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Product } from '$app/common/interfaces/product';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -49,6 +50,9 @@ export function useTabs(params: Params) {
       name: t('documents'),
       href: route('/products/:id/documents', { id }),
       enabled: canEditAndView,
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={product?.documents?.length} />
+      ),
     },
     {
       name: t('product_fields'),

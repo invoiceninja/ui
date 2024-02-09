@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   Link,
   Params,
@@ -32,6 +32,7 @@ export type Tab = {
   href: string;
   matcher?: Matcher[];
   enabled?: boolean;
+  formatName?: () => ReactNode | undefined;
 };
 export type Matcher = (params: Readonly<Params<string>>) => string;
 
@@ -104,7 +105,7 @@ export function Tabs(props: Props) {
           {props.tabs.map(
             (tab) =>
               (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                <option key={tab.name}>{tab.name}</option>
+                <option key={tab.name}>{tab.formatName?.() || tab.name}</option>
               )
           )}
         </select>
@@ -131,7 +132,7 @@ export function Tabs(props: Props) {
                     className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                     aria-current={isActive(tab) ? 'page' : undefined}
                   >
-                    {tab.name}
+                    {tab.formatName?.() || tab.name}
                   </Link>
                 )
             )}

@@ -476,7 +476,6 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -526,7 +525,6 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

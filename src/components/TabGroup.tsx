@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
@@ -23,6 +23,7 @@ interface Props {
   childrenClassName?: string;
   withScrollableContent?: boolean;
   onTabChange?: (index: number) => void;
+  formatTabLabel?: (index: number) => ReactNode | undefined;
 }
 
 export function TabGroup(props: Props) {
@@ -66,7 +67,7 @@ export function TabGroup(props: Props) {
                 { 'w-full': props.width === 'full' }
               )}
             >
-              {tab}
+              {props.formatTabLabel?.(index) || tab}
             </button>
           </div>
         ))}
