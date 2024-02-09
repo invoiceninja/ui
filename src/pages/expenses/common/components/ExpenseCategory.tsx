@@ -26,6 +26,7 @@ import { useSave } from '../../edit/hooks/useSave';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface DropdownProps {
   visible: boolean;
@@ -38,6 +39,8 @@ interface DropdownProps {
 function ExpenseCategoriesDropdown(props: DropdownProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const adjustColorDarkness = useAdjustColorDarkness();
 
@@ -70,15 +73,18 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               maxWidth: '20rem',
             }}
           >
-            <DropdownElement
-              className="font-medium text-center py-3"
-              onClick={() => {
-                setIsModalOpen(true);
-                setVisible(false);
-              }}
-            >
-              {t('new_expense_category')}
-            </DropdownElement>
+            {(isAdmin || isOwner) && (
+              <DropdownElement
+                className="font-medium text-center py-3"
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setVisible(false);
+                }}
+                cypressRef="newExpenseCategoryAction"
+              >
+                {t('new_expense_category')}
+              </DropdownElement>
+            )}
 
             <div className="flex flex-col max-h-80 overflow-y-auto">
               {expenseCategories?.map(
@@ -100,7 +106,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div className="cursor-pointer">
+        <div className="cursor-pointer" data-cy="expenseCategoryBadge">
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}
