@@ -30,6 +30,7 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   client: Client | undefined;
@@ -98,7 +99,17 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
 
   return (
     <Card title={t('additional_info')}>
-      <TabGroup className="px-5" tabs={tabs}>
+      <TabGroup
+        className="px-5"
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 3) {
+            return (
+              <DocumentsTabLabel numberOfDocuments={client?.documents.length} />
+            );
+          }
+        }}
+      >
         <div className="-mx-5">
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>

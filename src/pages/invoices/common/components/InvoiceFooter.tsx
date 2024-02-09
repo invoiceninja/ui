@@ -31,6 +31,7 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   invoice?: Invoice;
@@ -67,7 +68,18 @@ export function InvoiceFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={invoice?.documents.length}
+              />
+            );
+          }
+        }}
+      >
         <div>
           <MarkdownEditor
             value={invoice?.public_notes || ''}

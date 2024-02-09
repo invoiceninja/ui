@@ -18,6 +18,7 @@ import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
 
 interface Props {
   client: Client;
@@ -31,15 +32,15 @@ export function Gateways(props: Props) {
 
   const [companyGateways, setCompanyGateways] = useState<CompanyGateway[]>();
 
-  const getCompanyGatewayLabel = (gatewayId: string) => {
-    const filteredGateways = companyGateways?.filter(
-      ({ id }) => id === gatewayId
-    );
+  const getCompanyGateway = (gatewayId: string) => {
+    return companyGateways?.find(({ id }) => id === gatewayId);
+  };
 
-    return (
-      filteredGateways &&
-      filteredGateways.length >= 1 &&
-      filteredGateways[0].label
+  const isStripeGateway = (gatewayKey: string | undefined) => {
+    return Boolean(
+      gatewayKey &&
+        (gatewayKey === 'd14dd26a37cecc30fdd65700bfb55b23' ||
+          gatewayKey === 'd14dd26a47cecc30fdd65700bfb67b34')
     );
   };
 
@@ -57,17 +58,22 @@ export function Gateways(props: Props) {
             key={token.id}
             className="flex items-center justify-between my-2.5"
           >
-            <div>
+            <div className="flex flex-col space-y-1.5">
               <div className="inline-flex items-center space-x-1">
                 <div>
                   <MdPayment fontSize={22} />
                 </div>
                 <div className="inline-flex items-center">
-                  <span> {t('gateway')}</span>
+                  <span>{t('gateway')}</span>
                   <MdChevronRight size={20} />
-                  <span>
-                    {getCompanyGatewayLabel(token.company_gateway_id)}
-                  </span>
+
+                  <Link
+                    to={route('/settings/gateways/:id/edit', {
+                      id: token.company_gateway_id,
+                    })}
+                  >
+                    {getCompanyGateway(token.company_gateway_id)?.label}
+                  </Link>
                 </div>
               </div>
 
@@ -85,15 +91,21 @@ export function Gateways(props: Props) {
               </div>
             </div>
 
-            <div>
+            {isStripeGateway(
+              getCompanyGateway(token.company_gateway_id)?.gateway_key
+            ) && (
               <Link
-                to={route('/settings/gateways/:id/edit', {
-                  id: token.company_gateway_id,
-                })}
+                external
+                to={route(
+                  'https://dashboard.stripe.com/customers/:customerReference',
+                  {
+                    customerReference: token.gateway_customer_reference,
+                  }
+                )}
               >
-                <MdLaunch size={18} />
+                <Icon element={MdLaunch} size={18} />
               </Link>
-            </div>
+            )}
           </div>
         ))}
       </InfoCard>

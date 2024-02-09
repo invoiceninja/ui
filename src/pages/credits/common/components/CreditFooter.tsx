@@ -32,6 +32,7 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -68,7 +69,16 @@ export function CreditFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel numberOfDocuments={credit?.documents.length} />
+            );
+          }
+        }}
+      >
         <div>
           <MarkdownEditor
             value={credit?.terms || ''}
