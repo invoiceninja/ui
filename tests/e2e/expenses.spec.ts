@@ -673,3 +673,79 @@ test('Expense categories endpoint contains with but not sort parameter', async (
 
   await logout(page);
 });
+
+test('The new_expense_category action is not shown on the badge dropdown', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('edit_expense');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.getByRole('button', { name: 'Columns', exact: true }).click();
+
+  await page.waitForTimeout(100);
+
+  await page
+    .locator('[data-cy="columSelector"]')
+    .selectOption({ label: 'Category' });
+
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+  await expect(
+    page.getByText('Successfully saved settings').first()
+  ).toBeVisible();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).not.toBeVisible();
+
+  await logout(page);
+});
+
+test('The new_expense_category action is shown on the badge dropdown', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('admin');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).toBeVisible();
+
+  await logout(page);
+});
