@@ -46,10 +46,16 @@ export const SendEmailBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg"
-          style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-
-        >{t('are_you_sure')}</span>
+        <span
+          className="text-lg"
+          style={{
+            backgroundColor: colors.$2,
+            color: colors.$3,
+            colorScheme: colors.$0,
+          }}
+        >
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button
@@ -62,9 +68,7 @@ export const SendEmailBulkAction = (props: Props) => {
               setIsModalOpen(false);
             }}
           >
-            <span className="text-base mx-3"
-              style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
-            >{t('yes')}</span>
+            {t('yes')}
           </Button>
         </div>
       </Modal>
