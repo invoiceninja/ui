@@ -17,11 +17,22 @@ import { Inline } from '$app/components/Inline';
 import Toggle from '$app/components/forms/Toggle';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { trans } from '$app/common/helpers';
+import { useEffect } from 'react';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
 
   const { subscription, handleChange, errors } = props;
+
+  useEffect(() => {
+    if (!subscription.allow_cancellation) {
+      handleChange('refund_period', 0);
+    }
+
+    if (!subscription.trial_enabled) {
+      handleChange('trial_duration', 0);
+    }
+  }, [subscription.trial_enabled, subscription.allow_cancellation]);
 
   return (
     <Card title={t('settings')}>
