@@ -99,8 +99,8 @@ export default function Quotes() {
             table="quote"
           />
         }
-        onTableRowClick={(invoice) => {
-          setSliderQuoteId(invoice.id);
+        onTableRowClick={(quote) => {
+          setSliderQuoteId(quote.id);
           setQuoteSliderVisibility(true);
         }}
         linkToCreateGuards={[permission('create_quote')]}
