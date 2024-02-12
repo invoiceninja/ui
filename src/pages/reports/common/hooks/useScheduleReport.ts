@@ -60,7 +60,7 @@ export function useScheduleReport() {
         document_email_attachment:
           report.payload.document_email_attachment ?? false,
       }),
-      clients: report.payload.clients?.split(',') || [],
+      clients: report.payload.clients ? report.payload.clients.split(',') : [],
       vendors: report.payload.vendors || '',
       projects: report.payload.projects || '',
       categories: report.payload.categories || '',
