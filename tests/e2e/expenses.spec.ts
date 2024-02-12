@@ -749,3 +749,33 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
 
   await logout(page);
 });
+
+test('The new_expense_category action is shown on the badge dropdown with only create_expense permission', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).toBeVisible();
+
+  await logout(page);
+});
