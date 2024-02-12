@@ -26,7 +26,7 @@ import { useSave } from '../../edit/hooks/useSave';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface DropdownProps {
   visible: boolean;
@@ -40,7 +40,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const { isAdmin, isOwner } = useAdmin();
+  const hasPermission = useHasPermission();
 
   const adjustColorDarkness = useAdjustColorDarkness();
 
@@ -73,7 +73,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               maxWidth: '20rem',
             }}
           >
-            {(isAdmin || isOwner) && (
+            {hasPermission('create_expense') && (
               <DropdownElement
                 className="font-medium text-center py-3"
                 onClick={() => {
