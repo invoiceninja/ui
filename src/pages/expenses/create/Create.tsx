@@ -57,7 +57,7 @@ export default function Create() {
   });
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
-    'by_rate'
+    company?.calculate_expense_tax_by_amount ? 'by_amount' : 'by_rate'
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
@@ -94,6 +94,8 @@ export default function Create() {
             : '',
           should_be_invoiced: company?.mark_expenses_invoiceable,
           invoice_documents: company?.invoice_expense_documents,
+          calculate_tax_by_amount: taxInputType === 'by_amount',
+          uses_inclusive_taxes: company.expense_inclusive_taxes,
         };
       }
 
