@@ -172,6 +172,7 @@ export function Form(props: Props) {
               id="classification"
               defaultValue={vendor.classification ?? ''}
               onValueChange={(value) => handleChange('classification', value)}
+              errorMessage={errors?.errors.classification}
             >
               <option value=""></option>
               <option value="individual">{t('individual')}</option>

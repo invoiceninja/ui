@@ -72,6 +72,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               minWidth: '15rem',
               maxWidth: '20rem',
             }}
+            onClick={(event) => event.stopPropagation()}
           >
             {hasPermission('create_expense') && (
               <DropdownElement
