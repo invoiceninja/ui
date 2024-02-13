@@ -69,6 +69,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               minWidth: '15rem',
               maxWidth: '20rem',
             }}
+            onClick={(event) => event.stopPropagation()}
           >
             <DropdownElement
               className="font-medium text-center py-3"
@@ -100,7 +101,10 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div className="cursor-pointer">
+        <div
+          className="cursor-pointer"
+          onClick={(event) => event.stopPropagation()}
+        >
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}
@@ -108,7 +112,10 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               color: adjustColorDarkness(hex, darknessAmount),
               backgroundColor: expense.category?.color || '',
             }}
-            onClick={() => !isFormBusy && setVisible(true)}
+            onClick={() =>
+              !isFormBusy &&
+              setVisible((currentVisibility) => !currentVisibility)
+            }
           />
         </div>
       </Tippy>

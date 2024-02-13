@@ -14,6 +14,9 @@ import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Report } from '../useReports';
 import { EXPORT_DOCUMENTS_REPORTS } from '../../index/Reports';
+import collect from 'collect.js';
+import { reportColumn } from '../components/SortableColumns';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 const DATE_RANGES_ALIASES = {
   last7: 'last7_days',
@@ -22,9 +25,21 @@ const DATE_RANGES_ALIASES = {
 export function useScheduleReport() {
   const navigate = useNavigate();
 
+  const { preferences } = usePreferences();
+
   const setScheduleParameters = useSetAtom(scheduleParametersAtom);
 
-  return (report: Report) => {
+  return (report: Report, showCustomColumns: boolean) => {
+    let reportKeys: string[] = [];
+
+    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+      reportKeys = collect(
+        preferences.reports.columns[report.identifier][reportColumn]
+      )
+        .pluck('value')
+        .toArray() as string[];
+    }
+
     setScheduleParameters({
       ...DEFAULT_SCHEDULE_PARAMETERS,
       report_name: report.identifier,
@@ -45,6 +60,11 @@ export function useScheduleReport() {
         document_email_attachment:
           report.payload.document_email_attachment ?? false,
       }),
+      clients: report.payload.clients ? report.payload.clients.split(',') : [],
+      vendors: report.payload.vendors || '',
+      projects: report.payload.projects || '',
+      categories: report.payload.categories || '',
+      report_keys: reportKeys,
     });
 
     navigate('/settings/schedules/create?template=email_report');

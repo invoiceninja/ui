@@ -26,6 +26,7 @@ interface Props {
   disableClosing?: boolean;
   overflowVisible?: boolean;
   closeButtonCypressRef?: string;
+  stopPropagationInHeader?: boolean;
 }
 
 export function Modal(props: Props) {
@@ -96,6 +97,9 @@ export function Modal(props: Props) {
                   'overflow-hidden': !props.overflowVisible,
                 }
               )}
+              onClick={(event) =>
+                props.stopPropagationInHeader && event.stopPropagation()
+              }
             >
               <div
                 className="flex flex-col justify-between items-start"
