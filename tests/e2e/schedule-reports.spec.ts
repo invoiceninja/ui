@@ -376,3 +376,103 @@ test('Expense report test', async ({ page }) => {
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
   ).toBeVisible();
 });
+
+test('Expense report test with clients, project and categories selectors', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Reports', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="reportNameSelector"]')
+    .selectOption({ label: 'Expense' });
+
+  await page.waitForTimeout(300);
+
+  await page
+    .locator('[data-cy="reportDateRange"]')
+    .selectOption({ label: 'Last 7 Days' });
+
+  await page.locator('#clientItemSelector').first().click();
+
+  await page
+    .locator('#clientItemSelector')
+    .getByText('test create client', { exact: true })
+    .first()
+    .click();
+
+  await page.locator('#projectItemSelector').first().click();
+
+  await page
+    .locator('#projectItemSelector')
+    .getByText('test assigned project', { exact: true })
+    .first()
+    .click();
+
+  await page.locator('#expenseCategoryItemSelector').first().click();
+
+  await page
+    .locator('#expenseCategoryItemSelector')
+    .getByText('testing create expense', { exact: true })
+    .first()
+    .click();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'More Actions', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Schedule', exact: true })
+    .click();
+
+  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
+    'expense'
+  );
+  await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
+  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
+    'last7_days'
+  );
+  await expect(page.locator('#clientItemSelector')).toContainText(
+    'test create client'
+  );
+  await expect(page.locator('#projectItemSelector')).toContainText(
+    'test assigned project'
+  );
+  await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
+    'testing create expense'
+  );
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await page.waitForURL('**/settings/schedules/**/edit');
+
+  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
+    'expense'
+  );
+  await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
+  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
+    'last7_days'
+  );
+  await expect(page.locator('#clientItemSelector')).toContainText(
+    'test create client'
+  );
+  await expect(page.locator('#projectItemSelector')).toContainText(
+    'test assigned project'
+  );
+  await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
+    'testing create expense'
+  );
+
+  await expect(
+    page.locator('h2').filter({ hasText: 'Edit Schedule' })
+  ).toBeVisible();
+});

@@ -52,6 +52,7 @@ import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -230,6 +231,7 @@ export function useExpenseColumns() {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
+  const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const expenseColumns = useAllExpenseColumns();
   type ExpenseColumns = (typeof expenseColumns)[number];
@@ -336,9 +338,9 @@ export function useExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value, expense) =>
+      format: (_, expense) =>
         formatMoney(
-          value,
+          calculateExpenseAmount(expense),
           expense.client?.country_id,
           expense.currency_id || expense.client?.settings.currency_id
         ),
