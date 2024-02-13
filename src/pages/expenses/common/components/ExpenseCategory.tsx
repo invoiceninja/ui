@@ -59,7 +59,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
   const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
   return (
-    <>
+    <div onClick={(event) => event.stopPropagation()}>
       <Tippy
         placement="bottom"
         interactive={true}
@@ -106,7 +106,11 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div className="cursor-pointer" data-cy="expenseCategoryBadge">
+        <div
+          className="cursor-pointer"
+          onClick={(event) => event.stopPropagation()}
+          data-cy="expenseCategoryBadge"
+        >
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}
@@ -114,7 +118,10 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               color: adjustColorDarkness(hex, darknessAmount),
               backgroundColor: expense.category?.color || '',
             }}
-            onClick={() => !isFormBusy && setVisible(true)}
+            onClick={() =>
+              !isFormBusy &&
+              setVisible((currentVisibility) => !currentVisibility)
+            }
           />
         </div>
       </Tippy>
@@ -126,7 +133,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
           save({ ...expense, category_id: category.id })
         }
       />
-    </>
+    </div>
   );
 }
 
