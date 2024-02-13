@@ -157,6 +157,7 @@ export function Details(props: Props) {
                 value={expense.tax_name1}
                 onValueChange={(value) => handleChange('tax_name1', value)}
                 errorMessage={errors?.errors.tax_name1}
+                cypressRef="taxNameByAmount1"
               />
               <InputField
                 type="number"
@@ -166,6 +167,7 @@ export function Details(props: Props) {
                   handleChange('tax_amount1', parseFloat(value))
                 }
                 errorMessage={errors?.errors.tax_amount1}
+                cypressRef="taxRateByAmount1"
               />
             </div>
           </Element>
@@ -208,6 +210,7 @@ export function Details(props: Props) {
                 value={expense.tax_name2}
                 onValueChange={(value) => handleChange('tax_name2', value)}
                 errorMessage={errors?.errors.tax_name2}
+                cypressRef="taxNameByAmount2"
               />
               <InputField
                 type="number"
@@ -217,6 +220,7 @@ export function Details(props: Props) {
                   handleChange('tax_amount2', parseFloat(value))
                 }
                 errorMessage={errors?.errors.tax_amount2}
+                cypressRef="taxRateByAmount2"
               />
             </div>
           </Element>

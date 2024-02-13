@@ -67,6 +67,8 @@ export interface Company {
   convert_products: boolean;
   bank_integrations: BankAccount[];
   documents: Document[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
 }
 
 export interface Settings {
