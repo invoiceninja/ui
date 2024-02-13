@@ -106,11 +106,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div
-          className="cursor-pointer"
-          onClick={(event) => event.stopPropagation()}
-          data-cy="expenseCategoryBadge"
-        >
+        <div className="cursor-pointer" data-cy="expenseCategoryBadge">
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}
