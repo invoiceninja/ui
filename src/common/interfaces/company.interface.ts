@@ -303,6 +303,7 @@ export interface Settings {
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
   custom_sending_email: string;
+  smtp: string;
 }
 
 export interface TaxData {

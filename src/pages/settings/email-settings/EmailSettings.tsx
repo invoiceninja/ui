@@ -10,7 +10,7 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { endpoint, isHosted, trans } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -43,11 +43,16 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useEmailProviders } from './common/hooks/useEmailProviders';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export function EmailSettings() {
   useTitle('email_settings');
 
   const [t] = useTranslation();
+
+  const isSMTPConfigurationAllowed =
+    import.meta.env.VITE_HOSTED_SHOW_SMTP_SETTINGS === 'true' || isSelfHosted();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
@@ -589,6 +594,32 @@ export function EmailSettings() {
             ))}
           </SelectField>
         </Element>
+
+        {(proPlan() || enterprisePlan()) && isSMTPConfigurationAllowed && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="smtp"
+                labelElement={<SettingsLabel label="SMTP" />}
+              />
+            }
+          >
+            <SelectField
+              value={company?.settings.smtp || ''}
+              onValueChange={(value) => handleChange('settings.smtp', value)}
+              withBlank
+              disabled={disableSettingsField('smtp')}
+            >
+              <option value="smtp_host">{t('host')}</option>
+              <option value="smtp_port">{t('port')}</option>
+              <option value="smtp_encryption">{t('encryption')}</option>
+              <option value="smtp_username">{t('username')}</option>
+              <option value="smtp_password">{t('password')}</option>
+              <option value="smtp_local_domain">{t('local_domain')}</option>
+              <option value="smtp_verify_peer">{t('verify_peer')}</option>
+            </SelectField>
+          </Element>
+        )}
 
         <Divider />
 
