@@ -843,8 +843,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.getByRole('button', { name: 'Send Email', exact: true }).click();
 
-  await expect(page.getByText('Second Custom')).toBeVisible();
-  await expect(page.getByText('Third Custom')).toBeVisible();
+  await expect(page.getByText('testing subject second custom')).toBeVisible();
+  await expect(page.getByText('testing subject third custom')).toBeVisible();
 
   await logout(page);
 });
