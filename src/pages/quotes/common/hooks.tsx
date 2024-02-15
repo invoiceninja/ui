@@ -55,6 +55,7 @@ import {
   MdDelete,
   MdDone,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPictureAsPdf,
   MdPrint,
@@ -264,13 +265,19 @@ export function useSave(props: CreateProps) {
   };
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
   const { isAdmin, isOwner } = useAdmin();
 
   const setQuote = useSetAtom(quoteAtom);
+
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
@@ -304,6 +311,16 @@ export function useActions() {
   };
 
   const actions: Action<Quote>[] = [
+    (quote: Quote) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/pdf', { id: quote.id })}
@@ -401,9 +418,12 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) => <CloneOptionsModal quote={quote} />,
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'archive')}
@@ -413,7 +433,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'restore')}
@@ -423,7 +443,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'delete')}
