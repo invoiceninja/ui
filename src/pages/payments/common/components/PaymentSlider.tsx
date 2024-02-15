@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -34,13 +34,11 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
-import { EmailRecord } from '$app/components/EmailRecord';
-import { useEffect, useState } from 'react';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { Payment } from '$app/common/interfaces/payment';
 import { useActions } from '../hooks/useActions';
 import { PaymentStatus } from './PaymentStatus';
+import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -50,7 +48,9 @@ dayjs.extend(relativeTime);
 function useGenerateActivityElement() {
   const [t] = useTranslation();
 
-  return (activity: QuoteActivity) => {
+  const formatMoney = useFormatMoney();
+
+  return (activity: PaymentActivity, payment: Payment | null) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
@@ -60,14 +60,19 @@ function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      quote:
+      payment_amount: formatMoney(
+        activity.payment_amount,
+        payment?.client?.country_id,
+        payment?.client?.settings.currency_id
+      ),
+      invoice:
         (
           <Link
-            to={route('/quotes/:id/edit', {
-              id: activity.quote?.hashed_id,
+            to={route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
             })}
           >
-            {activity?.quote?.label}
+            {activity?.invoice?.label}
           </Link>
         ) ?? '',
       contact:
@@ -93,7 +98,6 @@ function useGenerateActivityElement() {
 
 export function PaymentSlider() {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -110,15 +114,13 @@ export function PaymentSlider() {
   const [payment, setPayment] = useAtom(paymentSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(paymentSliderVisibilityAtom);
 
-  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
-
   const { data: resource } = useQuery({
-    queryKey: ['/api/v1/quotes', payment?.id, 'slider'],
+    queryKey: ['/api/v1/payments', payment?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
         endpoint(
-          `/api/v1/quotes/${payment?.id}?include=activities.history&reminder_schedule=true`
+          `/api/v1/payments/${payment?.id}?include=activities.history,invoices&reminder_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
@@ -128,40 +130,18 @@ export function PaymentSlider() {
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', payment?.id, 'quote'],
+    queryKey: ['/api/v1/activities', payment?.id, 'payment'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'quote',
+        entity: 'payment',
         entity_id: payment?.id,
       }).then(
-        (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
+        (response: AxiosResponse<GenericManyResponse<PaymentActivity>>) =>
           response.data.data
       ),
     enabled: payment !== null && isVisible,
     staleTime: Infinity,
   });
-
-  const fetchEmailHistory = async () => {
-    const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/quotes', payment?.id, 'emailHistory'],
-        () =>
-          request('POST', endpoint('/api/v1/emails/entityHistory'), {
-            entity: 'quote',
-            entity_id: payment?.id,
-          }),
-        { staleTime: Infinity }
-      )
-      .then((response) => response.data);
-
-    setEmailRecords(response);
-  };
-
-  useEffect(() => {
-    if (payment) {
-      fetchEmailHistory();
-    }
-  }, [payment]);
 
   return (
     <Slider
@@ -171,10 +151,10 @@ export function PaymentSlider() {
         setIsSliderVisible(false);
         setPayment(null);
       }}
-      title={`${t('quote')} ${payment?.number}`}
+      title={`${t('payment')} ${payment?.number}`}
       topRight={
         payment &&
-        (hasPermission('edit_quote') || entityAssigned(payment)) && (
+        (hasPermission('edit_payment') || entityAssigned(payment)) && (
           <ResourceActions
             label={t('more_actions')}
             resource={payment}
@@ -185,12 +165,12 @@ export function PaymentSlider() {
       withoutActionContainer
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[t('overview'), t('history'), t('activity')]}
         width="full"
       >
         <div className="space-y-2">
           <div>
-            <Element leftSide={t('payment_amount')}>
+            <Element leftSide={t('payment_amount')} withoutWrappingLeftSide>
               {payment
                 ? formatMoney(
                     payment?.amount,
@@ -211,15 +191,53 @@ export function PaymentSlider() {
             </Element>
 
             <Element leftSide={t('date')}>
-              {payment ? date(payment?.date, dateFormat) : null}
+              {payment ? date(payment.date, dateFormat) : null}
+            </Element>
+
+            <Element leftSide={t('payment_type')}>
+              {payment ? t(payment.type_id) : null}
             </Element>
 
             <Element leftSide={t('status')}>
               {payment ? <PaymentStatus entity={payment} /> : null}
             </Element>
           </div>
+
           <Divider withoutPadding />
-          Invoices
+
+          <div className="flex flex-col space-y-2">
+            {payment?.invoices?.map((invoice, index) => (
+              <ClickableElement
+                key={index}
+                to={route('/invoices/:id/edit', {
+                  id: invoice.id,
+                })}
+                disableNavigation={disableNavigation('invoice', invoice)}
+              >
+                <div className="flex flex-col space-y-2">
+                  <p className="font-semibold">
+                    {t('invoice')} {invoice.number}
+                  </p>
+
+                  <div className="flex items-center space-x-1">
+                    <p>
+                      {formatMoney(
+                        invoice.amount,
+                        invoice.client?.country_id,
+                        invoice.client?.settings.currency_id
+                      )}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{date(invoice.date, dateFormat)}</p>
+                  </div>
+
+                  <div>
+                    <InvoiceStatus entity={invoice} />
+                  </div>
+                </div>
+              </ClickableElement>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -263,24 +281,13 @@ export function PaymentSlider() {
         <div>
           {activities?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
+              <p>{activityElement(activity, payment)}</p>
               <div className="inline-flex items-center space-x-1">
                 <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
                 <p>&middot;</p>
                 <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
-          ))}
-        </div>
-
-        <div className="flex flex-col">
-          {emailRecords?.map((emailRecord, index) => (
-            <EmailRecord
-              key={index}
-              className="py-4"
-              emailRecord={emailRecord}
-              index={index}
-            />
           ))}
         </div>
       </TabGroup>

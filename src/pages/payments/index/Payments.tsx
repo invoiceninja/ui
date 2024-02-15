@@ -41,20 +41,15 @@ export default function Payments() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
-
-  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
-
-  const columns = usePaymentColumns();
-
-  const actions = useActions();
-
-  const paymentColumns = useAllPaymentColumns();
-
-  const filters = usePaymentFilters();
-
   const disableNavigation = useDisableNavigation();
 
+  const actions = useActions();
+  const filters = usePaymentFilters();
+  const columns = usePaymentColumns();
+  const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
   const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
   const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
