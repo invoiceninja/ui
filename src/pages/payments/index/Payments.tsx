@@ -25,6 +25,15 @@ import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  PaymentSlider,
+  paymentSliderAtom,
+  paymentSliderVisibilityAtom,
+} from '../common/components/PaymentSlider';
 
 export default function Payments() {
   useTitle('payments');
@@ -43,7 +52,27 @@ export default function Payments() {
 
   const filters = usePaymentFilters();
 
+  const disableNavigation = useDisableNavigation();
+
   const customBulkActions = useCustomBulkActions();
+
+  const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
+  const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
+  const [paymentSliderVisibility, setPaymentSliderVisibility] = useAtom(
+    paymentSliderVisibilityAtom
+  );
+
+  const { data: paymentResponse } = usePaymentQuery({ id: sliderPaymentId });
+
+  useEffect(() => {
+    if (paymentResponse && paymentSliderVisibility) {
+      setPaymentSlider(paymentResponse);
+    }
+  }, [paymentResponse, paymentSliderVisibility]);
+
+  useEffect(() => {
+    return () => setPaymentSliderVisibility(false);
+  }, []);
 
   return (
     <Default
@@ -72,9 +101,15 @@ export default function Payments() {
             table="payment"
           />
         }
+        onTableRowClick={(payment) => {
+          setSliderPaymentId(payment.id);
+          setPaymentSliderVisibility(true);
+        }}
         linkToCreateGuards={[permission('create_payment')]}
         hideEditableOptions={!hasPermission('edit_payment')}
       />
+
+      {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
     </Default>
   );
 }
