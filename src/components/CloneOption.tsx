@@ -9,10 +9,9 @@
  */
 
 import { IconType } from 'react-icons';
-import styled from 'styled-components';
 import { Icon as ReactFeatherIcon } from 'react-feather';
 import { Icon } from './icons/Icon';
-import { useColorScheme } from '$app/common/colors';
+import { Button } from './forms';
 
 interface Props {
   onClick: () => void;
@@ -20,24 +19,18 @@ interface Props {
   label: string;
 }
 
-const CloneOptionStyled = styled.div`
-  &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
-  }
-`;
 export function CloneOption(props: Props) {
-  const colors = useColorScheme();
-
   const { onClick, icon, label } = props;
 
   return (
-    <CloneOptionStyled
-      theme={{ hoverColor: colors.$5 }}
-      className="flex flex-1 items-center space-x-10 text-base py-2 px-10 cursor-pointer"
+    <Button
+      behavior="button"
+      type="secondary"
+      className="w-3/4"
       onClick={onClick}
     >
-      <Icon element={icon} style={{ width: '1.35rem', height: '1.35rem' }} />
+      <Icon element={icon} style={{ width: '1.1rem', height: '1.1rem' }} />
       <span>{label}</span>
-    </CloneOptionStyled>
+    </Button>
   );
 }

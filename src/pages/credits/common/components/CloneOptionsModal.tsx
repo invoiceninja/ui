@@ -155,7 +155,7 @@ export function CloneOptionsModal(props: Props) {
         closeButtonCypressRef="cloneOptionsModalXButton"
       >
         <div className="flex justify-center">
-          <div className="flex flex-col">
+          <div className="flex flex-1 flex-col items-center space-y-3">
             {hasPermission('create_invoice') && (
               <CloneOption
                 label={t('invoice')}
