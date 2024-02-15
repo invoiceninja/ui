@@ -69,6 +69,13 @@ export interface Company {
   documents: Document[];
   calculate_expense_tax_by_amount: boolean;
   expense_inclusive_taxes: boolean;
+  smtp_host: string;
+  smtp_port: string;
+  smtp_encryption: string;
+  smtp_username: string;
+  smtp_password: string;
+  smtp_local_domain: string;
+  smtp_verify_peer: string;
 }
 
 export interface Settings {
@@ -303,7 +310,6 @@ export interface Settings {
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
   custom_sending_email: string;
-  smtp: string;
 }
 
 export interface TaxData {
