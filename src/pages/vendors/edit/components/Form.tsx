@@ -173,14 +173,16 @@ export function Form(props: Props) {
               defaultValue={vendor.classification ?? ''}
               onValueChange={(value) => handleChange('classification', value)}
               errorMessage={errors?.errors.classification}
+              withBlank
             >
-              <option value=""></option>
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>
+              <option value="company">{t('company')}</option>
               <option value="partnership">{t('partnership')}</option>
               <option value="trust">{t('trust')}</option>
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
+              <option value="other">{t('other')}</option>
             </SelectField>
           </Element>
 
