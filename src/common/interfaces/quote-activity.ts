@@ -21,7 +21,7 @@ export interface QuoteActivity {
   ip: string;
 }
 
-export interface Client {
+interface Client {
   label: string;
   hashed_id: string;
 }
