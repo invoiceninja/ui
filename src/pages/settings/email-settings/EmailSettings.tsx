@@ -657,12 +657,16 @@ export function EmailSettings() {
             </Element>
 
             <Element leftSide={t('verify_peer')}>
-              <InputField
-                value={company?.smtp_verify_peer || ''}
+              <SelectField
+                value={company?.smtp_verify_peer || 'false'}
                 onValueChange={(value) =>
                   handleChange('smtp_verify_peer', value)
                 }
-              />
+                withBlank
+              >
+                <option value="false">{t('false')}</option>
+                <option value="true">{t('true')}</option>
+              </SelectField>
             </Element>
           </>
         )}
