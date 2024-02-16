@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -37,10 +37,7 @@ import { useActions } from '../hooks/useActions';
 import { PaymentStatus } from './PaymentStatus';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
-import { useEffect, useState } from 'react';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
-import { EmailRecord } from '$app/components/EmailRecord';
 import paymentType from '$app/common/constants/payment-type';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
@@ -111,7 +108,6 @@ function useGenerateActivityElement() {
 
 export function PaymentSlider() {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -127,8 +123,6 @@ export function PaymentSlider() {
 
   const [payment, setPayment] = useAtom(paymentSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(paymentSliderVisibilityAtom);
-
-  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const { data: resource } = useQuery({
     queryKey: ['/api/v1/payments', payment?.id, 'slider'],
@@ -157,33 +151,6 @@ export function PaymentSlider() {
     staleTime: Infinity,
   });
 
-  const fetchEmailHistory = async () => {
-    const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/payments', payment?.id, 'emailHistory'],
-        () =>
-          request('POST', endpoint('/api/v1/emails/entityHistory'), {
-            entity: 'payment',
-            entity_id: payment?.id,
-          }),
-        { staleTime: Infinity }
-      )
-      .then((response) => {
-        console.log(response.data);
-        return response.data;
-      });
-
-    setEmailRecords(response);
-  };
-
-  useEffect(() => {
-    if (payment) {
-      fetchEmailHistory();
-    }
-  }, [payment]);
-
-  console.log(resource);
-
   return (
     <Slider
       size="regular"
@@ -205,10 +172,7 @@ export function PaymentSlider() {
       }
       withoutActionContainer
     >
-      <TabGroup
-        tabs={[t('overview'), t('activity'), t('email_history')]}
-        width="full"
-      >
+      <TabGroup tabs={[t('overview'), t('activity')]} width="full">
         <div className="space-y-2">
           <div>
             <Element leftSide={t('payment_amount')} withoutWrappingLeftSide>
@@ -329,17 +293,6 @@ export function PaymentSlider() {
                 <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
-          ))}
-        </div>
-
-        <div className="flex flex-col">
-          {emailRecords.map((emailRecord, index) => (
-            <EmailRecord
-              key={index}
-              className="py-4"
-              emailRecord={emailRecord}
-              index={index}
-            />
           ))}
         </div>
       </TabGroup>
