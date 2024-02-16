@@ -9,7 +9,6 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
 import { ClickableElement, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
@@ -19,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -33,12 +32,16 @@ import reactStringReplace from 'react-string-replace';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
 import { Payment } from '$app/common/interfaces/payment';
 import { useActions } from '../hooks/useActions';
 import { PaymentStatus } from './PaymentStatus';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
+import { useEffect, useState } from 'react';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
+import { EmailRecord } from '$app/components/EmailRecord';
+import paymentType from '$app/common/constants/payment-type';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -75,6 +78,16 @@ function useGenerateActivityElement() {
             {activity?.invoice?.label}
           </Link>
         ) ?? '',
+      payment:
+        (
+          <Link
+            to={route('/payments/:id/edit', {
+              id: activity.payment?.hashed_id,
+            })}
+          >
+            {activity?.payment?.label}
+          </Link>
+        ) ?? '',
       contact:
         (
           <Link
@@ -98,6 +111,7 @@ function useGenerateActivityElement() {
 
 export function PaymentSlider() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -114,16 +128,16 @@ export function PaymentSlider() {
   const [payment, setPayment] = useAtom(paymentSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(paymentSliderVisibilityAtom);
 
+  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
+
   const { data: resource } = useQuery({
     queryKey: ['/api/v1/payments', payment?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
-        endpoint(
-          `/api/v1/payments/${payment?.id}?include=activities.history,invoices&reminder_schedule=true`
-        )
+        endpoint(`/api/v1/payments/${payment?.id}?include=invoices,credits`)
       ).then(
-        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
+        (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),
     enabled: payment !== null && isVisible,
     staleTime: Infinity,
@@ -142,6 +156,33 @@ export function PaymentSlider() {
     enabled: payment !== null && isVisible,
     staleTime: Infinity,
   });
+
+  const fetchEmailHistory = async () => {
+    const response = await queryClient
+      .fetchQuery(
+        ['/api/v1/payments', payment?.id, 'emailHistory'],
+        () =>
+          request('POST', endpoint('/api/v1/emails/entityHistory'), {
+            entity: 'payment',
+            entity_id: payment?.id,
+          }),
+        { staleTime: Infinity }
+      )
+      .then((response) => {
+        console.log(response.data);
+        return response.data;
+      });
+
+    setEmailRecords(response);
+  };
+
+  useEffect(() => {
+    if (payment) {
+      fetchEmailHistory();
+    }
+  }, [payment]);
+
+  console.log(resource);
 
   return (
     <Slider
@@ -165,7 +206,7 @@ export function PaymentSlider() {
       withoutActionContainer
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity')]}
+        tabs={[t('overview'), t('activity'), t('email_history')]}
         width="full"
       >
         <div className="space-y-2">
@@ -195,7 +236,9 @@ export function PaymentSlider() {
             </Element>
 
             <Element leftSide={t('payment_type')}>
-              {payment ? t(payment.type_id) : null}
+              {payment
+                ? t(paymentType[payment.type_id as keyof typeof paymentType])
+                : null}
             </Element>
 
             <Element leftSide={t('status')}>
@@ -238,44 +281,42 @@ export function PaymentSlider() {
               </ClickableElement>
             ))}
           </div>
-        </div>
 
-        <div>
-          {resource?.activities &&
-            resource.activities.map((activity) => (
+          {resource?.credits?.length && <Divider withoutPadding />}
+
+          <div className="flex flex-col space-y-2">
+            {resource?.credits?.map((credit, index) => (
               <ClickableElement
-                key={activity.id}
-                to={`/activities/${activity.id}`}
+                key={index}
+                to={route('/credits/:id/edit', {
+                  id: credit.id,
+                })}
+                disableNavigation={disableNavigation('credit', credit)}
               >
-                <div className="flex flex-col">
-                  <div className="flex space-x-1">
-                    <span>
-                      {payment?.client
-                        ? formatMoney(
-                            activity.history.amount,
-                            payment?.client?.country_id,
-                            payment?.client?.settings.currency_id
-                          )
-                        : null}
-                    </span>
-                    <span>&middot;</span>
-                    <DynamicLink
-                      to={`/clients/${activity.client_id}`}
-                      renderSpan={disableNavigation('client', payment?.client)}
-                    >
-                      {payment?.client?.display_name}
-                    </DynamicLink>
+                <div className="flex flex-col space-y-2">
+                  <p className="font-semibold">
+                    {t('credit')} {credit.number}
+                  </p>
+
+                  <div className="flex items-center space-x-1">
+                    <p>
+                      {formatMoney(
+                        credit.amount,
+                        credit.client?.country_id,
+                        credit.client?.settings.currency_id
+                      )}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{date(credit.date, dateFormat)}</p>
                   </div>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                    </p>
-                    <p>{dayjs.unix(activity.created_at).fromNow()}</p>
+                  <div>
+                    <CreditStatus entity={credit} />
                   </div>
                 </div>
               </ClickableElement>
             ))}
+          </div>
         </div>
 
         <div>
@@ -288,6 +329,17 @@ export function PaymentSlider() {
                 <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
+          ))}
+        </div>
+
+        <div className="flex flex-col">
+          {emailRecords.map((emailRecord, index) => (
+            <EmailRecord
+              key={index}
+              className="py-4"
+              emailRecord={emailRecord}
+              index={index}
+            />
           ))}
         </div>
       </TabGroup>

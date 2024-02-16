@@ -13,6 +13,7 @@ export interface PaymentActivity {
   contact: Client;
   client: Client;
   invoice: Client;
+  payment: Client;
   activity_type_id: number;
   id: string;
   hashed_id: string;
