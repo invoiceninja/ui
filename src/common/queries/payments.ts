@@ -24,6 +24,7 @@ import { $refetch } from '../hooks/useRefetch';
 interface PaymentParams {
   id: string | undefined;
   enabled?: boolean;
+  include?: string;
 }
 
 export function usePaymentQuery(params: PaymentParams) {
@@ -32,9 +33,13 @@ export function usePaymentQuery(params: PaymentParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/payments/:id?include=client,invoices,paymentables', {
-          id: params.id,
-        })
+        endpoint(
+          '/api/v1/payments/:id?include=client,invoices,paymentables,:include',
+          {
+            id: params.id,
+            include: params.include || '',
+          }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),

@@ -22,7 +22,6 @@ import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
@@ -123,19 +122,6 @@ export function PaymentSlider() {
 
   const [payment, setPayment] = useAtom(paymentSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(paymentSliderVisibilityAtom);
-
-  const { data: resource } = useQuery({
-    queryKey: ['/api/v1/payments', payment?.id, 'slider'],
-    queryFn: () =>
-      request(
-        'GET',
-        endpoint(`/api/v1/payments/${payment?.id}?include=invoices,credits`)
-      ).then(
-        (response: GenericSingleResourceResponse<Payment>) => response.data.data
-      ),
-    enabled: payment !== null && isVisible,
-    staleTime: Infinity,
-  });
 
   const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities', payment?.id, 'payment'],
@@ -246,10 +232,10 @@ export function PaymentSlider() {
             ))}
           </div>
 
-          {resource?.credits?.length && <Divider withoutPadding />}
+          {Boolean(payment?.credits?.length) && <Divider withoutPadding />}
 
           <div className="flex flex-col space-y-2">
-            {resource?.credits?.map((credit, index) => (
+            {payment?.credits?.map((credit, index) => (
               <ClickableElement
                 key={index}
                 to={route('/credits/:id/edit', {

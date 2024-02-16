@@ -57,7 +57,10 @@ export default function Payments() {
     paymentSliderVisibilityAtom
   );
 
-  const { data: paymentResponse } = usePaymentQuery({ id: sliderPaymentId });
+  const { data: paymentResponse } = usePaymentQuery({
+    id: sliderPaymentId,
+    include: 'credits',
+  });
 
   useEffect(() => {
     if (paymentResponse && paymentSliderVisibility) {
