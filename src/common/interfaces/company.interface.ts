@@ -75,7 +75,7 @@ export interface Company {
   smtp_username: string;
   smtp_password: string;
   smtp_local_domain: string;
-  smtp_verify_peer: string;
+  smtp_verify_peer: boolean;
 }
 
 export interface Settings {
