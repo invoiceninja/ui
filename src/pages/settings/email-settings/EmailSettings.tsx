@@ -43,6 +43,7 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useEmailProviders } from './common/hooks/useEmailProviders';
+import { SMTPMailDriver } from './common/components/SMTPMailDriver';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -605,66 +606,7 @@ export function EmailSettings() {
         )}
 
         {company?.settings.email_sending_method === 'smtp' && (
-          <>
-            <Element leftSide={t('host')}>
-              <InputField
-                value={company?.smtp_host || ''}
-                onValueChange={(value) => handleChange('smtp_host', value)}
-              />
-            </Element>
-
-            <Element leftSide={t('port')}>
-              <InputField
-                value={company?.smtp_port || ''}
-                onValueChange={(value) => handleChange('smtp_port', value)}
-              />
-            </Element>
-
-            <Element leftSide={t('encryption')}>
-              <SelectField
-                value={company?.smtp_encryption || ''}
-                onValueChange={(value) =>
-                  handleChange('smtp_encryption', value)
-                }
-                withBlank
-              >
-                <option value="tls">STARTTLS</option>
-                <option value="ssl">SSL/TLS</option>
-              </SelectField>
-            </Element>
-
-            <Element leftSide={t('username')}>
-              <InputField
-                value={company?.smtp_username || ''}
-                onValueChange={(value) => handleChange('smtp_username', value)}
-              />
-            </Element>
-
-            <Element leftSide={t('password')}>
-              <InputField
-                value={company?.smtp_password || ''}
-                onValueChange={(value) => handleChange('smtp_password', value)}
-              />
-            </Element>
-
-            <Element leftSide={t('local_domain')}>
-              <InputField
-                value={company?.smtp_local_domain || ''}
-                onValueChange={(value) =>
-                  handleChange('smtp_local_domain', value)
-                }
-              />
-            </Element>
-
-            <Element leftSide={t('verify_peer')}>
-              <Toggle
-                checked={company?.smtp_verify_peer ?? true}
-                onValueChange={(value) =>
-                  handleChange('smtp_verify_peer', value)
-                }
-              />
-            </Element>
-          </>
+          <SMTPMailDriver />
         )}
 
         <Divider />
