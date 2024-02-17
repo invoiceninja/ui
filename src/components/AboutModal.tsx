@@ -251,8 +251,8 @@ export function AboutModal(props: Props) {
 
             <div>
               <Icon
-                element={systemInfo?.system_health ? CheckCircle : MdWarning}
-                color={systemInfo?.system_health ? 'green' : 'red'}
+                element={systemInfo?.simple_db_check ? CheckCircle : MdWarning}
+                color={systemInfo?.simple_db_check ? 'green' : 'red'}
                 size={25}
               />
             </div>
