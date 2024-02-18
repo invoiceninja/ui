@@ -33,6 +33,10 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
+import { useQuery } from 'react-query';
+import { PasswordConfirmation } from './PasswordConfirmation';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 interface SystemInfo {
   system_health: boolean;
@@ -80,13 +84,37 @@ export function AboutModal(props: Props) {
 
   const { isAboutVisible, setIsAboutVisible } = props;
 
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isHealthCheckModalOpen, setIsHealthCheckModalOpen] =
     useState<boolean>(false);
   const [isForceUpdateModalOpen, setIsForceUpdateModalOpen] =
     useState<boolean>(false);
+  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
+    useState<boolean>(false);
+  const [isUpgradeLoadingModalOpen, setIsUpgradeLoadingModalOpen] =
+    useState<boolean>(false);
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo>();
+
+  const { data: installedVersion } = useQuery({
+    queryKey: ['/api/v1/self-update/check_version'],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/self-update/check_version')).then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
+
+  const { data: latestVersion } = useQuery({
+    queryKey: ['https://pdf.invoicing.co/api/version'],
+    queryFn: () =>
+      request('GET', 'https://pdf.invoicing.co/api/version').then(
+        (response) => response.data
+      ),
+    staleTime: Infinity,
+  });
 
   const handleHealthCheck = (allowAction?: boolean) => {
     if (!isFormBusy || allowAction) {
@@ -108,17 +136,48 @@ export function AboutModal(props: Props) {
       toast.processing();
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/refresh?current_company=true'))
-        .then((response) => {
-          dispatch(updateCompanyUsers(response.data.data));
-          toast.dismiss();
-          handleHealthCheck(true);
+      request('GET', endpoint('/api/v1/ping?clear_cache=true'))
+        .then(() => {
+          request('POST', endpoint('/api/v1/refresh?current_company=true'))
+            .then((response) => {
+              dispatch(updateCompanyUsers(response.data.data));
+              toast.dismiss();
+              handleHealthCheck(true);
+            })
+            .finally(() => setIsFormBusy(false));
         })
-        .finally(() => setIsFormBusy(false));
+        .catch(() => setIsFormBusy(false));
     }
   };
 
-  console.log(systemInfo);
+  const handleUpdateApp = (password: string) => {
+    if (!isFormBusy) {
+      const timeoutId = setTimeout(() => {
+        setIsUpgradeLoadingModalOpen(true);
+      }, 25000);
+
+      toast.processing();
+      setIsFormBusy(true);
+
+      request(
+        'POST',
+        endpoint('/api/v1/self-update'),
+        {},
+        { headers: { 'X-Api-Password': password } }
+      )
+        .then(() => window.location.reload())
+        .catch((error) => {
+          if (error.response?.status === 412) {
+            toast.error('password_error_incorrect');
+            setLastPasswordEntryTime(0);
+          }
+        })
+        .finally(() => {
+          clearTimeout(timeoutId);
+          setIsFormBusy(false);
+        });
+    }
+  };
 
   return (
     <>
@@ -126,7 +185,12 @@ export function AboutModal(props: Props) {
         title={t('about')}
         visible={isAboutVisible}
         onClose={() => !isFormBusy && setIsAboutVisible(false)}
-        disableClosing={isHealthCheckModalOpen || isForceUpdateModalOpen}
+        disableClosing={
+          isHealthCheckModalOpen ||
+          isForceUpdateModalOpen ||
+          isPasswordConfirmModalOpen ||
+          isUpgradeLoadingModalOpen
+        }
       >
         <div className="flex flex-col text-center">
           <div className="flex flex-col">
@@ -285,89 +349,97 @@ export function AboutModal(props: Props) {
             </div>
           </div>
 
-          <Div
-            className="flex justify-between items-center cursor-pointer py-1 px-3"
-            theme={{
-              hoverColor: colors.$5,
-            }}
-            onClick={() =>
-              window
-                .open(
-                  'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
-                  '_blank'
-                )
-                ?.focus()
-            }
-          >
-            <div className="flex flex-col">
-              <span className="font-medium text-base mb-1">
-                {systemInfo?.file_permissions === t('ok')
-                  ? t('file_permissions')
-                  : t('invalid_file_permissions')}
-              </span>
-              <span>
-                {systemInfo?.file_permissions === t('ok')
-                  ? t('ok')
-                  : systemInfo?.file_permissions}
-              </span>
-            </div>
+          {(Boolean(!systemInfo?.env_writable) ||
+            Boolean(systemInfo?.file_permissions !== 'Ok')) && (
+            <Div
+              className="flex justify-between items-center cursor-pointer py-1 px-3"
+              theme={{
+                hoverColor: colors.$5,
+              }}
+              onClick={() =>
+                window
+                  .open(
+                    'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
+                    '_blank'
+                  )
+                  ?.focus()
+              }
+            >
+              <div className="flex flex-col">
+                <span className="font-medium text-base mb-1">
+                  {t('invalid_file_permissions')}
+                </span>
 
-            <div>
-              <Icon
-                element={
-                  systemInfo?.file_permissions === t('ok')
-                    ? CheckCircle
-                    : MdWarning
-                }
-                color={
-                  systemInfo?.file_permissions === t('ok') ? 'green' : 'red'
-                }
-                size={25}
-              />
-            </div>
-          </Div>
+                <span>
+                  {!systemInfo?.env_writable
+                    ? t('env_not_writable')
+                    : systemInfo?.file_permissions}
+                </span>
+              </div>
 
-          <Div
-            className="flex justify-between items-center cursor-pointer py-1 px-3"
-            theme={{
-              hoverColor: colors.$5,
-            }}
-            onClick={() =>
-              window
-                .open(
-                  'https://invoiceninja.github.io/en/self-host-installation/#currency-conversion',
-                  '_blank'
-                )
-                ?.focus()
-            }
-          >
-            <div className="flex flex-col">
-              <span className="font-medium text-base mb-1">
-                {!systemInfo?.exchange_rate_api_not_configured
-                  ? t('exchange_rate_enabled')
-                  : t('exchange_rate_not_enabled')}
-              </span>
-              <span>
-                {!systemInfo?.exchange_rate_api_not_configured
-                  ? t('enabled')
-                  : t('add_open_exchange')}
-              </span>
-            </div>
+              <div>
+                <Icon element={MdWarning} color="red" size={25} />
+              </div>
+            </Div>
+          )}
 
-            <div>
-              <Icon
-                element={
-                  !systemInfo?.exchange_rate_api_not_configured
-                    ? CheckCircle
-                    : MdInfo
-                }
-                color={
-                  !systemInfo?.exchange_rate_api_not_configured ? 'green' : ''
-                }
-                size={25}
-              />
-            </div>
-          </Div>
+          {systemInfo?.pdf_engine !== 'SnapPDF PDF Generator' && (
+            <Div
+              className="flex justify-between items-center cursor-pointer py-1 px-3"
+              theme={{
+                hoverColor: colors.$5,
+              }}
+              onClick={() =>
+                window
+                  .open(
+                    'https://invoiceninja.github.io/en/self-host-troubleshooting/#pdf-conversion-issues',
+                    '_blank'
+                  )
+                  ?.focus()
+              }
+            >
+              <div className="flex flex-col">
+                <span className="font-medium text-base mb-1">
+                  {t('snappdf_not_enabled')}
+                </span>
+
+                <span>{t('use_snappdf')}</span>
+              </div>
+
+              <div>
+                <Icon element={MdInfo} size={25} />
+              </div>
+            </Div>
+          )}
+
+          {Boolean(systemInfo?.exchange_rate_api_not_configured) && (
+            <Div
+              className="flex justify-between items-center cursor-pointer py-1 px-3"
+              theme={{
+                hoverColor: colors.$5,
+              }}
+              onClick={() =>
+                window
+                  .open(
+                    'https://invoiceninja.github.io/en/self-host-installation/#currency-conversion',
+                    '_blank'
+                  )
+                  ?.focus()
+              }
+            >
+              <div className="flex flex-col">
+                <span className="font-medium text-base mb-1">
+                  {t('exchange_rate_not_enabled')}
+                </span>
+
+                <span>{t('add_open_exchange')}</span>
+              </div>
+
+              <div>
+                <Icon element={MdInfo} size={25} />
+              </div>
+            </Div>
+          )}
         </div>
 
         <div className="flex justify-between">
@@ -396,6 +468,9 @@ export function AboutModal(props: Props) {
         title={t('update_available')}
         visible={isForceUpdateModalOpen}
         onClose={() => setIsForceUpdateModalOpen(false)}
+        disableClosing={
+          isFormBusy || isPasswordConfirmModalOpen || isUpgradeLoadingModalOpen
+        }
       >
         <div className="flex flex-col space-y-5">
           <span className="font-medium text-base">
@@ -403,8 +478,12 @@ export function AboutModal(props: Props) {
           </span>
 
           <div className="flex flex-col">
-            <span>&middot; {t('installed_version')}: v5.8.23</span>
-            <span>&middot; {t('latest_version')}: v5.8.24</span>
+            <span>
+              &middot; {t('installed_version')}: {installedVersion}
+            </span>
+            <span>
+              &middot; {t('latest_version')}: {latestVersion}
+            </span>
           </div>
 
           <div className="flex justify-between">
@@ -427,7 +506,7 @@ export function AboutModal(props: Props) {
 
             <Button
               behavior="button"
-              onClick={handleHealthCheck}
+              onClick={() => setIsPasswordConfirmModalOpen(true)}
               disableWithoutIcon
               disabled={isFormBusy}
             >
@@ -436,6 +515,20 @@ export function AboutModal(props: Props) {
           </div>
         </div>
       </Modal>
+
+      <Modal
+        title={t('updating_app')}
+        visible={isUpgradeLoadingModalOpen}
+        onClose={() => setIsUpgradeLoadingModalOpen(false)}
+      >
+        {t('upgrade_in_progress')}
+      </Modal>
+
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setIsPasswordConfirmModalOpen}
+        onSave={handleUpdateApp}
+      />
     </>
   );
 }
