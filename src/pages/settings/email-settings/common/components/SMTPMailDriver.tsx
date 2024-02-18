@@ -116,7 +116,7 @@ export function SMTPMailDriver() {
           disableWithoutIcon
           disabled={isFormBusy}
         >
-          {t('test_configuration')}
+          {t('send_test_email')}
         </Button>
       </Element>
     </>
