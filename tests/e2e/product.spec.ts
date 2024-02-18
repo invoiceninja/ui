@@ -111,9 +111,7 @@ const checkEditPage = async (
     await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
+      page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
     ).toBeVisible();
   } else {
     await expect(
@@ -430,7 +428,6 @@ test('product documents preview with edit_product', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -480,7 +477,6 @@ test('product documents uploading with edit_product', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -715,7 +711,7 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await page
     .locator('[data-cy="tabs"]')
-    .getByRole('link', { name: 'Documents', exact: true })
+    .getByRole('link', { name: 'Documents' })
     .click();
 
   await page.waitForURL('**/products/**/documents');
@@ -739,9 +735,7 @@ test('rendering documents and product_fields tabs with admin permission', async 
     page.getByRole('link', { name: 'Edit', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
 
   await logout(page);
 });

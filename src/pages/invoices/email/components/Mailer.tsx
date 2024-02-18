@@ -136,19 +136,19 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
               {company?.settings.email_subject_custom1 && (
                 <option value="email_template_custom1">
-                  {t('first_custom')}
+                  {company?.settings.email_subject_custom1}
                 </option>
               )}
 
               {company?.settings.email_subject_custom2 && (
                 <option value="email_template_custom2">
-                  {t('second_custom')}
+                  {company?.settings.email_subject_custom2}
                 </option>
               )}
 
               {company?.settings.email_subject_custom3 && (
                 <option value="email_template_custom3">
-                  {t('third_custom')}
+                  {company?.settings.email_subject_custom3}
                 </option>
               )}
             </SelectField>

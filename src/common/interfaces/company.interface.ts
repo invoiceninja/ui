@@ -9,6 +9,7 @@
  */
 
 import { BankAccount } from './bank-accounts';
+import { Document } from './document.interface';
 
 export interface Company {
   id: string;
@@ -65,6 +66,9 @@ export interface Company {
   fill_products: boolean;
   convert_products: boolean;
   bank_integrations: BankAccount[];
+  documents: Document[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
 }
 
 export interface Settings {
@@ -298,6 +302,7 @@ export interface Settings {
   classification: string;
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
+  custom_sending_email: string;
 }
 
 export interface TaxData {

@@ -26,6 +26,7 @@ import { useSave } from '../../edit/hooks/useSave';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface DropdownProps {
   visible: boolean;
@@ -38,6 +39,8 @@ interface DropdownProps {
 function ExpenseCategoriesDropdown(props: DropdownProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
+  const hasPermission = useHasPermission();
 
   const adjustColorDarkness = useAdjustColorDarkness();
 
@@ -56,7 +59,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
   const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
   return (
-    <>
+    <div onClick={(event) => event.stopPropagation()}>
       <Tippy
         placement="bottom"
         interactive={true}
@@ -69,16 +72,20 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               minWidth: '15rem',
               maxWidth: '20rem',
             }}
+            onClick={(event) => event.stopPropagation()}
           >
-            <DropdownElement
-              className="font-medium text-center py-3"
-              onClick={() => {
-                setIsModalOpen(true);
-                setVisible(false);
-              }}
-            >
-              {t('new_expense_category')}
-            </DropdownElement>
+            {hasPermission('create_expense') && (
+              <DropdownElement
+                className="font-medium text-center py-3"
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setVisible(false);
+                }}
+                cypressRef="newExpenseCategoryAction"
+              >
+                {t('new_expense_category')}
+              </DropdownElement>
+            )}
 
             <div className="flex flex-col max-h-80 overflow-y-auto">
               {expenseCategories?.map(
@@ -100,7 +107,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
         )}
         visible={visible}
       >
-        <div className="cursor-pointer">
+        <div className="cursor-pointer" data-cy="expenseCategoryBadge">
           <StatusBadge
             for={{}}
             code={expense.category?.name || (t('uncategorized') as string)}
@@ -108,7 +115,10 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
               color: adjustColorDarkness(hex, darknessAmount),
               backgroundColor: expense.category?.color || '',
             }}
-            onClick={() => !isFormBusy && setVisible(true)}
+            onClick={() =>
+              !isFormBusy &&
+              setVisible((currentVisibility) => !currentVisibility)
+            }
           />
         </div>
       </Tippy>
@@ -120,7 +130,7 @@ function ExpenseCategoriesDropdown(props: DropdownProps) {
           save({ ...expense, category_id: category.id })
         }
       />
-    </>
+    </div>
   );
 }
 
