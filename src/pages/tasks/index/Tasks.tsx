@@ -52,8 +52,6 @@ export default function Tasks() {
 
   const showEditOption = useShowEditOption();
 
-  //testing actions
-
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
