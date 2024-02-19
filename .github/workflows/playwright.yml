@@ -114,9 +114,9 @@ jobs:
 
       - name: Prepare React FrontEnd
         run: |
-          git clone https://github.com/Civolilah/ui.git
+          git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
           cd ui
-          git checkout bugfix/1298-failing-tests
+          git checkout develop
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
