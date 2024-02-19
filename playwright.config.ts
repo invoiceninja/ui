@@ -30,7 +30,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 16 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: process.env.CI ? 'github' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -44,6 +44,10 @@ export default defineConfig({
     /** Screenshots & videos. */
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    bypassCSP: true,
+    launchOptions: {
+      args: ['--disable-web-security'],
+    },
   },
 
   /* Configure projects for major browsers */
@@ -90,7 +94,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run preview',
-    port: 4173,
+    port: 9323,
     reuseExistingServer: true,
   },
 });
