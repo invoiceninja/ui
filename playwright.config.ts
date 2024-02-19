@@ -44,6 +44,10 @@ export default defineConfig({
     /** Screenshots & videos. */
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    bypassCSP: true,
+    launchOptions: {
+      args: ['--disable-web-security'],
+    },
   },
 
   /* Configure projects for major browsers */
