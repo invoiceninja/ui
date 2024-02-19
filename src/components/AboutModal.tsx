@@ -280,9 +280,7 @@ export function AboutModal(props: Props) {
         <div className="flex flex-col space-y-3">
           <div className="flex justify-between items-center py-1 px-3">
             <div className="flex flex-col">
-              <span className="font-medium text-base mb-1">
-                {t('system_health')}
-              </span>
+              <span className="font-medium text-base mb-1">{t('system')}</span>
               <span>
                 {t('email')}: {systemInfo?.mail_mailer}
               </span>
@@ -306,7 +304,7 @@ export function AboutModal(props: Props) {
           <div className="flex justify-between items-center py-1 px-3">
             <div className="flex flex-col">
               <span className="font-medium text-base mb-1">
-                {t('database_check')}
+                {t('database_connection')}
               </span>
               <span>
                 {systemInfo?.simple_db_check ? t('passed') : t('failed')}
@@ -324,18 +322,14 @@ export function AboutModal(props: Props) {
 
           <div className="flex justify-between items-center py-1 px-3">
             <div className="flex flex-col">
-              <span className="font-medium text-base mb-1">
-                {t('php_info')}
-              </span>
+              <span className="font-medium text-base mb-1">PHP</span>
               <span>
                 {t('web')}: {systemInfo?.php_version.current_php_version}
               </span>
               <span>
                 {t('cli')}: {systemInfo?.php_version.current_php_cli_version}
               </span>
-              <span>
-                {t('memory_limit')}: {systemInfo?.php_version.memory_limit}
-              </span>
+              <span>Memory: {systemInfo?.php_version.memory_limit}</span>
             </div>
 
             <div>
@@ -367,7 +361,7 @@ export function AboutModal(props: Props) {
             >
               <div className="flex flex-col">
                 <span className="font-medium text-base mb-1">
-                  {t('invalid_file_permissions')}
+                  {t('permissions')}
                 </span>
 
                 <span>
