@@ -125,7 +125,7 @@ jobs:
           env:
             VITE_API_URL: http://ninja.test
             PLAYWRIGHT_BASE_URL: http://localhost:4173
-            PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+            PLAYWRIGHT_TEST_BASE_URL: http://localhost:4573
             VITE_IS_TEST: true
             VITE_ROUTER: browser
       - uses: actions/upload-artifact@v3
