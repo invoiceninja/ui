@@ -15,6 +15,14 @@ test('should create a bug report', async ({ request }) => {
   expect(result.ok());
 });
 
+test('should create a bug repoddrt', async ({ request }) => {
+  const endpoint = process.env.VITE_API_URL;
+
+  const result = await request.get(`${endpoint}/api/v1/ping`);
+
+  expect(result.ok());
+});
+
 test('Connecting Nordigen', async ({ page }) => {
   await login(page);
 
