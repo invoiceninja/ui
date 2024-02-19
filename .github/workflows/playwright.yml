@@ -121,7 +121,7 @@ jobs:
           npm ci
           npx playwright install --with-deps
           npm run build
-          npm run preview &
+          npm run preview --host &
           npx playwright test --trace on --workers=1 --reporter=list --max-failures=1
           env:
             VITE_API_URL: http://ninja.test
