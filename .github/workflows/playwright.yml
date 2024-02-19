@@ -116,18 +116,18 @@ jobs:
         run: |
           git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
           cd ui
-          git checkout bugfix/1298-failing-tests
+          git checkout develop
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
-          npm run preview &
           npx playwright test --workers=1 --reporter=list --max-failures=1
           env:
+            VITE_API_URL: http://ninja.test
             PLAYWRIGHT_BASE_URL: http://localhost:4173
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
             VITE_ROUTER: browser
-            VITE_API_URL: http://ninja.test
+            CI: 'true'
       - uses: actions/upload-artifact@v3
         if: always()
         with:
