@@ -130,7 +130,6 @@ jobs:
             VITE_IS_TEST: true
             VITE_ROUTER: browser
             CI: true
-            REUSE_SERVER: true
       - uses: actions/upload-artifact@v3
         if: always()
         with:
