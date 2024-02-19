@@ -69,6 +69,13 @@ export interface Company {
   documents: Document[];
   calculate_expense_tax_by_amount: boolean;
   expense_inclusive_taxes: boolean;
+  smtp_host: string;
+  smtp_port: string;
+  smtp_encryption: string;
+  smtp_username: string;
+  smtp_password: string;
+  smtp_local_domain: string;
+  smtp_verify_peer: boolean;
 }
 
 export interface Settings {
