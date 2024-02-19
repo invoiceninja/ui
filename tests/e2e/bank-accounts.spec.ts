@@ -1,22 +1,18 @@
 import { login, logout } from '$tests/e2e/helpers';
-import test, { expect, request } from '@playwright/test';
+import test, { expect } from '@playwright/test';
 
-test("API URL correct Reachable", () => {
-  
+test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
 
   expect(endpoint).toEqual('http://ninja.test');
-  
 });
 
 test('should create a bug report', async ({ request }) => {
-  
   const endpoint = process.env.VITE_API_URL;
 
   const result = await request.get(`${endpoint}/api/v1/ping`);
 
   expect(result.ok());
-
 });
 
 test('Connecting Nordigen', async ({ page }) => {
