@@ -121,7 +121,7 @@ jobs:
           npm ci
           npx playwright install --with-deps
           npm run preview &
-          npx playwright test --workers=1 --reporter=list --max-failures=1
+          npx playwright test --project=chromium --workers=1 --headed
           env:
             PLAYWRIGHT_BASE_URL: http://localhost:4173
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
