@@ -1,5 +1,5 @@
 import { login, logout } from '$tests/e2e/helpers';
-import test from '@playwright/test';
+import test, { expect, request } from '@playwright/test';
 
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
@@ -8,14 +8,6 @@ test('API URL correct Reachable', () => {
 });
 
 test('should create a bug report', async ({ request }) => {
-  const endpoint = process.env.VITE_API_URL;
-
-  const result = await request.get(`${endpoint}/api/v1/ping`);
-
-  expect(result.ok());
-});
-
-test('should create a bug repoddrt', async ({ request }) => {
   const endpoint = process.env.VITE_API_URL;
 
   const result = await request.get(`${endpoint}/api/v1/ping`);

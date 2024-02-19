@@ -43,6 +43,7 @@ import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsFie
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useEmailProviders } from './common/hooks/useEmailProviders';
+import { SMTPMailDriver } from './common/components/SMTPMailDriver';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -342,11 +343,14 @@ export function EmailSettings() {
             disabled={disableSettingsField('email_sending_method')}
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
-            {emailProviders.map(({ value, label }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            {emailProviders.map(
+              ({ value, label, enabled }) =>
+                enabled && (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                )
+            )}
           </SelectField>
         </Element>
 
@@ -464,7 +468,8 @@ export function EmailSettings() {
         )}
 
         {(company?.settings.email_sending_method === 'client_mailgun' ||
-          company?.settings.email_sending_method === 'client_postmark') && (
+          company?.settings.email_sending_method === 'client_postmark' ||
+          company?.settings.email_sending_method === 'smtp') && (
           <Element
             leftSide={
               <PropertyCheckbox
@@ -502,93 +507,107 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="reply_to_name"
-              labelElement={<SettingsLabel label={t('reply_to_name')} />}
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.reply_to_name || ''}
-            onValueChange={(value) =>
-              handleChange('settings.reply_to_name', value)
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="reply_to_name"
+                labelElement={<SettingsLabel label={t('reply_to_name')} />}
+              />
             }
-            disabled={disableSettingsField('reply_to_name')}
-            errorMessage={errors?.errors['settings.reply_to_name']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="reply_to_email"
-              labelElement={<SettingsLabel label={t('reply_to_email')} />}
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.reply_to_email || ''}
-            onValueChange={(value) =>
-              handleChange('settings.reply_to_email', value)
-            }
-            disabled={disableSettingsField('reply_to_email')}
-            errorMessage={errors?.errors['settings.reply_to_email']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="bcc_email"
-              labelElement={
-                <SettingsLabel
-                  label={t('bcc_email')}
-                  helpLabel={t('comma_sparated_list')}
-                />
-              }
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.bcc_email || ''}
-            onValueChange={(value) => handleChange('settings.bcc_email', value)}
-            disabled={disableSettingsField('bcc_email')}
-            errorMessage={errors?.errors['settings.bcc_email']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="entity_send_time"
-              labelElement={<SettingsLabel label={t('send_time')} />}
-            />
-          }
-        >
-          <SelectField
-            value={company?.settings.entity_send_time || ''}
-            onValueChange={(value) =>
-              handleChange(
-                'settings.entity_send_time',
-                value.length > 0 ? value : 6
-              )
-            }
-            withBlank
-            disabled={disableSettingsField('entity_send_time')}
-            errorMessage={errors?.errors['settings.entity_send_time']}
           >
-            {[...Array(24).keys()].map((number, index) => (
-              <option key={index} value={number + 1}>
-                {dayjs()
-                  .startOf('day')
-                  .add(number + 1, 'hour')
-                  .format('h:ss A')}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
+            <InputField
+              value={company?.settings.reply_to_name || ''}
+              onValueChange={(value) =>
+                handleChange('settings.reply_to_name', value)
+              }
+              disabled={disableSettingsField('reply_to_name')}
+              errorMessage={errors?.errors['settings.reply_to_name']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="reply_to_email"
+                labelElement={<SettingsLabel label={t('reply_to_email')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.reply_to_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.reply_to_email', value)
+              }
+              disabled={disableSettingsField('reply_to_email')}
+              errorMessage={errors?.errors['settings.reply_to_email']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="bcc_email"
+                labelElement={
+                  <SettingsLabel
+                    label={t('bcc_email')}
+                    helpLabel={t('comma_sparated_list')}
+                  />
+                }
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.bcc_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.bcc_email', value)
+              }
+              disabled={disableSettingsField('bcc_email')}
+              errorMessage={errors?.errors['settings.bcc_email']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="entity_send_time"
+                labelElement={<SettingsLabel label={t('send_time')} />}
+              />
+            }
+          >
+            <SelectField
+              value={company?.settings.entity_send_time || ''}
+              onValueChange={(value) =>
+                handleChange(
+                  'settings.entity_send_time',
+                  value.length > 0 ? value : 6
+                )
+              }
+              withBlank
+              disabled={disableSettingsField('entity_send_time')}
+              errorMessage={errors?.errors['settings.entity_send_time']}
+            >
+              {[...Array(24).keys()].map((number, index) => (
+                <option key={index} value={number + 1}>
+                  {dayjs()
+                    .startOf('day')
+                    .add(number + 1, 'hour')
+                    .format('h:ss A')}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method === 'smtp' && (
+          <SMTPMailDriver />
+        )}
 
         <Divider />
 
