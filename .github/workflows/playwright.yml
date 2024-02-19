@@ -119,7 +119,7 @@ jobs:
           git checkout develop
           cp .env.example .env
           npm ci
-          yarn playwright install --with-deps
+          npx playwright install --with-deps
           npm run preview &
           npx playwright test --workers=1 --reporter=list --max-failures=1
           env:
