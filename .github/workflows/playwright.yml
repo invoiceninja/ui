@@ -126,12 +126,14 @@ jobs:
           env:
             VITE_API_URL: http://ninja.test
             PLAYWRIGHT_BASE_URL: http://localhost:4173
-            PLAYWRIGHT_TEST_BASE_URL: http://localhost:4573
+            PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
             VITE_ROUTER: browser
+      - name: List directories
+        run: ls -d */
       - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
-          path: ui/playwright-report
+          path: playwright-report/
           retention-days: 30
