@@ -42,7 +42,7 @@ import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
-import { Payment } from '$app/common/interfaces/payment';
+import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
@@ -340,6 +340,7 @@ export function InvoiceSlider() {
           <div className="divide-y">
             {resource?.payments &&
               resource.payments.map((payment: Payment) => (
+                payment.paymentables.filter((item) => item.invoice_id == invoice?.id && item.archived_at == 0).map((paymentable: Paymentable) => (
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
@@ -353,13 +354,13 @@ export function InvoiceSlider() {
                     <p className="inline-flex items-center space-x-1">
                       <p>
                         {formatMoney(
-                          payment.amount,
+                          paymentable.amount,
                           payment.client?.country_id,
                           payment.client?.settings.currency_id
                         )}
                       </p>
                       <p>&middot;</p>
-                      <p>{date(payment.date, dateFormat)}</p>
+                        <p>{date(paymentable.created_at, dateFormat)}</p>
                     </p>
 
                     <div>
@@ -367,6 +368,7 @@ export function InvoiceSlider() {
                     </div>
                   </div>
                 </ClickableElement>
+                ))
               ))}
           </div>
         </div>

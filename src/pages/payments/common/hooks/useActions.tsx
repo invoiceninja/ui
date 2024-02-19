@@ -22,14 +22,21 @@ import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdDelete,
+  MdEdit,
   MdPayment,
   MdRestore,
   MdSend,
   MdSettingsBackupRestore,
 } from 'react-icons/md';
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'payment',
@@ -39,6 +46,16 @@ export function useActions() {
   const bulk = useBulk();
 
   const actions: Action<Payment>[] = [
+    (payment: Payment) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/payments/:id/edit', { id: payment.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (resource: Payment) =>
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
@@ -68,13 +85,13 @@ export function useActions() {
       </DropdownElement>
     ),
     (payment: Payment) =>
-      isEditPage &&
+      (isEditPage || showCommonBulkAction) &&
       getEntityState(payment) !== EntityState.Deleted && (
         <Divider withoutPadding />
       ),
     (payment: Payment) =>
       getEntityState(payment) === EntityState.Active &&
-      isEditPage && (
+      (isEditPage || showCommonBulkAction) && (
         <DropdownElement
           onClick={() => bulk([payment.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -85,7 +102,7 @@ export function useActions() {
     (payment: Payment) =>
       getEntityState(payment) === EntityState.Archived &&
       getEntityState(payment) !== EntityState.Deleted &&
-      isEditPage && (
+      (isEditPage || showCommonBulkAction) && (
         <DropdownElement
           onClick={() => bulk([payment.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -96,7 +113,7 @@ export function useActions() {
     (payment: Payment) =>
       (getEntityState(payment) === EntityState.Active ||
         getEntityState(payment) === EntityState.Archived) &&
-      isEditPage && (
+      (isEditPage || showCommonBulkAction) && (
         <DropdownElement
           onClick={() => bulk([payment.id], 'delete')}
           icon={<Icon element={MdDelete} />}

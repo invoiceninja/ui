@@ -1092,3 +1092,31 @@ test('The new_expense_category action is shown on the badge dropdown with only c
 
   await logout(page);
 });
+
+test('Creating expense with Save / Create button', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await page.getByRole('button', { name: 'Save / Create' }).click();
+
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/create');
+
+  await logout(page);
+});

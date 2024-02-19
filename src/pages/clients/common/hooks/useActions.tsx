@@ -70,7 +70,17 @@ export function useActions(params: Params) {
     (client) =>
       !client.is_deleted && (
         <DropdownElement
-          onClick={() => window.open(client.contacts[0].link, '__blank')}
+          onClick={() =>
+            window.open(
+              route(
+                `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
+                {
+                  clientHash: client.client_hash,
+                }
+              ),
+              '__blank'
+            )
+          }
           icon={<Icon element={MdCloudCircle} />}
         >
           {t('client_portal')}
