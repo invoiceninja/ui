@@ -130,7 +130,8 @@ jobs:
             VITE_IS_TEST: true
             VITE_ROUTER: browser
       - name: List directories
-        run: ls -d */
+        run: |
+          ls -d */
       - uses: actions/upload-artifact@v3
         if: always()
         with:
