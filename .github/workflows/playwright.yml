@@ -128,6 +128,7 @@ jobs:
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
             VITE_ROUTER: browser
+            CI: true
       - uses: actions/upload-artifact@v3
         if: always()
         with:
