@@ -168,7 +168,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (client) =>
-      (isAdmin || isOwner) && client && <PurgeClientAction client={client} />,
+      (isAdmin || isOwner) &&
+      client && <PurgeClientAction key="purge" client={client} />,
   ];
 
   return actions;

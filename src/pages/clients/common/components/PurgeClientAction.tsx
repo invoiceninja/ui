@@ -33,7 +33,6 @@ export function PurgeClientAction(props: Props) {
   return (
     <>
       <DropdownElement
-        key="purge"
         onClick={() => setPasswordConfirmModalOpen(true)}
         icon={<Icon element={MdDeleteForever} />}
       >

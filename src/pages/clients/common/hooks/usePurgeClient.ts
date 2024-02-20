@@ -34,9 +34,9 @@ export function usePurgeClient() {
       .then(() => {
         toast.success('purged_client');
 
-        queryClient.invalidateQueries();
-
         navigate('/clients');
+
+        queryClient.invalidateQueries();
       })
       .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
