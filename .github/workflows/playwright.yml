@@ -68,10 +68,13 @@ jobs:
       - name: Install Apache
         run: sudo apt-get update && sudo apt-get install -y apache2
 
-      - name: Configure Apache Port
+      - name: Enable Apache Modules
+        run: sudo a2enmod proxy proxy_http
+
+      - name: Configure Apache Proxy
         run: |
-          sudo sed -i "s/Listen 80/Listen 8000/" /etc/apache2/ports.conf
-          sudo sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:8000>/" /etc/apache2/sites-available/000-default.conf
+          echo "ProxyPass / http://in.localhost:8000/" | sudo tee /etc/apache2/sites-available/000-default.conf
+          echo "ProxyPassReverse / http://in.localhost:8000/" | sudo tee -a /etc/apache2/sites-available/000-default.conf
 
       - name: Start Apache
         run: sudo service apache2 start
