@@ -63,10 +63,12 @@ jobs:
     steps:
       - name: Add hosts to /etc/hosts
         run: |
-          sudo echo "127.0.0.1 in.localhost" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 in.localhost:8000" | sudo tee -a /etc/hosts
 
       - name: Install Apache
-        run: sudo apt-get update && sudo apt-get install -y apache2
+        run: |
+          sudo apt-get update && sudo apt-get install -y apache2
+          sudo sed -i 's/Listen 80/Listen 8000/' /etc/apache2/ports.conf
 
       - name: Start Apache
         run: sudo service apache2 start
