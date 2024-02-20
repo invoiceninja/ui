@@ -8,15 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useProductsQuery } from '$app/common/queries/products';
 import { Spinner } from '$app/components/Spinner';
 import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { Product } from '$app/common/interfaces/product';
+import { useQuery } from 'react-query';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 interface Props {
   value?: string;
@@ -29,9 +33,28 @@ export function ProductItemsSelector(props: Props) {
 
   const { value, onValueChange, errorMessage } = props;
 
-  const [productItems, setProductItems] = useState<SelectOption[]>();
+  const filterTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const { data: products } = useProductsQuery({ status: ['active'] });
+  const [productItems, setProductItems] = useState<SelectOption[]>();
+  const [filter, setFilter] = useState<string>('');
+
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['/api/v1/products', 'perPage=500', 'status=active', filter],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/products?per_page=4&include=&status=active&filter=:filter',
+          {
+            filter,
+          }
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Product[]>) =>
+          response.data.data
+      ),
+    staleTime: Infinity,
+  });
 
   useEffect(() => {
     if (products) {
@@ -101,21 +124,42 @@ export function ProductItemsSelector(props: Props) {
     <>
       {productItems ? (
         <Element leftSide={t('products')}>
-          <Select
-            id="productItemSelector"
-            placeholder={t('products')}
-            {...(value && {
-              value: productItems?.filter((option) =>
-                value
-                  .split(',')
-                  .find((productKey) => productKey === option.value)
-              ),
-            })}
-            onChange={(options) => onValueChange(handleChange(options))}
-            options={productItems}
-            isMulti={true}
-            styles={customStyles}
-          />
+          <div className="flex space-x-3">
+            <div className="flex-1">
+              <Select
+                id="productItemSelector"
+                placeholder={t('products')}
+                {...(value && {
+                  value: productItems?.filter((option) =>
+                    value
+                      .split(',')
+                      .find((productKey) => productKey === option.value)
+                  ),
+                })}
+                onChange={(options) => onValueChange(handleChange(options))}
+                options={productItems}
+                onInputChange={(filterValue) => {
+                  clearTimeout(filterTimeOut.current);
+
+                  const currentTimeout = setTimeout(
+                    () => setFilter(filterValue),
+                    600
+                  );
+
+                  filterTimeOut.current = currentTimeout;
+                }}
+                isMulti={true}
+                styles={customStyles}
+                isSearchable
+              />
+            </div>
+
+            {isLoading && (
+              <div className="flex justify-center items-center">
+                <Spinner />
+              </div>
+            )}
+          </div>
         </Element>
       ) : (
         <div className="flex justify-center items-center">
