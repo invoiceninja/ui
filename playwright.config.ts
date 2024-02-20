@@ -54,7 +54,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         bypassCSP: true,
         launchOptions: {
-          args: ['--disable-web-security', '--host-resolver-rules=MAP 127.0.0.1 ninja.test'],
+          args: ['--disable-web-security', '--host-resolver-rules=MAP 127.0.0.1 ninja.test', '--no-sandbox'],
         },
       },
     },
