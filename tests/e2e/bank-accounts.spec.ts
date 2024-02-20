@@ -1,6 +1,11 @@
 import { login, logout } from '$tests/e2e/helpers';
 import test, { expect, request } from '@playwright/test';
 
+test('API URL reachable', async ({ page }) => {
+  const endpoint = process.env.VITE_API_URL;
+  await expect(page.goto('http://ninja.test'));
+});
+
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
 
