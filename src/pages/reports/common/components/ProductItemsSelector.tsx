@@ -46,9 +46,10 @@ export function ProductItemsSelector(props: Props) {
       request(
         'GET',
         endpoint(
-          '/api/v1/products?per_page=4&include=&status=active&filter=:filter',
+          '/api/v1/products?per_page=:perPage&include=&status=active&filter=:filter',
           {
             filter,
+            perPage: import.meta.env.VITE_IS_TEST === 'true' ? 4 : 500,
           }
         )
       ).then(
@@ -84,9 +85,10 @@ export function ProductItemsSelector(props: Props) {
               request(
                 'GET',
                 endpoint(
-                  '/api/v1/products?per_page=4&include=&status=active&filter=:filter',
+                  '/api/v1/products?per_page=:perPage&include=&status=active&filter=:filter',
                   {
                     filter: currentFilter,
+                    perPage: import.meta.env.VITE_IS_TEST === 'true' ? 4 : 500,
                   }
                 )
               ).then(
