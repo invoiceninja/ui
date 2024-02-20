@@ -44,6 +44,10 @@ export default defineConfig({
     /** Screenshots & videos. */
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    proxy: {
+      server: 'http://ninja.test',
+      bypass: 'localhost',
+    },
   },
 
   /* Configure projects for major browsers */
