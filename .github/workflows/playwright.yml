@@ -40,7 +40,7 @@ jobs:
       MAIL_MAILER: log
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-      VITE_API_URL: http://in.localhost
+      VITE_API_URL: http://in.localhost:8000
 
     services:
       mariadb:
@@ -67,6 +67,11 @@ jobs:
 
       - name: Install Apache
         run: sudo apt-get update && sudo apt-get install -y apache2
+
+      - name: Configure Apache Port
+        run: |
+          sudo sed -i "s/Listen 80/Listen 8000/" /etc/apache2/ports.conf
+          sudo sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:8000>/" /etc/apache2/sites-available/000-default.conf
 
       - name: Start Apache
         run: sudo service apache2 start
@@ -124,7 +129,7 @@ jobs:
           npm run preview &
           npx playwright test --trace on --workers=1 --reporter=list --max-failures=5
           env:
-            VITE_API_URL: http://in.localhost
+            VITE_API_URL: http://in.localhost:8000
             PLAYWRIGHT_BASE_URL: http://localhost:4173
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
