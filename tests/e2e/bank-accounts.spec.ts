@@ -3,7 +3,9 @@ import test, { expect, request } from '@playwright/test';
 
 test('API URL reachable', async ({ page }) => {
   const endpoint = process.env.VITE_API_URL;
-  await expect(page.goto('http://ninja.test'));
+  await page.goto('http://ninja.test');
+
+  expect(page).toBeTruthy()
 });
 
 test('API URL correct Reachable', () => {
