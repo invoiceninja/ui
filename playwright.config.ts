@@ -44,10 +44,6 @@ export default defineConfig({
     /** Screenshots & videos. */
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    proxy: {
-      server: 'http://ninja.test',
-      bypass: 'localhost',
-    },
   },
 
   /* Configure projects for major browsers */
@@ -58,7 +54,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         bypassCSP: true,
         launchOptions: {
-          args: ['--disable-web-security', '--host-resolver-rules=MAP 127.0.0.1 ninja.test', '--no-sandbox'],
+          args: ['--disable-web-security'],
         },
       },
     },
