@@ -14,20 +14,17 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { route } from '$app/common/helpers/route';
 import { Gateways } from './components/Gateways';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
-import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -35,23 +32,10 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
+  const [t] = useTranslation();
+
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id, enabled: true });
-
-  const [t] = useTranslation();
-  const navigate = useNavigate();
-
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
-
-  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
-
-  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    setDocumentTitle(client?.display_name || 'view_client');
-  }, [client]);
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -61,14 +45,16 @@ export default function Client() {
     },
   ];
 
-  const handlePurgeClient = usePurgeClient(id);
-
   const tabs = useTabs();
+  const actions = useActions();
 
-  const actions = useActions({
-    setIsMergeModalOpen,
-    setPasswordConfirmModalOpen,
-  });
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  useEffect(() => {
+    setDocumentTitle(client?.display_name || 'view_client');
+  }, [client]);
 
   return (
     <Default
@@ -108,21 +94,6 @@ export default function Client() {
           </div>
         </>
       )}
-
-      {id && (
-        <MergeClientModal
-          visible={isMergeModalOpen}
-          setVisible={setIsMergeModalOpen}
-          mergeFromClientId={id}
-          editPage
-        />
-      )}
-
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={handlePurgeClient}
-      />
     </Default>
   );
 }
