@@ -19,7 +19,7 @@ import { Alert } from '$app/components/Alert';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Product } from '$app/common/interfaces/product';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 interface Props {
@@ -30,13 +30,15 @@ interface Props {
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const queryClient = useQueryClient();
 
   const { value, onValueChange, errorMessage } = props;
 
   const filterTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const [productItems, setProductItems] = useState<SelectOption[]>();
   const [filter, setFilter] = useState<string>('');
+  const [isInitial, setIsInitial] = useState<boolean>(Boolean(value));
+  const [productItems, setProductItems] = useState<SelectOption[]>();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['/api/v1/products', 'perPage=500', 'status=active', filter],
@@ -53,6 +55,7 @@ export function ProductItemsSelector(props: Props) {
         (response: GenericSingleResourceResponse<Product[]>) =>
           response.data.data
       ),
+    enabled: !isInitial,
     staleTime: Infinity,
   });
 
@@ -68,6 +71,55 @@ export function ProductItemsSelector(props: Props) {
       );
     }
   }, [products]);
+
+  useEffect(() => {
+    if (value && isInitial) {
+      (async () => {
+        for (let index = 0; index < value.split(',').length; index++) {
+          const currentFilter = value.split(',')[index];
+
+          const productsResponse = await queryClient.fetchQuery<Product[]>(
+            ['/api/v1/products', 'perPage=500', 'status=active', currentFilter],
+            () =>
+              request(
+                'GET',
+                endpoint(
+                  '/api/v1/products?per_page=4&include=&status=active&filter=:filter',
+                  {
+                    filter: currentFilter,
+                  }
+                )
+              ).then(
+                (response: GenericSingleResourceResponse<Product[]>) =>
+                  response.data.data
+              ),
+            { staleTime: Infinity }
+          );
+
+          setProductItems((currentProductItems) => {
+            const productItemsList = currentProductItems || [];
+
+            const currentProductList = !productItemsList.find(
+              ({ value }) => value === currentFilter
+            )
+              ? productsResponse
+                  .map((product) => ({
+                    value: product.product_key,
+                    label: product.product_key,
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                  }))
+                  .filter((product) => product.value === currentFilter)
+              : [];
+
+            return [...productItemsList, ...currentProductList];
+          });
+        }
+
+        setIsInitial(false);
+      })();
+    }
+  }, [value]);
 
   const handleChange = (
     products: MultiValue<{ value: string; label: string }>
@@ -122,7 +174,7 @@ export function ProductItemsSelector(props: Props) {
 
   return (
     <>
-      {productItems ? (
+      {productItems && !isInitial ? (
         <Element leftSide={t('products')}>
           <div className="flex space-x-3">
             <div className="flex-1">
@@ -130,7 +182,7 @@ export function ProductItemsSelector(props: Props) {
                 id="productItemSelector"
                 placeholder={t('products')}
                 {...(value && {
-                  value: productItems?.filter((option) =>
+                  defaultValue: productItems?.filter((option) =>
                     value
                       .split(',')
                       .find((productKey) => productKey === option.value)
