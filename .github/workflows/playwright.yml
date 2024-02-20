@@ -40,7 +40,7 @@ jobs:
       MAIL_MAILER: log
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-      VITE_API_URL: http://ninja.test
+      VITE_API_URL: http://ninja.test:8000
 
     services:
       mariadb:
@@ -111,6 +111,7 @@ jobs:
           sudo find ./ -type d -exec chmod 755 {} \;
           php artisan migrate:fresh --seed
           php artisan db:seed --class=RandomDataSeeder
+          php artisan serve --port=8000 &
 
       - name: Prepare React FrontEnd
         run: |
@@ -123,7 +124,7 @@ jobs:
           npm run build
           npx playwright test --workers=1 --reporter=list --max-failures=1
           env:
-            VITE_API_URL: http://ninja.test
+            VITE_API_URL: http://ninja.test:8000
             PLAYWRIGHT_BASE_URL: http://localhost:4173
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
             VITE_IS_TEST: true
