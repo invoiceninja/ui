@@ -10,7 +10,7 @@
 
 export interface TaskActivity {
   user: Client;
-  quote: Client;
+  task: Client;
   contact: Client;
   client: Client;
   activity_type_id: number;

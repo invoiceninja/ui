@@ -18,11 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
@@ -31,17 +30,22 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useActions } from '../hooks';
-import { EmailRecord } from '$app/components/EmailRecord';
-import { useEffect, useState } from 'react';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { QuoteActivity } from '$app/common/interfaces/quote-activity';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { TaskStatus } from './TaskStatus';
 import { Task } from '$app/common/interfaces/task';
 import { TaskActivity } from '$app/common/interfaces/task-activity';
+import {
+  calculateDifferenceBetweenLogs,
+  calculateHours,
+} from '../helpers/calculate-time';
+import {
+  calculateEntityState,
+  isTaskRunning,
+} from '../helpers/calculate-entity-state';
+import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { date as formatDate } from '$app/common/helpers';
+import { useFormatTimeLog } from '../../kanban/common/hooks';
+import { TaskClock } from '../../kanban/components/TaskClock';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -61,14 +65,14 @@ function useGenerateActivityElement() {
         </Link>
       ),
       user: activity.user?.label ?? t('system'),
-      quote:
+      task:
         (
           <Link
-            to={route('/quotes/:id/edit', {
-              id: activity.quote?.hashed_id,
+            to={route('/tasks/:id/edit', {
+              id: activity.task?.hashed_id,
             })}
           >
-            {activity?.quote?.label}
+            {activity?.task?.label}
           </Link>
         ) ?? '',
       contact:
@@ -94,7 +98,6 @@ function useGenerateActivityElement() {
 
 export function TaskSlider() {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
 
   const actions = useActions({
     showCommonBulkAction: true,
@@ -103,69 +106,29 @@ export function TaskSlider() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const formatTimeLog = useFormatTimeLog();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-  const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
 
   const [task, setTask] = useAtom(taskSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(taskSliderVisibilityAtom);
 
-  const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
-
-  const { data: invoiceResponse } = useInvoiceQuery({ id: task?.invoice_id });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: resource } = useQuery({
-    queryKey: ['/api/v1/tasks', task?.id, 'slider'],
-    queryFn: () =>
-      request(
-        'GET',
-        endpoint(
-          `/api/v1/tasks/${task?.id}?include=activities.history&reminder_schedule=true`
-        )
-      ).then(
-        (response: GenericSingleResourceResponse<Task>) => response.data.data
-      ),
-    enabled: task !== null && isVisible,
-    staleTime: Infinity,
-  });
+  const currentTaskTimeLogs = task && formatTimeLog(task.time_log);
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', task?.id, 'quote'],
+    queryKey: ['/api/v1/activities', task?.id, 'task'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'quote',
+        entity: 'task',
         entity_id: task?.id,
       }).then(
-        (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
+        (response: AxiosResponse<GenericManyResponse<TaskActivity>>) =>
           response.data.data
       ),
     enabled: task !== null && isVisible,
     staleTime: Infinity,
   });
-
-  const fetchEmailHistory = async () => {
-    const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/quotes', task?.id, 'emailHistory'],
-        () =>
-          request('POST', endpoint('/api/v1/emails/entityHistory'), {
-            entity: 'quote',
-            entity_id: task?.id,
-          }),
-        { staleTime: Infinity }
-      )
-      .then((response) => response.data);
-
-    setEmailRecords(response);
-  };
-
-  useEffect(() => {
-    if (task) {
-      fetchEmailHistory();
-    }
-  }, [task]);
 
   return (
     <Slider
@@ -188,18 +151,25 @@ export function TaskSlider() {
       }
       withoutActionContainer
     >
-      <TabGroup
-        tabs={[t('overview'), t('activity'), t('email_history')]}
-        width="full"
-      >
+      <TabGroup tabs={[t('overview'), t('activity')]} width="full">
         <div className="space-y-2">
           <div>
-            <Element leftSide={t('quote_amount')}>12222</Element>
+            <Element leftSide={t('amount')}>
+              {task
+                ? formatMoney(
+                    task.rate * calculateTaskHours(task.time_log),
+                    task.client?.country_id,
+                    task.client?.settings.currency_id
+                  )
+                : null}
+            </Element>
 
-            <Element leftSide={t('balance_due')}>12222</Element>
+            <Element leftSide={t('entity_state')}>
+              {task ? t(calculateEntityState(task)) : null}
+            </Element>
 
-            <Element leftSide={t('date')}>
-              {task ? date(task?.date, dateFormat) : null}
+            <Element leftSide={t('duration')}>
+              {task ? calculateHours(task.time_log.toString(), true) : null}
             </Element>
 
             <Element leftSide={t('status')}>
@@ -209,36 +179,29 @@ export function TaskSlider() {
 
           <Divider withoutPadding />
 
-          {invoiceResponse && (
-            <ClickableElement
-              to={route('/invoices/:id/edit', {
-                id: invoiceResponse.id,
-              })}
-              disableNavigation={disableNavigation('invoice', invoiceResponse)}
-            >
-              <div className="flex flex-col space-y-2">
-                <p className="font-semibold">
-                  {t('invoice')} {invoiceResponse.number}
-                </p>
+          {task &&
+            currentTaskTimeLogs?.map(([date, start, end], i) => (
+              <ClickableElement key={i}>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <p>{formatDate(date, dateFormat)}</p>
 
-                <div className="flex items-center space-x-1">
-                  <p>
-                    {formatMoney(
-                      invoiceResponse.amount,
-                      invoiceResponse.client?.country_id,
-                      invoiceResponse.client?.settings.currency_id
+                    <small>
+                      {start} - {end}
+                    </small>
+                  </div>
+
+                  <div>
+                    {isTaskRunning(task) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock task={task} calculateLastTimeLog={true} />
+                    ) : (
+                      calculateDifferenceBetweenLogs(task.time_log, i)
                     )}
-                  </p>
-                  <p>&middot;</p>
-                  <p>{date(invoiceResponse.date, dateFormat)}</p>
+                  </div>
                 </div>
-
-                <div>
-                  <InvoiceStatus entity={invoiceResponse} />
-                </div>
-              </div>
-            </ClickableElement>
-          )}
+              </ClickableElement>
+            ))}
         </div>
 
         <div>
@@ -251,17 +214,6 @@ export function TaskSlider() {
                 <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
-          ))}
-        </div>
-
-        <div className="flex flex-col">
-          {emailRecords?.map((emailRecord, index) => (
-            <EmailRecord
-              key={index}
-              className="py-4"
-              emailRecord={emailRecord}
-              index={index}
-            />
           ))}
         </div>
       </TabGroup>
