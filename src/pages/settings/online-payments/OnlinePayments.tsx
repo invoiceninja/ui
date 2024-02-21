@@ -196,6 +196,30 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
 
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="use_unapplied_payment"
+              labelElement={
+                <SettingsLabel label={t('use_unapplied_payments')} />
+              }
+              defaultValue="off"
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings.use_unapplied_payment || 'off'}
+            id="settings.use_unapplied_payment"
+            onChange={handleChange}
+            disabled={disableSettingsField('use_unapplied_payment')}
+            errorMessage={errors?.errors['settings.use_unapplied_payment']}
+          >
+            <option value="always">{t('enabled')}</option>
+            <option value="option">{t('show_option')}</option>
+            <option value="off">{t('off')}</option>
+          </SelectField>
+        </Element>
+
         {paymentTerms && (
           <>
             <Element
