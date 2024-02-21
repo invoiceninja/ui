@@ -1,6 +1,12 @@
 import { login, logout } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
+test('test cloneee', () => {
+  const endpoint = process.env.VITE_API_URL;
+
+  expect(endpoint).toEqual('http://ninja.test:8000');
+});
+
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
 
