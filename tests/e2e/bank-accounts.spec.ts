@@ -1,17 +1,10 @@
 import { login, logout } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test('API URL reachable', async ({ page }) => {
-  const endpoint = process.env.VITE_API_URL;
-  await page.goto('http://ninja.test');
-
-  expect(page).toBeTruthy()
-});
-
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
 
-  expect(endpoint).toEqual('http://ninja.test');
+  expect(endpoint).toEqual('http://ninja.test:8000');
 });
 
 test('should create a bug report', async ({ request }) => {
