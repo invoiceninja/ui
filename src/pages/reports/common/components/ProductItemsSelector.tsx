@@ -61,7 +61,7 @@ export function ProductItemsSelector(props: Props) {
   });
 
   useEffect(() => {
-    if (products) {
+    if (products && !isInitial) {
       setProductItems(
         products.map((product) => ({
           value: product.product_key,
@@ -71,7 +71,7 @@ export function ProductItemsSelector(props: Props) {
         }))
       );
     }
-  }, [products]);
+  }, [products, isInitial]);
 
   useEffect(() => {
     if (value && isInitial) {
@@ -114,7 +114,7 @@ export function ProductItemsSelector(props: Props) {
                   .filter((product) => product.value === currentFilter)
               : [];
 
-            return [...productItemsList, ...currentProductList];
+            return [...productItemsList, currentProductList[0]];
           });
         }
 
