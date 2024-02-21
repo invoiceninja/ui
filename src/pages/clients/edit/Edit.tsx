@@ -19,16 +19,13 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientQuery } from '$app/common/queries/clients';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useActions } from '../common/hooks/useActions';
-import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
@@ -45,17 +42,13 @@ export default function Edit() {
 
   const navigate = useNavigate();
 
+  const actions = useActions();
+
   const { data, isLoading } = useClientQuery({ id, enabled: true });
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
-  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState<boolean>(false);
-
-  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
-
-  const onPasswordConformation = usePurgeClient(id);
 
   useEffect(() => {
     if (data) {
@@ -119,11 +112,6 @@ export default function Edit() {
       });
   };
 
-  const actions = useActions({
-    setIsMergeModalOpen,
-    setPasswordConfirmModalOpen,
-  });
-
   return (
     <Default
       title={documentTitle}
@@ -176,21 +164,6 @@ export default function Edit() {
           </div>
         </div>
       )}
-
-      {id && (
-        <MergeClientModal
-          visible={isMergeModalOpen}
-          setVisible={setIsMergeModalOpen}
-          mergeFromClientId={id}
-          editPage
-        />
-      )}
-
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={onPasswordConformation}
-      />
     </Default>
   );
 }

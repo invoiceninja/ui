@@ -16,13 +16,13 @@ import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
-export function usePurgeClient(clientId: string | undefined) {
+export function usePurgeClient() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
-  return (password: string) => {
+  return (password: string, clientId: string) => {
     toast.processing();
 
     request(
