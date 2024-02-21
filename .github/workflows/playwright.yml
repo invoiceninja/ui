@@ -63,18 +63,10 @@ jobs:
     steps:
       - name: Add hosts to /etc/hosts
         run: |
-          sudo echo "127.0.0.1 in.localhost" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 ninja.test" | sudo tee -a /etc/hosts
 
       - name: Install Apache
         run: sudo apt-get update && sudo apt-get install -y apache2
-
-      - name: Enable Apache Modules
-        run: sudo a2enmod proxy proxy_http
-
-      - name: Configure Apache Proxy
-        run: |
-          echo "ProxyPass / http://in.localhost:8000/" | sudo tee /etc/apache2/sites-available/000-default.conf
-          echo "ProxyPassReverse / http://in.localhost:8000/" | sudo tee -a /etc/apache2/sites-available/000-default.conf
 
       - name: Start Apache
         run: sudo service apache2 start
