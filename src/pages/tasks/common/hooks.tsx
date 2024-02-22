@@ -29,6 +29,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
@@ -396,12 +397,18 @@ export function useTaskFilters() {
   return filters;
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
+
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
@@ -424,6 +431,16 @@ export function useActions() {
   };
 
   const actions = [
+    (task: Task) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/tasks/:id/edit', { id: task.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -465,9 +482,12 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       getEntityState(task) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([task.id], 'archive')}
@@ -477,7 +497,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Archived ||
         getEntityState(task) === EntityState.Deleted) && (
         <DropdownElement
@@ -488,7 +508,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Active ||
         getEntityState(task) === EntityState.Archived) && (
         <DropdownElement
