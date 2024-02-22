@@ -114,7 +114,9 @@ export function ProductItemsSelector(props: Props) {
                   .filter((product) => product.value === currentFilter)
               : [];
 
-            return [...productItemsList, currentProductList[0]];
+            return currentProductList[0]
+              ? [...productItemsList, currentProductList[0]]
+              : [...productItemsList];
           });
         }
 
