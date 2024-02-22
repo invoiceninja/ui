@@ -116,6 +116,8 @@ test('can view transaction', async ({ page }) => {
     .getByRole('link', { name: 'Transactions', exact: true })
     .click();
 
+  await page.waitForTimeout(1000);
+
   await checkTableEditability(page, false);
 
   await page.getByRole('row').nth(1).getByRole('link').first().click();
