@@ -288,6 +288,7 @@ export interface Settings {
   client_portal_under_payment_minimum: number;
   client_portal_allow_over_payment: boolean;
   use_credits_payment: string;
+  use_unapplied_payment: string;
   hide_empty_columns_on_pdf: boolean;
   email_from_name: string;
   auto_archive_invoice_cancelled: boolean;
