@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
+import { Button } from './Button';
 
 interface Props {
   value?: string;
@@ -51,6 +52,14 @@ export function ColorPicker(props: Props) {
           className="border rounded-md my-2 p-2 border-gray-300"
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
         />
+
+        <Button
+          className="w-full"
+          behavior="button"
+          onClick={() => setIsModalOpen(false)}
+        >
+          {t('done')}
+        </Button>
       </Modal>
 
       <div
