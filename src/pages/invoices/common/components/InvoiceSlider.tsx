@@ -60,7 +60,9 @@ dayjs.extend(relativeTime);
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
-  return (activity: InvoiceActivity) => {
+  const formatMoney = useFormatMoney();
+
+  return (activity: InvoiceActivity, invoice: Invoice | null) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
@@ -69,7 +71,6 @@ export function useGenerateActivityElement() {
           {activity.client?.label}
         </Link>
       ),
-
       user: activity.user?.label ?? t('system'),
       invoice:
         (
@@ -81,7 +82,21 @@ export function useGenerateActivityElement() {
             {activity?.invoice?.label}
           </Link>
         ) ?? '',
-
+      payment_amount: formatMoney(
+        activity.payment_amount,
+        invoice?.client?.country_id,
+        invoice?.client?.settings.currency_id
+      ),
+      payment:
+        (
+          <Link
+            to={route('/payments/:id/edit', {
+              id: activity.payment?.hashed_id,
+            })}
+          >
+            {activity?.payment?.label}
+          </Link>
+        ) ?? '',
       recurring_invoice:
         (
           <Link
@@ -92,7 +107,6 @@ export function useGenerateActivityElement() {
             {activity?.recurring_invoice?.label}
           </Link>
         ) ?? '',
-
       contact:
         (
           <Link
@@ -339,37 +353,42 @@ export function InvoiceSlider() {
 
           <div className="divide-y">
             {resource?.payments &&
-              resource.payments.map((payment: Payment) => (
-                payment.paymentables.filter((item) => item.invoice_id == invoice?.id && item.archived_at == 0).map((paymentable: Paymentable) => (
-                <ClickableElement
-                  key={payment.id}
-                  to={`/payments/${payment.id}/edit`}
-                  disableNavigation={disableNavigation('payment', payment)}
-                >
-                  <div className="flex flex-col space-y-2">
-                    <p className="font-semibold">
-                      {t('payment')} {payment.number}
-                    </p>
+              resource.payments.map((payment: Payment) =>
+                payment.paymentables
+                  .filter(
+                    (item) =>
+                      item.invoice_id == invoice?.id && item.archived_at == 0
+                  )
+                  .map((paymentable: Paymentable) => (
+                    <ClickableElement
+                      key={payment.id}
+                      to={`/payments/${payment.id}/edit`}
+                      disableNavigation={disableNavigation('payment', payment)}
+                    >
+                      <div className="flex flex-col space-y-2">
+                        <p className="font-semibold">
+                          {t('payment')} {payment.number}
+                        </p>
 
-                    <p className="inline-flex items-center space-x-1">
-                      <p>
-                        {formatMoney(
-                          paymentable.amount,
-                          payment.client?.country_id,
-                          payment.client?.settings.currency_id
-                        )}
-                      </p>
-                      <p>&middot;</p>
-                        <p>{date(paymentable.created_at, dateFormat)}</p>
-                    </p>
+                        <p className="inline-flex items-center space-x-1">
+                          <p>
+                            {formatMoney(
+                              paymentable.amount,
+                              payment.client?.country_id,
+                              payment.client?.settings.currency_id
+                            )}
+                          </p>
+                          <p>&middot;</p>
+                          <p>{date(paymentable.created_at, dateFormat)}</p>
+                        </p>
 
-                    <div>
-                      <PaymentStatus entity={payment} />
-                    </div>
-                  </div>
-                </ClickableElement>
-                ))
-              ))}
+                        <div>
+                          <PaymentStatus entity={payment} />
+                        </div>
+                      </div>
+                    </ClickableElement>
+                  ))
+              )}
           </div>
         </div>
 
@@ -420,7 +439,7 @@ export function InvoiceSlider() {
         <div>
           {activities2?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
+              <p>{activityElement(activity, invoice)}</p>
               <p className="inline-flex items-center space-x-1">
                 <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
                 <p>&middot;</p>

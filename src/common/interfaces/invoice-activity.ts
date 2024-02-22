@@ -13,6 +13,7 @@ export interface InvoiceActivity {
   invoice: Client;
   contact: Client;
   client: Client;
+  payment: Client;
   activity_type_id: number;
   id: string;
   hashed_id: string;
@@ -20,6 +21,7 @@ export interface InvoiceActivity {
   created_at: number;
   ip: string;
   recurring_invoice?: Client;
+  payment_amount: number;
 }
 
 export interface Client {
