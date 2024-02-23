@@ -26,6 +26,7 @@ import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { Alert } from '../Alert';
+import { ImportTemplateModal } from './ImportTemplateModal';
 
 interface Props {
   entity: string;
@@ -34,7 +35,7 @@ interface Props {
   type: string;
 }
 
-interface ImportMap extends Record<string, any> {
+export interface ImportMap extends Record<string, any> {
   hash: string;
   import_type: string;
   skip_header: boolean;
@@ -383,13 +384,11 @@ export function UploadImport(props: Props) {
             )}
             <Tr>
               <Td colSpan={2}>
-                <Button
-                  className="flex float-right"
-                  behavior="button"
-                  onClick={processImport}
-                >
-                  {t('import')}
-                </Button>
+                <ImportTemplateModal
+                  entity={props.entity}
+                  importMap={payload}
+                  onImport={processImport}
+                />
               </Td>
             </Tr>
           </Tbody>
