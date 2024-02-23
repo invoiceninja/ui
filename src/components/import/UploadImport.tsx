@@ -320,6 +320,16 @@ export function UploadImport(props: Props) {
       </Card>
 
       {mapData && !isImportFileTypeZip && (
+        <Card className="mt-4">
+          <Element leftSide={t('template')}>
+            <SelectField>
+              <option>ttt</option>
+            </SelectField>
+          </Element>
+        </Card>
+      )}
+
+      {mapData && !isImportFileTypeZip && (
         <Table>
           <Thead>
             <Th>{t('header')}</Th>

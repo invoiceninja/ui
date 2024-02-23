@@ -13,7 +13,7 @@ import { Button, InputField } from '../forms';
 import { ImportMap } from './UploadImport';
 import { useState } from 'react';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { isEqual, set } from 'lodash';
+import { cloneDeep, isEqual, set } from 'lodash';
 import { Modal } from '../Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
@@ -21,9 +21,10 @@ import { endpoint } from '$app/common/helpers';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
+import { User } from '$app/common/interfaces/user';
+import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {
   entity: string;
@@ -34,7 +35,7 @@ export function ImportTemplateModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const currentUser = useCurrentUser();
+  const user = useUserChanges();
   const reactSettings = useReactSettings();
 
   console.log(reactSettings);
@@ -102,31 +103,35 @@ export function ImportTemplateModal(props: Props) {
       toast.processing();
       setIsFormBusy(true);
 
-      const updatedUser = { ...currentUser };
+      const updatedUser = cloneDeep(user) as User;
 
-      set(
-        updatedUser,
-        `company_user.react_settings.import_templates.${templateName}`,
-        importMap.column_map
-      );
+      if (updatedUser) {
+        set(
+          updatedUser,
+          `company_user.react_settings.import_templates.${props.entity}.${templateName}`,
+          importMap.column_map?.[props.entity]?.mapping
+        );
 
-      request(
-        'PUT',
-        endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-        updatedUser
-      )
-        .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-          toast.success('updated_settings');
+        request(
+          'PUT',
+          endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+          updatedUser
+        )
+          .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+            toast.success('updated_settings');
 
-          set(updatedUser, 'company_user', response.data.data);
+            set(updatedUser, 'company_user', response.data.data);
 
-          $refetch(['company_users']);
+            $refetch(['company_users']);
 
-          dispatch(updateUser(updatedUser));
+            dispatch(updateUser(updatedUser));
 
-          setIsTemplateModalOpen(false);
-        })
-        .finally(() => setIsFormBusy(false));
+            handleOnClose();
+
+            onImport();
+          })
+          .finally(() => setIsFormBusy(false));
+      }
     }
   };
 
