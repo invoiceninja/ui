@@ -151,7 +151,7 @@ export function ImportTemplateModal(props: Props) {
       </Button>
 
       <Modal
-        title={t('template')}
+        title={t('save_as_template')}
         visible={isTemplateModalOpen}
         onClose={handleOnClose}
       >
