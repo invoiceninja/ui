@@ -35,12 +35,12 @@ export function ImportTemplateModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
+  const { onImport, importMap, entity } = props;
+
   const user = useUserChanges();
   const reactSettings = useReactSettings();
 
   console.log(reactSettings);
-
-  const { onImport, importMap, entity } = props;
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] =
     useState<boolean>(false);
@@ -63,17 +63,18 @@ export function ImportTemplateModal(props: Props) {
 
     let isSameTemplateSaved = false;
 
-    Object.entries(reactSettings?.import_templates?.[entity]).forEach(
-      ([templateName, columnMap]) => {
+    Object.values(reactSettings?.import_templates?.[entity]).forEach(
+      (columnMap) => {
         if (
           isEqual(
-            reactSettings?.import_templates?.[entity]?.[templateName],
-            importMap.column_map
+            columnMap,
+            Object.values(importMap.column_map?.[entity]?.mapping).map(
+              (column) => column || ''
+            )
           )
         ) {
           isSameTemplateSaved = true;
         }
-        console.log(templateName, columnMap);
       }
     );
 
@@ -109,7 +110,9 @@ export function ImportTemplateModal(props: Props) {
         set(
           updatedUser,
           `company_user.react_settings.import_templates.${props.entity}.${templateName}`,
-          importMap.column_map?.[props.entity]?.mapping
+          Object.values(importMap.column_map?.[props.entity]?.mapping).map(
+            (column) => column || ''
+          )
         );
 
         request(
@@ -148,7 +151,7 @@ export function ImportTemplateModal(props: Props) {
       </Button>
 
       <Modal
-        title={t('save_as_template')}
+        title={t('template')}
         visible={isTemplateModalOpen}
         onClose={handleOnClose}
       >
@@ -168,7 +171,7 @@ export function ImportTemplateModal(props: Props) {
               handleOnClose();
             }}
           >
-            {t('skip')}
+            {t('import')}
           </Button>
 
           <Button
@@ -177,7 +180,7 @@ export function ImportTemplateModal(props: Props) {
             disabled={!templateName || isTemplateNameDuplicated()}
             disableWithoutIcon
           >
-            {t('save')}
+            {t('save')} & {t('import')}
           </Button>
         </div>
       </Modal>
