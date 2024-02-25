@@ -30,17 +30,16 @@ interface Props {
   entity: string;
   importMap: ImportMap;
   onImport: () => void;
+  onCreatedTemplate: (name: string) => void;
 }
 export function ImportTemplateModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const { onImport, importMap, entity } = props;
+  const { onImport, onCreatedTemplate, importMap, entity } = props;
 
   const user = useUserChanges();
   const reactSettings = useReactSettings();
-
-  console.log(reactSettings);
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] =
     useState<boolean>(false);
@@ -131,6 +130,8 @@ export function ImportTemplateModal(props: Props) {
 
             handleOnClose();
 
+            onCreatedTemplate(templateName);
+
             onImport();
           })
           .finally(() => setIsFormBusy(false));
@@ -170,6 +171,8 @@ export function ImportTemplateModal(props: Props) {
               onImport();
               handleOnClose();
             }}
+            disabled={isFormBusy}
+            disableWithoutIcon
           >
             {t('import')}
           </Button>
@@ -177,7 +180,7 @@ export function ImportTemplateModal(props: Props) {
           <Button
             behavior="button"
             onClick={handleSaveTemplate}
-            disabled={!templateName || isTemplateNameDuplicated()}
+            disabled={!templateName || isTemplateNameDuplicated() || isFormBusy}
             disableWithoutIcon
           >
             {t('save')} & {t('import')}

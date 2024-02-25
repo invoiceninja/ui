@@ -77,8 +77,6 @@ export function UploadImport(props: Props) {
     {}
   );
 
-  console.log(defaultMapping);
-
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     payload.column_map[props.entity].mapping[event.target.id] =
       event.target.value;
@@ -105,12 +103,12 @@ export function UploadImport(props: Props) {
 
   const onDeletedTemplate = () => {
     setSelectedTemplate('');
-    setPayloadData({
-      ...payload,
+    setPayloadData((currentPayload) => ({
+      ...currentPayload,
       column_map: {
-        [props.entity]: { mapping: defaultMapping },
+        [props.entity]: { mapping: { ...defaultMapping } },
       },
-    });
+    }));
   };
 
   const decorateMapping = (mapping: any) => {
@@ -199,7 +197,9 @@ export function UploadImport(props: Props) {
                 payload.column_map[props.entity].mapping[index] =
                   response.data?.mappings[props.entity].available[mapping];
                 setPayloadData(payload);
-                setDefaultMapping(payload?.column_map?.[props.entity]?.mapping);
+                setDefaultMapping({
+                  ...payload?.column_map?.[props.entity]?.mapping,
+                });
                 setSelectedTemplate('');
               }
             );
@@ -371,7 +371,16 @@ export function UploadImport(props: Props) {
           <Element leftSide={t('template')}>
             <SelectField
               value={selectedTemplate}
-              onValueChange={(value) => setSelectedTemplate(value)}
+              onValueChange={(value) => {
+                setSelectedTemplate(value);
+
+                setPayloadData((currentPayload) => ({
+                  ...currentPayload,
+                  column_map: {
+                    [props.entity]: { mapping: { ...defaultMapping } },
+                  },
+                }));
+              }}
               withBlank
             >
               {templates.map((template, index) => (
@@ -461,6 +470,9 @@ export function UploadImport(props: Props) {
                   entity={props.entity}
                   importMap={payload}
                   onImport={processImport}
+                  onCreatedTemplate={(createdTemplate) =>
+                    setSelectedTemplate(createdTemplate)
+                  }
                 />
               </Td>
             </Tr>

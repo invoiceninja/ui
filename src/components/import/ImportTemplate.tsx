@@ -94,7 +94,7 @@ export function ImportTemplate(props: Props) {
   return (
     <Element>
       <div className="flex items-center space-x-10">
-        <span>{name}</span>
+        <span className="font-medium">{name}</span>
 
         <div
           className={classNames({
