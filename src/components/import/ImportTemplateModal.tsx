@@ -142,7 +142,7 @@ export function ImportTemplateModal(props: Props) {
   return (
     <>
       <Button
-        className="flex float-right"
+        className="flex"
         behavior="button"
         onClick={() =>
           shouldOpenTemplateModal() ? setIsTemplateModalOpen(true) : onImport()
