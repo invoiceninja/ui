@@ -164,7 +164,7 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    request('POST', endpoint(endPointUrl, params), requestData)
+    return request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
         props.onFileImported?.();

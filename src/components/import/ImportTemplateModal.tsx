@@ -29,7 +29,7 @@ import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
 interface Props {
   entity: string;
   importMap: ImportMap;
-  onImport: () => void;
+  onImport: () => Promise<void> | undefined;
   onCreatedTemplate: (name: string) => void;
 }
 export function ImportTemplateModal(props: Props) {
@@ -66,7 +66,7 @@ export function ImportTemplateModal(props: Props) {
       (columnMap) => {
         if (
           isEqual(
-            columnMap,
+            Object.values(columnMap).map((column) => column || ''),
             Object.values(importMap.column_map?.[entity]?.mapping).map(
               (column) => column || ''
             )
@@ -139,14 +139,18 @@ export function ImportTemplateModal(props: Props) {
     }
   };
 
+  const handleOpenModal = () => {
+    onImport()?.then(
+      () => shouldOpenTemplateModal() && setIsTemplateModalOpen(true)
+    );
+  };
+
   return (
     <>
       <Button
-        className="flex"
+        className="flex float-right"
         behavior="button"
-        onClick={() =>
-          shouldOpenTemplateModal() ? setIsTemplateModalOpen(true) : onImport()
-        }
+        onClick={handleOpenModal}
       >
         {t('import')}
       </Button>
@@ -163,29 +167,14 @@ export function ImportTemplateModal(props: Props) {
           changeOverride
         />
 
-        <div className="flex justify-between">
-          <Button
-            behavior="button"
-            type="secondary"
-            onClick={() => {
-              onImport();
-              handleOnClose();
-            }}
-            disabled={isFormBusy}
-            disableWithoutIcon
-          >
-            {t('import')}
-          </Button>
-
-          <Button
-            behavior="button"
-            onClick={handleSaveTemplate}
-            disabled={!templateName || isTemplateNameDuplicated() || isFormBusy}
-            disableWithoutIcon
-          >
-            {t('save')} & {t('import')}
-          </Button>
-        </div>
+        <Button
+          behavior="button"
+          onClick={handleSaveTemplate}
+          disabled={!templateName || isTemplateNameDuplicated() || isFormBusy}
+          disableWithoutIcon
+        >
+          {t('save')}
+        </Button>
       </Modal>
     </>
   );
