@@ -15,8 +15,8 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Document } from '../pages/Documents';
+import { date } from '$app/common/helpers';
 
 export const defaultColumns: string[] = [
   'name',
@@ -30,7 +30,7 @@ export const defaultColumns: string[] = [
 export function useAllDocumentColumns() {
   const documentColumns = [
     'name',
-    'linked_to',
+    //'linked_to',
     'size',
     'width',
     'height',
@@ -54,21 +54,56 @@ export function useDocumentColumns() {
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
-  const navigate = useNavigate();
+  type DocumentColumns = (typeof documentColumns)[number];
 
-  type ExpenseColumns = (typeof documentColumns)[number];
-
-  const columns: DataTableColumnsExtended<Document, ExpenseColumns> = [
+  const columns: DataTableColumnsExtended<Document, DocumentColumns> = [
     {
       column: 'name',
       id: 'name',
       label: t('name'),
-      format: (value) => value,
+    },
+    {
+      column: 'size',
+      id: 'size',
+      label: t('size'),
+      format: (value) => `${value} KB`,
+    },
+    {
+      column: 'width',
+      id: 'width',
+      label: t('width'),
+    },
+    {
+      column: 'height',
+      id: 'height',
+      label: t('height'),
+    },
+    {
+      column: 'private',
+      id: 'is_public',
+      label: t('private'),
+      format: (value) => (value ? t('no') : t('yes')),
+    },
+    {
+      column: 'created_at',
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'hash',
+      id: 'hash',
+      label: t('hash'),
+    },
+    {
+      column: 'type',
+      id: 'type',
+      label: t('type'),
     },
   ];
 
   const list: string[] =
-    reactSettings?.react_table_columns?.expense || defaultColumns;
+    reactSettings?.react_table_columns?.clientDocument || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

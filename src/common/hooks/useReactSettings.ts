@@ -69,7 +69,8 @@ export type ReactTableColumns =
   | 'vendor'
   | 'purchaseOrder'
   | 'expense'
-  | 'recurringExpense';
+  | 'recurringExpense'
+  | 'clientDocument';
 
 export const preferencesDefaults: Preferences = {
   dashboard_charts: {
