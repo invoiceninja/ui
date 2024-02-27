@@ -10,16 +10,27 @@
 
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Tab } from '$app/components/Tabs';
 import { modules } from '$app/pages/settings';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Client } from '$app/common/interfaces/client';
 
-export function useTabs() {
+interface Params {
+  client: Client | undefined;
+}
+export function useTabs(params: Params) {
   const [t] = useTranslation();
+
   const enabled = useEnabled();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { id } = useParams();
+  const { client } = params;
 
   let tabs: Tab[] = [
     { name: t('invoices'), href: route('/clients/:id', { id }) },
@@ -55,6 +66,17 @@ export function useTabs() {
     {
       name: t('activity'),
       href: route('/clients/:id/activities', { id }),
+    },
+    {
+      name: t('documents'),
+      href: route('/clients/:id/documents', { id }),
+      enabled:
+        hasPermission('view_client') ||
+        hasPermission('edit_client') ||
+        entityAssigned(client),
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={client?.documents?.length} />
+      ),
     },
   ];
 

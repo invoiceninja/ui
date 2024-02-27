@@ -45,7 +45,7 @@ export default function Client() {
     },
   ];
 
-  const tabs = useTabs();
+  const tabs = useTabs({ client: client });
   const actions = useActions();
 
   const navigate = useNavigate();
