@@ -131,8 +131,6 @@ export function ImportTemplateModal(props: Props) {
             handleOnClose();
 
             onCreatedTemplate(templateName);
-
-            onImport();
           })
           .finally(() => setIsFormBusy(false));
       }
