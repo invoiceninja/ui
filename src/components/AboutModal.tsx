@@ -62,6 +62,7 @@ interface SystemInfo {
   trailing_slash: boolean;
   file_permissions: string;
   exchange_rate_api_not_configured: boolean;
+  api_version: string;
 }
 
 interface Props {
@@ -330,6 +331,9 @@ export function AboutModal(props: Props) {
                 {t('cli')}: {systemInfo?.php_version.current_php_cli_version}
               </span>
               <span>Memory: {systemInfo?.php_version.memory_limit}</span>
+              <span>
+                {t('api_version')}: {systemInfo?.api_version}
+              </span>
             </div>
 
             <div>
