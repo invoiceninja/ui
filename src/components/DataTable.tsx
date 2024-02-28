@@ -126,6 +126,7 @@ interface Props<T> extends CommonProps {
   ) => void;
   hideEditableOptions?: boolean;
   dateRangeColumns?: DateRangeColumn[];
+  excludeColumns?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -154,6 +155,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeColumns = [],
+    excludeColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -516,31 +518,34 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           )}
 
-          {props.columns.map((column, index) => (
-            <Th
-              id={column.id}
-              key={index}
-              className={styleOptions?.thClassName}
-              isCurrentlyUsed={sortedBy === column.id}
-              onColumnClick={(data: ColumnSortPayload) => {
-                setSortedBy(data.field);
-                setSort(data.sort);
-              }}
-              childrenClassName={styleOptions?.thChildrenClassName}
-            >
-              <div className="flex items-center space-x-3">
-                {dateRangeColumns.some(
-                  (dateRangeColumn) => column.id === dateRangeColumn.column
-                ) && (
-                  <DateRangePicker
-                    setDateRange={setDateRange}
-                    onClick={() => handleDateRangeColumnClick(column.id)}
-                  />
-                )}
-                <span>{column.label}</span>
-              </div>
-            </Th>
-          ))}
+          {props.columns.map(
+            (column, index) =>
+              Boolean(!excludeColumns.includes(column.id)) && (
+                <Th
+                  id={column.id}
+                  key={index}
+                  className={styleOptions?.thClassName}
+                  isCurrentlyUsed={sortedBy === column.id}
+                  onColumnClick={(data: ColumnSortPayload) => {
+                    setSortedBy(data.field);
+                    setSort(data.sort);
+                  }}
+                  childrenClassName={styleOptions?.thChildrenClassName}
+                >
+                  <div className="flex items-center space-x-3">
+                    {dateRangeColumns.some(
+                      (dateRangeColumn) => column.id === dateRangeColumn.column
+                    ) && (
+                      <DateRangePicker
+                        setDateRange={setDateRange}
+                        onClick={() => handleDateRangeColumnClick(column.id)}
+                      />
+                    )}
+                    <span>{column.label}</span>
+                  </div>
+                </Th>
+              )
+          )}
 
           {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
@@ -615,29 +620,32 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 )}
 
-                {props.columns.map((column, index) => (
-                  <Td
-                    key={index}
-                    className={classNames(
-                      {
-                        'cursor-pointer': index < 3,
-                        'py-4': hideEditableOptions,
-                      },
-                      styleOptions?.tdClassName
-                    )}
-                    onClick={() => {
-                      if (index < 3) {
-                        props.onTableRowClick
-                          ? props.onTableRowClick(resource)
-                          : document.getElementById(resource.id)?.click();
-                      }
-                    }}
-                  >
-                    {column.format
-                      ? column.format(resource[column.id], resource)
-                      : resource[column.id]}
-                  </Td>
-                ))}
+                {props.columns.map(
+                  (column, index) =>
+                    Boolean(!excludeColumns.includes(column.id)) && (
+                      <Td
+                        key={index}
+                        className={classNames(
+                          {
+                            'cursor-pointer': index < 3,
+                            'py-4': hideEditableOptions,
+                          },
+                          styleOptions?.tdClassName
+                        )}
+                        onClick={() => {
+                          if (index < 3) {
+                            props.onTableRowClick
+                              ? props.onTableRowClick(resource)
+                              : document.getElementById(resource.id)?.click();
+                          }
+                        }}
+                      >
+                        {column.format
+                          ? column.format(resource[column.id], resource)
+                          : resource[column.id]}
+                      </Td>
+                    )
+                )}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>

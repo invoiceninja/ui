@@ -39,6 +39,7 @@ export default function Payments() {
       bulkRoute="/api/v1/payments/bulk"
       linkToCreate={route('/payments/create?client=:id', { id })}
       linkToEdit="/payments/:id/edit"
+      excludeColumns={['client_id']}
       showRestore={(resource: Payment) => !resource.is_deleted}
       linkToCreateGuards={[permission('create_payment')]}
       hideEditableOptions={!hasPermission('edit_payment')}

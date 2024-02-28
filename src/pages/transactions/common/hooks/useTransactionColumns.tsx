@@ -22,6 +22,7 @@ import { Link } from '$app/components/forms';
 import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
+import { useCleanDescriptionText } from './useCleanDescription';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ export function useTransactionColumns() {
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
+  const cleanDescriptionText = useCleanDescriptionText();
 
   const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
 
@@ -91,9 +93,13 @@ export function useTransactionColumns() {
           size="regular"
           truncate
           containsUnsafeHTMLTags
-          message={value as string}
+          message={cleanDescriptionText(value as string)}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span
+            dangerouslySetInnerHTML={{
+              __html: cleanDescriptionText(value as string),
+            }}
+          />
         </Tooltip>
       ),
     },

@@ -41,6 +41,7 @@ export default function Credits() {
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id })}
       linkToEdit="/credits/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_credit')]}
       hideEditableOptions={!hasPermission('edit_credit')}
     />
