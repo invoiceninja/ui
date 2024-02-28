@@ -23,8 +23,6 @@ import {
 import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 import { useParams } from 'react-router-dom';
 
-export const dataTableStaleTime = 50;
-
 export default function Tasks() {
   const { id } = useParams();
 
@@ -63,6 +61,7 @@ export default function Tasks() {
         rate: client?.settings?.default_task_rate || '',
       })}
       linkToEdit="/tasks/:id/edit"
+      excludeColumns={['client_id']}
       showEdit={(task: Task) => showEditOption(task)}
       linkToCreateGuards={[permission('create_task')]}
       hideEditableOptions={!hasPermission('edit_task')}
