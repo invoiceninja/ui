@@ -760,6 +760,14 @@ test('Product selector list gets updated on the report page when it is created',
 
   await page.locator('[id="productItemSelector"]').click();
 
+  await page
+    .locator('[id="productItemSelector"]')
+    .locator('[type="text"]')
+    .first()
+    .fill('test product selector');
+
+  await page.waitForTimeout(200);
+
   await expect(
     page.getByText('test product selector', { exact: true })
   ).toBeVisible();

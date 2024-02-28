@@ -8,15 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useProductsQuery } from '$app/common/queries/products';
 import { Spinner } from '$app/components/Spinner';
 import { Element } from '$app/components/cards';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { MultiValue, StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { Alert } from '$app/components/Alert';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { Product } from '$app/common/interfaces/product';
+import { useQuery, useQueryClient } from 'react-query';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 interface Props {
   value?: string;
@@ -26,15 +30,38 @@ interface Props {
 export function ProductItemsSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const queryClient = useQueryClient();
 
   const { value, onValueChange, errorMessage } = props;
 
+  const filterTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const [filter, setFilter] = useState<string>('');
+  const [isInitial, setIsInitial] = useState<boolean>(Boolean(value));
   const [productItems, setProductItems] = useState<SelectOption[]>();
 
-  const { data: products } = useProductsQuery({ status: ['active'] });
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['/api/v1/products', 'perPage=500', 'status=active', filter],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/products?per_page=:perPage&include=&status=active&filter=:filter',
+          {
+            filter,
+            perPage: import.meta.env.VITE_IS_TEST === 'true' ? 4 : 500,
+          }
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Product[]>) =>
+          response.data.data
+      ),
+    enabled: !isInitial,
+    staleTime: Infinity,
+  });
 
   useEffect(() => {
-    if (products) {
+    if (products && !isInitial) {
       setProductItems(
         products.map((product) => ({
           value: product.product_key,
@@ -44,7 +71,59 @@ export function ProductItemsSelector(props: Props) {
         }))
       );
     }
-  }, [products]);
+  }, [products, isInitial]);
+
+  useEffect(() => {
+    if (value && isInitial) {
+      (async () => {
+        for (let index = 0; index < value.split(',').length; index++) {
+          const currentFilter = value.split(',')[index];
+
+          const productsResponse = await queryClient.fetchQuery<Product[]>(
+            ['/api/v1/products', 'perPage=500', 'status=active', currentFilter],
+            () =>
+              request(
+                'GET',
+                endpoint(
+                  '/api/v1/products?per_page=:perPage&include=&status=active&filter=:filter',
+                  {
+                    filter: currentFilter,
+                    perPage: import.meta.env.VITE_IS_TEST === 'true' ? 4 : 500,
+                  }
+                )
+              ).then(
+                (response: GenericSingleResourceResponse<Product[]>) =>
+                  response.data.data
+              ),
+            { staleTime: Infinity }
+          );
+
+          setProductItems((currentProductItems) => {
+            const productItemsList = currentProductItems || [];
+
+            const currentProductList = !productItemsList.find(
+              ({ value }) => value === currentFilter
+            )
+              ? productsResponse
+                  .map((product) => ({
+                    value: product.product_key,
+                    label: product.product_key,
+                    color: colors.$3,
+                    backgroundColor: colors.$1,
+                  }))
+                  .filter((product) => product.value === currentFilter)
+              : [];
+
+            return currentProductList[0]
+              ? [...productItemsList, currentProductList[0]]
+              : [...productItemsList];
+          });
+        }
+
+        setIsInitial(false);
+      })();
+    }
+  }, [value]);
 
   const handleChange = (
     products: MultiValue<{ value: string; label: string }>
@@ -99,23 +178,44 @@ export function ProductItemsSelector(props: Props) {
 
   return (
     <>
-      {productItems ? (
+      {productItems && !isInitial ? (
         <Element leftSide={t('products')}>
-          <Select
-            id="productItemSelector"
-            placeholder={t('products')}
-            {...(value && {
-              value: productItems?.filter((option) =>
-                value
-                  .split(',')
-                  .find((productKey) => productKey === option.value)
-              ),
-            })}
-            onChange={(options) => onValueChange(handleChange(options))}
-            options={productItems}
-            isMulti={true}
-            styles={customStyles}
-          />
+          <div className="flex space-x-3">
+            <div className="flex-1">
+              <Select
+                id="productItemSelector"
+                placeholder={t('products')}
+                {...(value && {
+                  defaultValue: productItems?.filter((option) =>
+                    value
+                      .split(',')
+                      .find((productKey) => productKey === option.value)
+                  ),
+                })}
+                onChange={(options) => onValueChange(handleChange(options))}
+                options={productItems}
+                onInputChange={(filterValue) => {
+                  clearTimeout(filterTimeOut.current);
+
+                  const currentTimeout = setTimeout(
+                    () => setFilter(filterValue),
+                    600
+                  );
+
+                  filterTimeOut.current = currentTimeout;
+                }}
+                isMulti={true}
+                styles={customStyles}
+                isSearchable
+              />
+            </div>
+
+            {isLoading && (
+              <div className="flex justify-center items-center">
+                <Spinner />
+              </div>
+            )}
+          </div>
         </Element>
       ) : (
         <div className="flex justify-center items-center">
