@@ -132,6 +132,7 @@ interface Props<T> extends CommonProps {
   showDelete?: (resource: T) => boolean;
   withoutDefaultBulkActions?: boolean;
   withoutStatusFilter?: boolean;
+  queryIdentificator?: string;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -162,6 +163,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     dateRangeColumns = [],
     excludeColumns = [],
     methodType = 'GET',
+    queryIdentificator,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -276,6 +278,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { data, isLoading, isError } = useQuery(
     [
+      ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
       props.endpoint,
       perPage,
@@ -384,8 +387,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
-
-  console.log(props.columns);
 
   return (
     <div data-cy="dataTable">

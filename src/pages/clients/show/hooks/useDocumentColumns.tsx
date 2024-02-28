@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import { Document } from '../pages/Documents';
 import { date } from '$app/common/helpers';
+import { useParams } from 'react-router-dom';
+import { useClientQuery } from '$app/common/queries/clients';
 
 export const defaultColumns: string[] = [
   'name',
@@ -30,7 +29,7 @@ export const defaultColumns: string[] = [
 export function useAllDocumentColumns() {
   const documentColumns = [
     'name',
-    //'linked_to',
+    'linked_to',
     'size',
     'width',
     'height',
@@ -46,13 +45,13 @@ export function useAllDocumentColumns() {
 
 export function useDocumentColumns() {
   const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
+  const { id } = useParams();
 
   const reactSettings = useReactSettings();
   const documentColumns = useAllDocumentColumns();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const hasPermission = useHasPermission();
-  const disableNavigation = useDisableNavigation();
+  const { data: client } = useClientQuery({ id, enabled: Boolean(id) });
 
   type DocumentColumns = (typeof documentColumns)[number];
 
@@ -61,6 +60,12 @@ export function useDocumentColumns() {
       column: 'name',
       id: 'name',
       label: t('name'),
+    },
+    {
+      column: 'linked_to',
+      id: 'id',
+      label: t('linked_to'),
+      format: () => client?.display_name,
     },
     {
       column: 'size',

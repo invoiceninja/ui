@@ -8,14 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { useDocumentColumns } from '../hooks/useDocumentColumns';
+import {
+  defaultColumns,
+  useAllDocumentColumns,
+  useDocumentColumns,
+} from '../hooks/useDocumentColumns';
 import { DataTable } from '$app/components/DataTable';
+import { useDocumentFilters } from '../hooks/useDocumentFilters';
+import { useDocumentActions } from '../hooks/useDocumentActions';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { useDocumentCustomBulkActions } from '../hooks/useDocumentCustomBulkActions';
 
 export interface Document {
   archived_at: number;
@@ -44,35 +49,32 @@ export default function Documents() {
 
   const hasPermission = useHasPermission();
 
+  const filters = useDocumentFilters();
   const columns = useDocumentColumns();
-
-  const { data: latestVersion } = useQuery({
-    queryKey: route('/api/v1/clients/:id/documents', { id }),
-    queryFn: () =>
-      request(
-        'POST',
-        endpoint(
-          '/api/v1/clients/Wpmbk5ezJn/documents?per_page=10&page=1&filter=&sort=id%7Casc&status=active',
-          { id }
-        )
-      ).then((response) => response.data),
-    staleTime: Infinity,
-  });
-
-  console.log(latestVersion);
+  const actions = useDocumentActions();
+  const documentColumns = useAllDocumentColumns();
+  const customBulkActions = useDocumentCustomBulkActions();
 
   return (
     <>
       <DataTable
         resource="document"
         methodType="POST"
+        queryIdentificator="/api/v1/documents"
         endpoint={route('/api/v1/clients/:id/documents', { id })}
         columns={columns}
-        //customFilters={filters}
-        //customActions={actions}
-        customFilterPlaceholder="status"
+        customFilters={filters}
+        customActions={actions}
+        customBulkActions={customBulkActions}
+        customFilterPlaceholder="type"
         withResourcefulActions
-        bulkRoute="/api/v1/expenses/bulk"
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            table="clientDocument"
+            columns={documentColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+          />
+        }
         showEdit={() => false}
         showRestore={() => false}
         showArchive={() => false}
