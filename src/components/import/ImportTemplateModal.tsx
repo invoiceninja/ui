@@ -41,6 +41,8 @@ export function ImportTemplateModal(props: Props) {
   const user = useUserChanges();
   const reactSettings = useReactSettings();
 
+  const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] =
+    useState<boolean>(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] =
     useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -48,7 +50,7 @@ export function ImportTemplateModal(props: Props) {
 
   const handleOnClose = () => {
     setTemplateName('');
-    setIsTemplateModalOpen(false);
+    setIsSaveTemplateModalOpen(false);
   };
 
   const shouldOpenTemplateModal = () => {
@@ -155,7 +157,7 @@ export function ImportTemplateModal(props: Props) {
 
       <Modal
         title={t('save_as_template')}
-        visible={isTemplateModalOpen}
+        visible={isSaveTemplateModalOpen}
         onClose={handleOnClose}
       >
         <InputField
@@ -172,6 +174,25 @@ export function ImportTemplateModal(props: Props) {
           disableWithoutIcon
         >
           {t('save')}
+        </Button>
+      </Modal>
+
+      <Modal
+        title={t('save_as_template')}
+        visible={isTemplateModalOpen}
+        onClose={() => setIsTemplateModalOpen(false)}
+      >
+        <span className="font-medium text-base">{t('save_template_body')}</span>
+
+        <Button
+          className="self-end"
+          behavior="button"
+          onClick={() => {
+            setIsTemplateModalOpen(false);
+            setIsSaveTemplateModalOpen(true);
+          }}
+        >
+          {t('yes')}
         </Button>
       </Modal>
     </>
