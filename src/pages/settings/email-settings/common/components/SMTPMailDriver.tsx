@@ -11,7 +11,7 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 export function SMTPMailDriver() {
   const [t] = useTranslation();
 
-  const company = useInjectCompanyChanges();
+  const company = useCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
