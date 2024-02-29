@@ -10,7 +10,7 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { isHosted } from '$app/common/helpers';
+import { isDemo, isHosted } from '$app/common/helpers';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useTranslation } from 'react-i18next';
 
@@ -65,7 +65,8 @@ export function useEmailProviders() {
       enabled:
         (proPlan() || enterprisePlan()) &&
         isSMTPConfigurationAllowed &&
-        isCompanySettingsActive,
+        isCompanySettingsActive &&
+        !isDemo(),
     },
   ];
 
@@ -88,7 +89,7 @@ export function useEmailProviders() {
     {
       value: 'smtp',
       label: 'SMTP',
-      enabled: isCompanySettingsActive,
+      enabled: isCompanySettingsActive && !isDemo(),
     },
   ];
 
