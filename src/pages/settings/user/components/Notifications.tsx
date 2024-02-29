@@ -124,7 +124,7 @@ export function Notifications() {
 
       <Divider withoutPadding />
 
-      <Element className="mb-4 mt-4" leftSide={t('all_events')}>
+      <Element className="my-4" leftSide={t('all_events')}>
         <SelectField
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
