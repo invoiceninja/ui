@@ -14,8 +14,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useTranslation } from 'react-i18next';
 import { Document } from '../pages/Documents';
 import { date } from '$app/common/helpers';
-import { useParams } from 'react-router-dom';
-import { useClientQuery } from '$app/common/queries/clients';
+import { Link } from '$app/components/forms';
 
 export const defaultColumns: string[] = [
   'name',
@@ -45,13 +44,10 @@ export function useAllDocumentColumns() {
 
 export function useDocumentColumns() {
   const [t] = useTranslation();
-  const { id } = useParams();
 
   const reactSettings = useReactSettings();
   const documentColumns = useAllDocumentColumns();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const { data: client } = useClientQuery({ id, enabled: Boolean(id) });
 
   type DocumentColumns = (typeof documentColumns)[number];
 
@@ -63,9 +59,15 @@ export function useDocumentColumns() {
     },
     {
       column: 'linked_to',
-      id: 'id',
+      id: 'link',
       label: t('linked_to'),
-      format: () => client?.display_name,
+      format: (value) => {
+        if (value) {
+          const entity = (value as string).split('/')[1];
+
+          return <Link to={value as string}>{t(entity.slice(0, -1))}</Link>;
+        }
+      },
     },
     {
       column: 'size',

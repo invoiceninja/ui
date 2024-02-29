@@ -43,6 +43,7 @@ export interface Document {
   user_id: string;
   vendor_id: string;
   width: number;
+  link: string;
 }
 export default function Documents() {
   const { id } = useParams();
