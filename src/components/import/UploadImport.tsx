@@ -374,12 +374,14 @@ export function UploadImport(props: Props) {
               onValueChange={(value) => {
                 setSelectedTemplate(value);
 
-                setPayloadData((currentPayload) => ({
-                  ...currentPayload,
-                  column_map: {
-                    [props.entity]: { mapping: { ...defaultMapping } },
-                  },
-                }));
+                if (!value) {
+                  setPayloadData((currentPayload) => ({
+                    ...currentPayload,
+                    column_map: {
+                      [props.entity]: { mapping: { ...defaultMapping } },
+                    },
+                  }));
+                }
               }}
               withBlank
             >
