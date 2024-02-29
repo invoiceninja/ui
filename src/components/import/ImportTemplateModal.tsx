@@ -184,16 +184,25 @@ export function ImportTemplateModal(props: Props) {
       >
         <span className="font-medium text-base">{t('save_template_body')}</span>
 
-        <Button
-          className="self-end"
-          behavior="button"
-          onClick={() => {
-            setIsTemplateModalOpen(false);
-            setIsSaveTemplateModalOpen(true);
-          }}
-        >
-          {t('yes')}
-        </Button>
+        <div className="flex justify-between">
+          <Button
+            behavior="button"
+            type="secondary"
+            onClick={() => setIsTemplateModalOpen(false)}
+          >
+            {t('no')}
+          </Button>
+
+          <Button
+            behavior="button"
+            onClick={() => {
+              setIsTemplateModalOpen(false);
+              setIsSaveTemplateModalOpen(true);
+            }}
+          >
+            {t('yes')}
+          </Button>
+        </div>
       </Modal>
     </>
   );
