@@ -280,6 +280,10 @@ export function UploadImport(props: Props) {
     }
   }, [selectedTemplate]);
 
+  useEffect(() => {
+    return () => setSelectedTemplate('');
+  }, []);
+
   return (
     <>
       <Card title={t(props.entity)}>
@@ -472,9 +476,6 @@ export function UploadImport(props: Props) {
                   entity={props.entity}
                   importMap={payload}
                   onImport={processImport}
-                  onCreatedTemplate={(createdTemplate) =>
-                    setSelectedTemplate(createdTemplate)
-                  }
                 />
               </Td>
             </Tr>

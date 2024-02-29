@@ -103,7 +103,7 @@ export function ImportTemplate(props: Props) {
           })}
           onClick={() => !isFormBusy && handleDeleteTemplate()}
         >
-          <Icon element={MdDelete} color="red" size={22} />
+          <Icon element={MdDelete} size={22} />
         </div>
       </div>
     </Element>

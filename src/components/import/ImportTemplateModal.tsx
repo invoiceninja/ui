@@ -25,18 +25,19 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
 import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   entity: string;
   importMap: ImportMap;
   onImport: () => Promise<void> | undefined;
-  onCreatedTemplate: (name: string) => void;
 }
 export function ImportTemplateModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const { onImport, onCreatedTemplate, importMap, entity } = props;
+  const { onImport, importMap, entity } = props;
 
   const user = useUserChanges();
   const reactSettings = useReactSettings();
@@ -132,7 +133,7 @@ export function ImportTemplateModal(props: Props) {
 
             handleOnClose();
 
-            onCreatedTemplate(templateName);
+            navigate(`/${entity}s`);
           })
           .finally(() => setIsFormBusy(false));
       }
@@ -140,8 +141,10 @@ export function ImportTemplateModal(props: Props) {
   };
 
   const handleOpenModal = () => {
-    onImport()?.then(
-      () => shouldOpenTemplateModal() && setIsTemplateModalOpen(true)
+    onImport()?.then(() =>
+      shouldOpenTemplateModal()
+        ? setIsTemplateModalOpen(true)
+        : navigate(`/${entity}s`)
     );
   };
 
@@ -180,7 +183,10 @@ export function ImportTemplateModal(props: Props) {
       <Modal
         title={t('save_as_template')}
         visible={isTemplateModalOpen}
-        onClose={() => setIsTemplateModalOpen(false)}
+        onClose={() => {
+          setIsTemplateModalOpen(false);
+          navigate(`/${entity}s`);
+        }}
       >
         <span className="font-medium text-base">{t('save_template_body')}</span>
 
@@ -188,7 +194,10 @@ export function ImportTemplateModal(props: Props) {
           <Button
             behavior="button"
             type="secondary"
-            onClick={() => setIsTemplateModalOpen(false)}
+            onClick={() => {
+              setIsTemplateModalOpen(false);
+              navigate(`/${entity}s`);
+            }}
           >
             {t('no')}
           </Button>
