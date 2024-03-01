@@ -29,8 +29,9 @@ export default function Task() {
   const { documentTitle } = useTitle('edit_task');
   const [t] = useTranslation();
 
-  const { id } = useParams();
   const actions = useActions();
+
+  const { id } = useParams();
   const { data } = useTaskQuery({ id });
 
   const tabs: Tab[] = [
