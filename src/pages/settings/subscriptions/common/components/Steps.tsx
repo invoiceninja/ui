@@ -14,8 +14,8 @@ import {
 import { useQuery } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { AxiosResponse } from 'axios';
-import { checkDependencies } from '../utilities/dependencies';
+import { AxiosError, AxiosResponse } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export type Steps = Record<
   string,
@@ -61,13 +61,25 @@ export function Steps({
 
     items.splice(result.destination.index, 0, reorderedItem);
 
-    setDependencyErrors(checkDependencies(dependencies, items));
     handleChange('steps', items.join(','));
+    checkDependencies(items.join(','));
+  }
+
+  function checkDependencies(v?: string) {
+    request('POST', endpoint('/api/v1/subscriptions/steps/check'), {
+      steps: v ?? steps.join(','),
+    })
+      .then(() => setDependencyErrors([]))
+      .catch((e: AxiosError<ValidationBag>) => {
+        if (e.response?.data.errors.steps) {
+          setDependencyErrors(e.response.data.errors.steps);
+        }
+      });
   }
 
   useEffect(() => {
     if (dependencies) {
-      setDependencyErrors(checkDependencies(dependencies, steps));
+      checkDependencies();
     }
   }, [steps.length]);
 
@@ -89,7 +101,7 @@ export function Steps({
         </SelectField>
       </Element>
 
-      <Element leftSide={t('order')} leftSideHelp={t('order_help')}>
+      <Element leftSide={t('order')} leftSideHelp={t('steps_order_help')}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="columns">
             {(provided) => (
@@ -131,17 +143,15 @@ export function Steps({
           </Droppable>
         </DragDropContext>
 
-        {dependencyErrors.length > 0 && (
+        {errors?.errors.steps ? (
+          <div className="text-red-500 mt-2">{errors.errors.steps}</div>
+        ) : dependencyErrors.length ? (
           <div className="text-red-500 mt-2">
             {dependencyErrors.map((error, index) => (
               <p key={index}>{error}</p>
             ))}
-
-            <p className="mt-3">
-              You won't be able to save until order is correct.
-            </p>
           </div>
-        )}
+        ) : null}
       </Element>
     </Card>
   );
