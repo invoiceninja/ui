@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Task } from '$app/common/interfaces/task';
+import { Task as TaskType } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { Default } from '$app/components/layouts/Default';
@@ -25,46 +25,43 @@ import { Spinner } from '$app/components/Spinner';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 
-export default function Edit() {
+export default function Task() {
+  const { documentTitle } = useTitle('edit_task');
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('edit_task');
   const { id } = useParams();
+  const actions = useActions();
   const { data } = useTaskQuery({ id });
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: route('/expenses/:id/edit', { id }),
+      href: route('/tasks/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: route('/expenses/:id/documents', { id }),
+      href: route('/tasks/:id/documents', { id }),
     },
   ];
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const [task, setTask] = useState<Task>();
-
+  const [task, setTask] = useState<TaskType>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const actions = useActions();
+  const handleChange = (property: keyof TaskType, value: unknown) => {
+    setTask((current) => current && { ...current, [property]: value });
+  };
+
+  const handleSave = useUpdateTask({ isFormBusy, setIsFormBusy, setErrors });
 
   useEffect(() => {
     if (data) {
       setTask(data);
     }
   }, [data]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleChange = (property: keyof Task, value: unknown) => {
-    setTask((current) => current && { ...current, [property]: value });
-  };
-
-  const handleSave = useUpdateTask({ isFormBusy, setIsFormBusy, setErrors });
 
   return (
     <Default
@@ -89,9 +86,8 @@ export default function Edit() {
           <Outlet
             context={{
               errors,
-              setErrors,
               task,
-              setTask,
+              handleChange,
             }}
           />
         </div>
