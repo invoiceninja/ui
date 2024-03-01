@@ -35,6 +35,10 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { endpoint } from '$app/common/helpers';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface Props {
   task: Task;
@@ -64,6 +68,10 @@ export function TaskDetails(props: Props) {
     inSeconds: true,
     calculateLastTimeLog: false,
   });
+
+  const onDocumentActionSuccess = () => {
+    $refetch(['tasks']);
+  };
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -248,30 +256,48 @@ export function TaskDetails(props: Props) {
       </Card>
 
       {location.pathname.endsWith('/edit') && (
-        <Card className="col-span-12 xl:col-span-4 h-max px-6">
-          <TabGroup
-            tabs={[
-              t('description'),
-              ...(isAdmin || isOwner ? [t('custom_fields')] : []),
-            ]}
-          >
-            <div>
-              <InputField
-                element="textarea"
-                value={task.description}
-                onValueChange={(value) => handleChange('description', value)}
-                errorMessage={errors?.errors.description}
-              />
-            </div>
+        <>
+          <Card className="col-span-12 xl:col-span-4 h-max px-6">
+            <TabGroup
+              tabs={[
+                t('description'),
+                ...(isAdmin || isOwner ? [t('custom_fields')] : []),
+              ]}
+            >
+              <div>
+                <InputField
+                  element="textarea"
+                  value={task.description}
+                  onValueChange={(value) => handleChange('description', value)}
+                  errorMessage={errors?.errors.description}
+                />
+              </div>
 
-            <div>
-              <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-              <Link to="/settings/custom_fields/tasks" className="capitalize">
-                {t('click_here')}
-              </Link>
-            </div>
-          </TabGroup>
-        </Card>
+              <div>
+                <span className="text-sm">{t('custom_fields')} &nbsp;</span>
+                <Link to="/settings/custom_fields/tasks" className="capitalize">
+                  {t('click_here')}
+                </Link>
+              </div>
+            </TabGroup>
+          </Card>
+
+          {task && (
+            <Card className="col-span-12 px-6">
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/tasks/:id/upload', { id: task.id })}
+                onSuccess={onDocumentActionSuccess}
+              />
+
+              <DocumentsTable
+                documents={task?.documents || []}
+                onDocumentDelete={onDocumentActionSuccess}
+                disableEditableOptions={!entityAssigned(task, true)}
+              />
+            </Card>
+          )}
+        </>
       )}
 
       {!location.pathname.endsWith('/edit') && (
