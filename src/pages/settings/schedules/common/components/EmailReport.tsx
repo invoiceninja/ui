@@ -49,7 +49,8 @@ type ReportFiled =
   | 'vendors'
   | 'categories'
   | 'projects'
-  | 'report_keys';
+  | 'report_keys'
+  | 'include_deleted';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
   'send_email',
@@ -64,12 +65,15 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'status',
     'document_email_attachment',
     'report_keys',
+    'include_deleted',
   ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
     'products',
     'document_email_attachment',
     'report_keys',
+    'status',
+    'include_deleted',
   ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
@@ -82,25 +86,42 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'include_deleted',
   ],
   contact: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
-  recurring_invoice: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
-  quote: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment', 'report_keys'],
+  recurring_invoice: [
+    ...DEFAULT_REPORT_FIELDS,
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
+  quote: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
   quote_item: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'status',
+    'include_deleted',
   ],
   credit: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'include_deleted',
+    'status',
   ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   payment: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'status',
   ],
   expense: [
     ...DEFAULT_REPORT_FIELDS,
@@ -110,8 +131,16 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'projects',
     'categories',
     'report_keys',
+    'status',
+    'include_deleted',
   ],
-  task: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment', 'report_keys'],
+  task: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
   product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   vendor: [
     ...DEFAULT_REPORT_FIELDS,
@@ -122,11 +151,15 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'status',
+    'include_deleted',
   ],
   purchase_order_item: [
     ...DEFAULT_REPORT_FIELDS,
     'document_email_attachment',
     'report_keys',
+    'status',
+    'include_deleted',
   ],
 };
 
