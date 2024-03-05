@@ -62,6 +62,7 @@ export function useScheduleReport() {
       projects: report.payload.projects || '',
       categories: report.payload.categories || '',
       report_keys: reportKeys,
+      include_deleted: report.payload.include_deleted ?? false,
     });
 
     navigate('/settings/schedules/create?template=email_report');
