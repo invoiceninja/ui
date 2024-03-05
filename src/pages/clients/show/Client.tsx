@@ -35,7 +35,10 @@ export default function Client() {
   const [t] = useTranslation();
 
   const { id } = useParams();
-  const { data: client, isLoading } = useClientQuery({ id, enabled: true });
+  const { data: client, isLoading } = useClientQuery({
+    id,
+    enabled: Boolean(id),
+  });
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -45,7 +48,7 @@ export default function Client() {
     },
   ];
 
-  const tabs = useTabs();
+  const tabs = useTabs({ client });
   const actions = useActions();
 
   const navigate = useNavigate();
