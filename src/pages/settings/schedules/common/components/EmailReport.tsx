@@ -15,7 +15,7 @@ import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { ProductItemsSelector } from '$app/pages/reports/common/components/ProductItemsSelector';
 import { StatusSelector } from '$app/pages/reports/common/components/StatusSelector';
-import { useReports } from '$app/pages/reports/common/useReports';
+import { Identifier, useReports } from '$app/pages/reports/common/useReports';
 import { ranges } from '$app/pages/reports/index/Reports';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
@@ -155,8 +155,8 @@ export function EmailReport(props: Props) {
         >
           {reports.map((report, i) => (
             <option
-              value={report.schedule_identifier || report.identifier}
               key={i}
+              value={report.schedule_identifier || report.identifier}
             >
               {t(report.label)}
             </option>
@@ -237,6 +237,7 @@ export function EmailReport(props: Props) {
       {showReportFiled('status') && (
         <Element leftSide={t('status')}>
           <StatusSelector
+            report={schedule.parameters.report_name as Identifier}
             value={schedule.parameters.status}
             onValueChange={(value) =>
               handleChange('parameters.status' as keyof Schedule, value)
