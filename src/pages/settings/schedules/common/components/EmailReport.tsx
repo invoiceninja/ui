@@ -267,6 +267,24 @@ export function EmailReport(props: Props) {
         </Element>
       )}
 
+      {showReportFiled('include_deleted') && (
+        <Element
+          leftSide={t('include_deleted')}
+          leftSideHelp={t('include_deleted_help')}
+        >
+          <Toggle
+            checked={schedule.parameters.include_deleted}
+            onValueChange={(value) =>
+              handleChange(
+                'parameters.include_deleted' as keyof Schedule,
+                value
+              )
+            }
+            cypressRef="includeDeleted"
+          />
+        </Element>
+      )}
+
       {showReportFiled('status') && (
         <Element leftSide={t('status')}>
           <StatusSelector

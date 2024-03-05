@@ -32,6 +32,7 @@ export interface Parameters {
   categories: string;
   projects: string;
   report_keys: string[];
+  include_deleted?: boolean;
 }
 
 export interface Schedule {
