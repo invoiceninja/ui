@@ -34,17 +34,18 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function OnlinePayments() {
+  useTitle('online_payments');
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
-
   const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  useTitle('online_payments');
+  const { data: statics } = useStaticsQuery();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -253,6 +254,86 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_type_id"
+              labelElement={<SettingsLabel label={t('payment_type')} />}
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.payment_type_id || '0'}
+            onChange={handleChange}
+            id="settings.payment_type_id"
+            blankOptionValue="0"
+            disabled={disableSettingsField('payment_type_id')}
+            withBlank
+            errorMessage={errors?.errors['settings.payment_type_id']}
+          >
+            {statics?.payment_types.map(
+              (type: { id: string; name: string }) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              )
+            )}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="valid_until"
+              labelElement={<SettingsLabel label={t('quote_valid_until')} />}
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.valid_until || ''}
+            id="settings.valid_until"
+            onChange={handleChange}
+            disabled={disableSettingsField('valid_until')}
+            withBlank
+            errorMessage={errors?.errors['settings.valid_until']}
+          >
+            {paymentTerms?.map((type: PaymentTerm) => (
+              <option key={type.id} value={type.num_days}>
+                {type.name}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="default_expense_payment_type_id"
+              labelElement={<SettingsLabel label={t('expense_payment_type')} />}
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.default_expense_payment_type_id || ''}
+            onChange={handleChange}
+            disabled={disableSettingsField('default_expense_payment_type_id')}
+            id="settings.default_expense_payment_type_id"
+            blankOptionValue="0"
+            withBlank
+            errorMessage={
+              errors?.errors['settings.default_expense_payment_type_id']
+            }
+          >
+            {statics?.payment_types.map(
+              (type: { id: string; name: string }) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              )
+            )}
+          </SelectField>
+        </Element>
 
         <Element
           leftSideHelp={t('manual_payment_email_help')}
