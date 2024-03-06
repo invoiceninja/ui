@@ -397,6 +397,110 @@ test('archiving task withe edit_task', async ({ page }) => {
   }
 });
 
+test('task documents preview with edit_task', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('tasks@example.com');
+  await set('create_client', 'create_task', 'edit_task');
+  await save();
+  await logout(page);
+
+  await login(page, 'tasks@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page.getByRole('link', { name: 'Tasks', exact: true }).click();
+
+  await page.waitForURL('**/tasks');
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createTask({ page });
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
+
+  await page.waitForURL('**/tasks/**/edit');
+
+  await page
+    .getByRole('link', {
+      name: 'Documents',
+    })
+    .click();
+
+  await page.waitForURL('**/tasks/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+});
+
+test('task documents uploading with edit_task', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('tasks@example.com');
+  await set('create_client', 'create_task', 'edit_task');
+  await save();
+  await logout(page);
+
+  await login(page, 'tasks@example.com', 'password');
+
+  const tableBody = page.locator('tbody').first();
+
+  await page.getByRole('link', { name: 'Tasks', exact: true }).click();
+
+  await page.waitForURL('**/tasks');
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await page.waitForTimeout(200);
+
+  const doRecordsExist = await page.getByText('No records found').isHidden();
+
+  if (!doRecordsExist) {
+    await createTask({ page });
+  } else {
+    await tableRow
+      .getByRole('button')
+      .filter({ has: page.getByText('More Actions') })
+      .first()
+      .click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
+
+  await page.waitForURL('**/tasks/**/edit');
+
+  await page
+    .getByRole('link', {
+      name: 'Documents',
+    })
+    .click();
+
+  await page.waitForURL('**/tasks/**/documents');
+
+  await page
+    .locator('input[type="file"]')
+    .setInputFiles('./tests/assets/images/test-image.png');
+
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+
+  await expect(
+    page.getByText('test-image.png', { exact: true }).first()
+  ).toBeVisible();
+});
+
 test('all actions in dropdown displayed with admin permission', async ({
   page,
 }) => {
