@@ -45,7 +45,7 @@ export function TaskColumns() {
   ];
 
   return (
-    <Card title={t('task_columns')} padding="small" collapsed={true}>
+    <Card title={t('task_columns')} padding="small">
       <SortableVariableList
         for="task_columns"
         defaultVariables={defaultVariables}

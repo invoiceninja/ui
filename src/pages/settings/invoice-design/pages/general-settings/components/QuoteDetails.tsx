@@ -43,7 +43,7 @@ export function QuoteDetails() {
   ];
 
   return (
-    <Card title={t('quote_details')} padding="small" collapsed={true}>
+    <Card title={t('quote_details')} padding="small">
       <SortableVariableList
         for="quote_details"
         defaultVariables={defaultVariables}

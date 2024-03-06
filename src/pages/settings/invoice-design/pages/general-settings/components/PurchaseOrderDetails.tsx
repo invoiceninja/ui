@@ -43,7 +43,7 @@ export function PurchaseOrderDetails() {
   ];
 
   return (
-    <Card title={t('purchase_order_details')} padding="small" collapsed={true}>
+    <Card title={t('purchase_order_details')} padding="small">
       <SortableVariableList
         for="purchase_order_details"
         defaultVariables={defaultVariables}

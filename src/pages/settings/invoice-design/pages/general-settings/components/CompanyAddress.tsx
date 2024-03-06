@@ -48,7 +48,7 @@ export function CompanyAddress() {
   ];
 
   return (
-    <Card title={t('company_address')} padding="small" collapsed={true}>
+    <Card title={t('company_address')} padding="small">
       <SortableVariableList
         for="company_address"
         defaultVariables={defaultVariables}

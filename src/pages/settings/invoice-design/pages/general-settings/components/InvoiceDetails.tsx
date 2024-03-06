@@ -46,7 +46,7 @@ export function InvoiceDetails() {
   ];
 
   return (
-    <Card title={t('invoice_details')} padding="small" collapsed={true}>
+    <Card title={t('invoice_details')} padding="small">
       <SortableVariableList
         for="invoice_details"
         defaultVariables={defaultVariables}

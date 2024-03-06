@@ -66,7 +66,6 @@ export function ProductColumns() {
           : t('invoice_product_columns')
       }
       padding="small"
-      collapsed={true}
     >
       <SortableVariableList
         for="product_columns"

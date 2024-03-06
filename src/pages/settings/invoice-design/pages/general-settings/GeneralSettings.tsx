@@ -33,8 +33,8 @@ import { updatingRecordsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import axios, { AxiosPromise } from 'axios';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { TabGroup } from '$app/components/TabGroup';
+import { useTabs } from './hooks/useTabs';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -46,9 +46,11 @@ export interface GeneralSettingsPayload {
 
 export default function GeneralSettings() {
   const company = useInjectCompanyChanges();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const onSave = useHandleCompanySave();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const tabs = useTabs();
 
   const [payload, setPayload] = useState<GeneralSettingsPayload>({
     client_id: '-1',
@@ -99,25 +101,44 @@ export default function GeneralSettings() {
           <InvoiceGeneralSettings />
 
           {isCompanySettingsActive && (
-            <>
-              <ClientDetails />
-
-              {(proPlan() || enterprisePlan()) && (
-                <>
-                  <CompanyDetails />
-                  <CompanyAddress />
-                  <InvoiceDetails />
-                  <QuoteDetails />
-                  <CreditDetails />
-                  <VendorDetails />
-                  <PurchaseOrderDetails />
-                  <ProductColumns />
-                  <ProductQuoteColumns />
-                  <TaskColumns />
-                  <TotalFields />
-                </>
-              )}
-            </>
+            <TabGroup tabs={tabs}>
+              <div>
+                <ClientDetails />
+              </div>
+              <div>
+                <CompanyDetails />
+              </div>
+              <div>
+                <CompanyAddress />
+              </div>
+              <div>
+                <InvoiceDetails />
+              </div>
+              <div>
+                <QuoteDetails />
+              </div>
+              <div>
+                <CreditDetails />
+              </div>
+              <div>
+                <VendorDetails />
+              </div>
+              <div>
+                <PurchaseOrderDetails />
+              </div>
+              <div>
+                <ProductColumns />
+              </div>
+              <div>
+                <ProductQuoteColumns />
+              </div>
+              <div>
+                <TaskColumns />
+              </div>
+              <div>
+                <TotalFields />
+              </div>
+            </TabGroup>
           )}
         </div>
       </div>

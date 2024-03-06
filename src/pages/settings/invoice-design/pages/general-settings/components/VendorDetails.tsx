@@ -55,7 +55,7 @@ export function VendorDetails() {
   ];
 
   return (
-    <Card title={t('vendor_details')} padding="small" collapsed={true}>
+    <Card title={t('vendor_details')} padding="small">
       <SortableVariableList
         for="vendor_details"
         defaultVariables={defaultVariables}

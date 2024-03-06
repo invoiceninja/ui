@@ -43,7 +43,7 @@ export function CreditDetails() {
   ];
 
   return (
-    <Card title={t('credit_details')} padding="small" collapsed={true}>
+    <Card title={t('credit_details')} padding="small">
       <SortableVariableList
         for="credit_details"
         defaultVariables={defaultVariables}

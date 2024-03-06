@@ -30,7 +30,7 @@ export function TotalFields() {
   ];
 
   return (
-    <Card title={t('total_fields')} padding="small" collapsed={true}>
+    <Card title={t('total_fields')} padding="small">
       <SortableVariableList
         for="total_columns"
         defaultVariables={defaultVariables}
