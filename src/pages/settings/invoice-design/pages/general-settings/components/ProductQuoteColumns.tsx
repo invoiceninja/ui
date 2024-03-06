@@ -50,11 +50,7 @@ export function ProductQuoteColumns() {
   return (
     <>
       {!company?.settings.sync_invoice_quote_columns && (
-        <Card
-          title={t('quote_product_columns')}
-          padding="small"
-          collapsed={true}
-        >
+        <Card title={t('quote_product_columns')} padding="small">
           <SortableVariableList
             for="product_quote_columns"
             defaultVariables={defaultVariables}

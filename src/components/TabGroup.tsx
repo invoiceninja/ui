@@ -24,10 +24,18 @@ interface Props {
   withScrollableContent?: boolean;
   onTabChange?: (index: number) => void;
   formatTabLabel?: (index: number) => ReactNode | undefined;
+  hideTabs?: string[];
 }
 
 export function TabGroup(props: Props) {
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
+
+  const { hideTabs = [] } = props;
+
+  const hiddenTabsIndexes = hideTabs.map((hiddenTab) =>
+    props.tabs.indexOf(hiddenTab)
+  );
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -41,36 +49,37 @@ export function TabGroup(props: Props) {
     setCurrentIndex(props.defaultTabIndex || 0);
   }, [props.defaultTabIndex]);
 
-  const colors = useColorScheme();
-
   return (
     <div className={props.className} data-cy="tabs">
       <div
         className="-mb-px flex space-x-8 overflow-x-auto border-b"
         style={{ borderColor: colors.$5 }}
       >
-        {props.tabs.map((tab, index) => (
-          <div
-            key={index}
-            className={classNames({ 'w-full': props.width === 'full' })}
-          >
-            <button
-              type="button"
-              onClick={() => handleTabChange(index)}
-              style={{
-                borderColor:
-                  currentIndex === index ? accentColor : 'transparent',
-                color: currentIndex === index ? accentColor : colors.$3,
-              }}
-              className={classNames(
-                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                { 'w-full': props.width === 'full' }
-              )}
-            >
-              {props.formatTabLabel?.(index) || tab}
-            </button>
-          </div>
-        ))}
+        {props.tabs.map(
+          (tab, index) =>
+            !hideTabs.includes(tab) && (
+              <div
+                key={index}
+                className={classNames({ 'w-full': props.width === 'full' })}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(index)}
+                  style={{
+                    borderColor:
+                      currentIndex === index ? accentColor : 'transparent',
+                    color: currentIndex === index ? accentColor : colors.$3,
+                  }}
+                  className={classNames(
+                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                    { 'w-full': props.width === 'full' }
+                  )}
+                >
+                  {props.formatTabLabel?.(index) || tab}
+                </button>
+              </div>
+            )
+        )}
       </div>
 
       <div
@@ -80,20 +89,22 @@ export function TabGroup(props: Props) {
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
-        {[...props.children].map(
-          (element, index) =>
-            React.isValidElement(element) &&
-            React.cloneElement(element, {
-              key: index,
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              className: classNames(element.props?.className, {
-                'flex flex-col flex-1': props.height === 'full',
-                'block my-4': props.height !== 'full',
-                hidden: currentIndex !== index,
-              }),
-            })
-        )}
+        {[...props.children]
+          .map(
+            (element, index) =>
+              React.isValidElement(element) &&
+              React.cloneElement(element, {
+                key: index,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                className: classNames(element.props?.className, {
+                  'flex flex-col flex-1': props.height === 'full',
+                  'block my-4': props.height !== 'full',
+                  hidden: currentIndex !== index,
+                }),
+              })
+          )
+          .filter((_, index) => !hiddenTabsIndexes.includes(index))}
       </div>
     </div>
   );

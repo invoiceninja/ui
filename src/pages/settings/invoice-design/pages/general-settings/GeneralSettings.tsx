@@ -50,7 +50,7 @@ export default function GeneralSettings() {
 
   const onSave = useHandleCompanySave();
 
-  const tabs = useTabs();
+  const { tabs, hiddenTabs } = useTabs();
 
   const [payload, setPayload] = useState<GeneralSettingsPayload>({
     client_id: '-1',
@@ -101,7 +101,7 @@ export default function GeneralSettings() {
           <InvoiceGeneralSettings />
 
           {isCompanySettingsActive && (
-            <TabGroup tabs={tabs}>
+            <TabGroup tabs={tabs} hideTabs={hiddenTabs}>
               <div>
                 <ClientDetails />
               </div>

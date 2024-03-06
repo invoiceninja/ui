@@ -14,11 +14,11 @@ import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function ProductColumns() {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
+  const company = useCompanyChanges();
   const handleValueChange = useHandleSettingsValueChange();
   const customField = useCustomField();
 
@@ -77,9 +77,9 @@ export function ProductColumns() {
       <Element leftSide={t('share_invoice_quote_columns')}>
         <Toggle
           checked={Boolean(company?.settings.sync_invoice_quote_columns)}
-          onValueChange={(value) =>
-            handleValueChange('sync_invoice_quote_columns', value)
-          }
+          onValueChange={(value) => {
+            handleValueChange('sync_invoice_quote_columns', value);
+          }}
         />
       </Element>
     </Card>

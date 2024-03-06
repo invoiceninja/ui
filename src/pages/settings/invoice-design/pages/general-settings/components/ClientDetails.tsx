@@ -70,14 +70,16 @@ export function ClientDetails() {
   ];
 
   return (
-    <Card title={t('client_details')} padding="small">
+    <>
       <CustomDesignsPlanAlert />
 
-      <SortableVariableList
-        for="client_details"
-        defaultVariables={defaultVariables}
-        disabled={!proPlan() && !enterprisePlan()}
-      />
-    </Card>
+      <Card title={t('client_details')} padding="small">
+        <SortableVariableList
+          for="client_details"
+          defaultVariables={defaultVariables}
+          disabled={!proPlan() && !enterprisePlan()}
+        />
+      </Card>
+    </>
   );
 }

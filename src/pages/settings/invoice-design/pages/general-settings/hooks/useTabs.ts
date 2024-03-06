@@ -10,15 +10,19 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useTranslation } from 'react-i18next';
 
 export function useTabs() {
   const [t] = useTranslation();
 
-  const company = useCurrentCompany();
+  const company = useCompanyChanges();
 
   let tabs = [t('client_details')];
+
+  const hiddenTabs = company?.settings.sync_invoice_quote_columns
+    ? [t('quote_product_columns')]
+    : [];
 
   if (proPlan() || enterprisePlan()) {
     tabs = [
@@ -41,5 +45,5 @@ export function useTabs() {
     ];
   }
 
-  return tabs;
+  return { tabs, hiddenTabs };
 }
