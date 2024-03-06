@@ -119,13 +119,13 @@ export default function Reports() {
   const reports = useReports();
   const queryClient = useQueryClient();
   const scheduleReport = useScheduleReport();
-  const showReportField = useShowReportField();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
 
+  const showReportField = useShowReportField({ report: report.identifier });
   const { save, preferences } = usePreferences();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
@@ -385,7 +385,7 @@ export default function Reports() {
             />
           </Element>
 
-          {showReportField(report.identifier, 'document_email_attachment') && (
+          {showReportField('document_email_attachment') && (
             <Element leftSide={t('document_email_attachment')}>
               <Toggle
                 style={{
@@ -403,7 +403,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'is_expense_billed') && (
+          {showReportField('is_expense_billed') && (
             <Element leftSide={t('expense_paid_report')}>
               <Toggle
                 style={{
@@ -421,7 +421,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'is_income_billed') && (
+          {showReportField('is_income_billed') && (
             <Element leftSide={t('cash_vs_accrual')}>
               <Toggle
                 style={{
@@ -439,7 +439,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'include_tax') && (
+          {showReportField('include_tax') && (
             <Element leftSide={t('include_tax')}>
               <Toggle
                 style={{
@@ -457,7 +457,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'include_deleted') && (
+          {showReportField('include_deleted') && (
             <Element
               leftSide={t('include_deleted')}
               leftSideHelp={t('include_deleted_help')}
@@ -478,7 +478,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'status') && (
+          {showReportField('status') && (
             <Element leftSide={t('status')} className={'mb-50 py-50'}>
               <StatusSelector
                 report={report.identifier}
@@ -489,7 +489,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {showReportField(report.identifier, 'product_key') && (
+          {showReportField('product_key') && (
             <ProductItemsSelector
               onValueChange={(productsKeys) =>
                 handlePayloadChange('product_key', productsKeys)
@@ -497,7 +497,7 @@ export default function Reports() {
             />
           )}
 
-          {showReportField(report.identifier, 'clients') && (
+          {showReportField('clients') && (
             <MultiClientSelector
               value={report.payload.clients}
               onValueChange={(clientIds) =>
@@ -506,7 +506,7 @@ export default function Reports() {
             />
           )}
 
-          {showReportField(report.identifier, 'vendors') && (
+          {showReportField('vendors') && (
             <MultiVendorSelector
               value={report.payload.vendors}
               onValueChange={(vendorIds) =>
@@ -515,7 +515,7 @@ export default function Reports() {
             />
           )}
 
-          {showReportField(report.identifier, 'projects') && (
+          {showReportField('projects') && (
             <MultiProjectSelector
               value={report.payload.projects}
               onValueChange={(projectIds) =>
@@ -524,7 +524,7 @@ export default function Reports() {
             />
           )}
 
-          {showReportField(report.identifier, 'categories') && (
+          {showReportField('categories') && (
             <MultiExpenseCategorySelector
               value={report.payload.categories}
               onValueChange={(expenseCategoryIds) =>

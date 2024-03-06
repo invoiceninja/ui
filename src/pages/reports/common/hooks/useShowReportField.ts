@@ -68,8 +68,14 @@ const ReportFields: Record<Identifier, Field[]> = {
   user_sales_report: [],
 };
 
-export function useShowReportField() {
-  return (report: Identifier, field: Field) => {
+interface Params {
+  report: Identifier;
+}
+
+export function useShowReportField(params: Params) {
+  const { report } = params;
+
+  return (field: Field) => {
     return Boolean(ReportFields[report].includes(field));
   };
 }
