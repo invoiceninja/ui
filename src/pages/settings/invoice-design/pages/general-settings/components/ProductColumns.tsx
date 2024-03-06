@@ -77,9 +77,9 @@ export function ProductColumns() {
       <Element leftSide={t('share_invoice_quote_columns')}>
         <Toggle
           checked={Boolean(company?.settings.sync_invoice_quote_columns)}
-          onValueChange={(value) => {
-            handleValueChange('sync_invoice_quote_columns', value);
-          }}
+          onValueChange={(value) =>
+            handleValueChange('sync_invoice_quote_columns', value)
+          }
         />
       </Element>
     </Card>
