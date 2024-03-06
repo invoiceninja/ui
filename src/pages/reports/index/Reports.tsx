@@ -95,23 +95,6 @@ export const ranges: Range[] = [
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
-export const EXPORT_DOCUMENTS_REPORTS: Identifier[] = [
-  'client',
-  'invoice',
-  'invoice_item',
-  'quote',
-  'quote_item',
-  'credit',
-  'document',
-  'payment',
-  'expense',
-  'task',
-  'product',
-  'vendor',
-  'purchase_order',
-  'purchase_order_item',
-];
-
 const download = (data: BlobPart, identifier: string) => {
   const blob = new Blob([data], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
