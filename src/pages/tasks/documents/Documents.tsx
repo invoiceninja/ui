@@ -30,7 +30,7 @@ export default function Documents() {
   };
 
   return (
-    <div className="w-2/3">
+    <div className="w-full lg:w-2/3">
       <Upload
         widgetOnly
         endpoint={endpoint('/api/v1/tasks/:id/upload', { id: task?.id })}
