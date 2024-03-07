@@ -412,6 +412,7 @@ export function useActions(params?: Params) {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
+    editPageTabs: ['documents'],
   });
 
   const start = useStart();
