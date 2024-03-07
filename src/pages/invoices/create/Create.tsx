@@ -103,7 +103,7 @@ export default function Create() {
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
 
-  const save = useHandleCreate(setErrors);
+  const save = useHandleCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
   useEffect(() => {
     setInvoiceSum(undefined);

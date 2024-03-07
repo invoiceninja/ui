@@ -110,7 +110,7 @@ export default function Edit() {
   }, [invoice]);
 
   const actions = useActions();
-  const save = useHandleSave(setErrors);
+  const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   return (
     <Default

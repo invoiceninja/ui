@@ -21,13 +21,21 @@ import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Dispatch, SetStateAction } from 'react';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
-export function useHandleCreate(
-  setErrors: (errors: ValidationBag | undefined) => unknown
-) {
+interface Params {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+export function useHandleCreate(params: Params) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const { setErrors, isDefaultTerms, isDefaultFooter } = params;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -37,8 +45,23 @@ export function useHandleCreate(
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/invoices'), invoice)
-      .then((response: GenericSingleResourceResponse<Invoice>) => {
+    let apiEndpoint = '/api/v1/invoices?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), invoice)
+      .then(async (response: GenericSingleResourceResponse<Invoice>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_invoice');
 
         $refetch(['products']);

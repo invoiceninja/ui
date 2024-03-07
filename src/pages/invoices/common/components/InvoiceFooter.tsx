@@ -151,7 +151,7 @@ export function InvoiceFooter(props: Props) {
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
           <div className="mb-4">
             <Upload

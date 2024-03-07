@@ -85,6 +85,8 @@ export default function Edit() {
     InvoiceSum | InvoiceSumInclusive
   >();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -109,7 +111,7 @@ export default function Edit() {
     setInvoiceSum
   );
 
-  const onSave = useSave(setErrors);
+  const onSave = useSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   const actions = useActions();
   const colors = useColorScheme();
@@ -201,6 +203,10 @@ export default function Edit() {
               purchaseOrder={purchaseOrder}
               handleChange={handleChange}
               errors={errors}
+              isDefaultFooter={isDefaultFooter}
+              isDefaultTerms={isDefaultTerms}
+              setIsDefaultFooter={setIsDefaultFooter}
+              setIsDefaultTerms={setIsDefaultTerms}
             />
 
             <InvoiceTotals

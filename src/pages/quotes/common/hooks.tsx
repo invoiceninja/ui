@@ -89,6 +89,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -201,11 +202,15 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
 
@@ -219,8 +224,23 @@ export function useCreate(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/quotes'), quote)
-      .then((response: GenericSingleResourceResponse<Quote>) => {
+    let apiEndpoint = '/api/v1/quotes?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), quote)
+      .then(async (response: GenericSingleResourceResponse<Quote>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_quote');
 
         $refetch(['quotes']);
@@ -238,7 +258,9 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
@@ -249,8 +271,23 @@ export function useSave(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
-      .then(() => {
+    let apiEndpoint = '/api/v1/quotes/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: quote.id }), quote)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_quote');
 
         $refetch(['quotes']);
