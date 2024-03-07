@@ -125,21 +125,21 @@ export function Footer(props: Props) {
           </Element>
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={purchaseOrder.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={purchaseOrder.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="my-4">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <UserSelector
@@ -194,9 +194,9 @@ export function Footer(props: Props) {
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
-          <div>
+          <div className="my-4">
             <Upload
               widgetOnly
               endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {

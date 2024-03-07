@@ -151,7 +151,7 @@ export function QuoteFooter(props: Props) {
         {location.pathname.endsWith('/create') ? (
           <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
-          <div className="mb-4">
+          <div className="my-4">
             <Upload
               widgetOnly
               endpoint={endpoint('/api/v1/quotes/:id/upload', {
