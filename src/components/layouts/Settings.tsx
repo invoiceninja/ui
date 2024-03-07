@@ -164,7 +164,7 @@ export function Settings(props: Props) {
           {advanced.filter((route) => route.enabled).length > 0 && (
             <div className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8 truncate space-x-1">
               <span>{t('advanced_settings')}</span>
-              <sup>{t('PRO')}</sup>
+              <sup>{t('pro')}</sup>
             </div>
           )}
 
