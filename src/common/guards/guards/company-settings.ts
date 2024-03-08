@@ -13,5 +13,5 @@ import { Guard } from '../Guard';
 
 export function companySettings(): Guard {
   return ({ settingsLevel }) =>
-    Promise.resolve(Boolean(settingsLevel !== SettingsLevel.Company));
+    Promise.resolve(Boolean(settingsLevel === SettingsLevel.Company));
 }
