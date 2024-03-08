@@ -48,6 +48,7 @@ import { MultiClientSelector } from '../common/components/MultiClientSelector';
 import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseCategorySelector';
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
+import { useShowReportField } from '../common/hooks/useShowReportField';
 interface Range {
   identifier: string;
   label: string;
@@ -94,23 +95,6 @@ export const ranges: Range[] = [
   { identifier: 'custom', label: 'custom', scheduleIdentifier: 'custom' },
 ];
 
-export const EXPORT_DOCUMENTS_REPORTS: Identifier[] = [
-  'client',
-  'invoice',
-  'invoice_item',
-  'quote',
-  'quote_item',
-  'credit',
-  'document',
-  'payment',
-  'expense',
-  'task',
-  'product',
-  'vendor',
-  'purchase_order',
-  'purchase_order_item',
-];
-
 const download = (data: BlobPart, identifier: string) => {
   const blob = new Blob([data], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -141,6 +125,7 @@ export default function Reports() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
 
+  const showReportField = useShowReportField({ report: report.identifier });
   const { save, preferences } = usePreferences();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
@@ -400,7 +385,7 @@ export default function Reports() {
             />
           </Element>
 
-          {EXPORT_DOCUMENTS_REPORTS.includes(report.identifier) && (
+          {showReportField('document_email_attachment') && (
             <Element leftSide={t('document_email_attachment')}>
               <Toggle
                 style={{
@@ -418,61 +403,85 @@ export default function Reports() {
             </Element>
           )}
 
-          {report.identifier === 'profitloss' && (
-            <>
-              <Element leftSide={t('expense_paid_report')}>
-                <Toggle
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  checked={report.payload.is_expense_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_expense_billed', value)
-                  }
-                  cypressRef="expenseBilled"
-                />
-              </Element>
-
-              <Element leftSide={t('cash_vs_accrual')}>
-                <Toggle
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  checked={report.payload.is_income_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_income_billed', value)
-                  }
-                  cypressRef="incomeBilled"
-                />
-              </Element>
-
-              <Element leftSide={t('include_tax')}>
-                <Toggle
-                  style={{
-                    color: colors.$3,
-                    colorScheme: colors.$0,
-                    backgroundColor: colors.$1,
-                    borderColor: colors.$4,
-                  }}
-                  checked={report.payload.include_tax}
-                  onValueChange={(value) =>
-                    handlePayloadChange('include_tax', value)
-                  }
-                  cypressRef="includeTax"
-                />
-              </Element>
-            </>
+          {showReportField('is_expense_billed') && (
+            <Element leftSide={t('expense_paid_report')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.is_expense_billed}
+                onValueChange={(value) =>
+                  handlePayloadChange('is_expense_billed', value)
+                }
+                cypressRef="expenseBilled"
+              />
+            </Element>
           )}
 
-          {report.identifier === 'invoice' && (
+          {showReportField('is_income_billed') && (
+            <Element leftSide={t('cash_vs_accrual')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.is_income_billed}
+                onValueChange={(value) =>
+                  handlePayloadChange('is_income_billed', value)
+                }
+                cypressRef="incomeBilled"
+              />
+            </Element>
+          )}
+
+          {showReportField('include_tax') && (
+            <Element leftSide={t('include_tax')}>
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.include_tax}
+                onValueChange={(value) =>
+                  handlePayloadChange('include_tax', value)
+                }
+                cypressRef="includeTax"
+              />
+            </Element>
+          )}
+
+          {showReportField('include_deleted') && (
+            <Element
+              leftSide={t('include_deleted')}
+              leftSideHelp={t('include_deleted_help')}
+            >
+              <Toggle
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+                checked={report.payload.include_deleted}
+                onValueChange={(value) =>
+                  handlePayloadChange('include_deleted', value)
+                }
+                cypressRef="includeDeleted"
+              />
+            </Element>
+          )}
+
+          {showReportField('status') && (
             <Element leftSide={t('status')} className={'mb-50 py-50'}>
               <StatusSelector
+                report={report.identifier}
                 onValueChange={(statuses) =>
                   handlePayloadChange('status', statuses)
                 }
@@ -480,8 +489,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {(report.identifier === 'product_sales' ||
-            report.identifier === 'invoice_item') && (
+          {showReportField('product_key') && (
             <ProductItemsSelector
               onValueChange={(productsKeys) =>
                 handlePayloadChange('product_key', productsKeys)
@@ -489,36 +497,40 @@ export default function Reports() {
             />
           )}
 
-          {report.identifier === 'expense' && (
-            <>
-              <MultiClientSelector
-                value={report.payload.clients}
-                onValueChange={(clientIds) =>
-                  handlePayloadChange('clients', clientIds)
-                }
-              />
+          {showReportField('clients') && (
+            <MultiClientSelector
+              value={report.payload.clients}
+              onValueChange={(clientIds) =>
+                handlePayloadChange('clients', clientIds)
+              }
+            />
+          )}
 
-              <MultiVendorSelector
-                value={report.payload.vendors}
-                onValueChange={(vendorIds) =>
-                  handlePayloadChange('vendors', vendorIds)
-                }
-              />
+          {showReportField('vendors') && (
+            <MultiVendorSelector
+              value={report.payload.vendors}
+              onValueChange={(vendorIds) =>
+                handlePayloadChange('vendors', vendorIds)
+              }
+            />
+          )}
 
-              <MultiProjectSelector
-                value={report.payload.projects}
-                onValueChange={(projectIds) =>
-                  handlePayloadChange('projects', projectIds)
-                }
-              />
+          {showReportField('projects') && (
+            <MultiProjectSelector
+              value={report.payload.projects}
+              onValueChange={(projectIds) =>
+                handlePayloadChange('projects', projectIds)
+              }
+            />
+          )}
 
-              <MultiExpenseCategorySelector
-                value={report.payload.categories}
-                onValueChange={(expenseCategoryIds) =>
-                  handlePayloadChange('categories', expenseCategoryIds)
-                }
-              />
-            </>
+          {showReportField('categories') && (
+            <MultiExpenseCategorySelector
+              value={report.payload.categories}
+              onValueChange={(expenseCategoryIds) =>
+                handlePayloadChange('categories', expenseCategoryIds)
+              }
+            />
           )}
         </Card>
 
