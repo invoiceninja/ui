@@ -51,31 +51,28 @@ export function TabGroup(props: Props) {
         className="-mb-px flex space-x-8 overflow-x-auto border-b"
         style={{ borderColor: colors.$5 }}
       >
-        {props.tabs.map(
-          (tab, index) =>
-            !hideTabs.includes(tab) && (
-              <div
-                key={index}
-                className={classNames({ 'w-full': props.width === 'full' })}
-              >
-                <button
-                  type="button"
-                  onClick={() => handleTabChange(index)}
-                  style={{
-                    borderColor:
-                      currentIndex === index ? accentColor : 'transparent',
-                    color: currentIndex === index ? accentColor : colors.$3,
-                  }}
-                  className={classNames(
-                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                    { 'w-full': props.width === 'full' }
-                  )}
-                >
-                  {props.formatTabLabel?.(index) || tab}
-                </button>
-              </div>
-            )
-        )}
+        {props.tabs.map((tab, index) => (
+          <div
+            key={index}
+            className={classNames({ 'w-full': props.width === 'full' })}
+          >
+            <button
+              type="button"
+              onClick={() => handleTabChange(index)}
+              style={{
+                borderColor:
+                  currentIndex === index ? accentColor : 'transparent',
+                color: currentIndex === index ? accentColor : colors.$3,
+              }}
+              className={classNames(
+                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                { 'w-full': props.width === 'full' }
+              )}
+            >
+              {props.formatTabLabel?.(index) || tab}
+            </button>
+          </div>
+        ))}
       </div>
 
       <div
