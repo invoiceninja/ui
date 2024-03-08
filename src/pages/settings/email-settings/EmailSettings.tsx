@@ -309,7 +309,7 @@ export function EmailSettings() {
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
                 <option value="EN16931">EN16931</option>
-                <option value="XInvoice_3.0">XInvoice_3.0</option>
+                <option value="XInvoice_3_0">XInvoice_3_0</option>
                 <option value="XInvoice_2_3">XInvoice_2_3</option>
                 <option value="XInvoice_2_2">XInvoice_2_2</option>
                 <option value="XInvoice_2_1">XInvoice_2_1</option>
