@@ -189,6 +189,7 @@ interface SaveButton {
   onClick: () => unknown;
   label?: string;
   disableSaveButton?: boolean;
+  displayButton?: boolean;
 }
 
 export const saveBtnAtom = atom<SaveButton | null>(null);
@@ -197,8 +198,12 @@ export function useSaveBtn(options?: SaveButton, deps: unknown[] = []) {
   const [saveBtn, setSaveBtn] = useAtom(saveBtnAtom);
 
   useEffect(() => {
-    if (options) {
+    if (options && options.displayButton) {
       setSaveBtn(options);
+    }
+
+    if (options && !options.displayButton) {
+      setSaveBtn(null);
     }
 
     return () => {

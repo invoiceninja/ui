@@ -16,7 +16,7 @@ import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design
 import { useCustomField } from '$app/components/CustomField';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-export function ProductColumns() {
+export default function ProductColumns() {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const handleValueChange = useHandleSettingsValueChange();
