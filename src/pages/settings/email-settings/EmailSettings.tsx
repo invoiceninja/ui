@@ -309,6 +309,8 @@ export function EmailSettings() {
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
                 <option value="EN16931">EN16931</option>
+                <option value="XInvoice_3.0">XInvoice_3.0</option>
+                <option value="XInvoice_2_3">XInvoice_2_3</option>
                 <option value="XInvoice_2_2">XInvoice_2_2</option>
                 <option value="XInvoice_2_1">XInvoice_2_1</option>
                 <option value="XInvoice_2_0">XInvoice_2_0</option>
@@ -316,9 +318,9 @@ export function EmailSettings() {
                 <option value="XInvoice-Extended">XInvoice-Extended</option>
                 <option value="XInvoice-BasicWL">XInvoice-BasicWL</option>
                 <option value="XInvoice-Basic">XInvoice-Basic</option>
-                <option value="Facturae_3.2">Facturae_3.2</option>
-                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
+                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
+                <option value="Facturae_3.2">Facturae_3.2</option>
               </SelectField>
             </Element>
           </>
