@@ -70,6 +70,8 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
   const [client, setClient] = useState<Client | undefined>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const resetInvoiceForm = () => {
     handleChange('client_id', '');
@@ -101,7 +103,7 @@ export default function Create() {
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
 
-  const save = useHandleCreate(setErrors);
+  const save = useHandleCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
   useEffect(() => {
     setInvoiceSum(undefined);
@@ -296,6 +298,10 @@ export default function Create() {
           invoice={invoice}
           handleChange={handleChange}
           errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
         />
 
         {invoice && (
