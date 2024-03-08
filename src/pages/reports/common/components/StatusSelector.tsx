@@ -44,7 +44,6 @@ export function StatusSelector(props: Props) {
   const { value, onValueChange, errorMessage, report } = props;
 
   const [options, setOptions] = useState<SelectOption[]>([]);
-  const [selectedValue, setSelectedValue] = useState<string>(value ?? '');
 
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
@@ -70,11 +69,10 @@ export function StatusSelector(props: Props) {
 
   const handleStatusChange = (
     statuses: MultiValue<{ value: string; label: string }>
-  ) => {
-    return (statuses as SelectOption[])
+  ) =>
+    (statuses as SelectOption[])
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
-  };
 
   useEffect(() => {
     if (report === 'invoice' || report === 'invoice_item') {
@@ -115,25 +113,14 @@ export function StatusSelector(props: Props) {
       <Select
         id="statusSelector"
         styles={customStyles}
-        value={options.filter((option) =>
-          selectedValue
-            .split(',')
-            .find((optionValue) => optionValue === option.value)
-        )}
-        onChange={(options) => {
-          const currentValue = options.find((option) => option.value === 'all')
-            ? 'all'
-            : handleStatusChange(options);
-
-          onValueChange(currentValue);
-          setSelectedValue(currentValue);
-        }}
+        {...(value && {
+          value: options.filter((option) =>
+            value.split(',').find((optionValue) => option.value === optionValue)
+          ),
+        })}
+        onChange={(options) => onValueChange(handleStatusChange(options))}
         placeholder={t('status')}
-        options={
-          selectedValue === 'all'
-            ? options.filter((option) => option.value === 'all')
-            : options
-        }
+        options={options}
         isMulti={true}
       />
 
