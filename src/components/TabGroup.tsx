@@ -24,10 +24,14 @@ interface Props {
   withScrollableContent?: boolean;
   onTabChange?: (index: number) => void;
   formatTabLabel?: (index: number) => ReactNode | undefined;
+  withoutVerticalMargin?: boolean;
 }
 
 export function TabGroup(props: Props) {
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
+
+  const { withoutVerticalMargin } = props;
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
@@ -40,8 +44,6 @@ export function TabGroup(props: Props) {
   useEffect(() => {
     setCurrentIndex(props.defaultTabIndex || 0);
   }, [props.defaultTabIndex]);
-
-  const colors = useColorScheme();
 
   return (
     <div className={props.className} data-cy="tabs">
@@ -76,7 +78,7 @@ export function TabGroup(props: Props) {
       <div
         className={classNames(props.childrenClassName, {
           'flex flex-1': props.height === 'full',
-          'my-4': props.height !== 'full',
+          'my-4': props.height !== 'full' && !withoutVerticalMargin,
           'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
@@ -89,7 +91,7 @@ export function TabGroup(props: Props) {
               // @ts-ignore
               className: classNames(element.props?.className, {
                 'flex flex-col flex-1': props.height === 'full',
-                'block my-4': props.height !== 'full',
+                'block my-4': props.height !== 'full' && !withoutVerticalMargin,
                 hidden: currentIndex !== index,
               }),
             })

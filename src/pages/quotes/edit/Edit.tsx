@@ -67,6 +67,8 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -99,7 +101,7 @@ export default function Edit() {
   }, [quote]);
 
   const actions = useActions();
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
@@ -205,7 +207,14 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <QuoteFooter handleChange={handleChange} errors={errors} />
+        <QuoteFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {quote && (
           <InvoiceTotals

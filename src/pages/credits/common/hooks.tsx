@@ -85,6 +85,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -197,16 +198,18 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const navigate = useNavigate();
 
   const saveCompany = useHandleCompanySave();
-
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (credit: Credit) => {
@@ -215,8 +218,23 @@ export function useCreate(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/credits'), credit)
-      .then((response: GenericSingleResourceResponse<Credit>) => {
+    let apiEndpoint = '/api/v1/credits?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), credit)
+      .then(async (response: GenericSingleResourceResponse<Credit>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_credit');
 
         $refetch(['credits']);
@@ -238,10 +256,11 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
 
   return async (credit: Credit) => {
@@ -251,8 +270,23 @@ export function useSave(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
-      .then(() => {
+    let apiEndpoint = '/api/v1/credits/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: credit.id }), credit)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_credit');
 
         $refetch(['credits']);
