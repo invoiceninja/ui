@@ -24,6 +24,7 @@ import { endpoint } from '$app/common/helpers';
 
 interface Params {
   client: Client | undefined;
+  isPurgeActionCalled?: boolean;
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
@@ -33,7 +34,7 @@ export function useTabs(params: Params) {
   const entityAssigned = useEntityAssigned();
 
   const { id } = useParams();
-  const { client } = params;
+  const { client, isPurgeActionCalled } = params;
 
   const { data: clientDocuments } = useQuery({
     queryKey: ['/api/v1/documents', id, 'client'],
@@ -42,7 +43,7 @@ export function useTabs(params: Params) {
         (response) => response.data.data
       ),
     staleTime: Infinity,
-    enabled: Boolean(id),
+    enabled: Boolean(id) && !isPurgeActionCalled,
   });
 
   let tabs: Tab[] = [

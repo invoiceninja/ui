@@ -14,7 +14,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Tabs } from '$app/components/Tabs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Address } from './components/Address';
@@ -34,10 +34,13 @@ export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
   const [t] = useTranslation();
 
+  const [isPurgeActionCalled, setIsPurgeActionCalled] =
+    useState<boolean>(false);
+
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({
     id,
-    enabled: Boolean(id),
+    enabled: Boolean(id) && !isPurgeActionCalled,
   });
 
   const pages: Page[] = [
@@ -48,8 +51,8 @@ export default function Client() {
     },
   ];
 
-  const tabs = useTabs({ client });
-  const actions = useActions();
+  const tabs = useTabs({ client, isPurgeActionCalled });
+  const actions = useActions({ setIsPurgeActionCalled });
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
@@ -57,6 +60,10 @@ export default function Client() {
 
   useEffect(() => {
     setDocumentTitle(client?.display_name || 'view_client');
+
+    return () => {
+      setIsPurgeActionCalled(false);
+    };
   }, [client]);
 
   return (
@@ -93,7 +100,7 @@ export default function Client() {
           <Tabs tabs={tabs} className="mt-6" />
 
           <div className="my-4">
-            <Outlet />
+            <Outlet context={{ isPurgeActionCalled }} />
           </div>
         </>
       )}

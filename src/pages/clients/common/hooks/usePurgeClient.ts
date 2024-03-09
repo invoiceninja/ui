@@ -15,15 +15,22 @@ import { useSetAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { Dispatch, SetStateAction } from 'react';
 
-export function usePurgeClient() {
+interface Params {
+  setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
+}
+export function usePurgeClient(params?: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const { setIsPurgeActionCalled } = params || {};
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   return (password: string, clientId: string) => {
     toast.processing();
+    setIsPurgeActionCalled?.(true);
 
     request(
       'POST',
@@ -43,6 +50,8 @@ export function usePurgeClient() {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
         }
+
+        setIsPurgeActionCalled?.(false);
       });
   };
 }

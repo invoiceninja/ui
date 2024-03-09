@@ -39,12 +39,17 @@ export default function Edit() {
   const { id } = useParams();
 
   const [t] = useTranslation();
-
   const navigate = useNavigate();
 
-  const actions = useActions();
+  const [isPurgeActionCalled, setIsPurgeActionCalled] =
+    useState<boolean>(false);
 
-  const { data, isLoading } = useClientQuery({ id, enabled: true });
+  const actions = useActions({ setIsPurgeActionCalled });
+
+  const { data, isLoading } = useClientQuery({
+    id,
+    enabled: !isPurgeActionCalled,
+  });
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
@@ -60,6 +65,10 @@ export default function Edit() {
 
       setContacts(contacts);
     }
+
+    return () => {
+      setIsPurgeActionCalled(false);
+    };
   }, [data]);
 
   useEffect(() => {

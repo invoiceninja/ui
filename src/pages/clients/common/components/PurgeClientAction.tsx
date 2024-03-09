@@ -15,17 +15,18 @@ import { useTranslation } from 'react-i18next';
 import { MdDeleteForever } from 'react-icons/md';
 import { usePurgeClient } from '../hooks/usePurgeClient';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 interface Props {
   client: Client;
+  setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function PurgeClientAction(props: Props) {
   const [t] = useTranslation();
 
-  const { client } = props;
+  const { client, setIsPurgeActionCalled } = props;
 
-  const handlePurgeClient = usePurgeClient();
+  const handlePurgeClient = usePurgeClient({ setIsPurgeActionCalled });
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);

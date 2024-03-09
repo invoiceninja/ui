@@ -35,10 +35,16 @@ import {
 } from '$app/common/hooks/permissions/useHasPermission';
 import { PurgeClientAction } from '../components/PurgeClientAction';
 import { MergeClientAction } from '../components/MergeClientAction';
+import { Dispatch, SetStateAction } from 'react';
 
-export function useActions() {
+interface Params {
+  setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
+
+  const { setIsPurgeActionCalled } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -169,7 +175,13 @@ export function useActions() {
       ),
     (client) =>
       (isAdmin || isOwner) &&
-      client && <PurgeClientAction key="purge" client={client} />,
+      client && (
+        <PurgeClientAction
+          key="purge"
+          client={client}
+          setIsPurgeActionCalled={setIsPurgeActionCalled}
+        />
+      ),
   ];
 
   return actions;
