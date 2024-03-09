@@ -10,7 +10,7 @@
 
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useParams } from 'react-router-dom';
+import { useOutletContext, useParams } from 'react-router-dom';
 import {
   defaultColumns,
   useAllDocumentColumns,
@@ -45,8 +45,16 @@ export interface Document {
   width: number;
   link: string;
 }
+
+interface Context {
+  isPurgeActionCalled: boolean;
+}
 export default function Documents() {
   const { id } = useParams();
+
+  const context: Context = useOutletContext();
+
+  const { isPurgeActionCalled } = context;
 
   const hasPermission = useHasPermission();
 
@@ -80,6 +88,7 @@ export default function Documents() {
         showRestore={() => false}
         showArchive={() => false}
         showDelete={() => false}
+        disableQuery={isPurgeActionCalled}
         withoutDefaultBulkActions
         withoutStatusFilter
         hideEditableOptions={!hasPermission('edit_expense')}

@@ -133,6 +133,7 @@ interface Props<T> extends CommonProps {
   withoutDefaultBulkActions?: boolean;
   withoutStatusFilter?: boolean;
   queryIdentificator?: string;
+  disableQuery?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -164,6 +165,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     excludeColumns = [],
     methodType = 'GET',
     queryIdentificator,
+    disableQuery,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -293,6 +295,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     () => request(methodType, apiEndpoint.href),
     {
       staleTime: props.staleTime ?? Infinity,
+      enabled: !disableQuery,
     }
   );
 
