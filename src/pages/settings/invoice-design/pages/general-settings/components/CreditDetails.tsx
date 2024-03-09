@@ -40,6 +40,7 @@ export default function CreditDetails() {
       label: customField('invoice4').label() || t('custom4'),
     },
     { value: '$client.balance', label: t('client_balance') },
+    { value: '$credit.balance', label: t('credit_balance') },
   ];
 
   return (

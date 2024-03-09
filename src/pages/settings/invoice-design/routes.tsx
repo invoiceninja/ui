@@ -43,7 +43,7 @@ const CreditDetails = lazy(
   () => import('./pages/general-settings/components/CreditDetails')
 );
 const VendorDetails = lazy(
-  () => import('./pages/general-settings/components/CreditDetails')
+  () => import('./pages/general-settings/components/VendorDetails')
 );
 const PurchaseOrderDetails = lazy(
   () => import('./pages/general-settings/components/PurchaseOrderDetails')

@@ -43,6 +43,7 @@ export default function InvoiceDetails() {
     },
     { value: '$invoice.project', label: t('project') },
     { value: '$client.balance', label: t('client_balance') },
+    { value: '$invoice.total', label: t('invoice_total') },
   ];
 
   return (
