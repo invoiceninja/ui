@@ -101,5 +101,5 @@ export function Guard({ guards, component, type = 'page' }: Props) {
     return null;
   }
 
-  return <Fallback>{component}</Fallback>;
+  return <Fallback type={type}>{component}</Fallback>;
 }
