@@ -15,7 +15,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import axios, { AxiosPromise } from 'axios';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { Outlet, useLocation } from 'react-router-dom';
 import { updatingRecordsAtom } from './common/atoms';
 import { useEffect, useState } from 'react';
@@ -40,7 +40,7 @@ export default function InvoiceDesign() {
   const location = useLocation();
   const company = useCompanyChanges();
   const displaySaveButtonAndPreview =
-    !location.pathname.includes('custom_design');
+    !location.pathname.includes('custom_designs');
 
   const onSave = useHandleCompanySave();
 
@@ -52,7 +52,7 @@ export default function InvoiceDesign() {
     settings_type: 'company',
   });
 
-  const [updatingRecords] = useAtom(updatingRecordsAtom);
+  const updatingRecords = useAtomValue(updatingRecordsAtom);
 
   const handleSave = () => {
     onSave();
