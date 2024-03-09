@@ -99,7 +99,10 @@ export function OnlinePayments() {
             <PropertyCheckbox
               propertyKey="auto_bill_standard_invoices"
               labelElement={
-                <SettingsLabel label={t('auto_bill_standard_invoices')} />
+                <SettingsLabel
+                  label={t('auto_bill_standard_invoices')}
+                  helpLabel={t('auto_bill_standard_invoices_help')}
+                />
               }
               defaultValue={false}
             />
@@ -156,7 +159,12 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="auto_bill_date"
-              labelElement={<SettingsLabel label={t('auto_bill_on')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('auto_bill_on')}
+                  helpLabel={t('auto_bill_on_help')}
+                />
+              }
               defaultValue="on_send_date"
             />
           }
@@ -178,7 +186,10 @@ export function OnlinePayments() {
             <PropertyCheckbox
               propertyKey="use_credits_payment"
               labelElement={
-                <SettingsLabel label={t('use_available_credits')} />
+                <SettingsLabel
+                  label={t('use_available_credits')}
+                  helpLabel={t('use_available_credits_help')}
+                />
               }
               defaultValue="off"
             />
@@ -202,7 +213,10 @@ export function OnlinePayments() {
             <PropertyCheckbox
               propertyKey="use_unapplied_payment"
               labelElement={
-                <SettingsLabel label={t('use_unapplied_payments')} />
+                <SettingsLabel
+                  label={t('use_unapplied_payments')}
+                  helpLabel={t('use_unapplied_payments_help')}
+                />
               }
               defaultValue="off"
             />
@@ -227,7 +241,12 @@ export function OnlinePayments() {
               leftSide={
                 <PropertyCheckbox
                   propertyKey="payment_terms"
-                  labelElement={<SettingsLabel label={t('payment_terms')} />}
+                  labelElement={
+                    <SettingsLabel
+                      label={t('payment_terms')}
+                      helpLabel={t('payment_terms_help')}
+                    />
+                  }
                 />
               }
             >
@@ -259,7 +278,12 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="payment_type_id"
-              labelElement={<SettingsLabel label={t('payment_type')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('payment_type')}
+                  helpLabel={t('payment_type_help')}
+                />
+              }
             />
           }
         >
@@ -286,7 +310,12 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="valid_until"
-              labelElement={<SettingsLabel label={t('quote_valid_until')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('quote_valid_until')}
+                  helpLabel={t('quote_valid_until_help')}
+                />
+              }
             />
           }
         >
@@ -310,7 +339,12 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="default_expense_payment_type_id"
-              labelElement={<SettingsLabel label={t('expense_payment_type')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('expense_payment_type')}
+                  helpLabel={t('expense_payment_type_help')}
+                />
+              }
             />
           }
         >
