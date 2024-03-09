@@ -24,7 +24,7 @@ export function useGroupSettingsQuery(params?: GlobalParams) {
       request(
         'GET',
         endpoint('/api/v1/group_settings?status=:status', {
-          status: params?.status ?? 'all',
+          status: params?.status ?? 'active',
         })
       ).then(
         (response: GenericSingleResourceResponse<GroupSettings[]>) =>

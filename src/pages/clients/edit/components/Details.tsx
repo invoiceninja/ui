@@ -34,7 +34,7 @@ interface Props {
 export function Details(props: Props) {
   const [t] = useTranslation();
   const { data: users } = useUsersQuery();
-  const { data: groupSettings } = useGroupSettingsQuery({ status: ['active'] });
+  const { data: groupSettings } = useGroupSettingsQuery();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     props.setErrors(undefined);
