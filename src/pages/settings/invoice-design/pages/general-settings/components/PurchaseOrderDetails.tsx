@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 
-export function PurchaseOrderDetails() {
+export default function PurchaseOrderDetails() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -43,7 +43,7 @@ export function PurchaseOrderDetails() {
   ];
 
   return (
-    <Card title={t('purchase_order_details')} padding="small" collapsed={true}>
+    <Card title={t('purchase_order_details')} padding="small">
       <SortableVariableList
         for="purchase_order_details"
         defaultVariables={defaultVariables}

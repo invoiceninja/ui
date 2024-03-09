@@ -47,8 +47,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import {
+  saveBtnAtom,
   useNavigationTopRightElement,
-  useSaveBtn,
 } from '$app/components/layouts/common/hooks';
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
@@ -57,6 +57,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useAtomValue } from 'jotai';
 
 export interface SaveOption {
   label: string;
@@ -363,7 +364,7 @@ export function Default(props: Props) {
   ];
 
   const { isOwner } = useAdmin();
-  const saveBtn = useSaveBtn();
+  const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
   const colors = useColorScheme();
 
