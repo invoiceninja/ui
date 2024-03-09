@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { User } from '$app/common/interfaces/user';
 import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
 import { useUsersQuery } from '$app/common/queries/users';
@@ -89,7 +88,7 @@ export function Details(props: Props) {
             errorMessage={props.errors?.errors.group_settings_id}
           >
             <option value=""></option>
-            {groupSettings.map((group: GroupSettings, index: number) => (
+            {groupSettings.map((group, index: number) => (
               <option value={group.id} key={index}>
                 {group.name}
               </option>
