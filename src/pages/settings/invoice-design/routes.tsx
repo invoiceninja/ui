@@ -31,7 +31,7 @@ const CompanyDetails = lazy(
   () => import('./pages/general-settings/components/CompanyDetails')
 );
 const CompanyAddress = lazy(
-  () => import('./pages/general-settings/components/CompanyDetails')
+  () => import('./pages/general-settings/components/CompanyAddress')
 );
 const InvoiceDetails = lazy(
   () => import('./pages/general-settings/components/InvoiceDetails')
