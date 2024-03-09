@@ -87,6 +87,7 @@ test('Invoice report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
 
+  await page.locator('[data-cy="includeDeleted"]').check();
   await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
 
   await page
@@ -118,6 +119,7 @@ test('Invoice report test', async ({ page }) => {
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -145,6 +147,7 @@ test('Invoice report test', async ({ page }) => {
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -227,15 +230,24 @@ test('Product sales report test', async ({ page }) => {
     .locator('[data-cy="reportNameSelector"]')
     .selectOption({ label: 'Product Sales' });
 
-  await page.locator('[id="productItemSelector"]').click();
+  await page
+    .locator('[class=" css-1xc3v61-indicatorContainer"]')
+    .last()
+    .click();
 
-  await page.getByText('Nam.', { exact: true }).click();
+  await page.getByText('test create product', { exact: true }).first().click();
 
-  await page.waitForTimeout(200);
+  await page.getByText('Products', { exact: true }).last().click();
 
-  await page.locator('[id="productItemSelector"]').click();
+  await page
+    .locator('[class=" css-1xc3v61-indicatorContainer"]')
+    .last()
+    .click();
 
-  await page.getByText('Quod.', { exact: true }).first().click();
+  await page
+    .getByText('test dropdown product', { exact: true })
+    .first()
+    .click();
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
@@ -280,7 +292,7 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'Nam.Quod.'
+    'test create producttest dropdown product'
   );
 
   await page
@@ -304,7 +316,7 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'Nam.Quod.'
+    'test create producttest dropdown product'
   );
   await expect(
     page.locator('[data-testid="combobox-input-field"]')
@@ -327,11 +339,22 @@ test('Expense report test', async ({ page }) => {
     .locator('[data-cy="reportNameSelector"]')
     .selectOption({ label: 'Expense' });
 
+  await page.locator('[id="statusSelector"]').click();
+
+  await page.getByText('Pending').click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[id="statusSelector"]').click();
+
+  await page.getByText('Invoiced').first().click();
+
   await page
     .locator('[data-cy="reportDateRange"]')
     .selectOption({ label: 'This Month' });
 
   await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
+  await page.locator('[data-cy="includeDeleted"]').check();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -350,9 +373,13 @@ test('Expense report test', async ({ page }) => {
   await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
     'this_month'
   );
+  await expect(page.locator('[id="statusSelector"]')).toContainText(
+    'PendingInvoiced'
+  );
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -368,9 +395,13 @@ test('Expense report test', async ({ page }) => {
   await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
     'this_month'
   );
+  await expect(page.locator('[id="statusSelector"]')).toContainText(
+    'PendingInvoiced'
+  );
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -392,6 +423,16 @@ test('Expense report test with clients, project and categories selectors', async
     .selectOption({ label: 'Expense' });
 
   await page.waitForTimeout(300);
+
+  await page.locator('[id="statusSelector"]').click();
+
+  await page.getByText('Pending').click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[id="statusSelector"]').click();
+
+  await page.getByText('Invoiced').first().click();
 
   await page
     .locator('[data-cy="reportDateRange"]')
@@ -421,6 +462,8 @@ test('Expense report test with clients, project and categories selectors', async
     .first()
     .click();
 
+  await page.locator('[data-cy="includeDeleted"]').check();
+
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'More Actions', exact: true })
@@ -447,6 +490,10 @@ test('Expense report test with clients, project and categories selectors', async
   await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
     'testing create expense'
   );
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
+  await expect(page.locator('[id="statusSelector"]')).toContainText(
+    'PendingInvoiced'
+  );
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -470,6 +517,10 @@ test('Expense report test with clients, project and categories selectors', async
   );
   await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
     'testing create expense'
+  );
+  await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
+  await expect(page.locator('[id="statusSelector"]')).toContainText(
+    'PendingInvoiced'
   );
 
   await expect(
@@ -556,7 +607,7 @@ test('Product sales report test with filtering products', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test view producttest actions product'
+    'test actions producttest view product'
   );
 
   await page
@@ -580,7 +631,7 @@ test('Product sales report test with filtering products', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test view producttest actions product'
+    'test actions producttest view product'
   );
   await expect(
     page.locator('[data-testid="combobox-input-field"]')
