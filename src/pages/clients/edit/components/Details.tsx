@@ -34,7 +34,7 @@ interface Props {
 export function Details(props: Props) {
   const [t] = useTranslation();
   const { data: users } = useUsersQuery();
-  const { data: groupSettings } = useGroupSettingsQuery();
+  const { data: groupSettings } = useGroupSettingsQuery({ status: ['active'] });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     props.setErrors(undefined);
@@ -89,13 +89,11 @@ export function Details(props: Props) {
             errorMessage={props.errors?.errors.group_settings_id}
           >
             <option value=""></option>
-            {groupSettings.data.data.map(
-              (group: GroupSettings, index: number) => (
-                <option value={group.id} key={index}>
-                  {group.name}
-                </option>
-              )
-            )}
+            {groupSettings.map((group: GroupSettings, index: number) => (
+              <option value={group.id} key={index}>
+                {group.name}
+              </option>
+            ))}
           </SelectField>
         </Element>
       )}
