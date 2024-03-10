@@ -31,7 +31,7 @@ interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   mergeFromClientId: string;
-  setIsMergeClientActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function MergeClientModal(props: Props) {
@@ -43,7 +43,7 @@ export function MergeClientModal(props: Props) {
     entity: 'client',
   });
 
-  const { setIsMergeClientActionCalled } = props;
+  const { setIsPurgeOrMergeActionCalled } = props;
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
@@ -58,7 +58,7 @@ export function MergeClientModal(props: Props) {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
-      setIsMergeClientActionCalled?.(true);
+      setIsPurgeOrMergeActionCalled?.(true);
 
       request(
         'POST',
@@ -89,7 +89,7 @@ export function MergeClientModal(props: Props) {
                 navigate('/clients');
               }
             })
-            .catch(() => setIsMergeClientActionCalled?.(false));
+            .catch(() => setIsPurgeOrMergeActionCalled?.(false));
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
@@ -97,7 +97,7 @@ export function MergeClientModal(props: Props) {
             setLastPasswordEntryTime(0);
           }
 
-          setIsMergeClientActionCalled?.(false);
+          setIsPurgeOrMergeActionCalled?.(false);
         })
         .finally(() => setIsFormBusy(false));
     }

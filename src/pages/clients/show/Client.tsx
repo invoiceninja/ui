@@ -34,15 +34,13 @@ export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
   const [t] = useTranslation();
 
-  const [isPurgeActionCalled, setIsPurgeActionCalled] =
-    useState<boolean>(false);
-  const [isMergeClientActionCalled, setIsMergeClientActionCalled] =
+  const [isPurgeOrMergeActionCalled, setIsPurgeOrMergeActionCalled] =
     useState<boolean>(false);
 
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({
     id,
-    enabled: Boolean(id) && !isPurgeActionCalled && !isMergeClientActionCalled,
+    enabled: Boolean(id) && !isPurgeOrMergeActionCalled,
   });
 
   const pages: Page[] = [
@@ -55,12 +53,10 @@ export default function Client() {
 
   const tabs = useTabs({
     client,
-    isPurgeActionCalled,
-    isMergeClientActionCalled,
+    isPurgeOrMergeActionCalled,
   });
   const actions = useActions({
-    setIsPurgeActionCalled,
-    setIsMergeClientActionCalled,
+    setIsPurgeOrMergeActionCalled,
   });
 
   const navigate = useNavigate();
@@ -71,8 +67,7 @@ export default function Client() {
     setDocumentTitle(client?.display_name || 'view_client');
 
     return () => {
-      setIsPurgeActionCalled(false);
-      setIsMergeClientActionCalled(false);
+      setIsPurgeOrMergeActionCalled(false);
     };
   }, [client]);
 
@@ -111,7 +106,9 @@ export default function Client() {
 
           <div className="my-4">
             <Outlet
-              context={{ isPurgeActionCalled, isMergeClientActionCalled }}
+              context={{
+                isPurgeOrMergeActionCalled,
+              }}
             />
           </div>
         </>

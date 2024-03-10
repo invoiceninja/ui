@@ -18,12 +18,12 @@ import { BiGitMerge } from 'react-icons/bi';
 
 interface Props {
   client: Client;
-  setIsMergeClientActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function MergeClientAction(props: Props) {
   const [t] = useTranslation();
 
-  const { client, setIsMergeClientActionCalled } = props;
+  const { client, setIsPurgeOrMergeActionCalled } = props;
 
   const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
 
@@ -40,7 +40,7 @@ export function MergeClientAction(props: Props) {
         visible={isMergeModalOpen}
         setVisible={setIsMergeModalOpen}
         mergeFromClientId={client.id}
-        setIsMergeClientActionCalled={setIsMergeClientActionCalled}
+        setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
       />
     </>
   );
