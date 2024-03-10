@@ -23,6 +23,9 @@ import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { useSave } from './edit/hooks/useSave';
 import { Spinner } from '$app/components/Spinner';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -32,6 +35,9 @@ export default function Expense() {
   const { id } = useParams();
 
   const { data } = useExpenseQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
@@ -46,6 +52,9 @@ export default function Expense() {
     {
       name: t('documents'),
       href: route('/expenses/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={expense?.documents.length} />
+      ),
     },
   ];
 
@@ -72,17 +81,18 @@ export default function Expense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => expense && save(expense)}
-      navigationTopRight={
-        expense && (
-          <ResourceActions
-            resource={expense}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-      disableSaveButton={!expense}
+      {...((hasPermission('edit_expense') || entityAssigned(expense)) &&
+        expense && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={expense}
+              onSaveClick={() => save(expense)}
+              actions={actions}
+              disableSaveButton={!expense}
+              cypressRef="expenseActionDropdown"
+            />
+          ),
+        })}
     >
       {expense ? (
         <div className="space-y-4">

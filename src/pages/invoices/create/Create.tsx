@@ -70,6 +70,8 @@ export default function Create() {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
   const [client, setClient] = useState<Client | undefined>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const resetInvoiceForm = () => {
     handleChange('client_id', '');
@@ -101,7 +103,7 @@ export default function Create() {
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
 
-  const save = useHandleCreate(setErrors);
+  const save = useHandleCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
   useEffect(() => {
     setInvoiceSum(undefined);
@@ -142,6 +144,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setInvoice(undefined);
+    };
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
@@ -230,7 +236,7 @@ export default function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="product"
                   resource={invoice}
@@ -261,7 +267,7 @@ export default function Create() {
             </div>
 
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="task"
                   resource={invoice}
@@ -292,6 +298,10 @@ export default function Create() {
           invoice={invoice}
           handleChange={handleChange}
           errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
         />
 
         {invoice && (

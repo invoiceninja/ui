@@ -30,6 +30,7 @@ export function WebhookConfiguration(props: Props) {
     <Card title={t('webhooks')}>
       <Element leftSide={t('webhook_url')}>
         <CopyToClipboard
+          className="break-all"
           text={`${apiEndpoint()}/payment_webhook/${company.company_key}/${
             props.companyGateway.id
           }`}

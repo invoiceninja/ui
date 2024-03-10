@@ -18,7 +18,6 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import classNames from 'classnames';
 
-
 export interface NavigationItem {
   name: string;
   href: string;
@@ -50,7 +49,6 @@ export function DesktopSidebar(props: Props) {
 
   return (
     <div
-
       className={classNames(
         'hidden md:flex z-10 md:flex-col md:fixed md:inset-y-0',
         {
@@ -64,7 +62,11 @@ export function DesktopSidebar(props: Props) {
         className="flex flex-col flex-grow overflow-y-auto border-r"
       >
         <div
-          style={{ borderColor: colors.$5 }}
+          style={{
+            borderColor: colors.$5,
+            backgroundColor: colors.$1,
+            color: colors.$3,
+          }}
           className={classNames(
             'flex items-center flex-shrink-0 h-16 border-b',
             {
@@ -82,24 +84,22 @@ export function DesktopSidebar(props: Props) {
 
         <div className="flex-grow flex flex-col mt-4">
           <nav className="flex-1 pb-4 space-y-1" data-cy="navigationBar">
-            {props.navigation.map((item, index) => (
-
-                isMiniSidebar ? (
-                  <Tooltip
-                    key={index}
-                    message={item.name as string}
-                    width="auto"
-                    placement="right"
-                    truncate={false}
-                    size="large"
-                    withoutArrow={true}
-                  >
+            {props.navigation.map((item, index) =>
+              isMiniSidebar ? (
+                <Tooltip
+                  key={index}
+                  message={item.name as string}
+                  placement="right"
+                  withoutArrow
+                  withoutWrapping
+                  width="auto"
+                >
                   <SidebarItem key={index} item={item} colors={colors} />
-                  </Tooltip>
-                ) : (
-                  <SidebarItem key={index} item={item} colors={colors} />
-                )
-            ))}
+                </Tooltip>
+              ) : (
+                <SidebarItem key={index} item={item} colors={colors} />
+              )
+            )}
           </nav>
 
           <HelpSidebarIcons docsLink={props.docsLink} />

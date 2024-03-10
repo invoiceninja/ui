@@ -825,7 +825,7 @@ export function ComboboxAsync<T = any>({
       return Boolean(entry);
     }
 
-    return false;
+    return true;
   };
 
   const { data, isLoading } = useQuery(
@@ -883,12 +883,32 @@ export function ComboboxAsync<T = any>({
 
         if (inputOptions.value && inputOptions.value.toString().length > 0) {
           currentUrl.searchParams.set('with', inputOptions.value.toString());
+
+          if (currentUrl.searchParams.get('sort')) {
+            currentUrl.searchParams.delete('sort');
+          }
         }
 
         return currentUrl.href;
       });
     }
-  }, [enableQuery, inputOptions.value]);
+
+    if (enableQuery && !inputOptions.value) {
+      setUrl((c) => {
+        const currentUrl = new URL(c);
+
+        if (currentUrl.searchParams.get('with')) {
+          currentUrl.searchParams.delete('with');
+        }
+
+        if (sortBy) {
+          currentUrl.searchParams.set('sort', sortBy);
+        }
+
+        return currentUrl.href;
+      });
+    }
+  }, [entries, enableQuery, inputOptions.value]);
 
   useEffect(() => {
     if (data) {

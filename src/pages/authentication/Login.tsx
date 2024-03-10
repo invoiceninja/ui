@@ -28,6 +28,8 @@ import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
 import { useColorScheme } from '$app/common/colors';
+import { version } from '$app/common/helpers/version';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function Login() {
   useTitle('login');
@@ -60,12 +62,15 @@ export function Login() {
     })
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
-        return error.response?.status === 422
-          ? setErrors(error.response.data.errors)
-          : setMessage(
-              error.response?.data.message ??
-                (t('invalid_credentials') as string)
-            );
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors);
+        } else if (error.response?.status === 503) {
+          toast.error('app_maintenance');
+        } else {
+          setMessage(
+            error.response?.data.message ?? (t('invalid_credentials') as string)
+          );
+        }
       })
       .finally(() => setIsFormBusy(false));
   }
@@ -171,6 +176,8 @@ export function Login() {
             </div>
           </>
         )}
+
+        <p className="mt-4 text-xs">{version}</p>
       </div>
 
       <Disable2faModal

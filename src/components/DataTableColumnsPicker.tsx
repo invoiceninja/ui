@@ -149,6 +149,7 @@ export function DataTableColumnsPicker(props: Props) {
           onValueChange={handleSelectChange}
           value=""
           withBlank
+          cypressRef="columSelector"
         >
           {filteredColumns.map((column, index) => (
             <option key={index} value={column}>

@@ -13,7 +13,7 @@ import { Card, ClickableElement, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { InputField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
-import { useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
 import { useAtom } from 'jotai';
@@ -21,9 +21,13 @@ import { payloadAtom } from '../Edit';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
   errors: ValidationBag | undefined;
+  isFormBusy: boolean;
+  shouldRenderHTML: boolean;
+  setShouldRenderHTML: Dispatch<SetStateAction<boolean>>;
 }
 
 export function Settings(props: Props) {
@@ -34,15 +38,43 @@ export function Settings(props: Props) {
   const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
-  const handleExport = useCallback(() => {
+  const handleExportToTxtFile = () => {
     if (payload.design) {
-      navigator.clipboard.writeText(JSON.stringify(payload.design.design));
+      const blob = new Blob([JSON.stringify(payload.design.design)], {
+        type: 'text/plain',
+      });
+      const url = URL.createObjectURL(blob);
 
-      toast.success(
-        trans('copied_to_clipboard', {
-          value: t('design').toLowerCase(),
-        })
-      );
+      const link = document.createElement('a');
+
+      link.download = `${payload.design.name}_${t('export').toLowerCase()}`;
+      link.href = url;
+      link.target = '_blank';
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleExport = useCallback(() => {
+    if (!navigator.clipboard) {
+      return handleExportToTxtFile();
+    }
+
+    if (payload.design) {
+      navigator.clipboard
+        .writeText(JSON.stringify(payload.design.design))
+        .then(() =>
+          toast.success(
+            trans('copied_to_clipboard', {
+              value: t('design').toLowerCase(),
+            })
+          )
+        )
+        .catch(() => handleExportToTxtFile());
     }
   }, [payload.design]);
 
@@ -87,6 +119,14 @@ export function Settings(props: Props) {
         <ClickableElement onClick={handleExport}>
           {t('export')}
         </ClickableElement>
+
+        <Element leftSide={t('html_mode')}>
+          <Toggle
+            checked={props.shouldRenderHTML}
+            onChange={(value) => props.setShouldRenderHTML(value)}
+            disabled={props.isFormBusy}
+          />
+        </Element>
       </Card>
     </>
   );

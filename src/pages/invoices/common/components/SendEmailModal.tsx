@@ -49,15 +49,24 @@ function useAvailableTypes() {
   ];
 
   if (company?.settings.email_subject_custom1) {
-    types.push({ label: 'first_custom', value: 'custom1' });
+    types.push({
+      label: company?.settings.email_subject_custom1,
+      value: 'custom1',
+    });
   }
 
   if (company?.settings.email_subject_custom2) {
-    types.push({ label: 'second_custom', value: 'custom2' });
+    types.push({
+      label: company?.settings.email_subject_custom2,
+      value: 'custom2',
+    });
   }
 
   if (company?.settings.email_subject_custom3) {
-    types.push({ label: 'third_custom', value: 'custom3' });
+    types.push({
+      label: company?.settings.email_subject_custom3,
+      value: 'custom3',
+    });
   }
 
   return types;
@@ -77,6 +86,7 @@ export function SendEmailModal(props: Props) {
       title={trans('email_count_invoices', { count: invoiceIds.length })}
       visible={visible}
       onClose={() => setVisible(false)}
+      closeButtonCypressRef="sendEmailModalXButton"
     >
       <div>
         {availableTypes.map((type, index) => (

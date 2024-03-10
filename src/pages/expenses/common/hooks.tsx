@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -51,6 +50,9 @@ import { ExpenseCategory } from './components/ExpenseCategory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -226,10 +228,10 @@ export function useExpenseColumns() {
   const disableNavigation = useDisableNavigation();
 
   const navigate = useNavigate();
-
   const formatMoney = useFormatMoney();
-
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
+  const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const expenseColumns = useAllExpenseColumns();
   type ExpenseColumns = (typeof expenseColumns)[number];
@@ -252,14 +254,14 @@ export function useExpenseColumns() {
       label: t('status'),
       format: (value, expense) => (
         <div className="flex items-center space-x-2">
-          <Link
+          <DynamicLink
             to={route('/expenses/:id/edit', { id: expense.id })}
-            disableNavigation={disableNavigation('expense', expense)}
+            renderSpan={disableNavigation('expense', expense)}
           >
             <span className="inline-flex items-center space-x-4">
               <ExpenseStatus entity={expense} />
             </span>
-          </Link>
+          </DynamicLink>
 
           {expense.invoice_id && (
             <Assigned
@@ -290,12 +292,12 @@ export function useExpenseColumns() {
       id: 'number',
       label: t('number'),
       format: (field, expense) => (
-        <Link
+        <DynamicLink
           to={route('/expenses/:id/edit', { id: expense.id })}
-          disableNavigation={disableNavigation('expense', expense)}
+          renderSpan={disableNavigation('expense', expense)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -304,12 +306,12 @@ export function useExpenseColumns() {
       label: t('vendor'),
       format: (value, expense) =>
         expense.vendor && (
-          <Link
+          <DynamicLink
             to={route('/vendors/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('vendor', expense.vendor)}
+            renderSpan={disableNavigation('vendor', expense.vendor)}
           >
             {expense.vendor.name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -318,12 +320,12 @@ export function useExpenseColumns() {
       label: t('client'),
       format: (value, expense) =>
         expense.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('client', expense.client)}
+            renderSpan={disableNavigation('client', expense.client)}
           >
             {expense.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -336,9 +338,9 @@ export function useExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value, expense) =>
+      format: (_, expense) =>
         formatMoney(
-          value,
+          calculateExpenseAmount(expense),
           expense.client?.country_id,
           expense.currency_id || expense.client?.settings.currency_id
         ),
@@ -380,21 +382,25 @@ export function useExpenseColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('expense1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('expense2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('expense3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('expense4', value?.toString()),
     },
     {
       column: 'documents',

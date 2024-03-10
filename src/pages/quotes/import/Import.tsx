@@ -19,7 +19,7 @@ export default function Import() {
   const { documentTitle } = useTitle('import');
 
   const pages: Page[] = [
-    { name: t('quotes'), href: '/quote' },
+    { name: t('quotes'), href: '/quotes' },
     { name: t('import'), href: '/quotes/import' },
   ];
 

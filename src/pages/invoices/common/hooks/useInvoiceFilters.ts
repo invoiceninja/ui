@@ -45,6 +45,12 @@ export function useInvoiceFilters() {
       color: 'white',
       backgroundColor: '#CA8A04',
     },
+    {
+      label: t('cancelled'),
+      value: 'cancelled',
+      color: 'white',
+      backgroundColor: '#000000',
+    },
   ];
 
   return filters;
