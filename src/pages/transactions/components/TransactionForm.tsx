@@ -66,6 +66,7 @@ export function TransactionForm(props: Props) {
             )
           }
           errorMessage={props.errors?.errors.base_type}
+          cypressRef="transactionTypeSelector"
         >
           {Object.values(transactionTypes).map((transactionType) => (
             <option key={transactionType} value={transactionType}>
@@ -130,6 +131,22 @@ export function TransactionForm(props: Props) {
           errorMessage={props.errors?.errors.description}
         />
       </Element>
+
+      {props.page === 'edit' && (
+        <>
+          {props.transaction.participant && (
+            <Element leftSide={t('participant')}>
+              <InputField value={props.transaction.participant} readOnly />
+            </Element>
+          )}
+
+          {props.transaction.participant_name && (
+            <Element leftSide={t('participant_name')}>
+              <InputField value={props.transaction.participant_name} readOnly />
+            </Element>
+          )}
+        </>
+      )}
     </>
   );
 }

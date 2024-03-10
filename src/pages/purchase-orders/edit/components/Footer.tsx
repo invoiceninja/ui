@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { endpoint } from '$app/common/helpers';
@@ -23,15 +23,37 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Dispatch, SetStateAction } from 'react';
+import Toggle from '$app/components/forms/Toggle';
 
-export function Footer(props: PurchaseOrderCardProps) {
+interface Props extends PurchaseOrderCardProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
+}
+export function Footer(props: Props) {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { id } = useParams();
 
   const location = useLocation();
 
-  const { purchaseOrder, handleChange, errors } = props;
+  const {
+    purchaseOrder,
+    handleChange,
+    errors,
+    isDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
+  } = props;
 
   const tabs = [
     t('terms'),
@@ -48,12 +70,38 @@ export function Footer(props: PurchaseOrderCardProps) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 5) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={purchaseOrder?.documents.length}
+              />
+            );
+          }
+        }}
+        withoutVerticalMargin
+      >
         <div>
           <MarkdownEditor
             value={purchaseOrder.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultTerms}
+                onValueChange={(value) => setIsDefaultTerms(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_terms')}</span>
+          </Element>
         </div>
 
         <div>
@@ -61,23 +109,37 @@ export function Footer(props: PurchaseOrderCardProps) {
             value={purchaseOrder.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultFooter}
+                onValueChange={(value) => setIsDefaultFooter(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_footer')}</span>
+          </Element>
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={purchaseOrder.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={purchaseOrder.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="my-4">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <UserSelector
@@ -132,20 +194,25 @@ export function Footer(props: PurchaseOrderCardProps) {
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
-          <div>
+          <div className="my-4">
             <Upload
               widgetOnly
               endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={
+                !hasPermission('edit_purchase_order') &&
+                !entityAssigned(purchaseOrder)
+              }
             />
 
             <DocumentsTable
               documents={purchaseOrder.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={!entityAssigned(purchaseOrder, true)}
             />
           </div>
         )}

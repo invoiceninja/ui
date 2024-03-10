@@ -9,9 +9,21 @@ import {
 } from '$tests/e2e/helpers';
 import test, { expect, Page } from '@playwright/test';
 
+interface ModalAction {
+  label: string;
+  visible: boolean;
+}
+
+interface Modal {
+  title: string;
+  actions: ModalAction[];
+  dataCyXButton: string;
+}
+
 export interface Action {
   label: string;
   visible: boolean;
+  modal?: Modal;
 }
 
 interface Params {
@@ -44,6 +56,7 @@ interface CreateParams {
   clientName?: string;
   assignTo?: string;
   withNavigation?: boolean;
+  email?: string;
 }
 
 const createClient = async (params: CreateParams) => {
@@ -53,6 +66,7 @@ const createClient = async (params: CreateParams) => {
     assignTo,
     withNavigation = true,
     isTableEditable = true,
+    email,
   } = params;
 
   if (withNavigation) {
@@ -72,7 +86,7 @@ const createClient = async (params: CreateParams) => {
   await page.locator('#name').fill(clientName || 'Company Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
-  await page.locator('#email_0').fill('first@example.com');
+  await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
     await page
@@ -122,25 +136,13 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Client', exact: true })
-    ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('link', { name: 'Edit Client', exact: true })
-    ).toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).toBeVisible();
   }
 };
@@ -255,7 +257,7 @@ test('can edit client', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -269,7 +271,9 @@ test('can edit client', async ({ page }) => {
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -311,7 +315,7 @@ test('can create a client', async ({ page }) => {
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -325,7 +329,9 @@ test('can create a client', async ({ page }) => {
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -368,7 +374,7 @@ test('can view and edit assigned client with create_client', async ({
 
   await page
     .locator('[data-cy="topNavbar"]')
-    .getByRole('link', { name: 'Edit Client', exact: true })
+    .getByRole('button', { name: 'Edit', exact: true })
     .click();
 
   await checkEditPage(page);
@@ -382,7 +388,9 @@ test('can view and edit assigned client with create_client', async ({
     page.getByText('Successfully updated client', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -413,12 +421,7 @@ test('deleting client with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page, withNavigation: false });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
@@ -466,12 +469,7 @@ test('archiving client withe edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page, withNavigation: false });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -522,7 +520,9 @@ test("can't purge client without admin permission", async ({ page }) => {
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -546,10 +546,7 @@ test('can purge client with admin permission', async ({ page }) => {
 
   await checkShowPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'More Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await page.getByText('Purge', { exact: true }).click();
 
@@ -591,12 +588,10 @@ test('client documents preview with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page });
 
-    const moreActionsButton = page
+    await page
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .filter({ has: page.getByText('Edit') })
+      .click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -604,16 +599,15 @@ test('client documents preview with edit_client', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await checkEditPage(page);
 
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -646,12 +640,10 @@ test('client documents uploading with edit_client', async ({ page }) => {
   if (!doRecordsExist) {
     await createClient({ page });
 
-    const moreActionsButton = page
+    await page
       .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .filter({ has: page.getByText('Edit') })
+      .click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -659,15 +651,15 @@ test('client documents uploading with edit_client', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await checkEditPage(page);
 
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -707,7 +699,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
   await logout(page);
 });
@@ -748,7 +742,62 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 
   await checkShowPage(page, true);
 
-  await checkDropdownActions(page, actions, 'clientActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
+
+  await logout(page);
+});
+
+test('Merge client action', async ({ page }) => {
+  await login(page);
+
+  await createClient({
+    page,
+    clientName: 'test merge one',
+    email: 'firstMerge@example.com',
+  });
+
+  await createClient({
+    page,
+    clientName: 'test merge two',
+    email: 'secondMerge@example.com',
+  });
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await page
+    .getByRole('button', { name: 'Merge', exact: true })
+    .first()
+    .click();
+
+  await expect(page.getByText('Merge Into')).toBeVisible();
+
+  await page.locator('[data-testid="combobox-input-field"]').click();
+
+  await page
+    .locator('[data-testid="combobox-input-field"]')
+    .fill('firstMerge@example.com');
+
+  await page.getByRole('option').first().click();
+
+  await page.getByRole('button', { name: 'Merge' }).click();
+
+  if (await page.getByRole('heading', { name: 'Confirmation' }).isVisible()) {
+    await page.getByLabel('Current password*').fill('password');
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  }
+
+  await expect(page.getByText('Merge Into')).not.toBeVisible();
+  await expect(page.getByText('Successfully merged client')).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+
+  await expect(page.getByText('firstMerge@example.com')).toBeVisible();
+  await expect(page.getByText('secondMerge@example.com')).not.toBeVisible();
 
   await logout(page);
 });

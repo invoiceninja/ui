@@ -61,24 +61,50 @@ import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
 
   const navigate = useNavigate();
 
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
     toast.processing();
     setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/purchase_orders'), purchaseOrder)
-      .then((response: GenericSingleResourceResponse<PurchaseOrder>) => {
+    let apiEndpoint = '/api/v1/purchase_orders?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), purchaseOrder)
+      .then(async (response: GenericSingleResourceResponse<PurchaseOrder>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_purchase_order');
 
         $refetch(['purchase_orders']);
@@ -147,9 +173,9 @@ export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const reactSettings = useReactSettings();
-
   const formatMoney = useFormatMoney();
+  const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
   type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
@@ -270,21 +296,29 @@ export function usePurchaseOrderColumns() {
         column: firstCustom,
         id: 'custom_value1',
         label: firstCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice1', value?.toString()),
       },
       {
         column: secondCustom,
         id: 'custom_value2',
         label: secondCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice2', value?.toString()),
       },
       {
         column: thirdCustom,
         id: 'custom_value3',
         label: thirdCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice3', value?.toString()),
       },
       {
         column: fourthCustom,
         id: 'custom_value4',
         label: fourthCustom,
+        format: (value) =>
+          formatCustomFieldValue('invoice4', value?.toString()),
       },
       {
         column: 'discount',
@@ -367,12 +401,15 @@ export function usePurchaseOrderFilters() {
 
 export function useActions() {
   const [t] = useTranslation();
-
   const navigate = useNavigate();
 
   const bulk = useBulk();
-
   const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+
+  const disableNavigation = useDisableNavigation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
 
@@ -400,8 +437,9 @@ export function useActions() {
       project_id: '',
       subscription_id: '',
       status_id: '1',
-      vendor_id: '',
+      client_id: '',
       paid_to_date: 0,
+      vendor: undefined,
     });
 
     navigate('/purchase_orders/create?action=clone');
@@ -440,7 +478,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) =>
-      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
+      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted &&
+      (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => scheduleEmailRecord(purchaseOrder.id)}
           icon={<Icon element={MdSchedule} />}
@@ -484,7 +523,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) =>
-      Boolean(purchaseOrder.expense_id.length) && (
+      Boolean(purchaseOrder.expense_id.length) &&
+      !disableNavigation('expense', purchaseOrder.expense) && (
         <DropdownElement
           onClick={() =>
             navigate(
@@ -504,14 +544,17 @@ export function useActions() {
         {t('vendor_portal')}
       </DropdownElement>
     ),
-    (purchaseOrder) => (
-      <DropdownElement
-        onClick={() => cloneToPurchaseOrder(purchaseOrder)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
+    () => <Divider withoutPadding />,
+    (purchaseOrder) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => cloneToPurchaseOrder(purchaseOrder)}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone_to_purchase_order')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

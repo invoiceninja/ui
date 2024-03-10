@@ -44,6 +44,8 @@ export interface Preferences {
   };
 }
 
+type ImportTemplates = Record<string, Record<string, Record<number, string>>>;
+
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
@@ -54,6 +56,7 @@ export interface ReactSettings {
   table_filters?: Record<string, TableFiltersPreference>;
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
+  import_templates?: ImportTemplates;
 }
 
 export type ReactTableColumns =
@@ -69,7 +72,8 @@ export type ReactTableColumns =
   | 'vendor'
   | 'purchaseOrder'
   | 'expense'
-  | 'recurringExpense';
+  | 'recurringExpense'
+  | 'clientDocument';
 
 export const preferencesDefaults: Preferences = {
   dashboard_charts: {

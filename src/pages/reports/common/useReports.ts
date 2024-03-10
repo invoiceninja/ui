@@ -20,10 +20,18 @@ export interface Payload {
   is_expense_billed?: boolean;
   include_tax?: boolean;
   status?: string;
+  product_key?: string;
+  document_email_attachment?: boolean;
+  clients?: string;
+  categories?: string;
+  projects?: string;
+  vendors?: string;
+  include_deleted?: boolean;
 }
 
 export interface Report {
   identifier: Identifier;
+  schedule_identifier?: string;
   label: string;
   endpoint: string;
   payload: Payload;
@@ -92,6 +100,8 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
       },
       preview: '/api/v1/reports/clients?output=json',
       supports_previews: true,
@@ -126,6 +136,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/credits?output=json',
       supports_previews: true,
@@ -143,6 +156,7 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
       },
       preview: '/api/v1/reports/documents?output=json',
       supports_previews: true,
@@ -160,6 +174,13 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        clients: '',
+        vendors: '',
+        categories: '',
+        projects: '',
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/expenses?output=json',
       supports_previews: true,
@@ -178,6 +199,8 @@ export function useReports() {
         report_keys: [],
         send_email: false,
         status: '',
+        document_email_attachment: false,
+        include_deleted: false,
       },
       preview: '/api/v1/reports/invoices?output=json',
       supports_previews: true,
@@ -195,6 +218,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/invoice_items?output=json',
       supports_previews: true,
@@ -213,6 +239,8 @@ export function useReports() {
         report_keys: [],
         send_email: false,
         status: '',
+        document_email_attachment: false,
+        include_deleted: false,
       },
       preview: '/api/v1/reports/purchase_orders?output=json',
       supports_previews: true,
@@ -230,6 +258,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/purchase_order_items?output=json',
       supports_previews: true,
@@ -247,6 +278,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/quotes?output=json',
       supports_previews: true,
@@ -264,6 +298,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/quote_items?output=json',
       supports_previews: true,
@@ -281,6 +318,8 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/recurring_invoices?output=json',
       supports_previews: true,
@@ -298,6 +337,8 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        status: '',
       },
       preview: '/api/v1/reports/payments?output=json',
       supports_previews: true,
@@ -315,6 +356,7 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
       },
       preview: '/api/v1/reports/products?output=json',
       supports_previews: true,
@@ -350,6 +392,9 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
+        include_deleted: false,
+        status: '',
       },
       preview: '/api/v1/reports/tasks?output=json',
       supports_previews: true,
@@ -367,6 +412,7 @@ export function useReports() {
         date_range: 'all',
         report_keys: [],
         send_email: false,
+        document_email_attachment: false,
       },
       preview: '/api/v1/reports/vendors?output=json',
       supports_previews: true,
@@ -393,6 +439,7 @@ export function useReports() {
     },
     {
       identifier: 'aged_receivable_detailed_report',
+      schedule_identifier: 'ar_detailed',
       label: 'aged_receivable_detailed_report',
       endpoint: '/api/v1/reports/ar_detail_report',
       allow_custom_column: false,
@@ -413,6 +460,7 @@ export function useReports() {
     },
     {
       identifier: 'aged_receivable_summary_report',
+      schedule_identifier: 'ar_summary',
       label: 'aged_receivable_summary_report',
       endpoint: '/api/v1/reports/ar_summary_report',
       allow_custom_column: false,
@@ -434,6 +482,7 @@ export function useReports() {
     {
       identifier: 'client_balance_report',
       label: 'client_balance_report',
+      schedule_identifier: 'client_balance',
       endpoint: '/api/v1/reports/client_balance_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -454,6 +503,7 @@ export function useReports() {
     {
       identifier: 'client_sales_report',
       label: 'client_sales_report',
+      schedule_identifier: 'client_sales',
       endpoint: '/api/v1/reports/client_sales_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -474,6 +524,7 @@ export function useReports() {
     {
       identifier: 'tax_summary_report',
       label: 'tax_summary_report',
+      schedule_identifier: 'tax_summary',
       endpoint: '/api/v1/reports/tax_summary_report',
       allow_custom_column: false,
       custom_columns: [],
@@ -494,6 +545,7 @@ export function useReports() {
     {
       identifier: 'user_sales_report',
       label: 'user_sales_report',
+      schedule_identifier: 'user_sales',
       endpoint: '/api/v1/reports/user_sales_report',
       allow_custom_column: false,
       custom_columns: [],

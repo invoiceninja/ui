@@ -767,7 +767,7 @@ const fonts = [
   { value: 'Zeyada', label: 'Zeyada' },
 ];
 
-export function GeneralSettings() {
+export default function GeneralSettings() {
   const [t] = useTranslation();
 
   const currentCompany = useCurrentCompany();

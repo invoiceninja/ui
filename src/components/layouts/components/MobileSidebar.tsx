@@ -84,7 +84,10 @@ export function MobileSidebar(props: Props) {
               </div>
             </Transition.Child>
 
-            <div className="flex-shrink-0 flex items-center px-4 bg-ninja-gray py-3 border-b h-16 justify-center border-gray-600">
+            <div
+              className="flex-shrink-0 flex items-center px-4 py-3 border-b h-16 justify-center border-gray-600"
+              style={{ backgroundColor: colors.$1, color: colors.$3 }}
+            >
               {isMiniSidebar ? (
                 <img className="w-8" src={logo} alt="Company logo" />
               ) : (

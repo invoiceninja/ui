@@ -23,11 +23,14 @@ import {
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -65,6 +68,7 @@ export default function PurchaseOrders() {
           />
         }
         linkToCreateGuards={[permission('create_purchase_order')]}
+        hideEditableOptions={!hasPermission('edit_purchase_order')}
       />
     </Default>
   );

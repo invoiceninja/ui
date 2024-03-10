@@ -10,22 +10,14 @@
 
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
-import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { useAtom } from 'jotai';
-import { creditAtom } from '$app/pages/credits/common/atoms';
+import { useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
@@ -54,12 +46,13 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { useBulk } from '$app/common/queries/invoices';
 import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
-import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import {useDownloadEInvoice} from "$app/pages/invoices/common/hooks/useDownloadEInvoice";
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
+import { EntityActionElement } from '$app/components/EntityActionElement';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -96,20 +89,11 @@ export function useActions(params?: Params) {
 
   const reverseInvoice = useReverseInvoice();
 
-  const showActionByPreferences = useShowActionByPreferences({
-    commonActionsSection: Boolean(!dropdown),
-    entity: 'invoice',
-  });
-
   const bulk = useBulk();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
 
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const setInvoice = useSetAtom(invoiceAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({
@@ -132,88 +116,6 @@ export function useActions(params?: Params) {
     navigate('/invoices/create?action=clone');
   };
 
-  const cloneToQuote = (invoice: Invoice) => {
-    setQuote({
-      ...(invoice as unknown as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToCredit = (invoice: Invoice) => {
-    setCredit({
-      ...(invoice as unknown as Credit),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/credits/create?action=clone');
-  };
-
-  const cloneToRecurringInvoice = (invoice: Invoice) => {
-    setRecurringInvoice({
-      ...(invoice as unknown as RecurringInvoice),
-      id: '',
-      number: '',
-      documents: [],
-      frequency_id: '5',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (invoice: Invoice) => {
-    setPurchaseOrder({
-      ...(invoice as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/purchase_orders/create?action=clone');
-  };
-
   return [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
@@ -225,387 +127,313 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && dropdown && <Divider withoutPadding />,
+    (invoice: Invoice) => (
+      <EmailInvoiceAction
+        {...(!dropdown && {
+          key: 'email_invoice',
+        })}
+        invoice={invoice}
+        isDropdown={dropdown}
+      />
+    ),
+    (invoice: Invoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'view_pdf',
+        })}
+        entity="invoice"
+        actionKey="view_pdf"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('view_pdf')}
+        to={route('/invoices/:id/pdf', { id: invoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('view_pdf')}
+      </EntityActionElement>
+    ),
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'email_invoice') && (
-        <EmailInvoiceAction
+      getEntityState(invoice) !== EntityState.Deleted && (
+        <EntityActionElement
           {...(!dropdown && {
-            key: 'email_invoice',
-          })}
-          invoice={invoice}
-          dropdown={dropdown}
-        />
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'view_pdf') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('view_pdf'),
-            key: 'view_pdf',
-          })}
-          to={route('/invoices/:id/pdf', { id: invoice.id })}
-          icon={
-            <Icon element={MdPictureAsPdf} {...(!dropdown && { size: 23.5 })} />
-          }
-        >
-          {t('view_pdf')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      getEntityState(invoice) !== EntityState.Deleted &&
-      showActionByPreferences('invoice', 'print_pdf') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('print_pdf'),
             key: 'print_pdf',
           })}
+          entity="invoice"
+          actionKey="print_pdf"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('print_pdf')}
           onClick={() => printPdf([invoice.id])}
-          icon={<Icon element={MdPrint} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdPrint}
         >
           {t('print_pdf')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       invoice.status_id !== InvoiceStatus.Paid &&
-      showActionByPreferences('invoice', 'schedule') &&
       (isAdmin || isOwner) && (
-        <DropdownElement
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('schedule'),
             key: 'schedule',
           })}
+          entity="invoice"
+          actionKey="schedule"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('schedule')}
           onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={
-            <Icon element={MdSchedule} {...(!dropdown && { size: 23.5 })} />
-          }
+          icon={MdSchedule}
         >
           {t('schedule')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'delivery_note') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: `${t('delivery_note')} ${t('pdf')}`,
-            key: 'delivery_note',
-          })}
-          to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
-          icon={
-            <Icon element={MdPictureAsPdf} {...(!dropdown && { size: 23.5 })} />
-          }
-        >
-          {t('delivery_note')} ({t('pdf')})
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'download') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('download'),
-            key: 'download',
-          })}
-          onClick={() => downloadPdf(invoice)}
-          icon={
-            <Icon element={MdDownload} {...(!dropdown && { size: 23.5 })} />
-          }
-        >
-          {t('download')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'download_e_invoice') && (
-        <DropdownElement
-          {...(!dropdown && { behavior: 'tooltipButton',
-              tooltipText: t('download_e_invoice'),
-              key: 'download', })}
-          onClick={() => downloadEInvoice(invoice)}
-          icon={
-            <Icon element={MdDownload} {...(!dropdown && { color: 'white' })} />
-          }
-        >
-          {t('download_e_invoice')}
-        </DropdownElement>
-      ),
+    (invoice: Invoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'delivery_note',
+        })}
+        entity="invoice"
+        actionKey="delivery_note"
+        isCommonActionSection={!dropdown}
+        tooltipText={`${t('delivery_note')} ${t('pdf')}`}
+        to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
+        icon={MdPictureAsPdf}
+      >
+        {t('delivery_note')} ({t('pdf')})
+      </EntityActionElement>
+    ),
+    (invoice: Invoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download',
+        })}
+        entity="invoice"
+        actionKey="download"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download')}
+        onClick={() => downloadPdf(invoice)}
+        icon={MdDownload}
+      >
+        {t('download')}
+      </EntityActionElement>
+    ),
+    (invoice: Invoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'download_e_invoice',
+        })}
+        entity="invoice"
+        actionKey="download_e_invoice"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('download_e_invoice')}
+        onClick={() => downloadEInvoice(invoice)}
+        icon={MdDownload}
+      >
+        {t('download_e_invoice')}
+      </EntityActionElement>
+    ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Draft &&
-      !invoice.is_deleted &&
-      showActionByPreferences('invoice', 'mark_sent') && (
-        <DropdownElement
+      !invoice.is_deleted && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('mark_sent'),
             key: 'mark_sent',
           })}
+          entity="invoice"
+          actionKey="mark_sent"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_sent')}
           onClick={() => bulk([invoice.id], 'mark_sent')}
-          icon={
-            <Icon
-              element={MdMarkEmailRead}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
+          icon={MdMarkEmailRead}
         >
           {t('mark_sent')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
-      !invoice.is_deleted &&
-      showActionByPreferences('invoice', 'mark_paid') && (
-        <DropdownElement
+      !invoice.is_deleted && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('mark_paid'),
             key: 'mark_paid',
           })}
+          entity="invoice"
+          actionKey="mark_paid"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('mark_paid')}
           onClick={() => bulk([invoice.id], 'mark_paid')}
-          icon={<Icon element={MdPaid} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdPaid}
         >
           {t('mark_paid')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
-      isInvoiceAutoBillable(invoice) &&
-      showActionByPreferences('invoice', 'auto_bill') && (
-        <DropdownElement
+      isInvoiceAutoBillable(invoice) && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('auto_bill'),
             key: 'auto_bill',
           })}
+          entity="invoice"
+          actionKey="auto_bill"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('auto_bill')}
           onClick={() => bulk([invoice.id], 'auto_bill')}
-          icon={<Icon element={BiMoney} {...(!dropdown && { size: 23.5 })} />}
+          icon={BiMoney}
         >
           {t('auto_bill')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < 4 &&
-      showActionByPreferences('invoice', 'enter_payment') &&
       hasPermission('create_payment') && (
-        <DropdownElement
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('enter_payment'),
             key: 'enter_payment',
           })}
+          entity="invoice"
+          actionKey="enter_payment"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('enter_payment')}
           to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
             invoiceId: invoice.id,
             clientId: invoice.client_id,
           })}
-          icon={
-            <Icon element={BiPlusCircle} {...(!dropdown && { size: 23.5 })} />
-          }
+          icon={BiPlusCircle}
         >
           {t('enter_payment')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'client_portal') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('client_portal'),
-            key: 'client_portal',
-          })}
-          onClick={() => invoice && openClientPortal(invoice)}
-          icon={
-            <Icon element={MdCloudCircle} {...(!dropdown && { size: 23.5 })} />
-          }
-        >
-          {t('client_portal')}
-        </DropdownElement>
-      ),
+    (invoice: Invoice) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'client_portal',
+        })}
+        entity="invoice"
+        actionKey="client_portal"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('client_portal')}
+        onClick={() => invoice && openClientPortal(invoice)}
+        icon={MdCloudCircle}
+      >
+        {t('client_portal')}
+      </EntityActionElement>
+    ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) &&
-      showActionByPreferences('invoice', 'cancel_invoice') && (
-        <DropdownElement
+        invoice.status_id === InvoiceStatus.Partial) && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('cancel_invoice'),
             key: 'cancel_invoice',
           })}
+          entity="invoice"
+          actionKey="cancel_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('cancel_invoice')}
           onClick={() => bulk([invoice.id], 'cancel')}
-          icon={<Icon element={MdCancel} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdCancel}
         >
           {t('cancel_invoice')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Paid ||
         invoice.status_id === InvoiceStatus.Partial) &&
       !invoice.is_deleted &&
       !invoice.archived_at &&
-      showActionByPreferences('invoice', 'reverse') &&
       hasPermission('create_credit') && (
-        <DropdownElement
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('reverse'),
             key: 'reverse',
           })}
+          entity="invoice"
+          actionKey="reverse"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('reverse')}
           onClick={() => reverseInvoice(invoice)}
-          icon={<Icon element={MdRefresh} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdRefresh}
         >
           {t('reverse')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone') &&
       hasPermission('create_invoice') && (
-        <DropdownElement
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone'),
-            key: 'clone',
+            key: 'clone_to_invoice',
           })}
+          entity="invoice"
+          actionKey="clone_to_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('clone_to_invoice')}
           onClick={() => cloneToInvoice(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
+          icon={MdControlPointDuplicate}
         >
-          {t('clone')}
-        </DropdownElement>
+          {t('clone_to_invoice')}
+        </EntityActionElement>
       ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_quote') &&
-      hasPermission('create_quote') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_quote'),
-            key: 'clone_to_quote',
-          })}
-          onClick={() => cloneToQuote(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_quote')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_credit') &&
-      hasPermission('create_credit') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_credit'),
-            key: 'clone_to_credit',
-          })}
-          onClick={() => cloneToCredit(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_credit')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_recurring') &&
-      hasPermission('create_recurring_invoice') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_recurring'),
-            key: 'clone_to_recurring',
-          })}
-          onClick={() => cloneToRecurringInvoice(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_recurring')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
-      showActionByPreferences('invoice', 'clone_to_purchase_order') &&
-      hasPermission('create_purchase_order') && (
-        <DropdownElement
-          {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('clone_to_purchase_order'),
-            key: 'clone_to_purchase_order',
-          })}
-          onClick={() => cloneToPurchaseOrder(invoice)}
-          icon={
-            <Icon
-              element={MdControlPointDuplicate}
-              {...(!dropdown && { size: 23.5 })}
-            />
-          }
-        >
-          {t('clone_to_purchase_order')}
-        </DropdownElement>
-      ),
+    (invoice: Invoice) => (
+      <CloneOptionsModal
+        {...(!dropdown && {
+          key: 'clone_to_other',
+        })}
+        dropdown={dropdown}
+        invoice={invoice}
+      />
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      invoice.archived_at === 0 &&
-      (showActionByPreferences('invoice', 'archive') || dropdown) && (
-        <DropdownElement
+      invoice.archived_at === 0 && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('archive'),
             key: 'archive',
           })}
+          entity="invoice"
+          actionKey="archive"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('archive')}
           onClick={() => bulk([invoice.id], 'archive')}
-          icon={<Icon element={MdArchive} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdArchive}
+          excludePreferences
         >
           {t('archive')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
       invoice.archived_at > 0 &&
-      invoice.status_id !== InvoiceStatus.Cancelled &&
-      (showActionByPreferences('invoice', 'restore') || dropdown) && (
-        <DropdownElement
+      invoice.status_id !== InvoiceStatus.Cancelled && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('restore'),
             key: 'restore',
           })}
+          entity="invoice"
+          actionKey="restore"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('restore')}
           onClick={() => bulk([invoice.id], 'restore')}
-          icon={<Icon element={MdRestore} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdRestore}
+          excludePreferences
         >
           {t('restore')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
     (invoice: Invoice) =>
       (isEditPage || Boolean(showCommonBulkAction)) &&
-      !invoice.is_deleted &&
-      (showActionByPreferences('invoice', 'delete') || dropdown) && (
-        <DropdownElement
+      !invoice.is_deleted && (
+        <EntityActionElement
           {...(!dropdown && {
-            behavior: 'tooltipButton',
-            tooltipText: t('delete'),
             key: 'delete',
           })}
+          entity="invoice"
+          actionKey="delete"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('delete')}
           onClick={() => bulk([invoice.id], 'delete')}
-          icon={<Icon element={MdDelete} {...(!dropdown && { size: 23.5 })} />}
+          icon={MdDelete}
+          excludePreferences
         >
           {t('delete')}
-        </DropdownElement>
+        </EntityActionElement>
       ),
   ];
 }

@@ -12,14 +12,17 @@ import { ApiTransactionType } from '$app/common/enums/transactions';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useExpensesQuery } from '$app/common/queries/expenses';
 import { DataTableColumns } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
 import { Link } from '$app/components/forms';
 import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
+import { useCleanDescriptionText } from './useCleanDescription';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -27,6 +30,8 @@ export function useTransactionColumns() {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+  const disableNavigation = useDisableNavigation();
+  const cleanDescriptionText = useCleanDescriptionText();
 
   const { data: invoices } = useInvoicesQuery({ perPage: 1000 });
 
@@ -44,13 +49,14 @@ export function useTransactionColumns() {
     {
       id: 'status',
       label: t('status'),
-      format: (_, transaction) => {
-        return (
-          <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
-            <EntityStatus transaction={transaction} />
-          </Link>
-        );
-      },
+      format: (_, transaction) => (
+        <DynamicLink
+          to={route('/transactions/:id/edit', { id: transaction.id })}
+          renderSpan={disableNavigation('bank_transaction', transaction)}
+        >
+          <EntityStatus transaction={transaction} />
+        </DynamicLink>
+      ),
     },
     {
       id: 'deposit',
@@ -87,9 +93,13 @@ export function useTransactionColumns() {
           size="regular"
           truncate
           containsUnsafeHTMLTags
-          message={value as string}
+          message={cleanDescriptionText(value as string)}
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span
+            dangerouslySetInnerHTML={{
+              __html: cleanDescriptionText(value as string),
+            }}
+          />
         </Tooltip>
       ),
     },

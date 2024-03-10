@@ -97,16 +97,18 @@ export function Standing(props: Props) {
                   </Element>
                 )}
 
-                <div className="flex items-center space-x-1">
-                  <div>
-                    <Icon element={MdLockOutline} size={24} />
-                  </div>
+                {client.private_notes && (
+                  <div className="flex items-center space-x-1">
+                    <div>
+                      <Icon element={MdLockOutline} size={24} />
+                    </div>
 
-                  <span
-                    className="whitespace-normal"
-                    dangerouslySetInnerHTML={{ __html: client.private_notes }}
-                  />
-                </div>
+                    <span
+                      className="whitespace-normal"
+                      dangerouslySetInnerHTML={{ __html: client.private_notes }}
+                    />
+                  </div>
+                )}
               </div>
             }
             className="h-full"

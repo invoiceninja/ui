@@ -82,7 +82,10 @@ export const recurringInvoiceRoutes = (
           <Guard
             guards={[
               enabled(ModuleBitmask.RecurringInvoices),
-              permission('view_recurring_invoice'),
+              or(
+                permission('edit_recurring_invoice'),
+                assigned('/api/v1/recurring_invoices/:id')
+              ),
             ]}
             component={<Pdf />}
           />

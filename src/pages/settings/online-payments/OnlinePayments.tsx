@@ -34,17 +34,18 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function OnlinePayments() {
+  useTitle('online_payments');
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
-
   const disableSettingsField = useDisableSettingsField();
 
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  useTitle('online_payments');
+  const { data: statics } = useStaticsQuery();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -91,14 +92,17 @@ export function OnlinePayments() {
       withoutBackButton
     >
       <Gateways />
-      
+
       <Card title={t('settings')}>
         <Element
           leftSide={
             <PropertyCheckbox
               propertyKey="auto_bill_standard_invoices"
               labelElement={
-                <SettingsLabel label={t('auto_bill_standard_invoices')} />
+                <SettingsLabel
+                  label={t('auto_bill_standard_invoices')}
+                  helpLabel={t('auto_bill_standard_invoices_help')}
+                />
               }
               defaultValue={false}
             />
@@ -155,7 +159,12 @@ export function OnlinePayments() {
           leftSide={
             <PropertyCheckbox
               propertyKey="auto_bill_date"
-              labelElement={<SettingsLabel label={t('auto_bill_on')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('auto_bill_on')}
+                  helpLabel={t('auto_bill_on_help')}
+                />
+              }
               defaultValue="on_send_date"
             />
           }
@@ -177,7 +186,10 @@ export function OnlinePayments() {
             <PropertyCheckbox
               propertyKey="use_credits_payment"
               labelElement={
-                <SettingsLabel label={t('use_available_credits')} />
+                <SettingsLabel
+                  label={t('use_available_credits')}
+                  helpLabel={t('use_available_credits_help')}
+                />
               }
               defaultValue="off"
             />
@@ -196,13 +208,45 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
 
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="use_unapplied_payment"
+              labelElement={
+                <SettingsLabel
+                  label={t('use_unapplied_payments')}
+                  helpLabel={t('use_unapplied_payments_help')}
+                />
+              }
+              defaultValue="off"
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings.use_unapplied_payment || 'off'}
+            id="settings.use_unapplied_payment"
+            onChange={handleChange}
+            disabled={disableSettingsField('use_unapplied_payment')}
+            errorMessage={errors?.errors['settings.use_unapplied_payment']}
+          >
+            <option value="always">{t('enabled')}</option>
+            <option value="option">{t('show_option')}</option>
+            <option value="off">{t('off')}</option>
+          </SelectField>
+        </Element>
+
         {paymentTerms && (
           <>
             <Element
               leftSide={
                 <PropertyCheckbox
                   propertyKey="payment_terms"
-                  labelElement={<SettingsLabel label={t('payment_terms')} />}
+                  labelElement={
+                    <SettingsLabel
+                      label={t('payment_terms')}
+                      helpLabel={t('payment_terms_help')}
+                    />
+                  }
                 />
               }
             >
@@ -229,6 +273,101 @@ export function OnlinePayments() {
             </Element>
           </>
         )}
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="payment_type_id"
+              labelElement={
+                <SettingsLabel
+                  label={t('payment_type')}
+                  helpLabel={t('payment_type_help')}
+                />
+              }
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.payment_type_id || '0'}
+            onChange={handleChange}
+            id="settings.payment_type_id"
+            blankOptionValue="0"
+            disabled={disableSettingsField('payment_type_id')}
+            withBlank
+            errorMessage={errors?.errors['settings.payment_type_id']}
+          >
+            {statics?.payment_types.map(
+              (type: { id: string; name: string }) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              )
+            )}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="valid_until"
+              labelElement={
+                <SettingsLabel
+                  label={t('quote_valid_until')}
+                  helpLabel={t('quote_valid_until_help')}
+                />
+              }
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.valid_until || ''}
+            id="settings.valid_until"
+            onChange={handleChange}
+            disabled={disableSettingsField('valid_until')}
+            withBlank
+            errorMessage={errors?.errors['settings.valid_until']}
+          >
+            {paymentTerms?.map((type: PaymentTerm) => (
+              <option key={type.id} value={type.num_days}>
+                {type.name}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="default_expense_payment_type_id"
+              labelElement={
+                <SettingsLabel
+                  label={t('expense_payment_type')}
+                  helpLabel={t('expense_payment_type_help')}
+                />
+              }
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings?.default_expense_payment_type_id || ''}
+            onChange={handleChange}
+            disabled={disableSettingsField('default_expense_payment_type_id')}
+            id="settings.default_expense_payment_type_id"
+            blankOptionValue="0"
+            withBlank
+            errorMessage={
+              errors?.errors['settings.default_expense_payment_type_id']
+            }
+          >
+            {statics?.payment_types.map(
+              (type: { id: string; name: string }) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              )
+            )}
+          </SelectField>
+        </Element>
 
         <Element
           leftSideHelp={t('manual_payment_email_help')}
@@ -288,8 +427,8 @@ export function OnlinePayments() {
               propertyKey="send_email_on_mark_paid"
               labelElement={
                 <SettingsLabel
-                  label={t('send_email_on_mark_paid')}
-                  helpLabel={t('send_email_on_mark_paid_help')}
+                  label={t('mark_paid_payment_email')}
+                  helpLabel={t('mark_paid_payment_email_help')}
                 />
               }
               defaultValue={false}
@@ -474,12 +613,7 @@ export function OnlinePayments() {
             disabled={disableSettingsField('payment_email_all_contacts')}
           />
         </Element>
-
-        
-
       </Card>
-
-      
     </Settings>
   );
 }

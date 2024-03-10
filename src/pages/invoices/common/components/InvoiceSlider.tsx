@@ -42,7 +42,7 @@ import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
-import { Payment } from '$app/common/interfaces/payment';
+import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
@@ -50,6 +50,7 @@ import { EmailRecord } from '$app/components/EmailRecord';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -61,13 +62,6 @@ export function useGenerateActivityElement() {
 
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    if (activity.activity_type_id === 4) {
-      text = text.replace(
-        ':user',
-        `${t('recurring_invoice')} :recurring_invoice`
-      );
-    }
 
     const replacements = {
       client: (
@@ -307,7 +301,6 @@ export function InvoiceSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                placement="top"
                 containsUnsafeHTMLTags
                 message={(resource?.reminder_schedule as string) ?? ''}
               >
@@ -347,6 +340,7 @@ export function InvoiceSlider() {
           <div className="divide-y">
             {resource?.payments &&
               resource.payments.map((payment: Payment) => (
+                payment.paymentables.filter((item) => item.invoice_id == invoice?.id && item.archived_at == 0).map((paymentable: Paymentable) => (
                 <ClickableElement
                   key={payment.id}
                   to={`/payments/${payment.id}/edit`}
@@ -360,13 +354,13 @@ export function InvoiceSlider() {
                     <p className="inline-flex items-center space-x-1">
                       <p>
                         {formatMoney(
-                          payment.amount,
+                          paymentable.amount,
                           payment.client?.country_id,
                           payment.client?.settings.currency_id
                         )}
                       </p>
                       <p>&middot;</p>
-                      <p>{date(payment.date, dateFormat)}</p>
+                        <p>{date(paymentable.created_at, dateFormat)}</p>
                     </p>
 
                     <div>
@@ -374,6 +368,7 @@ export function InvoiceSlider() {
                     </div>
                   </div>
                 </ClickableElement>
+                ))
               ))}
           </div>
         </div>
@@ -403,15 +398,12 @@ export function InvoiceSlider() {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link
+                    <DynamicLink
                       to={`/clients/${activity.client_id}`}
-                      disableNavigation={disableNavigation(
-                        'client',
-                        invoice?.client
-                      )}
+                      renderSpan={disableNavigation('client', invoice?.client)}
                     >
                       {invoice?.client?.display_name}
-                    </Link>
+                    </DynamicLink>
                   </div>
 
                   <div className="inline-flex items-center space-x-1">

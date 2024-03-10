@@ -58,6 +58,11 @@ import {
 import { TaskClock } from './components/TaskClock';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 interface CardItem {
   id: string;
@@ -82,6 +87,11 @@ type SliderType = 'view' | 'edit';
 export default function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
@@ -259,7 +269,7 @@ export default function Kanban() {
   }, [projectId]);
 
   const colors = useColorScheme();
-  
+
   return (
     <Default
       title={documentTitle}
@@ -283,43 +293,66 @@ export default function Kanban() {
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
         actionChildren={
-          <div className="flex w-full divide-x-2" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-            {sliderType === 'view' && (
-              <ReactRouterLink
-                to={route('/tasks/:id/edit', { id: currentTask?.id })}
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
-              >
-                <Edit size={18} />
-                <span>{t('edit_task')}</span>
-              </ReactRouterLink>
-            )}
+          <div
+            className="flex w-full divide-x-2"
+            style={{
+              color: colors.$3,
+              colorScheme: colors.$0,
+              backgroundColor: colors.$1,
+              borderColor: colors.$4,
+            }}
+          >
+            {sliderType === 'view' &&
+              (hasPermission('edit_task') || entityAssigned(currentTask)) && (
+                <ReactRouterLink
+                  to={route('/tasks/:id/edit', { id: currentTask?.id })}
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                >
+                  <Edit size={18} />
+                  <span>{t('edit_task')}</span>
+                </ReactRouterLink>
+              )}
 
             {/* <button className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50">
               <Plus size={18} />
               <span>{t('invoice_task')}</span>
             </button> */}
 
-            {currentTask && !isTaskRunning(currentTask) && (
-              <button
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
-                onClick={() => startTask(currentTask)}
-              >
-                <Play size={18} />
-                <span>{t('start')}</span>
-              </button>
-            )}
+            {currentTask &&
+              !isTaskRunning(currentTask) &&
+              (hasPermission('edit_task') || entityAssigned(currentTask)) && (
+                <button
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                  onClick={() => startTask(currentTask)}
+                >
+                  <Play size={18} />
+                  <span>{t('start')}</span>
+                </button>
+              )}
 
-            {currentTask && isTaskRunning(currentTask) && (
-              <button
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
-                onClick={() => stopTask(currentTask)}
-              >
-                <Pause size={18} />
-                <span>{t('stop')}</span>
-              </button>
-            )}
+            {currentTask &&
+              isTaskRunning(currentTask) &&
+              (hasPermission('edit_task') || entityAssigned(currentTask)) && (
+                <button
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
+                  className="flex justify-center items-center text-sm p-4 space-x-2 w-full"
+                  onClick={() => stopTask(currentTask)}
+                >
+                  <Pause size={18} />
+                  <span>{t('stop')}</span>
+                </button>
+              )}
           </div>
         }
         size="regular"
@@ -329,7 +362,15 @@ export default function Kanban() {
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
-      <div className="grid grid-cols-12 gap-4" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+      <div
+        className="grid grid-cols-12 gap-4"
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
+      >
         <Card className="col-span-12 xl:col-span-4">
           <Element leftSide={t('project')}>
             <ProjectSelector
@@ -344,7 +385,13 @@ export default function Kanban() {
 
       {board && (
         <div
-          style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4, paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
+          style={{
+            color: colors.$3,
+            colorScheme: colors.$0,
+            backgroundColor: colors.$1,
+            borderColor: colors.$4,
+            paddingRight: isKanbanViewSliderVisible ? 512 : 0,
+          }}
           className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
           <DragDropContext onDragEnd={onDragEnd}>
@@ -353,32 +400,50 @@ export default function Kanban() {
                 {(provided) => (
                   <div
                     className="bg-white rounded shadow select-none h-max"
-                    style={{ minWidth: 360, color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-
+                    style={{
+                      minWidth: 360,
+                      color: colors.$3,
+                      colorScheme: colors.$0,
+                      backgroundColor: colors.$1,
+                      borderColor: colors.$4,
+                    }}
                   >
-                    <div className="flex items-center justify-between border-b px-4 py-5" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-                      <h3 className="leading-6 font-medium ">
-                        {board.title}
-                      </h3>
+                    <div
+                      className="flex items-center justify-between border-b px-4 py-5"
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
+                    >
+                      <h3 className="leading-6 font-medium ">{board.title}</h3>
 
-                      <MdAddCircle
-                        className="cursor-pointer"
-                        fontSize={22}
-                        onClick={() => {
-                          setTaskDetails({
-                            taskStatusId: board.id,
-                            projectId,
-                          });
-                          setIsTaskModalOpened(true);
-                        }}
-                      />
+                      {hasPermission('create_task') && (
+                        <MdAddCircle
+                          className="cursor-pointer"
+                          fontSize={22}
+                          onClick={() => {
+                            setTaskDetails({
+                              taskStatusId: board.id,
+                              projectId,
+                            });
+                            setIsTaskModalOpened(true);
+                          }}
+                        />
+                      )}
                     </div>
 
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       className="p-4 space-y-4"
-                      style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                      style={{
+                        color: colors.$3,
+                        colorScheme: colors.$0,
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$4,
+                      }}
                     >
                       {board.cards.map((card, i) => (
                         <div
@@ -396,7 +461,12 @@ export default function Kanban() {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className="px-4 sm:px-6 py-4"
-                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+                                style={{
+                                  color: colors.$3,
+                                  colorScheme: colors.$0,
+                                  backgroundColor: colors.$1,
+                                  borderColor: colors.$4,
+                                }}
                               >
                                 <p>{card.title}</p>
                                 <small>
@@ -410,42 +480,85 @@ export default function Kanban() {
                             )}
                           </Draggable>
 
-                          <div className="hidden group-hover:flex border-t justify-center items-center" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-                            <button
-                              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                              className="w-full py-2 rounded-bl"
-                              onClick={() => handleCurrentTask(card.id, 'view')}
-                            >
-                              {t('view')}
-                            </button>
-
-                            <button
-                              style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                              className="w-full text-center py-2"
-                              onClick={() => handleCurrentTask(card.id, 'edit')}
-                            >
-                              {t('edit')}
-                            </button>
-
-                            {isTaskRunning(card.task) && (
+                          <div
+                            className="hidden group-hover:flex border-t justify-center items-center"
+                            style={{
+                              color: colors.$3,
+                              colorScheme: colors.$0,
+                              backgroundColor: colors.$1,
+                              borderColor: colors.$4,
+                            }}
+                          >
+                            {(hasPermission('view_task') ||
+                              hasPermission('edit_task') ||
+                              entityAssigned(currentTask)) && (
                               <button
-                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                                className="w-full py-2 rounded-br"
-                                onClick={() => stopTask(card.task)}
+                                style={{
+                                  color: colors.$3,
+                                  colorScheme: colors.$0,
+                                  backgroundColor: colors.$1,
+                                  borderColor: colors.$4,
+                                }}
+                                className="w-full py-2 rounded-bl"
+                                onClick={() =>
+                                  handleCurrentTask(card.id, 'view')
+                                }
                               >
-                                {t('stop')}
+                                {t('view')}
                               </button>
                             )}
 
-                            {!isTaskRunning(card.task) && (
+                            {(hasPermission('edit_task') ||
+                              entityAssigned(currentTask)) && (
                               <button
-                                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                                className="w-full py-2 rounded-br"
-                                onClick={() => startTask(card.task)}
+                                style={{
+                                  color: colors.$3,
+                                  colorScheme: colors.$0,
+                                  backgroundColor: colors.$1,
+                                  borderColor: colors.$4,
+                                }}
+                                className="w-full text-center py-2"
+                                onClick={() =>
+                                  handleCurrentTask(card.id, 'edit')
+                                }
                               >
-                                {t('start')}
+                                {t('edit')}
                               </button>
                             )}
+
+                            {isTaskRunning(card.task) &&
+                              (hasPermission('edit_task') ||
+                                entityAssigned(currentTask)) && (
+                                <button
+                                  style={{
+                                    color: colors.$3,
+                                    colorScheme: colors.$0,
+                                    backgroundColor: colors.$1,
+                                    borderColor: colors.$4,
+                                  }}
+                                  className="w-full py-2 rounded-br"
+                                  onClick={() => stopTask(card.task)}
+                                >
+                                  {t('stop')}
+                                </button>
+                              )}
+
+                            {!isTaskRunning(card.task) &&
+                              (hasPermission('edit_task') ||
+                                entityAssigned(currentTask)) && (
+                                <button
+                                  style={{
+                                    color: colors.$3,
+                                    colorScheme: colors.$0,
+                                    backgroundColor: colors.$1,
+                                    borderColor: colors.$4,
+                                  }}
+                                  className="w-full py-2 rounded-br"
+                                  onClick={() => startTask(card.task)}
+                                >
+                                  {t('start')}
+                                </button>
+                              )}
                           </div>
                         </div>
                       ))}
@@ -458,16 +571,31 @@ export default function Kanban() {
             ))}
           </DragDropContext>
 
-          <div>
-            <div className="shadow rounded p-1" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-              <MdAdd
-                style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-                className="cursor-pointer"
-                fontSize={28}
-                onClick={() => setIsTaskStatusModalOpened(true)}
-              />
+          {(isAdmin || isOwner) && (
+            <div>
+              <div
+                className="shadow rounded p-1"
+                style={{
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$4,
+                }}
+              >
+                <MdAdd
+                  style={{
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                    backgroundColor: colors.$1,
+                    borderColor: colors.$4,
+                  }}
+                  className="cursor-pointer"
+                  fontSize={28}
+                  onClick={() => setIsTaskStatusModalOpened(true)}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

@@ -112,12 +112,18 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setPurchaseOrder(undefined);
+    };
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<
     InvoiceSum | InvoiceSumInclusive
   >();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -142,7 +148,7 @@ export default function Create() {
     setInvoiceSum
   );
 
-  const onSave = useCreate({ setErrors });
+  const onSave = useCreate({ setErrors, isDefaultTerms, isDefaultFooter });
 
   useEffect(() => {
     purchaseOrder &&
@@ -181,6 +187,7 @@ export default function Create() {
               purchaseOrder &&
               handleInvitationChange(purchaseOrder, id, checked)
             }
+            initiallyVisible
             errorMessage={errors?.errors.vendor_id}
           />
         </Card>
@@ -224,6 +231,10 @@ export default function Create() {
               purchaseOrder={purchaseOrder}
               handleChange={handleChange}
               errors={errors}
+              isDefaultFooter={isDefaultFooter}
+              isDefaultTerms={isDefaultTerms}
+              setIsDefaultFooter={setIsDefaultFooter}
+              setIsDefaultTerms={setIsDefaultTerms}
             />
 
             <InvoiceTotals

@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { DataTable } from '$app/components/DataTable';
 import {
   useActions,
@@ -19,6 +21,8 @@ import { useParams } from 'react-router-dom';
 
 export default function Expenses() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
 
   const columns = useExpenseColumns();
 
@@ -43,6 +47,9 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?vendor=:id', { id })}
       linkToEdit="/expenses/:id/edit"
+      excludeColumns={['vendor_id']}
+      linkToCreateGuards={[permission('create_expense')]}
+      hideEditableOptions={!hasPermission('edit_expense')}
     />
   );
 }

@@ -19,8 +19,6 @@ import {
 } from '$app/pages/expenses/common/hooks';
 import { useParams } from 'react-router-dom';
 
-export const dataTableStaleTime = 50;
-
 export default function Expenses() {
   const { id } = useParams();
 
@@ -49,6 +47,7 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?client=:id', { id })}
       linkToEdit="/expenses/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_expense')]}
       hideEditableOptions={!hasPermission('edit_expense')}
     />

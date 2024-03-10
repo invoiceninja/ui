@@ -41,12 +41,18 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { Card } from '$app/components/cards';
 import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
   const { t } = useTranslation();
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -79,6 +85,8 @@ export default function Edit() {
     InvoiceSum | InvoiceSumInclusive
   >();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -103,30 +111,42 @@ export default function Edit() {
     setInvoiceSum
   );
 
-  const onSave = useSave(setErrors);
+  const onSave = useSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   const actions = useActions();
+  const colors = useColorScheme();
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
-      navigationTopRight={
-        purchaseOrder && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={purchaseOrder}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_purchase_order') ||
+        entityAssigned(purchaseOrder)) &&
+        purchaseOrder && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={purchaseOrder}
+              onSaveClick={() => onSave(purchaseOrder)}
+              actions={actions}
+              cypressRef="purchaseOrderActionDropdown"
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {purchaseOrder && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <PurchaseOrderStatus entity={purchaseOrder} />
             </div>
           )}
@@ -183,6 +203,10 @@ export default function Edit() {
               purchaseOrder={purchaseOrder}
               handleChange={handleChange}
               errors={errors}
+              isDefaultFooter={isDefaultFooter}
+              isDefaultTerms={isDefaultTerms}
+              setIsDefaultFooter={setIsDefaultFooter}
+              setIsDefaultTerms={setIsDefaultTerms}
             />
 
             <InvoiceTotals
@@ -206,6 +230,7 @@ export default function Edit() {
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>

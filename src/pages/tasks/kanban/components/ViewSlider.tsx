@@ -31,9 +31,15 @@ import { TaskClock } from './TaskClock';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function ViewSlider() {
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const company = useCurrentCompany();
   const accentColor = useAccentColor();
@@ -52,7 +58,19 @@ export function ViewSlider() {
   };
 
   return (
-    <TabGroup tabs={[t('overview'), t('documents')]} width="full">
+    <TabGroup
+      tabs={[t('overview'), t('documents')]}
+      width="full"
+      formatTabLabel={(tabIndex) => {
+        if (tabIndex === 1) {
+          return (
+            <DocumentsTabLabel
+              numberOfDocuments={currentTask?.documents.length}
+            />
+          );
+        }
+      }}
+    >
       <div>
         {currentTask && (
           <>
@@ -116,11 +134,15 @@ export function ViewSlider() {
           })}
           onSuccess={onSuccess}
           widgetOnly
+          disableUpload={
+            !hasPermission('edit_task') && !entityAssigned(currentTask)
+          }
         />
 
         <DocumentsTable
           documents={currentTask?.documents || []}
           onDocumentDelete={onSuccess}
+          disableEditableOptions={!entityAssigned(currentTask, true)}
         />
       </div>
     </TabGroup>

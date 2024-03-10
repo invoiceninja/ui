@@ -61,6 +61,8 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const clientResolver = useClientResolver();
   const productColumns = useProductColumns();
@@ -110,6 +112,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setQuote(undefined);
+    };
   }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
@@ -123,7 +129,6 @@ export default function Create() {
 
     return company?.settings[prop as keyof CompanySettings];
   };
-
 
   useEffect(() => {
     quote &&
@@ -158,7 +163,6 @@ export default function Create() {
           handleChange('tax_name3', settingResolver(client, 'tax_name3'));
           handleChange('tax_rate3', settingResolver(client, 'tax_rate3'));
         }
-
       });
   }, [quote?.client_id]);
 
@@ -166,7 +170,7 @@ export default function Create() {
     quote && calculateInvoiceSum(quote);
   }, [quote]);
 
-  const save = useCreate({ setErrors });
+  const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
   const taskColumns = useTaskColumns();
 
   return (
@@ -196,7 +200,7 @@ export default function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="product"
                   resource={quote}
@@ -219,7 +223,7 @@ export default function Create() {
             </div>
 
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="task"
                   resource={quote}
@@ -243,7 +247,14 @@ export default function Create() {
           </TabGroup>
         </div>
 
-        <QuoteFooter handleChange={handleChange} errors={errors} />
+        <QuoteFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {quote && (
           <InvoiceTotals

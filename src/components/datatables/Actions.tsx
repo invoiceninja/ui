@@ -37,6 +37,7 @@ interface Props extends CommonProps {
   beforeFilter?: ReactNode;
   defaultCustomFilterOptions?: SelectOption[];
   filter: string;
+  withoutStatusFilter?: boolean;
 }
 
 export function Actions(props: Props) {
@@ -120,21 +121,38 @@ export function Actions(props: Props) {
     }),
   };
 
-
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
-      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0" style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}>
+    <div
+      className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
+      style={{
+        color: colors.$3,
+        colorScheme: colors.$0,
+        backgroundColor: colors.$2,
+        borderColor: colors.$4,
+      }}
+    >
+      <div
+        className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0"
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
+      >
         {props.children}
-        {props.options && props.defaultOptions && (
-          <Select
-            styles={customStyles}
-            defaultValue={props.defaultOptions}
-            onChange={(options) => onStatusChange(options)}
-            placeholder={t('status')}
-            options={props.options}
-            isMulti={props.optionsMultiSelect}
-          />
-        )}
+        {props.options &&
+          props.defaultOptions &&
+          !props.withoutStatusFilter && (
+            <Select
+              styles={customStyles}
+              defaultValue={props.defaultOptions}
+              onChange={(options) => onStatusChange(options)}
+              placeholder={t('status')}
+              options={props.options}
+              isMulti={props.optionsMultiSelect}
+            />
+          )}
 
         {props.customFilters &&
           props.customFilterPlaceholder &&

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { endpoint } from '$app/common/helpers';
@@ -27,16 +27,39 @@ import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
   handleChange: ChangeHandler;
   errors: ValidationBag | undefined;
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
 }
 
 export function QuoteFooter(props: Props) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { handleChange, errors } = props;
+  const {
+    handleChange,
+    errors,
+    isDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
+  } = props;
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const location = useLocation();
 
@@ -49,7 +72,7 @@ export function QuoteFooter(props: Props) {
     t('private_notes'),
     t('documents'),
     t('settings'),
-    t('custom_fields'),
+    ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   const onSuccess = () => {
@@ -58,12 +81,36 @@ export function QuoteFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel numberOfDocuments={quote?.documents.length} />
+            );
+          }
+        }}
+        withoutVerticalMargin
+      >
         <div>
           <MarkdownEditor
             value={quote?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultTerms}
+                onValueChange={(value) => setIsDefaultTerms(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_terms')}</span>
+          </Element>
         </div>
 
         <div>
@@ -71,16 +118,30 @@ export function QuoteFooter(props: Props) {
             value={quote?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultFooter}
+                onValueChange={(value) => setIsDefaultFooter(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_footer')}</span>
+          </Element>
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={quote?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={quote?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
@@ -88,25 +149,29 @@ export function QuoteFooter(props: Props) {
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
-          <div>
+          <div className="my-4">
             <Upload
               widgetOnly
               endpoint={endpoint('/api/v1/quotes/:id/upload', {
                 id,
               })}
               onSuccess={onSuccess}
+              disableUpload={
+                !hasPermission('edit_quote') && !entityAssigned(quote)
+              }
             />
 
             <DocumentsTable
               documents={quote?.documents || []}
               onDocumentDelete={onSuccess}
+              disableEditableOptions={!entityAssigned(quote, true)}
             />
           </div>
         )}
 
-        <div>
+        <div className="my-4">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
@@ -115,6 +180,7 @@ export function QuoteFooter(props: Props) {
                   value={quote?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
                   errorMessage={errors?.errors.assigned_user_id}
+                  readonly={!hasPermission('edit_quote')}
                 />
               </div>
 
@@ -175,7 +241,7 @@ export function QuoteFooter(props: Props) {
           </div>
         </div>
 
-        <div>
+        <div className="my-4">
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
             {t('click_here')}

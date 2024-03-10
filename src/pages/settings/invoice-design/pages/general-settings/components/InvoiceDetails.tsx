@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 
-export function InvoiceDetails() {
+export default function InvoiceDetails() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -43,10 +43,11 @@ export function InvoiceDetails() {
     },
     { value: '$invoice.project', label: t('project') },
     { value: '$client.balance', label: t('client_balance') },
+    { value: '$invoice.total', label: t('invoice_total') },
   ];
 
   return (
-    <Card title={t('invoice_details')} padding="small" collapsed={true}>
+    <Card title={t('invoice_details')} padding="small">
       <SortableVariableList
         for="invoice_details"
         defaultVariables={defaultVariables}

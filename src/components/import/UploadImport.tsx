@@ -26,7 +26,10 @@ import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { Alert } from '../Alert';
-
+import { ImportTemplateModal } from './ImportTemplateModal';
+import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ImportTemplate } from './ImportTemplate';
 
 interface Props {
   entity: string;
@@ -35,7 +38,7 @@ interface Props {
   type: string;
 }
 
-interface ImportMap extends Record<string, any> {
+export interface ImportMap extends Record<string, any> {
   hash: string;
   import_type: string;
   skip_header: boolean;
@@ -50,6 +53,13 @@ export function UploadImport(props: Props) {
     ...(isImportFileTypeZip && { 'application/zip': ['.zip'] }),
   };
 
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
+  const { numberOfTemplates, templates } = useEntityImportTemplates({
+    entity: props.entity,
+  });
+
   const [importSettings, setImportSettings] = useState<boolean>(false);
   const [importData, setImportData] = useState<boolean>(false);
   const [formData, setFormData] = useState(new FormData());
@@ -62,11 +72,43 @@ export function UploadImport(props: Props) {
     column_map: { [props.entity]: { mapping: {} } },
   });
   const [errors, setErrors] = useState<ValidationBag>();
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [defaultMapping, setDefaultMapping] = useState<Record<string, string>>(
+    {}
+  );
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     payload.column_map[props.entity].mapping[event.target.id] =
       event.target.value;
-    setPayloadData(payload);
+    setPayloadData({ ...payload });
+    setSelectedTemplate('');
+  };
+
+  const handleChangeTemplate = () => {
+    const mappingTemplate: Record<string, string> = {};
+
+    Object.entries(
+      reactSettings?.import_templates?.[props.entity]?.[selectedTemplate] || {}
+    ).forEach(([key, value]) => {
+      mappingTemplate[key as keyof typeof mappingTemplate] = value || '';
+    });
+
+    setPayloadData((currentPayload) => ({
+      ...currentPayload,
+      column_map: {
+        [props.entity]: { mapping: mappingTemplate },
+      },
+    }));
+  };
+
+  const onDeletedTemplate = () => {
+    setSelectedTemplate('');
+    setPayloadData((currentPayload) => ({
+      ...currentPayload,
+      column_map: {
+        [props.entity]: { mapping: { ...defaultMapping } },
+      },
+    }));
   };
 
   const decorateMapping = (mapping: any) => {
@@ -122,7 +164,7 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    request('POST', endpoint(endPointUrl, params), requestData)
+    return request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
         props.onFileImported?.();
@@ -155,6 +197,10 @@ export function UploadImport(props: Props) {
                 payload.column_map[props.entity].mapping[index] =
                   response.data?.mappings[props.entity].available[mapping];
                 setPayloadData(payload);
+                setDefaultMapping({
+                  ...payload?.column_map?.[props.entity]?.mapping,
+                });
+                setSelectedTemplate('');
               }
             );
           }
@@ -176,14 +222,11 @@ export function UploadImport(props: Props) {
     setFormData(formData);
   };
 
-  const defaultHint = (index: number) => {
-    if (!mapData?.mappings[props.entity]?.hints) return null;
+  const getColumnValue = (index: number) => {
+    if (!Object.keys(payload?.column_map[props.entity]?.mapping).length)
+      return null;
 
-    return (
-      mapData?.mappings[props.entity].available[
-        mapData.mappings[props.entity]?.hints[index]
-      ] ?? null
-    );
+    return payload?.column_map[props.entity]?.mapping[index] ?? null;
   };
 
   const removeFileFromFormData = (fileIndex: number) => {
@@ -226,12 +269,20 @@ export function UploadImport(props: Props) {
       }
     },
   });
-  
-  const colors = useColorScheme();
 
   useEffect(() => {
     addFilesToFormData();
   }, [files]);
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      handleChangeTemplate();
+    }
+  }, [selectedTemplate]);
+
+  useEffect(() => {
+    return () => setSelectedTemplate('');
+  }, []);
 
   return (
     <>
@@ -247,8 +298,14 @@ export function UploadImport(props: Props) {
             >
               <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <input {...getInputProps()} />
-                <Image className="mx-auto h-12 w-12" style={{ color: colors.$3, colorScheme: colors.$0 }} />
-                <span className="mt-2 block text-sm font-medium" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+                <Image
+                  className="mx-auto h-12 w-12"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                />
+                <span
+                  className="mt-2 block text-sm font-medium"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                >
                   {isDragActive
                     ? t('drop_file_here')
                     : t('dropzone_default_message')}
@@ -313,6 +370,43 @@ export function UploadImport(props: Props) {
         )}
       </Card>
 
+      {mapData && !isImportFileTypeZip && Boolean(numberOfTemplates) && (
+        <Card className="mt-4">
+          <Element leftSide={t('template')}>
+            <SelectField
+              value={selectedTemplate}
+              onValueChange={(value) => {
+                setSelectedTemplate(value);
+
+                if (!value) {
+                  setPayloadData((currentPayload) => ({
+                    ...currentPayload,
+                    column_map: {
+                      [props.entity]: { mapping: { ...defaultMapping } },
+                    },
+                  }));
+                }
+              }}
+              withBlank
+            >
+              {templates.map((template, index) => (
+                <option key={index} value={template}>
+                  {template}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+
+          {selectedTemplate && (
+            <ImportTemplate
+              name={selectedTemplate}
+              entity={props.entity}
+              onDeletedTemplate={onDeletedTemplate}
+            />
+          )}
+        </Card>
+      )}
+
       {mapData && !isImportFileTypeZip && (
         <Table>
           <Thead>
@@ -335,9 +429,9 @@ export function UploadImport(props: Props) {
                   <Td>
                     <SelectField
                       id={index}
+                      value={getColumnValue(index)}
                       onChange={handleChange}
                       withBlank
-                      defaultValue={defaultHint(index)}
                     >
                       {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
@@ -378,13 +472,11 @@ export function UploadImport(props: Props) {
             )}
             <Tr>
               <Td colSpan={2}>
-                <Button
-                  className="flex float-right"
-                  behavior="button"
-                  onClick={processImport}
-                >
-                  {t('import')}
-                </Button>
+                <ImportTemplateModal
+                  entity={props.entity}
+                  importMap={payload}
+                  onImport={processImport}
+                />
               </Td>
             </Tr>
           </Tbody>

@@ -85,11 +85,10 @@ export default function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={onSave}
       navigationTopRight={
         vendor && (
           <ResourceActions
-            label={t('more_actions')}
+            onSaveClick={onSave}
             resource={vendor}
             actions={actions}
           />

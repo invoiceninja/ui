@@ -11,7 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   Link,
   Params,
@@ -27,7 +27,13 @@ interface Props {
   disableBackupNavigation?: boolean;
 }
 
-export type Tab = { name: string; href: string; matcher?: Matcher[] };
+export type Tab = {
+  name: string;
+  href: string;
+  matcher?: Matcher[];
+  enabled?: boolean;
+  formatName?: () => ReactNode | undefined;
+};
 export type Matcher = (params: Readonly<Params<string>>) => string;
 
 export function Tabs(props: Props) {
@@ -96,9 +102,12 @@ export function Tabs(props: Props) {
           className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           defaultValue={props.tabs.find((tab) => tab)?.name}
         >
-          {props.tabs.map((tab) => (
-            <option key={tab.name}>{tab.name}</option>
-          ))}
+          {props.tabs.map(
+            (tab) =>
+              (typeof tab.enabled === 'undefined' || tab.enabled) && (
+                <option key={tab.name}>{tab.formatName?.() || tab.name}</option>
+              )
+          )}
         </select>
       </div>
 
@@ -109,21 +118,24 @@ export function Tabs(props: Props) {
             className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
             aria-label="Tabs"
           >
-            {props.tabs.map((tab) => (
-              <Link
-                key={tab.name}
-                to={tab.href}
-                onClick={(event) => handleScroll(event)}
-                style={{
-                  borderColor: isActive(tab) ? accentColor : 'transparent',
-                  color: isActive(tab) ? accentColor : colors.$3,
-                }}
-                className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                aria-current={isActive(tab) ? 'page' : undefined}
-              >
-                {tab.name}
-              </Link>
-            ))}
+            {props.tabs.map(
+              (tab) =>
+                (typeof tab.enabled === 'undefined' || tab.enabled) && (
+                  <Link
+                    key={tab.name}
+                    to={tab.href}
+                    onClick={(event) => handleScroll(event)}
+                    style={{
+                      borderColor: isActive(tab) ? accentColor : 'transparent',
+                      color: isActive(tab) ? accentColor : colors.$3,
+                    }}
+                    className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                    aria-current={isActive(tab) ? 'page' : undefined}
+                  >
+                    {tab.formatName?.() || tab.name}
+                  </Link>
+                )
+            )}
           </nav>
         </div>
       </div>

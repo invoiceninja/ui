@@ -11,13 +11,13 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms/Link';
 import { Card } from '$app/components/cards';
 import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export function UpcomingQuotes() {
   const [t] = useTranslation();
@@ -30,24 +30,24 @@ export function UpcomingQuotes() {
       id: 'number',
       label: t('number'),
       format: (value, quote) => (
-        <Link
+        <DynamicLink
           to={route('/quotes/:id/edit', { id: quote.id })}
-          disableNavigation={disableNavigation('quote', quote)}
+          renderSpan={disableNavigation('quote', quote)}
         >
           {quote.number}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
       id: 'client_id',
       label: t('client'),
       format: (value, quote) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: quote.client_id })}
-          disableNavigation={disableNavigation('client', quote.client)}
+          renderSpan={disableNavigation('client', quote.client)}
         >
           {quote.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
