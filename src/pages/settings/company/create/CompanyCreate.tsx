@@ -103,8 +103,6 @@ export function CompanyCreate(props: Props) {
     }
   };
 
-  const colors = useColorScheme();
-
   return (
     <Modal
       title={t('add_company')}
