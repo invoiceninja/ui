@@ -41,6 +41,7 @@ import { customField } from '$app/components/CustomField';
 export const reportColumn = 11;
 
 export function useTranslationAlias() {
+  const [t] = useTranslation();
   const company = useCurrentCompany();
   const customFields = company?.custom_fields;
 
@@ -84,7 +85,7 @@ export function useTranslationAlias() {
       contact_custom_value4: findCustomField('vendor_contact4', true),
     };
 
-    return fields[field as keyof typeof fields] || field;
+    return fields[field as keyof typeof fields] || t(field);
   };
 }
 
@@ -105,16 +106,18 @@ export function Column({
 }: ColumnProps) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const findTranslationAlias = useTranslationAlias();
 
   const translateLabel = (record: Record) => {
     const parts = record.value.split('.');
 
-    return `${t(`${parts[0]}`)} - ${t(
-      `${findTranslationAlias(record.trans, parts[0] as Entity)}`
+    return `${t(`${parts[0]}`)} - ${findTranslationAlias(
+      record.trans,
+      parts[0] as Entity
     )}`;
   };
-  const colors = useColorScheme();
 
   return (
     <div>
