@@ -44,6 +44,8 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useEmailProviders } from './common/hooks/useEmailProviders';
 import { SMTPMailDriver } from './common/components/SMTPMailDriver';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -342,7 +344,10 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
             }
-            disabled={disableSettingsField('email_sending_method')}
+            disabled={
+              disableSettingsField('email_sending_method') ||
+              (!proPlan() && !enterprisePlan())
+            }
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
             {emailProviders.map(
