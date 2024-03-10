@@ -43,12 +43,17 @@ export default function Edit() {
 
   const [isPurgeActionCalled, setIsPurgeActionCalled] =
     useState<boolean>(false);
+  const [isMergeClientActionCalled, setIsMergeClientActionCalled] =
+    useState<boolean>(false);
 
-  const actions = useActions({ setIsPurgeActionCalled });
+  const actions = useActions({
+    setIsPurgeActionCalled,
+    setIsMergeClientActionCalled,
+  });
 
   const { data, isLoading } = useClientQuery({
     id,
-    enabled: !isPurgeActionCalled,
+    enabled: !isPurgeActionCalled && !isMergeClientActionCalled,
   });
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
@@ -68,6 +73,7 @@ export default function Edit() {
 
     return () => {
       setIsPurgeActionCalled(false);
+      setIsMergeClientActionCalled(false);
     };
   }, [data]);
 

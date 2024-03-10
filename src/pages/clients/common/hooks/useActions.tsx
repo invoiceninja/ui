@@ -39,12 +39,13 @@ import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
   setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setIsMergeClientActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
 
-  const { setIsPurgeActionCalled } = params || {};
+  const { setIsPurgeActionCalled, setIsMergeClientActionCalled } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -138,7 +139,12 @@ export function useActions(params?: Params) {
     (client) =>
       !client.is_deleted &&
       (isAdmin || isOwner) &&
-      client && <MergeClientAction client={client} />,
+      client && (
+        <MergeClientAction
+          client={client}
+          setIsMergeClientActionCalled={setIsMergeClientActionCalled}
+        />
+      ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>

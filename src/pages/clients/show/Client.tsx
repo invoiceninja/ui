@@ -36,11 +36,13 @@ export default function Client() {
 
   const [isPurgeActionCalled, setIsPurgeActionCalled] =
     useState<boolean>(false);
+  const [isMergeClientActionCalled, setIsMergeClientActionCalled] =
+    useState<boolean>(false);
 
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({
     id,
-    enabled: Boolean(id) && !isPurgeActionCalled,
+    enabled: Boolean(id) && !isPurgeActionCalled && !isMergeClientActionCalled,
   });
 
   const pages: Page[] = [
@@ -51,8 +53,15 @@ export default function Client() {
     },
   ];
 
-  const tabs = useTabs({ client, isPurgeActionCalled });
-  const actions = useActions({ setIsPurgeActionCalled });
+  const tabs = useTabs({
+    client,
+    isPurgeActionCalled,
+    isMergeClientActionCalled,
+  });
+  const actions = useActions({
+    setIsPurgeActionCalled,
+    setIsMergeClientActionCalled,
+  });
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
@@ -63,6 +72,7 @@ export default function Client() {
 
     return () => {
       setIsPurgeActionCalled(false);
+      setIsMergeClientActionCalled(false);
     };
   }, [client]);
 
@@ -100,7 +110,9 @@ export default function Client() {
           <Tabs tabs={tabs} className="mt-6" />
 
           <div className="my-4">
-            <Outlet context={{ isPurgeActionCalled }} />
+            <Outlet
+              context={{ isPurgeActionCalled, isMergeClientActionCalled }}
+            />
           </div>
         </>
       )}
