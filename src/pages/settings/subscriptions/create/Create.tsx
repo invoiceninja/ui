@@ -136,6 +136,7 @@ export function Create() {
               handleChange={handleChange}
               errors={errors}
               products={products}
+              page="create"
             />
           )}
         </div>
