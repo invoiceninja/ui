@@ -44,8 +44,8 @@ export function UploadImport(props: Props) {
         const reader = new FileReader();
 
         reader.onload = (event: ProgressEvent<FileReader>) => {
-          const cvsData = (event.target?.result as string) || '';
-          const rowData = cvsData.split('\n');
+          const csvData = (event.target?.result as string) || '';
+          const rowData = csvData.split('\n');
 
           if (!rowData.length || rowData.length === 1) {
             resolve(false);
