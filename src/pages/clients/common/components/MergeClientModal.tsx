@@ -25,18 +25,25 @@ import { useNavigate } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   mergeFromClientId: string;
-  editPage?: boolean;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function MergeClientModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { isEditOrShowPage } = useEntityPageIdentifier({
+    entity: 'client',
+  });
+
+  const { setIsPurgeOrMergeActionCalled } = props;
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
@@ -51,6 +58,7 @@ export function MergeClientModal(props: Props) {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
+      setIsPurgeOrMergeActionCalled?.(true);
 
       request(
         'POST',
@@ -67,8 +75,8 @@ export function MergeClientModal(props: Props) {
         .then(() => {
           $refetch(['clients']);
 
-          request('POST', endpoint('/api/v1/refresh')).then(
-            (response: AxiosResponse) => {
+          request('POST', endpoint('/api/v1/refresh'))
+            .then((response: AxiosResponse) => {
               toast.success('merged_clients');
 
               dispatch(updateCompanyUsers(response.data.data));
@@ -77,17 +85,19 @@ export function MergeClientModal(props: Props) {
 
               props.setVisible(false);
 
-              if (props.editPage) {
+              if (isEditOrShowPage) {
                 navigate('/clients');
               }
-            }
-          );
+            })
+            .catch(() => setIsPurgeOrMergeActionCalled?.(false));
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
             setLastPasswordEntryTime(0);
           }
+
+          setIsPurgeOrMergeActionCalled?.(false);
         })
         .finally(() => setIsFormBusy(false));
     }
