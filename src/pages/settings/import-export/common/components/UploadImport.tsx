@@ -63,7 +63,7 @@ export function UploadImport(props: Props) {
     });
   };
 
-  const checkRowsLength = async (files: File[]) => {
+  const shouldUploadFiles = async (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
 
@@ -78,7 +78,7 @@ export function UploadImport(props: Props) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'text/*': ['.csv'] },
     onDrop: async (acceptedFiles) => {
-      const shouldAddFiles = await checkRowsLength(acceptedFiles);
+      const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
       if (shouldAddFiles) {
         acceptedFiles.forEach((file) => {
