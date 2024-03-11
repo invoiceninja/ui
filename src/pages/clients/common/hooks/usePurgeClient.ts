@@ -18,19 +18,19 @@ import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmati
 import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
-  setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function usePurgeClient(params?: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { setIsPurgeActionCalled } = params || {};
+  const { setIsPurgeOrMergeActionCalled } = params || {};
 
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   return (password: string, clientId: string) => {
     toast.processing();
-    setIsPurgeActionCalled?.(true);
+    setIsPurgeOrMergeActionCalled?.(true);
 
     request(
       'POST',
@@ -51,7 +51,7 @@ export function usePurgeClient(params?: Params) {
           setLastPasswordEntryTime(0);
         }
 
-        setIsPurgeActionCalled?.(false);
+        setIsPurgeOrMergeActionCalled?.(false);
       });
   };
 }

@@ -41,14 +41,16 @@ export default function Edit() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const [isPurgeActionCalled, setIsPurgeActionCalled] =
+  const [isPurgeOrMergeActionCalled, setIsPurgeOrMergeActionCalled] =
     useState<boolean>(false);
 
-  const actions = useActions({ setIsPurgeActionCalled });
+  const actions = useActions({
+    setIsPurgeOrMergeActionCalled,
+  });
 
   const { data, isLoading } = useClientQuery({
     id,
-    enabled: !isPurgeActionCalled,
+    enabled: !isPurgeOrMergeActionCalled,
   });
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
@@ -67,7 +69,7 @@ export default function Edit() {
     }
 
     return () => {
-      setIsPurgeActionCalled(false);
+      setIsPurgeOrMergeActionCalled(false);
     };
   }, [data]);
 
