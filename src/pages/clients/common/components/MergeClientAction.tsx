@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { MergeClientModal } from './MergeClientModal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +18,12 @@ import { BiGitMerge } from 'react-icons/bi';
 
 interface Props {
   client: Client;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function MergeClientAction(props: Props) {
   const [t] = useTranslation();
 
-  const { client } = props;
+  const { client, setIsPurgeOrMergeActionCalled } = props;
 
   const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
 
@@ -39,6 +40,7 @@ export function MergeClientAction(props: Props) {
         visible={isMergeModalOpen}
         setVisible={setIsMergeModalOpen}
         mergeFromClientId={client.id}
+        setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
       />
     </>
   );

@@ -47,14 +47,14 @@ export interface Document {
 }
 
 interface Context {
-  isPurgeActionCalled: boolean;
+  isPurgeOrMergeActionCalled: boolean;
 }
 export default function Documents() {
   const { id } = useParams();
 
   const context: Context = useOutletContext();
 
-  const { isPurgeActionCalled } = context;
+  const { isPurgeOrMergeActionCalled } = context;
 
   const hasPermission = useHasPermission();
 
@@ -88,7 +88,7 @@ export default function Documents() {
         showRestore={() => false}
         showArchive={() => false}
         showDelete={() => false}
-        disableQuery={isPurgeActionCalled}
+        disableQuery={isPurgeOrMergeActionCalled}
         withoutDefaultBulkActions
         withoutStatusFilter
         hideEditableOptions={!hasPermission('edit_expense')}

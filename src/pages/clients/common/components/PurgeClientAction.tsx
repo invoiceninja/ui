@@ -19,14 +19,14 @@ import { Dispatch, SetStateAction, useState } from 'react';
 
 interface Props {
   client: Client;
-  setIsPurgeActionCalled?: Dispatch<SetStateAction<boolean>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function PurgeClientAction(props: Props) {
   const [t] = useTranslation();
 
-  const { client, setIsPurgeActionCalled } = props;
+  const { client, setIsPurgeOrMergeActionCalled } = props;
 
-  const handlePurgeClient = usePurgeClient({ setIsPurgeActionCalled });
+  const handlePurgeClient = usePurgeClient({ setIsPurgeOrMergeActionCalled });
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState<boolean>(false);
