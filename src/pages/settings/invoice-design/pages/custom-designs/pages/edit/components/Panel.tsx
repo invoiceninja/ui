@@ -14,7 +14,6 @@ import { useMediaQuery } from 'react-responsive';
 
 interface Props {
   children: ReactNode;
-  className?: string;
 }
 export function Panel(props: Props) {
   const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
