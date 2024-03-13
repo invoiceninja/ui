@@ -28,14 +28,24 @@ import { isEqual } from 'lodash';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { route } from '$app/common/helpers/route';
 import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+const StyledGatewayTypeIcon = styled(GatewayTypeIcon)`
+  cursor: pointer;
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }: 
+`;
+
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
@@ -119,7 +129,11 @@ export function CompanyEdit(props: Props) {
 
   return (
     <Modal
-      title={t('welcome_to_invoice_ninja')}
+      title={
+        stepIndex !== 2
+          ? t('welcome_to_invoice_ninja')
+          : t('accept_payments_online')
+      }
       visible={props.isModalOpen}
       onClose={() => {
         props.setIsModalOpen(false);
@@ -165,20 +179,30 @@ export function CompanyEdit(props: Props) {
 
         {stepIndex === 2 && (
           <div className="flex flex-col items-center">
-            <GatewayTypeIcon name="stripe" style={{ width: '75%' }} />
+            <StyledGatewayTypeIcon
+              name="stripe"
+              onClick={handleConnectStripe}
+              style={{ width: '75%' }}
+            />
+
+            <StyledGatewayTypeIcon
+              name="paypal"
+              onClick={handleConnectStripe}
+              style={{ width: '63%' }}
+            />
 
             <Button
               behavior="button"
               className="w-full"
-              onClick={handleConnectStripe}
+              onClick={() => navigate('/settings/online_payments')}
             >
-              {t('setup')}
+              {t('all_payment_gateways')}
             </Button>
           </div>
         )}
 
         <div className="flex justify-end">
-          {stepIndex !== 2 || isSelfHosted() ? (
+          {(stepIndex !== 2 || isSelfHosted()) && (
             <Button
               behavior="button"
               onClick={() => {
@@ -187,13 +211,6 @@ export function CompanyEdit(props: Props) {
               }}
             >
               {isHosted() ? t('next') : t('save')}
-            </Button>
-          ) : (
-            <Button
-              behavior="button"
-              onClick={() => props.setIsModalOpen(false)}
-            >
-              {t('done')}
             </Button>
           )}
         </div>

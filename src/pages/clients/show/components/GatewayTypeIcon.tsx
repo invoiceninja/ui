@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CSSProperties } from 'react';
+import { CSSProperties, MouseEvent } from 'react';
 import visaLogo from '/gateway-card-images/visa.png';
 import authorizeLogo from '/gateway-card-images/authorize-net.png';
 import americanExpressLogo from '/gateway-card-images/american-express.png';
@@ -29,6 +29,7 @@ import wepayLogo from '/gateway-card-images/wepay.svg';
 
 interface Props {
   name: string;
+  onClick?: (event: MouseEvent<HTMLImageElement>) => void;
   style?: CSSProperties;
 }
 
@@ -54,10 +55,13 @@ export const availableGatewayLogos = [
 ];
 
 export function GatewayTypeIcon(props: Props) {
+  const { onClick } = props;
+
   switch (props.name) {
     case 'visa':
       return (
         <img
+          onClick={onClick}
           src={visaLogo}
           alt="Visa"
           style={props.style || { width: 30, height: 30 }}
@@ -67,6 +71,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'american_express':
       return (
         <img
+          onClick={onClick}
           src={americanExpressLogo}
           alt="American Express"
           style={props.style || { width: 30, height: 30 }}
@@ -76,6 +81,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'mastercard':
       return (
         <img
+          onClick={onClick}
           src={masterCardLogo}
           alt="Mastercard"
           style={props.style || { width: 30, height: 30 }}
@@ -85,6 +91,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paypal':
       return (
         <img
+          onClick={onClick}
           src={paypalLogo}
           alt="PayPal"
           style={props.style || { width: 40, height: 40 }}
@@ -94,6 +101,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paypal_ppcp':
       return (
         <img
+          onClick={onClick}
           src={paypalLogo}
           alt="PayPal"
           style={props.style || { width: 40, height: 40 }}
@@ -103,6 +111,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'authorize':
       return (
         <img
+          onClick={onClick}
           src={authorizeLogo}
           alt="AuthorizeNet"
           style={props.style || { width: 40, height: 40 }}
@@ -112,6 +121,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'braintree':
       return (
         <img
+          onClick={onClick}
           src={braintreeLogo}
           alt="Braintree"
           style={props.style || { width: 40, height: 40 }}
@@ -121,6 +131,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'checkoutcom':
       return (
         <img
+          onClick={onClick}
           src={checkoutcomLogo}
           alt="Checkoutcom"
           style={props.style || { width: 40, height: 40 }}
@@ -130,6 +141,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'gocardless':
       return (
         <img
+          onClick={onClick}
           src={goCardlessLogo}
           alt="GoCardless"
           style={props.style || { width: 40, height: 40 }}
@@ -139,6 +151,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'mollie':
       return (
         <img
+          onClick={onClick}
           src={mollieLogo}
           alt="Mollie"
           style={props.style || { width: 40, height: 40 }}
@@ -148,6 +161,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'payfast':
       return (
         <img
+          onClick={onClick}
           src={payfastLogo}
           alt="Payfast"
           style={props.style || { width: 40, height: 40 }}
@@ -157,6 +171,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paytrace':
       return (
         <img
+          onClick={onClick}
           src={paytraceLogo}
           alt="Paytrace"
           style={props.style || { width: 40, height: 40 }}
@@ -166,6 +181,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'razorpay':
       return (
         <img
+          onClick={onClick}
           src={razorpayLogo}
           alt="Razorpay"
           style={props.style || { width: 40, height: 40 }}
@@ -175,6 +191,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'square':
       return (
         <img
+          onClick={onClick}
           src={squareLogo}
           alt="Square"
           style={props.style || { width: 40, height: 40 }}
@@ -184,6 +201,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'stripe':
       return (
         <img
+          onClick={onClick}
           src={stripeLogo}
           alt="Stripe"
           style={props.style || { width: 40, height: 40 }}
@@ -193,6 +211,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'eway':
       return (
         <img
+          onClick={onClick}
           src={ewayLogo}
           alt="Eway"
           style={props.style || { width: 40, height: 40 }}
@@ -202,6 +221,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'forte':
       return (
         <img
+          onClick={onClick}
           src={forteLogo}
           alt="Forte"
           style={props.style || { width: 40, height: 40 }}
@@ -211,6 +231,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'wepay':
       return (
         <img
+          onClick={onClick}
           src={wepayLogo}
           alt="Wepay"
           style={props.style || { width: 30, height: 30 }}
