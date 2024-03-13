@@ -829,7 +829,7 @@ export default function GeneralSettings() {
   }, []);
 
   return (
-    <Card title={t('general_settings')} padding="small" collapsed={false}>
+    <Card title={t('general_settings')} padding="small">
       <Element
         leftSide={
           <PropertyCheckbox
