@@ -29,10 +29,9 @@ import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
-import { PanelResizeHandle } from 'react-resizable-panels';
 import { PanelGroup } from './components/PanelGroup';
-import { useMediaQuery } from 'react-responsive';
 import { Panel } from './components/Panel';
+import { PanelResizeHandle } from './components/PanelResizeHandle';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -48,8 +47,6 @@ export const payloadAtom = atom<PreviewPayload>({
 
 export default function Edit() {
   const actions = useActions();
-
-  const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
@@ -109,27 +106,25 @@ export default function Edit() {
   return (
     <PanelGroup>
       <Panel>
-        <div className="w-full lg:w-1/2 overflow-y-auto">
-          <div className="space-y-4 max-h-[80vh] pl-1 pr-2">
-            <Settings
-              errors={errors}
-              isFormBusy={isFormBusy}
-              shouldRenderHTML={shouldRenderHTML}
-              setShouldRenderHTML={setShouldRenderHTML}
-            />
-            <Body />
-            <Header />
-            <Footer />
-            <Includes />
-            <Variables />
-          </div>
+        <div className="space-y-4 max-h-[80vh] overflow-y-auto">
+          <Settings
+            errors={errors}
+            isFormBusy={isFormBusy}
+            shouldRenderHTML={shouldRenderHTML}
+            setShouldRenderHTML={setShouldRenderHTML}
+          />
+          <Body />
+          <Header />
+          <Footer />
+          <Includes />
+          <Variables />
         </div>
       </Panel>
 
-      {isLargeScreen && <PanelResizeHandle className="w-1 bg-gray-500" />}
+      <PanelResizeHandle />
 
       <Panel>
-        <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
+        <div className="max-h-[80vh] overflow-y-scroll">
           {payload.design ? (
             <InvoiceViewer
               link={endpoint('/api/v1/preview?html=:renderHTML', {

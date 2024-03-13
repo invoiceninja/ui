@@ -8,23 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
-import { PanelGroup as PanelGroupBase } from 'react-resizable-panels';
+import { Icon } from '$app/components/icons/Icon';
+import { Maximize2 } from 'react-feather';
+import { PanelResizeHandle as PanelResizeHandleBase } from 'react-resizable-panels';
 import { useMediaQuery } from 'react-responsive';
 
-interface Props {
-  children: ReactNode;
-}
-export function PanelGroup(props: Props) {
+export function PanelResizeHandle() {
   const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
-  const { children } = props;
-
   return isLargeScreen ? (
-    <PanelGroupBase direction="horizontal" className="gap-4">
-      {children}
-    </PanelGroupBase>
+    <PanelResizeHandleBase className="flex items-center">
+      <Icon
+        element={Maximize2}
+        style={{ rotate: '45deg', width: '2rem', height: '1.75rem' }}
+      />
+    </PanelResizeHandleBase>
   ) : (
-    <div className="flex flex-col gap-4">{children}</div>
+    <></>
   );
 }
