@@ -30,14 +30,14 @@ import { route } from '$app/common/helpers/route';
 import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const StyledGatewayTypeIcon = styled(GatewayTypeIcon)`
-  cursor: pointer;
+const Div = styled.div`
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
   }: 
@@ -48,6 +48,7 @@ export function CompanyEdit(props: Props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const companyChanges = useInjectCompanyChanges();
 
@@ -83,15 +84,15 @@ export function CompanyEdit(props: Props) {
       .finally(() => setIsFormBusy(false));
   };
 
-  const handleConnectStripe = () => {
+  const handleConnectPaymentGateway = (gateway: 'stripe' | 'paypal') => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/one_time_token'), {
-      context: 'stripe_connect',
+      context: `${gateway}_connect`,
     }).then((response) => {
       window
         .open(
-          route('https://invoicing.co/stripe/signup/:token', {
+          route(`https://invoicing.co/${gateway}/signup/:token`, {
             token: response.data.hash,
           }),
           '_blank'
@@ -179,22 +180,35 @@ export function CompanyEdit(props: Props) {
 
         {stepIndex === 2 && (
           <div className="flex flex-col items-center">
-            <StyledGatewayTypeIcon
-              name="stripe"
-              onClick={handleConnectStripe}
-              style={{ width: '75%' }}
-            />
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('stripe')}
+            >
+              <GatewayTypeIcon name="stripe" style={{ width: '64%' }} />
+            </Div>
 
-            <StyledGatewayTypeIcon
-              name="paypal"
-              onClick={handleConnectStripe}
-              style={{ width: '63%' }}
-            />
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('paypal')}
+            >
+              <GatewayTypeIcon
+                name="paypal"
+                style={{
+                  width: '38%',
+                  transform: 'scale(1.7)',
+                }}
+              />
+            </Div>
 
             <Button
               behavior="button"
-              className="w-full"
-              onClick={() => navigate('/settings/online_payments')}
+              className="w-full mt-4"
+              onClick={() => {
+                props.setIsModalOpen(false);
+                navigate('/settings/online_payments');
+              }}
             >
               {t('all_payment_gateways')}
             </Button>
