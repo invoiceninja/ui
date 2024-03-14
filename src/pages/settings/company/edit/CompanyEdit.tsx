@@ -84,15 +84,23 @@ export function CompanyEdit(props: Props) {
       .finally(() => setIsFormBusy(false));
   };
 
-  const handleConnectPaymentGateway = (gateway: 'stripe' | 'paypal') => {
+  const handleConnectPaymentGateway = (
+    gateway: 'stripe_connect' | 'paypal_ppcp'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/one_time_token'), {
-      context: `${gateway}_connect`,
+      context: gateway,
     }).then((response) => {
+      let url = 'stripe/signup/:token';
+
+      if (gateway === 'paypal_ppcp') {
+        url = 'paypal?token=:token';
+      }
+
       window
         .open(
-          route(`https://invoicing.co/${gateway}/signup/:token`, {
+          route(`https://invoicing.co/${url}`, {
             token: response.data.hash,
           }),
           '_blank'
@@ -183,7 +191,7 @@ export function CompanyEdit(props: Props) {
             <Div
               className="flex w-full justify-center h-28 cursor-pointer"
               theme={{ hoverColor: colors.$5 }}
-              onClick={() => handleConnectPaymentGateway('stripe')}
+              onClick={() => handleConnectPaymentGateway('stripe_connect')}
             >
               <GatewayTypeIcon name="stripe" style={{ width: '64%' }} />
             </Div>
@@ -191,13 +199,14 @@ export function CompanyEdit(props: Props) {
             <Div
               className="flex w-full justify-center h-28 cursor-pointer"
               theme={{ hoverColor: colors.$5 }}
-              onClick={() => handleConnectPaymentGateway('paypal')}
+              onClick={() => handleConnectPaymentGateway('paypal_ppcp')}
             >
               <GatewayTypeIcon
                 name="paypal"
                 style={{
                   width: '38%',
                   transform: 'scale(1.7)',
+                  pointerEvents: 'none',
                 }}
               />
             </Div>
