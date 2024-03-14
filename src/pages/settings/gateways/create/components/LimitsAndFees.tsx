@@ -18,10 +18,11 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
+import { atom, useAtom } from 'jotai';
 
 interface Props {
   gateway: Gateway;
@@ -32,11 +33,13 @@ interface Props {
   errors: ValidationBag | undefined;
 }
 
+const currentGatewayTypeAtom = atom<string | undefined>(undefined);
+
 export function LimitsAndFees(props: Props) {
   const [t] = useTranslation();
-  const [currentGatewayTypeId, setCurrentGatewayTypeId] = useState<
-    string | undefined
-  >();
+  const [currentGatewayTypeId, setCurrentGatewayTypeId] = useAtom(
+    currentGatewayTypeAtom
+  );
 
   const resolveGatewayTypeTranslation = useResolveGatewayTypeTranslation();
   const handleFeesAndLimitsEntryChange = useHandleFeesAndLimitsEntryChange(
@@ -47,6 +50,10 @@ export function LimitsAndFees(props: Props) {
     const enabled = Object.entries(props.companyGateway.fees_and_limits).filter(
       ([, entry]) => entry.is_enabled
     );
+
+    if (typeof currentGatewayTypeId !== 'undefined' && enabled.length > 0) {
+      return;
+    }
 
     enabled.length > 0
       ? setCurrentGatewayTypeId(enabled[0][0])
