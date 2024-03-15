@@ -62,7 +62,9 @@ export default function InvoiceDesign() {
     },
     {
       name: t('design'),
-      href: route('/settings/invoice_design/custom_designs/:id/edit', { id }),
+      href: id
+        ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
+        : '/settings/invoice_design/custom_designs/create',
     },
   ];
 

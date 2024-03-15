@@ -83,7 +83,16 @@ export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
-    <Route path="custom_designs/:id/edit" element={<CustomDesign />}>
+    <Route
+      path="custom_designs/:id/edit"
+      element={
+        <Guard
+          guards={[companySettings()]}
+          component={<CustomDesign />}
+          type="subPage"
+        />
+      }
+    >
       <Route path="" element={<Settings />} />
       <Route path="body" element={<Body />} />
       <Route path="header" element={<Headers />} />
