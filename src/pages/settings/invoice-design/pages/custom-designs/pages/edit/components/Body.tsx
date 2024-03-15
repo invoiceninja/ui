@@ -18,9 +18,11 @@ import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useColorScheme } from '$app/common/colors';
 
-export function Body() {
+export default function Body() {
   const [payload] = useAtom(payloadAtom);
   const [value, setValue] = useState(payload.design?.design.body);
+
+  console.log(value);
 
   const { t } = useTranslation();
   const { handleBlockChange } = useDesignUtilities();
@@ -29,7 +31,7 @@ export function Body() {
   useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
   return (
-    <Card title={t('body')} padding="small" collapsed={true}>
+    <Card title={t('body')} padding="small">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         height="25rem"

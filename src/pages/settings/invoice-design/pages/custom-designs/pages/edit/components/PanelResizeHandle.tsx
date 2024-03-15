@@ -8,21 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Icon } from '$app/components/icons/Icon';
-import { Maximize2 } from 'react-feather';
+import { useColorScheme } from '$app/common/colors';
 import { PanelResizeHandle as PanelResizeHandleBase } from 'react-resizable-panels';
 import { useMediaQuery } from 'react-responsive';
+import styled from 'styled-components';
 
+const PanelResizeHandleBaseStyled = styled(PanelResizeHandleBase)`
+  background-color: ${(props) => props.theme.backgroundColor};
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
 export function PanelResizeHandle() {
   const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
+  const colors = useColorScheme();
+
   return isLargeScreen ? (
-    <PanelResizeHandleBase className="flex items-center">
-      <Icon
-        element={Maximize2}
-        style={{ rotate: '45deg', width: '2rem', height: '1.75rem' }}
-      />
-    </PanelResizeHandleBase>
+    <PanelResizeHandleBaseStyled
+      className="flex items-center"
+      theme={{ hoverColor: '#3366CC', backgroundColor: colors.$5 }}
+      style={{ width: '2.5px' }}
+    />
   ) : (
     <></>
   );

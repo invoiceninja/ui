@@ -89,9 +89,9 @@ export default function InvoiceDesign() {
 
   return (
     <Default title={documentTitle}>
-      <Tabs tabs={tabs} />
+      <Tabs tabs={tabs} visible={true} />
 
-      <div className="flex flex-col lg:flex-row gap-4 my-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         <div
           className={classNames('w-full overflow-y-auto', {
             'lg:w-1/2': displaySaveButtonAndPreview,

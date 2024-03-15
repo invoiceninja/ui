@@ -28,7 +28,7 @@ import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useColorScheme } from '$app/common/colors';
 
-export function Includes() {
+export default function Includes() {
   const [payload] = useAtom(payloadAtom);
   const [value, setValue] = useState(payload.design?.design.includes);
 
@@ -41,7 +41,7 @@ export function Includes() {
   ]);
 
   return (
-    <Card title={t('includes')} padding="small" collapsed={true}>
+    <Card title={t('includes')} padding="small">
       <Editor
         height="25rem"
         defaultLanguage="html"
@@ -50,7 +50,6 @@ export function Includes() {
         options={{
           minimap: {
             enabled: false,
-            
           },
         }}
         onChange={(markup) => markup && setValue(markup)}

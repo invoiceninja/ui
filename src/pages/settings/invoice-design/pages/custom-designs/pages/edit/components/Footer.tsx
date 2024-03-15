@@ -28,7 +28,7 @@ import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useColorScheme } from '$app/common/colors';
 
-export function Footer() {
+export default function Footer() {
   const [payload] = useAtom(payloadAtom);
   const [value, setValue] = useState(payload.design?.design.footer);
 
@@ -39,7 +39,7 @@ export function Footer() {
   useDebounce(() => value && handleBlockChange('footer', value), 1000, [value]);
 
   return (
-    <Card title={t('footer')} padding="small" collapsed={true}>
+    <Card title={t('footer')} padding="small">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         height="25rem"

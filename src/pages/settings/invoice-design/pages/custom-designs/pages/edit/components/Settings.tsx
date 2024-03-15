@@ -22,18 +22,21 @@ import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
+import { useOutletContext } from 'react-router-dom';
 
-interface Props {
+interface Context {
   errors: ValidationBag | undefined;
   isFormBusy: boolean;
   shouldRenderHTML: boolean;
   setShouldRenderHTML: Dispatch<SetStateAction<boolean>>;
 }
 
-export function Settings(props: Props) {
+export default function Settings() {
   const { t } = useTranslation();
 
-  const { errors } = props;
+  const context: Context = useOutletContext();
+
+  const { errors, isFormBusy, shouldRenderHTML, setShouldRenderHTML } = context;
 
   const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
@@ -84,7 +87,7 @@ export function Settings(props: Props) {
     <>
       <Import onImport={(parts) => handlePropertyChange('design', parts)} />
 
-      <Card title={t('settings')} padding="small" collapsed={false}>
+      <Card title={t('settings')} padding="small">
         <Element leftSide={t('name')}>
           <InputField
             value={payload.design?.name}
@@ -122,9 +125,9 @@ export function Settings(props: Props) {
 
         <Element leftSide={t('html_mode')}>
           <Toggle
-            checked={props.shouldRenderHTML}
-            onChange={(value) => props.setShouldRenderHTML(value)}
-            disabled={props.isFormBusy}
+            checked={shouldRenderHTML}
+            onChange={(value) => setShouldRenderHTML(value)}
+            disabled={isFormBusy}
           />
         </Element>
       </Card>

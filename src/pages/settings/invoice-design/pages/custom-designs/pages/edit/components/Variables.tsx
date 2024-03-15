@@ -14,16 +14,11 @@ import { variables } from '$app/pages/settings/invoice-design/customize/common/v
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
 import { useTranslation } from 'react-i18next';
 
-export function Variables() {
+export default function Variables() {
   const { t } = useTranslation();
 
   return (
-    <Card
-      title={t('variables')}
-      padding="small"
-      childrenClassName="px-5"
-      collapsed={true}
-    >
+    <Card title={t('variables')} padding="small" childrenClassName="px-5">
       <TabGroup tabs={[t('invoice'), t('client'), t('contact'), t('company')]}>
         <section>
           {variables.invoice.map((variable, index) => (

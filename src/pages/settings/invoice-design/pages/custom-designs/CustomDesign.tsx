@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -12,7 +11,7 @@
 import { Design } from '$app/common/interfaces/design';
 import { useEffect, useState } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
-import { useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { atom, useAtom } from 'jotai';
 import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
@@ -24,9 +23,11 @@ import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
-import { PanelGroup } from './components/PanelGroup';
-import { Panel } from './components/Panel';
-import { PanelResizeHandle } from './components/PanelResizeHandle';
+import { PanelGroup } from './pages/edit/components/PanelGroup';
+import { Panel } from './pages/edit/components/Panel';
+import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
+import { Tabs } from '$app/components/Tabs';
+import { useTabs } from './pages/edit/common/hooks/useTabs';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -40,8 +41,11 @@ export const payloadAtom = atom<PreviewPayload>({
   entity_type: 'invoice',
 });
 
-export default function Edit() {
+export default function CustomDesign() {
   const actions = useActions();
+
+  const tabs = useTabs();
+  const location = useLocation();
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
@@ -83,7 +87,7 @@ export default function Edit() {
         />
       ),
     },
-    [payload.design, isFormBusy]
+    [payload.design, isFormBusy, location]
   );
 
   useEffect(() => {
@@ -99,28 +103,41 @@ export default function Edit() {
   }, [data]);
 
   return (
-    <PanelGroup>
-      <Panel>
-        <div className="space-y-4 max-h-[80vh] overflow-y-auto"></div>
-      </Panel>
+    <>
+      <Tabs tabs={tabs} />
 
-      <PanelResizeHandle />
-
-      <Panel>
-        <div className="max-h-[80vh] overflow-y-scroll">
-          {payload.design ? (
-            <InvoiceViewer
-              link={endpoint('/api/v1/preview?html=:renderHTML', {
-                renderHTML: shouldRenderHTML,
-              })}
-              resource={payload}
-              method="POST"
-              withToast
-              renderAsHTML={shouldRenderHTML}
+      <PanelGroup>
+        <Panel>
+          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
+            <Outlet
+              context={{
+                errors,
+                isFormBusy,
+                shouldRenderHTML,
+                setShouldRenderHTML,
+              }}
             />
-          ) : null}
-        </div>
-      </Panel>
-    </PanelGroup>
+          </div>
+        </Panel>
+
+        <PanelResizeHandle />
+
+        <Panel>
+          <div className="max-h-[80vh] overflow-y-scroll">
+            {payload.design ? (
+              <InvoiceViewer
+                link={endpoint('/api/v1/preview?html=:renderHTML', {
+                  renderHTML: shouldRenderHTML,
+                })}
+                resource={payload}
+                method="POST"
+                withToast
+                renderAsHTML={shouldRenderHTML}
+              />
+            ) : null}
+          </div>
+        </Panel>
+      </PanelGroup>
+    </>
   );
 }

@@ -21,7 +21,7 @@ export function PanelGroup(props: Props) {
   const { children } = props;
 
   return isLargeScreen ? (
-    <PanelGroupBase direction="horizontal" className="gap-4">
+    <PanelGroupBase direction="horizontal" className="gap-4 mt-4">
       {children}
     </PanelGroupBase>
   ) : (
