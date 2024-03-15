@@ -243,29 +243,72 @@ export function UploadImport(props: Props) {
     setFormData(updatedFormData);
   };
 
+  const checkRowsLengthInCSV = (file: File) => {
+    return new Promise((resolve) => {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const csvData = (event.target?.result as string) || '';
+          const rowData = csvData.split('\n');
+
+          if (!rowData.length || rowData.length === 1) {
+            resolve(false);
+          } else if (rowData.length === 2 && !rowData[1]) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+
+        reader.readAsText(file);
+      } catch (error) {
+        resolve(false);
+      }
+    });
+  };
+
+  const shouldUploadFiles = async (files: File[]) => {
+    for (let i = 0; i < files.length; i++) {
+      const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
+
+      if (!hasCorrectRowsLength) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: acceptableFileExtensions,
-    onDrop: (acceptedFiles) => {
-      const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
-        type.includes(props.type)
-      );
+    onDrop: async (acceptedFiles) => {
+      const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
-      if (isFilesTypeCorrect) {
-        acceptedFiles.forEach((file) => {
-          if (isImportFileTypeZip) {
-            setFiles((prevState) => [...prevState, file]);
-          } else {
-            formData.append(`files[${props.entity}]`, file);
+      if (shouldAddFiles) {
+        const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
+          type.includes(props.type)
+        );
+
+        if (isFilesTypeCorrect) {
+          acceptedFiles.forEach((file) => {
+            if (isImportFileTypeZip) {
+              setFiles((prevState) => [...prevState, file]);
+            } else {
+              formData.append(`files[${props.entity}]`, file);
+            }
+          });
+
+          if (!isImportFileTypeZip) {
+            formData.append('import_type', props.entity);
+            formik.submitForm();
+            setFormData(formData);
           }
-        });
-
-        if (!isImportFileTypeZip) {
-          formData.append('import_type', props.entity);
-          formik.submitForm();
-          setFormData(formData);
+        } else {
+          toast.error('wrong_file_extension');
         }
       } else {
-        toast.error('wrong_file_extension');
+        toast.error('csv_rows_length');
       }
     },
   });
