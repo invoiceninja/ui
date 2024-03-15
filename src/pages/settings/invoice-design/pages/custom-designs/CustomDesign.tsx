@@ -12,7 +12,7 @@ import { Design } from '$app/common/interfaces/design';
 import { useEffect, useState } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { atom, useAtom } from 'jotai';
+import { atom } from 'jotai';
 import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -28,6 +28,7 @@ import { Panel } from './pages/edit/components/Panel';
 import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './pages/edit/common/hooks/useTabs';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -42,6 +43,8 @@ export const payloadAtom = atom<PreviewPayload>({
 });
 
 export default function CustomDesign() {
+  useTitle('invoice_design');
+
   const actions = useActions();
 
   const tabs = useTabs();
@@ -50,7 +53,11 @@ export default function CustomDesign() {
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
 
-  const [payload, setPayload] = useAtom(payloadAtom);
+  const [payload, setPayload] = useState<PreviewPayload>({
+    design: null,
+    entity_id: '-1',
+    entity_type: 'invoice',
+  });
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
@@ -115,6 +122,8 @@ export default function CustomDesign() {
                 isFormBusy,
                 shouldRenderHTML,
                 setShouldRenderHTML,
+                payload,
+                setPayload,
               }}
             />
           </div>

@@ -17,18 +17,20 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
 import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { useOutletContext } from 'react-router-dom';
+import { PreviewPayload } from '../../../CustomDesign';
 
-interface Context {
+export interface Context {
   errors: ValidationBag | undefined;
   isFormBusy: boolean;
   shouldRenderHTML: boolean;
   setShouldRenderHTML: Dispatch<SetStateAction<boolean>>;
+  payload: PreviewPayload;
+  setPayload: Dispatch<SetStateAction<PreviewPayload>>;
 }
 
 export default function Settings() {
@@ -36,9 +38,9 @@ export default function Settings() {
 
   const context: Context = useOutletContext();
 
-  const { errors, isFormBusy, shouldRenderHTML, setShouldRenderHTML } = context;
+  const { errors, isFormBusy, shouldRenderHTML, setShouldRenderHTML, payload } =
+    context;
 
-  const [payload] = useAtom(payloadAtom);
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
   const handleExportToTxtFile = () => {

@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDesignUtilities } from '../common/hooks';
@@ -17,9 +15,14 @@ import { useDebounce } from 'react-use';
 import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useColorScheme } from '$app/common/colors';
+import { useOutletContext } from 'react-router-dom';
+import { Context } from './Settings';
 
 export default function Header() {
-  const [payload] = useAtom(payloadAtom);
+  const context: Context = useOutletContext();
+
+  const { payload } = context;
+
   const [value, setValue] = useState(payload.design?.design.header);
 
   const { t } = useTranslation();
