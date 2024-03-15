@@ -28,16 +28,27 @@ import { isEqual } from 'lodash';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { route } from '$app/common/helpers/route';
 import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+const Div = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }: 
+`;
+
 export function CompanyEdit(props: Props) {
   const [t] = useTranslation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const companyChanges = useInjectCompanyChanges();
 
@@ -73,15 +84,23 @@ export function CompanyEdit(props: Props) {
       .finally(() => setIsFormBusy(false));
   };
 
-  const handleConnectStripe = () => {
+  const handleConnectPaymentGateway = (
+    gateway: 'stripe_connect' | 'paypal_ppcp'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/one_time_token'), {
-      context: 'stripe_connect',
+      context: gateway,
     }).then((response) => {
+      let url = 'stripe/signup/:token';
+
+      if (gateway === 'paypal_ppcp') {
+        url = 'paypal?token=:token';
+      }
+
       window
         .open(
-          route('https://invoicing.co/stripe/signup/:token', {
+          route(`https://invoicing.co/${url}`, {
             token: response.data.hash,
           }),
           '_blank'
@@ -119,7 +138,11 @@ export function CompanyEdit(props: Props) {
 
   return (
     <Modal
-      title={t('welcome_to_invoice_ninja')}
+      title={
+        stepIndex !== 2
+          ? t('welcome_to_invoice_ninja')
+          : t('accept_payments_online')
+      }
       visible={props.isModalOpen}
       onClose={() => {
         props.setIsModalOpen(false);
@@ -165,20 +188,44 @@ export function CompanyEdit(props: Props) {
 
         {stepIndex === 2 && (
           <div className="flex flex-col items-center">
-            <GatewayTypeIcon name="stripe" style={{ width: '75%' }} />
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('stripe_connect')}
+            >
+              <GatewayTypeIcon name="stripe" style={{ width: '64%' }} />
+            </Div>
+
+            <Div
+              className="flex w-full justify-center h-28 cursor-pointer"
+              theme={{ hoverColor: colors.$5 }}
+              onClick={() => handleConnectPaymentGateway('paypal_ppcp')}
+            >
+              <GatewayTypeIcon
+                name="paypal"
+                style={{
+                  width: '38%',
+                  transform: 'scale(1.7)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Div>
 
             <Button
               behavior="button"
-              className="w-full"
-              onClick={handleConnectStripe}
+              className="w-full mt-4"
+              onClick={() => {
+                props.setIsModalOpen(false);
+                navigate('/settings/online_payments');
+              }}
             >
-              {t('setup')}
+              {t('all_payment_gateways')}
             </Button>
           </div>
         )}
 
         <div className="flex justify-end">
-          {stepIndex !== 2 || isSelfHosted() ? (
+          {(stepIndex !== 2 || isSelfHosted()) && (
             <Button
               behavior="button"
               onClick={() => {
@@ -187,13 +234,6 @@ export function CompanyEdit(props: Props) {
               }}
             >
               {isHosted() ? t('next') : t('save')}
-            </Button>
-          ) : (
-            <Button
-              behavior="button"
-              onClick={() => props.setIsModalOpen(false)}
-            >
-              {t('done')}
             </Button>
           )}
         </div>
