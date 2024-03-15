@@ -36,6 +36,7 @@ import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -58,6 +59,7 @@ export default function Invoices() {
   const actions = useActions();
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
+  const footerColumns = useFooterColumns();
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
@@ -83,6 +85,7 @@ export default function Invoices() {
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
         columns={columns}
+        footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"

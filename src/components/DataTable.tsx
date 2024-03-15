@@ -57,6 +57,7 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { TFooter } from './tables/TFooter';
 
 export interface DateRangeColumn {
   column: string;
@@ -67,6 +68,11 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+}[];
+
+export type FooterColumns<T = any> = {
+  id: string;
+  format?: (field: (string | number)[], resource: T[]) => unknown;
 }[];
 
 type CustomBulkActionContext<T> = {
@@ -134,6 +140,7 @@ interface Props<T> extends CommonProps {
   withoutStatusFilter?: boolean;
   queryIdentificator?: string;
   disableQuery?: boolean;
+  footerColumns?: FooterColumns;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -166,6 +173,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     methodType = 'GET',
     queryIdentificator,
     disableQuery,
+    footerColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -749,6 +757,12 @@ export function DataTable<T extends object>(props: Props<T>) {
               </Tr>
             ))}
         </Tbody>
+
+        {footerColumns.length && (
+          <TFooter>
+            <div></div>
+          </TFooter>
+        )}
       </Table>
 
       {data && !props.withoutPagination && (
