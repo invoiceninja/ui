@@ -14,7 +14,7 @@ import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 
-interface Props extends CommonProps {
+export interface SelectProps extends CommonProps {
   defaultValue?: any;
   label?: string | null;
   required?: boolean;
@@ -24,7 +24,7 @@ interface Props extends CommonProps {
   blankOptionValue?: string | number;
 }
 
-export function SelectField(props: Props) {
+export function SelectField(props: SelectProps) {
   const colors = useColorScheme();
 
   return (
