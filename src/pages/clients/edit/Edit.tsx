@@ -127,8 +127,11 @@ export default function Edit() {
       });
   };
 
-  const { changeTemplateVisible, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -183,7 +186,7 @@ export default function Edit() {
 
           <ChangeTemplateModal<Client>
             entity="client"
-            entities={[client]}
+            entities={changeTemplateResources as Client[]}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(client) => `${t('number')}: ${client.number}`}
