@@ -21,12 +21,12 @@ import { Context } from './Settings';
 export default function Header() {
   const context: Context = useOutletContext();
 
-  const { payload } = context;
+  const { payload, setPayload } = context;
 
   const [value, setValue] = useState(payload.design?.design.header);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
 
   useDebounce(() => value && handleBlockChange('header', value), 1000, [value]);
   const colors = useColorScheme();

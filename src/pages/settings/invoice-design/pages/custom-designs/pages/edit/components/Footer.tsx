@@ -31,12 +31,12 @@ import { Context } from './Settings';
 export default function Footer() {
   const context: Context = useOutletContext();
 
-  const { payload } = context;
+  const { payload, setPayload } = context;
 
   const [value, setValue] = useState(payload.design?.design.footer);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
   useDebounce(() => value && handleBlockChange('footer', value), 1000, [value]);

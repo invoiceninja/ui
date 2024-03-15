@@ -21,12 +21,12 @@ import { Context } from './Settings';
 export default function Body() {
   const context: Context = useOutletContext();
 
-  const { payload } = context;
+  const { payload, setPayload } = context;
 
   const [value, setValue] = useState(payload.design?.design.body);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
   useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);

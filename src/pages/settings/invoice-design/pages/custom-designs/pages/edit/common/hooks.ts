@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { Design, Parts } from '$app/common/interfaces/design';
+import { PreviewPayload } from '../../../CustomDesign';
+import { Dispatch, SetStateAction } from 'react';
 
-export function useDesignUtilities() {
-  const [payload, setPayload] = useAtom(payloadAtom);
+interface Params {
+  payload: PreviewPayload;
+  setPayload: Dispatch<SetStateAction<PreviewPayload>>;
+}
+export function useDesignUtilities(params: Params) {
+  const { payload, setPayload } = params;
 
   const handlePropertyChange = (
     property: keyof Design,

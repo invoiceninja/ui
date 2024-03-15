@@ -38,8 +38,14 @@ export default function Settings() {
 
   const context: Context = useOutletContext();
 
-  const { errors, isFormBusy, shouldRenderHTML, setShouldRenderHTML, payload } =
-    context;
+  const {
+    errors,
+    isFormBusy,
+    shouldRenderHTML,
+    setShouldRenderHTML,
+    payload,
+    setPayload,
+  } = context;
 
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
@@ -83,7 +89,7 @@ export default function Settings() {
     }
   }, [payload.design]);
 
-  const { handlePropertyChange } = useDesignUtilities();
+  const { handlePropertyChange } = useDesignUtilities({ payload, setPayload });
 
   return (
     <>

@@ -31,12 +31,12 @@ import { Context } from './Settings';
 export default function Includes() {
   const context: Context = useOutletContext();
 
-  const { payload } = context;
+  const { payload, setPayload } = context;
 
   const [value, setValue] = useState(payload.design?.design.includes);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
   useDebounce(() => value && handleBlockChange('includes', value), 1000, [
