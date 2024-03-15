@@ -36,6 +36,11 @@ import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -71,6 +76,12 @@ export default function Invoices() {
   useEffect(() => {
     return () => setInvoiceSliderVisibility(false);
   }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -117,6 +128,15 @@ export default function Invoices() {
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
+
+      <ChangeTemplateModal<Invoice>
+        entity="invoice"
+        entities={changeTemplateResources as Invoice[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        bulkUrl="/api/v1/invoices/bulk"
+      />
     </Default>
   );
 }
