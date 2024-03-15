@@ -73,3 +73,18 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
     }
   );
 }
+
+export function useTemplateQuery(entity: string) {
+  return useQuery<Design[]>(
+    ['/api/v1/designs?template=true&entities=' + entity],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/designs?template=true&status=active&sort=name|asc&entities=' + entity)
+      ).then(
+        (response: AxiosResponse<GenericManyResponse<Design>>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
