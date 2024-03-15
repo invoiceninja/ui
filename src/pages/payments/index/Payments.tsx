@@ -34,6 +34,10 @@ import {
   paymentSliderAtom,
   paymentSliderVisibilityAtom,
 } from '../common/components/PaymentSlider';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Payments() {
   useTitle('payments');
@@ -72,6 +76,12 @@ export default function Payments() {
     return () => setPaymentSliderVisibility(false);
   }, []);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={t('payments')}
@@ -108,6 +118,15 @@ export default function Payments() {
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
+
+      <ChangeTemplateModal<Payment>
+        entity="payment"
+        entities={changeTemplateResources as Payment[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        bulkUrl="/api/v1/payments/bulk"
+      />
     </Default>
   );
 }
