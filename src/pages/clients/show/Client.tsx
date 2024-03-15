@@ -29,6 +29,11 @@ import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Client as IClient } from '$app/common/interfaces/client';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -71,6 +76,9 @@ export default function Client() {
     };
   }, [client]);
 
+  const { changeTemplateVisible, setChangeTemplateVisible } =
+    useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -111,6 +119,15 @@ export default function Client() {
               }}
             />
           </div>
+
+          <ChangeTemplateModal<IClient>
+            entity="client"
+            entities={[client]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(client) => `${t('number')}: ${client.number}`}
+            bulkUrl="/api/v1/clients/bulk"
+          />
         </>
       )}
     </Default>
