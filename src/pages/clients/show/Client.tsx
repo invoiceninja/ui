@@ -76,8 +76,11 @@ export default function Client() {
     };
   }, [client]);
 
-  const { changeTemplateVisible, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -122,7 +125,7 @@ export default function Client() {
 
           <ChangeTemplateModal<IClient>
             entity="client"
-            entities={[client]}
+            entities={changeTemplateResources as IClient[]}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(client) => `${t('number')}: ${client.number}`}
