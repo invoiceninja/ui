@@ -58,6 +58,8 @@ import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export interface SaveOption {
   label: string;
@@ -332,7 +334,7 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: hasPermission('view_reports'),
+      visible: hasPermission('view_reports') && (proPlan() || enterprisePlan()),
     },
     {
       name: t('transactions'),
