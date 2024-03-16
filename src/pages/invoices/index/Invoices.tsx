@@ -63,7 +63,7 @@ export default function Invoices() {
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
-  const { filteredColumns, allColumns } = useFooterColumns();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -86,7 +86,7 @@ export default function Invoices() {
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
         columns={columns}
-        footerColumns={filteredColumns}
+        footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
@@ -108,7 +108,7 @@ export default function Invoices() {
           <div className="flex space-x-2 pr-4">
             <DataTableFooterColumnsPicker
               table="invoice"
-              columns={allColumns}
+              columns={allFooterColumns}
             />
 
             <DataTableColumnsPicker

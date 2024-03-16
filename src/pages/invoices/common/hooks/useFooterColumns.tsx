@@ -59,7 +59,7 @@ export function useFooterColumns() {
     reactSettings?.table_footer_columns?.invoice || [];
 
   return {
-    filteredColumns: columns.filter(({ id }) => currentColumns.includes(id)),
-    allColumns: columns,
+    footerColumns: columns.filter(({ id }) => currentColumns.includes(id)),
+    allFooterColumns: columns,
   };
 }

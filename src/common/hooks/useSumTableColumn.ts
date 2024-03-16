@@ -11,8 +11,10 @@
 import collect from 'collect.js';
 import { Invoice } from '../interfaces/invoice';
 import { useFormatMoney } from './money/useFormatMoney';
+import { Client } from '../interfaces/client';
+import { RecurringInvoice } from '../interfaces/recurring-invoice';
 
-type Resource = Invoice;
+type Resource = Invoice | Client | RecurringInvoice;
 
 export function useSumTableColumn() {
   const formatMoney = useFormatMoney();

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ReactNode } from 'react';
 
 interface Props {
@@ -17,8 +18,10 @@ interface Props {
 export function TFooter(props: Props) {
   const { children } = props;
 
+  const accentColor = useAccentColor();
+
   return (
-    <tfoot className="border-t">
+    <tfoot style={{ backgroundColor: accentColor }}>
       <tr>{children}</tr>
     </tfoot>
   );

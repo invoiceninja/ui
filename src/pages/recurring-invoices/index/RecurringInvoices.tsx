@@ -38,6 +38,8 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -59,13 +61,11 @@ export default function RecurringInvoices() {
   ];
 
   const actions = useActions();
-
   const filters = useRecurringInvoiceFilters();
-
-  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
-
   const columns = useRecurringInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
+  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
@@ -95,6 +95,7 @@ export default function RecurringInvoices() {
       <DataTable
         resource="recurring_invoice"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
@@ -117,11 +118,18 @@ export default function RecurringInvoices() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={recurringInvoiceColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="recurringInvoice"
-          />
+          <div className="flex space-x-2 pr-4">
+            <DataTableFooterColumnsPicker
+              table="recurringInvoice"
+              columns={allFooterColumns}
+            />
+
+            <DataTableColumnsPicker
+              columns={recurringInvoiceColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="recurringInvoice"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
         hideEditableOptions={!hasPermission('edit_recurring_invoice')}

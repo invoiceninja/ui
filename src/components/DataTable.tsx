@@ -779,11 +779,11 @@ export function DataTable<T extends object>(props: Props<T>) {
             {props.columns.map(
               (column, index) =>
                 Boolean(!excludeColumns.includes(column.id)) && (
-                  <Td key={index}>
+                  <Td key={index} customizeTextColor>
                     {getFooterColumn(column.id) ? (
                       <div className="flex items-center space-x-3">
                         {getFooterColumn(column.id)?.format(
-                          getColumnValues(column.id),
+                          getColumnValues(column.id) || [],
                           data?.data.data || []
                         ) || '-/-'}
                       </div>
