@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -10,7 +9,11 @@
  */
 
 import { Invoice } from '$app/common/interfaces/invoice';
+import { useTranslation } from 'react-i18next';
 import { useAllInvoiceColumns } from './useInvoiceColumns';
+import { ReactNode } from 'react';
+import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export type DataTableFooterColumnsExtended<
   TResource = any,
@@ -18,10 +21,19 @@ export type DataTableFooterColumnsExtended<
 > = {
   column: TColumn;
   id: keyof TResource;
-  format?: (field: (string | number)[], resource: TResource[]) => unknown;
+  label: string;
+  format: (
+    field: (string | number)[],
+    resource: TResource[]
+  ) => ReactNode | string | number;
 }[];
 
 export function useFooterColumns() {
+  const [t] = useTranslation();
+
+  const reactSettings = useReactSettings();
+
+  const sumTableColumn = useSumTableColumn();
   const invoiceColumns = useAllInvoiceColumns();
 
   type InvoiceColumns = (typeof invoiceColumns)[number];
@@ -30,14 +42,24 @@ export function useFooterColumns() {
     {
       column: 'amount',
       id: 'amount',
-      format: (values, invoices) => <span>amount</span>,
+      label: t('amount'),
+      format: (values, invoices) =>
+        sumTableColumn(values as number[], invoices),
     },
     {
       column: 'balance',
       id: 'balance',
-      format: (values, invoices) => <span>amount</span>,
+      label: t('balance'),
+      format: (values, invoices) =>
+        sumTableColumn(values as number[], invoices),
     },
   ];
 
-  return columns;
+  const currentColumns: string[] =
+    reactSettings?.table_footer_columns?.invoice || [];
+
+  return {
+    filteredColumns: columns.filter(({ id }) => currentColumns.includes(id)),
+    allColumns: columns,
+  };
 }

@@ -18,7 +18,7 @@ export function TFooter(props: Props) {
   const { children } = props;
 
   return (
-    <tfoot>
+    <tfoot className="border-t">
       <tr>{children}</tr>
     </tfoot>
   );

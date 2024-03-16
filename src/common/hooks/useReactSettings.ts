@@ -57,6 +57,7 @@ export interface ReactSettings {
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
+  table_footer_columns?: Record<ReactTableColumns, string[]>;
 }
 
 export type ReactTableColumns =

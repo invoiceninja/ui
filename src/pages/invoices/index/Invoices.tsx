@@ -37,6 +37,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -59,10 +60,10 @@ export default function Invoices() {
   const actions = useActions();
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
-  const footerColumns = useFooterColumns();
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
+  const { filteredColumns, allColumns } = useFooterColumns();
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -85,7 +86,7 @@ export default function Invoices() {
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
         columns={columns}
-        footerColumns={footerColumns}
+        footerColumns={filteredColumns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
@@ -104,11 +105,18 @@ export default function Invoices() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            table="invoice"
-            columns={invoiceColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-          />
+          <div className="flex space-x-2 pr-4">
+            <DataTableFooterColumnsPicker
+              table="invoice"
+              columns={allColumns}
+            />
+
+            <DataTableColumnsPicker
+              table="invoice"
+              columns={invoiceColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}

@@ -72,7 +72,11 @@ export type DataTableColumns<T = any> = {
 
 export type FooterColumns<T = any> = {
   id: string;
-  format?: (field: (string | number)[], resource: T[]) => unknown;
+  label: string;
+  format: (
+    field: (string | number)[],
+    resource: T[]
+  ) => ReactNode | string | number;
 }[];
 
 type CustomBulkActionContext<T> = {
@@ -377,6 +381,16 @@ export function DataTable<T extends object>(props: Props<T>) {
     columnOfCurrentQueryParameter !== columnId &&
       queryParameterOfCurrentColumn &&
       setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+  };
+
+  const getFooterColumn = (columnId: string) => {
+    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  };
+
+  const getColumnValues = (columnId: string) => {
+    return data?.data.data.map(
+      (resource: T) => resource[columnId as keyof typeof resource]
+    );
   };
 
   useEffect(() => {
@@ -758,9 +772,29 @@ export function DataTable<T extends object>(props: Props<T>) {
             ))}
         </Tbody>
 
-        {footerColumns.length && (
+        {Boolean(footerColumns.length) && (
           <TFooter>
-            <div></div>
+            {!props.withoutActions && !hideEditableOptions && <Th></Th>}
+
+            {props.columns.map(
+              (column, index) =>
+                Boolean(!excludeColumns.includes(column.id)) && (
+                  <Td key={index}>
+                    {getFooterColumn(column.id) ? (
+                      <div className="flex items-center space-x-3">
+                        {getFooterColumn(column.id)?.format(
+                          getColumnValues(column.id),
+                          data?.data.data || []
+                        ) || '-/-'}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                  </Td>
+                )
+            )}
+
+            {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
           </TFooter>
         )}
       </Table>
