@@ -24,20 +24,21 @@ export function useSumTableColumn() {
         0
       );
 
-      const clientIds = collect(resources)
-        .pluck('client_id')
+      const countryIds = collect(resources)
+        .pluck('client.country_id')
         .unique()
-        .toArray();
+        .toArray() as string[];
 
-      if (clientIds.length > 1) {
+      const currencyIds = collect(resources)
+        .pluck('client.settings.currency_id')
+        .unique()
+        .toArray() as string[];
+
+      if (countryIds.length > 1 || currencyIds.length > 1) {
         return result;
       }
 
-      return formatMoney(
-        result,
-        resources[0].client?.country_id,
-        resources[0].client?.settings.country_id
-      );
+      return formatMoney(result, countryIds[0], currencyIds[0]);
     }
 
     return '-/-';
