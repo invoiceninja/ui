@@ -21,6 +21,8 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -33,13 +35,11 @@ export default function RecurringExpenses() {
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
-  const columns = useRecurringExpenseColumns();
-
   const actions = useActions();
-
-  const recurringExpenseColumns = useAllRecurringExpenseColumns();
-
+  const columns = useRecurringExpenseColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
+  const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
   return (
     <Default
@@ -52,6 +52,7 @@ export default function RecurringExpenses() {
         resource="recurring_expense"
         endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc"
         columns={columns}
+        footerColumns={footerColumns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
@@ -59,11 +60,18 @@ export default function RecurringExpenses() {
         customBulkActions={customBulkActions}
         withResourcefulActions
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={recurringExpenseColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="recurringExpense"
-          />
+          <div className="flex space-x-2 pr-4">
+            <DataTableFooterColumnsPicker
+              table="recurringExpense"
+              columns={allFooterColumns}
+            />
+
+            <DataTableColumnsPicker
+              columns={recurringExpenseColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="recurringExpense"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_recurring_expense')]}
         hideEditableOptions={!hasPermission('edit_recurring_expense')}

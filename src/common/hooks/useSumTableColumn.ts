@@ -16,6 +16,8 @@ import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { Payment } from '../interfaces/payment';
 import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Expense } from '../interfaces/expense';
+import { RecurringExpense } from '../interfaces/recurring-expense';
+import { Transaction } from '../interfaces/transactions';
 
 type Resource =
   | Invoice
@@ -23,7 +25,9 @@ type Resource =
   | RecurringInvoice
   | Payment
   | PurchaseOrder
-  | Expense;
+  | Expense
+  | RecurringExpense
+  | Transaction;
 
 interface Params {
   currencyPath?: string;
