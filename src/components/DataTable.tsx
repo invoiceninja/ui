@@ -772,7 +772,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             ))}
         </Tbody>
 
-        {Boolean(footerColumns.length) && (
+        {Boolean(footerColumns.length) && Boolean(data?.data.data.length) && (
           <TFooter>
             {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
@@ -785,7 +785,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                         {getFooterColumn(column.id)?.format(
                           getColumnValues(column.id) || [],
                           data?.data.data || []
-                        ) || '-/-'}
+                        ) ?? '-/-'}
                       </div>
                     ) : (
                       <></>

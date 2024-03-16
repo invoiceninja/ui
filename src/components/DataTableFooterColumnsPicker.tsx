@@ -115,7 +115,13 @@ export function DataTableFooterColumnsPicker(props: Props) {
       >
         <div className="flex flex-col">
           {columns.map((column, index) => (
-            <Element key={index} leftSide={column.label} noExternalPadding>
+            <Element
+              key={index}
+              leftSide={column.label}
+              noExternalPadding
+              withoutWrappingLeftSide
+              pushContentToRight
+            >
               <Toggle
                 checked={isColumnChecked(column.id)}
                 onValueChange={(value) => handleChange(column.id, value)}

@@ -34,6 +34,8 @@ import {
   paymentSliderAtom,
   paymentSliderVisibilityAtom,
 } from '../common/components/PaymentSlider';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Payments() {
   useTitle('payments');
@@ -48,6 +50,7 @@ export default function Payments() {
   const columns = usePaymentColumns();
   const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
@@ -82,6 +85,7 @@ export default function Payments() {
       <DataTable
         resource="payment"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/payments?include=client,invoices&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
@@ -93,11 +97,18 @@ export default function Payments() {
         customFilterPlaceholder="status"
         showRestore={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={paymentColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="payment"
-          />
+          <div className="flex space-x-2 pr-4">
+            <DataTableFooterColumnsPicker
+              table="payment"
+              columns={allFooterColumns}
+            />
+
+            <DataTableColumnsPicker
+              columns={paymentColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="payment"
+            />
+          </div>
         }
         onTableRowClick={(payment) => {
           setSliderPaymentId(payment.id);

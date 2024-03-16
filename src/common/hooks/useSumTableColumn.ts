@@ -13,11 +13,26 @@ import { Invoice } from '../interfaces/invoice';
 import { useFormatMoney } from './money/useFormatMoney';
 import { Client } from '../interfaces/client';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
+import { Payment } from '../interfaces/payment';
+import { PurchaseOrder } from '../interfaces/purchase-order';
+import { Expense } from '../interfaces/expense';
 
-type Resource = Invoice | Client | RecurringInvoice;
+type Resource =
+  | Invoice
+  | Client
+  | RecurringInvoice
+  | Payment
+  | PurchaseOrder
+  | Expense;
 
-export function useSumTableColumn() {
+interface Params {
+  currencyPath?: string;
+  countryPath?: string;
+}
+export function useSumTableColumn(params?: Params) {
   const formatMoney = useFormatMoney();
+
+  const { currencyPath, countryPath } = params || {};
 
   return (values: number[] | undefined, resources: Resource[] | undefined) => {
     if (values && resources) {
@@ -27,12 +42,12 @@ export function useSumTableColumn() {
       );
 
       const countryIds = collect(resources)
-        .pluck('client.country_id')
+        .pluck(countryPath || 'client.country_id')
         .unique()
         .toArray() as string[];
 
       const currencyIds = collect(resources)
-        .pluck('client.settings.currency_id')
+        .pluck(currencyPath || 'client.settings.currency_id')
         .unique()
         .toArray() as string[];
 
@@ -40,7 +55,11 @@ export function useSumTableColumn() {
         return result;
       }
 
-      return formatMoney(result, countryIds[0], currencyIds[0]);
+      return formatMoney(
+        result,
+        typeof countryIds[0] === 'string' ? countryIds[0] : undefined,
+        typeof currencyIds[0] === 'string' ? currencyIds[0] : undefined
+      );
     }
 
     return '-/-';

@@ -15,17 +15,17 @@ import { useActions, useCreditColumns } from '$app/pages/credits/common/hooks';
 import { useCustomBulkActions } from '$app/pages/credits/common/hooks/useCustomBulkActions';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFooterColumns } from '$app/pages/credits/common/hooks/useFooterColumns';
 
 export default function Credits() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
 
-  const columns = useCreditColumns();
-
   const actions = useActions();
-
+  const columns = useCreditColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -35,6 +35,7 @@ export default function Credits() {
         { id }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       customBulkActions={customBulkActions}
       withResourcefulActions

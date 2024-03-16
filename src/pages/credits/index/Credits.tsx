@@ -23,6 +23,8 @@ import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useCreditsFilters } from '../common/hooks/useCreditsFilters';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Credits() {
   useTitle('credits');
@@ -35,10 +37,9 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
   const filters = useCreditsFilters();
-
   const creditColumns = useAllCreditColumns();
-
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   return (
     <Default
@@ -52,6 +53,7 @@ export default function Credits() {
         endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
+        footerColumns={footerColumns}
         linkToCreate="/credits/create"
         linkToEdit="/credits/:id/edit"
         customActions={actions}
@@ -60,11 +62,18 @@ export default function Credits() {
         customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={creditColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="credit"
-          />
+          <div className="flex space-x-2 pr-4">
+            <DataTableFooterColumnsPicker
+              table="credit"
+              columns={allFooterColumns}
+            />
+
+            <DataTableColumnsPicker
+              columns={creditColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="credit"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_credit')]}
         hideEditableOptions={!hasPermission('edit_credit')}
