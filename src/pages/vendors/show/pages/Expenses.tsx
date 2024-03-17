@@ -17,7 +17,6 @@ import {
   useExpenseColumns,
   useExpenseFilters,
 } from '$app/pages/expenses/common/hooks';
-import { useFooterColumns } from '$app/pages/expenses/common/hooks/useFooterColumns';
 import { useParams } from 'react-router-dom';
 
 export default function Expenses() {
@@ -28,7 +27,6 @@ export default function Expenses() {
   const actions = useActions();
   const filters = useExpenseFilters();
   const columns = useExpenseColumns();
-  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -40,7 +38,6 @@ export default function Expenses() {
         }
       )}
       columns={columns}
-      footerColumns={footerColumns}
       customFilters={filters}
       customActions={actions}
       customFilterPlaceholder="status"

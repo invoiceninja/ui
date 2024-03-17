@@ -26,8 +26,6 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -42,7 +40,6 @@ export default function Expenses() {
   const columns = useExpenseColumns();
   const expenseColumns = useAllExpenseColumns();
   const customBulkActions = useCustomBulkActions();
-  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   return (
     <Default
@@ -55,7 +52,6 @@ export default function Expenses() {
         resource="expense"
         endpoint="/api/v1/expenses?include=client,vendor,category&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
         columns={columns}
-        footerColumns={footerColumns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
@@ -74,18 +70,11 @@ export default function Expenses() {
           />
         }
         leftSideChevrons={
-          <div className="flex space-x-2 pr-4">
-            <DataTableFooterColumnsPicker
-              table="expense"
-              columns={allFooterColumns}
-            />
-
-            <DataTableColumnsPicker
-              columns={expenseColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-              table="expense"
-            />
-          </div>
+          <DataTableColumnsPicker
+            columns={expenseColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="expense"
+          />
         }
         linkToCreateGuards={[permission('create_expense')]}
         hideEditableOptions={!hasPermission('edit_expense')}

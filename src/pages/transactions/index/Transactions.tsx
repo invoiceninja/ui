@@ -26,8 +26,6 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -43,7 +41,6 @@ export default function Transactions() {
   const customBulkActions = useCustomBulkActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
@@ -90,7 +87,6 @@ export default function Transactions() {
           endpoint="/api/v1/bank_transactions?sort=id|desc"
           bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
-          footerColumns={footerColumns}
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"
           onTableRowClick={getSelectedTransaction}
@@ -108,14 +104,6 @@ export default function Transactions() {
               ]}
               component={<ImportButton route="/transactions/import" />}
             />
-          }
-          leftSideChevrons={
-            <div className="flex space-x-2 pr-4">
-              <DataTableFooterColumnsPicker
-                table="transaction"
-                columns={allFooterColumns}
-              />
-            </div>
           }
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}

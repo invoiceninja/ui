@@ -18,7 +18,6 @@ import {
   usePurchaseOrderFilters,
 } from '$app/pages/purchase-orders/common/hooks';
 import { useCustomBulkActions } from '$app/pages/purchase-orders/common/hooks/useCustomBulkActions';
-import { useFooterColumns } from '$app/pages/purchase-orders/common/hooks/useFooterColumns';
 import { useParams } from 'react-router-dom';
 
 export default function PurchaseOrders() {
@@ -30,7 +29,6 @@ export default function PurchaseOrders() {
   const filters = usePurchaseOrderFilters();
   const columns = usePurchaseOrderColumns();
   const customBulkActions = useCustomBulkActions();
-  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -42,7 +40,6 @@ export default function PurchaseOrders() {
         }
       )}
       columns={columns}
-      footerColumns={footerColumns}
       customFilters={filters}
       customActions={actions}
       customBulkActions={customBulkActions}

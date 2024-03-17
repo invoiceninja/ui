@@ -26,8 +26,6 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function Clients() {
   useTitle('clients');
@@ -41,7 +39,6 @@ export default function Clients() {
   const columns = useClientColumns();
   const clientColumns = useAllClientColumns();
   const customBulkActions = useCustomBulkActions();
-  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   return (
     <Default
@@ -55,7 +52,6 @@ export default function Clients() {
         endpoint="/api/v1/clients?sort=id|desc"
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
-        footerColumns={footerColumns}
         linkToCreate="/clients/create"
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
@@ -71,18 +67,11 @@ export default function Clients() {
           />
         }
         leftSideChevrons={
-          <div className="flex space-x-2 pr-4">
-            <DataTableFooterColumnsPicker
-              table="client"
-              columns={allFooterColumns}
-            />
-
-            <DataTableColumnsPicker
-              table="client"
-              columns={clientColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-            />
-          </div>
+          <DataTableColumnsPicker
+            table="client"
+            columns={clientColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+          />
         }
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}

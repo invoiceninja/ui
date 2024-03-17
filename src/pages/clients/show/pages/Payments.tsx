@@ -16,7 +16,6 @@ import { usePaymentColumns } from '$app/pages/payments/common/hooks/usePaymentCo
 import { useActions } from '$app/pages/payments/common/hooks/useActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
-import { useFooterColumns } from '$app/pages/payments/common/hooks/useFooterColumns';
 
 export default function Payments() {
   const { id } = useParams();
@@ -25,7 +24,6 @@ export default function Payments() {
 
   const actions = useActions();
   const columns = usePaymentColumns();
-  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -35,7 +33,6 @@ export default function Payments() {
         { id }
       )}
       columns={columns}
-      footerColumns={footerColumns}
       customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"

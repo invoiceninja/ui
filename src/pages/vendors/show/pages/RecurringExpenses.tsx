@@ -16,7 +16,6 @@ import {
   useActions,
   useRecurringExpenseColumns,
 } from '$app/pages/recurring-expenses/common/hooks';
-import { useFooterColumns } from '$app/pages/recurring-expenses/common/hooks/useFooterColumns';
 import { useParams } from 'react-router-dom';
 
 export default function RecurringExpenses() {
@@ -25,7 +24,6 @@ export default function RecurringExpenses() {
   const hasPermission = useHasPermission();
 
   const actions = useActions();
-  const { footerColumns } = useFooterColumns();
   const columns = useRecurringExpenseColumns();
 
   return (
@@ -36,7 +34,6 @@ export default function RecurringExpenses() {
         { id }
       )}
       columns={columns}
-      footerColumns={footerColumns}
       customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_expenses/bulk"

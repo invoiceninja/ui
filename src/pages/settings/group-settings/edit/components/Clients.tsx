@@ -13,7 +13,6 @@ import { DataTable } from '$app/components/DataTable';
 import { useActions } from '$app/pages/clients/common/hooks/useActions';
 import { useClientColumns } from '$app/pages/clients/common/hooks/useClientColumns';
 import { useCustomBulkActions } from '$app/pages/clients/common/hooks/useCustomBulkActions';
-import { useFooterColumns } from '$app/pages/clients/common/hooks/useFooterColumns';
 import { useParams } from 'react-router-dom';
 
 export function Clients() {
@@ -22,7 +21,6 @@ export function Clients() {
   const actions = useActions();
   const columns = useClientColumns();
   const customBulkActions = useCustomBulkActions();
-  const { footerColumns } = useFooterColumns();
 
   return (
     <div className="mt-8">
@@ -34,7 +32,6 @@ export function Clients() {
         bulkRoute="/api/v1/clients/bulk"
         linkToEdit="/clients/:id/edit"
         columns={columns}
-        footerColumns={footerColumns}
         customActions={actions}
         customBulkActions={customBulkActions}
         withResourcefulActions

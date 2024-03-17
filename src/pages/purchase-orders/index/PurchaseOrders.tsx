@@ -24,8 +24,6 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -43,7 +41,6 @@ export default function PurchaseOrders() {
   const columns = usePurchaseOrderColumns();
   const customBulkActions = useCustomBulkActions();
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
-  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -54,25 +51,17 @@ export default function PurchaseOrders() {
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
         columns={columns}
-        footerColumns={footerColumns}
         customActions={actions}
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
-          <div className="flex space-x-2 pr-4">
-            <DataTableFooterColumnsPicker
-              table="purchaseOrder"
-              columns={allFooterColumns}
-            />
-
-            <DataTableColumnsPicker
-              columns={purchaseOrderColumns as unknown as string[]}
-              defaultColumns={defaultColumns}
-              table="purchaseOrder"
-            />
-          </div>
+          <DataTableColumnsPicker
+            columns={purchaseOrderColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="purchaseOrder"
+          />
         }
         linkToCreateGuards={[permission('create_purchase_order')]}
         hideEditableOptions={!hasPermission('edit_purchase_order')}
