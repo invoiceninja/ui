@@ -35,7 +35,9 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
   const filters = useCreditsFilters();
+
   const creditColumns = useAllCreditColumns();
+
   const customBulkActions = useCustomBulkActions();
 
   return (

@@ -36,11 +36,15 @@ export default function PurchaseOrders() {
     { name: t('purchase_orders'), href: '/purchase_orders' },
   ];
 
-  const actions = useActions();
-  const filters = usePurchaseOrderFilters();
   const columns = usePurchaseOrderColumns();
-  const customBulkActions = useCustomBulkActions();
+
+  const filters = usePurchaseOrderFilters();
+
+  const actions = useActions();
+
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>

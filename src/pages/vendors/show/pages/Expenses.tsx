@@ -24,9 +24,11 @@ export default function Expenses() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
-  const filters = useExpenseFilters();
   const columns = useExpenseColumns();
+
+  const filters = useExpenseFilters();
+
+  const actions = useActions();
 
   return (
     <DataTable

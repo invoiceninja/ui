@@ -25,9 +25,12 @@ export default function PurchaseOrders() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
-  const filters = usePurchaseOrderFilters();
   const columns = usePurchaseOrderColumns();
+
+  const filters = usePurchaseOrderFilters();
+
+  const actions = useActions();
+
   const customBulkActions = useCustomBulkActions();
 
   return (

@@ -21,8 +21,10 @@ export default function Credits() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
   const columns = useCreditColumns();
+
+  const actions = useActions();
+
   const customBulkActions = useCustomBulkActions();
 
   return (

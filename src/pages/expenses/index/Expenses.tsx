@@ -35,10 +35,14 @@ export default function Expenses() {
 
   const pages = [{ name: t('expenses'), href: '/expenses' }];
 
-  const actions = useActions();
-  const filters = useExpenseFilters();
   const columns = useExpenseColumns();
+
+  const actions = useActions();
+
+  const filters = useExpenseFilters();
+
   const expenseColumns = useAllExpenseColumns();
+
   const customBulkActions = useCustomBulkActions();
 
   return (

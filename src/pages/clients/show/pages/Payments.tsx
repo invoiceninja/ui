@@ -22,8 +22,9 @@ export default function Payments() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
   const columns = usePaymentColumns();
+
+  const actions = useActions();
 
   return (
     <DataTable

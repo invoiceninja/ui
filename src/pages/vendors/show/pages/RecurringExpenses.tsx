@@ -23,8 +23,9 @@ export default function RecurringExpenses() {
 
   const hasPermission = useHasPermission();
 
-  const actions = useActions();
   const columns = useRecurringExpenseColumns();
+
+  const actions = useActions();
 
   return (
     <DataTable

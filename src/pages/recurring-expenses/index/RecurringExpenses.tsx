@@ -33,10 +33,13 @@ export default function RecurringExpenses() {
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
-  const actions = useActions();
   const columns = useRecurringExpenseColumns();
-  const customBulkActions = useCustomBulkActions();
+
+  const actions = useActions();
+
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
+
+  const customBulkActions = useCustomBulkActions();
 
   return (
     <Default
