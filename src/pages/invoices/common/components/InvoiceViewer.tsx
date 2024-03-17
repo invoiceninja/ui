@@ -16,6 +16,7 @@ import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/InvoiceDesign';
+import interact from 'interactjs';
 
 interface Props {
   link: string;
@@ -95,6 +96,63 @@ export function InvoiceViewer(props: Props) {
     );
   }
 
+  const pixelSize = 16;
+
+  interact('.pdf-preview')
+    .origin('self')
+    .draggable({
+      modifiers: [
+        interact.modifiers.snap({
+          // snap to the corners of a grid
+          targets: [interact.snappers.grid({ x: pixelSize, y: pixelSize })],
+        }),
+      ],
+      listeners: {
+        // draw colored squares on move
+        move: function (event: any) {
+          const context = event.target.getContext('2d'),
+            // calculate the angle of the drag direction
+            dragAngle = (180 * Math.atan2(event.dx, event.dy)) / Math.PI;
+
+          // set color based on drag angle and speed
+          context.fillStyle =
+            'hsl(' +
+            dragAngle +
+            ', 86%, ' +
+            (30 + Math.min(event.speed / 1000, 1) * 50) +
+            '%)';
+
+          // draw squares
+          context.fillRect(
+            event.pageX - pixelSize / 2,
+            event.pageY - pixelSize / 2,
+            pixelSize,
+            pixelSize
+          );
+        },
+      },
+    })
+    // clear the canvas on doubletap
+    .on('doubletap', function (event: any) {
+      const context = event.target.getContext('2d');
+
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    });
+
+  function resizeCanvases() {
+    [].forEach.call(
+      document.querySelectorAll('.pdf-preview'),
+      function (canvas: any) {
+        canvas.width = document.body.clientWidth;
+        canvas.height = window.innerHeight * 0.7;
+      }
+    );
+  }
+
+  // interact.js can also add DOM event listeners
+  interact(document).on('DOMContentLoaded', resizeCanvases);
+  //interact(window).on('resize', resizeCanvases);
+
   return (
     <>
       {isLoading && (
@@ -107,6 +165,7 @@ export function InvoiceViewer(props: Props) {
       )}
 
       <iframe
+        className="pdf-preview"
         ref={iframeRef}
         width="100%"
         height={isLoading ? 0 : props.height || 1500}
