@@ -105,11 +105,11 @@ export function DataTableFooterColumnsPicker(props: Props) {
         className="text-sm cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
-        {t('footer_columns')}
+        {t('footer')}
       </div>
 
       <Modal
-        title={t('footer_columns')}
+        title={t('footer')}
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >

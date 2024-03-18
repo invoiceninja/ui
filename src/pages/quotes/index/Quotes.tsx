@@ -97,11 +97,13 @@ export default function Quotes() {
           />
         }
         leftSideChevrons={
-          <div className="flex space-x-2 pr-4">
+          <div className="flex items-center space-x-1 pr-4">
             <DataTableFooterColumnsPicker
               table="quote"
               columns={allFooterColumns}
             />
+
+            <span>|</span>
 
             <DataTableColumnsPicker
               columns={quoteColumns as unknown as string[]}

@@ -118,11 +118,13 @@ export default function RecurringInvoices() {
           />
         }
         leftSideChevrons={
-          <div className="flex space-x-2 pr-4">
+          <div className="flex items-center space-x-1 pr-4">
             <DataTableFooterColumnsPicker
               table="recurringInvoice"
               columns={allFooterColumns}
             />
+
+            <span>|</span>
 
             <DataTableColumnsPicker
               columns={recurringInvoiceColumns as unknown as string[]}
