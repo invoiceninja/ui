@@ -53,6 +53,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdEdit,
@@ -90,6 +91,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -347,6 +349,9 @@ export function useActions(params?: Params) {
     navigate('/quotes/create?action=clone');
   };
 
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
+
   const actions: Action<Quote>[] = [
     (quote: Quote) =>
       Boolean(showEditAction) && (
@@ -444,6 +449,17 @@ export function useActions(params?: Params) {
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([quote]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (quote) =>
       hasPermission('create_quote') && (

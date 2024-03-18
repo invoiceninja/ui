@@ -40,6 +40,10 @@ import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -74,6 +78,12 @@ export default function Tasks() {
   useEffect(() => {
     return () => setTaskSliderVisibility(false);
   }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -123,6 +133,15 @@ export default function Tasks() {
       />
 
       {!disableNavigation('task', taskSlider) && <TaskSlider />}
+
+      <ChangeTemplateModal<Task>
+        entity="task"
+        entities={changeTemplateResources as Task[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
+      />
     </Default>
   );
 }

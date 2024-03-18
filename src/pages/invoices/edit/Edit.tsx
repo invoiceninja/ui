@@ -44,6 +44,11 @@ import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/Invoic
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -111,6 +116,9 @@ export default function Edit() {
 
   const actions = useActions();
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
+
+  const { changeTemplateVisible, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   return (
     <Default
@@ -262,6 +270,17 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      {invoice ? (
+        <ChangeTemplateModal<IInvoice>
+          entity="invoice"
+          entities={[invoice]}
+          visible={changeTemplateVisible}
+          setVisible={setChangeTemplateVisible}
+          labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+          bulkUrl="/api/v1/invoices/bulk"
+        />
+      ) : null}
     </Default>
   );
 }
