@@ -35,6 +35,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -69,6 +70,7 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -445,6 +447,9 @@ export function useActions() {
     navigate('/purchase_orders/create?action=clone');
   };
 
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
+
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
       <DropdownElement
@@ -555,6 +560,17 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([purchaseOrder]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

@@ -46,8 +46,33 @@ export function useDesignUtilities(params: Params) {
     }
   };
 
+  const handleResourceChange = (value: string, checked: boolean) => {
+    if (!payload.design) {
+      return;
+    }
+
+    const entities =
+      payload.design.entities.length > 1
+        ? payload.design.entities.split(',') || ([] as string[])
+        : [];
+
+    const filtered = entities.filter((e) => e !== value);
+
+    if (checked) {
+      filtered.push(value);
+    }
+
+    if (payload && payload.design) {
+      setPayload({
+        ...payload,
+        design: { ...payload.design, entities: filtered.join(',') },
+      });
+    }
+  };
+
   return {
     handlePropertyChange,
     handleBlockChange,
+    handleResourceChange,
   };
 }

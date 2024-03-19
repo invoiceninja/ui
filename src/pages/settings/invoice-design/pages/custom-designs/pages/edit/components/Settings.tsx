@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
-import { InputField } from '$app/components/forms';
+import { Checkbox, InputField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -21,6 +21,7 @@ import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
+import { templateEntites } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
 import { PreviewPayload } from '../../../CustomDesign';
 
@@ -89,7 +90,10 @@ export default function Settings() {
     }
   }, [payload.design]);
 
-  const { handlePropertyChange } = useDesignUtilities({ payload, setPayload });
+  const { handlePropertyChange, handleResourceChange } = useDesignUtilities({
+    payload,
+    setPayload,
+  });
 
   return (
     <>
@@ -102,6 +106,20 @@ export default function Settings() {
             onValueChange={(value) => handlePropertyChange('name', value)}
             errorMessage={errors?.errors.name}
           />
+        </Element>
+
+        <Element leftSide={t('resource')}>
+          {templateEntites.map((entity) => (
+            <Checkbox
+              key={entity}
+              label={t(entity)}
+              value={entity}
+              onValueChange={(value, checked) =>
+                handleResourceChange(value, Boolean(checked))
+              }
+              checked={payload.design?.entities.includes(entity)}
+            />
+          ))}
         </Element>
 
         <Element leftSide={t('design')}>

@@ -18,10 +18,12 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdDelete,
+  MdDesignServices,
   MdEdit,
   MdPayment,
   MdRestore,
@@ -44,6 +46,11 @@ export function useActions(params?: Params) {
   });
 
   const bulk = useBulk();
+
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+  } = useChangeTemplate();
 
   const actions: Action<Payment>[] = [
     (payment: Payment) =>
@@ -82,6 +89,17 @@ export function useActions(params?: Params) {
         icon={<Icon element={MdSend} />}
       >
         {t('email_payment')}
+      </DropdownElement>
+    ),
+    (payment: Payment) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([payment]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
     (payment: Payment) =>

@@ -37,6 +37,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useQuoteQuery } from '../common/queries';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { ChangeTemplateModal, useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote } from '$app/common/interfaces/quote';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -70,6 +72,12 @@ export default function Quotes() {
   useEffect(() => {
     return () => setQuoteSliderVisibility(false);
   }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -108,6 +116,15 @@ export default function Quotes() {
       />
 
       {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}
+
+      <ChangeTemplateModal<Quote>
+        entity="quote"
+        entities={changeTemplateResources as Quote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
+      />
     </Default>
   );
 }

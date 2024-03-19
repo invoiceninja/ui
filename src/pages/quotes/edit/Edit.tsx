@@ -41,6 +41,11 @@ import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns'
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote as IQuote } from '$app/common/interfaces/quote';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -106,6 +111,12 @@ export default function Edit() {
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -242,6 +253,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<IQuote>
+        entity="quote"
+        entities={changeTemplateResources as IQuote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
+      />
     </Default>
   );
 }
