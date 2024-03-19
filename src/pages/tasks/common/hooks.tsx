@@ -28,6 +28,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdNotStarted,
@@ -69,6 +70,7 @@ import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'status',
@@ -431,6 +433,9 @@ export function useActions(params?: Params) {
     navigate('/tasks/create?action=clone');
   };
 
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
+
   const actions = [
     (task: Task) =>
       Boolean(showEditAction) && (
@@ -483,6 +488,17 @@ export function useActions(params?: Params) {
           {t('clone')}
         </DropdownElement>
       ),
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([task]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) && (
         <Divider withoutPadding />

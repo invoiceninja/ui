@@ -24,6 +24,10 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { Spinner } from '$app/components/Spinner';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');
@@ -64,6 +68,12 @@ export default function Task() {
     }
   }, [data]);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -95,6 +105,15 @@ export default function Task() {
       ) : (
         <Spinner />
       )}
+
+      <ChangeTemplateModal<TaskType>
+        entity="task"
+        entities={changeTemplateResources as TaskType[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
+      />
     </Default>
   );
 }

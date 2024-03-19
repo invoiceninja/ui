@@ -25,6 +25,10 @@ import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -58,6 +62,9 @@ export default function Edit() {
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
   };
+
+  const { changeTemplateVisible, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   return (
     <Card title={documentTitle}>
@@ -204,6 +211,17 @@ export default function Edit() {
             }
           />
         )}
+
+      {payment ? (
+        <ChangeTemplateModal<Payment>
+          entity="payment"
+          entities={[payment]}
+          visible={changeTemplateVisible}
+          setVisible={setChangeTemplateVisible}
+          labelFn={(payment) => `${t('number')}: ${payment.number}`}
+          bulkUrl="/api/v1/payments/bulk"
+        />
+      ) : null}
     </Card>
   );
 }

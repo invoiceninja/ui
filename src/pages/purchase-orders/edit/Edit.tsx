@@ -44,6 +44,10 @@ import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -115,6 +119,12 @@ export default function Edit() {
 
   const actions = useActions();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -235,6 +245,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<PurchaseOrder>
+        entity="purchase_order"
+        entities={changeTemplateResources as PurchaseOrder[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+        bulkUrl="/api/v1/purchase_orders/bulk"
+      />
     </Default>
   );
 }

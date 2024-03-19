@@ -27,4 +27,6 @@ export interface Design {
   is_deleted: boolean;
   is_free: boolean;
   updated_at: number;
+  is_template: boolean;
+  entities: string;
 }
