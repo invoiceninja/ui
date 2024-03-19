@@ -315,6 +315,7 @@ export interface Settings {
   delivery_note_design_id: string;
   payment_receipt_design_id: string;
   payment_refund_design_id: string;
+  enable_rappen_rounding: boolean;
 }
 
 export interface TaxData {
