@@ -23,10 +23,11 @@ import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '../settings';
+import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
 
 export default function Dashboard() {
   useTitle('dashboard');
-  
+
   const [t] = useTranslation();
 
   const user = useCurrentUser();
@@ -65,6 +66,12 @@ export default function Dashboard() {
         {enabled(ModuleBitmask.Invoices) && (
           <div className="col-span-12 xl:col-span-6">
             <PastDueInvoices />
+          </div>
+        )}
+
+        {enabled(ModuleBitmask.RecurringInvoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingRecurringInvoices />
           </div>
         )}
 
