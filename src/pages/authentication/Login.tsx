@@ -30,6 +30,7 @@ import { Disable2faModal } from './components/Disable2faModal';
 import { useColorScheme } from '$app/common/colors';
 import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
+import classNames from 'classnames';
 
 export function Login() {
   useTitle('login');
@@ -130,8 +131,16 @@ export function Login() {
             />
 
             <div className="space-y-2">
-              <div className="flex flex-col lg:flex-row items-center justify-between">
-                <InputLabel>{t('secret')}</InputLabel>
+              <div
+                className={classNames(
+                  'flex flex-col lg:flex-row items-center',
+                  {
+                    'justify-between': isSelfHosted(),
+                    'justify-end': isHosted(),
+                  }
+                )}
+              >
+                {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
                 <div
                   className="text-sm hover:underline cursor-pointer"
                   onClick={() => setIsDisable2faModalOpen(true)}
