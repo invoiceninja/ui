@@ -26,6 +26,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdMarkEmailRead,
@@ -53,6 +54,7 @@ import {
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -115,6 +117,9 @@ export function useActions(params?: Params) {
 
     navigate('/invoices/create?action=clone');
   };
+
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   return [
     (invoice: Invoice) =>
@@ -351,6 +356,17 @@ export function useActions(params?: Params) {
           {t('reverse')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([invoice]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
       hasPermission('create_invoice') && (

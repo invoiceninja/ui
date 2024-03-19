@@ -22,6 +22,7 @@ import {
   MdArchive,
   MdCloudCircle,
   MdDelete,
+  MdDesignServices,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
@@ -36,6 +37,7 @@ import {
 import { PurgeClientAction } from '../components/PurgeClientAction';
 import { MergeClientAction } from '../components/MergeClientAction';
 import { Dispatch, SetStateAction } from 'react';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
@@ -55,6 +57,9 @@ export function useActions(params?: Params) {
   });
 
   const configureClientSettings = useConfigureClientSettings();
+
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -144,6 +149,17 @@ export function useActions(params?: Params) {
           setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
         />
       ),
+    (client) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([client]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>
