@@ -294,7 +294,7 @@ export function GatewaysTable(params: Params) {
           )}
 
           <Button to="/settings/gateways/create">
-            {t('new_company_gateway')}
+            {t('new_payment_gateway')}
           </Button>
         </div>
       </div>
