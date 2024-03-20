@@ -43,7 +43,15 @@ export function Steps({
   });
 
   const filtered = dependencies
-    ? Object.values(dependencies).filter((step) => !steps.includes(step.id))
+    ? Object.values(dependencies)
+        .filter((step) => !steps.includes(step.id))
+        .filter((step) => {
+          if (steps.some((s) => s.startsWith('auth.'))) {
+            return !step.id.startsWith('auth.');
+          }
+
+          return true;
+        })
     : [];
 
   function handleDelete(column: string) {
