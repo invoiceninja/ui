@@ -20,9 +20,8 @@ const GeneralSettings = lazy(
   () => import('./pages/general-settings/components/GeneralSettings')
 );
 const CustomDesigns = lazy(
-  () => import('./pages/custom-designs/CustomDesigns')
+  () => import('./pages/custom-designs/index/CustomDesigns')
 );
-const Edit = lazy(() => import('./pages/custom-designs/pages/edit/Edit'));
 const Create = lazy(() => import('./pages/custom-designs/pages/create/Create'));
 const ClientDetails = lazy(
   () => import('./pages/general-settings/components/ClientDetails')
@@ -60,12 +59,47 @@ const TaskColumns = lazy(
 const TotalFields = lazy(
   () => import('./pages/general-settings/components/TotalFields')
 );
+const CustomDesign = lazy(() => import('./pages/custom-designs/CustomDesign'));
+const Settings = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Settings')
+);
+const Body = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Body')
+);
+const Headers = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Headers')
+);
+const Footer = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Footer')
+);
+const Includes = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Includes')
+);
+const Variables = lazy(
+  () => import('./pages/custom-designs/pages/edit/components/Variables')
+);
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
-    <Route path="custom_designs/:id/edit" element={<Edit />} />
+    <Route
+      path="custom_designs/:id/edit"
+      element={
+        <Guard
+          guards={[companySettings()]}
+          component={<CustomDesign />}
+          type="subPage"
+        />
+      }
+    >
+      <Route path="" element={<Settings />} />
+      <Route path="body" element={<Body />} />
+      <Route path="header" element={<Headers />} />
+      <Route path="footer" element={<Footer />} />
+      <Route path="includes" element={<Includes />} />
+      <Route path="variables" element={<Variables />} />
+    </Route>
     <Route path="custom_designs/create" element={<Create />} />
     <Route
       path="client_details"

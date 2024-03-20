@@ -12,10 +12,10 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useEffect, useRef, useState } from 'react';
 import { Resource } from './InvoicePreview';
-import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/InvoiceDesign';
+import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/CustomDesign';
 
 interface Props {
   link: string;

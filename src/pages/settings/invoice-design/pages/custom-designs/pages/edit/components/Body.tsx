@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDesignUtilities } from '../common/hooks';
@@ -17,19 +15,24 @@ import { useDebounce } from 'react-use';
 import { Card } from '$app/components/cards';
 import Editor from '@monaco-editor/react';
 import { useColorScheme } from '$app/common/colors';
+import { useOutletContext } from 'react-router-dom';
+import { Context } from './Settings';
 
-export function Body() {
-  const [payload] = useAtom(payloadAtom);
+export default function Body() {
+  const context: Context = useOutletContext();
+
+  const { payload, setPayload } = context;
+
   const [value, setValue] = useState(payload.design?.design.body);
 
   const { t } = useTranslation();
-  const { handleBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
   useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
   return (
-    <Card title={t('body')} padding="small" collapsed={true}>
+    <Card title={t('body')} padding="small">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         height="25rem"

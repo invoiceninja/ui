@@ -17,26 +17,37 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { trans } from '$app/common/helpers';
 import { useAtom } from 'jotai';
-import { payloadAtom } from '../Edit';
 import { Import, importModalVisiblityAtom } from './Import';
 import { useDesignUtilities } from '../common/hooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { templateEntites } from '../../create/Create';
+import { useOutletContext } from 'react-router-dom';
+import { PreviewPayload } from '../../../CustomDesign';
 
-interface Props {
+export interface Context {
   errors: ValidationBag | undefined;
   isFormBusy: boolean;
   shouldRenderHTML: boolean;
   setShouldRenderHTML: Dispatch<SetStateAction<boolean>>;
+  payload: PreviewPayload;
+  setPayload: Dispatch<SetStateAction<PreviewPayload>>;
 }
 
-export function Settings(props: Props) {
+export default function Settings() {
   const { t } = useTranslation();
 
-  const { errors } = props;
+  const context: Context = useOutletContext();
 
-  const [payload] = useAtom(payloadAtom);
+  const {
+    errors,
+    isFormBusy,
+    shouldRenderHTML,
+    setShouldRenderHTML,
+    payload,
+    setPayload,
+  } = context;
+
   const [, setIsImportModalVisible] = useAtom(importModalVisiblityAtom);
 
   const handleExportToTxtFile = () => {
@@ -79,13 +90,16 @@ export function Settings(props: Props) {
     }
   }, [payload.design]);
 
-  const { handlePropertyChange, handleResourceChange } = useDesignUtilities();
+  const { handlePropertyChange, handleResourceChange } = useDesignUtilities({
+    payload,
+    setPayload,
+  });
 
   return (
     <>
       <Import onImport={(parts) => handlePropertyChange('design', parts)} />
 
-      <Card title={t('settings')} padding="small" collapsed={false}>
+      <Card title={t('settings')} padding="small">
         <Element leftSide={t('name')}>
           <InputField
             value={payload.design?.name}
@@ -137,9 +151,9 @@ export function Settings(props: Props) {
 
         <Element leftSide={t('html_mode')}>
           <Toggle
-            checked={props.shouldRenderHTML}
-            onChange={(value) => props.setShouldRenderHTML(value)}
-            disabled={props.isFormBusy}
+            checked={shouldRenderHTML}
+            onChange={(value) => setShouldRenderHTML(value)}
+            disabled={isFormBusy}
           />
         </Element>
       </Card>
