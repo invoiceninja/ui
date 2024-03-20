@@ -11,24 +11,24 @@
 import { Design } from '$app/common/interfaces/design';
 import { useEffect, useState } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
-import { useParams } from 'react-router-dom';
-import { atom, useAtom } from 'jotai';
-import { Settings } from './components/Settings';
-import { Body } from './components/Body';
-import { Header } from './components/Headers';
-import { Footer } from './components/Footer';
-import { Includes } from './components/Includes';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { atom } from 'jotai';
 import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Variables } from './components/Variables';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
+import { PanelGroup } from './pages/edit/components/PanelGroup';
+import { Panel } from './pages/edit/components/Panel';
+import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
+import { Tabs } from '$app/components/Tabs';
+import { useTabs } from './pages/edit/common/hooks/useTabs';
+import { useTitle } from '$app/common/hooks/useTitle';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -42,13 +42,22 @@ export const payloadAtom = atom<PreviewPayload>({
   entity_type: 'invoice',
 });
 
-export default function Edit() {
+export default function CustomDesign() {
+  useTitle('invoice_design');
+
   const actions = useActions();
+
+  const tabs = useTabs();
+  const location = useLocation();
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
 
-  const [payload, setPayload] = useAtom(payloadAtom);
+  const [payload, setPayload] = useState<PreviewPayload>({
+    design: null,
+    entity_id: '-1',
+    entity_type: 'invoice',
+  });
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [shouldRenderHTML, setShouldRenderHTML] = useState<boolean>(false);
@@ -85,7 +94,7 @@ export default function Edit() {
         />
       ),
     },
-    [payload.design, isFormBusy]
+    [payload.design, isFormBusy, location]
   );
 
   useEffect(() => {
@@ -101,36 +110,43 @@ export default function Edit() {
   }, [data]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
-      <div className="w-full lg:w-1/2 overflow-y-auto">
-        <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
-          <Settings
-            errors={errors}
-            isFormBusy={isFormBusy}
-            shouldRenderHTML={shouldRenderHTML}
-            setShouldRenderHTML={setShouldRenderHTML}
-          />
-          <Body />
-          <Header />
-          <Footer />
-          <Includes />
-          <Variables />
-        </div>
-      </div>
+    <>
+      <Tabs tabs={tabs} />
 
-      <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
-        {payload.design ? (
-          <InvoiceViewer
-            link={endpoint('/api/v1/preview?html=:renderHTML', {
-              renderHTML: shouldRenderHTML,
-            })}
-            resource={payload}
-            method="POST"
-            withToast
-            renderAsHTML={shouldRenderHTML}
-          />
-        ) : null}
-      </div>
-    </div>
+      <PanelGroup>
+        <Panel>
+          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
+            <Outlet
+              context={{
+                errors,
+                isFormBusy,
+                shouldRenderHTML,
+                setShouldRenderHTML,
+                payload,
+                setPayload,
+              }}
+            />
+          </div>
+        </Panel>
+
+        <PanelResizeHandle />
+
+        <Panel>
+          <div className="max-h-[80vh] overflow-y-scroll">
+            {payload.design ? (
+              <InvoiceViewer
+                link={endpoint('/api/v1/preview?html=:renderHTML', {
+                  renderHTML: shouldRenderHTML,
+                })}
+                resource={payload}
+                method="POST"
+                withToast
+                renderAsHTML={shouldRenderHTML}
+              />
+            ) : null}
+          </div>
+        </Panel>
+      </PanelGroup>
+    </>
   );
 }
