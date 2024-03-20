@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -19,6 +19,11 @@ import { useResolveInputField } from '../hooks/useResolveInputField';
 import { StripeConnect } from './gateways/StripeConnect';
 import { WePay } from './gateways/WePay';
 import { PayPalPPCP } from './gateways/PayPalPPCP';
+import { Divider } from '$app/components/cards/Divider';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useState } from 'react';
 
 interface Props {
   gateway: Gateway;
@@ -43,6 +48,27 @@ export function Credentials(props: Props) {
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
+  const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
+
+  const handleTestCredentials = () => {
+    if (!isTestingBusy) {
+      toast.processing();
+      setIsTestingBusy(true);
+
+      request(
+        'POST',
+        endpoint('/api/v1/company_gateways/:id/test', {
+          id: props.companyGateway.id,
+        })
+      )
+        .then((response) => {
+          console.log(response);
+          toast.success('ok');
+        })
+        .finally(() => setIsTestingBusy(false));
+    }
+  };
+
   return (
     <Card title={t('credentials')}>
       {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
@@ -59,13 +85,14 @@ export function Credentials(props: Props) {
 
       {props.gateway && props.gateway.key === WEPAY && <WePay />}
 
-      {props.gateway && props.gateway.key === PAYPAL_PPCP && 
-        <PayPalPPCP 
-          gateway={props.gateway} 
-          companyGateway={props.companyGateway} 
+      {props.gateway && props.gateway.key === PAYPAL_PPCP && (
+        <PayPalPPCP
+          gateway={props.gateway}
+          companyGateway={props.companyGateway}
           setCompanyGateway={props.setCompanyGateway}
           errors={props.errors}
-          />}
+        />
+      )}
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&
@@ -78,6 +105,20 @@ export function Credentials(props: Props) {
             )}
           </Element>
         ))}
+
+      <Divider />
+
+      <div className="flex justify-end pr-6">
+        <Button
+          className="self-end"
+          behavior="button"
+          onClick={handleTestCredentials}
+          disableWithoutIcon
+          disabled={isTestingBusy}
+        >
+          {t('test_credentials')}
+        </Button>
+      </div>
     </Card>
   );
 }
