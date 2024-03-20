@@ -25,6 +25,7 @@ interface Props {
   className?: string;
   tabs: Tab[];
   disableBackupNavigation?: boolean;
+  visible?: boolean;
 }
 
 export type Tab = {
@@ -37,11 +38,16 @@ export type Tab = {
 export type Matcher = (params: Readonly<Params<string>>) => string;
 
 export function Tabs(props: Props) {
-  const accentColor = useAccentColor();
-  const location = useLocation();
-  const params = useParams();
-
   const navigate = useNavigate();
+
+  const { visible = true } = props;
+
+  const params = useParams();
+  const location = useLocation();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
+  const [searchParams] = useSearchParams();
+  const tabBar = useRef<HTMLDivElement>(null);
 
   const isActive = (tab: Tab) => {
     return (
@@ -51,8 +57,6 @@ export function Tabs(props: Props) {
       )
     );
   };
-
-  const tabBar = useRef<HTMLDivElement>(null);
 
   const handleScroll = (event: MouseEvent<HTMLAnchorElement>) => {
     const clickedTab = event.currentTarget;
@@ -67,8 +71,6 @@ export function Tabs(props: Props) {
       left: clickedTab!.offsetLeft - scrollWidth - scrollBy,
     });
   };
-
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (props.tabs.length && !props.disableBackupNavigation) {
@@ -86,9 +88,7 @@ export function Tabs(props: Props) {
     }
   }, []);
 
-  const colors = useColorScheme();
-
-  return (
+  return visible ? (
     <div className={props.className} data-cy="tabs">
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
@@ -140,5 +140,7 @@ export function Tabs(props: Props) {
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 }
