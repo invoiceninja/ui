@@ -69,12 +69,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {enabled(ModuleBitmask.RecurringInvoices) && (
-          <div className="col-span-12 xl:col-span-6">
-            <UpcomingRecurringInvoices />
-          </div>
-        )}
-
         {enabled(ModuleBitmask.Quotes) && (
           <div className="col-span-12 xl:col-span-6">
             <ExpiredQuotes />
@@ -84,6 +78,12 @@ export default function Dashboard() {
         {enabled(ModuleBitmask.Quotes) && (
           <div className="col-span-12 xl:col-span-6">
             <UpcomingQuotes />
+          </div>
+        )}
+
+        {enabled(ModuleBitmask.RecurringInvoices) && (
+          <div className="col-span-12 xl:col-span-6">
+            <UpcomingRecurringInvoices />
           </div>
         )}
       </div>
