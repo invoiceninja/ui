@@ -33,7 +33,7 @@ export function useActions() {
           onClick={() => bulk([transaction.id], 'unlink')}
           icon={<Icon element={MdLinkOff} />}
         >
-          {t('unlink_payment')}
+          {t('unlink')}
         </DropdownElement>
       ),
     (transaction) =>

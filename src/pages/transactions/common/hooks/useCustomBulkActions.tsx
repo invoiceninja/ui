@@ -44,7 +44,7 @@ export const useCustomBulkActions = () => {
           }}
           icon={<Icon element={MdLinkOff} />}
         >
-          {t('unlink_payment')}
+          {t('unlink')}
         </DropdownElement>
       ),
     ({ selectedResources, setSelected }) =>
