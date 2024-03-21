@@ -44,6 +44,8 @@ import {
 import { Quote } from '$app/common/interfaces/quote';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -61,6 +63,7 @@ export default function Quotes() {
   const actions = useActions();
   const filters = useQuoteFilters();
   const columns = useQuoteColumns();
+  const reactSettings = useReactSettings();
   const quoteColumns = useAllQuoteColumns();
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
@@ -108,13 +111,21 @@ export default function Quotes() {
           />
         }
         leftSideChevrons={
-          <div className="flex items-center space-x-1 pr-4">
-            <DataTableFooterColumnsPicker
-              table="quote"
-              columns={allFooterColumns}
-            />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="quote"
+                  columns={allFooterColumns}
+                />
 
-            <span>|</span>
+                <span>|</span>
+              </>
+            )}
 
             <DataTableColumnsPicker
               columns={quoteColumns as unknown as string[]}

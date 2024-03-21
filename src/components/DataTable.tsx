@@ -58,6 +58,7 @@ import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
 import { TFooter } from './tables/TFooter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export interface DateRangeColumn {
   column: string;
@@ -155,6 +156,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
   const options = useDataTableOptions();
+
+  const reactSettings = useReactSettings();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -772,31 +775,35 @@ export function DataTable<T extends object>(props: Props<T>) {
             ))}
         </Tbody>
 
-        {Boolean(footerColumns.length) && Boolean(data?.data.data.length) && (
-          <TFooter>
-            {!props.withoutActions && !hideEditableOptions && <Th></Th>}
+        {Boolean(footerColumns.length) &&
+          Boolean(data?.data.data.length) &&
+          Boolean(reactSettings.show_table_footer) && (
+            <TFooter>
+              {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
-            {props.columns.map(
-              (column, index) =>
-                Boolean(!excludeColumns.includes(column.id)) && (
-                  <Td key={index} customizeTextColor>
-                    {getFooterColumn(column.id) ? (
-                      <div className="flex items-center space-x-3">
-                        {getFooterColumn(column.id)?.format(
-                          getColumnValues(column.id) || [],
-                          data?.data.data || []
-                        ) ?? '-/-'}
-                      </div>
-                    ) : (
-                      <></>
-                    )}
-                  </Td>
-                )
-            )}
+              {props.columns.map(
+                (column, index) =>
+                  Boolean(!excludeColumns.includes(column.id)) && (
+                    <Td key={index} customizeTextColor>
+                      {getFooterColumn(column.id) ? (
+                        <div className="flex items-center space-x-3">
+                          {getFooterColumn(column.id)?.format(
+                            getColumnValues(column.id) || [],
+                            data?.data.data || []
+                          ) ?? '-/-'}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </Td>
+                  )
+              )}
 
-            {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
-          </TFooter>
-        )}
+              {props.withResourcefulActions && !hideEditableOptions && (
+                <Th></Th>
+              )}
+            </TFooter>
+          )}
       </Table>
 
       {data && !props.withoutPagination && (

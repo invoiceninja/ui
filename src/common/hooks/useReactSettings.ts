@@ -58,6 +58,7 @@ export interface ReactSettings {
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
   table_footer_columns?: Record<ReactTableColumns, string[]>;
+  show_table_footer?: boolean;
 }
 
 export type ReactTableColumns =

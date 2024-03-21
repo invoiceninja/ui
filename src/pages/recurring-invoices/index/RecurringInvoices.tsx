@@ -40,6 +40,8 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -61,6 +63,7 @@ export default function RecurringInvoices() {
   ];
 
   const actions = useActions();
+  const reactSettings = useReactSettings();
   const filters = useRecurringInvoiceFilters();
   const columns = useRecurringInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
@@ -118,13 +121,21 @@ export default function RecurringInvoices() {
           />
         }
         leftSideChevrons={
-          <div className="flex items-center space-x-1 pr-4">
-            <DataTableFooterColumnsPicker
-              table="recurringInvoice"
-              columns={allFooterColumns}
-            />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="recurringInvoice"
+                  columns={allFooterColumns}
+                />
 
-            <span>|</span>
+                <span>|</span>
+              </>
+            )}
 
             <DataTableColumnsPicker
               columns={recurringInvoiceColumns as unknown as string[]}

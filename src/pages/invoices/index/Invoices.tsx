@@ -43,6 +43,8 @@ import {
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -65,6 +67,7 @@ export default function Invoices() {
   const actions = useActions();
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
+  const reactSettings = useReactSettings();
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
@@ -116,13 +119,21 @@ export default function Invoices() {
           />
         }
         leftSideChevrons={
-          <div className="flex items-center space-x-1 pr-4">
-            <DataTableFooterColumnsPicker
-              table="invoice"
-              columns={allFooterColumns}
-            />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="invoice"
+                  columns={allFooterColumns}
+                />
 
-            <span>|</span>
+                <span>|</span>
+              </>
+            )}
 
             <DataTableColumnsPicker
               table="invoice"
