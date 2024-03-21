@@ -15,7 +15,7 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdOutlineContentCopy } from 'react-icons/md';
+import { MdLinkOff, MdOutlineContentCopy } from 'react-icons/md';
 import { CreateExpenseBulkAction } from '../../components/CreateExpenseBulkAction';
 
 export const useCustomBulkActions = () => {
@@ -29,7 +29,24 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const showUnlinkAction = (selectedTransactions: Transaction[]) => {
+    return selectedTransactions.every(({ payment_id }) => payment_id);
+  };
+
   const customBulkActions: CustomBulkAction<Transaction>[] = [
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showUnlinkAction(selectedResources) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'unlink');
+            setSelected([]);
+          }}
+          icon={<Icon element={MdLinkOff} />}
+        >
+          {t('unlink_payment')}
+        </DropdownElement>
+      ),
     ({ selectedResources, setSelected }) =>
       selectedResources && (
         <CreateExpenseBulkAction
