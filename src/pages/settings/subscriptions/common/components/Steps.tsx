@@ -43,15 +43,7 @@ export function Steps({
   });
 
   const filtered = dependencies
-    ? Object.values(dependencies)
-        .filter((step) => !steps.includes(step.id))
-        .filter((step) => {
-          if (steps.some((s) => s.startsWith('auth.'))) {
-            return !step.id.startsWith('auth.');
-          }
-
-          return true;
-        })
+    ? Object.values(dependencies).filter((step) => !steps.includes(step.id))
     : [];
 
   function handleDelete(column: string) {
@@ -91,9 +83,19 @@ export function Steps({
     }
   }, [steps.length]);
 
+  const auth = filtered
+    .filter((step) => step.id.startsWith('auth.'))
+    .filter((step) => {
+      if (steps.some((s) => s.startsWith('auth.'))) {
+        return !step.id.startsWith('auth.');
+      }
+
+      return true;
+    });
+
   return (
     <Card title={t('steps')}>
-      <Element leftSide={t('add_step')}>
+      <Element leftSide={t('authentication')}>
         <SelectField
           value=""
           onValueChange={(value) => {
@@ -101,11 +103,29 @@ export function Steps({
           }}
           withBlank
         >
-          {filtered.map((column, index) => (
+          {auth.map((column, index) => (
             <option key={index} value={column.id}>
               {t(column.id)}
             </option>
           ))}
+        </SelectField>
+      </Element>
+
+      <Element leftSide={t('other_steps')}>
+        <SelectField
+          value=""
+          onValueChange={(value) => {
+            handleChange('steps', [...steps, value].join(','));
+          }}
+          withBlank
+        >
+          {filtered
+            .filter((step) => !step.id.startsWith('auth.'))
+            .map((column, index) => (
+              <option key={index} value={column.id}>
+                {t(column.id)}
+              </option>
+            ))}
         </SelectField>
       </Element>
 
