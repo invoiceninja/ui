@@ -293,9 +293,7 @@ export function GatewaysTable(params: Params) {
             </Button>
           )}
 
-          <Button to="/settings/gateways/create">
-            {t('new_company_gateway')}
-          </Button>
+          <Button to="/settings/gateways/create">{t('add_gateway')}</Button>
         </div>
       </div>
 

@@ -108,19 +108,21 @@ export default function Settings() {
           />
         </Element>
 
-        <Element leftSide={t('resource')}>
-          {templateEntites.map((entity) => (
-            <Checkbox
-              key={entity}
-              label={t(entity)}
-              value={entity}
-              onValueChange={(value, checked) =>
-                handleResourceChange(value, Boolean(checked))
-              }
-              checked={payload.design?.entities.includes(entity)}
-            />
-          ))}
-        </Element>
+        {payload.design?.is_template ? (
+          <Element leftSide={t('resource')}>
+            {templateEntites.map((entity) => (
+              <Checkbox
+                key={entity}
+                label={t(entity)}
+                value={entity}
+                onValueChange={(value, checked) =>
+                  handleResourceChange(value, Boolean(checked))
+                }
+                checked={payload.design?.entities.includes(entity)}
+              />
+            ))}
+          </Element>
+        ) : null}
 
         <Element leftSide={t('design')}>
           <DesignSelector
