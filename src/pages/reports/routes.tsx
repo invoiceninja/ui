@@ -12,8 +12,6 @@ import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
-import { or } from '$app/common/guards/guards/or';
-import { plan } from '$app/common/guards/guards/plan';
 
 const Reports = lazy(() => import('$app/pages/reports/index/Reports'));
 
@@ -21,13 +19,7 @@ export const reportRoutes = (
   <Route
     path="/reports"
     element={
-      <Guard
-        guards={[
-          permission('view_reports'),
-          or(plan('pro'), plan('enterprise')),
-        ]}
-        component={<Reports />}
-      />
+      <Guard guards={[permission('view_reports')]} component={<Reports />} />
     }
   />
 );
