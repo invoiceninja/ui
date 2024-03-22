@@ -119,7 +119,7 @@ export default function Show() {
         })}
     >
       <div className="grid grid-cols-3 gap-4">
-        <InfoCard title={t('details')}>
+        <InfoCard title={project.name}>
           {project && (
             <div className="flex space-x-20 my-3">
               <span
@@ -169,7 +169,7 @@ export default function Show() {
           {project?.invoices?.map((invoice: Invoice) => (
             <div>
             <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-              {t('invoice')} #${invoice.number}
+              {t('invoice')} #{invoice.number}
             </Link>
             </div>
           ))}

@@ -657,8 +657,8 @@ export const useCustomBulkActions = () => {
       ),
     ({ selectedResources, setSelected }) =>
       selectedResources &&
-      showInvoiceTaskAction(selectedResources) &&
-      hasPermission('create_invoice') ? (
+        showInvoiceTaskAction(selectedResources) &&
+        hasPermission('create_invoice') ? (
         <DropdownElement
           onClick={() => {
             invoiceTask(selectedResources);
