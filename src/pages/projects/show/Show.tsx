@@ -165,30 +165,28 @@ export default function Show() {
 
         <InfoCard title={t('notes')}>
           <>
-          
-          {project?.invoices?.map((invoice: Invoice) => (
-            <div>
+          {project?.invoices?.map((invoice: Invoice, index: number) => (
+          <div key={index}>
             <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
               {t('invoice')} #{invoice.number}
             </Link>
-            </div>
+          </div>
           ))}
 
-          {project?.quotes?.map((quote: Quote) => (
-            <div>
+          {project?.quotes?.map((quote: Quote, index: number) => (
+          <div key={index}>
             <Link to={route('/quotes/:id/edit', { id: quote.id })}>
               {t('quote')} #{quote.number}
             </Link>
-            </div>
+          </div>
           ))}
-          
 
-          {project?.expenses?.map((expense: Expense) => (
-            <div>
+          {project?.expenses?.map((expense: Expense, index: number) => (
+          <div key={index}>
             <Link to={route('/expenses/:id/edit', { id: expense.id })}>
               {t('expense')} #{expense.number}
             </Link>
-            </div>
+          </div>
           ))}
 
           </>
