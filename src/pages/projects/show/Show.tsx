@@ -47,6 +47,9 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Expense } from '$app/common/interfaces/expense';
+import { Quote } from '$app/common/interfaces/quote';
 
 dayjs.extend(duration);
 
@@ -71,7 +74,7 @@ export default function Show() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/projects/${id}?include=client,tasks`)
+        endpoint(`/api/v1/projects/${id}?include=client,tasks,invoices,quotes,expenses`)
       ).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
@@ -161,7 +164,34 @@ export default function Show() {
         </InfoCard>
 
         <InfoCard title={t('notes')}>
-          <p>{project.public_notes}</p>
+          <>
+          
+          {project?.invoices?.map((invoice: Invoice) => (
+            <div>
+            <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+              {t('invoice')} #${invoice.number}
+            </Link>
+            </div>
+          ))}
+
+          {project?.quotes?.map((quote: Quote) => (
+            <div>
+            <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+              {t('quote')} #{quote.number}
+            </Link>
+            </div>
+          ))}
+          
+
+          {project?.expenses?.map((expense: Expense) => (
+            <div>
+            <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+              {t('expense')} #{expense.number}
+            </Link>
+            </div>
+          ))}
+
+          </>
         </InfoCard>
 
         <InfoCard title={t('summary')}>
