@@ -112,7 +112,10 @@ export function Preferences() {
           />
         </Element>
 
-        <Element leftSide={t('show_table_footer')}>
+        <Element
+          leftSide={t('show_table_footer')}
+          leftSideHelp={t('show_table_footer_help')}
+        >
           <Toggle
             checked={Boolean(reactSettings?.show_table_footer)}
             onValueChange={(value) =>
