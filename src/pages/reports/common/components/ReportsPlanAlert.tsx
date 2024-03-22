@@ -31,7 +31,7 @@ export function ReportsPlanAlert(props?: CommonProps) {
             <div className="flex items-center justify-between">
               <p className="inline-flex items-center space-x-1">
                 <MdInfoOutline fontSize={18} />
-                <span>{t('paid_plan_reports')}.</span>
+                <span>{t('start_free_trial_message')}.</span>
               </p>
 
               {user?.company_user && (
