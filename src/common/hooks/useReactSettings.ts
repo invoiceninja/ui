@@ -15,6 +15,7 @@ import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
+import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -46,6 +47,8 @@ export interface Preferences {
 
 type ImportTemplates = Record<string, Record<string, Record<number, string>>>;
 
+type ColorTheme = Record<ThemeColorField, string>;
+
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
@@ -57,6 +60,7 @@ export interface ReactSettings {
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
+  color_theme?: ColorTheme;
 }
 
 export type ReactTableColumns =

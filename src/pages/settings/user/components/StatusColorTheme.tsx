@@ -8,10 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { useState } from 'react';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdClose, MdDone } from 'react-icons/md';
+import hexColorRegex from 'hex-color-regex';
 
 type ThemeKey =
   | 'light'
@@ -37,6 +43,53 @@ type ThemeKey =
   | 'superhero'
   | 'united'
   | 'yeti';
+
+export type ThemeColorField =
+  | 'status_color_theme'
+  | 'sidebar_active_background_color'
+  | 'sidebar_active_font_color'
+  | 'sidebar_inactive_background_color'
+  | 'sidebar_inactive_font_color'
+  | 'invoice_header_background_color'
+  | 'invoice_header_font_color'
+  | 'table_alternate_row_background_color';
+
+const DEFAULT_COLORS = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#3f51b5',
+  '#2f7dc3',
+  '#2196f3',
+  '#03a9f4',
+  '#00bcd4',
+  '#009688',
+  '#4caf50',
+  '#8bc34a',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#9e9e9e',
+  '#607d8b',
+  '#616161',
+  '#000000',
+  '#57a6e4',
+  '#324da1',
+  '#4c9a1c',
+  '#cd8900',
+  '#b93700',
+];
+
+const CUSTOM_COLOR_FIELDS: ThemeColorField[] = [
+  'sidebar_active_background_color',
+  'sidebar_active_font_color',
+  'sidebar_inactive_background_color',
+  'sidebar_inactive_font_color',
+  'invoice_header_background_color',
+  'invoice_header_font_color',
+  'table_alternate_row_background_color',
+];
 
 interface Theme {
   palette: string[];
@@ -113,43 +166,198 @@ const COLOR_THEMES: Record<ThemeKey, Theme> = {
   },
 };
 
+export function useIsColorValid() {
+  return (color: string | undefined, fallBackColor: string) => {
+    if (color) {
+      if (hexColorRegex().test(color)) {
+        return color;
+      }
+    }
+
+    return fallBackColor;
+  };
+}
+
 export function StatusColorTheme() {
   const [t] = useTranslation();
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>('light');
 
   return (
-    <Element leftSide={t('status_color_theme')}>
-      <SelectField
-        value={selectedTheme}
-        onValueChange={(value) => setSelectedTheme(value as ThemeKey)}
-        customSelector
-      >
-        {Object.keys(COLOR_THEMES).map((themeKey, index) => (
-          <option key={index} value={themeKey}>
-            <div className="flex w-full space-x-2">
-              <span className="flex w-1/4 capitalize truncate">
-                {t(themeKey)}
-              </span>
+    <>
+      <Element leftSide={t('status_color_theme')}>
+        <SelectField
+          value={selectedTheme}
+          onValueChange={(value) => setSelectedTheme(value as ThemeKey)}
+          customSelector
+        >
+          {Object.keys(COLOR_THEMES).map((themeKey, index) => (
+            <option key={index} value={themeKey}>
+              <div className="flex w-full space-x-2">
+                <span className="flex w-1/4 capitalize truncate">
+                  {t(themeKey)}
+                </span>
 
-              <div className="flex">
-                {COLOR_THEMES[
-                  themeKey as keyof typeof COLOR_THEMES
-                ].palette.map((paletteColor) => (
-                  <div
-                    key={paletteColor}
-                    style={{
-                      backgroundColor: paletteColor,
-                      width: 50,
-                      height: 20,
-                    }}
-                  />
-                ))}
+                <div className="flex">
+                  {COLOR_THEMES[
+                    themeKey as keyof typeof COLOR_THEMES
+                  ].palette.map((paletteColor) => (
+                    <div
+                      key={paletteColor}
+                      style={{
+                        backgroundColor: paletteColor,
+                        width: 50,
+                        height: 20,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          </option>
-        ))}
-      </SelectField>
-    </Element>
+            </option>
+          ))}
+        </SelectField>
+      </Element>
+
+      {CUSTOM_COLOR_FIELDS.map((customField) => (
+        <Element key={customField} leftSide={t(customField)}>
+          <CustomColorField fieldKey={customField} />
+        </Element>
+      ))}
+
+      <div className="flex justify-end px-6 mt-10 space-x-5">
+        <Button behavior="button" type="secondary">
+          {t('export_colors')}
+        </Button>
+
+        <Button behavior="button">{t('import_colors')}</Button>
+      </div>
+    </>
+  );
+}
+
+interface Props {
+  fieldKey: ThemeColorField;
+}
+export function CustomColorField(props: Props) {
+  const { fieldKey } = props;
+
+  const reactSettings = useReactSettings();
+
+  const handleUserChange = useHandleCurrentUserChangeProperty();
+
+  return (
+    <div className="flex space-x-20">
+      <InputField
+        value={reactSettings?.color_theme?.[fieldKey] || ''}
+        onValueChange={(value) =>
+          handleUserChange(
+            `company_user.react_settings.color_theme.${fieldKey}`,
+            value
+          )
+        }
+      />
+
+      <DefaultColorPickerModal fieldKey={fieldKey} />
+    </div>
+  );
+}
+
+interface ModalProps {
+  fieldKey: ThemeColorField;
+}
+
+export function DefaultColorPickerModal(props: ModalProps) {
+  const [t] = useTranslation();
+
+  const { fieldKey } = props;
+
+  const reactSettings = useReactSettings();
+
+  const isColorValid = useIsColorValid();
+  const handleUserChange = useHandleCurrentUserChangeProperty();
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedColor, setSelectedColor] = useState<string>('');
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setSelectedColor(reactSettings?.color_theme?.[fieldKey] || '');
+    }
+  }, [isModalOpen]);
+
+  return (
+    <>
+      <div className="flex items-center space-x-2">
+        <div
+          className="cursor-pointer hover:opacity-75"
+          onClick={() => setIsModalOpen(true)}
+          style={{
+            width: 100,
+            height: 38,
+            backgroundColor: isColorValid(
+              reactSettings?.color_theme?.[fieldKey],
+              '#9e9e9e'
+            ),
+          }}
+        />
+
+        <Icon
+          className="cursor-pointer"
+          element={MdClose}
+          size={26}
+          onClick={() =>
+            handleUserChange(
+              `company_user.react_settings.color_theme.${fieldKey}`,
+              ''
+            )
+          }
+        />
+      </div>
+
+      <Modal
+        title={t(fieldKey)}
+        visible={isModalOpen}
+        size="small"
+        onClose={() => setIsModalOpen(false)}
+      >
+        <div className="flex flex-col space-y-6">
+          <div className="grid grid-cols-6 gap-x-2 gap-y-2">
+            {DEFAULT_COLORS.map((color) => (
+              <div
+                key={color}
+                className="relative cursor-pointer w-full hover:opacity-75"
+                onClick={() => setSelectedColor(color)}
+                style={{ height: 32, backgroundColor: color }}
+              >
+                {selectedColor === color && (
+                  <Icon
+                    className="absolute"
+                    element={MdDone}
+                    color="white"
+                    size={25}
+                    style={{ top: '0.3rem', left: '1.45rem' }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <Button
+            className="self-end"
+            behavior="button"
+            onClick={() => {
+              handleUserChange(
+                `company_user.react_settings.color_theme.${fieldKey}`,
+                selectedColor
+              );
+
+              setIsModalOpen(false);
+            }}
+          >
+            {t('done')}
+          </Button>
+        </div>
+      </Modal>
+    </>
   );
 }
