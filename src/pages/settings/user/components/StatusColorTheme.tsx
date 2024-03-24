@@ -99,7 +99,7 @@ const COLOR_THEMES: Record<ThemeKey, Theme> = {
     palette: ['#58a6e4', '#324ea1', '#4c9a1d', '#cd8900', '#b83700'],
   },
   dark: {
-    palette: ['#298aaa', '#0c45a3', '#0c45a3', '#a87001', '#8b3c40'],
+    palette: ['#298aaa', '#0c45a3', '#407535', '#a87001', '#8b3c40'],
   },
   cerulean: {
     palette: ['#043c73', '#2fa3e7', '#74a739', '#dd5601', '#c71b22'],
