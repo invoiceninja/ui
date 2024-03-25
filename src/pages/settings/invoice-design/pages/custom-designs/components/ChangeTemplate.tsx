@@ -149,7 +149,7 @@ export function ChangeTemplateModal<T = any>({
     >
       <Element leftSide={t('design')} noExternalPadding>
         <ComboboxAsync
-          endpoint={endpoint(`/api/v1/designs?template=true&entity=${entity}`)}
+          endpoint={endpoint(`/api/v1/designs?template=true&entities=${entity}`)}
           inputOptions={{
             value: templateId ?? '',
             label: '',
