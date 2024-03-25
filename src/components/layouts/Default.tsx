@@ -31,10 +31,7 @@ import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
@@ -363,7 +360,6 @@ export function Default(props: Props) {
     },
   ];
 
-  const { isOwner } = useAdmin();
   const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
   const colors = useColorScheme();
@@ -430,9 +426,7 @@ export function Default(props: Props) {
                   }
                 >
                   <span>
-                    {isSelfHosted() && isOwner
-                      ? t('white_label_button')
-                      : t('unlock_pro')}
+                    {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>
               )}
