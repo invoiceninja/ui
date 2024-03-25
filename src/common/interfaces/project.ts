@@ -9,6 +9,9 @@
  */
 
 import { Client } from './client';
+import { Expense } from './expense';
+import { Invoice } from './invoice';
+import { Quote } from './quote';
 import { Task } from './task';
 
 export interface Project {
@@ -35,5 +38,8 @@ export interface Project {
   documents: any[];
   client?: Client;
   tasks?: Task[];
+  invoices?: Invoice[];
+  expenses?: Expense[];
+  quotes?: Quote[];
   current_hours: number;
 }
