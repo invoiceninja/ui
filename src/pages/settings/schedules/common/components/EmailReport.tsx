@@ -66,6 +66,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'document_email_attachment',
     'report_keys',
     'include_deleted',
+    'client',
   ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -74,6 +75,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
@@ -94,6 +96,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   quote: [
     ...DEFAULT_REPORT_FIELDS,
@@ -101,6 +104,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   quote_item: [
     ...DEFAULT_REPORT_FIELDS,
@@ -115,6 +119,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'include_deleted',
     'status',
+    'client',
   ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   payment: [
@@ -122,6 +127,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'document_email_attachment',
     'report_keys',
     'status',
+    'client',
   ],
   expense: [
     ...DEFAULT_REPORT_FIELDS,
@@ -133,6 +139,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   task: [
     ...DEFAULT_REPORT_FIELDS,
@@ -140,6 +147,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
   vendor: [
