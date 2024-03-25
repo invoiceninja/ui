@@ -24,7 +24,7 @@ export function InfoCard(props: Props) {
 
   return (
     <div
-      className={`border px-4 py-5 shadow rounded overflow-hidden sm:p-6 space-y-2 ${props.className}`}
+      className={`border px-4 py-5 shadow rounded overflow-auto sm:p-6 space-y-2 ${props.className}`}
       style={{
         backgroundColor: colors.$1,
         borderColor: colors.$5,
