@@ -74,7 +74,9 @@ export default function Show() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/projects/${id}?include=client,tasks,invoices,quotes,expenses`)
+        endpoint(
+          `/api/v1/projects/${id}?include=client,tasks,invoices,quotes,expenses`
+        )
       ).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
@@ -163,33 +165,34 @@ export default function Show() {
           </p>
         </InfoCard>
 
-        <InfoCard title={t('notes')}>
-          <>
-          {project?.invoices?.map((invoice: Invoice, index: number) => (
-          <div key={index}>
-            <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-              {t('invoice')} #{invoice.number}
-            </Link>
-          </div>
-          ))}
+        <InfoCard title={t('notes')} className="h-56">
+          <p>{project.public_notes}</p>
 
-          {project?.quotes?.map((quote: Quote, index: number) => (
-          <div key={index}>
-            <Link to={route('/quotes/:id/edit', { id: quote.id })}>
-              {t('quote')} #{quote.number}
-            </Link>
-          </div>
-          ))}
+          <div className="mt-3">
+            {project?.invoices?.map((invoice: Invoice, index: number) => (
+              <div key={index}>
+                <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+                  {t('invoice')} #{invoice.number}
+                </Link>
+              </div>
+            ))}
 
-          {project?.expenses?.map((expense: Expense, index: number) => (
-          <div key={index}>
-            <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-              {t('expense')} #{expense.number}
-            </Link>
-          </div>
-          ))}
+            {project?.quotes?.map((quote: Quote, index: number) => (
+              <div key={index}>
+                <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+                  {t('quote')} #{quote.number}
+                </Link>
+              </div>
+            ))}
 
-          </>
+            {project?.expenses?.map((expense: Expense, index: number) => (
+              <div key={index}>
+                <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+                  {t('expense')} #{expense.number}
+                </Link>
+              </div>
+            ))}
+          </div>
         </InfoCard>
 
         <InfoCard title={t('summary')}>
