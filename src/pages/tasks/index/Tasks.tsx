@@ -91,7 +91,7 @@ export default function Tasks() {
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client,project&without_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"

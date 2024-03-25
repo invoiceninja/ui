@@ -71,6 +71,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { User } from '$app/common/interfaces/user';
 import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export const defaultColumns: string[] = [
@@ -114,6 +115,8 @@ export function useAllTaskColumns() {
     'is_running',
     'rate',
     'updated_at',
+    'user',
+    'assigned_user',
   ] as const;
 
   return taskColumns;
@@ -135,6 +138,16 @@ export function useTaskColumns() {
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
+
+  const formatUserName = (user: User) => {
+    const firstName = user?.first_name ?? '';
+    const lastName = user?.last_name ?? '';
+
+    if (firstName.length === 0 && lastName.length === 0)
+      return user?.email ?? 'Unknown User';
+
+    return `${firstName} ${lastName}`;
+  };
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -330,6 +343,19 @@ export function useTaskColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, task) => formatUserName(task?.user),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, task) =>
+        task?.assigned_user ? formatUserName(task?.assigned_user) : '',
     },
   ];
 
