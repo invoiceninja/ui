@@ -18,6 +18,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose, MdDone } from 'react-icons/md';
 import hexColorRegex from 'hex-color-regex';
+import { toast } from '$app/common/helpers/toast/toast';
+import { cloneDeep } from 'lodash';
+import { useDispatch } from 'react-redux';
+import { updateChanges } from '$app/common/stores/slices/user';
 
 type ThemeKey =
   | 'light'
@@ -178,17 +182,76 @@ export function useIsColorValid() {
   };
 }
 
+export function useThemeColorByIndex() {
+  const reactSettings = useReactSettings();
+
+  return (colorIndex: number) => {
+    let color;
+
+    CUSTOM_COLOR_FIELDS.forEach((fieldKey, index) => {
+      if (index === colorIndex) {
+        color = reactSettings?.color_theme?.[fieldKey];
+      }
+    });
+
+    return color || '';
+  };
+}
+
 export function StatusColorTheme() {
   const [t] = useTranslation();
 
-  const [selectedTheme, setSelectedTheme] = useState<ThemeKey>('light');
+  const reactSettings = useReactSettings();
+
+  const dispatch = useDispatch();
+  const handleUserChange = useHandleCurrentUserChangeProperty();
+
+  const handleExportColors = () => {
+    let value = '';
+
+    CUSTOM_COLOR_FIELDS.forEach((fieldKey) => {
+      if (!value && reactSettings?.color_theme?.[fieldKey]) {
+        value = reactSettings.color_theme[fieldKey];
+      }
+
+      if (value && reactSettings?.color_theme?.[fieldKey]) {
+        value += ',' + reactSettings.color_theme[fieldKey];
+      }
+    });
+
+    navigator.clipboard
+      .writeText(value)
+      .then(() => toast.success('copied_to_clipboard', { value: '' }));
+  };
+
+  const handleClearAll = () => {
+    const updatedColorTheme = cloneDeep(reactSettings?.color_theme);
+
+    if (updatedColorTheme) {
+      CUSTOM_COLOR_FIELDS.forEach((fieldKey) => {
+        updatedColorTheme[fieldKey] = '';
+      });
+
+      dispatch(
+        updateChanges({
+          property: 'company_user.react_settings.color_theme',
+          value: updatedColorTheme,
+        })
+      );
+    }
+  };
 
   return (
     <>
       <Element leftSide={t('status_color_theme')}>
         <SelectField
-          value={selectedTheme}
-          onValueChange={(value) => setSelectedTheme(value as ThemeKey)}
+          value={reactSettings?.color_theme?.status_color_theme || 'light'}
+          onValueChange={(value) =>
+            handleUserChange(
+              'company_user.react_settings.color_theme.status_color_theme',
+              value
+            )
+          }
           customSelector
         >
           {Object.keys(COLOR_THEMES).map((themeKey, index) => (
@@ -224,12 +287,14 @@ export function StatusColorTheme() {
         </Element>
       ))}
 
-      <div className="flex justify-end px-6 mt-10 space-x-5">
-        <Button behavior="button" type="secondary">
-          {t('export_colors')}
+      <div className="flex justify-end px-6 mt-10 space-x-4">
+        <Button behavior="button" type="secondary" onClick={handleClearAll}>
+          {t('clear_all')}
         </Button>
 
-        <Button behavior="button">{t('import_colors')}</Button>
+        <Button behavior="button" onClick={handleExportColors}>
+          {t('export_colors')}
+        </Button>
       </div>
     </>
   );

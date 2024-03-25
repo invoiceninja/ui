@@ -57,6 +57,7 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { useThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface DateRangeColumn {
   column: string;
@@ -144,6 +145,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
   const options = useDataTableOptions();
+
+  const themeColorByIndex = useThemeColorByIndex();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -615,6 +618,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
+                backgroundColor={index % 2 === 0 ? themeColorByIndex(6) : ''}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
