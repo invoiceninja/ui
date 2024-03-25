@@ -50,6 +50,10 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Expense } from '$app/common/interfaces/expense';
 import { Quote } from '$app/common/interfaces/quote';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 dayjs.extend(duration);
 
@@ -95,6 +99,12 @@ export default function Show() {
 
   const showEditOption = useShowEditOption();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   if (!project) {
     return (
@@ -233,6 +243,15 @@ export default function Show() {
           />
         </div>
       )}
+
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
+      />
     </Default>
   );
 }
