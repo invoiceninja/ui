@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { emitter } from '$app';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -84,6 +85,8 @@ export function ChangeTemplateModal<T = any>({
     }).then((response) => {
       const hash = response.data.message as string;
 
+      emitter.emit('bulk.completed');
+
       if (sendEmail) {
         setVisible(false);
         toast.success();
@@ -112,6 +115,8 @@ export function ChangeTemplateModal<T = any>({
           setPdfUrl(fileUrl);
 
           toast.success();
+
+          emitter.emit('bulk.completed');
         })
         .finally(() => {
           if (submitBtn.current) {
