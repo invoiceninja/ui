@@ -182,6 +182,22 @@ export function useIsColorValid() {
   };
 }
 
+export function useStatusThemeColorByIndex() {
+  const reactSettings = useReactSettings();
+
+  return (colorIndex: number) => {
+    let color;
+
+    if (reactSettings?.color_theme?.status_color_theme) {
+      color =
+        COLOR_THEMES[reactSettings.color_theme.status_color_theme as ThemeKey]
+          .palette[colorIndex];
+    }
+
+    return color || '';
+  };
+}
+
 export function useThemeColorByIndex() {
   const reactSettings = useReactSettings();
 
