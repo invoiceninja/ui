@@ -71,6 +71,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -365,6 +366,8 @@ export function usePurchaseOrderColumns() {
 export function usePurchaseOrderFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -382,19 +385,19 @@ export function usePurchaseOrderFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColorByIndex(0) || '#93C5FD',
     },
     {
       label: t('accepted'),
       value: 'accepted',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColorByIndex(1) || '#1D4ED8',
     },
     {
       label: t('cancelled'),
       value: 'cancelled',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColorByIndex(4) || '#e6b05c',
     },
   ];
 

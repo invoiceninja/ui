@@ -12,6 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusEnum } from '$app/common/enums/recurring-invoice-status';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: RecurringInvoice;
@@ -19,6 +20,8 @@ interface Props {
 
 export function RecurringInvoiceStatus(props: Props) {
   const [t] = useTranslation();
+
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
 
   const {
     status_id,
@@ -41,11 +44,25 @@ export function RecurringInvoiceStatus(props: Props) {
   if (isArchived) return <Badge variant="orange">{t('archived')}</Badge>;
 
   if (!isDraft && remainingCycles === 0) {
-    return <Badge variant="light-blue">{t('completed')}</Badge>;
+    return (
+      <Badge
+        variant="light-blue"
+        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+      >
+        {t('completed')}
+      </Badge>
+    );
   }
 
   if (isPending) {
-    return <Badge variant="dark-blue">{t('pending')}</Badge>;
+    return (
+      <Badge
+        variant="dark-blue"
+        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+      >
+        {t('pending')}
+      </Badge>
+    );
   }
 
   if (isDraft) {
@@ -53,11 +70,25 @@ export function RecurringInvoiceStatus(props: Props) {
   }
 
   if (status_id === RecurringInvoiceStatusEnum.ACTIVE) {
-    return <Badge variant="green">{t('active')}</Badge>;
+    return (
+      <Badge
+        variant="green"
+        style={{ backgroundColor: statusThemeColorByIndex(2) }}
+      >
+        {t('active')}
+      </Badge>
+    );
   }
 
   if (status_id === RecurringInvoiceStatusEnum.PAUSED) {
-    return <Badge variant="orange">{t('paused')}</Badge>;
+    return (
+      <Badge
+        variant="orange"
+        style={{ backgroundColor: statusThemeColorByIndex(3) }}
+      >
+        {t('paused')}
+      </Badge>
+    );
   }
 
   return <></>;

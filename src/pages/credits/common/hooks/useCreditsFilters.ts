@@ -9,10 +9,13 @@
  */
 
 import { SelectOption } from '$app/components/datatables/Actions';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 export function useCreditsFilters() {
   const [t] = useTranslation();
+
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
 
   const filters: SelectOption[] = [
     {
@@ -31,19 +34,19 @@ export function useCreditsFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColorByIndex(0) || '#93C5FD',
     },
     {
       label: t('partial'),
       value: 'partial',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColorByIndex(1) || '#1D4ED8',
     },
     {
       label: t('applied'),
       value: 'applied',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColorByIndex(2) || '#22C55E',
     },
   ];
 

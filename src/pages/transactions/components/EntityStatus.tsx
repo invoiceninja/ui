@@ -12,6 +12,7 @@ import { transactionStatuses } from '$app/common/constants/transactions';
 import { TransactionStatus } from '$app/common/enums/transactions';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -23,6 +24,8 @@ export function EntityStatus(props: Props) {
 
   const { is_deleted, archived_at, status_id } = props.transaction;
 
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+
   if (is_deleted) {
     return <Badge variant="red">{t('deleted')}</Badge>;
   }
@@ -32,15 +35,36 @@ export function EntityStatus(props: Props) {
   }
 
   if (TransactionStatus.Unmatched === status_id) {
-    return <Badge variant="generic">{t(transactionStatuses[1])}</Badge>;
+    return (
+      <Badge
+        variant="generic"
+        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+      >
+        {t(transactionStatuses[1])}
+      </Badge>
+    );
   }
 
   if (TransactionStatus.Matched === status_id) {
-    return <Badge variant="dark-blue">{t(transactionStatuses[2])}</Badge>;
+    return (
+      <Badge
+        variant="dark-blue"
+        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+      >
+        {t(transactionStatuses[2])}
+      </Badge>
+    );
   }
 
   if (TransactionStatus.Converted === status_id) {
-    return <Badge variant="green">{t(transactionStatuses[3])}</Badge>;
+    return (
+      <Badge
+        variant="green"
+        style={{ backgroundColor: statusThemeColorByIndex(2) }}
+      >
+        {t(transactionStatuses[3])}
+      </Badge>
+    );
   }
 
   return <></>;

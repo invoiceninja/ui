@@ -92,6 +92,7 @@ import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -901,6 +902,8 @@ export function useQuoteColumns() {
 export function useQuoteFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -918,31 +921,31 @@ export function useQuoteFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColorByIndex(0) || '#93C5FD',
     },
     {
       label: t('approved'),
       value: 'approved',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColorByIndex(1) || '#1D4ED8',
     },
     {
       label: t('expired'),
       value: 'expired',
       color: 'white',
-      backgroundColor: '#DC2626',
+      backgroundColor: statusThemeColorByIndex(4) || '#DC2626',
     },
     {
       label: t('upcoming'),
       value: 'upcoming',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColorByIndex(3) || '#e6b05c',
     },
     {
       label: t('converted'),
       value: 'converted',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColorByIndex(2) || '#22C55E',
     },
   ];
 

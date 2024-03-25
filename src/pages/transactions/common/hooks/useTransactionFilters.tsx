@@ -9,10 +9,13 @@
  */
 
 import { SelectOption } from '$app/components/datatables/Actions';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 export function useTransactionFilters() {
   const [t] = useTranslation();
+
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
 
   const filters: SelectOption[] = [
     {
@@ -25,31 +28,31 @@ export function useTransactionFilters() {
       label: t('unmatched'),
       value: 'unmatched',
       color: 'white',
-      backgroundColor: '#6B7280',
+      backgroundColor: statusThemeColorByIndex(0) || '#6B7280',
     },
     {
       label: t('matched'),
       value: 'matched',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColorByIndex(1) || '#1D4ED8',
     },
     {
       label: t('converted'),
       value: 'converted',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColorByIndex(2) || '#22C55E',
     },
     {
       label: t('deposits'),
       value: 'deposits',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColorByIndex(3) || '#e6b05c',
     },
     {
       label: t('withdrawals'),
       value: 'withdrawals',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColorByIndex(4) || '#93C5FD',
     },
   ];
 

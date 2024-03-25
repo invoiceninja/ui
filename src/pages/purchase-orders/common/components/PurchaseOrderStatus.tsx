@@ -12,6 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { PurchaseOrderStatus as PurchaseOrderStatusEnum } from '$app/common/enums/purchase-order-status';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: PurchaseOrder;
@@ -21,6 +22,8 @@ export function PurchaseOrderStatus(props: Props) {
   const [t] = useTranslation();
 
   const { status_id, archived_at, is_deleted, invitations } = props.entity;
+
+  const statusThemeColorByIndex = useStatusThemeColorByIndex();
 
   const checkPurchaseOrderInvitationsViewedDate = () => {
     return invitations.some((invitation) => invitation.viewed_date);
@@ -41,19 +44,47 @@ export function PurchaseOrderStatus(props: Props) {
   }
 
   if (isCancelled) {
-    return <Badge variant="black">{t('cancelled')}</Badge>;
+    return (
+      <Badge
+        variant="black"
+        style={{ backgroundColor: statusThemeColorByIndex(4) }}
+      >
+        {t('cancelled')}
+      </Badge>
+    );
   }
 
   if (status_id === PurchaseOrderStatusEnum.Received) {
-    return <Badge variant="green">{t('received')}</Badge>;
+    return (
+      <Badge
+        variant="green"
+        style={{ backgroundColor: statusThemeColorByIndex(2) }}
+      >
+        {t('received')}
+      </Badge>
+    );
   }
 
   if (isAccepted) {
-    return <Badge variant="dark-blue">{t('accepted')}</Badge>;
+    return (
+      <Badge
+        variant="dark-blue"
+        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+      >
+        {t('accepted')}
+      </Badge>
+    );
   }
 
   if (isSent) {
-    return <Badge variant="light-blue">{t('sent')}</Badge>;
+    return (
+      <Badge
+        variant="light-blue"
+        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+      >
+        {t('sent')}
+      </Badge>
+    );
   }
 
   if (isDraft) {
@@ -61,7 +92,14 @@ export function PurchaseOrderStatus(props: Props) {
   }
 
   if (isViewed && !isCancelled && !isAccepted) {
-    return <Badge variant="yellow">{t('viewed')}</Badge>;
+    return (
+      <Badge
+        variant="yellow"
+        style={{ backgroundColor: statusThemeColorByIndex(3) }}
+      >
+        {t('viewed')}
+      </Badge>
+    );
   }
 
   return <></>;
