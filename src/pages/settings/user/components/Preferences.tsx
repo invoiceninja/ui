@@ -111,6 +111,21 @@ export function Preferences() {
             onChange={(v) => (v ? setColorScheme($1) : setColorScheme($2))}
           />
         </Element>
+
+        <Element
+          leftSide={t('show_table_footer')}
+          leftSideHelp={t('show_table_footer_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings?.show_table_footer)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.show_table_footer',
+                value
+              )
+            }
+          />
+        </Element>
       </Card>
 
       <PreferenceCard
