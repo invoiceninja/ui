@@ -111,3 +111,39 @@ test('archiving user', async ({ page }) => {
     page.getByRole('link', { name: 'Products Example', exact: true })
   ).not.toBeVisible();
 });
+
+test('removing user', async ({ page }) => {
+  await login(page);
+
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Credits Example', exact: true })
+    .click();
+
+  await page.getByLabel('Password').fill('password');
+  await page.getByLabel('Password').press('Enter');
+
+  const moreActionsButton = page
+    .locator('[data-cy="chevronDownButton"]')
+    .first();
+
+  await moreActionsButton.click();
+
+  await page.getByRole('button', { name: 'Remove', exact: true }).click();
+
+  await expect(page.getByText('Successfully removed user')).toBeVisible();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .first()
+    .click();
+
+  await expect(
+    page.getByRole('link', { name: 'Credits Example', exact: true })
+  ).not.toBeVisible();
+});
