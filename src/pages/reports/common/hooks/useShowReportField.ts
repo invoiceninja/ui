@@ -21,22 +21,29 @@ type Field =
   | 'vendors'
   | 'projects'
   | 'categories'
-  | 'include_deleted';
+  | 'include_deleted'
+  | 'client';
 
 const ReportFields: Record<Identifier, Field[]> = {
   client: ['document_email_attachment', 'include_deleted'],
-  invoice: ['document_email_attachment', 'status', 'include_deleted'],
+  invoice: ['document_email_attachment', 'status', 'include_deleted', 'client'],
   invoice_item: [
     'document_email_attachment',
     'product_key',
     'include_deleted',
     'status',
+    'client',
   ],
-  quote: ['document_email_attachment', 'include_deleted', 'status'],
-  quote_item: ['document_email_attachment', 'include_deleted', 'status'],
-  credit: ['document_email_attachment', 'include_deleted', 'status'],
+  quote: ['document_email_attachment', 'include_deleted', 'status', 'client'],
+  quote_item: [
+    'document_email_attachment',
+    'include_deleted',
+    'status',
+    'client',
+  ],
+  credit: ['document_email_attachment', 'include_deleted', 'status', 'client'],
   document: ['document_email_attachment'],
-  payment: ['document_email_attachment', 'status'],
+  payment: ['document_email_attachment', 'status', 'client'],
   expense: [
     'document_email_attachment',
     'clients',
@@ -46,7 +53,7 @@ const ReportFields: Record<Identifier, Field[]> = {
     'include_deleted',
     'status',
   ],
-  task: ['document_email_attachment', 'include_deleted', 'status'],
+  task: ['document_email_attachment', 'include_deleted', 'status', 'client'],
   product: ['document_email_attachment'],
   vendor: ['document_email_attachment'],
   purchase_order: ['document_email_attachment', 'include_deleted', 'status'],
@@ -57,8 +64,8 @@ const ReportFields: Record<Identifier, Field[]> = {
   ],
   activity: [],
   contact: [],
-  recurring_invoice: ['include_deleted', 'status'],
-  product_sales: ['product_key'],
+  recurring_invoice: ['include_deleted', 'status', 'client'],
+  product_sales: ['product_key', 'client'],
   aged_receivable_detailed_report: [],
   aged_receivable_summary_report: [],
   client_balance_report: [],
