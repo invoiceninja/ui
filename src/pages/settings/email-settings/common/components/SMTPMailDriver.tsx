@@ -16,6 +16,7 @@ import { Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -99,6 +100,38 @@ export function SMTPMailDriver() {
           onValueChange={(value) => handleChange('smtp_local_domain', value)}
           disabled={isFormBusy}
         />
+      </Element>
+
+      <Element
+        leftSide={t('bcc_email')}
+        leftSideHelp={t('comma_sparated_list')}
+      >
+        <InputField
+          value={company?.settings.bcc_email || ''}
+          onValueChange={(value) => handleChange('settings.bcc_email', value)}
+        />
+      </Element>
+
+      <Element leftSide={t('send_time')}>
+        <SelectField
+          value={company?.settings.entity_send_time || ''}
+          onValueChange={(value) =>
+            handleChange(
+              'settings.entity_send_time',
+              value.length > 0 ? value : 6
+            )
+          }
+          withBlank
+        >
+          {[...Array(24).keys()].map((number, index) => (
+            <option key={index} value={number + 1}>
+              {dayjs()
+                .startOf('day')
+                .add(number + 1, 'hour')
+                .format('h:ss A')}
+            </option>
+          ))}
+        </SelectField>
       </Element>
 
       <Element leftSide={t('verify_peer')}>
