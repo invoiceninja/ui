@@ -368,12 +368,6 @@ test('Expense report test', async ({ page }) => {
   await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
   await page.locator('[data-cy="includeDeleted"]').check();
 
-  await page.locator('[data-testid="combobox-input-field"]').click();
-
-  await page.waitForTimeout(200);
-
-  await page.locator('[role="listbox"]').getByRole('option').first().click();
-
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'More Actions', exact: true })
@@ -398,9 +392,6 @@ test('Expense report test', async ({ page }) => {
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
-  );
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -423,9 +414,6 @@ test('Expense report test', async ({ page }) => {
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
-  );
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -488,12 +476,6 @@ test('Expense report test with clients, project and categories selectors', async
 
   await page.locator('[data-cy="includeDeleted"]').check();
 
-  await page.locator('[data-testid="combobox-input-field"]').click();
-
-  await page.waitForTimeout(200);
-
-  await page.locator('[role="listbox"]').getByRole('option').first().click();
-
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'More Actions', exact: true })
@@ -524,9 +506,6 @@ test('Expense report test with clients, project and categories selectors', async
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'PendingInvoiced'
   );
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
-  );
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -554,9 +533,6 @@ test('Expense report test with clients, project and categories selectors', async
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'PendingInvoiced'
-  );
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
   );
 
   await expect(

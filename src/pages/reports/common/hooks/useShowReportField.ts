@@ -52,7 +52,6 @@ const ReportFields: Record<Identifier, Field[]> = {
     'categories',
     'include_deleted',
     'status',
-    'client',
   ],
   task: ['document_email_attachment', 'include_deleted', 'status', 'client'],
   product: ['document_email_attachment'],

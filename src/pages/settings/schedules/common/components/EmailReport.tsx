@@ -139,7 +139,6 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
-    'client',
   ],
   task: [
     ...DEFAULT_REPORT_FIELDS,

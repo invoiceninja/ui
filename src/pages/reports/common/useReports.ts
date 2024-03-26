@@ -182,7 +182,6 @@ export function useReports() {
         projects: '',
         include_deleted: false,
         status: '',
-        client_id: '',
       },
       preview: '/api/v1/reports/expenses?output=json',
       supports_previews: true,
