@@ -52,9 +52,9 @@ export function DropdownDateRangePicker(props: Props) {
     }
 
     props.handleDateChange(
-      dayjs(value[0], dateFormat, antdLocale?.locale).format('YYYY-MM-DD') +
+      dayjs(value[0]).format('YYYY-MM-DD') +
         ',' +
-        dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
+        dayjs(value[1]).format('YYYY-MM-DD')
     );
   };
 
