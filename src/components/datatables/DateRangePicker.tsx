@@ -49,12 +49,22 @@ export function DateRangePicker(props: Props) {
   const handleChangeValue = (value: [string, string]) => {
     dayjs.extend(customParseFormat);
 
+    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
+
     const start = value[0]
-      ? dayjs(value[0], dateFormat || undefined).format('YYYY-MM-DD')
+      ? dayjs(
+          value[0],
+          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
+          antdLocale?.locale
+        ).format('YYYY-MM-DD')
       : '';
 
     const end = value[1]
-      ? dayjs(value[1], dateFormat || undefined).format('YYYY-MM-DD')
+      ? dayjs(
+          value[1],
+          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
+          antdLocale?.locale
+        ).format('YYYY-MM-DD')
       : '';
 
     setCurrentDateRange(start || end ? [start, end].join(',') : '');
