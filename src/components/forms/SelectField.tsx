@@ -101,7 +101,7 @@ export function SelectField(props: SelectProps) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className={classNames({ 'space-y-2': Boolean(customSelector) })}>
       {props.label && (
         <InputLabel className="mb-2" for={props.id}>
           {props.label}
