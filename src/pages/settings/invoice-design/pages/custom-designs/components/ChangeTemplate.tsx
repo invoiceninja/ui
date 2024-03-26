@@ -102,9 +102,12 @@ export function ChangeTemplateModal<T = any>({
         .fetchQuery({
           queryKey: ['reports', hash],
           queryFn: () =>
-            request('POST', endpoint(`/api/v1/templates/preview/${hash}`)).then(
-              (response) => response.data
-            ),
+            request(
+              'POST',
+              endpoint(`/api/v1/templates/preview/${hash}`),
+              {},
+              { responseType: 'arraybuffer' }
+            ).then((response) => response.data),
           retry: 10,
           retryDelay: import.meta.env.DEV ? 1000 : 5000,
         })
@@ -149,7 +152,9 @@ export function ChangeTemplateModal<T = any>({
     >
       <Element leftSide={t('design')} noExternalPadding>
         <ComboboxAsync
-          endpoint={endpoint(`/api/v1/designs?template=true&entities=${entity}`)}
+          endpoint={endpoint(
+            `/api/v1/designs?template=true&entities=${entity}`
+          )}
           inputOptions={{
             value: templateId ?? '',
             label: '',
