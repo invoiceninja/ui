@@ -38,6 +38,10 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -59,13 +63,12 @@ export default function RecurringInvoices() {
   ];
 
   const actions = useActions();
-
+  const reactSettings = useReactSettings();
   const filters = useRecurringInvoiceFilters();
-
-  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
-
   const columns = useRecurringInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
+  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
@@ -95,6 +98,7 @@ export default function RecurringInvoices() {
       <DataTable
         resource="recurring_invoice"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
@@ -117,11 +121,28 @@ export default function RecurringInvoices() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={recurringInvoiceColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="recurringInvoice"
-          />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="recurringInvoice"
+                  columns={allFooterColumns}
+                />
+
+                <span>|</span>
+              </>
+            )}
+
+            <DataTableColumnsPicker
+              columns={recurringInvoiceColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="recurringInvoice"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
         hideEditableOptions={!hasPermission('edit_recurring_invoice')}

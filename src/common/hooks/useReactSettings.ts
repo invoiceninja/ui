@@ -60,6 +60,8 @@ export interface ReactSettings {
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
+  table_footer_columns?: Record<ReactTableColumns, string[]>;
+  show_table_footer?: boolean;
   color_theme?: ColorTheme;
 }
 
@@ -77,7 +79,8 @@ export type ReactTableColumns =
   | 'purchaseOrder'
   | 'expense'
   | 'recurringExpense'
-  | 'clientDocument';
+  | 'clientDocument'
+  | 'transaction';
 
 export const preferencesDefaults: Preferences = {
   dashboard_charts: {

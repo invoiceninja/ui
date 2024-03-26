@@ -57,6 +57,8 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { TFooter } from './tables/TFooter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface DateRangeColumn {
@@ -68,6 +70,15 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+}[];
+
+export type FooterColumns<T = any> = {
+  id: string;
+  label: string;
+  format: (
+    field: (string | number)[],
+    resource: T[]
+  ) => ReactNode | string | number;
 }[];
 
 type CustomBulkActionContext<T> = {
@@ -135,6 +146,7 @@ interface Props<T> extends CommonProps {
   withoutStatusFilter?: boolean;
   queryIdentificator?: string;
   disableQuery?: boolean;
+  footerColumns?: FooterColumns;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -145,6 +157,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
   const options = useDataTableOptions();
+
+  const reactSettings = useReactSettings();
 
   const themeColorByIndex = useThemeColorByIndex();
 
@@ -169,6 +183,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     methodType = 'GET',
     queryIdentificator,
     disableQuery,
+    footerColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -372,6 +387,16 @@ export function DataTable<T extends object>(props: Props<T>) {
     columnOfCurrentQueryParameter !== columnId &&
       queryParameterOfCurrentColumn &&
       setDateRangeQueryParameter(queryParameterOfCurrentColumn);
+  };
+
+  const getFooterColumn = (columnId: string) => {
+    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  };
+
+  const getColumnValues = (columnId: string) => {
+    return data?.data.data.map(
+      (resource: T) => resource[columnId as keyof typeof resource]
+    );
   };
 
   useEffect(() => {
@@ -753,6 +778,36 @@ export function DataTable<T extends object>(props: Props<T>) {
               </Tr>
             ))}
         </Tbody>
+
+        {Boolean(footerColumns.length) &&
+          Boolean(data?.data.data.length) &&
+          Boolean(reactSettings.show_table_footer) && (
+            <TFooter>
+              {!props.withoutActions && !hideEditableOptions && <Th></Th>}
+
+              {props.columns.map(
+                (column, index) =>
+                  Boolean(!excludeColumns.includes(column.id)) && (
+                    <Td key={index} customizeTextColor>
+                      {getFooterColumn(column.id) ? (
+                        <div className="flex items-center space-x-3">
+                          {getFooterColumn(column.id)?.format(
+                            getColumnValues(column.id) || [],
+                            data?.data.data || []
+                          ) ?? '-/-'}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </Td>
+                  )
+              )}
+
+              {props.withResourcefulActions && !hideEditableOptions && (
+                <Th></Th>
+              )}
+            </TFooter>
+          )}
       </Table>
 
       {data && !props.withoutPagination && (
