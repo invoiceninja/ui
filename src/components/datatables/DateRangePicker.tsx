@@ -49,9 +49,13 @@ export function DateRangePicker(props: Props) {
   const handleChangeValue = (value: [string, string]) => {
     dayjs.extend(customParseFormat);
 
-    const start = value[0] ? dayjs(value[0]).format('YYYY-MM-DD') : '';
+    const start = value[0]
+      ? dayjs(value[0], dateFormat || undefined).format('YYYY-MM-DD')
+      : '';
 
-    const end = value[1] ? dayjs(value[1]).format('YYYY-MM-DD') : '';
+    const end = value[1]
+      ? dayjs(value[1], dateFormat || undefined).format('YYYY-MM-DD')
+      : '';
 
     setCurrentDateRange(start || end ? [start, end].join(',') : '');
 
