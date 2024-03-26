@@ -645,6 +645,9 @@ test('Product sales report test with filtering products', async ({ page }) => {
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
     'test actions producttest view product'
   );
+  await expect(
+    page.locator('[data-testid="combobox-input-field"]')
+  ).not.toBeEmpty();
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
