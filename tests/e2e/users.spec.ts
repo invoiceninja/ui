@@ -41,3 +41,73 @@ test("Can't see owner of the account in the list of users", async ({
 
   await logout(page);
 });
+
+test('deleting user', async ({ page }) => {
+  await login(page);
+
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .click();
+
+  await page.getByRole('link', { name: 'Quotes Example', exact: true }).click();
+
+  await page.getByLabel('Password').fill('password');
+  await page.getByLabel('Password').press('Enter');
+
+  const moreActionsButton = page
+    .locator('[data-cy="chevronDownButton"]')
+    .first();
+
+  await moreActionsButton.click();
+
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+
+  await expect(page.getByText('Successfully deleted user')).toBeVisible();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .first()
+    .click();
+
+  await expect(
+    page.getByRole('link', { name: 'Quotes Example', exact: true })
+  ).not.toBeVisible();
+});
+
+test('archiving user', async ({ page }) => {
+  await login(page);
+
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Products Example', exact: true })
+    .click();
+
+  await page.getByLabel('Password').fill('password');
+  await page.getByLabel('Password').press('Enter');
+
+  const moreActionsButton = page
+    .locator('[data-cy="chevronDownButton"]')
+    .first();
+
+  await moreActionsButton.click();
+
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+
+  await expect(page.getByText('Successfully deleted user')).toBeVisible();
+
+  await page
+    .getByRole('link', { name: 'User Management', exact: true })
+    .first()
+    .click();
+
+  await expect(
+    page.getByRole('link', { name: 'Products Example', exact: true })
+  ).not.toBeVisible();
+});
