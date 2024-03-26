@@ -112,6 +112,7 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'report_keys',
     'status',
     'include_deleted',
+    'client',
   ],
   credit: [
     ...DEFAULT_REPORT_FIELDS,
