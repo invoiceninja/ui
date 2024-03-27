@@ -32,6 +32,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useActions } from '../common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { Steps } from '../common/components/Steps';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment_link');
@@ -54,7 +55,7 @@ export function Edit() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
-  const tabs = [t('overview'), t('settings'), t('webhook')];
+  const tabs = [t('overview'), t('settings'), t('webhook'), t('steps')];
 
   const [products, setProducts] = useState<Product[]>();
   const [subscription, setSubscription] = useState<Subscription>();
@@ -166,6 +167,16 @@ export function Edit() {
         <div>
           {subscription && (
             <Webhook
+              subscription={subscription}
+              handleChange={handleChange}
+              errors={errors}
+            />
+          )}
+        </div>
+
+        <div>
+          {subscription && (
+            <Steps
               subscription={subscription}
               handleChange={handleChange}
               errors={errors}
