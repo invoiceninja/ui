@@ -596,7 +596,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {report.identifier === 'product_sales' && (
+          {showReportField('client') && (
             <Element leftSide={t('client')}>
               <ClientSelector
                 value={report.payload.client_id}
