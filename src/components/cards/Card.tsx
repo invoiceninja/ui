@@ -55,12 +55,13 @@ interface Props {
   childrenClassName?: string;
   withoutHeaderBorder?: boolean;
   topRight?: ReactNode;
+  height?: 'full';
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
-  const { padding = 'regular' } = props;
+  const { padding = 'regular', height } = props;
 
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
@@ -70,7 +71,10 @@ export function Card(props: Props) {
     <div
       className={classNames(
         `border shadow rounded overflow-visible ${props.className}`,
-        { 'overflow-y-auto': props.withScrollableBody }
+        {
+          'overflow-y-auto': props.withScrollableBody,
+          'h-full': height === 'full',
+        }
       )}
       style={{
         ...props.style,
@@ -79,7 +83,10 @@ export function Card(props: Props) {
         borderColor: colors.$4,
       }}
     >
-      <form onSubmit={props.onFormSubmit}>
+      <form
+        onSubmit={props.onFormSubmit}
+        className={classNames({ 'h-full': height === 'full' })}
+      >
         {props.title && (
           <div
             className={classNames({
@@ -134,6 +141,7 @@ export function Card(props: Props) {
             'py-0': props.withoutBodyPadding,
             'py-4': padding === 'regular' && !props.withoutBodyPadding,
             'py-2': padding === 'small' && !props.withoutBodyPadding,
+            'h-full': height === 'full',
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}

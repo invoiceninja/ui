@@ -620,6 +620,9 @@ export const useCustomBulkActions = () => {
     setSelected?.([]);
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
@@ -680,6 +683,17 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

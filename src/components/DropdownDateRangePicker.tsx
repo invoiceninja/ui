@@ -51,10 +51,20 @@ export function DropdownDateRangePicker(props: Props) {
       return;
     }
 
+    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
+
     props.handleDateChange(
-      dayjs(value[0], dateFormat, antdLocale?.locale).format('YYYY-MM-DD') +
+      dayjs(
+        value[0],
+        !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
+        antdLocale?.locale
+      ).format('YYYY-MM-DD') +
         ',' +
-        dayjs(value[1], dateFormat, antdLocale?.locale).format('YYYY-MM-DD')
+        dayjs(
+          value[1],
+          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
+          antdLocale?.locale
+        ).format('YYYY-MM-DD')
     );
   };
 

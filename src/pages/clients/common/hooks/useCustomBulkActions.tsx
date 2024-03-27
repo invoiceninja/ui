@@ -14,9 +14,10 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdDownload } from 'react-icons/md';
+import { MdDesignServices, MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -45,6 +46,9 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Client>[] = [
     ({ selectedResources, setSelected }) =>
       shouldShowDownloadDocuments(selectedResources) && (
@@ -59,6 +63,17 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
   ];
 
   return customBulkActions;

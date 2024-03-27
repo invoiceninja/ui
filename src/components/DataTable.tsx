@@ -57,6 +57,7 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
@@ -418,6 +419,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
+
+  useEffect(() => {
+    emitter.on('bulk.completed', () => setSelected([]));
+  }, []);
 
   return (
     <div data-cy="dataTable">
