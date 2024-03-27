@@ -42,10 +42,9 @@ export default function Footer() {
   useDebounce(() => value && handleBlockChange('footer', value), 1000, [value]);
 
   return (
-    <Card title={t('footer')} padding="small">
+    <Card title={t('footer')} padding="small" height="full">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
-        height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.footer}
         options={{
