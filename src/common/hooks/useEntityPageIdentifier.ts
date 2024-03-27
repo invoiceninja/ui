@@ -24,7 +24,8 @@ interface Params {
     | 'purchase_order'
     | 'client'
     | 'vendor'
-    | 'product';
+    | 'product'
+    | 'transaction';
   editPageTabs?: string[];
 }
 
