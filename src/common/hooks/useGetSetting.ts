@@ -21,6 +21,10 @@ export function useGetSetting() {
   return (client: Client | undefined, propertyKey: keyof Settings) => {
     if (groupSettings && client) {
       if (client.settings[propertyKey] !== undefined) {
+        if (import.meta.env.VITE_IS_TEST === 'true') {
+          return `Client: ${client.settings[propertyKey]}`;
+        }
+
         return client.settings[propertyKey];
       }
 
@@ -28,6 +32,10 @@ export function useGetSetting() {
         client.group_settings &&
         client.group_settings.settings[propertyKey] !== undefined
       ) {
+        if (import.meta.env.VITE_IS_TEST === 'true') {
+          return `Group: ${client.group_settings.settings[propertyKey]}`;
+        }
+
         return client.group_settings.settings[propertyKey];
       }
 
@@ -40,8 +48,16 @@ export function useGetSetting() {
           currentGroupSettings &&
           currentGroupSettings.settings[propertyKey] !== undefined
         ) {
+          if (import.meta.env.VITE_IS_TEST === 'true') {
+            return `Group: ${currentGroupSettings.settings[propertyKey]}`;
+          }
+
           return currentGroupSettings.settings[propertyKey];
         }
+      }
+
+      if (import.meta.env.VITE_IS_TEST === 'true') {
+        return `Company: ${company.settings[propertyKey]}`;
       }
 
       return company.settings[propertyKey];
