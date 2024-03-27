@@ -61,10 +61,8 @@ export function Credentials(props: Props) {
           id: props.companyGateway.id,
         })
       )
-        .then((response) => {
-          console.log(response);
-          toast.success('ok');
-        })
+        .then((response) => toast.success(response.data.message))
+        .catch((response) => toast.error(response.response?.data?.message))
         .finally(() => setIsTestingBusy(false));
     }
   };
@@ -110,7 +108,6 @@ export function Credentials(props: Props) {
 
       <div className="flex justify-end pr-6">
         <Button
-          className="self-end"
           behavior="button"
           onClick={handleTestCredentials}
           disableWithoutIcon
