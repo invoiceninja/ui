@@ -115,7 +115,7 @@ export default function CustomDesign() {
 
       <PanelGroup>
         <Panel>
-          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
+          <div className="space-y-4 h-full max-h-[80vh] overflow-y-auto">
             <Outlet
               context={{
                 errors,

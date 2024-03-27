@@ -32,10 +32,9 @@ export default function Body() {
   useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
   return (
-    <Card title={t('body')} padding="small">
+    <Card title={t('body')} padding="small" height="full">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
-        height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.body}
         options={{

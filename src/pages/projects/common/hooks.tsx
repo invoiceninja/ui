@@ -468,6 +468,9 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       hasPermission('create_invoice') && (
@@ -494,6 +497,17 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];
