@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdContactPage,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -32,6 +33,7 @@ import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -82,6 +84,9 @@ export function useCustomBulkActions() {
       ({ status_id }) => status_id === PurchaseOrderStatus.Accepted
     );
   };
+
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
     ({ selectedIds, setSelected }) => (
@@ -176,6 +181,17 @@ export function useCustomBulkActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];
