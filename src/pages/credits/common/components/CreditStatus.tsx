@@ -12,7 +12,7 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { CreditStatus as CreditStatusEnum } from '$app/common/enums/credit-status';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Credit;
@@ -23,7 +23,7 @@ export function CreditStatus(props: Props) {
 
   const { status_id, is_deleted, archived_at, invitations } = props.entity;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const checkCreditInvitationsViewedDate = () => {
     return invitations.some((invitation) => invitation.viewed_date);
@@ -49,7 +49,7 @@ export function CreditStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+        style={{ backgroundColor: statusThemeColors.$1 }}
       >
         {t('sent')}
       </Badge>
@@ -60,7 +60,7 @@ export function CreditStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('partial')}
       </Badge>
@@ -69,10 +69,7 @@ export function CreditStatus(props: Props) {
 
   if (status_id === CreditStatusEnum.Applied) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('applied')}
       </Badge>
     );

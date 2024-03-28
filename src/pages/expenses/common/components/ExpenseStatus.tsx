@@ -12,7 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { Expense } from '$app/common/interfaces/expense';
 import { ResourceItem } from '$app/pages/transactions/components/ListBox';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Expense | ResourceItem;
@@ -31,7 +31,7 @@ export function ExpenseStatus(props: Props) {
     is_deleted,
   } = props.entity;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const isInvoiced = Boolean(invoice_id);
 
@@ -49,7 +49,7 @@ export function ExpenseStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
+        style={{ backgroundColor: statusThemeColors.$3 }}
       >
         {t('invoiced')}
       </Badge>
@@ -61,10 +61,7 @@ export function ExpenseStatus(props: Props) {
 
   if (isPaid) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$1 }}>
         {t('paid')}
       </Badge>
     );

@@ -12,7 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { Payment } from '$app/common/interfaces/payment';
 import { PaymentStatus as PaymentStatusEnum } from '$app/common/enums/payment-status';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Payment;
@@ -23,7 +23,7 @@ export function PaymentStatus(props: Props) {
 
   const { status_id, applied, amount, is_deleted, archived_at } = props.entity;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
@@ -34,7 +34,7 @@ export function PaymentStatus(props: Props) {
       return (
         <Badge
           variant="generic"
-          style={{ backgroundColor: statusThemeColorByIndex(0) }}
+          style={{ backgroundColor: statusThemeColors.$1 }}
         >
           {t('unapplied')}
         </Badge>
@@ -52,7 +52,7 @@ export function PaymentStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(3) }}
+        style={{ backgroundColor: statusThemeColors.$4 }}
       >
         {t('payment_status_2')}
       </Badge>
@@ -61,10 +61,7 @@ export function PaymentStatus(props: Props) {
 
   if (status_id === PaymentStatusEnum.Failed) {
     return (
-      <Badge
-        variant="red"
-        style={{ backgroundColor: statusThemeColorByIndex(4) }}
-      >
+      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('payment_status_3')}
       </Badge>
     );
@@ -72,10 +69,7 @@ export function PaymentStatus(props: Props) {
 
   if (status_id === PaymentStatusEnum.Completed) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('payment_status_4')}
       </Badge>
     );
@@ -85,7 +79,7 @@ export function PaymentStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('payment_status_5')}
       </Badge>

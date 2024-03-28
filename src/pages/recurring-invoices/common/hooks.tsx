@@ -72,7 +72,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -725,7 +725,7 @@ export function useRecurringInvoiceColumns() {
 export function useRecurringInvoiceFilters() {
   const [t] = useTranslation();
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const filters: SelectOption[] = [
     {
@@ -738,19 +738,19 @@ export function useRecurringInvoiceFilters() {
       label: t('active'),
       value: 'active',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(2) || '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('paused'),
       value: 'paused',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(3) || '#F97316',
+      backgroundColor: statusThemeColors.$4 || '#F97316',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(0) || '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
   ];
 

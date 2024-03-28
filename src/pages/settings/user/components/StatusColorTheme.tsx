@@ -182,36 +182,45 @@ export function useIsColorValid() {
   };
 }
 
-export function useStatusThemeColorByIndex() {
+export function useStatusThemeColorScheme() {
   const reactSettings = useReactSettings();
 
-  return (colorIndex: number) => {
-    let color;
-
-    if (reactSettings?.color_theme?.status_color_theme) {
-      color =
-        COLOR_THEMES[reactSettings.color_theme.status_color_theme as ThemeKey]
-          .palette[colorIndex];
-    }
-
-    return color || '';
+  const colors = {
+    $1: '',
+    $2: '',
+    $3: '',
+    $4: '',
+    $5: '',
   };
+
+  COLOR_THEMES[
+    reactSettings?.color_theme?.status_color_theme as ThemeKey
+  ].palette.forEach((value, index) => {
+    colors[`$${index + 1}` as keyof typeof colors] = value;
+  });
+
+  return colors;
 }
 
-export function useThemeColorByIndex() {
+export function useThemeColorScheme() {
   const reactSettings = useReactSettings();
 
-  return (colorIndex: number) => {
-    let color;
-
-    CUSTOM_COLOR_FIELDS.forEach((fieldKey, index) => {
-      if (index === colorIndex) {
-        color = reactSettings?.color_theme?.[fieldKey];
-      }
-    });
-
-    return color || '';
+  const colors = {
+    $1: '',
+    $2: '',
+    $3: '',
+    $4: '',
+    $5: '',
+    $6: '',
+    $7: '',
   };
+
+  CUSTOM_COLOR_FIELDS.forEach((fieldKey, index) => {
+    colors[`$${index + 1}` as keyof typeof colors] =
+      reactSettings?.color_theme?.[fieldKey] || '';
+  });
+
+  return colors;
 }
 
 export function StatusColorTheme() {

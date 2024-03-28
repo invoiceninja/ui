@@ -9,13 +9,13 @@
  */
 
 import { SelectOption } from '$app/components/datatables/Actions';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 export function usePaymentFilters() {
   const [t] = useTranslation();
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const filters: SelectOption[] = [
     {
@@ -34,25 +34,25 @@ export function usePaymentFilters() {
       label: t('cancelled'),
       value: 'cancelled',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(3) || '#93C5FD',
+      backgroundColor: statusThemeColors.$4 || '#93C5FD',
     },
     {
       label: t('failed'),
       value: 'failed',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(4) || '#DC2626',
+      backgroundColor: statusThemeColors.$5 || '#DC2626',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(2) || '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('partially_refunded'),
       value: 'partially_refunded',
       color: 'white',
-      backgroundColor: statusThemeColorByIndex(1) || '#1D4ED8',
+      backgroundColor: statusThemeColors.$2 || '#1D4ED8',
     },
     {
       label: t('refunded'),

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import dayjs from 'dayjs';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Invoice;
@@ -25,7 +25,7 @@ export function InvoiceStatus(props: Props) {
   const { status_id, due_date, partial_due_date, partial, balance } =
     props.entity;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const checkInvoiceInvitationsViewedDate = () => {
     return props.entity.invitations.some(
@@ -67,10 +67,7 @@ export function InvoiceStatus(props: Props) {
 
   if (isPastDue() && !isCancelledOrReversed) {
     return (
-      <Badge
-        variant="yellow"
-        style={{ backgroundColor: statusThemeColorByIndex(4) }}
-      >
+      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('past_due')}
       </Badge>
     );
@@ -78,10 +75,7 @@ export function InvoiceStatus(props: Props) {
 
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {
     return (
-      <Badge
-        variant="yellow"
-        style={{ backgroundColor: statusThemeColorByIndex(3) }}
-      >
+      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$4 }}>
         {t('viewed')}
       </Badge>
     );
@@ -95,7 +89,7 @@ export function InvoiceStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+        style={{ backgroundColor: statusThemeColors.$1 }}
       >
         {t('sent')}
       </Badge>
@@ -106,7 +100,7 @@ export function InvoiceStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('partial')}
       </Badge>
@@ -115,10 +109,7 @@ export function InvoiceStatus(props: Props) {
 
   if (status_id === InvoiceStatusEnum.Paid) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('paid')}
       </Badge>
     );

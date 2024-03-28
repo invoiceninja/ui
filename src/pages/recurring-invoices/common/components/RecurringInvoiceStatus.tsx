@@ -12,7 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusEnum } from '$app/common/enums/recurring-invoice-status';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: RecurringInvoice;
@@ -21,7 +21,7 @@ interface Props {
 export function RecurringInvoiceStatus(props: Props) {
   const [t] = useTranslation();
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const {
     status_id,
@@ -47,7 +47,7 @@ export function RecurringInvoiceStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+        style={{ backgroundColor: statusThemeColors.$1 }}
       >
         {t('completed')}
       </Badge>
@@ -58,7 +58,7 @@ export function RecurringInvoiceStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('pending')}
       </Badge>
@@ -71,10 +71,7 @@ export function RecurringInvoiceStatus(props: Props) {
 
   if (status_id === RecurringInvoiceStatusEnum.ACTIVE) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('active')}
       </Badge>
     );
@@ -82,10 +79,7 @@ export function RecurringInvoiceStatus(props: Props) {
 
   if (status_id === RecurringInvoiceStatusEnum.PAUSED) {
     return (
-      <Badge
-        variant="orange"
-        style={{ backgroundColor: statusThemeColorByIndex(3) }}
-      >
+      <Badge variant="orange" style={{ backgroundColor: statusThemeColors.$4 }}>
         {t('paused')}
       </Badge>
     );

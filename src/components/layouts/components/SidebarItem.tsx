@@ -13,7 +13,7 @@ import { NavigationItem } from './DesktopSidebar';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import classNames from 'classnames';
 
 const Div = styled.div`
@@ -33,7 +33,7 @@ export function SidebarItem(props: Props) {
 
   const user = useInjectUserChanges();
 
-  const themeColorByIndex = useThemeColorByIndex();
+  const themeColors = useThemeColorScheme();
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
@@ -47,9 +47,9 @@ export function SidebarItem(props: Props) {
     <Div
       theme={{
         color: item.current
-          ? themeColorByIndex(0) || colors.$8
-          : themeColorByIndex(2) || 'transparent',
-        hoverColor: themeColorByIndex(0) || colors.$8,
+          ? themeColors.$1 || colors.$8
+          : themeColors.$3 || 'transparent',
+        hoverColor: themeColors.$1 || colors.$8,
       }}
       key={item.name}
       className={classNames(
@@ -64,7 +64,7 @@ export function SidebarItem(props: Props) {
         <div
           className="flex justify-start items-center my-2"
           style={{
-            color: item.current ? themeColorByIndex(1) : themeColorByIndex(3),
+            color: item.current ? themeColors.$2 : themeColors.$4,
           }}
         >
           <item.icon
@@ -74,7 +74,7 @@ export function SidebarItem(props: Props) {
             })}
             aria-hidden="true"
             style={{
-              color: item.current ? themeColorByIndex(1) : themeColorByIndex(3),
+              color: item.current ? themeColors.$2 : themeColors.$4,
             }}
           />
           {!isMiniSidebar && item.name}
@@ -90,7 +90,7 @@ export function SidebarItem(props: Props) {
           <item.rightButton.icon
             className="h-5 w-5"
             style={{
-              color: item.current ? themeColorByIndex(1) : themeColorByIndex(3),
+              color: item.current ? themeColors.$2 : themeColors.$4,
             }}
           />
         </Link>

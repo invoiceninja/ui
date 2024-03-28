@@ -12,7 +12,7 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { RecurringExpenseStatus as RecurringExpenseStatusEnum } from '$app/common/enums/recurring-expense-status';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   recurringExpense: RecurringExpense;
@@ -23,7 +23,7 @@ export function RecurringExpenseStatus(props: Props) {
 
   const { recurringExpense } = props;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { is_deleted, archived_at, status_id } = recurringExpense;
 
@@ -41,10 +41,7 @@ export function RecurringExpenseStatus(props: Props) {
 
   if (RecurringExpenseStatusEnum.Active === status_id) {
     return (
-      <Badge
-        variant="blue"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="blue" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('active')}
       </Badge>
     );
@@ -58,7 +55,7 @@ export function RecurringExpenseStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('pending')}
       </Badge>
@@ -67,10 +64,7 @@ export function RecurringExpenseStatus(props: Props) {
 
   if (RecurringExpenseStatusEnum.Completed === status_id) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$1 }}>
         {t('completed')}
       </Badge>
     );

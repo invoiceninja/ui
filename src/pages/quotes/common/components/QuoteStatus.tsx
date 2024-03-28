@@ -12,7 +12,7 @@ import { Quote } from '$app/common/interfaces/quote';
 import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { QuoteStatus as QuoteStatusEnum } from '$app/common/enums/quote-status';
-import { useStatusThemeColorByIndex } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Quote;
@@ -24,7 +24,7 @@ export function QuoteStatus(props: Props) {
   const { status_id, is_deleted, archived_at, invoice_id, invitations } =
     props.entity;
 
-  const statusThemeColorByIndex = useStatusThemeColorByIndex();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const checkQuoteInvitationsViewedDate = () => {
     return invitations?.some((invitation) => invitation.viewed_date);
@@ -44,10 +44,7 @@ export function QuoteStatus(props: Props) {
 
   if (invoice_id) {
     return (
-      <Badge
-        variant="green"
-        style={{ backgroundColor: statusThemeColorByIndex(2) }}
-      >
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
         {t('converted')}
       </Badge>
     );
@@ -55,10 +52,7 @@ export function QuoteStatus(props: Props) {
 
   if (statusExpired) {
     return (
-      <Badge
-        variant="red"
-        style={{ backgroundColor: statusThemeColorByIndex(4) }}
-      >
+      <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('expired')}
       </Badge>
     );
@@ -76,7 +70,7 @@ export function QuoteStatus(props: Props) {
     return (
       <Badge
         variant="light-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(0) }}
+        style={{ backgroundColor: statusThemeColors.$1 }}
       >
         {t('sent')}
       </Badge>
@@ -87,7 +81,7 @@ export function QuoteStatus(props: Props) {
     return (
       <Badge
         variant="dark-blue"
-        style={{ backgroundColor: statusThemeColorByIndex(1) }}
+        style={{ backgroundColor: statusThemeColors.$2 }}
       >
         {t('approved')}
       </Badge>
