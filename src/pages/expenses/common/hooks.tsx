@@ -53,6 +53,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -538,6 +539,8 @@ export function useHandleChange(params: HandleChangeExpenseParams) {
 export function useExpenseFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -561,19 +564,19 @@ export function useExpenseFilters() {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$3 || '#1D4ED8',
     },
     {
       label: t('paid'),
       value: 'paid',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$1 || '#22C55E',
     },
     {
       label: t('unpaid'),
       value: 'unpaid',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColors.$4 || '#e6b05c',
     },
   ];
 

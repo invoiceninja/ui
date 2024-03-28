@@ -23,6 +23,7 @@ interface Props extends CommonProps {
   onColumnClick?: any;
   isCurrentlyUsed?: boolean;
   childrenClassName?: string;
+  textColor?: string;
 }
 
 const defaultProps: Props = {
@@ -52,7 +53,7 @@ export function Th(props: Props) {
   return (
     <th
       style={{
-        color: colors.$9,
+        color: props.textColor || colors.$9,
         borderColor: colors.$4,
       }}
       onClick={handleClick}

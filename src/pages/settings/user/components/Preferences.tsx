@@ -25,6 +25,7 @@ import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { $1, $2, colorSchemeAtom } from '$app/common/colors';
 import { useAtom } from 'jotai';
+import { StatusColorTheme } from './StatusColorTheme';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -126,6 +127,8 @@ export function Preferences() {
             }
           />
         </Element>
+
+        <StatusColorTheme />
       </Card>
 
       <PreferenceCard
