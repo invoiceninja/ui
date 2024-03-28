@@ -15,6 +15,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import {
   MdCancel,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -35,6 +36,7 @@ import { useReverseInvoice } from './useReverseInvoice';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -123,6 +125,9 @@ export const useCustomBulkActions = () => {
     documentsBulk(invoiceIds, 'download');
     setSelected?.([]);
   };
+
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Invoice>[] = [
     ({ selectedResources, setSelected }) => (
@@ -240,6 +245,17 @@ export const useCustomBulkActions = () => {
           {t('cancel_invoice')}
         </DropdownElement>
       ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
   ];
 
   return customBulkActions;

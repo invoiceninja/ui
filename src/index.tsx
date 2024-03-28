@@ -23,6 +23,8 @@ import { createRoot } from 'react-dom/client';
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
 import { GoogleOAuth } from './components/GoogleOAuth';
+import mitt from 'mitt';
+import { Events } from './common/events';
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
@@ -71,3 +73,5 @@ createRoot(container).render(
     </QueryClientProvider>
   </React.StrictMode>
 );
+
+export const emitter = mitt<Events>();

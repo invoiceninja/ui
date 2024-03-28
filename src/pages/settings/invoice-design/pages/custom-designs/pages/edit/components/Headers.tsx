@@ -32,10 +32,9 @@ export default function Header() {
   const colors = useColorScheme();
 
   return (
-    <Card title={t('header')} padding="small">
+    <Card title={t('header')} padding="small" height="full">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
-        height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.header}
         options={{

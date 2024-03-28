@@ -139,7 +139,6 @@ export function useTaskColumns() {
   type TaskColumns = (typeof taskColumns)[number];
 
   const formatUserName = (user: User) => {
-
     const firstName = user?.first_name ?? '';
     const lastName = user?.last_name ?? '';
 
@@ -147,8 +146,7 @@ export function useTaskColumns() {
       return user?.email ?? 'Unknown User';
 
     return `${firstName} ${lastName}`;
-
-  }
+  };
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -355,7 +353,8 @@ export function useTaskColumns() {
       column: 'assigned_user',
       id: 'assigned_user_id',
       label: t('assigned_user'),
-      format: (value, task) => task?.assigned_user ? formatUserName(task?.assigned_user) : '',
+      format: (value, task) =>
+        task?.assigned_user ? formatUserName(task?.assigned_user) : '',
     },
   ];
 
@@ -619,6 +618,9 @@ export const useCustomBulkActions = () => {
     setSelected?.([]);
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
@@ -657,8 +659,8 @@ export const useCustomBulkActions = () => {
       ),
     ({ selectedResources, setSelected }) =>
       selectedResources &&
-        showInvoiceTaskAction(selectedResources) &&
-        hasPermission('create_invoice') ? (
+      showInvoiceTaskAction(selectedResources) &&
+      hasPermission('create_invoice') ? (
         <DropdownElement
           onClick={() => {
             invoiceTask(selectedResources);
@@ -679,6 +681,17 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

@@ -220,6 +220,7 @@ export function Settings() {
               )
             }
             disabled={disableSettingsField('military_time')}
+            cypressRef="militaryTimeToggle"
           />
         </Element>
 

@@ -44,9 +44,8 @@ export default function Includes() {
   ]);
 
   return (
-    <Card title={t('includes')} padding="small">
+    <Card title={t('includes')} padding="small" height="full">
       <Editor
-        height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.includes}
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}

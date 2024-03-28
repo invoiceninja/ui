@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdContactPage,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdMarkEmailRead,
@@ -34,6 +35,7 @@ import { route } from '$app/common/helpers/route';
 import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -85,6 +87,9 @@ export function useCustomBulkActions() {
     documentsBulk(quoteIds, 'download');
     setSelected?.([]);
   };
+
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Quote>[] = [
     ({ selectedIds, selectedResources, setSelected }) => (
@@ -198,6 +203,17 @@ export function useCustomBulkActions() {
           setSelected={setSelected}
         />
       ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
   ];
 
   return customBulkActions;
