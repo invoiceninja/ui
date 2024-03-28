@@ -41,7 +41,7 @@ export function Edit() {
 
   const { data } = useCompanyGatewayQuery({ id });
 
-  const { documentTitle } = useTitle('edit_payment_gateway');
+  const { documentTitle } = useTitle('edit_gateway');
 
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -60,7 +60,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
-      name: t('edit_payment_gateway'),
+      name: t('edit_gateway'),
       href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
@@ -121,7 +121,7 @@ export function Edit() {
         <div>
           {companyGateway && (
             <div className="space-y-4">
-              <Card title={t('edit_payment_gateway')}>
+              <Card title={t('edit_gateway')}>
                 <Element leftSide={t('payment_provider')}>
                   {companyGateway.label}
                 </Element>
