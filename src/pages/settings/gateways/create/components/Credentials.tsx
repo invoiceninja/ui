@@ -119,7 +119,7 @@ export function Credentials(props: Props) {
             disableWithoutIcon
             disabled={isTestingBusy}
           >
-            {t('test_credentials')}
+            {t('health_check')}
           </Button>
         </div>
       </Card>
