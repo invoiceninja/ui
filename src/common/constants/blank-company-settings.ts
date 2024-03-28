@@ -9,6 +9,8 @@
  */
 
 export const defaultSettings = {
+  industry_id: '',
+  size_id: '',
   lock_invoices: '',
   show_all_tasks_client_portal: '',
   portal_design_id: '',
