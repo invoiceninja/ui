@@ -333,6 +333,28 @@ export function EmailSettings() {
         <Element
           leftSide={
             <PropertyCheckbox
+              propertyKey="e_quote_type"
+              labelElement={<SettingsLabel label={t('e_quote_type')} />}
+              defaultValue="OrderX_Comfort"
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings.e_quote_type || 'OrderX_Comfort'}
+            onValueChange={(value) =>
+              handleChange('settings.e_quote_type', value)
+            }
+            disabled={disableSettingsField('e_quote_type')}
+          >
+            <option value="OrderX_Comfort">OrderX_Comfort</option>
+            <option value="OrderX_Basic">OrderX_Basic</option>
+            <option value="OrderX_Extended">OrderX_Extended</option>
+          </SelectField>
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
               propertyKey="email_sending_method"
               labelElement={<SettingsLabel label={t('email_provider')} />}
               defaultValue="default"

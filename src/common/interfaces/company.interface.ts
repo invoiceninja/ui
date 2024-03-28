@@ -316,6 +316,7 @@ export interface Settings {
   payment_receipt_design_id: string;
   payment_refund_design_id: string;
   enable_rappen_rounding: boolean;
+  e_quote_type: string;
 }
 
 export interface TaxData {

@@ -19,11 +19,18 @@ import { useGenerateEInvoiceUrl } from './useGenerateEInvoiceUrl';
 
 interface Props {
   resource: MailerResourceType;
+  downloadType?:
+    | 'download_e_quote'
+    | 'download_e_credit'
+    | 'download_e_purchase_order';
 }
 
 export function useDownloadEInvoice(props: Props) {
   const queryClient = useQueryClient();
-  const url = useGenerateEInvoiceUrl({ resourceType: props.resource });
+  const url = useGenerateEInvoiceUrl({
+    resourceType: props.resource,
+    downloadType: props.downloadType,
+  });
 
   return (resource: MailerResource) => {
     const downloadableUrl = url(resource);

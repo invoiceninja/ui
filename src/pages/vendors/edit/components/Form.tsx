@@ -167,6 +167,14 @@ export function Form(props: Props) {
             />
           </Element>
 
+          <Element leftSide={t('routing_id')}>
+            <InputField
+              value={vendor.routing_id || ''}
+              onValueChange={(value) => handleChange('routing_id', value)}
+              errorMessage={props.errors?.errors.routing_id}
+            />
+          </Element>
+
           <Element leftSide={t('classification')}>
             <SelectField
               id="classification"

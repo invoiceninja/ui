@@ -16,6 +16,10 @@ import {
 
 interface Props {
   resourceType: MailerResourceType;
+  downloadType?:
+    | 'download_e_quote'
+    | 'download_e_credit'
+    | 'download_e_purchase_order';
 }
 
 export function useGenerateEInvoiceUrl(props: Props) {
@@ -24,11 +28,11 @@ export function useGenerateEInvoiceUrl(props: Props) {
       return;
     }
 
-
     if (resource.invitations.length > 0) {
-      return endpoint('/api/v1/:resource/:invitation/download_e_invoice', {
+      return endpoint('/api/v1/:resource/:invitation/:downloadType', {
         resource: props.resourceType,
         invitation: resource.invitations[0].key,
+        downloadType: props.downloadType || 'download_e_invoice',
       });
     }
   };
