@@ -16,6 +16,8 @@ import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 import { Button } from './Button';
+import { Icon } from '../icons/Icon';
+import { MdDone } from 'react-icons/md';
 
 interface Props {
   value?: string;
@@ -23,11 +25,40 @@ interface Props {
   disabled?: boolean;
 }
 
+const DEFAULT_COLORS = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#3f51b5',
+  '#2f7dc3',
+  '#2196f3',
+  '#03a9f4',
+  '#00bcd4',
+  '#009688',
+  '#4caf50',
+  '#8bc34a',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#9e9e9e',
+  '#607d8b',
+  '#616161',
+  '#000000',
+  '#57a6e4',
+  '#324da1',
+  '#4c9a1c',
+  '#cd8900',
+  '#b93700',
+];
+
 export function ColorPicker(props: Props) {
   const { t } = useTranslation();
 
   const [color, setColor] = useState(props.value || '#000000');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDefaultPaletteModalOpen, setIsDefaultPaletteModalOpen] =
+    useState<boolean>(false);
 
   useDebounce(() => props.onValueChange?.(color), 500, [color]);
 
@@ -53,13 +84,53 @@ export function ColorPicker(props: Props) {
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
         />
 
-        <Button
-          className="w-full"
-          behavior="button"
-          onClick={() => setIsModalOpen(false)}
-        >
-          {t('done')}
-        </Button>
+        <div className="flex">
+          <Button
+            className="w-full"
+            behavior="button"
+            onClick={() => setIsModalOpen(false)}
+          >
+            {t('done')}
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        title={t('default_palette')}
+        visible={isDefaultPaletteModalOpen}
+        size="small"
+        onClose={() => setIsDefaultPaletteModalOpen(false)}
+      >
+        <div className="flex flex-col space-y-6">
+          <div className="grid grid-cols-6 gap-x-2 gap-y-2">
+            {DEFAULT_COLORS.map((defaultColor) => (
+              <div
+                key={defaultColor}
+                className="relative cursor-pointer w-full hover:opacity-75"
+                onClick={() => setColor(defaultColor)}
+                style={{ height: 32, backgroundColor: defaultColor }}
+              >
+                {color === defaultColor && (
+                  <Icon
+                    className="absolute"
+                    element={MdDone}
+                    color="white"
+                    size={25}
+                    style={{ top: '0.3rem', left: '1.45rem' }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <Button
+            className="self-end"
+            behavior="button"
+            onClick={() => setIsDefaultPaletteModalOpen(false)}
+          >
+            {t('done')}
+          </Button>
+        </div>
       </Modal>
 
       <div
