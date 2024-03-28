@@ -24,6 +24,7 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   gateway: Gateway;
@@ -49,6 +50,7 @@ export function Credentials(props: Props) {
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
+  const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
 
   const handleTestCredentials = () => {
     if (!isTestingBusy) {
@@ -61,61 +63,78 @@ export function Credentials(props: Props) {
           id: props.companyGateway.id,
         })
       )
-        .then((response) => toast.success(response.data.message))
-        .catch((response) => toast.error(response.response?.data?.message))
-        .finally(() => setIsTestingBusy(false));
+        .then(() => setIsTestingSuccessful(true))
+        .catch(() => setIsTestingSuccessful(false))
+        .finally(() => {
+          toast.dismiss();
+          setIsTestingBusy(false);
+        });
     }
   };
 
   return (
-    <Card title={t('credentials')}>
-      {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
-        <Element leftSide={t('help')}>
-          <Link external to={props.gateway.site_url}>
-            {t('learn_more')}
-          </Link>
-        </Element>
-      )}
-
-      {props.gateway && props.gateway.key === STRIPE_CONNECT && (
-        <StripeConnect />
-      )}
-
-      {props.gateway && props.gateway.key === WEPAY && <WePay />}
-
-      {props.gateway && props.gateway.key === PAYPAL_PPCP && (
-        <PayPalPPCP
-          gateway={props.gateway}
-          companyGateway={props.companyGateway}
-          setCompanyGateway={props.setCompanyGateway}
-          errors={props.errors}
-        />
-      )}
-
-      {props.gateway &&
-        !hostedGateways.includes(props.gateway.key) &&
-        Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
-          <Element leftSide={formatLabel(field)} key={index}>
-            {resolveInputField(
-              field,
-              JSON.parse(props.gateway.fields)[field],
-              props.errors
-            )}
+    <>
+      <Card title={t('credentials')}>
+        {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
+          <Element leftSide={t('help')}>
+            <Link external to={props.gateway.site_url}>
+              {t('learn_more')}
+            </Link>
           </Element>
-        ))}
+        )}
 
-      <Divider />
+        {props.gateway && props.gateway.key === STRIPE_CONNECT && (
+          <StripeConnect />
+        )}
 
-      <div className="flex justify-end pr-6">
-        <Button
-          behavior="button"
-          onClick={handleTestCredentials}
-          disableWithoutIcon
-          disabled={isTestingBusy}
-        >
-          {t('test_credentials')}
-        </Button>
-      </div>
-    </Card>
+        {props.gateway && props.gateway.key === WEPAY && <WePay />}
+
+        {props.gateway && props.gateway.key === PAYPAL_PPCP && (
+          <PayPalPPCP
+            gateway={props.gateway}
+            companyGateway={props.companyGateway}
+            setCompanyGateway={props.setCompanyGateway}
+            errors={props.errors}
+          />
+        )}
+
+        {props.gateway &&
+          !hostedGateways.includes(props.gateway.key) &&
+          Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
+            <Element leftSide={formatLabel(field)} key={index}>
+              {resolveInputField(
+                field,
+                JSON.parse(props.gateway.fields)[field],
+                props.errors
+              )}
+            </Element>
+          ))}
+
+        <Divider />
+
+        <div className="flex justify-end pr-6">
+          <Button
+            behavior="button"
+            onClick={handleTestCredentials}
+            disableWithoutIcon
+            disabled={isTestingBusy}
+          >
+            {t('test_credentials')}
+          </Button>
+        </div>
+      </Card>
+
+      <Modal
+        title={t('status')}
+        visible={typeof isTestingSuccessful !== 'undefined'}
+        onClose={() => setIsTestingSuccessful(undefined)}
+      >
+        {typeof isTestingSuccessful !== 'undefined' && (
+          <span className="text-center font-medium text-base pb-3">
+            {t(isTestingSuccessful ? 'success' : 'status_failed')}
+          </span>
+        )}
+      </Modal>
+    </>
   );
 }
