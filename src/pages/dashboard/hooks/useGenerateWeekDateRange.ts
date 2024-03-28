@@ -22,6 +22,10 @@ export function useGenerateWeekDateRange() {
     let currentDate = start.clone();
 
     while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+      if (currentDate.isSame(start, 'day')) {
+        dates.push(start.toDate());
+      }
+
       dates.push(currentDate.endOf('week').toDate());
       currentDate = currentDate.add(1, 'week');
     }
