@@ -11,7 +11,7 @@
 import { AxiosError } from 'axios';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { date, dateTime, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -493,6 +493,7 @@ export function useAllRecurringInvoiceColumns() {
 
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
@@ -570,7 +571,7 @@ export function useRecurringInvoiceColumns() {
       column: 'next_send_date',
       id: 'next_send_date',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => dateTime(value),
     },
     {
       column: 'frequency',
