@@ -29,9 +29,12 @@ export function useActions() {
   const handleImportCustomers = (companyGatewayId: string) => {
     toast.processing();
 
-    request('POST', endpoint(`/api/v1/company_gateways/:id/import_customers`), {
-      id: companyGatewayId,
-    }).then((response) => toast.success(response.data.message));
+    request(
+      'POST',
+      endpoint('/api/v1/company_gateways/:id/import_customers', {
+        id: companyGatewayId,
+      })
+    ).then((response) => toast.success(response.data.message));
   };
 
   const actions: Action<CompanyGateway>[] = [
