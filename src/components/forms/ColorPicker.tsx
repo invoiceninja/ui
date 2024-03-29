@@ -23,6 +23,7 @@ interface Props {
   value?: string;
   onValueChange?: (color: string) => unknown;
   disabled?: boolean;
+  includeDefaultPalette?: boolean;
 }
 
 const DEFAULT_COLORS = [
@@ -55,14 +56,17 @@ const DEFAULT_COLORS = [
 export function ColorPicker(props: Props) {
   const { t } = useTranslation();
 
+  const { includeDefaultPalette } = props;
+
+  const colors = useColorScheme();
+
   const [color, setColor] = useState(props.value || '#000000');
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDefaultPaletteModalOpen, setIsDefaultPaletteModalOpen] =
     useState<boolean>(false);
 
   useDebounce(() => props.onValueChange?.(color), 500, [color]);
-
-  const colors = useColorScheme();
 
   useEffect(() => {
     props.value && setColor(props.value);
@@ -75,6 +79,7 @@ export function ColorPicker(props: Props) {
         visible={isModalOpen}
         onClose={setIsModalOpen}
         centerContent
+        disableClosing={isDefaultPaletteModalOpen}
       >
         <HexColorPicker color={color} onChange={setColor} />
         <HexColorInput
@@ -84,9 +89,19 @@ export function ColorPicker(props: Props) {
           style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
         />
 
-        <div className="flex">
+        <div className="flex w-full justify-between">
+          {includeDefaultPalette && (
+            <Button
+              behavior="button"
+              type="secondary"
+              onClick={() => setIsDefaultPaletteModalOpen(true)}
+            >
+              {t('default')}
+            </Button>
+          )}
+
           <Button
-            className="w-full"
+            className={classNames({ 'w-full': !includeDefaultPalette })}
             behavior="button"
             onClick={() => setIsModalOpen(false)}
           >
@@ -96,7 +111,7 @@ export function ColorPicker(props: Props) {
       </Modal>
 
       <Modal
-        title={t('default_palette')}
+        title={t('default')}
         visible={isDefaultPaletteModalOpen}
         size="small"
         onClose={() => setIsDefaultPaletteModalOpen(false)}
@@ -123,13 +138,14 @@ export function ColorPicker(props: Props) {
             ))}
           </div>
 
-          <Button
-            className="self-end"
-            behavior="button"
-            onClick={() => setIsDefaultPaletteModalOpen(false)}
-          >
-            {t('done')}
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              behavior="button"
+              onClick={() => setIsDefaultPaletteModalOpen(false)}
+            >
+              {t('done')}
+            </Button>
+          </div>
         </div>
       </Modal>
 
