@@ -16,7 +16,7 @@ import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, dateTime, endpoint, trans } from '$app/common/helpers';
+import { date, endpoint, trans, useDateTime } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery } from 'react-query';
@@ -96,6 +96,7 @@ export const RecurringInvoiceSlider = () => {
   );
   const [t] = useTranslation();
 
+  const dateTime = useDateTime();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();

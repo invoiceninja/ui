@@ -11,7 +11,12 @@
 import { AxiosError } from 'axios';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import { date, dateTime, endpoint, getEntityState } from '$app/common/helpers';
+import {
+  date,
+  endpoint,
+  getEntityState,
+  useDateTime,
+} from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -496,6 +501,7 @@ export function useRecurringInvoiceColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const dateTime = useDateTime();
   const disableNavigation = useDisableNavigation();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();

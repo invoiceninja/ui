@@ -65,27 +65,25 @@ export function date(date: number | string, format: string) {
   return dayjs(date).format(format);
 }
 
-export function dateTime(
-  date: number | string,
-  dateFormat?: string,
-  timeFormat?: string
-) {
+export function useDateTime() {
   const { timeFormat: companyTimeFormat } = useCompanyTimeFormat();
   const { dateFormat: companyDateFormat } = useCurrentCompanyDateFormats();
 
-  if (date === 0 || date === '' || date === undefined) {
-    return '';
-  }
+  return (date: number | string, dateFormat?: string, timeFormat?: string) => {
+    if (date === 0 || date === '' || date === undefined) {
+      return '';
+    }
 
-  const finalFormat = `${dateFormat || companyDateFormat} ${
-    timeFormat || companyTimeFormat
-  }`;
+    const finalFormat = `${dateFormat || companyDateFormat} ${
+      timeFormat || companyTimeFormat
+    }`;
 
-  if (typeof date === 'number') {
-    return dayjs.unix(date).format(finalFormat);
-  }
+    if (typeof date === 'number') {
+      return dayjs.unix(date).format(finalFormat);
+    }
 
-  return dayjs(date).format(finalFormat);
+    return dayjs(date).format(finalFormat);
+  };
 }
 
 export function useParseDayjs() {

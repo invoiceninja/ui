@@ -17,9 +17,10 @@ import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { dateTime } from '$app/common/helpers';
+import { useDateTime } from '$app/common/helpers';
 
 export function UpcomingRecurringInvoices() {
+  const dateTime = useDateTime();
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
 
