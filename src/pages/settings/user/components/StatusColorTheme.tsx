@@ -195,7 +195,7 @@ export function useStatusThemeColorScheme() {
 
   COLOR_THEMES[
     reactSettings?.color_theme?.status_color_theme as ThemeKey
-  ].palette.forEach((value, index) => {
+  ]?.palette?.forEach((value, index) => {
     colors[`$${index + 1}` as keyof typeof colors] = value;
   });
 
@@ -289,7 +289,7 @@ export function StatusColorTheme() {
                 <div className="flex">
                   {COLOR_THEMES[
                     themeKey as keyof typeof COLOR_THEMES
-                  ].palette.map((paletteColor) => (
+                  ]?.palette?.map((paletteColor) => (
                     <div
                       key={paletteColor}
                       style={{
