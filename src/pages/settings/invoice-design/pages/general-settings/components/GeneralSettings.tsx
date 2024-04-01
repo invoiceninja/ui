@@ -1348,6 +1348,7 @@ export default function GeneralSettings() {
             }
           }}
           disabled={disableSettingsField('primary_color')}
+          includeDefaultPalette
         />
       </Element>
 
@@ -1370,6 +1371,7 @@ export default function GeneralSettings() {
             }
           }}
           disabled={disableSettingsField('secondary_color')}
+          includeDefaultPalette
         />
       </Element>
 
