@@ -11,12 +11,7 @@
 import { AxiosError } from 'axios';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import {
-  date,
-  endpoint,
-  getEntityState,
-  useDateTime,
-} from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -77,6 +72,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -575,7 +571,7 @@ export function useRecurringInvoiceColumns() {
     },
     {
       column: 'next_send_date',
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
       format: (value) => dateTime(value),
     },

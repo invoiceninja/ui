@@ -17,7 +17,7 @@ import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { useDateTime } from '$app/common/helpers';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export function UpcomingRecurringInvoices() {
   const dateTime = useDateTime();
@@ -57,7 +57,7 @@ export function UpcomingRecurringInvoices() {
       ),
     },
     {
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
       format: (value) => dateTime(value),
     },

@@ -15,7 +15,6 @@ import { route } from '$app/common/helpers/route';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 import { useCurrentCompanyDateFormats } from './hooks/useCurrentCompanyDateFormats';
-import { useCompanyTimeFormat } from './hooks/useCompanyTimeFormat';
 
 export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
@@ -63,27 +62,6 @@ export function date(date: number | string, format: string) {
   }
 
   return dayjs(date).format(format);
-}
-
-export function useDateTime() {
-  const { timeFormat: companyTimeFormat } = useCompanyTimeFormat();
-  const { dateFormat: companyDateFormat } = useCurrentCompanyDateFormats();
-
-  return (date: number | string, dateFormat?: string, timeFormat?: string) => {
-    if (date === 0 || date === '' || date === undefined) {
-      return '';
-    }
-
-    const finalFormat = `${dateFormat || companyDateFormat} ${
-      timeFormat || companyTimeFormat
-    }`;
-
-    if (typeof date === 'number') {
-      return dayjs.unix(date).format(finalFormat);
-    }
-
-    return dayjs(date).format(finalFormat);
-  };
 }
 
 export function useParseDayjs() {

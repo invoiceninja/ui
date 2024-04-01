@@ -16,7 +16,7 @@ import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans, useDateTime } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery } from 'react-query';
@@ -46,6 +46,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -194,7 +195,7 @@ export const RecurringInvoiceSlider = () => {
             {recurringInvoice && recurringInvoice.next_send_date ? (
               <Element leftSide={t('next_send_date')}>
                 {recurringInvoice
-                  ? dateTime(recurringInvoice.next_send_date)
+                  ? dateTime(recurringInvoice.next_send_datetime)
                   : null}
               </Element>
             ) : null}
