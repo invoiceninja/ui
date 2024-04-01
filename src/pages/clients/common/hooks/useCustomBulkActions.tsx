@@ -18,6 +18,7 @@ import { MdDesignServices, MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { AssignToGroupBulkAction } from '../components/AssignToGroupBulkAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -73,6 +74,9 @@ export const useCustomBulkActions = () => {
       >
         {t('run_template')}
       </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <AssignToGroupBulkAction clients={selectedResources} />
     ),
   ];
 
