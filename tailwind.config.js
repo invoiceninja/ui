@@ -9,6 +9,10 @@ module.exports = {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
       colors: {
+        brand: {
+          primary: '#096a2e',
+          accent: '#8abe52',
+        },
         ninja: {
           gray: '#242930',
           'gray-darker': '#2F2E2E',

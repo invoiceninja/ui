@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import DefaultLogo from '../../resources/images/invoiceninja-logo@light.png';
+import DefaultLogo from '../../resources/images/vcsr-logo@light.png';
+import DefaultIcon from '../../resources/images/vcsr-icon@light.png';
 
 export default {
   logo: DefaultLogo,
+  icon: DefaultIcon,
 };

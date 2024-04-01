@@ -9,7 +9,7 @@
  */
 
 export default {
-  accent: '#117DC0',
-  primary: '#2F7DC3',
+  accent: '#8abe52',
+  primary: '#096a2e',
   secondary: '#7081e0',
 };

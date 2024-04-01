@@ -157,7 +157,7 @@ export function Login() {
               </Alert>
             )}
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
+            <Button disabled={isFormBusy} className="mt-4 bg-brand-primary" variant="block">
               {t('login')}
             </Button>
           </form>

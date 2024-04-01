@@ -28,7 +28,8 @@ interface SettingsState {
 
 const initialState: SettingsState = {
   colors: {
-    primary: '#117DC0',
+    primary: '#096a2e',
+    secondary: '#8abe52',
   },
   darkMode: false,
   activeSettings: {

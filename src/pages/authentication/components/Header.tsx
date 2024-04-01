@@ -10,7 +10,7 @@
 
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Link } from '../../../components/forms/Link';
-import Logo from '../../../resources/images/invoiceninja-logo@dark.png';
+import Logo from '../../../resources/images/vcsr-logo@light.png';
 
 export function Header() {
   const accentColor = useAccentColor();

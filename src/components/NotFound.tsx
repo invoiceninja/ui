@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import Logo from '../resources/images/invoiceninja-logo@dark.png';
+import Logo from '../resources/images/vcsr-logo@light.png';
 
 export default function NotFound() {
   const [t] = useTranslation();
