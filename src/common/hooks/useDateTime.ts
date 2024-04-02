@@ -17,6 +17,7 @@ import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 export function useDateTime() {
   const { timeZone: companyTimeZone } = useCompanyTimeZone();
   const { timeFormat: companyTimeFormat } = useCompanyTimeFormat();
@@ -38,12 +39,13 @@ export function useDateTime() {
 
     if (typeof date === 'number') {
       return dayjs
-        .unix(date)
+        .utc(date)
         .tz(timeZone || companyTimeZone)
         .format(finalFormat);
     }
 
-    return dayjs(date)
+    return dayjs
+      .utc(date)
       .tz(timeZone || companyTimeZone)
       .format(finalFormat);
   };
