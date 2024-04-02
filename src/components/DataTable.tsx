@@ -51,7 +51,7 @@ import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
 import { EntityState } from '$app/common/enums/entity-state';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { refetchByUrl } from '$app/common/hooks/useRefetch';
+import { $refetch, refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useLocation } from 'react-router-dom';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
@@ -344,6 +344,8 @@ export function DataTable<T extends object>(props: Props<T>) {
             },
           })
         );
+
+        $refetch(['activities']);
       })
       .finally(() => {
         refetchByUrl([props.endpoint, apiEndpoint.pathname]);
