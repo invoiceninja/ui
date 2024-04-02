@@ -183,4 +183,5 @@ export const defaultSettings = {
   e_invoice_type: '',
   default_expense_payment_type_id: '',
   classification: '',
+  e_quote_type: '',
 };
