@@ -92,6 +92,7 @@ import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChangeHandler = <T extends keyof Quote>(
@@ -321,6 +322,10 @@ export function useActions(params?: Params) {
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const downloadEQuote = useDownloadEInvoice({
+    resource: 'quote',
+    downloadType: 'download_e_quote',
+  });
   const printPdf = usePrintPdf({ entity: 'quote' });
   const markSent = useMarkSent();
   const approve = useApprove();
@@ -387,6 +392,14 @@ export function useActions(params?: Params) {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => downloadEQuote(quote)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_quote')}
       </DropdownElement>
     ),
     (quote) =>

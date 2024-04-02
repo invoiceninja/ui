@@ -71,6 +71,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface CreateProps {
@@ -426,6 +427,10 @@ export function useActions() {
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'purchase_order',
   });
+  const downloadEPurchaseOrder = useDownloadEInvoice({
+    resource: 'purchase_order',
+    downloadType: 'download_e_purchase_order',
+  });
 
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
@@ -501,6 +506,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => downloadEPurchaseOrder(purchaseOrder)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_purchase_order')}
       </DropdownElement>
     ),
     (purchaseOrder) =>
