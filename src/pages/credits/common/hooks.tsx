@@ -88,6 +88,7 @@ import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -323,6 +324,10 @@ export function useActions() {
   const markPaid = useMarkPaid();
   const bulk = useBulk();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
+  const downloadECredit = useDownloadEInvoice({
+    resource: 'credit',
+    downloadType: 'download_e_credit',
+  });
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -373,6 +378,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => downloadECredit(credit)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_credit')}
       </DropdownElement>
     ),
     (credit) =>
