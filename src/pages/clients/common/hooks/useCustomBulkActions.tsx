@@ -37,6 +37,10 @@ export const useCustomBulkActions = () => {
     return clients.every(({ is_deleted }) => !is_deleted);
   };
 
+  const showAssignGroupAction = (clients: Client[]) => {
+    return clients.every(({ is_deleted }) => !is_deleted);
+  };
+
   const handleDownloadDocuments = (
     selectedClients: Client[],
     setSelected: Dispatch<SetStateAction<string[]>>
@@ -75,9 +79,10 @@ export const useCustomBulkActions = () => {
         {t('run_template')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <AssignToGroupBulkAction clients={selectedResources} />
-    ),
+    ({ selectedResources }) =>
+      showAssignGroupAction(selectedResources) && (
+        <AssignToGroupBulkAction clients={selectedResources} />
+      ),
   ];
 
   return customBulkActions;
