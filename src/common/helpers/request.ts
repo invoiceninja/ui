@@ -12,17 +12,29 @@ import axios, { AxiosError, AxiosRequestConfig, Method } from 'axios';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { ValidationBag } from '../interfaces/validation-bag';
 import { toast } from './toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 const client = axios.create();
 
 client.interceptors.response.use(
   (response) => {
+    const payload = response.config.data && JSON.parse(response.config.data);
+    const requestMethod = response.config.method;
+
+    if (
+      requestMethod === 'put' ||
+      (requestMethod === 'post' && payload?.action === 'delete') ||
+      requestMethod === 'delete'
+    ) {
+      $refetch(['activities']);
+    }
+
     return response;
   },
   (error: AxiosError<ValidationBag>) => {
     if (error.response?.status === 429 || error.response?.status === 403) {
-      window.location.reload();
-      localStorage.clear();
+      //window.location.reload();
+      //localStorage.clear();
     }
 
     if (error.response?.status === 404) {
