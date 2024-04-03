@@ -93,20 +93,19 @@ export function useDataTablePreferences(params: Params) {
     const defaultFilters = {
       ...(customFilters && { customFilter: ['all'] }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
-      currentPage: 1,
       status: ['active'],
       perPage: '10',
     };
 
     const cleanedUpFilters = {
-      ...(filter && { filter }),
       ...(sortedBy && { sortedBy }),
       ...(customFilters && { customFilter }),
       sort,
-      currentPage,
       status,
       perPage,
     };
+
+    storeSessionTableFilters(filter, currentPage);
 
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
       return;
@@ -126,8 +125,6 @@ export function useDataTablePreferences(params: Params) {
       );
 
       handleUpdateUserPreferences(updatedUser as User);
-
-      storeSessionTableFilters(filter, currentPage);
     }
   };
 

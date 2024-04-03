@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,10 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
+import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
 
+type SessionDataTableFilters = Record<string, Record<string, string | number>>;
 const storage = createJSONStorage(() => sessionStorage);
-const dataTableFiltersAtom = atomWithStorage('dataTableFilters', {}, storage);
+export const dataTableFiltersAtom = atomWithStorage<SessionDataTableFilters>(
+  'dataTableFilters',
+  {},
+  storage as AsyncStorage<SessionDataTableFilters>
+);
 
 interface Params {
   tableKey: string;
@@ -20,5 +26,15 @@ interface Params {
 export function useStoreSessionTableFilters(params: Params) {
   const { tableKey } = params;
 
-  return (filter: string, currentPage: number) => {};
+  const setDataTableFilters = useSetAtom(dataTableFiltersAtom);
+
+  return (filter: string, currentPage: number) => {
+    setDataTableFilters((current) => ({
+      ...current,
+      [tableKey]: {
+        filter,
+        currentPage,
+      },
+    }));
+  };
 }
