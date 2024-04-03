@@ -80,6 +80,10 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   );
 }
 
+const successMessages = {
+  assign_group: 'updated_group',
+};
+
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
@@ -91,12 +95,16 @@ export function useBulk() {
   ) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/clients/bulk'), {
+    return request('POST', endpoint('/api/v1/clients/bulk'), {
       action,
       ids,
       ...(groupSettingsId && { group_settings_id: groupSettingsId }),
     }).then(() => {
-      toast.success(`${action}d_client`);
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_client`;
+
+      toast.success(message);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

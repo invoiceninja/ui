@@ -44,7 +44,10 @@ export function AssignToGroupBulkAction(props: Props) {
       <Modal
         title={t('group')}
         visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setGroupSettingsId('');
+        }}
         overflowVisible
       >
         <GroupSettingsSelector
@@ -60,12 +63,12 @@ export function AssignToGroupBulkAction(props: Props) {
               clients.map(({ id }) => id),
               'assign_group',
               groupSettingsId
-            )
+            ).then(() => setIsModalOpen(false))
           }
           disabled={!groupSettingsId}
           disableWithoutIcon
         >
-          {t('assign_group')}
+          {t('add_to_group')}
         </Button>
       </Modal>
     </>
