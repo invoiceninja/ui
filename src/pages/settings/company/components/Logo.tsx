@@ -159,7 +159,7 @@ export function Logo({ isSettingsPage = true }: Props) {
     </Card>
   ) : (
     <div className="flex flex-col space-y-5">
-      <span className="text-lg font-medium">{t('upload_company_logo')}</span>
+      <span className="text-lg font-medium">{t('upload_logo')}</span>
 
       <div className="grid grid-cols-12 gap-x-4">
         <div className="bg-gray-200 col-span-6 rounded-lg p-6">
