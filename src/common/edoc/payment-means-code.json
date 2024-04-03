@@ -1,0 +1,1019 @@
+{
+    "CodeList": {
+        "Identification": {
+            "ShortName": "PaymentMeansCode",
+            "LongName": [
+                "Payment Means Code",
+                "UN/ECE 4461"
+            ],
+            "Version": "D10B",
+            "CanonicalUri": "urn:un:unece:uncefact:codelist:standard:UNECE:PaymentMeansCode",
+            "CanonicalVersionUri": "urn:un:unece:uncefact:codelist:standard:UNECE:PaymentMeansCode:D10B",
+            "LocationUri": "http://docs.oasis-open.org/ubl/os-UBL-2.1/cl/gc/default/PaymentMeansCode-2.1.gc",
+            "AlternateFormatLocationUri": "http://www.unece.org/fileadmin/DAM/uncefact/codelist/standard/UNECE_PaymentMeansCode_D10B.xsd",
+            "Agency": {
+                "LongName": "United Nations Economic Commission for Europe",
+                "Identifier": 6
+            }
+        },
+        "ColumnSet": {
+            "Column": [
+                {
+                    "ShortName": "Code",
+                    "Data": ""
+                },
+                {
+                    "ShortName": "Name",
+                    "Data": ""
+                },
+                {
+                    "ShortName": "Description",
+                    "Data": ""
+                }
+            ],
+            "Key": {
+                "ShortName": "CodeKey",
+                "ColumnRef": ""
+            }
+        },
+        "SimpleCodeList": {
+            "Row": [
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 1
+                        },
+                        {
+                            "SimpleValue": "Instrument not defined"
+                        },
+                        {
+                            "SimpleValue": "Not defined legally enforceable agreement between two or more parties (expressing a contractual right or a right to the payment of money)."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 2
+                        },
+                        {
+                            "SimpleValue": "Automated clearing house credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the automated clearing house system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 3
+                        },
+                        {
+                            "SimpleValue": "Automated clearing house debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the automated clearing house system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 4
+                        },
+                        {
+                            "SimpleValue": "ACH demand debit reversal"
+                        },
+                        {
+                            "SimpleValue": "A request to reverse an ACH debit transaction to a demand deposit account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 5
+                        },
+                        {
+                            "SimpleValue": "ACH demand credit reversal"
+                        },
+                        {
+                            "SimpleValue": "A request to reverse a credit transaction to a demand deposit account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 6
+                        },
+                        {
+                            "SimpleValue": "ACH demand credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 7
+                        },
+                        {
+                            "SimpleValue": "ACH demand debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a demand deposit account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 8
+                        },
+                        {
+                            "SimpleValue": "Hold"
+                        },
+                        {
+                            "SimpleValue": "Indicates that the bank should hold the payment for collection by the beneficiary or other instructions."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 9
+                        },
+                        {
+                            "SimpleValue": "National or regional clearing"
+                        },
+                        {
+                            "SimpleValue": "Indicates that the payment should be made using the national or regional clearing."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 10
+                        },
+                        {
+                            "SimpleValue": "In cash"
+                        },
+                        {
+                            "SimpleValue": "Payment by currency (including bills and coins) in circulation, including checking account deposits."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 11
+                        },
+                        {
+                            "SimpleValue": "ACH savings credit reversal"
+                        },
+                        {
+                            "SimpleValue": "A request to reverse an ACH credit transaction to a savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 12
+                        },
+                        {
+                            "SimpleValue": "ACH savings debit reversal"
+                        },
+                        {
+                            "SimpleValue": "A request to reverse an ACH debit transaction to a savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 13
+                        },
+                        {
+                            "SimpleValue": "ACH savings credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 14
+                        },
+                        {
+                            "SimpleValue": "ACH savings debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 15
+                        },
+                        {
+                            "SimpleValue": "Bookentry credit"
+                        },
+                        {
+                            "SimpleValue": "A credit entry between two accounts at the same bank branch. Synonym: house credit."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 16
+                        },
+                        {
+                            "SimpleValue": "Bookentry debit"
+                        },
+                        {
+                            "SimpleValue": "A debit entry between two accounts at the same bank branch. Synonym: house debit."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 17
+                        },
+                        {
+                            "SimpleValue": "ACH demand cash concentration/disbursement (CCD) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit account using the CCD payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 18
+                        },
+                        {
+                            "SimpleValue": "ACH demand cash concentration/disbursement (CCD) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a demand deposit account using the CCD payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 19
+                        },
+                        {
+                            "SimpleValue": "ACH demand corporate trade payment (CTP) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit account using the CTP payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 20
+                        },
+                        {
+                            "SimpleValue": "Cheque"
+                        },
+                        {
+                            "SimpleValue": "Payment by a pre-printed form on which instructions are given to an account holder (a bank or building society) to pay a stated sum to a named recipient."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 21
+                        },
+                        {
+                            "SimpleValue": "Banker's draft"
+                        },
+                        {
+                            "SimpleValue": "Issue of a banker's draft in payment of the funds."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 22
+                        },
+                        {
+                            "SimpleValue": "Certified banker's draft"
+                        },
+                        {
+                            "SimpleValue": "Cheque drawn by a bank on itself or its agent. A person who owes money to another buys the draft from a bank for cash and hands it to the creditor who need have no fear that it might be dishonoured."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 23
+                        },
+                        {
+                            "SimpleValue": "Bank cheque (issued by a banking or similar establishment)"
+                        },
+                        {
+                            "SimpleValue": "Payment by a pre-printed form, which has been completed by a financial institution, on which instructions are given to an account holder (a bank or building society) to pay a stated sum to a named recipient."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 24
+                        },
+                        {
+                            "SimpleValue": "Bill of exchange awaiting acceptance"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on the debtor but not yet accepted by the debtor."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 25
+                        },
+                        {
+                            "SimpleValue": "Certified cheque"
+                        },
+                        {
+                            "SimpleValue": "Payment by a pre-printed form stamped with the paying bank's certification on which instructions are given to an account holder (a bank or building society) to pay a stated sum to a named recipient ."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 26
+                        },
+                        {
+                            "SimpleValue": "Local cheque"
+                        },
+                        {
+                            "SimpleValue": "Indicates that the cheque is given local to the recipient."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 27
+                        },
+                        {
+                            "SimpleValue": "ACH demand corporate trade payment (CTP) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a demand deposit account using the CTP payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 28
+                        },
+                        {
+                            "SimpleValue": "ACH demand corporate trade exchange (CTX) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit account using the CTX payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 29
+                        },
+                        {
+                            "SimpleValue": "ACH demand corporate trade exchange (CTX) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a demand account using the CTX payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 30
+                        },
+                        {
+                            "SimpleValue": "Credit transfer"
+                        },
+                        {
+                            "SimpleValue": "Payment by credit movement of funds from one account to another."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 31
+                        },
+                        {
+                            "SimpleValue": "Debit transfer"
+                        },
+                        {
+                            "SimpleValue": "Payment by debit movement of funds from one account to another."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 32
+                        },
+                        {
+                            "SimpleValue": "ACH demand cash concentration/disbursement plus (CCD+) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit account using the CCD+ payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 33
+                        },
+                        {
+                            "SimpleValue": "ACH demand cash concentration/disbursement plus (CCD+) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a demand deposit account using the CCD+ payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 34
+                        },
+                        {
+                            "SimpleValue": "ACH prearranged payment and deposit (PPD)"
+                        },
+                        {
+                            "SimpleValue": "A consumer credit transaction made through the ACH system to a demand deposit or savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 35
+                        },
+                        {
+                            "SimpleValue": "ACH savings cash concentration/disbursement (CCD) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a demand deposit or savings account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 36
+                        },
+                        {
+                            "SimpleValue": "ACH savings cash concentration/disbursement (CCD) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a savings account using the CCD payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 37
+                        },
+                        {
+                            "SimpleValue": "ACH savings corporate trade payment (CTP) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a savings account using the CTP payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 38
+                        },
+                        {
+                            "SimpleValue": "ACH savings corporate trade payment (CTP) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a savings account using the CTP payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 39
+                        },
+                        {
+                            "SimpleValue": "ACH savings corporate trade exchange (CTX) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a savings account using the CTX payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 40
+                        },
+                        {
+                            "SimpleValue": "ACH savings corporate trade exchange (CTX) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a savings account using the CTX payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 41
+                        },
+                        {
+                            "SimpleValue": "ACH savings cash concentration/disbursement plus (CCD+) credit"
+                        },
+                        {
+                            "SimpleValue": "A credit transaction made through the ACH system to a savings account using the CCD+ payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 42
+                        },
+                        {
+                            "SimpleValue": "Payment to bank account"
+                        },
+                        {
+                            "SimpleValue": "Payment by an arrangement for settling debts that is operated by the Post Office."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 43
+                        },
+                        {
+                            "SimpleValue": "ACH savings cash concentration/disbursement plus (CCD+) debit"
+                        },
+                        {
+                            "SimpleValue": "A debit transaction made through the ACH system to a savings account using the CCD+ payment format."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 44
+                        },
+                        {
+                            "SimpleValue": "Accepted bill of exchange"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on the debtor and accepted by the debtor."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 45
+                        },
+                        {
+                            "SimpleValue": "Referenced home-banking credit transfer"
+                        },
+                        {
+                            "SimpleValue": "A referenced credit transfer initiated through home-banking."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 46
+                        },
+                        {
+                            "SimpleValue": "Interbank debit transfer"
+                        },
+                        {
+                            "SimpleValue": "A debit transfer via interbank means."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 47
+                        },
+                        {
+                            "SimpleValue": "Home-banking debit transfer"
+                        },
+                        {
+                            "SimpleValue": "A debit transfer initiated through home-banking."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 48
+                        },
+                        {
+                            "SimpleValue": "Bank card"
+                        },
+                        {
+                            "SimpleValue": "Payment by means of a card issued by a bank or other financial institution."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 49
+                        },
+                        {
+                            "SimpleValue": "Direct debit"
+                        },
+                        {
+                            "SimpleValue": "The amount is to be, or has been, directly debited to the customer's bank account."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 50
+                        },
+                        {
+                            "SimpleValue": "Payment by postgiro"
+                        },
+                        {
+                            "SimpleValue": "A method for the transmission of funds through the postal system rather than through the banking system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 51
+                        },
+                        {
+                            "SimpleValue": "FR, norme 6 97-Telereglement CFONB (French Organisation for Banking Standards)  - Option A"
+                        },
+                        {
+                            "SimpleValue": "A French standard procedure that allows a debtor to pay an amount due to a creditor. The creditor will forward it to its bank, which will collect the money on the bank account of the debtor."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 52
+                        },
+                        {
+                            "SimpleValue": "Urgent commercial payment"
+                        },
+                        {
+                            "SimpleValue": "Payment order which requires guaranteed processing by the most appropriate means to ensure it occurs on the requested execution date, provided that it is issued to the ordered bank before the agreed cut-off time."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 53
+                        },
+                        {
+                            "SimpleValue": "Urgent Treasury Payment"
+                        },
+                        {
+                            "SimpleValue": "Payment order or transfer which must be executed, by the most appropriate means, as urgently as possible and before urgent commercial payments."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 60
+                        },
+                        {
+                            "SimpleValue": "Promissory note"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by one person to another, signed by the maker, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 61
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by the debtor"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by the debtor to another person, signed by the debtor, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 62
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by the debtor and endorsed by a bank"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by the debtor to another person, signed by the debtor and endorsed by a bank, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 63
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by the debtor and endorsed by a third party"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by the debtor to another person, signed by the debtor and endorsed by a third party, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 64
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by a bank"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by the bank to another person, signed by the bank, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 65
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by a bank and endorsed by another bank"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by the bank to another person, signed by the bank and endorsed by another bank, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 66
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by a third party"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by a third party to another person, signed by the third party, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 67
+                        },
+                        {
+                            "SimpleValue": "Promissory note signed by a third party and endorsed by a bank"
+                        },
+                        {
+                            "SimpleValue": "Payment by an unconditional promise in writing made by a third party to another person, signed by the third party and endorsed by a bank, engaging to pay on demand or at a fixed or determinable future time a sum certain in money, to order or to bearer."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 70
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on the debtor"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on the debtor."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 74
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a bank"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a bank."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 75
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor, endorsed by another bank"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor, endorsed by another bank."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 76
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a bank and endorsed by a third party"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a bank and endorsed by a third party."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 77
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a third party"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by the creditor on a third party."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 78
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by creditor on third party, accepted and endorsed by bank"
+                        },
+                        {
+                            "SimpleValue": "Bill drawn by creditor on third party, accepted and endorsed by bank."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 91
+                        },
+                        {
+                            "SimpleValue": "Not transferable banker's draft"
+                        },
+                        {
+                            "SimpleValue": "Issue a bankers draft not endorsable."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 92
+                        },
+                        {
+                            "SimpleValue": "Not transferable local cheque"
+                        },
+                        {
+                            "SimpleValue": "Issue a cheque not endorsable in payment of the funds."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 93
+                        },
+                        {
+                            "SimpleValue": "Reference giro"
+                        },
+                        {
+                            "SimpleValue": "Ordering customer tells the bank to use the payment system 'Reference giro'. Used in the Finnish national banking system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 94
+                        },
+                        {
+                            "SimpleValue": "Urgent giro"
+                        },
+                        {
+                            "SimpleValue": "Ordering customer tells the bank to use the bank service 'Urgent Giro' when transferring the payment. Used in Finnish national banking system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 95
+                        },
+                        {
+                            "SimpleValue": "Free format giro"
+                        },
+                        {
+                            "SimpleValue": "Ordering customer tells the ordering bank to use the bank service 'Free Format Giro' when transferring the payment. Used in Finnish national banking system."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 96
+                        },
+                        {
+                            "SimpleValue": "Requested method for payment was not used"
+                        },
+                        {
+                            "SimpleValue": "If the requested method for payment was or could not be used, this code indicates that."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": 97
+                        },
+                        {
+                            "SimpleValue": "Clearing between partners"
+                        },
+                        {
+                            "SimpleValue": "Amounts which two partners owe to each other to be compensated in order to avoid useless payments."
+                        }
+                    ]
+                },
+                {
+                    "Value": [
+                        {
+                            "SimpleValue": "ZZZ"
+                        },
+                        {
+                            "SimpleValue": "Mutually defined"
+                        },
+                        {
+                            "SimpleValue": "A code assigned within a code list to be used on an interim basis and as defined among trading partners until a precise code can be assigned to the code list."
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
