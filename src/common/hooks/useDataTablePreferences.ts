@@ -22,6 +22,7 @@ import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../stores/slices/user';
+import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
   apiEndpoint: URL;
@@ -58,6 +59,7 @@ export function useDataTablePreferences(params: Params) {
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
+  const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
 
   const handleUpdateUserPreferences = (updatedUser: User) => {
     request(
@@ -124,6 +126,8 @@ export function useDataTablePreferences(params: Params) {
       );
 
       handleUpdateUserPreferences(updatedUser as User);
+
+      storeSessionTableFilters(filter, currentPage);
     }
   };
 
