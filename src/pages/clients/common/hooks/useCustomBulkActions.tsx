@@ -79,9 +79,12 @@ export const useCustomBulkActions = () => {
         {t('run_template')}
       </DropdownElement>
     ),
-    ({ selectedResources }) =>
+    ({ selectedResources, setSelected }) =>
       showAssignGroupAction(selectedResources) && (
-        <AssignToGroupBulkAction clients={selectedResources} />
+        <AssignToGroupBulkAction
+          clients={selectedResources}
+          setSelected={setSelected}
+        />
       ),
   ];
 

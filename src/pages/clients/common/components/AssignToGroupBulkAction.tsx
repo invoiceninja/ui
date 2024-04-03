@@ -15,17 +15,18 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { GroupSettingsSelector } from '$app/components/group-settings/GroupSettingsSelector';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdGroup } from 'react-icons/md';
 
 interface Props {
   clients: Client[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export function AssignToGroupBulkAction(props: Props) {
   const [t] = useTranslation();
 
-  const { clients } = props;
+  const { clients, setSelected } = props;
 
   const bulk = useBulk();
 
@@ -60,13 +61,15 @@ export function AssignToGroupBulkAction(props: Props) {
 
         <Button
           behavior="button"
-          onClick={() =>
+          onClick={() => {
             bulk(
               clients.map(({ id }) => id),
               'assign_group',
               groupSettingsId
-            ).then(() => handleOnClose())
-          }
+            ).then(() => handleOnClose());
+
+            setSelected([]);
+          }}
           disabled={!groupSettingsId}
           disableWithoutIcon
         >
