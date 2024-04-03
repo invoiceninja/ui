@@ -72,6 +72,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface RecurringInvoiceUtilitiesProps {
@@ -494,8 +495,10 @@ export function useAllRecurringInvoiceColumns() {
 
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const dateTime = useDateTime();
   const disableNavigation = useDisableNavigation();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -569,9 +572,9 @@ export function useRecurringInvoiceColumns() {
     },
     {
       column: 'next_send_date',
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => dateTime(value),
     },
     {
       column: 'frequency',
