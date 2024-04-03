@@ -32,6 +32,11 @@ export function AssignToGroupBulkAction(props: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [groupSettingsId, setGroupSettingsId] = useState<string>('');
 
+  const handleOnClose = () => {
+    setIsModalOpen(false);
+    setGroupSettingsId('');
+  };
+
   return (
     <>
       <DropdownElement
@@ -44,10 +49,7 @@ export function AssignToGroupBulkAction(props: Props) {
       <Modal
         title={t('group')}
         visible={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setGroupSettingsId('');
-        }}
+        onClose={handleOnClose}
         overflowVisible
       >
         <GroupSettingsSelector
@@ -63,7 +65,7 @@ export function AssignToGroupBulkAction(props: Props) {
               clients.map(({ id }) => id),
               'assign_group',
               groupSettingsId
-            ).then(() => setIsModalOpen(false))
+            ).then(() => handleOnClose())
           }
           disabled={!groupSettingsId}
           disableWithoutIcon
