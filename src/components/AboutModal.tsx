@@ -217,7 +217,7 @@ export function AboutModal(props: Props) {
           </Button>
         )}
 
-        {isSelfHosted() && (
+        {isSelfHosted() && installedVersion !== latestVersion && (
           <Button
             behavior="button"
             className="flex items-center"
