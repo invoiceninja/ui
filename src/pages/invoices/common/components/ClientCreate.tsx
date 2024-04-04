@@ -170,7 +170,7 @@ export function ClientCreate({
                 />
 
                 <InputField
-                  label={t('first_name')}
+                  label={`${t('contact')} ${t('first_name')}`}
                   value={contacts[0].first_name}
                   onValueChange={(value) =>
                     handleContactsChange(value, 'first_name')
@@ -179,7 +179,7 @@ export function ClientCreate({
                 />
 
                 <InputField
-                  label={t('last_name')}
+                  label={`${t('contact')} ${t('last_name')}`}
                   value={contacts[0].last_name}
                   onValueChange={(value) =>
                     handleContactsChange(value, 'last_name')
@@ -188,7 +188,7 @@ export function ClientCreate({
                 />
 
                 <InputField
-                  label={t('email')}
+                  label={`${t('contact')} ${t('email')}`}
                   value={contacts[0].email}
                   onValueChange={(value) =>
                     handleContactsChange(value, 'email')
@@ -197,7 +197,7 @@ export function ClientCreate({
                 />
 
                 <InputField
-                  label={t('phone')}
+                  label={`${t('contact')} ${t('phone')}`}
                   value={contacts[0].phone}
                   onValueChange={(value) =>
                     handleContactsChange(value, 'phone')
@@ -211,6 +211,7 @@ export function ClientCreate({
                   onChange={(value) => {
                     const $client = cloneDeep(client)!;
                     set($client, 'settings.currency_id', value);
+                    setClient($client);
                   }}
                   errorMessage={errors?.errors['settings.currency_id']}
                   dismissable
@@ -260,7 +261,7 @@ export function ClientCreate({
           <Spinner />
         )}
 
-        <div className="flex justify-end space-x-5">
+        <div className="flex justify-between">
           <Button
             behavior="button"
             type="secondary"
