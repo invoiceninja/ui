@@ -262,6 +262,18 @@ export function Settings() {
         />
       </Element>
 
+      <Element
+        leftSide={t('enable_client_portal_dashboard')}
+        leftSideHelp={t('enable_client_portal_dashboard_help')}
+      >
+        <Toggle
+          checked={Boolean(company?.settings?.enable_client_portal_dashboard)}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_portal_dashboard', value)
+          }
+        />
+      </Element>
+
       {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
       </Element> */}

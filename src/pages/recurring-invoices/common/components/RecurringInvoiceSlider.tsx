@@ -46,6 +46,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -96,6 +97,7 @@ export const RecurringInvoiceSlider = () => {
   );
   const [t] = useTranslation();
 
+  const dateTime = useDateTime();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -193,7 +195,7 @@ export const RecurringInvoiceSlider = () => {
             {recurringInvoice && recurringInvoice.next_send_date ? (
               <Element leftSide={t('next_send_date')}>
                 {recurringInvoice
-                  ? date(recurringInvoice.next_send_date, dateFormat)
+                  ? dateTime(recurringInvoice.next_send_datetime)
                   : null}
               </Element>
             ) : null}

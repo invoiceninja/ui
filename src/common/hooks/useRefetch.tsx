@@ -213,6 +213,10 @@ export const keys = {
     path: '/api/v1/subscriptions',
     dependencies: [],
   },
+  activities: {
+    path: '/api/v1/activities',
+    dependencies: ['/api/v1/activities/entity'],
+  },
 };
 
 export function useRefetch() {

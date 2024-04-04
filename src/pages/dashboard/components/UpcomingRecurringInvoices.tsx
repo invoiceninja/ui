@@ -15,15 +15,13 @@ import { route } from '$app/common/helpers/route';
 import { Card } from '$app/components/cards';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { date } from '$app/common/helpers';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 export function UpcomingRecurringInvoices() {
+  const dateTime = useDateTime();
   const formatMoney = useFormatMoney();
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
   const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<RecurringInvoice> = [
@@ -59,9 +57,9 @@ export function UpcomingRecurringInvoices() {
       ),
     },
     {
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => dateTime(value),
     },
     {
       id: 'balance',
