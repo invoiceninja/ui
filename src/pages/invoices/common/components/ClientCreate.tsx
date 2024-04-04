@@ -16,7 +16,7 @@ import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
 import { Address } from '$app/pages/clients/edit/components/Address';
 import { Contacts } from '$app/pages/clients/edit/components/Contacts';
@@ -27,7 +27,7 @@ import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Modal } from '$app/components/Modal';
-import { Element } from '$app/components/cards';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface Props {
   isModalOpen: boolean;
@@ -63,6 +63,21 @@ export function ClientCreate({
     setErrors(undefined);
 
     setClient((client) => client && set({ ...client }, property, value));
+  };
+
+  const handleContactsChange = (
+    value: string | number | boolean,
+    propertyId: string
+  ) => {
+    setErrors(undefined);
+
+    const contactIndex = contacts.findIndex(
+      (contact) => contact.contact_key === contacts[0].contact_key
+    );
+
+    set(contacts[contactIndex], propertyId, value);
+
+    setContacts([...contacts]);
   };
 
   const handleClose = (value: boolean) => {
@@ -138,80 +153,126 @@ export function ClientCreate({
       title={t('new_client')!}
       visible={isModalOpen}
       onClose={() => handleClose(false)}
-      size={fundamentalConceptVisible ? 'small' : 'large'}
+      size={fundamentalConceptVisible ? 'extraSmall' : 'large'}
       renderTransitionChildAsFragment
+      overflowVisible
     >
-      {client ? (
-        <>
-          {fundamentalConceptVisible ? (
-            <>
-              <Element leftSide={t('name')} noExternalPadding>
+      <div className="flex flex-col space-y-7">
+        {client ? (
+          <>
+            {fundamentalConceptVisible ? (
+              <div className="flex flex-col space-y-3">
                 <InputField
-                  id="name"
+                  label={t('name')}
                   value={client?.name || ''}
                   onValueChange={(value) => handleChange('name', value)}
                   errorMessage={errors?.errors.name}
                 />
-              </Element>
-            </>
-          ) : (
-            <div className="flex flex-col xl:flex-row xl:gap-4">
-              <div className="w-full xl:w-1/2">
-                <Details
-                  client={client}
-                  setClient={setClient}
-                  setErrors={setErrors}
-                  errors={errors}
+
+                <InputField
+                  label={t('first_name')}
+                  value={contacts[0].first_name}
+                  onValueChange={(value) =>
+                    handleContactsChange(value, 'first_name')
+                  }
+                  errorMessage={errors?.errors.name}
                 />
 
-                <div className="mt-5">
-                  <Address
+                <InputField
+                  label={t('last_name')}
+                  value={contacts[0].last_name}
+                  onValueChange={(value) =>
+                    handleContactsChange(value, 'last_name')
+                  }
+                  errorMessage={errors?.errors.name}
+                />
+
+                <InputField
+                  label={t('email')}
+                  value={contacts[0].email}
+                  onValueChange={(value) =>
+                    handleContactsChange(value, 'email')
+                  }
+                  errorMessage={errors?.errors['contacts.0.email']}
+                />
+
+                <InputField
+                  label={t('phone')}
+                  value={contacts[0].phone}
+                  onValueChange={(value) =>
+                    handleContactsChange(value, 'phone')
+                  }
+                  errorMessage={errors?.errors['contacts.0.phone']}
+                />
+
+                <CurrencySelector
+                  label={t('currency')}
+                  value={client?.settings?.currency_id || ''}
+                  onChange={(value) => {
+                    const $client = cloneDeep(client)!;
+                    set($client, 'settings.currency_id', value);
+                  }}
+                  errorMessage={errors?.errors['settings.currency_id']}
+                  dismissable
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col xl:flex-row xl:gap-4">
+                <div className="w-full xl:w-1/2">
+                  <Details
                     client={client}
                     setClient={setClient}
                     setErrors={setErrors}
                     errors={errors}
                   />
+
+                  <div className="mt-5">
+                    <Address
+                      client={client}
+                      setClient={setClient}
+                      setErrors={setErrors}
+                      errors={errors}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="w-full xl:w-1/2">
-                <Contacts
-                  contacts={contacts}
-                  setContacts={setContacts}
-                  setErrors={setErrors}
-                  errors={errors}
-                />
-
-                <div className="mt-5">
-                  <AdditionalInfo
-                    client={client}
-                    setClient={setClient}
+                <div className="w-full xl:w-1/2">
+                  <Contacts
+                    contacts={contacts}
+                    setContacts={setContacts}
                     setErrors={setErrors}
                     errors={errors}
                   />
+
+                  <div className="mt-5">
+                    <AdditionalInfo
+                      client={client}
+                      setClient={setClient}
+                      setErrors={setErrors}
+                      errors={errors}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <Spinner />
-      )}
+            )}
+          </>
+        ) : (
+          <Spinner />
+        )}
 
-      <div className="flex justify-end space-x-5">
-        <Button
-          behavior="button"
-          type="secondary"
-          onClick={() => setFundamentalConceptVisible((current) => !current)}
-        >
-          {fundamentalConceptVisible
-            ? t('show_more_fields')
-            : t('show_less_fields')}
-        </Button>
+        <div className="flex justify-end space-x-5">
+          <Button
+            behavior="button"
+            type="secondary"
+            onClick={() => setFundamentalConceptVisible((current) => !current)}
+          >
+            {fundamentalConceptVisible ? t('show_more') : t('show_less')}
+          </Button>
 
-        <Button behavior="button" onClick={onSave}>
-          {t('save')}
-        </Button>
+          <Button behavior="button" onClick={onSave}>
+            {t('save')}
+          </Button>
+        </div>
       </div>
     </Modal>
   );
