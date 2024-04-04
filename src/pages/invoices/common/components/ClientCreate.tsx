@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -25,9 +25,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Slider } from '$app/components/cards/Slider';
-import { Inline } from '$app/components/Inline';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Modal } from '$app/components/Modal';
+import { Element } from '$app/components/cards';
 
 interface Props {
   isModalOpen: boolean;
@@ -52,16 +52,18 @@ export function ClientCreate({
       send_email: false,
     },
   ]);
+  const [fundamentalConceptVisible, setFundamentalConceptVisible] =
+    useState<boolean>(true);
 
   const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    if (blankClient && isModalOpen) {
-      setClient({ ...blankClient });
-    }
-  }, [isModalOpen]);
+  const handleChange = (property: keyof Client, value: string) => {
+    setErrors(undefined);
+
+    setClient((client) => client && set({ ...client }, property, value));
+  };
 
   const handleClose = (value: boolean) => {
     setIsModalOpen(value);
@@ -125,55 +127,92 @@ export function ClientCreate({
       });
   };
 
+  useEffect(() => {
+    if (blankClient && isModalOpen) {
+      setClient({ ...blankClient });
+    }
+  }, [isModalOpen]);
+
   return (
-    <Slider
+    <Modal
       title={t('new_client')!}
       visible={isModalOpen}
       onClose={() => handleClose(false)}
-      size="regular"
-      actionChildren={
-        <Inline className="w-full flex justify-end">
-          <Button type="secondary" onClick={() => handleClose(false)}>
-            {t('cancel')}
-          </Button>
-
-          <Button onClick={onSave}>{t('save')}</Button>
-        </Inline>
-      }
+      size={fundamentalConceptVisible ? 'small' : 'large'}
+      renderTransitionChildAsFragment
     >
       {client ? (
-        <div className="flex flex-col divide-y">
-          <Details
-            client={client}
-            setClient={setClient}
-            setErrors={setErrors}
-            errors={errors}
-          />
+        <>
+          {fundamentalConceptVisible ? (
+            <>
+              <Element leftSide={t('name')} noExternalPadding>
+                <InputField
+                  id="name"
+                  value={client?.name || ''}
+                  onValueChange={(value) => handleChange('name', value)}
+                  errorMessage={errors?.errors.name}
+                />
+              </Element>
+            </>
+          ) : (
+            <div className="flex flex-col xl:flex-row xl:gap-4">
+              <div className="w-full xl:w-1/2">
+                <Details
+                  client={client}
+                  setClient={setClient}
+                  setErrors={setErrors}
+                  errors={errors}
+                />
 
-          <Contacts
-            contacts={contacts}
-            setContacts={setContacts}
-            setErrors={setErrors}
-            errors={errors}
-          />
+                <div className="mt-5">
+                  <Address
+                    client={client}
+                    setClient={setClient}
+                    setErrors={setErrors}
+                    errors={errors}
+                  />
+                </div>
+              </div>
 
-          <Address
-            client={client}
-            setClient={setClient}
-            setErrors={setErrors}
-            errors={errors}
-          />
+              <div className="w-full xl:w-1/2">
+                <Contacts
+                  contacts={contacts}
+                  setContacts={setContacts}
+                  setErrors={setErrors}
+                  errors={errors}
+                />
 
-          <AdditionalInfo
-            client={client}
-            setClient={setClient}
-            setErrors={setErrors}
-            errors={errors}
-          />
-        </div>
+                <div className="mt-5">
+                  <AdditionalInfo
+                    client={client}
+                    setClient={setClient}
+                    setErrors={setErrors}
+                    errors={errors}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <Spinner />
       )}
-    </Slider>
+
+      <div className="flex justify-end space-x-5">
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setFundamentalConceptVisible((current) => !current)}
+        >
+          {fundamentalConceptVisible
+            ? t('show_more_fields')
+            : t('show_less_fields')}
+        </Button>
+
+        <Button behavior="button" onClick={onSave}>
+          {t('save')}
+        </Button>
+      </div>
+    </Modal>
   );
 }
