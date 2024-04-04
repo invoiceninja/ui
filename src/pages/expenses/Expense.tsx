@@ -26,6 +26,7 @@ import { Spinner } from '$app/components/Spinner';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import Toggle from '$app/components/forms/Toggle';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -96,7 +97,15 @@ export default function Expense() {
     >
       {expense ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              <div className="flex items-center space-x-3">
+                <span className="text-sm">{t('preview')}</span>
+                <Toggle />
+              </div>
+            }
+          />
 
           <Outlet
             context={{
