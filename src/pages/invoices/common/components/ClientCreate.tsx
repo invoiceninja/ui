@@ -81,6 +81,7 @@ export function ClientCreate({
   };
 
   const handleClose = (value: boolean) => {
+    setFundamentalConceptVisible(true);
     setIsModalOpen(value);
     setErrors(undefined);
     setClient(undefined);
