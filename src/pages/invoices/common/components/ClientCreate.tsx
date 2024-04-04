@@ -28,6 +28,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Modal } from '$app/components/Modal';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import classNames from 'classnames';
 
 interface Props {
   isModalOpen: boolean;
@@ -262,7 +263,12 @@ export function ClientCreate({
           <Spinner />
         )}
 
-        <div className="flex justify-between">
+        <div
+          className={classNames('flex', {
+            'justify-between': fundamentalConceptVisible,
+            'justify-end space-x-5': !fundamentalConceptVisible,
+          })}
+        >
           <Button
             behavior="button"
             type="secondary"
