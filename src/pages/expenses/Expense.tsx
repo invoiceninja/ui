@@ -27,6 +27,9 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import Toggle from '$app/components/forms/Toggle';
+import { Panel } from '$app/components/resizable-panels/Panel';
+import { PanelGroup } from '$app/components/resizable-panels/PanelGroup';
+import { PanelResizeHandle } from '$app/components/resizable-panels/PanelResizeHandle';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -66,6 +69,7 @@ export default function Expense() {
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
 
   const actions = useActions();
 
@@ -102,21 +106,37 @@ export default function Expense() {
             rightSide={
               <div className="flex items-center space-x-3">
                 <span className="text-sm">{t('preview')}</span>
-                <Toggle />
+                <Toggle
+                  checked={isPreviewMode}
+                  onValueChange={(value) => setIsPreviewMode(value)}
+                />
               </div>
             }
           />
 
-          <Outlet
-            context={{
-              errors,
-              setErrors,
-              expense,
-              setExpense,
-              taxInputType,
-              setTaxInputType,
-            }}
-          />
+          <PanelGroup renderBasePanelGroup={isPreviewMode}>
+            <Panel renderBasePanel={isPreviewMode}>
+              <Outlet
+                context={{
+                  errors,
+                  setErrors,
+                  expense,
+                  setExpense,
+                  taxInputType,
+                  setTaxInputType,
+                  isPreviewMode,
+                }}
+              />
+            </Panel>
+
+            <PanelResizeHandle renderBasePanelResizeHandler={isPreviewMode} />
+
+            <Panel renderBasePanel={isPreviewMode}>
+              {isPreviewMode && (
+                <div className="w-full bg-gray-200" style={{ height: 1500 }} />
+              )}
+            </Panel>
+          </PanelGroup>
         </div>
       ) : (
         <Spinner />
