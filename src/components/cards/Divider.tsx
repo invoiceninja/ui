@@ -9,9 +9,10 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 
-interface Props {
+interface Props extends CommonProps {
   withoutPadding?: boolean;
   borderColor?: string;
 }
@@ -22,9 +23,13 @@ export function Divider(props: Props) {
   return (
     <div
       style={{ borderColor: props.borderColor || colors.$4 }}
-      className={classNames('border-b', {
-        'pt-6 mb-4 border-b': !props.withoutPadding,
-      })}
+      className={classNames(
+        'border-b',
+        {
+          'pt-6 mb-4 border-b': !props.withoutPadding,
+        },
+        props.className ?? ''
+      )}
     ></div>
   );
 }

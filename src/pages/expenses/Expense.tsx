@@ -136,7 +136,11 @@ export default function Expense() {
             />
 
             {isPreviewMode && !isLargeScreen && (
-              <Divider withoutPadding borderColor={colors.$5} />
+              <Divider
+                className="pt-4"
+                withoutPadding
+                borderColor={colors.$5}
+              />
             )}
 
             <Panel renderBasePanel={isPreviewMode && isLargeScreen}>
