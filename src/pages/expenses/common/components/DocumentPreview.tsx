@@ -12,6 +12,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Document } from '$app/common/interfaces/document.interface';
 import { defaultHeaders } from '$app/common/queries/common/headers';
+import { FileIcon } from '$app/components/FileIcon';
 import { Spinner } from '$app/components/Spinner';
 import { Icon } from '$app/components/icons/Icon';
 import { android } from '$app/pages/invoices/common/components/InvoiceViewer';
@@ -39,12 +40,17 @@ export function DocumentPreview(props: Props) {
   const [documentUrl, setDocumentUrl] = useState<string>('');
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [documentIndex, setDocumentIndex] = useState<number>(0);
+  const [unableToPreview, setUnableToPreview] = useState<boolean>(false);
 
   const isDocumentPicture = () => {
     const documentType = documents[documentIndex]?.type;
 
     return (
-      documentType === 'png' || documentType === 'jpg' || documentType === 'gif'
+      documentType === 'png' ||
+      documentType === 'jpg' ||
+      documentType === 'gif' ||
+      documentType === 'webp' ||
+      documentType === 'tiff'
     );
   };
 
@@ -57,6 +63,7 @@ export function DocumentPreview(props: Props) {
   useEffect(() => {
     if (documents.length) {
       setIsFormBusy(true);
+      setUnableToPreview(false);
 
       if (documents[documentIndex]) {
         queryClient
@@ -80,11 +87,10 @@ export function DocumentPreview(props: Props) {
 
             if (isDocumentPicture()) {
               setDocumentUrl(URL.createObjectURL(blob));
-            }
-
-            if (!android && iframeRef.current && isDocumentPdf()) {
-              console.log(URL.createObjectURL(blob));
+            } else if (!android && iframeRef.current && isDocumentPdf()) {
               iframeRef.current.src = URL.createObjectURL(blob);
+            } else {
+              setUnableToPreview(true);
             }
           })
           .finally(() => setIsFormBusy(false));
@@ -96,6 +102,7 @@ export function DocumentPreview(props: Props) {
     return () => {
       setDocumentUrl('');
       setIsFormBusy(false);
+      setUnableToPreview(false);
     };
   }, [documents, documentIndex]);
 
@@ -143,15 +150,23 @@ export function DocumentPreview(props: Props) {
             </div>
           )}
 
-          {isDocumentPicture() && !isFormBusy && (
+          {isDocumentPicture() && !isFormBusy && !unableToPreview && (
             <img className="w-full" src={documentUrl} />
           )}
 
           <iframe
             ref={iframeRef}
             width="100%"
-            height={isFormBusy || !isDocumentPdf() ? 0 : 1500}
+            height={
+              isFormBusy || !isDocumentPdf() || unableToPreview ? 0 : 1500
+            }
           />
+
+          {unableToPreview && (
+            <div className="flex h-full justify-center items-center">
+              <FileIcon type={documents[documentIndex]?.type} size={150} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex justify-center">{t('no_records_found')}.</div>
