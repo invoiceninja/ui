@@ -91,7 +91,7 @@ export function Tabs(props: Props) {
 
   return visible ? (
     <div className={props.className} data-cy="tabs">
-      <div className="sm:hidden">
+      <div className="flex flex-col space-y-5 sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
@@ -110,6 +110,8 @@ export function Tabs(props: Props) {
               )
           )}
         </select>
+
+        {props.rightSide}
       </div>
 
       <div className="hidden sm:block">

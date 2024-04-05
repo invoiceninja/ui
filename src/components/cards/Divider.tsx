@@ -13,6 +13,7 @@ import classNames from 'classnames';
 
 interface Props {
   withoutPadding?: boolean;
+  borderColor?: string;
 }
 
 export function Divider(props: Props) {
@@ -20,7 +21,7 @@ export function Divider(props: Props) {
 
   return (
     <div
-      style={{ borderColor: colors.$4 }}
+      style={{ borderColor: props.borderColor || colors.$4 }}
       className={classNames('border-b', {
         'pt-6 mb-4 border-b': !props.withoutPadding,
       })}

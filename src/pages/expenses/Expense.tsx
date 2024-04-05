@@ -30,6 +30,10 @@ import Toggle from '$app/components/forms/Toggle';
 import { Panel } from '$app/components/resizable-panels/Panel';
 import { PanelGroup } from '$app/components/resizable-panels/PanelGroup';
 import { PanelResizeHandle } from '$app/components/resizable-panels/PanelResizeHandle';
+import { DocumentPreview } from './common/components/DocumentPreview';
+import { useMediaQuery } from 'react-responsive';
+import { Divider } from '$app/components/cards/Divider';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -37,8 +41,10 @@ export default function Expense() {
   const { documentTitle } = useTitle('edit_expense');
 
   const { id } = useParams();
-
+  const actions = useActions();
+  const colors = useColorScheme();
   const { data } = useExpenseQuery({ id });
+  const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -62,16 +68,12 @@ export default function Expense() {
     },
   ];
 
+  const [errors, setErrors] = useState<ValidationBag>();
   const [expense, setExpense] = useState<ExpenseType>();
-
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
-
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
-
-  const actions = useActions();
 
   const save = useSave({ setErrors });
 
@@ -104,7 +106,7 @@ export default function Expense() {
           <Tabs
             tabs={tabs}
             rightSide={
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-end space-x-3">
                 <span className="text-sm">{t('preview')}</span>
                 <Toggle
                   checked={isPreviewMode}
@@ -114,8 +116,8 @@ export default function Expense() {
             }
           />
 
-          <PanelGroup renderBasePanelGroup={isPreviewMode}>
-            <Panel renderBasePanel={isPreviewMode}>
+          <PanelGroup renderBasePanelGroup={isPreviewMode && isLargeScreen}>
+            <Panel renderBasePanel={isPreviewMode && isLargeScreen}>
               <Outlet
                 context={{
                   errors,
@@ -129,11 +131,17 @@ export default function Expense() {
               />
             </Panel>
 
-            <PanelResizeHandle renderBasePanelResizeHandler={isPreviewMode} />
+            <PanelResizeHandle
+              renderBasePanelResizeHandler={isPreviewMode && isLargeScreen}
+            />
 
-            <Panel renderBasePanel={isPreviewMode}>
+            {isPreviewMode && !isLargeScreen && (
+              <Divider withoutPadding borderColor={colors.$5} />
+            )}
+
+            <Panel renderBasePanel={isPreviewMode && isLargeScreen}>
               {isPreviewMode && (
-                <div className="w-full bg-gray-200" style={{ height: 1500 }} />
+                <DocumentPreview documents={expense.documents} />
               )}
             </Panel>
           </PanelGroup>
