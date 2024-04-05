@@ -496,9 +496,30 @@ export function EmailSettings() {
           </>
         )}
 
+        {company?.settings.email_sending_method === 'client_brevo' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="brevo_secret"
+                labelElement={<SettingsLabel label={t('secret')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.brevo_secret || ''}
+              onValueChange={(value) =>
+                handleChange('settings.brevo_secret', value)
+              }
+              disabled={disableSettingsField('brevo_secret')}
+              errorMessage={errors?.errors['settings.brevo_secret']}
+            />
+          </Element>
+        )}
+
         {(company?.settings.email_sending_method === 'client_mailgun' ||
           company?.settings.email_sending_method === 'client_postmark' ||
-          company?.settings.email_sending_method === 'smtp') && (
+          company?.settings.email_sending_method === 'smtp' ||
+          company?.settings.email_sending_method === 'client_brevo') && (
           <Element
             leftSide={
               <PropertyCheckbox
