@@ -18,15 +18,19 @@ const client = axios.create();
 
 client.interceptors.response.use(
   (response) => {
-    const payload = response.config.data && JSON.parse(response.config.data);
-    const requestMethod = response.config.method;
+    try {
+      const payload = response.config.data && JSON.parse(response.config.data);
+      const requestMethod = response.config.method;
 
-    if (
-      requestMethod === 'put' ||
-      (requestMethod === 'post' && payload?.action === 'delete') ||
-      requestMethod === 'delete'
-    ) {
-      $refetch(['activities']);
+      if (
+        requestMethod === 'put' ||
+        (requestMethod === 'post' && payload?.action === 'delete') ||
+        requestMethod === 'delete'
+      ) {
+        $refetch(['activities']);
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     return response;
