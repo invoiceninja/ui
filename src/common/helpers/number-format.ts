@@ -15,7 +15,7 @@ export function numberFormat(
   thousandSeparator = ','
 ) {
   const number = typeof value === 'string' ? parseFloat(value) : value;
-  const str = number.toFixed(decimals).toString().split('.');
+  const str = parseFloat(number.toString()).toFixed(decimals).toString().split('.');
   const parts = [];
 
   for (let i = str[0].length; i > 0; i -= 3) {

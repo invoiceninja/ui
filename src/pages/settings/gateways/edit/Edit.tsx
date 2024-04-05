@@ -29,12 +29,15 @@ import { useHandleUpdate } from './hooks/useHandleUpdate';
 import { ImportCustomers } from './components/stripe/ImportCustomers';
 import { WebhookConfiguration } from './components/WebhookConfiguration';
 import collect from 'collect.js';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 export function Edit() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
   const { id } = useParams();
+  const actions = useActions();
 
   const { data } = useCompanyGatewayQuery({ id });
 
@@ -98,7 +101,19 @@ export function Edit() {
   }, [gateway]);
 
   return (
-    <Settings title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
+    <Settings
+      title={documentTitle}
+      breadcrumbs={pages}
+      navigationTopRight={
+        companyGateway && (
+          <ResourceActions
+            resource={companyGateway}
+            onSaveClick={onSave}
+            actions={actions}
+          />
+        )
+      }
+    >
       <TabGroup
         tabs={tabs}
         defaultTabIndex={Number(searchParams.get('tab')) ?? 0}

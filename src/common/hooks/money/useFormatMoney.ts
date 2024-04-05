@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Number } from '$app/common/helpers/number';
+import { Number as NumberHelper } from '$app/common/helpers/number';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { useResolveCountry } from '../useResolveCountry';
 import { useResolveCurrency } from '../useResolveCurrency';
@@ -30,9 +30,14 @@ export function useFormatMoney() {
     const currency = resolveCurrency(currentCurrencyId);
 
     if (country && currency) {
-      return Number.formatMoney(value, currency, country, {
-        showCurrencyCode: company.settings.show_currency_code,
-      });
+      return NumberHelper.formatMoney(
+        isNaN(Number(value)) ? 0 : value,
+        currency,
+        country,
+        {
+          showCurrencyCode: company.settings.show_currency_code,
+        }
+      );
     }
 
     return value;

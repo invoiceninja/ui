@@ -8,7 +8,7 @@ type AdminPermission = 'admin';
 export type Permission = TPermissions | AdminPermission;
 
 export async function logout(page: Page) {
-  await page.goto('/#/logout');
+  await page.goto('/logout');
 
   await page.waitForURL('**/login');
 }
@@ -21,20 +21,10 @@ export async function login(
   await page.waitForTimeout(500);
   await page.goto('/login');
   await page.locator('input[name="email"]').fill(email);
-  // await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
-  await page.waitForTimeout(500);
-
-  const isDashboardAvailable = await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Dashboard', exact: true })
-    .isVisible();
-
-  await page.waitForURL(
-    isDashboardAvailable ? '**/dashboard' : '**/settings/user_details'
-  );
+  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible();
 }
 
 export function permissions(page: Page) {
@@ -43,7 +33,7 @@ export function permissions(page: Page) {
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     const tableBody = page.locator('tbody').first();
 
@@ -51,7 +41,7 @@ export function permissions(page: Page) {
 
     await page.getByLabel('Current password*').fill('password');
     await page.locator('#current_password').press('Tab');
-    
+
     await page.getByLabel('Current password*').click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Permissions' }).click();
@@ -138,13 +128,35 @@ export async function checkDropdownActions(
 
   const dropDown = page.locator(`[data-cy=${dropdownId}]`);
 
-  actions.forEach(async ({ label, visible }) => {
+  for (const { label, visible, modal } of actions) {
     if (visible) {
       await expect(dropDown.getByText(label).first()).toBeVisible();
+
+      if (modal) {
+        await page.getByText(label).first().click();
+
+        await expect(page.getByText(modal.title).first()).toBeVisible();
+
+        for (const modalAction of modal.actions) {
+          if (modalAction.visible) {
+            await expect(
+              page.getByText(modalAction.label).first()
+            ).toBeVisible();
+          } else {
+            await expect(
+              page.getByText(modalAction.label).first()
+            ).not.toBeVisible();
+          }
+        }
+
+        await page.locator(`[data-cy=${modal.dataCyXButton}]`).click();
+
+        await expect(page.getByText(modal.title).first()).not.toBeVisible();
+      }
     } else {
       await expect(dropDown.getByText(label).first()).not.toBeVisible();
     }
-  });
+  }
 }
 
 export function useHasPermission({

@@ -25,11 +25,14 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Transactions() {
   useTitle('transactions');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
 
   const columns = useTransactionColumns();
 
@@ -104,6 +107,7 @@ export default function Transactions() {
           }
           withResourcefulActions
           linkToCreateGuards={[permission('create_bank_transaction')]}
+          hideEditableOptions={!hasPermission('edit_bank_transaction')}
         />
       </Default>
     </>

@@ -50,6 +50,9 @@ import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '../common/components/ConfirmActionModal';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -58,6 +61,9 @@ export default function Edit() {
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
   const reactSettings = useReactSettings();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const [saveOptions, setSaveOptions] = useState<SaveOption[]>();
 
@@ -149,28 +155,41 @@ export default function Edit() {
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
+  const colors = useColorScheme();
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => recurringInvoice && save(recurringInvoice)}
-      additionalSaveOptions={saveOptions}
-      navigationTopRight={
-        recurringInvoice && (
-          <ResourceActions
-            resource={recurringInvoice}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_recurring_invoice') ||
+        entityAssigned(recurringInvoice)) &&
+        recurringInvoice && {
+          onSaveClick: () => save(recurringInvoice),
+          navigationTopRight: (
+            <ResourceActions
+              resource={recurringInvoice}
+              label={t('more_actions')}
+              actions={actions}
+              cypressRef="recurringInvoiceActionDropdown"
+            />
+          ),
+          additionalSaveOptions: saveOptions,
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {recurringInvoice && (
             <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
+              <span
+                className="text-sm"
+                style={{
+                  backgroundColor: colors.$2,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
+              >
+                {t('status')}
+              </span>
               <RecurringInvoiceStatusBadge entity={recurringInvoice} />
             </div>
           )}
@@ -269,6 +288,7 @@ export default function Edit() {
               entity="recurring_invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>

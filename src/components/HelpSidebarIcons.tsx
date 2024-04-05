@@ -16,15 +16,10 @@ import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import {
-  Facebook,
-  GitHub,
   HelpCircle,
   Info,
   Mail,
   MessageSquare,
-  Slack,
-  Twitter,
-  Youtube,
   AlertCircle,
   ChevronLeft,
   ChevronRight,
@@ -41,6 +36,7 @@ import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleC
 import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
+import { AboutModal } from './AboutModal';
 
 interface Props {
   docsLink?: string;
@@ -173,61 +169,11 @@ export function HelpSidebarIcons(props: Props) {
           {t('dismiss')}
         </Button>
       </Modal>
-      <Modal
-        title={t('about')}
-        visible={isAboutVisible}
-        onClose={setIsAboutVisible}
-      >
-        <section>
-          <p className="text-gray-800">
-            {user?.first_name} {user?.last_name}
-          </p>
 
-          <p>{user?.email}</p>
-        </section>
-
-        <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
-          <a
-            href="https://twitter.com/invoiceninja"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Twitter />
-          </a>
-
-          <a
-            href="https://www.facebook.com/invoiceninja"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Facebook />
-          </a>
-
-          <a
-            href="https://github.com/invoiceninja"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <GitHub />
-          </a>
-
-          <a
-            href="https://www.youtube.com/channel/UCXAHcBvhW05PDtWYIq7WDFA/videos"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Youtube />
-          </a>
-
-          <a
-            href="http://slack.invoiceninja.com/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Slack />
-          </a>
-        </div>
-      </Modal>
+      <AboutModal
+        isAboutVisible={isAboutVisible}
+        setIsAboutVisible={setIsAboutVisible}
+      />
 
       <nav
         style={{ borderColor: colors.$5 }}

@@ -12,13 +12,13 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms/Link';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export function PastDueInvoices() {
   const formatMoney = useFormatMoney();
@@ -32,12 +32,12 @@ export function PastDueInvoices() {
       label: t('number'),
       format: (value, invoice) => {
         return (
-          <Link
+          <DynamicLink
             to={route('/invoices/:id/edit', { id: invoice.id })}
-            disableNavigation={disableNavigation('invoice', invoice)}
+            renderSpan={disableNavigation('invoice', invoice)}
           >
             {invoice.number}
-          </Link>
+          </DynamicLink>
         );
       },
     },
@@ -45,18 +45,21 @@ export function PastDueInvoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: invoice.client_id })}
-          disableNavigation={disableNavigation('client', invoice.client)}
+          renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
       id: 'due_date',
       label: t('due_date'),
-      format: (value, invoice) => value && invoice.partial_due_date.length > 2 ? dayjs(invoice.partial_due_date).format(dateFormat) : dayjs(value).format(dateFormat),
+      format: (value, invoice) =>
+        value && invoice.partial_due_date.length > 2
+          ? dayjs(invoice.partial_due_date).format(dateFormat)
+          : dayjs(value).format(dateFormat),
     },
     {
       id: 'balance',

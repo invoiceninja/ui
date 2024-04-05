@@ -23,21 +23,30 @@ interface Props {
   onContactCheckboxChange: (id: string, checked: boolean) => unknown;
   readonly?: boolean;
   errorMessage?: string | string[];
+  initiallyVisible?: boolean;
 }
 
 export function VendorSelector(props: Props) {
   const { t } = useTranslation();
-  const [vendor, setVendor] = useState<Vendor>();
+
+  const { resource, initiallyVisible } = props;
 
   const vendorResolver = useVendorResolver();
 
+  const [vendor, setVendor] = useState<Vendor>();
+  const [vendorId, setVendorId] = useState<string>('');
+
   useEffect(() => {
-    if (props.resource && props.resource.vendor_id.length > 0) {
-      vendorResolver
-        .find(props.resource.vendor_id)
-        .then((vendor) => setVendor(vendor));
+    if (vendorId) {
+      vendorResolver.find(vendorId).then((vendor) => setVendor(vendor));
     }
-  }, [props.resource?.vendor_id]);
+  }, [vendorId]);
+
+  useEffect(() => {
+    if (resource) {
+      setVendorId(resource.vendor_id || resource.vendor?.id || '');
+    }
+  }, [resource?.vendor_id, resource?.vendor?.id]);
 
   const isChecked = (id: string) => {
     const potential = props.resource?.invitations.find(
@@ -53,15 +62,15 @@ export function VendorSelector(props: Props) {
         <Selector
           inputLabel={t('vendor')}
           onChange={(vendor) => props.onChange(vendor.id)}
-          value={props.resource?.vendor_id}
+          value={vendorId}
           readonly={props.readonly}
-          clearButton={Boolean(props.resource?.vendor_id)}
           onClearButtonClick={props.onClearButtonClick}
+          initiallyVisible={initiallyVisible}
           errorMessage={props.errorMessage}
         />
       </div>
 
-      {props.resource?.vendor_id &&
+      {vendorId &&
         vendor &&
         vendor.contacts.map((contact, index) => (
           <div key={index}>
@@ -71,7 +80,7 @@ export function VendorSelector(props: Props) {
               label={
                 contact.first_name.length >= 1
                   ? `${contact.first_name} ${contact.last_name}`
-                  : t('blank_contact')
+                  : contact.email || vendor.name
               }
               checked={isChecked(contact.id)}
               onValueChange={(value, checked) =>
@@ -79,7 +88,9 @@ export function VendorSelector(props: Props) {
               }
             />
 
-            <span className="text-sm text-gray-700">{contact.email}</span>
+            {contact.first_name && (
+              <span className="text-sm">{contact.email}</span>
+            )}
           </div>
         ))}
     </>

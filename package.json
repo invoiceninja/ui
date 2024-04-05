@@ -1,6 +1,6 @@
 {
   "name": "@invoiceninja/ui",
-  "version": "05.02.2024.1",
+  "version": "02.04.2024.1",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.0.1",
@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.2.0",
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.40.1",
     "@tailwindcss/forms": "^0.5.3",
     "@types/jest": "^29.2.4",
     "@types/lodash": "^4.14.191",

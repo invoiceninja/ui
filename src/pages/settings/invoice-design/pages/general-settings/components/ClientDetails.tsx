@@ -16,7 +16,7 @@ import { CustomDesignsPlanAlert } from '../../custom-designs/components/CustomDe
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
-export function ClientDetails() {
+export default function ClientDetails() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -70,18 +70,16 @@ export function ClientDetails() {
   ];
 
   return (
-    <Card
-      title={t('client_details')}
-      padding="small"
-      collapsed={!proPlan() && !enterprisePlan() ? false : true}
-    >
-      <CustomDesignsPlanAlert className="px-6" />
+    <>
+      <CustomDesignsPlanAlert />
 
-      <SortableVariableList
-        for="client_details"
-        defaultVariables={defaultVariables}
-        disabled={!proPlan() && !enterprisePlan()}
-      />
-    </Card>
+      <Card title={t('client_details')} padding="small">
+        <SortableVariableList
+          for="client_details"
+          defaultVariables={defaultVariables}
+          disabled={!proPlan() && !enterprisePlan()}
+        />
+      </Card>
+    </>
   );
 }

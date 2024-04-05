@@ -16,14 +16,12 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';
+import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCloudCircle,
   MdDelete,
-  MdDeleteForever,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
@@ -35,17 +33,18 @@ import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { PurgeClientAction } from '../components/PurgeClientAction';
+import { MergeClientAction } from '../components/MergeClientAction';
+import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
-  setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
-  setMergeFromClientId?: Dispatch<SetStateAction<string>>;
-  setPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
-  setPurgeClientId?: Dispatch<SetStateAction<string>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
-
-export function useActions(params: Params) {
+export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
+
+  const { setIsPurgeOrMergeActionCalled } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -70,7 +69,17 @@ export function useActions(params: Params) {
     (client) =>
       !client.is_deleted && (
         <DropdownElement
-          onClick={() => window.open(client.contacts[0].link, '__blank')}
+          onClick={() =>
+            window.open(
+              route(
+                `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
+                {
+                  clientHash: client.client_hash,
+                }
+              ),
+              '__blank'
+            )
+          }
           icon={<Icon element={MdCloudCircle} />}
         >
           {t('client_portal')}
@@ -128,16 +137,12 @@ export function useActions(params: Params) {
       ),
     (client) =>
       !client.is_deleted &&
-      (isAdmin || isOwner) && (
-        <DropdownElement
-          onClick={() => {
-            params.setMergeFromClientId?.(client.id);
-            params.setIsMergeModalOpen(true);
-          }}
-          icon={<Icon element={BiGitMerge} />}
-        >
-          {t('merge')}
-        </DropdownElement>
+      (isAdmin || isOwner) &&
+      client && (
+        <MergeClientAction
+          client={client}
+          setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
+        />
       ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
@@ -174,17 +179,13 @@ export function useActions(params: Params) {
         </DropdownElement>
       ),
     (client) =>
-      (isAdmin || isOwner) && (
-        <DropdownElement
+      (isAdmin || isOwner) &&
+      client && (
+        <PurgeClientAction
           key="purge"
-          onClick={() => {
-            params.setPurgeClientId?.(client.id);
-            params.setPasswordConfirmModalOpen(true);
-          }}
-          icon={<Icon element={MdDeleteForever} />}
-        >
-          {t('purge')}
-        </DropdownElement>
+          client={client}
+          setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
+        />
       ),
   ];
 

@@ -136,6 +136,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setRecurringInvoice(undefined);
+    };
   }, [data]);
 
   useEffect(() => {
@@ -210,7 +214,7 @@ export default function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {recurringInvoice && client ? (
+              {recurringInvoice ? (
                 <ProductsTable
                   type="product"
                   resource={recurringInvoice}
@@ -238,7 +242,7 @@ export default function Create() {
             </div>
 
             <div>
-              {recurringInvoice && client ? (
+              {recurringInvoice ? (
                 <ProductsTable
                   type="task"
                   resource={recurringInvoice}

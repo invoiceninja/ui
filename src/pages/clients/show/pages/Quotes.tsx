@@ -41,6 +41,7 @@ export default function Quotes() {
       bulkRoute="/api/v1/quotes/bulk"
       linkToCreate={route('/quotes/create?client=:id', { id })}
       linkToEdit="/quotes/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_quote')]}
       hideEditableOptions={!hasPermission('edit_quote')}
     />

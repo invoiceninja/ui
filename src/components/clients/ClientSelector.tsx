@@ -17,7 +17,6 @@ import { ComboboxAsync } from '../forms/Combobox';
 import { Alert } from '../Alert';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { ClientContact } from '$app/common/interfaces/client-contact';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -26,6 +25,7 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   staleTime?: number;
   disableWithSpinner?: boolean;
   clearInputAfterSelection?: boolean;
+  dropdownLabelFn?: (client: Client) => string | JSX.Element;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -34,26 +34,7 @@ export function ClientSelector(props: ClientSelectorProps) {
 
   const hasPermission = useHasPermission();
 
-  const showDropdownContact = (contacts: ClientContact[], keyword: string) => {
-    let contactIndex = -1;
-
-    contacts.forEach(({ first_name, last_name, email }, index) => {
-      if (
-        keyword &&
-        (first_name?.includes(keyword) ||
-          last_name?.includes(keyword) ||
-          email?.includes(keyword))
-      ) {
-        contactIndex = index;
-      }
-    });
-
-    if (contactIndex < 0) {
-      contactIndex = 0;
-    }
-
-    return contactIndex;
-  };
+  const { dropdownLabelFn } = props;
 
   return (
     <>
@@ -78,31 +59,8 @@ export function ClientSelector(props: ClientSelectorProps) {
           label: 'display_name',
           value: 'id',
           customSearchableValue: (client) =>
-            client.contacts
-              .map(({ first_name, last_name, email }) =>
-                [[first_name, last_name].join(' '), email].join(',')
-              )
-              .join(','),
-          dropdownLabelFn: (client, searchTerm) => (
-            <div className="flex flex-col justify-center cursor-pointer">
-              <span className="font-semibold">{client.display_name}</span>
-
-              {client.contacts.map(
-                (contact, index) =>
-                  showDropdownContact(client.contacts, searchTerm) ===
-                    index && (
-                    <div key={index} className="flex space-x-1 text-xs">
-                      <span>{contact.first_name}</span>
-                      <span>{contact.last_name}</span>
-                      {(contact.first_name || contact.last_name) && (
-                        <span>-</span>
-                      )}
-                      <span>{contact.email}</span>
-                    </div>
-                  )
-              )}
-            </div>
-          ),
+            client.contacts.map(({ email }) => email).join(','),
+          dropdownLabelFn,
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}

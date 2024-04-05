@@ -19,6 +19,7 @@ import { Quote } from '../interfaces/quote';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { Task } from '../interfaces/task';
+import { Transaction } from '../interfaces/transactions';
 import { Vendor } from '../interfaces/vendor';
 import { useHasPermission } from './permissions/useHasPermission';
 import { useEntityAssigned } from './useEntityAssigned';
@@ -35,7 +36,8 @@ type Entity =
   | 'task'
   | 'expense'
   | 'vendor'
-  | 'recurring_expense';
+  | 'recurring_expense'
+  | 'bank_transaction';
 
 type Resource =
   | Client
@@ -49,7 +51,8 @@ type Resource =
   | Task
   | Expense
   | Vendor
-  | RecurringExpense;
+  | RecurringExpense
+  | Transaction;
 
 export function useDisableNavigation() {
   const hasPermission = useHasPermission();

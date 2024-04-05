@@ -106,8 +106,9 @@ export function AddTasksOnInvoiceAction(props: Props) {
     !isModalVisible && setSelected?.([]);
   }, [isModalVisible]);
 
-  return (tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
-    isBulkAction ? (
+  return ((tasks.length && tasks[0].client_id && !tasks[0].invoice_id) ||
+    isBulkAction) &&
+    (hasPermission('create_invoice') || hasPermission('edit_invoice')) ? (
     <>
       <AddTasksOnInvoiceModal
         visible={isModalVisible}

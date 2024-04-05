@@ -19,15 +19,11 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
@@ -35,19 +31,12 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { Quote } from '$app/common/interfaces/quote';
-import { creditAtom } from '$app/pages/credits/common/atoms';
-import { Credit } from '$app/common/interfaces/credit';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { StatusBadge } from '$app/components/StatusBadge';
@@ -74,13 +63,15 @@ import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/componen
 
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import dayjs from 'dayjs';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { UpdatePricesAction } from './components/UpdatePricesAction';
 import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -282,26 +273,20 @@ interface Params {
 }
 
 export function useActions(params?: Params) {
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
-
-  const { t } = useTranslation();
-
-  const hasPermission = useHasPermission();
+  const [t] = useTranslation();
 
   const bulk = useBulkAction();
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const toggleStartStop = useToggleStartStop();
+
+  const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
 
   const { showEditAction, showCommonBulkActions } = params || {};
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
   });
-
-  const navigate = useNavigate();
-  const toggleStartStop = useToggleStartStop();
 
   const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
     setRecurringInvoice({
@@ -312,85 +297,6 @@ export function useActions(params?: Params) {
     });
 
     navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToInvoice = (recurringInvoice: RecurringInvoice) => {
-    setInvoice({
-      ...(recurringInvoice as unknown as Invoice),
-      id: '',
-      documents: [],
-      number: '',
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
-
-  const cloneToQuote = (recurringInvoice: RecurringInvoice) => {
-    setQuote({
-      ...(recurringInvoice as unknown as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToCredit = (recurringInvoice: RecurringInvoice) => {
-    setCredit({
-      ...(recurringInvoice as unknown as Credit),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/credits/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (recurringInvoice: RecurringInvoice) => {
-    setPurchaseOrder({
-      ...(recurringInvoice as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<RecurringInvoice>[] = [
@@ -450,45 +356,12 @@ export function useActions(params?: Params) {
           onClick={() => cloneToRecurringInvoice(recurringInvoice)}
           icon={<Icon element={MdControlPointDuplicate} />}
         >
-          {t('clone')}
+          {t('clone_to_recurring')}
         </DropdownElement>
       ),
-    (recurringInvoice) =>
-      hasPermission('create_invoice') && (
-        <DropdownElement
-          onClick={() => cloneToInvoice(recurringInvoice)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_invoice')}
-        </DropdownElement>
-      ),
-    (recurringInvoice) =>
-      hasPermission('create_quote') && (
-        <DropdownElement
-          onClick={() => cloneToQuote(recurringInvoice)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_quote')}
-        </DropdownElement>
-      ),
-    (recurringInvoice) =>
-      hasPermission('create_credit') && (
-        <DropdownElement
-          onClick={() => cloneToCredit(recurringInvoice)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_credit')}
-        </DropdownElement>
-      ),
-    (recurringInvoice) =>
-      hasPermission('create_purchase_order') && (
-        <DropdownElement
-          onClick={() => cloneToPurchaseOrder(recurringInvoice)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_purchase_order')}
-        </DropdownElement>
-      ),
+    (recurringInvoice) => (
+      <CloneOptionsModal recurringInvoice={recurringInvoice} />
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkActions)) && (
         <Divider withoutPadding />
@@ -629,6 +502,7 @@ export function useRecurringInvoiceColumns() {
 
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -652,17 +526,14 @@ export function useRecurringInvoiceColumns() {
       id: 'number',
       label: t('number'),
       format: (value, recurringInvoice) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
-          disableNavigation={disableNavigation(
-            'recurring_invoice',
-            recurringInvoice
-          )}
+          renderSpan={disableNavigation('recurring_invoice', recurringInvoice)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -670,15 +541,12 @@ export function useRecurringInvoiceColumns() {
       id: 'client_id',
       label: t('client'),
       format: (value, recurringInvoice) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: recurringInvoice.client_id })}
-          disableNavigation={disableNavigation(
-            'client',
-            recurringInvoice.client
-          )}
+          renderSpan={disableNavigation('client', recurringInvoice.client)}
         >
           {recurringInvoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -744,21 +612,25 @@ export function useRecurringInvoiceColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',

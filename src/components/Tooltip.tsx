@@ -9,12 +9,13 @@
  */
 
 import classNames from 'classnames';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   children: ReactElement;
-  message: string;
+  message?: string;
   className?: string;
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
@@ -22,10 +23,23 @@ interface Props {
   placement?: 'top' | 'bottom' | 'right';
   containsUnsafeHTMLTags?: boolean;
   withoutArrow?: boolean;
+  tooltipElement?: ReactNode;
+  disabled?: boolean;
+  withoutWrapping?: boolean;
 }
 
 export function Tooltip(props: Props) {
-  const { width, placement, withoutArrow } = props;
+  const colors = useColorScheme();
+
+  const {
+    width,
+    placement,
+    withoutArrow,
+    tooltipElement,
+    message,
+    disabled,
+    withoutWrapping,
+  } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
 
@@ -62,40 +76,55 @@ export function Tooltip(props: Props) {
         placement={placement || 'top-start'}
         interactive={true}
         render={() => (
-          <div className="flex flex-col items-center whitespace-normal">
-            <span
+          <div className="flex flex-col items-center">
+            <div
               className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all whitespace-nowrap',
+                'relative p-2 text-xs text-center text-white rounded-md',
                 {
                   'leading-1': includeLeading,
                   'leading-none': !includeLeading,
+                  'whitespace-normal break-all':
+                    Boolean(message) && !withoutWrapping,
+                  'whitespace-nowrap': withoutWrapping,
                 }
               )}
-              style={{ width: width || messageWidth }}
+              style={{
+                width: width || messageWidth,
+                backgroundColor: colors.$5,
+                color: colors.$3,
+              }}
             >
-              {props.containsUnsafeHTMLTags ? (
-                <span dangerouslySetInnerHTML={{ __html: props.message }} />
-              ) : (
-                props.message
+              {message && (
+                <>
+                  {props.containsUnsafeHTMLTags ? (
+                    <span dangerouslySetInnerHTML={{ __html: message }} />
+                  ) : (
+                    message
+                  )}
+                </>
               )}
-            </span>
+
+              {tooltipElement}
+            </div>
 
             {!withoutArrow && (
-              <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
+              <div
+                className="w-3 h-3 -mt-2 rotate-45 opacity-90"
+                style={{ backgroundColor: colors.$5 }}
+              ></div>
             )}
           </div>
         )}
+        disabled={disabled}
       >
-        {
-          <div
-            ref={parentChildrenElement}
-            className={classNames('cursor-pointer', {
-              'truncate w-full': props.truncate,
-            })}
-          >
-            {props.children}
-          </div>
-        }
+        <div
+          ref={parentChildrenElement}
+          className={classNames('cursor-pointer', {
+            'truncate w-full': props.truncate,
+          })}
+        >
+          {props.children}
+        </div>
       </Tippy>
     </div>
   );

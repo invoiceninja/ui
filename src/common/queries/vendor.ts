@@ -16,6 +16,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Params } from './common/params.interface';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { useHasPermission } from '../hooks/permissions/useHasPermission';
 
 interface VendorParams {
   id: string | undefined;
@@ -34,13 +35,15 @@ export function useVendorQuery(params: VendorParams) {
 }
 
 export function useBlankVendorQuery() {
+  const hasPermission = useHasPermission();
+
   return useQuery<Vendor>(
     ['/api/v1/vendors', 'create'],
     () =>
       request('GET', endpoint('/api/v1/vendors/create')).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: hasPermission('create_vendor') }
   );
 }
 

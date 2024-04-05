@@ -40,19 +40,21 @@ export function useBlankClientQuery(params: BlankQueryParams) {
 
 interface Props {
   enabled?: boolean;
+  status?: string[];
 }
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    [
-      '/api/v1/clients',
-      'filter_deleted_clients=true',
-      'per_page=500',
-      'include=group_settings',
-    ],
+    ['/api/v1/clients', 'per_page=500', props],
     () =>
-      request('GET', endpoint('/api/v1/clients?per_page=500')).then(
-        (response) => response.data.data
+      request(
+        'GET',
+        endpoint('/api/v1/clients?per_page=500&status=:status', {
+          status: props.status?.join(',') ?? 'all',
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<Client[]>) =>
+          response.data.data
       ),
     { enabled: props.enabled ?? true, staleTime: Infinity }
   );

@@ -37,7 +37,7 @@ export const useBulk = () => {
     }).then(() => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
-        `${action}d_invoice`;
+        `${action}d_credit`;
 
       toast.success(message);
 

@@ -21,6 +21,9 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useDispatch } from 'react-redux';
 import { SmsVerificationModal } from '../../components/SmsVerificationModal';
+import { useColorScheme } from '$app/common/colors';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 
 interface Props {
   checkVerification: boolean;
@@ -46,11 +49,12 @@ export function TwoFactorAuthenticationModals(props: Props) {
   const [isEnableModalOpen, setIsEnableModalOpen] = useState<boolean>(false);
   const [isSmsModalOpen, setIsSmsModalOpen] = useState<boolean>(false);
 
-  const [qrCode, setQrCode] = useState('');
-  const [qrCodeSecret, setQrCodeSecret] = useState('');
+  const [qrCode, setQrCode] = useState<string>('');
+  const [qrCodeSecret, setQrCodeSecret] = useState<string>('');
 
-  const [oneTimePassword, setOneTimePassword] = useState('');
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+  const [oneTimePassword, setOneTimePassword] = useState<string>('');
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const requestQrCode = () => {
     toast.processing();
@@ -70,6 +74,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
 
   const enableTwoFactor = () => {
     toast.processing();
+    setErrors(undefined);
 
     request('POST', endpoint('/api/v1/settings/enable_two_factor'), {
       secret: qrCodeSecret,
@@ -81,6 +86,12 @@ export function TwoFactorAuthenticationModals(props: Props) {
         dispatch(updateUser(merge({}, user, { google_2fa_secret: true })));
 
         setIsEnableModalOpen(false);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        }
       })
       .finally(() => setIsSubmitDisabled(false));
   };
@@ -159,6 +170,8 @@ export function TwoFactorAuthenticationModals(props: Props) {
     }
   }, [isSmsModalOpen, isEnableModalOpen]);
 
+  const colors = useColorScheme();
+
   return (
     <>
       <SmsVerificationModal
@@ -175,7 +188,16 @@ export function TwoFactorAuthenticationModals(props: Props) {
       >
         <div className="flex flex-col items-center pb-8 space-y-4">
           <QRCode size={156} value={qrCode} />
-          <p className="text-gray-900 font-semibold">{qrCodeSecret}</p>
+          <p
+            className="font-semibold"
+            style={{
+              backgroundColor: colors.$2,
+              color: colors.$3,
+              colorScheme: colors.$0,
+            }}
+          >
+            {qrCodeSecret}
+          </p>
         </div>
 
         <InputField
@@ -183,6 +205,7 @@ export function TwoFactorAuthenticationModals(props: Props) {
           type="text"
           label={t('one_time_password')}
           onValueChange={(value) => setOneTimePassword(value)}
+          errorMessage={errors?.errors.one_time_password}
         />
 
         <Button

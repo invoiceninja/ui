@@ -10,7 +10,7 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
-import { Route } from 'react-router-dom';
+import { Outlet, Route } from 'react-router-dom';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
@@ -80,21 +80,19 @@ export const quoteRoutes = (
       }
     />
     <Route
-      path=":id/pdf"
+      path=":id"
       element={
         <Guard
           guards={[
             enabled(ModuleBitmask.Quotes),
-            or(
-              permission('view_quote'),
-              permission('edit_quote'),
-              assigned('/api/v1/quotes/:id')
-            ),
+            or(permission('edit_quote'), assigned('/api/v1/quotes/:id')),
           ]}
-          component={<Pdf />}
+          component={<Outlet />}
         />
       }
-    />
-    <Route path=":id/email" element={<Email />} />
+    >
+      <Route path="pdf" element={<Pdf />} />
+      <Route path="email" element={<Email />} />
+    </Route>
   </Route>
 );

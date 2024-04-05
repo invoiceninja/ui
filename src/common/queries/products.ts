@@ -16,20 +16,25 @@ import { Product } from '$app/common/interfaces/product';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericQueryOptions } from './invoices';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Params } from './common/params.interface';
 
-interface Params {
+interface ProductsParams extends Params {
   include?: string;
 }
 
-export function useProductsQuery(params?: Params) {
+export function useProductsQuery(params?: ProductsParams) {
   return useQuery<Product[]>(
     ['/api/v1/products'],
     () =>
       request(
         'GET',
-        endpoint('/api/v1/products?per_page=500&include=:include', {
-          include: params?.include || '',
-        })
+        endpoint(
+          '/api/v1/products?per_page=500&include=:include&status=:status',
+          {
+            include: params?.include || '',
+            status: params?.status ?? 'all',
+          }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Product[]>) =>
           response.data.data

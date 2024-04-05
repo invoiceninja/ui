@@ -24,23 +24,53 @@ import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  PaymentSlider,
+  paymentSliderAtom,
+  paymentSliderVisibilityAtom,
+} from '../common/components/PaymentSlider';
 
 export default function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
 
-  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
-
-  const columns = usePaymentColumns();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions();
-
-  const paymentColumns = useAllPaymentColumns();
-
   const filters = usePaymentFilters();
-
+  const columns = usePaymentColumns();
+  const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
+
+  const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
+  const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
+  const [paymentSliderVisibility, setPaymentSliderVisibility] = useAtom(
+    paymentSliderVisibilityAtom
+  );
+
+  const { data: paymentResponse } = usePaymentQuery({
+    id: sliderPaymentId,
+    include: 'credits',
+  });
+
+  useEffect(() => {
+    if (paymentResponse && paymentSliderVisibility) {
+      setPaymentSlider(paymentResponse);
+    }
+  }, [paymentResponse, paymentSliderVisibility]);
+
+  useEffect(() => {
+    return () => setPaymentSliderVisibility(false);
+  }, []);
 
   return (
     <Default
@@ -69,8 +99,15 @@ export default function Payments() {
             table="payment"
           />
         }
+        onTableRowClick={(payment) => {
+          setSliderPaymentId(payment.id);
+          setPaymentSliderVisibility(true);
+        }}
         linkToCreateGuards={[permission('create_payment')]}
+        hideEditableOptions={!hasPermission('edit_payment')}
       />
+
+      {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
     </Default>
   );
 }

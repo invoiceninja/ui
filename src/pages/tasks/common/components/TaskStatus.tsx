@@ -68,7 +68,7 @@ export function TaskStatus(props: Props) {
     const darknessAmount = isColorLight(red, green, blue) ? -220 : 220;
 
     return (
-      <div ref={ref}>
+      <div ref={ref} onClick={(event) => event.stopPropagation()}>
         <StatusBadge
           for={{}}
           code={status.name}
@@ -93,7 +93,7 @@ export function TaskStatus(props: Props) {
   }
 
   return (
-    <div ref={ref}> 
+    <div ref={ref} onClick={(event) => event.stopPropagation()}>
       <StatusBadge
         for={{}}
         code="logged"

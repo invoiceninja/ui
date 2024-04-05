@@ -9,7 +9,13 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Payment } from '$app/common/interfaces/payment';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -20,9 +26,21 @@ interface Params {
 export function useTabs(params: Params) {
   const [t] = useTranslation();
 
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
   const { id } = useParams();
 
   const { payment } = params;
+
+  const canOnlyEdit = hasPermission('edit_payment') || entityAssigned(payment);
+
+  const canEditAndView =
+    hasPermission('view_payment') ||
+    hasPermission('edit_payment') ||
+    entityAssigned(payment);
 
   let tabs: Tab[] = [
     {
@@ -32,18 +50,25 @@ export function useTabs(params: Params) {
     {
       name: t('apply'),
       href: route('/payments/:id/apply', { id }),
+      enabled: canOnlyEdit,
     },
     {
       name: t('refund'),
       href: route('/payments/:id/refund', { id }),
+      enabled: canOnlyEdit,
     },
     {
       name: t('documents'),
       href: route('/payments/:id/documents', { id }),
+      enabled: canEditAndView,
+      formatName: () => (
+        <DocumentsTabLabel numberOfDocuments={payment?.documents?.length} />
+      ),
     },
     {
       name: t('custom_fields'),
       href: route('/payments/:id/payment_fields', { id }),
+      enabled: isAdmin || isOwner,
     },
   ];
 

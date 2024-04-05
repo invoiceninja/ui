@@ -11,7 +11,7 @@
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { date as formatDate } from '$app/common/helpers';
+import { date as formatDate, useParseDayjs } from '$app/common/helpers';
 import { ChartData, TotalColors } from './Totals';
 import {
   Line,
@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
+import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
 
 type Props = {
   data: ChartData;
@@ -44,23 +45,61 @@ type LineChartData = {
 
 export function Chart(props: Props) {
   const { t } = useTranslation();
-  const { currency } = props;
+  const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const parseDayjs = useParseDayjs();
+  const generateWeekDateRange = useGenerateWeekDateRange();
 
   const formatMoney = useFormatMoney();
 
   const [chartData, setChartData] = useState<LineChartData>([]);
 
-  const generateDateRange = (start: Date, end: Date, range: 1 | 7 | 30) => {
-    const date = new Date(start.getTime());
+  const generateDateRange = (
+    startDate: Date,
+    endDate: Date,
+    period: 'day' | 'week' | 'month'
+  ) => {
+    let dates = [];
 
-    const dates = [];
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
 
-    while (date <= end) {
-      dates.push(new Date(date));
-      date.setDate(date.getDate() + range);
+    let currentDate = start.clone();
+
+    switch (period) {
+      case 'day':
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          dates.push(currentDate.toDate());
+          currentDate = currentDate.add(1, 'day');
+        }
+        break;
+
+      case 'week':
+        dates = generateWeekDateRange(startDate, endDate);
+        break;
+
+      case 'month':
+        while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          if (currentDate.isSame(start, 'day')) {
+            dates.push(start.toDate());
+          }
+
+          dates.push(currentDate.endOf('month').toDate());
+          currentDate = currentDate.add(1, 'month');
+        }
+        break;
+
+      default:
+        return [];
+    }
+
+    const lengthOfDates = dates.length;
+
+    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(end)) {
+      dates[lengthOfDates - 1] = end.toDate();
     }
 
     return dates;
@@ -69,18 +108,27 @@ export function Chart(props: Props) {
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
+    let isMatchingWithLastPointDay = false;
+
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
 
       if (nextEntry) {
-        const dateToCheck = dayjs(date);
+        const dateToCheck = parseDayjs(date);
 
-        const startDate = dayjs(entry.date);
-        const endDate = dayjs(nextEntry.date);
+        const startDate = parseDayjs(entry.date);
+        const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
-          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
+          dateToCheck.isAfter(startDate) &&
+          dateToCheck.isBefore(endDate) &&
+          !dateToCheck.isSame(parseDayjs(data[0].date));
+
         const isEntryDateMatch = entry.date === date;
+
+        isMatchingWithLastPointDay =
+          startDate.isSame(dateToCheck) &&
+          !dateToCheck.isSame(parseDayjs(data[0].date));
 
         return isDateInRange || isEntryDateMatch;
       }
@@ -88,7 +136,11 @@ export function Chart(props: Props) {
       return false;
     });
 
-    return recordIndex;
+    return chartSensitivity !== 'day' &&
+      recordIndex > -1 &&
+      !isMatchingWithLastPointDay
+      ? recordIndex + 1
+      : recordIndex;
   };
 
   const yAxisWidth = useMemo(() => {
@@ -110,61 +162,19 @@ export function Chart(props: Props) {
   }, [chartData]);
 
   useEffect(() => {
-    const data: LineChartData = [];
+    const dates = generateDateRange(
+      new Date(props.dates.start_date),
+      new Date(props.dates.end_date),
+      props.chartSensitivity
+    );
 
-    if (props.chartSensitivity === 'day') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        1
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
-
-    if (props.chartSensitivity === 'week') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        7
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
-
-    if (props.chartSensitivity === 'month') {
-      const dates = generateDateRange(
-        new Date(props.dates.start_date),
-        new Date(props.dates.end_date),
-        30
-      );
-
-      dates.map((date) => {
-        data.push({
-          date: formatDate(date.toString(), dateFormat),
-          invoices: 0,
-          outstanding: 0,
-          payments: 0,
-          expenses: 0,
-        });
-      });
-    }
+    const data: LineChartData = dates.map((date) => ({
+      date: formatDate(date.toString(), dateFormat),
+      invoices: 0,
+      outstanding: 0,
+      payments: 0,
+      expenses: 0,
+    }));
 
     props.data?.invoices.forEach((invoice) => {
       const date = formatDate(invoice.date, dateFormat);
@@ -267,6 +277,7 @@ export function Chart(props: Props) {
           tick={{ fontSize: 14 }}
           stroke={colors.$3}
         />
+
         <YAxis
           interval={0}
           tickCount={6}

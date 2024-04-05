@@ -91,8 +91,11 @@ export function Totals() {
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
-  const chartScale = settings.preferences.dashboard_charts.default_view;
-  const currency = settings.preferences.dashboard_charts.currency;
+  const chartScale =
+    settings?.preferences?.dashboard_charts?.default_view || 'month';
+  const currency = settings?.preferences?.dashboard_charts?.currency || 1;
+  const dateRange =
+    settings?.preferences?.dashboard_charts?.range || 'this_month';
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -108,15 +111,15 @@ export function Totals() {
   }>({
     start_date: '',
     end_date: '',
-    date_range: settings.preferences.dashboard_charts.range,
+    date_range: dateRange,
   });
 
   useEffect(() => {
     setBody((current) => ({
       ...current,
-      date_range: settings.preferences.dashboard_charts.range,
+      date_range: dateRange,
     }));
-  }, [settings.preferences.dashboard_charts.range]);
+  }, [settings?.preferences?.dashboard_charts?.range]);
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
@@ -262,7 +265,7 @@ export function Totals() {
           <Preferences>
             <CurrencySelector
               label={t('currency')}
-              value={settings.preferences.dashboard_charts.currency.toString()}
+              value={currency.toString()}
               onChange={(v) =>
                 update('preferences.dashboard_charts.currency', parseInt(v))
               }
@@ -270,7 +273,7 @@ export function Totals() {
 
             <SelectField
               label={t('range')}
-              value={settings.preferences.dashboard_charts.default_view}
+              value={chartScale}
               onValueChange={(value) =>
                 update(
                   'preferences.dashboard_charts.default_view',
@@ -285,7 +288,7 @@ export function Totals() {
 
             <SelectField
               label={t('date_range')}
-              value={settings.preferences.dashboard_charts.range}
+              value={dateRange}
               onValueChange={(value) =>
                 update('preferences.dashboard_charts.range', value)
               }

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 import { useCustomField } from '$app/components/CustomField';
 
-export function TaskColumns() {
+export default function TaskColumns() {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -45,7 +45,7 @@ export function TaskColumns() {
   ];
 
   return (
-    <Card title={t('task_columns')} padding="small" collapsed={true}>
+    <Card title={t('task_columns')} padding="small">
       <SortableVariableList
         for="task_columns"
         defaultVariables={defaultVariables}

@@ -64,7 +64,7 @@ export function Users() {
           resource="user"
           columns={columns}
           endpoint={route(
-            '/api/v1/users?without=:userId&sort=id|desc&status=active',
+            '/api/v1/users?hideOwnerUsers=true&without=:userId&sort=id|desc&status=active',
             {
               userId: currentUser?.id,
             }

@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { BankAccount } from './bank-accounts';
+import { Document } from './document.interface';
+
 export interface Company {
   id: string;
   size_id: string;
@@ -61,6 +64,18 @@ export interface Company {
   first_month_of_year: string;
   company_key: string;
   fill_products: boolean;
+  convert_products: boolean;
+  bank_integrations: BankAccount[];
+  documents: Document[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
+  smtp_host: string;
+  smtp_port: string;
+  smtp_encryption: string;
+  smtp_username: string;
+  smtp_password: string;
+  smtp_local_domain: string;
+  smtp_verify_peer: boolean;
 }
 
 export interface Settings {
@@ -273,6 +288,7 @@ export interface Settings {
   client_portal_under_payment_minimum: number;
   client_portal_allow_over_payment: boolean;
   use_credits_payment: string;
+  use_unapplied_payment: string;
   hide_empty_columns_on_pdf: boolean;
   email_from_name: string;
   auto_archive_invoice_cancelled: boolean;
@@ -293,6 +309,8 @@ export interface Settings {
   send_email_on_mark_paid: boolean;
   classification: string;
   payment_email_all_contacts: boolean;
+  show_pdfhtml_on_mobile: boolean;
+  custom_sending_email: string;
 }
 
 export interface TaxData {

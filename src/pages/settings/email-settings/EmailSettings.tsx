@@ -42,6 +42,10 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useEmailProviders } from './common/hooks/useEmailProviders';
+import { SMTPMailDriver } from './common/components/SMTPMailDriver';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -54,6 +58,8 @@ export function EmailSettings() {
     { name: t('settings'), href: '/settings' },
     { name: t('email_settings'), href: '/settings/email_settings' },
   ];
+
+  const emailProviders = useEmailProviders();
 
   const company = useInjectCompanyChanges();
   const currentCompany = useCurrentCompany();
@@ -305,16 +311,18 @@ export function EmailSettings() {
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
                 <option value="EN16931">EN16931</option>
-                <option value="XInvoice_2_2">XInvoice_2_2</option>
-                <option value="XInvoice_2_1">XInvoice_2_1</option>
-                <option value="XInvoice_2_0">XInvoice_2_0</option>
-                <option value="XInvoice_1_0">XInvoice_1_0</option>
+                <option value="XInvoice_3_0">XInvoice_3.0</option>
+                <option value="XInvoice_2_3">XInvoice_2.3</option>
+                <option value="XInvoice_2_2">XInvoice_2.2</option>
+                <option value="XInvoice_2_1">XInvoice_2.1</option>
+                <option value="XInvoice_2_0">XInvoice_2.0</option>
+                <option value="XInvoice_1_0">XInvoice_1.0</option>
                 <option value="XInvoice-Extended">XInvoice-Extended</option>
                 <option value="XInvoice-BasicWL">XInvoice-BasicWL</option>
                 <option value="XInvoice-Basic">XInvoice-Basic</option>
-                <option value="Facturae_3.2">Facturae_3.2</option>
-                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
+                <option value="Facturae_3.2.1">Facturae_3.2.1</option>
+                <option value="Facturae_3.2">Facturae_3.2</option>
               </SelectField>
             </Element>
           </>
@@ -336,16 +344,20 @@ export function EmailSettings() {
             onValueChange={(value) =>
               handleChange('settings.email_sending_method', value)
             }
-            disabled={disableSettingsField('email_sending_method')}
+            disabled={
+              disableSettingsField('email_sending_method') ||
+              (!proPlan() && !enterprisePlan())
+            }
             errorMessage={errors?.errors['settings.email_sending_method']}
           >
-            <option defaultChecked value="default">
-              {t('default')}
-            </option>
-            {isHosted() && <option value="gmail">Gmail</option>}
-            {isHosted() && <option value="office365">Microsoft</option>}
-            <option value="client_postmark">Postmark</option>
-            <option value="client_mailgun">Mailgun</option>
+            {emailProviders.map(
+              ({ value, label, enabled }) =>
+                enabled && (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                )
+            )}
           </SelectField>
         </Element>
 
@@ -462,6 +474,28 @@ export function EmailSettings() {
           </>
         )}
 
+        {(company?.settings.email_sending_method === 'client_mailgun' ||
+          company?.settings.email_sending_method === 'client_postmark' ||
+          company?.settings.email_sending_method === 'smtp') && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="custom_sending_email"
+                labelElement={<SettingsLabel label={t('from_email')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.custom_sending_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.custom_sending_email', value)
+              }
+              disabled={disableSettingsField('custom_sending_email')}
+              errorMessage={errors?.errors['settings.custom_sending_email']}
+            />
+          </Element>
+        )}
+
         <Element
           leftSide={
             <PropertyCheckbox
@@ -480,93 +514,107 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="reply_to_name"
-              labelElement={<SettingsLabel label={t('reply_to_name')} />}
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.reply_to_name || ''}
-            onValueChange={(value) =>
-              handleChange('settings.reply_to_name', value)
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="reply_to_name"
+                labelElement={<SettingsLabel label={t('reply_to_name')} />}
+              />
             }
-            disabled={disableSettingsField('reply_to_name')}
-            errorMessage={errors?.errors['settings.reply_to_name']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="reply_to_email"
-              labelElement={<SettingsLabel label={t('reply_to_email')} />}
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.reply_to_email || ''}
-            onValueChange={(value) =>
-              handleChange('settings.reply_to_email', value)
-            }
-            disabled={disableSettingsField('reply_to_email')}
-            errorMessage={errors?.errors['settings.reply_to_email']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="bcc_email"
-              labelElement={
-                <SettingsLabel
-                  label={t('bcc_email')}
-                  helpLabel={t('comma_sparated_list')}
-                />
-              }
-            />
-          }
-        >
-          <InputField
-            value={company?.settings.bcc_email || ''}
-            onValueChange={(value) => handleChange('settings.bcc_email', value)}
-            disabled={disableSettingsField('bcc_email')}
-            errorMessage={errors?.errors['settings.bcc_email']}
-          />
-        </Element>
-
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              propertyKey="entity_send_time"
-              labelElement={<SettingsLabel label={t('send_time')} />}
-            />
-          }
-        >
-          <SelectField
-            value={company?.settings.entity_send_time || ''}
-            onValueChange={(value) =>
-              handleChange(
-                'settings.entity_send_time',
-                value.length > 0 ? value : 6
-              )
-            }
-            withBlank
-            disabled={disableSettingsField('entity_send_time')}
-            errorMessage={errors?.errors['settings.entity_send_time']}
           >
-            {[...Array(24).keys()].map((number, index) => (
-              <option key={index} value={number + 1}>
-                {dayjs()
-                  .startOf('day')
-                  .add(number + 1, 'hour')
-                  .format('h:ss A')}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
+            <InputField
+              value={company?.settings.reply_to_name || ''}
+              onValueChange={(value) =>
+                handleChange('settings.reply_to_name', value)
+              }
+              disabled={disableSettingsField('reply_to_name')}
+              errorMessage={errors?.errors['settings.reply_to_name']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="reply_to_email"
+                labelElement={<SettingsLabel label={t('reply_to_email')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.reply_to_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.reply_to_email', value)
+              }
+              disabled={disableSettingsField('reply_to_email')}
+              errorMessage={errors?.errors['settings.reply_to_email']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="bcc_email"
+                labelElement={
+                  <SettingsLabel
+                    label={t('bcc_email')}
+                    helpLabel={t('comma_sparated_list')}
+                  />
+                }
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.bcc_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.bcc_email', value)
+              }
+              disabled={disableSettingsField('bcc_email')}
+              errorMessage={errors?.errors['settings.bcc_email']}
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method !== 'smtp' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="entity_send_time"
+                labelElement={<SettingsLabel label={t('send_time')} />}
+              />
+            }
+          >
+            <SelectField
+              value={company?.settings.entity_send_time || ''}
+              onValueChange={(value) =>
+                handleChange(
+                  'settings.entity_send_time',
+                  value.length > 0 ? value : 6
+                )
+              }
+              withBlank
+              disabled={disableSettingsField('entity_send_time')}
+              errorMessage={errors?.errors['settings.entity_send_time']}
+            >
+              {[...Array(24).keys()].map((number, index) => (
+                <option key={index} value={number + 1}>
+                  {dayjs()
+                    .startOf('day')
+                    .add(number + 1, 'hour')
+                    .format('h:ss A')}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method === 'smtp' && (
+          <SMTPMailDriver />
+        )}
 
         <Divider />
 

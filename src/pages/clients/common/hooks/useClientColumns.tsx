@@ -29,6 +29,8 @@ import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'name',
@@ -102,6 +104,7 @@ export function useClientColumns() {
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const resolveLanguage = useResolveLanguage();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const getContactsColumns = useCallback((client: Client) => {
     const names: string[] = [];
@@ -132,12 +135,12 @@ export function useClientColumns() {
       id: 'display_name',
       label: t('name'),
       format: (value, client) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: client.id })}
-          disableNavigation={disableNavigation('client', client)}
+          renderSpan={disableNavigation('client', client)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -168,12 +171,12 @@ export function useClientColumns() {
       label: t('contact_name'),
       format: (value, resource) =>
         resource.contacts.length > 0 && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: resource.id })}
-            disableNavigation={disableNavigation('client', resource)}
+            renderSpan={disableNavigation('client', resource)}
           >
             {resource.contacts[0].first_name} {resource.contacts[0].last_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -249,21 +252,25 @@ export function useClientColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('client1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('client2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('client3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('client4', value?.toString()),
     },
     {
       column: 'documents',

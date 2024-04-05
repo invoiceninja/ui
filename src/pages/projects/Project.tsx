@@ -22,16 +22,22 @@ import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
   const { id } = useParams();
   const { data } = useProjectQuery({ id });
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
 
@@ -43,6 +49,10 @@ export default function Project() {
 
   useEffect(() => {
     data?.name && setDocumentTitle(data.name);
+
+    if (data) {
+      setProjectValue(data);
+    }
   }, [data]);
 
   const pages: Page[] = [
@@ -61,11 +71,19 @@ export default function Project() {
     {
       name: t('documents'),
       href: route('/projects/:id/documents', { id }),
+      enabled:
+        hasPermission('view_project') ||
+        hasPermission('edit_project') ||
+        entityAssigned(projectValue),
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={projectValue?.documents?.length}
+        />
+      ),
     },
   ];
 
-  const onSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSave = () => {
     toast.processing();
     setErrors(undefined);
 
@@ -88,13 +106,13 @@ export default function Project() {
       title={documentTitle}
       breadcrumbs={pages}
       disableSaveButton={!projectValue}
-      onSaveClick={onSave}
       navigationTopRight={
         projectValue && (
           <ResourceActions
             resource={projectValue}
-            label={t('more_actions')}
+            onSaveClick={onSave}
             actions={actions}
+            cypressRef="projectActionDropdown"
           />
         )
       }

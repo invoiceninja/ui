@@ -20,6 +20,7 @@ import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useColorScheme } from '$app/common/colors';
+import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 
 interface Props {
   readonly?: boolean;
@@ -103,43 +104,49 @@ export function ClientSelector(props: Props) {
       {resource?.client_id &&
         client &&
         client.contacts.map((contact, index) => (
-          <div key={index}>
-            <Checkbox
-              id={contact.id}
-              value={contact.id}
-              label={
-                contact.first_name.length >= 1
-                  ? `${contact.first_name} ${contact.last_name}`
-                  : t('blank_contact')
-              }
-              checked={handleCheckedState(contact.id)}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                props.onContactCheckboxChange(
-                  event.target.value,
-                  event.target.checked
-                )
-              }
-            />
-
+          <div key={index} className="flex justify-between items-center">
             <div>
-              <p className="text-sm" style={{ color: colors.$3 }}>
-                {contact.email}
-              </p>
+              <Checkbox
+                id={contact.id}
+                value={contact.id}
+                label={
+                  contact.first_name.length >= 1
+                    ? `${contact.first_name} ${contact.last_name}`
+                    : contact.email || client.display_name
+                }
+                checked={handleCheckedState(contact.id)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  props.onContactCheckboxChange(
+                    event.target.value,
+                    event.target.checked
+                  )
+                }
+              />
 
-              {resource.invitations.length >= 1 && (
-                <>
-                  <Link
-                    to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
-                    external
-                  >
-                    {t('view_in_portal')}
-                  </Link>
-                  <CopyToClipboardIconOnly
-                    text={resource.invitations[0].link}
-                  />
-                </>
-              )}
+              <div>
+                {contact.first_name && (
+                  <p className="text-sm" style={{ color: colors.$3 }}>
+                    {contact.email}
+                  </p>
+                )}
+
+                {resource.invitations.length >= 1 && (
+                  <>
+                    <Link
+                      to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
+                      external
+                    >
+                      {t('view_in_portal')}
+                    </Link>
+                    <CopyToClipboardIconOnly
+                      text={resource.invitations[0].link}
+                    />
+                  </>
+                )}
+              </div>
             </div>
+
+            {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
           </div>
         ))}
     </>

@@ -173,13 +173,18 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Toggle
             checked={expense.should_be_invoiced}
             onChange={(value) => handleChange('should_be_invoiced', value)}
+            cypressRef="shouldBeInvoicedToggle"
           />
         </Element>
       )}
 
       {expense && (
         <Element leftSide={t('mark_paid')} leftSideHelp={t('mark_paid_help')}>
-          <Toggle checked={isMarkPaid()} onChange={onMarkPaid} />
+          <Toggle
+            checked={isMarkPaid()}
+            onChange={onMarkPaid}
+            cypressRef="markPaidToggle"
+          />
         </Element>
       )}
 
@@ -224,6 +229,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Toggle
             checked={convertCurrency || false}
             onChange={(value: boolean) => setConvertCurrency(value)}
+            cypressRef="convertCurrencyToggle"
           />
         </Element>
       )}
@@ -278,6 +284,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           <Toggle
             checked={expense.invoice_documents}
             onChange={(value) => handleChange('invoice_documents', value)}
+            cypressRef="addDocumentsToInvoiceToggle"
           />
         </Element>
       )}

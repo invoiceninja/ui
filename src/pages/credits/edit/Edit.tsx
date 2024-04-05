@@ -36,11 +36,16 @@ import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
 
@@ -59,6 +64,8 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -91,22 +98,23 @@ export default function Edit() {
   }, [credit]);
 
   const actions = useActions();
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => credit && save(credit)}
-      navigationTopRight={
-        credit && (
-          <ResourceActions
-            resource={credit}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
+      {...((hasPermission('edit_credit') || entityAssigned(credit)) &&
+        credit && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={credit}
+              onSaveClick={() => save(credit)}
+              actions={actions}
+              cypressRef="creditActionDropdown"
+            />
+          ),
+        })}
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
@@ -156,7 +164,14 @@ export default function Edit() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} errors={errors} />
+        <CreditFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {credit && (
           <InvoiceTotals
@@ -179,6 +194,7 @@ export default function Edit() {
               entity="credit"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
+              withRemoveLogoCTA
             />
           )}
         </div>

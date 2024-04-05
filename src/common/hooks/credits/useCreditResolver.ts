@@ -22,7 +22,7 @@ export function useCreditResolver() {
       () =>
         request(
           'GET',
-          endpoint('/api/v1/credits/:id?include=client', { id })
+          endpoint('/api/v1/credits/:id?include=client&sort=id|asc', { id })
         ).then((response) => response.data.data),
       { staleTime: Infinity }
     );

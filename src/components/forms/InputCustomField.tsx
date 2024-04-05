@@ -80,7 +80,7 @@ export function InputCustomField(props: Props) {
       {!Object.values(AvailableTypes).includes(type as AvailableTypes) && (
         <SelectField
           style={{ color: colors.$3, colorScheme: colors.$0 }}
-          defaultValue={props.defaultValue || ''}
+          value={props.defaultValue || ''}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             props.onValueChange(event.target.value)
           }

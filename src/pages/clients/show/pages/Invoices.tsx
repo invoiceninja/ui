@@ -17,17 +17,13 @@ import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustom
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
 
-export const dataTableStaleTime = 50;
-
 export default function Invoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
 
-  const columns = useInvoiceColumns();
-
   const actions = useActions();
-
+  const columns = useInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
 
   return (
@@ -44,6 +40,7 @@ export default function Invoices() {
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_invoice')]}
       hideEditableOptions={!hasPermission('edit_invoice')}
     />

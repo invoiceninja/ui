@@ -8,25 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosError } from 'axios';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { Dispatch, SetStateAction } from 'react';
 
-export function usePurgeClient(clientId: string | undefined) {
+interface Params {
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
+}
+export function usePurgeClient(params?: Params) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const { setIsPurgeOrMergeActionCalled } = params || {};
+
   const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
-  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-
-  return (password: string) => {
+  return (password: string, clientId: string) => {
     toast.processing();
+    setIsPurgeOrMergeActionCalled?.(true);
 
     request(
       'POST',
@@ -37,8 +41,7 @@ export function usePurgeClient(clientId: string | undefined) {
       .then(() => {
         toast.success('purged_client');
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries();
 
         navigate('/clients');
       })
@@ -47,6 +50,8 @@ export function usePurgeClient(clientId: string | undefined) {
           toast.error('password_error_incorrect');
           setLastPasswordEntryTime(0);
         }
+
+        setIsPurgeOrMergeActionCalled?.(false);
       });
   };
 }

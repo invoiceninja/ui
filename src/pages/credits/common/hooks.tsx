@@ -25,33 +25,23 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import {
   DataTableColumnsExtended,
   resourceViewedAt,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
-import { quoteAtom } from '$app/pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useMarkSent } from './hooks/useMarkSent';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -92,6 +82,10 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -204,16 +198,18 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const navigate = useNavigate();
 
   const saveCompany = useHandleCompanySave();
-
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (credit: Credit) => {
@@ -222,8 +218,23 @@ export function useCreate(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/credits'), credit)
-      .then((response: GenericSingleResourceResponse<Credit>) => {
+    let apiEndpoint = '/api/v1/credits?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), credit)
+      .then(async (response: GenericSingleResourceResponse<Credit>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_credit');
 
         $refetch(['credits']);
@@ -245,10 +256,11 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultFooter, isDefaultTerms } = props;
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
 
   return async (credit: Credit) => {
@@ -258,8 +270,23 @@ export function useSave(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
-      .then(() => {
+    let apiEndpoint = '/api/v1/credits/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: credit.id }), credit)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_credit');
 
         $refetch(['credits']);
@@ -275,23 +302,18 @@ export function useSave(props: CreateProps) {
 }
 
 export function useActions() {
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const [t] = useTranslation();
 
-  const { t } = useTranslation();
-
+  const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const navigate = useNavigate();
-
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'credit',
   });
+
+  const setCredit = useSetAtom(creditAtom);
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const printPdf = usePrintPdf({ entity: 'credit' });
@@ -320,91 +342,6 @@ export function useActions() {
     });
 
     navigate('/credits/create?action=clone');
-  };
-
-  const cloneToInvoice = (credit: Credit) => {
-    setInvoice({
-      ...credit,
-      id: '',
-      number: '',
-      documents: [],
-      due_date: '',
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      po_number: '',
-    });
-
-    navigate('/invoices/create?action=clone');
-  };
-
-  const cloneToQuote = (credit: Credit) => {
-    setQuote({
-      ...(credit as Quote),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-      po_number: '',
-    });
-
-    navigate('/quotes/create?action=clone');
-  };
-
-  const cloneToRecurringInvoice = (credit: Credit) => {
-    setRecurringInvoice({
-      ...(credit as unknown as RecurringInvoice),
-      id: '',
-      number: '',
-      documents: [],
-      frequency_id: '5',
-      paid_to_date: 0,
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      po_number: '',
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (credit: Credit) => {
-    setPurchaseOrder({
-      ...(credit as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-      po_number: '',
-    });
-
-    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<Credit>[] = [
@@ -504,45 +441,10 @@ export function useActions() {
           onClick={() => cloneToCredit(credit)}
           icon={<Icon element={MdControlPointDuplicate} />}
         >
-          {t('clone')}
+          {t('clone_to_credit')}
         </DropdownElement>
       ),
-    (credit) =>
-      hasPermission('create_invoice') && (
-        <DropdownElement
-          onClick={() => cloneToInvoice(credit)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_invoice')}
-        </DropdownElement>
-      ),
-    (credit) =>
-      hasPermission('create_quote') && (
-        <DropdownElement
-          onClick={() => cloneToQuote(credit)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_quote')}
-        </DropdownElement>
-      ),
-    (credit) =>
-      hasPermission('create_recurring_invoice') && (
-        <DropdownElement
-          onClick={() => cloneToRecurringInvoice(credit)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_recurring_invoice')}
-        </DropdownElement>
-      ),
-    (credit) =>
-      hasPermission('create_purchase_order') && (
-        <DropdownElement
-          onClick={() => cloneToPurchaseOrder(credit)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_purchase_order')}
-        </DropdownElement>
-      ),
+    (credit) => <CloneOptionsModal credit={credit} />,
     () => isEditPage && <Divider withoutPadding />,
     (credit) =>
       isEditPage &&
@@ -647,9 +549,9 @@ export function useCreditColumns() {
   type CreditColumns = (typeof creditColumns)[number];
 
   const formatMoney = useFormatMoney();
-  const resolveCountry = useResolveCountry();
-
   const reactSettings = useReactSettings();
+  const resolveCountry = useResolveCountry();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -668,12 +570,12 @@ export function useCreditColumns() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link
+        <DynamicLink
           to={route('/credits/:id/edit', { id: credit.id })}
-          disableNavigation={disableNavigation('credit', credit)}
+          renderSpan={disableNavigation('credit', credit)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -681,12 +583,12 @@ export function useCreditColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: credit.client_id })}
-          disableNavigation={disableNavigation('client', credit.client)}
+          renderSpan={disableNavigation('client', credit.client)}
         >
           {credit.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -778,21 +680,25 @@ export function useCreditColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',

@@ -42,6 +42,10 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from './RecurringInvoiceStatus';
 import { RecurringInvoiceActivity } from '$app/common/interfaces/recurring-invoice-activity';
 import frequencies from '$app/common/constants/frequency';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -92,6 +96,10 @@ export const RecurringInvoiceSlider = () => {
   );
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
+
   const formatMoney = useFormatMoney();
   const actions = useActions({
     showCommonBulkActions: true,
@@ -101,7 +109,7 @@ export const RecurringInvoiceSlider = () => {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: resource } = useQuery({
-    queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id],
+    queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
@@ -144,7 +152,9 @@ export const RecurringInvoiceSlider = () => {
       size="regular"
       title={`${t('recurring_invoice')} ${recurringInvoice?.number || ''}`}
       topRight={
-        recurringInvoice ? (
+        recurringInvoice &&
+        (hasPermission('edit_recurring_invoice') ||
+          entityAssigned(recurringInvoice)) ? (
           <ResourceActions
             label={t('more_actions')}
             resource={recurringInvoice}
@@ -273,9 +283,15 @@ export const RecurringInvoiceSlider = () => {
                         : null}
                     </span>
                     <span>&middot;</span>
-                    <Link to={`/clients/${activity.client_id}`}>
+                    <DynamicLink
+                      to={`/clients/${activity.client_id}`}
+                      renderSpan={disableNavigation(
+                        'client',
+                        recurringInvoice?.client
+                      )}
+                    >
                       {recurringInvoice?.client?.display_name}
-                    </Link>
+                    </DynamicLink>
                   </div>
 
                   <div className="inline-flex items-center space-x-1">

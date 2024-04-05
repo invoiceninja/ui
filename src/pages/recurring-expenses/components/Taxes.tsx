@@ -9,11 +9,13 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Link, Radio } from '$app/components/forms';
+import { Radio } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { RecurringExpenseCardProps } from './Details';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props extends RecurringExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';
@@ -25,11 +27,30 @@ export function TaxSettings(props: Props) {
 
   const company = useCurrentCompany();
 
+  const { isAdmin, isOwner } = useAdmin();
+
   const { recurringExpense, handleChange, taxInputType, setTaxInputType } =
     props;
 
+  const handleResetTaxValues = (value: 'by_rate' | 'by_amount') => {
+    if (value === 'by_amount') {
+      handleChange('tax_rate1', 0);
+      handleChange('tax_rate2', 0);
+      handleChange('tax_rate3', 0);
+    } else {
+      handleChange('tax_amount1', 0);
+      handleChange('tax_amount2', 0);
+      handleChange('tax_amount3', 0);
+    }
+
+    handleChange('tax_name1', '');
+    handleChange('tax_name2', '');
+    handleChange('tax_name3', '');
+  };
+
   const taxTypeChange = (value: string) => {
     setTaxInputType(value as 'by_rate' | 'by_amount');
+    handleResetTaxValues(value as 'by_rate' | 'by_amount');
     handleChange('calculate_tax_by_amount', value === 'by_amount');
   };
 
@@ -37,7 +58,12 @@ export function TaxSettings(props: Props) {
     <Card title={t('taxes')} isLoading={!recurringExpense}>
       {!company?.enabled_expense_tax_rates && (
         <Element leftSide={t('expense_tax_help')}>
-          <Link to="/settings/tax_settings">{t('settings')}</Link>
+          <DynamicLink
+            to="/settings/tax_settings"
+            renderSpan={!isAdmin && !isOwner}
+          >
+            {t('settings')}
+          </DynamicLink>
         </Element>
       )}
 
@@ -68,6 +94,7 @@ export function TaxSettings(props: Props) {
           <Toggle
             checked={recurringExpense.uses_inclusive_taxes}
             onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+            cypressRef="inclusiveTaxesToggle"
           />
         </Element>
       )}

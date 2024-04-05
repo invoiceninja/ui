@@ -14,6 +14,7 @@ import { ClientContact } from '$app/common/interfaces/client-contact';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 
 interface Props {
   client: Client;
@@ -36,17 +37,24 @@ export function Contacts(props: Props) {
               <div className="space-y-2">
                 {client.contacts.map(
                   (contact: ClientContact, index: number) => (
-                    <div key={index}>
-                      <p
-                        className="font-semibold"
-                        style={{ color: accentColor }}
-                      >
-                        {contact.first_name} {contact.last_name}
-                      </p>
+                    <div
+                      key={index}
+                      className="flex justify-between items-center"
+                    >
+                      <div>
+                        <p
+                          className="font-semibold"
+                          style={{ color: accentColor }}
+                        >
+                          {contact.first_name} {contact.last_name}
+                        </p>
 
-                      <p>{contact.phone}</p>
+                        <p>{contact.phone}</p>
 
-                      <CopyToClipboard text={contact.email} />
+                        <CopyToClipboard text={contact.email} />
+                      </div>
+
+                      {contact.is_locked && <UserUnsubscribedTooltip />}
                     </div>
                   )
                 )}

@@ -10,10 +10,14 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
+import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankSubscriptionQuery() {
   const { isAdmin, isOwner } = useAdmin();
@@ -44,4 +48,25 @@ export function useSubscriptionQuery(params: { id: string | undefined }) {
       ),
     { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
+}
+
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return async (ids: string[], action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    return request('POST', endpoint('/api/v1/subscriptions/bulk'), {
+      action,
+      ids,
+    }).then(() => {
+      toast.success(`${action}d_subscription`);
+
+      $refetch(['subscriptions']);
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
+  };
 }

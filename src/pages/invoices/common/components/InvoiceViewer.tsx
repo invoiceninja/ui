@@ -12,10 +12,10 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useEffect, useRef, useState } from 'react';
 import { Resource } from './InvoicePreview';
-import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
+import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/InvoiceDesign';
 
 interface Props {
   link: string;
@@ -25,14 +25,18 @@ interface Props {
   withToast?: boolean;
   height?: number;
   enabled?: boolean;
+  renderAsHTML?: boolean;
 }
 
 export const android = Boolean(navigator.userAgent.match(/Android/i));
 
 export function InvoiceViewer(props: Props) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const linkRef = useRef<HTMLAnchorElement>(null);
   const queryClient = useQueryClient();
+
+  const { renderAsHTML } = props;
+
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,7 +57,7 @@ export function InvoiceViewer(props: Props) {
           })
             .then((response) => {
               const blob = new Blob([response.data], {
-                type: 'application/pdf',
+                type: renderAsHTML ? 'text/html' : 'application/pdf',
               });
               const url = URL.createObjectURL(blob);
 

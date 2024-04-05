@@ -22,10 +22,7 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
@@ -33,7 +30,6 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
@@ -42,14 +38,9 @@ import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
-import { creditAtom } from '$app/pages/credits/common/atoms';
-import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
-import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -64,6 +55,7 @@ import {
   MdDelete,
   MdDone,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPictureAsPdf,
   MdPrint,
@@ -94,6 +86,10 @@ import {
 } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -206,11 +202,15 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
 
@@ -224,8 +224,23 @@ export function useCreate(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/quotes'), quote)
-      .then((response: GenericSingleResourceResponse<Quote>) => {
+    let apiEndpoint = '/api/v1/quotes?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), quote)
+      .then(async (response: GenericSingleResourceResponse<Quote>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_quote');
 
         $refetch(['quotes']);
@@ -243,7 +258,9 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
@@ -254,8 +271,23 @@ export function useSave(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
-      .then(() => {
+    let apiEndpoint = '/api/v1/quotes/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: quote.id }), quote)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_quote');
 
         $refetch(['quotes']);
@@ -270,18 +302,19 @@ export function useSave(props: CreateProps) {
   };
 }
 
-export function useActions() {
-  const [, setQuote] = useAtom(quoteAtom);
-  const [, setInvoice] = useAtom(invoiceAtom);
-  const [, setCredit] = useAtom(creditAtom);
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
-
-  const { t } = useTranslation();
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
+  const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
-
   const { isAdmin, isOwner } = useAdmin();
+
+  const setQuote = useSetAtom(quoteAtom);
+
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
@@ -314,86 +347,17 @@ export function useActions() {
     navigate('/quotes/create?action=clone');
   };
 
-  const cloneToCredit = (quote: Quote) => {
-    setCredit({
-      ...quote,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-
-    navigate('/credits/create?action=clone');
-  };
-
-  const cloneToRecurringInvoice = (quote: Quote) => {
-    setRecurringInvoice({
-      ...(quote as unknown as RecurringInvoice),
-      id: '',
-      number: '',
-      documents: [],
-      frequency_id: '5',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-    });
-
-    navigate('/recurring_invoices/create?action=clone');
-  };
-
-  const cloneToPurchaseOrder = (quote: Quote) => {
-    setPurchaseOrder({
-      ...(quote as unknown as PurchaseOrder),
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '1',
-      vendor_id: '',
-    });
-
-    navigate('/purchase_orders/create?action=clone');
-  };
-
-  const cloneToInvoice = (quote: Quote) => {
-    setInvoice({
-      ...quote,
-      id: '',
-      number: '',
-      documents: [],
-      date: dayjs().format('YYYY-MM-DD'),
-      due_date: '',
-      total_taxes: 0,
-      exchange_rate: 1,
-      last_sent_date: '',
-      project_id: '',
-      subscription_id: '',
-      status_id: '',
-      vendor_id: '',
-      paid_to_date: 0,
-    });
-    navigate('/invoices/create?action=clone');
-  };
-
   const actions: Action<Quote>[] = [
+    (quote: Quote) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/pdf', { id: quote.id })}
@@ -487,48 +451,16 @@ export function useActions() {
           onClick={() => cloneToQuote(quote)}
           icon={<Icon element={MdControlPointDuplicate} />}
         >
-          {t('clone')}
+          {t('clone_to_quote')}
         </DropdownElement>
       ),
-    (quote) =>
-      hasPermission('create_invoice') && (
-        <DropdownElement
-          onClick={() => cloneToInvoice(quote)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_invoice')}
-        </DropdownElement>
+    (quote) => <CloneOptionsModal quote={quote} />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
       ),
     (quote) =>
-      hasPermission('create_credit') && (
-        <DropdownElement
-          onClick={() => cloneToCredit(quote)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_credit')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      hasPermission('create_recurring_invoice') && (
-        <DropdownElement
-          onClick={() => cloneToRecurringInvoice(quote)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_recurring_invoice')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      hasPermission('create_purchase_order') && (
-        <DropdownElement
-          onClick={() => cloneToPurchaseOrder(quote)}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_purchase_order')}
-        </DropdownElement>
-      ),
-    () => isEditPage && <Divider withoutPadding />,
-    (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'archive')}
@@ -538,7 +470,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'restore')}
@@ -548,7 +480,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'delete')}
@@ -633,8 +565,9 @@ export function useQuoteColumns() {
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
-  const resolveCountry = useResolveCountry();
   const reactSettings = useReactSettings();
+  const resolveCountry = useResolveCountry();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const quoteViewedAt = useCallback((quote: Quote) => {
     let viewed = '';
@@ -692,12 +625,12 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <Link
+        <DynamicLink
           to={route('/quotes/:id/edit', { id: quote.id })}
-          disableNavigation={disableNavigation('quote', quote)}
+          renderSpan={disableNavigation('quote', quote)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -705,12 +638,12 @@ export function useQuoteColumns() {
       id: 'client_id',
       label: t('client'),
       format: (_, quote) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: quote.client_id })}
-          disableNavigation={disableNavigation('client', quote.client)}
+          renderSpan={disableNavigation('client', quote.client)}
         >
           {quote.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -797,21 +730,25 @@ export function useQuoteColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('invoice1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('invoice2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('invoice3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('invoice4', value?.toString()),
     },
     {
       column: 'discount',

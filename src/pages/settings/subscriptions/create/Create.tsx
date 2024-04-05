@@ -43,7 +43,10 @@ export function Create() {
 
   const { data } = useBlankSubscriptionQuery();
 
-  const { data: productsData } = useProductsQuery({ include: 'company' });
+  const { data: productsData } = useProductsQuery({
+    include: 'company',
+    status: ['active'],
+  });
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 

@@ -12,13 +12,13 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms/Link';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { DynamicLink } from '$app/components/DynamicLink';
 
 export function UpcomingInvoices() {
   const formatMoney = useFormatMoney();
@@ -33,12 +33,12 @@ export function UpcomingInvoices() {
       label: t('number'),
       format: (value, invoice) => {
         return (
-          <Link
+          <DynamicLink
             to={route('/invoices/:id/edit', { id: invoice.id })}
-            disableNavigation={disableNavigation('invoice', invoice)}
+            renderSpan={disableNavigation('invoice', invoice)}
           >
             {invoice.number}
-          </Link>
+          </DynamicLink>
         );
       },
     },
@@ -46,26 +46,24 @@ export function UpcomingInvoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link
+        <DynamicLink
           to={route('/clients/:id', { id: invoice.client_id })}
-          disableNavigation={disableNavigation('client', invoice.client)}
+          renderSpan={disableNavigation('client', invoice.client)}
         >
           {invoice.client?.display_name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
       id: 'due_date',
       label: t('due_date'),
       format: (value, invoice) => {
-
-        if(invoice.partial_due_date.length > 2)
+        if (invoice.partial_due_date.length > 2)
           return dayjs(invoice.partial_due_date).format(dateFormat);
-        else if(invoice.due_date.length > 2)
-          return dayjs(invoice.due_date).format(dateFormat)
-        else 
-          return '';
-        },
+        else if (invoice.due_date.length > 2)
+          return dayjs(invoice.due_date).format(dateFormat);
+        else return '';
+      },
     },
     {
       id: 'balance',

@@ -31,11 +31,14 @@ import { useBulk } from '$app/common/queries/purchase-orders';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const disableNavigation = useDisableNavigation();
 
   const bulk = useBulk();
 
@@ -123,7 +126,8 @@ export function useCustomBulkActions() {
     ),
     ({ selectedResources }) =>
       selectedResources?.length &&
-      selectedResources[0].expense_id && (
+      selectedResources[0].expense_id &&
+      !disableNavigation('expense', selectedResources[0].expense) && (
         <DropdownElement
           onClick={() =>
             navigate(

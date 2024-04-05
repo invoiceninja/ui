@@ -24,17 +24,22 @@ import { $refetch } from '../hooks/useRefetch';
 interface PaymentParams {
   id: string | undefined;
   enabled?: boolean;
+  include?: string;
 }
 
 export function usePaymentQuery(params: PaymentParams) {
   return useQuery(
-    ['/api/v1/payments', params.id],
+    ['/api/v1/payments', params],
     () =>
       request(
         'GET',
-        endpoint('/api/v1/payments/:id?include=client,invoices,paymentables', {
-          id: params.id,
-        })
+        endpoint(
+          '/api/v1/payments/:id?include=client,invoices,paymentables,:include',
+          {
+            id: params.id,
+            include: params.include || '',
+          }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),

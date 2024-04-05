@@ -24,7 +24,7 @@ export function QuoteStatus(props: Props) {
     props.entity;
 
   const checkQuoteInvitationsViewedDate = () => {
-    return invitations.some((invitation) => invitation.viewed_date);
+    return invitations?.some((invitation) => invitation.viewed_date);
   };
 
   const isApproved =

@@ -25,7 +25,7 @@ export function Alert(props: Props) {
 
   return (
     <div
-      style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+      style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1 }}
       className={classNames(`border-l-4 py-2 ${props.className}`, {
         'bg-red-50 border-red-500': props.type === 'danger',
         'bg-yellow-50 border-yellow-500': props.type === 'warning',

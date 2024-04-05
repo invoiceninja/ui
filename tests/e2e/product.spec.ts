@@ -108,16 +108,10 @@ const checkEditPage = async (
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
-    await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
+      page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
     ).toBeVisible();
   } else {
     await expect(
@@ -127,15 +121,7 @@ const checkEditPage = async (
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
-    ).not.toBeVisible();
-
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('link', { name: 'Documents', exact: true })
+      page.locator('[data-cy="chevronDownButton"]')
     ).not.toBeVisible();
   }
 
@@ -248,7 +234,9 @@ test('can edit product', async ({ page }) => {
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -285,7 +273,9 @@ test('can create a product', async ({ page }) => {
     page.getByText('Successfully updated product', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -422,13 +412,6 @@ test('product documents preview with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -436,16 +419,15 @@ test('product documents preview with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
-  }
 
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+  }
 
   await page.waitForURL('**/products/**/edit');
 
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -479,13 +461,6 @@ test('product documents uploading with edit_product', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createProduct({ page, withNavigation: false });
-
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -493,15 +468,15 @@ test('product documents uploading with edit_product', async ({ page }) => {
       .first();
 
     await moreActionsButton.click();
+
+    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
-  await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/products/**/edit');
 
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -539,7 +514,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -569,7 +546,9 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await checkEditPage(page, true, false);
 
-  await checkDropdownActions(page, actions, 'productActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
   await logout(page);
 });
@@ -666,6 +645,8 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -707,6 +688,8 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
@@ -728,7 +711,7 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await page
     .locator('[data-cy="tabs"]')
-    .getByRole('link', { name: 'Documents', exact: true })
+    .getByRole('link', { name: 'Documents' })
     .click();
 
   await page.waitForURL('**/products/**/documents');
@@ -752,8 +735,41 @@ test('rendering documents and product_fields tabs with admin permission', async 
     page.getByRole('link', { name: 'Edit', exact: true })
   ).toBeVisible();
 
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
+
+  await logout(page);
+});
+
+test('Product selector list gets updated on the report page when it is created', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createProduct({ page, name: 'test product selector' });
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Reports', exact: true })
+    .click();
+
+  await page
+    .locator('[data-cy="reportNameSelector"]')
+    .selectOption({ label: 'Product Sales' });
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[id="productItemSelector"]').click();
+
+  await page
+    .locator('[id="productItemSelector"]')
+    .locator('[type="text"]')
+    .first()
+    .fill('test product selector');
+
+  await page.waitForTimeout(200);
+
   await expect(
-    page.getByRole('link', { name: 'Documents', exact: true })
+    page.getByText('test product selector', { exact: true })
   ).toBeVisible();
 
   await logout(page);

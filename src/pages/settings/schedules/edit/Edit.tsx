@@ -21,21 +21,23 @@ import { useScheduleQuery } from '$app/common/queries/schedules';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useActions } from '../common/hooks/useActions';
+import { ResourceActions } from '$app/components/ResourceActions';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_schedule');
 
   const [t] = useTranslation();
-  const navigate = useNavigate();
   const { id } = useParams();
 
+  const actions = useActions();
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
@@ -53,35 +55,23 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayload = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload({ schedule });
 
-  useEffect(() => {
-    if (scheduleResponse) {
-      setSchedule(scheduleResponse);
-    }
-  }, [scheduleResponse]);
-
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule);
-
       request(
         'PUT',
         endpoint('/api/v1/task_schedulers/:id', { id }),
-        formattedSchedule
+        formatSchedulePayload()
       )
         .then(() => {
           toast.success('updated_schedule');
 
           $refetch(['task_schedulers']);
-
-          navigate('/settings/schedules');
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -93,12 +83,26 @@ export function Edit() {
     }
   };
 
+  useEffect(() => {
+    if (scheduleResponse) {
+      setSchedule(scheduleResponse);
+    }
+  }, [scheduleResponse]);
+
   return (
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={isFormBusy || !schedule || showPlanAlert}
-      onSaveClick={handleSave}
+      navigationTopRight={
+        schedule && (
+          <ResourceActions
+            resource={schedule}
+            onSaveClick={handleSave}
+            actions={actions}
+            disableSaveButton={isFormBusy || !schedule || showPlanAlert}
+          />
+        )
+      }
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 

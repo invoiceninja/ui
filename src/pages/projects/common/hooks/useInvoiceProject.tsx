@@ -156,10 +156,9 @@ export function useInvoiceProject() {
           tax_id: '',
         };
 
-        const projectName =
-          company.invoice_task_project && task?.project?.name
-            ? '## ' + task.project?.name + '\n'
-            : '';
+        const projectName = task?.project?.name
+          ? '## ' + task.project?.name + '\n'
+          : '';
 
         if (parsed.length) {
           item.notes = projectName + task?.description + ' ' + parsed.join(' ');

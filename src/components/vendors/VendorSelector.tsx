@@ -18,10 +18,11 @@ import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
-  initiallyVisible?: boolean;
+  initiallyVisibleModal?: boolean;
   setVisible?: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
   staleTime?: number;
+  initiallyVisible?: boolean;
 }
 
 export function VendorSelector(props: VendorSelectorProps) {
@@ -33,7 +34,7 @@ export function VendorSelector(props: VendorSelectorProps) {
   return (
     <>
       <CreateVendorModal
-        visible={props.initiallyVisible || isModalOpen}
+        visible={props.initiallyVisibleModal || isModalOpen}
         setVisible={props.setVisible || setIsModalOpen}
         setSelectedIds={props.setSelectedIds}
         onVendorCreated={(vendor) => props.onChange(vendor)}

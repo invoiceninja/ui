@@ -37,6 +37,7 @@ export function CompanyCreate(props: Props) {
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const colors = useColorScheme();
 
   const switchCompany = (
     index: number,

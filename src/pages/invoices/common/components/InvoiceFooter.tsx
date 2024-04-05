@@ -11,7 +11,7 @@
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { InputField, Link } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -31,11 +31,17 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
   invoice?: Invoice;
   handleChange: ChangeHandler;
   errors: ValidationBag | undefined;
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
 }
 
 export function InvoiceFooter(props: Props) {
@@ -48,7 +54,15 @@ export function InvoiceFooter(props: Props) {
 
   const location = useLocation();
 
-  const { invoice, handleChange, errors } = props;
+  const {
+    invoice,
+    handleChange,
+    errors,
+    isDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
+  } = props;
   const { id } = useParams();
 
   const tabs = [
@@ -67,15 +81,27 @@ export function InvoiceFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
-        <div>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={invoice?.documents.length}
+              />
+            );
+          }
+        }}
+        withoutVerticalMargin
+      >
+        <div className="mb-4">
           <MarkdownEditor
             value={invoice?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
-        <div>
+        <div className="mb-4">
           <MarkdownEditor
             value={invoice?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
@@ -87,6 +113,20 @@ export function InvoiceFooter(props: Props) {
             value={invoice?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultTerms}
+                onValueChange={(value) => setIsDefaultTerms(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_terms')}</span>
+          </Element>
         </div>
 
         <div>
@@ -94,12 +134,26 @@ export function InvoiceFooter(props: Props) {
             value={invoice?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
+
+          <Element
+            className="mt-4"
+            leftSide={
+              <Toggle
+                checked={isDefaultFooter}
+                onValueChange={(value) => setIsDefaultFooter(value)}
+              />
+            }
+            noExternalPadding
+            noVerticalPadding
+          >
+            <span className="font-medium">{t('save_as_default_footer')}</span>
+          </Element>
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div className="text-sm">{t('save_to_upload_documents')}.</div>
+          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
         ) : (
-          <div>
+          <div className="my-4">
             <Upload
               widgetOnly
               endpoint={endpoint('/api/v1/invoices/:id/upload', {
@@ -114,14 +168,12 @@ export function InvoiceFooter(props: Props) {
             <DocumentsTable
               documents={invoice?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={
-                !hasPermission('edit_invoice') && !entityAssigned(invoice)
-              }
+              disableEditableOptions={!entityAssigned(invoice, true)}
             />
           </div>
         )}
 
-        <div>
+        <div className="my-4">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
@@ -169,6 +221,7 @@ export function InvoiceFooter(props: Props) {
                   value={invoice?.assigned_user_id}
                   onChange={(user) => handleChange('assigned_user_id', user.id)}
                   errorMessage={errors?.errors.assigned_user_id}
+                  readonly={!hasPermission('edit_invoice')}
                 />
               </div>
 
@@ -193,7 +246,7 @@ export function InvoiceFooter(props: Props) {
           </div>
         </div>
 
-        <div>
+        <div className="my-4">
           <span className="text-sm">{t('custom_fields')} &nbsp;</span>
           <Link to="/settings/custom_fields/invoices" className="capitalize">
             {t('click_here')}

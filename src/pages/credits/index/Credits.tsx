@@ -22,11 +22,13 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useCreditsFilters } from '../common/hooks/useCreditsFilters';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Credits() {
   useTitle('credits');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
@@ -65,6 +67,7 @@ export default function Credits() {
           />
         }
         linkToCreateGuards={[permission('create_credit')]}
+        hideEditableOptions={!hasPermission('edit_credit')}
       />
     </Default>
   );

@@ -27,11 +27,17 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { Spinner } from '$app/components/Spinner';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export default function RecurringExpense() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('edit_recurring_expense');
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
 
@@ -55,6 +61,11 @@ export default function RecurringExpense() {
     {
       name: t('documents'),
       href: route('/recurring_expenses/:id/documents', { id }),
+      formatName: () => (
+        <DocumentsTabLabel
+          numberOfDocuments={recurringExpense?.documents.length}
+        />
+      ),
     },
   ];
 
@@ -103,17 +114,19 @@ export default function RecurringExpense() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSave}
-      navigationTopRight={
-        recurringExpense && (
-          <ResourceActions
-            resource={recurringExpense}
-            label={t('more_actions')}
-            actions={actions}
-          />
-        )
-      }
-      disableSaveButton={!recurringExpense}
+      {...((hasPermission('edit_recurring_expense') ||
+        entityAssigned(recurringExpense)) &&
+        recurringExpense && {
+          navigationTopRight: (
+            <ResourceActions
+              resource={recurringExpense}
+              actions={actions}
+              onSaveClick={handleSave}
+              disableSaveButton={!recurringExpense}
+              cypressRef="recurringExpenseActionDropdown"
+            />
+          ),
+        })}
     >
       {recurringExpense ? (
         <div className="space-y-4">

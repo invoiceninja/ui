@@ -141,6 +141,7 @@ export function TaxSettings() {
                     handleToggleChange('settings.inclusive_taxes', value)
                   }
                   checked={Boolean(companyChanges?.settings.inclusive_taxes)}
+                  cypressRef="inclusiveTaxToggle"
                 />
 
                 {companyChanges?.settings.inclusive_taxes ? (

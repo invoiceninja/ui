@@ -18,6 +18,7 @@ import { MdFilterAlt } from 'react-icons/md';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
 import { useColorScheme } from '$app/common/colors';
+import { Icon } from '$app/components/icons/Icon';
 
 interface Props {
   searchParams: SearchInput;
@@ -64,16 +65,21 @@ export function SearchArea(props: Props) {
       />
 
       <VendorSelector
-        initiallyVisible={isCreateVendorModalOpen}
+        initiallyVisibleModal={isCreateVendorModalOpen}
         setVisible={setIsCreateVendorModalOpen}
         setSelectedIds={props.setSelectedIds}
         onChange={() => {}}
       />
 
-      <div className="flex items-center" style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0  }}>
+      <div className="flex items-center pr-3">
         <InputField
           changeOverride={true}
-          style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+          style={{
+            color: colors.$3,
+            colorScheme: colors.$0,
+            backgroundColor: colors.$1,
+            borderColor: colors.$4,
+          }}
           placeholder={trans(`search_${props.dataKey}`, {
             count: '',
           })}
@@ -84,25 +90,29 @@ export function SearchArea(props: Props) {
         />
 
         {isInvoicesDataKey || isPaymentsDataKey || isExpensesDataKey ? (
-          <MdFilterAlt
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-            className="ml-3 cursor-pointer"
-            fontSize={28}
-            onClick={() =>
-              props.setIsFilterModalOpened((prevState) => !prevState)
-            }
-          />
+          <>
+            <Icon
+              element={MdFilterAlt}
+              className="ml-3 cursor-pointer"
+              size={28}
+              onClick={() =>
+                props.setIsFilterModalOpened((prevState) => !prevState)
+              }
+            />
+          </>
         ) : (
-          <BiPlusCircle
-            style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
-            className="ml-3 cursor-pointer"
-            fontSize={28}
-            onClick={() =>
-              props.dataKey === 'vendors'
-                ? setIsCreateVendorModalOpen(true)
-                : setIsCreateExpenseCategoryModalOpen(true)
-            }
-          />
+          <>
+            <Icon
+              element={BiPlusCircle}
+              className="ml-3 cursor-pointer"
+              size={28}
+              onClick={() =>
+                props.dataKey === 'vendors'
+                  ? setIsCreateVendorModalOpen(true)
+                  : setIsCreateExpenseCategoryModalOpen(true)
+              }
+            />
+          </>
         )}
 
         {props.isFilterModalOpened && (

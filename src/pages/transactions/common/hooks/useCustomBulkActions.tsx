@@ -16,6 +16,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineContentCopy } from 'react-icons/md';
+import { CreateExpenseBulkAction } from '../../components/CreateExpenseBulkAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -29,6 +30,13 @@ export const useCustomBulkActions = () => {
   };
 
   const customBulkActions: CustomBulkAction<Transaction>[] = [
+    ({ selectedResources, setSelected }) =>
+      selectedResources && (
+        <CreateExpenseBulkAction
+          setSelected={setSelected}
+          transactions={selectedResources}
+        />
+      ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showConvertAction(selectedResources) && (

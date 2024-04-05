@@ -16,7 +16,6 @@ import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -54,6 +53,9 @@ import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifi
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 
 export const defaultColumns: string[] = [
   'status',
@@ -128,8 +130,9 @@ export function useRecurringExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-
   const reactSettings = useReactSettings();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
+  const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
   type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
@@ -148,17 +151,14 @@ export function useRecurringExpenseColumns() {
       id: 'status_id',
       label: t('status'),
       format: (value, recurringExpense) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
-          disableNavigation={disableNavigation(
-            'recurring_expense',
-            recurringExpense
-          )}
+          renderSpan={disableNavigation('recurring_expense', recurringExpense)}
         >
           <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -166,17 +166,14 @@ export function useRecurringExpenseColumns() {
       id: 'number',
       label: t('number'),
       format: (field, recurringExpense) => (
-        <Link
+        <DynamicLink
           to={route('/recurring_expenses/:id/edit', {
             id: recurringExpense.id,
           })}
-          disableNavigation={disableNavigation(
-            'recurring_expense',
-            recurringExpense
-          )}
+          renderSpan={disableNavigation('recurring_expense', recurringExpense)}
         >
           {field}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -185,15 +182,12 @@ export function useRecurringExpenseColumns() {
       label: t('vendor'),
       format: (value, recurringExpense) =>
         recurringExpense.vendor && (
-          <Link
+          <DynamicLink
             to={route('/vendors/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation(
-              'vendor',
-              recurringExpense.vendor
-            )}
+            renderSpan={disableNavigation('vendor', recurringExpense.vendor)}
           >
             {recurringExpense.vendor.name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -202,15 +196,12 @@ export function useRecurringExpenseColumns() {
       label: t('client'),
       format: (value, recurringExpense) =>
         recurringExpense.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation(
-              'client',
-              recurringExpense.client
-            )}
+            renderSpan={disableNavigation('client', recurringExpense.client)}
           >
             {recurringExpense.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -223,9 +214,9 @@ export function useRecurringExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value, recurringExpense) =>
+      format: (_, recurringExpense) =>
         formatMoney(
-          value,
+          calculateExpenseAmount(recurringExpense),
           recurringExpense.client?.country_id,
           recurringExpense.currency_id ||
             recurringExpense.client?.settings.currency_id
@@ -268,21 +259,25 @@ export function useRecurringExpenseColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('expense1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('expense2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('expense3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('expense4', value?.toString()),
     },
     {
       column: 'documents',

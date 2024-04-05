@@ -9,6 +9,8 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useProjectQuery } from '$app/common/queries/projects';
 import { DocumentsTable } from '$app/components/DocumentsTable';
@@ -17,6 +19,9 @@ import { useParams } from 'react-router-dom';
 
 export default function Documents() {
   const { id } = useParams();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const { data: project } = useProjectQuery({ id });
 
@@ -29,11 +34,15 @@ export default function Documents() {
       <Upload
         endpoint={endpoint('/api/v1/projects/:id/upload', { id })}
         onSuccess={onSuccess}
+        disableUpload={
+          !hasPermission('edit_project') && !entityAssigned(project)
+        }
       />
 
       <DocumentsTable
         documents={project?.documents || []}
         onDocumentDelete={onSuccess}
+        disableEditableOptions={!entityAssigned(project, true)}
       />
     </>
   );

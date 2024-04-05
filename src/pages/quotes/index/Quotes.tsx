@@ -27,23 +27,49 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtom } from 'jotai';
+import {
+  QuoteSlider,
+  quoteSliderAtom,
+  quoteSliderVisibilityAtom,
+} from '../common/components/QuoteSlider';
+import { useEffect, useState } from 'react';
+import { useQuoteQuery } from '../common/queries';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
 
   const [t] = useTranslation();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderQuoteId, setSliderQuoteId] = useState<string>('');
+  const [quoteSlider, setQuoteSlider] = useAtom(quoteSliderAtom);
+  const [quoteSliderVisibility, setQuoteSliderVisibility] = useAtom(
+    quoteSliderVisibilityAtom
+  );
+
+  const actions = useActions();
+  const filters = useQuoteFilters();
+  const columns = useQuoteColumns();
+  const quoteColumns = useAllQuoteColumns();
+  const customBulkActions = useCustomBulkActions();
+
+  const { data: quoteResponse } = useQuoteQuery({ id: sliderQuoteId });
 
   const pages: Page[] = [{ name: t('quotes'), href: route('/quotes') }];
 
-  const columns = useQuoteColumns();
+  useEffect(() => {
+    if (quoteResponse && quoteSliderVisibility) {
+      setQuoteSlider(quoteResponse);
+    }
+  }, [quoteResponse, quoteSliderVisibility]);
 
-  const actions = useActions();
-
-  const quoteColumns = useAllQuoteColumns();
-
-  const filters = useQuoteFilters();
-
-  const customBulkActions = useCustomBulkActions();
+  useEffect(() => {
+    return () => setQuoteSliderVisibility(false);
+  }, []);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -73,8 +99,15 @@ export default function Quotes() {
             table="quote"
           />
         }
+        onTableRowClick={(quote) => {
+          setSliderQuoteId(quote.id);
+          setQuoteSliderVisibility(true);
+        }}
         linkToCreateGuards={[permission('create_quote')]}
+        hideEditableOptions={!hasPermission('edit_quote')}
       />
+
+      {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}
     </Default>
   );
 }

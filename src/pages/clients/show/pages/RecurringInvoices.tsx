@@ -44,6 +44,7 @@ export default function RecurringInvoices() {
         id,
       })}
       linkToEdit="/recurring_invoices/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_recurring_invoice')]}
       hideEditableOptions={!hasPermission('edit_recurring_invoice')}
     />

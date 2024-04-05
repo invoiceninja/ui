@@ -58,6 +58,8 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const clientResolver = useClientResolver();
   const productColumns = useProductColumns();
@@ -130,6 +132,10 @@ export default function Create() {
 
       return value;
     });
+
+    return () => {
+      setCredit(undefined);
+    };
   }, [data]);
 
   useEffect(() => {
@@ -157,7 +163,7 @@ export default function Create() {
     credit && calculateInvoiceSum(credit);
   }, [credit]);
 
-  const save = useCreate({ setErrors });
+  const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
 
   return (
     <Default
@@ -181,7 +187,7 @@ export default function Create() {
         <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
-          {credit && client ? (
+          {credit ? (
             <ProductsTable
               type="product"
               resource={credit}
@@ -206,7 +212,14 @@ export default function Create() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} errors={errors} />
+        <CreditFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {credit && (
           <InvoiceTotals

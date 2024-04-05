@@ -26,7 +26,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import {
   RecurringInvoiceSlider,
   recurringInvoiceSliderAtom,
@@ -36,11 +36,16 @@ import { useEffect, useState } from 'react';
 import { useRecurringInvoiceQuery } from '../common/queries';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const [sliderRecurringInvoiceId, setSliderRecurringInvoiceId] =
     useState<string>('');
@@ -62,7 +67,9 @@ export default function RecurringInvoices() {
   const columns = useRecurringInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
 
-  const setRecurringInvoiceSlider = useSetAtom(recurringInvoiceSliderAtom);
+  const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
+    recurringInvoiceSliderAtom
+  );
   const [
     recurringInvoiceSliderVisibility,
     setRecurringInvoiceSliderVisibility,
@@ -117,6 +124,7 @@ export default function RecurringInvoices() {
           />
         }
         linkToCreateGuards={[permission('create_recurring_invoice')]}
+        hideEditableOptions={!hasPermission('edit_recurring_invoice')}
         onTableRowClick={(recurringInvoice) => {
           setSliderRecurringInvoiceId(
             (recurringInvoice as RecurringInvoice).id
@@ -125,7 +133,9 @@ export default function RecurringInvoices() {
         }}
       />
 
-      <RecurringInvoiceSlider />
+      {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (
+        <RecurringInvoiceSlider />
+      )}
     </Default>
   );
 }

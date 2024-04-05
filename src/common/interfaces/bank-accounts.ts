@@ -27,4 +27,5 @@ export interface BankAccount {
   provider_id: number;
   provider_name: string;
   updated_at: number;
+  integration_type: string;
 }

@@ -29,6 +29,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
@@ -66,6 +67,8 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'status',
@@ -120,6 +123,7 @@ export function useTaskColumns() {
 
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -181,12 +185,12 @@ export function useTaskColumns() {
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link
+        <DynamicLink
           to={route('/tasks/:id/edit', { id: task.id })}
-          disableNavigation={disableNavigation('task', task)}
+          renderSpan={disableNavigation('task', task)}
         >
           {value}
-        </Link>
+        </DynamicLink>
       ),
     },
     {
@@ -195,12 +199,12 @@ export function useTaskColumns() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link
+          <DynamicLink
             to={route('/clients/:id', { id: value.toString() })}
-            disableNavigation={disableNavigation('client', task.client)}
+            renderSpan={disableNavigation('client', task.client)}
           >
             {task.client.display_name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {
@@ -257,21 +261,25 @@ export function useTaskColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('task1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('task2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('task3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('task4', value?.toString()),
     },
     {
       column: 'date',
@@ -389,15 +397,22 @@ export function useTaskFilters() {
   return filters;
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
 
+  const { showCommonBulkAction, showEditAction } = params || {};
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'task',
+    editPageTabs: ['documents'],
   });
 
   const start = useStart();
@@ -417,6 +432,16 @@ export function useActions() {
   };
 
   const actions = [
+    (task: Task) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/tasks/:id/edit', { id: task.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -458,9 +483,12 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       getEntityState(task) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([task.id], 'archive')}
@@ -470,7 +498,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Archived ||
         getEntityState(task) === EntityState.Deleted) && (
         <DropdownElement
@@ -481,7 +509,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(task) === EntityState.Active ||
         getEntityState(task) === EntityState.Archived) && (
         <DropdownElement

@@ -10,7 +10,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type SettingsLevel = 'company' | 'group' | 'client';
+export type SettingsLevel = 'company' | 'group' | 'client';
 
 interface ActiveSettings {
   name: string;

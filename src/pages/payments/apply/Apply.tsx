@@ -37,8 +37,43 @@ export default function Apply() {
   const [t] = useTranslation();
   const { data: payment, isLoading } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
+
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
+
+  const calcApplyAmount = (balance: number) => {
+  
+    if(payment){
+      
+      const unapplied = payment?.amount - payment?.refunded - payment?.applied;
+
+      let invoices_total = 0;
+      formik.values.invoices.map((invoice: any) => {
+        invoices_total = invoices_total + Number(invoice.amount);
+      });
+
+      return Math.min(unapplied-invoices_total, balance);
+
+    }
+
+    return balance;
+  };
+
+  const calcApplyBalance = () => {
+    if (payment) {
+
+      const unapplied = payment?.amount - payment?.refunded - payment?.applied;
+
+      let total = 0;
+      formik.values.invoices.map((invoice: any) => {
+        total = total + Number(invoice.amount);
+      });
+
+      return unapplied - total;
+    }
+
+    return 0;
+  }
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -126,6 +161,7 @@ export default function Apply() {
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
+            {formik.values.invoices.length >= 1 && `  - (${formatMoney(calcApplyBalance(), payment.client?.country_id, payment.client?.settings.currency_id)} ${t('remaining')})`}
           </Element>
         </>
       )}
@@ -157,7 +193,7 @@ export default function Apply() {
               resource
                 ? handleInvoiceChange(
                     resource.id,
-                    resource.balance,
+                    calcApplyAmount(resource.balance),
                     resource.number
                   )
                 : null

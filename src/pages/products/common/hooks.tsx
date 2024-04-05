@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { EntityState } from '$app/common/enums/entity-state';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -44,6 +43,8 @@ import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -96,11 +97,10 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const disableNavigation = useDisableNavigation();
-
   const formatMoney = useFormatMoney();
-
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
+  const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -116,12 +116,12 @@ export function useProductColumns() {
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
 
-          <Link
+          <DynamicLink
             to={route('/products/:id/edit', { id: product.id })}
-            disableNavigation={disableNavigation('product', product)}
+            renderSpan={disableNavigation('product', product)}
           >
             {value}
-          </Link>
+          </DynamicLink>
         </span>
       ),
     },
@@ -174,21 +174,25 @@ export function useProductColumns() {
       column: firstCustom,
       id: 'custom_value1',
       label: firstCustom,
+      format: (value) => formatCustomFieldValue('product1', value?.toString()),
     },
     {
       column: secondCustom,
       id: 'custom_value2',
       label: secondCustom,
+      format: (value) => formatCustomFieldValue('product2', value?.toString()),
     },
     {
       column: thirdCustom,
       id: 'custom_value3',
       label: thirdCustom,
+      format: (value) => formatCustomFieldValue('product3', value?.toString()),
     },
     {
       column: fourthCustom,
       id: 'custom_value4',
       label: fourthCustom,
+      format: (value) => formatCustomFieldValue('product4', value?.toString()),
     },
     {
       column: 'documents',

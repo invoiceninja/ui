@@ -61,7 +61,7 @@ export function ShippingAddress(props: Props) {
       >
         {t('copy_billing')}
       </Button>
-      <Element leftSide={t('billing_address1')}>
+      <Element leftSide={t('shipping_address1')}>
         <InputField
           id="shipping_address1"
           value={props.client?.shipping_address1 || ''}

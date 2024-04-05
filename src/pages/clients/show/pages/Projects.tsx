@@ -44,6 +44,7 @@ export default function Projects() {
       bulkRoute="/api/v1/projects/bulk"
       linkToCreate={route('/projects/create?client=:id', { id: id })}
       linkToEdit="/projects/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_project')]}
       hideEditableOptions={!hasPermission('edit_project')}
     />

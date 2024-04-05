@@ -14,15 +14,20 @@ import { Suspense } from 'react';
 
 interface Props {
   children: JSX.Element;
+  type?: 'page' | 'component' | 'subPage';
 }
 
-export function Fallback({ children }: Props) {
+export function Fallback({ children, type = 'page' }: Props) {
   return (
     <Suspense
       fallback={
-        <Default>
+        type === 'page' || type === 'component' ? (
+          <Default>
+            <Spinner />
+          </Default>
+        ) : (
           <Spinner />
-        </Default>
+        )
       }
     >
       {children}

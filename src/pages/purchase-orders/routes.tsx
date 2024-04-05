@@ -58,6 +58,23 @@ export const purchaseOrderRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
+    </Route>
+
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            or(
+              permission('edit_purchase_order'),
+              assigned('/api/v1/purchase_orders/:id')
+            ),
+          ]}
+          component={<Outlet />}
+        />
+      }
+    >
       <Route path="email" element={<Email />} />
       <Route path="pdf" element={<Pdf />} />
     </Route>

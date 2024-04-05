@@ -15,7 +15,7 @@ import { useCurrentUser } from './useCurrentUser';
 
 interface Params {
   commonActionsSection: boolean;
-  entity: 'invoice';
+  entity: Entity;
 }
 export function useShowActionByPreferences(params: Params) {
   const user = useCurrentUser();
@@ -26,7 +26,7 @@ export function useShowActionByPreferences(params: Params) {
 
   const defaultCommonActions = useDefaultCommonActions();
 
-  return (entity: Entity, actionKey: string) => {
+  return (actionKey: string) => {
     if (!isEditPage) {
       return true;
     }

@@ -74,6 +74,8 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const {
     handleChange,
@@ -108,7 +110,7 @@ export default function Edit() {
   }, [invoice]);
 
   const actions = useActions();
-  const save = useHandleSave(setErrors);
+  const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   return (
     <Default
@@ -226,6 +228,10 @@ export default function Edit() {
           invoice={invoice}
           handleChange={handleChange}
           errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
         />
 
         {invoice && (
@@ -251,6 +257,7 @@ export default function Edit() {
               endpoint="/api/v1/live_preview?entity=:entity"
               observable={true}
               initiallyVisible={false}
+              withRemoveLogoCTA
             />
           )}
         </div>

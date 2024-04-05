@@ -49,12 +49,18 @@ export function CreateExpenseCategoryForm(props: Props) {
   return (
     <CardContainer>
       <InputField
-        style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+        style={{
+          color: colors.$3,
+          colorScheme: colors.$0,
+          backgroundColor: colors.$1,
+          borderColor: colors.$4,
+        }}
         required
         label={t('name')}
         value={expenseCategory?.name}
         onValueChange={(value) => handleChange('name', value)}
         errorMessage={errors?.errors.name}
+        cypressRef="expenseCategoryNameField"
       />
 
       <InputLabel>{t('color')}</InputLabel>

@@ -71,7 +71,11 @@ export function EmailRecord(props: Props) {
       className={classNames('flex flex-col', {
         'border-b': withBottomBorder,
       })}
-      style={{ borderColor: colors.$5 }}
+      style={{
+        borderColor: colors.$5,
+        color: colors.$3,
+        colorScheme: colors.$0,
+      }}
     >
       <Div
         className={classNames(
@@ -81,7 +85,7 @@ export function EmailRecord(props: Props) {
             'cursor-pointer': Boolean(emailRecord.events.length),
           }
         )}
-        theme={{ hoverColor: colors.$2 }}
+        theme={{ hoverColor: colors.$4 }}
         onClick={() =>
           Boolean(emailRecord.events.length) &&
           setIsCollapsed((current) => !current)
@@ -135,7 +139,7 @@ export function EmailRecord(props: Props) {
           <EventDiv
             key={index}
             className="flex flex-col flex-1 min-w-0 space-y-4 px-6 py-2"
-            theme={{ hoverColor: colors.$2 }}
+            theme={{ hoverColor: colors.$4 }}
           >
             <div className="flex justify-between space-x-2">
               <span className="text-sm truncate">
