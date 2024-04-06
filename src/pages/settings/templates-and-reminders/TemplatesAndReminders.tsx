@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
@@ -295,6 +295,8 @@ export function TemplatesAndReminders() {
   const variables =
     templateId === 'payment' ? paymentVariables : commonVariables;
 
+  console.log(user?.company_user?.ninja_portal_url);
+
   return (
     <Settings
       title={t('templates_and_reminders')}
@@ -397,13 +399,15 @@ export function TemplatesAndReminders() {
                 </strong>{' '}
                 {t('plan')}.
               </span>
-              <Link
+              <Button
+                behavior="button"
                 className="mt-2"
-                external
-                to={user?.company_user?.ninja_portal_url || ''}
+                onClick={() =>
+                  window.open(user?.company_user?.ninja_portal_url || '')
+                }
               >
-                <Button>{t('plan_change')}</Button>
-              </Link>
+                {t('plan_change')}
+              </Button>
             </div>
           )}
         </Element>
