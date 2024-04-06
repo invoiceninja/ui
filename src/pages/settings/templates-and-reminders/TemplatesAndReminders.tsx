@@ -295,8 +295,6 @@ export function TemplatesAndReminders() {
   const variables =
     templateId === 'payment' ? paymentVariables : commonVariables;
 
-  console.log(user?.company_user?.ninja_portal_url);
-
   return (
     <Settings
       title={t('templates_and_reminders')}
