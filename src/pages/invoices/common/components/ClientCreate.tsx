@@ -274,7 +274,7 @@ export function ClientCreate({
             type="secondary"
             onClick={() => setFundamentalConceptVisible((current) => !current)}
           >
-            {fundamentalConceptVisible ? t('show_more') : t('show_less')}
+            {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
           </Button>
 
           <Button behavior="button" onClick={onSave}>
