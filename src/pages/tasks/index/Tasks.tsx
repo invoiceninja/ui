@@ -44,6 +44,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { ExtensionBanner } from '../common/components/ExtensionBanner';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -86,7 +87,12 @@ export default function Tasks() {
   } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      aboveMainContainer={<ExtensionBanner />}
+      withoutBackButton
+    >
       <DataTable
         resource="task"
         columns={columns}
