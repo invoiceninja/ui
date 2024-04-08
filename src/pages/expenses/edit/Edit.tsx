@@ -17,6 +17,7 @@ import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
 import { TaxSettings } from '../create/components/Taxes';
+import classNames from 'classnames';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -25,6 +26,7 @@ export interface Context {
   setExpense: Dispatch<SetStateAction<Expense | undefined>>;
   taxInputType: 'by_rate' | 'by_amount';
   setTaxInputType: Dispatch<SetStateAction<'by_rate' | 'by_amount'>>;
+  isPreviewMode: boolean;
 }
 
 export default function Edit() {
@@ -37,13 +39,18 @@ export default function Edit() {
     errors,
     taxInputType,
     setTaxInputType,
+    isPreviewMode,
   } = context;
 
   const handleChange = useHandleChange({ setExpense, setErrors });
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-12 xl:col-span-4">
+      <div
+        className={classNames('col-span-12', {
+          'xl:col-span-4': !isPreviewMode,
+        })}
+      >
         <Details
           expense={expense}
           handleChange={handleChange}
@@ -53,11 +60,19 @@ export default function Edit() {
         />
       </div>
 
-      <div className="col-span-12 xl:col-span-4">
+      <div
+        className={classNames('col-span-12', {
+          'xl:col-span-4': !isPreviewMode,
+        })}
+      >
         <Notes expense={expense} handleChange={handleChange} errors={errors} />
       </div>
 
-      <div className="col-span-12 xl:col-span-4 space-y-4">
+      <div
+        className={classNames('col-span-12 space-y-4', {
+          'xl:col-span-4': !isPreviewMode,
+        })}
+      >
         <AdditionalInfo
           expense={expense}
           handleChange={handleChange}
