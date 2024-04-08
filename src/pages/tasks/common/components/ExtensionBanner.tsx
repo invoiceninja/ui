@@ -9,32 +9,33 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { useDetectBrowser } from '$app/common/hooks/useDetectBrowser';
 import { Banner } from '$app/components/Banner';
 import { Icon } from '$app/components/icons/Icon';
-import { useAtom } from 'jotai';
-import { atomWithStorage, createJSONStorage } from 'jotai/utils';
-import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaChrome } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 
-const storage = createJSONStorage(() => sessionStorage);
-export const chromeExtensionBannerAtom = atomWithStorage<string>(
-  'displayChromeExtensionBanner',
-  'true',
-  storage as AsyncStorage<string>
-);
 export function ExtensionBanner() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
 
+  const { isChrome } = useDetectBrowser();
+
   const [displayChromeExtensionBanner, setDisplayChromeExtensionBanner] =
-    useAtom(chromeExtensionBannerAtom);
+    useState<string | null>(
+      sessionStorage.getItem('displayChromeExtensionBanner')
+    );
 
-  console.log(displayChromeExtensionBanner);
+  useEffect(() => {
+    if (displayChromeExtensionBanner === 'false') {
+      sessionStorage.setItem('displayChromeExtensionBanner', 'false');
+    }
+  }, [displayChromeExtensionBanner]);
 
-  if (displayChromeExtensionBanner === 'false') {
+  if (displayChromeExtensionBanner === 'false' || !isChrome) {
     return <></>;
   }
 
