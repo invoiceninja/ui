@@ -10,18 +10,15 @@
 
 import { ReactNode } from 'react';
 import { Panel as PanelBase } from 'react-resizable-panels';
-import { useMediaQuery } from 'react-responsive';
 
 interface Props {
   children: ReactNode;
-  renderBasePanel?: boolean;
+  renderBasePanel: boolean;
 }
 export function Panel(props: Props) {
-  const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
-
   const { children, renderBasePanel } = props;
 
-  return isLargeScreen || Boolean(renderBasePanel) ? (
+  return renderBasePanel ? (
     <PanelBase defaultSize={50} minSize={25}>
       {children}
     </PanelBase>

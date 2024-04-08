@@ -60,6 +60,11 @@ export function useEmailProviders() {
       enabled: true,
     },
     {
+      value: 'client_brevo',
+      label: 'Brevo',
+      enabled: true,
+    },
+    {
       value: 'smtp',
       label: 'SMTP',
       enabled:
@@ -84,6 +89,11 @@ export function useEmailProviders() {
     {
       value: 'client_mailgun',
       label: 'Mailgun',
+      enabled: true,
+    },
+    {
+      value: 'client_brevo',
+      label: 'Brevo',
       enabled: true,
     },
     {

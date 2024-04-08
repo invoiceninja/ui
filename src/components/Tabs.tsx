@@ -26,6 +26,7 @@ interface Props {
   tabs: Tab[];
   disableBackupNavigation?: boolean;
   visible?: boolean;
+  rightSide?: ReactNode;
 }
 
 export type Tab = {
@@ -90,7 +91,7 @@ export function Tabs(props: Props) {
 
   return visible ? (
     <div className={props.className} data-cy="tabs">
-      <div className="sm:hidden">
+      <div className="flex flex-col space-y-5 sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
@@ -109,10 +110,15 @@ export function Tabs(props: Props) {
               )
           )}
         </select>
+
+        {props.rightSide}
       </div>
 
       <div className="hidden sm:block">
-        <div className="border-b" style={{ borderColor: colors.$5 }}>
+        <div
+          className="flex justify-between border-b"
+          style={{ borderColor: colors.$5 }}
+        >
           <nav
             ref={tabBar}
             className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
@@ -137,6 +143,8 @@ export function Tabs(props: Props) {
                 )
             )}
           </nav>
+
+          {props.rightSide}
         </div>
       </div>
     </div>
