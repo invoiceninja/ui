@@ -184,4 +184,5 @@ export const defaultSettings = {
   default_expense_payment_type_id: '',
   classification: '',
   e_quote_type: '',
+  brevo_secret: '',
 };
