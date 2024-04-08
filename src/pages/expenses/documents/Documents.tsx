@@ -16,11 +16,12 @@ import { Context } from '../edit/Edit';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import classNames from 'classnames';
 
 export default function Documents() {
   const context: Context = useOutletContext();
 
-  const { expense } = context;
+  const { expense, isPreviewMode } = context;
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -30,7 +31,12 @@ export default function Documents() {
   };
 
   return (
-    <div className="w-2/3">
+    <div
+      className={classNames({
+        'w-2/3': !isPreviewMode,
+        'w-full': isPreviewMode,
+      })}
+    >
       <Upload
         widgetOnly
         endpoint={endpoint('/api/v1/expenses/:id/upload', { id: expense.id })}

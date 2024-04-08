@@ -97,16 +97,17 @@ export function LimitsAndFees(props: Props) {
           <Element leftSide={`${t('min')} ${t('limit')}`}>
             <div className="space-y-4">
               <InputField
-                disabled={
-                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit === -1
-                }
+                type="number"
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     .min_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
+                }
+                disabled={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .min_limit === -1
                 }
                 errorMessage={props.errors?.errors.min_limit}
               />
@@ -127,16 +128,17 @@ export function LimitsAndFees(props: Props) {
           <Element leftSide={`${t('max')} ${t('limit')}`}>
             <div className="space-y-4">
               <InputField
-                disabled={
-                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit === -1
-                }
+                type="number"
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     .max_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
+                }
+                disabled={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .max_limit === -1
                 }
                 errorMessage={props.errors?.errors.max_limit}
               />
@@ -158,6 +160,7 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={t('fee_percent')}>
             <InputField
+              type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   .fee_percent
@@ -171,6 +174,7 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={t('fee_amount')}>
             <InputField
+              type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   .fee_amount
@@ -184,6 +188,7 @@ export function LimitsAndFees(props: Props) {
 
           <Element leftSide={t('fee_cap')}>
             <InputField
+              type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                   .fee_cap
