@@ -26,6 +26,14 @@ import { Spinner } from '$app/components/Spinner';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import Toggle from '$app/components/forms/Toggle';
+import { Panel } from '$app/components/resizable-panels/Panel';
+import { PanelGroup } from '$app/components/resizable-panels/PanelGroup';
+import { PanelResizeHandle } from '$app/components/resizable-panels/PanelResizeHandle';
+import { DocumentPreview } from './common/components/DocumentPreview';
+import { useMediaQuery } from 'react-responsive';
+import { Divider } from '$app/components/cards/Divider';
+import { useColorScheme } from '$app/common/colors';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -33,8 +41,10 @@ export default function Expense() {
   const { documentTitle } = useTitle('edit_expense');
 
   const { id } = useParams();
-
+  const actions = useActions();
+  const colors = useColorScheme();
   const { data } = useExpenseQuery({ id });
+  const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -58,15 +68,12 @@ export default function Expense() {
     },
   ];
 
+  const [errors, setErrors] = useState<ValidationBag>();
   const [expense, setExpense] = useState<ExpenseType>();
-
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
-
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const actions = useActions();
 
   const save = useSave({ setErrors });
 
@@ -96,18 +103,52 @@ export default function Expense() {
     >
       {expense ? (
         <div className="space-y-4">
-          <Tabs tabs={tabs} />
-
-          <Outlet
-            context={{
-              errors,
-              setErrors,
-              expense,
-              setExpense,
-              taxInputType,
-              setTaxInputType,
-            }}
+          <Tabs
+            tabs={tabs}
+            rightSide={
+              <div className="flex items-center justify-end space-x-3">
+                <span className="text-sm">{t('preview')}</span>
+                <Toggle
+                  checked={isPreviewMode}
+                  onValueChange={(value) => setIsPreviewMode(value)}
+                />
+              </div>
+            }
           />
+
+          <PanelGroup renderBasePanelGroup={isPreviewMode && isLargeScreen}>
+            <Panel renderBasePanel={isPreviewMode && isLargeScreen}>
+              <Outlet
+                context={{
+                  errors,
+                  setErrors,
+                  expense,
+                  setExpense,
+                  taxInputType,
+                  setTaxInputType,
+                  isPreviewMode,
+                }}
+              />
+            </Panel>
+
+            <PanelResizeHandle
+              renderBasePanelResizeHandler={isPreviewMode && isLargeScreen}
+            />
+
+            {isPreviewMode && !isLargeScreen && (
+              <Divider
+                className="pt-4"
+                withoutPadding
+                borderColor={colors.$5}
+              />
+            )}
+
+            <Panel renderBasePanel={isPreviewMode && isLargeScreen}>
+              {isPreviewMode && (
+                <DocumentPreview documents={expense.documents} />
+              )}
+            </Panel>
+          </PanelGroup>
         </div>
       ) : (
         <Spinner />
