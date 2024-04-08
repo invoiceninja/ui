@@ -310,6 +310,7 @@ export function EmailSettings() {
                 disabled={disableSettingsField('e_invoice_type')}
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
+                <option value="FACT1">FACT1</option>
                 <option value="EN16931">EN16931</option>
                 <option value="XInvoice_3_0">XInvoice_3.0</option>
                 <option value="XInvoice_2_3">XInvoice_2.3</option>
