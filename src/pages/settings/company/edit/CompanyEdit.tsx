@@ -139,9 +139,11 @@ export function CompanyEdit(props: Props) {
   return (
     <Modal
       title={
-        stepIndex !== 2
-          ? t('welcome_to_invoice_ninja')
-          : t('accept_payments_online')
+        stepIndex !== 1
+          ? stepIndex === 0
+            ? t('welcome_to_invoice_ninja')
+            : t('accept_payments_online')
+          : ''
       }
       visible={props.isModalOpen}
       onClose={() => {
