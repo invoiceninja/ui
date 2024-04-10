@@ -329,8 +329,6 @@ export function EmailSettings() {
           </>
         ) : null}
 
-        <Divider />
-
         <Element
           leftSide={
             <PropertyCheckbox
@@ -352,6 +350,8 @@ export function EmailSettings() {
             <option value="OrderX_Extended">OrderX_Extended</option>
           </SelectField>
         </Element>
+
+        <Divider />
 
         <Element
           leftSide={
