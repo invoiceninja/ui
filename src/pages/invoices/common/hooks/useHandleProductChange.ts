@@ -41,9 +41,11 @@ export function useHandleProductChange(props: Props) {
       return props.onChange(index, lineItem);
     }
 
-    lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
-
     if (company.fill_products) {
+      lineItem.quantity = company?.default_quantity
+        ? 1
+        : product?.quantity ?? 0;
+
       if (resource.client_id) {
         resolveClient.find(resource.client_id).then((client) => {
           const clientCurrencyId = client.settings.currency_id;
