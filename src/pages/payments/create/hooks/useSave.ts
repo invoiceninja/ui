@@ -17,21 +17,19 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useGenerate64CharHash } from '$app/common/hooks/useGenerateHash';
+import { generate64CharHash } from '$app/common/hooks/useGenerateHash';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
   const navigate = useNavigate();
 
-  const generateHash = useGenerate64CharHash();
-
   return (payment: Payment, sendEmail: boolean) => {
     setErrors(undefined);
 
     toast.processing();
 
-    const idempotencyKey = generateHash();
+    const idempotencyKey = generate64CharHash();
 
     request(
       'POST',

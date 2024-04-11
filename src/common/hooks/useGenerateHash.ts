@@ -10,11 +10,9 @@
 
 import { sha256 } from 'js-sha256';
 
-export function useGenerate64CharHash() {
-  return () => {
-    const hash = sha256.create();
-    hash.update(`${Date.now().toString()}${Math.random().toString()}`);
+export function generate64CharHash() {
+  const hash = sha256.create();
+  hash.update(`${Date.now().toString()}${Math.random().toString()}`);
 
-    return hash.hex();
-  };
+  return hash.hex();
 }
