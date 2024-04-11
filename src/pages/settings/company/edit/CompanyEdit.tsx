@@ -60,6 +60,18 @@ export function CompanyEdit(props: Props) {
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
+  const handleChangeName = (value: string) => {
+    handleChange('settings.name', value);
+
+    const subDomainValue = value
+      .split('')
+      .filter((c) => /[a-zA-Z]/.test(c))
+      .join('')
+      .toLowerCase();
+
+    handleChange('subdomain', subDomainValue);
+  };
+
   const handleUpdateCompany = (isWizard: boolean) => {
     request(
       'PUT',
@@ -159,8 +171,9 @@ export function CompanyEdit(props: Props) {
             <InputField
               label={t('company_name')}
               value={companyChanges?.settings?.name}
-              onValueChange={(value) => handleChange('settings.name', value)}
+              onValueChange={(value) => handleChangeName(value)}
               errorMessage={errors?.errors?.name}
+              changeOverride
             />
 
             {isHosted() && (
@@ -168,6 +181,7 @@ export function CompanyEdit(props: Props) {
                 label={t('subdomain')}
                 value={companyChanges?.subdomain}
                 onValueChange={(value) => handleChange('subdomain', value)}
+                changeOverride
               />
             )}
 

@@ -324,6 +324,7 @@ export function EmailSettings() {
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
                 <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2">Facturae_3.2</option>
+                <option value="FatturaPA">FatturaPA</option>
               </SelectField>
             </Element>
 
