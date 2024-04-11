@@ -19,7 +19,6 @@ interface Props {
 }
 
 export function ValidationAlert(props: Props) {
-  console.log(props.errors.errors);
   const { entity, withoutTopMessage, withoutListBullets } = props;
 
   const validationMessageAlias = useValidationMessageAlias({ entity });

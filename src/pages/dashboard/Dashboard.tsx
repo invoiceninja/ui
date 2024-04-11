@@ -8,10 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo, isSelfHosted } from '$app/common/helpers';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
 import { Activity } from '$app/pages/dashboard/components/Activity';
 import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
 import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
@@ -26,26 +23,13 @@ import { ModuleBitmask } from '../settings';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
 
 export default function Dashboard() {
-  useTitle('dashboard');
-
   const [t] = useTranslation();
-
-  const user = useCurrentUser();
+  useTitle('dashboard');
 
   const enabled = useEnabled();
 
   return (
-    <Default
-      title={t('dashboard')}
-      navigationTopRight={
-        isSelfHosted() &&
-        !isDemo() &&
-        (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
-          <SwitchToFlutter />
-        )
-      }
-      withoutBackButton
-    >
+    <Default title={t('dashboard')} withoutBackButton>
       <Totals />
 
       <div className="grid grid-cols-12 gap-4 my-6">
