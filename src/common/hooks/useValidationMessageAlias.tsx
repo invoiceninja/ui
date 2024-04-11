@@ -8,20 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useClientValidationMessageAlias } from '$app/pages/clients/common/hooks/useClientValidationMessageAlias';
+import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
 
 interface Params {
   entity?: 'client';
 }
+export function useValidationMessageAlias(params?: Params) {
+  const [t] = useTranslation();
 
-export function useValidationMessageAlias(params: Params) {
-  const { entity } = params;
-
-  const clientValidationMessageAlias = useClientValidationMessageAlias();
+  const { entity } = params || {};
 
   return (property: string, message: string[]) => {
-    if (entity === 'client') {
-      return clientValidationMessageAlias(property, message);
+    if (property === 'id' && entity === 'client') {
+      return (
+        <div className="inline-flex flex-col justify-center">
+          <div className="flex items-center space-x-2">
+            <span>{t('clients_limit')}!</span>
+
+            <Link className="underline" to="/settings/account_management">
+              {t('unlock_unlimited_clients')}!
+            </Link>
+          </div>
+
+          <span>{message}</span>
+        </div>
+      );
     }
 
     return message;
