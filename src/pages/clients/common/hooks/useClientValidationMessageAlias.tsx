@@ -19,14 +19,13 @@ export function useClientValidationMessageAlias() {
       return (
         <div className="inline-flex flex-col justify-center">
           <div className="flex items-center space-x-2">
-            <span>{t('clients_limit')}!</span>
+            <span>{t('limit_clients')}!</span>
 
             <Link className="underline" to="/settings/account_management">
               {t('unlock_unlimited_clients')}!
             </Link>
           </div>
 
-          <span>{message}</span>
         </div>
       );
     }
