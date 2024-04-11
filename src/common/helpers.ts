@@ -121,3 +121,13 @@ export function isDemo() {
 export function isProduction() {
   return import.meta.env.PROD;
 }
+
+export function checkJsonObject(text: string) {
+  try {
+    const parsedJson = text && JSON.parse(text);
+
+    return parsedJson;
+  } catch (e) {
+    return false;
+  }
+}
