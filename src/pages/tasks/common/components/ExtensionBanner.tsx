@@ -26,12 +26,12 @@ export function ExtensionBanner() {
 
   const [displayChromeExtensionBanner, setDisplayChromeExtensionBanner] =
     useState<string | null>(
-      sessionStorage.getItem('displayChromeExtensionBanner')
+      localStorage.getItem('displayChromeExtensionBanner')
     );
 
   useEffect(() => {
     if (displayChromeExtensionBanner === 'false') {
-      sessionStorage.setItem('displayChromeExtensionBanner', 'false');
+      localStorage.setItem('displayChromeExtensionBanner', 'false');
     }
   }, [displayChromeExtensionBanner]);
 
