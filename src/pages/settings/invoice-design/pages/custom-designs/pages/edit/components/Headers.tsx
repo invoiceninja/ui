@@ -28,7 +28,7 @@ export default function Header() {
   const { t } = useTranslation();
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
 
-  useDebounce(() => value && handleBlockChange('header', value), 1000, [value]);
+  useDebounce(() => handleBlockChange('header', value || ''), 1000, [value]);
   const colors = useColorScheme();
 
   return (
@@ -42,7 +42,7 @@ export default function Header() {
             enabled: false,
           },
         }}
-        onChange={(markup) => markup && setValue(markup)}
+        onChange={(markup) => setValue(markup)}
       />
     </Card>
   );
