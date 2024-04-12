@@ -36,11 +36,17 @@
 
         if (document.body) {
           document.body.appendChild(noscriptElement);
-          document.body.appendChild(rsmsCssLink);
         } else {
           document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(noscriptElement);
-            document.body.appendChild(rsmsCssLink);
+          });
+        }
+
+        if (document.head) {
+          document.head.appendChild(rsmsCssLink);
+        } else {
+          document.addEventListener('DOMContentLoaded', function () {
+            document.head.appendChild(rsmsCssLink);
           });
         }
       } else {
@@ -48,11 +54,11 @@
         rsmsCssLink.rel = 'stylesheet';
         rsmsCssLink.href = '/rsms-inter.css';
 
-        if (document.body) {
-          document.body.appendChild(rsmsCssLink);
+        if (document.head) {
+          document.head.appendChild(rsmsCssLink);
         } else {
           document.addEventListener('DOMContentLoaded', function () {
-            document.body.appendChild(rsmsCssLink);
+            document.head.appendChild(rsmsCssLink);
           });
         }
       }
