@@ -28,7 +28,7 @@ export default function Header() {
   const { t } = useTranslation();
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
 
-  useDebounce(() => handleBlockChange('header', value || ''), 1000, [value]);
+  useDebounce(() => handleBlockChange('header', value || ''), 500, [value]);
   const colors = useColorScheme();
 
   return (

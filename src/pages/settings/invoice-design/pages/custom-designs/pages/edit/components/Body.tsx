@@ -29,7 +29,7 @@ export default function Body() {
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
-  useDebounce(() => handleBlockChange('body', value || ''), 1000, [value]);
+  useDebounce(() => handleBlockChange('body', value || ''), 500, [value]);
 
   return (
     <Card title={t('body')} padding="small" height="full">

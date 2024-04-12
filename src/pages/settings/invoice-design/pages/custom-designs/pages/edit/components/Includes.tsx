@@ -39,7 +39,7 @@ export default function Includes() {
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
-  useDebounce(() => handleBlockChange('includes', value || ''), 1000, [value]);
+  useDebounce(() => handleBlockChange('includes', value || ''), 500, [value]);
 
   return (
     <Card title={t('includes')} padding="small" height="full">
