@@ -11,7 +11,6 @@
       content="Leading free invoice generator for freelancers and small businesses. Invoice clients, accept payments, track expenses &amp; time billable-tasks online."
     />
 
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
@@ -31,11 +30,29 @@
 
         noscriptElement.appendChild(pixelBody);
 
+        const rsmsCssLink = document.createElement('link');
+        rsmsCssLink.rel = 'stylesheet';
+        rsmsCssLink.href = 'https://rsms.me/inter/inter.css';
+
         if (document.body) {
           document.body.appendChild(noscriptElement);
+          document.body.appendChild(rsmsCssLink);
         } else {
           document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(noscriptElement);
+            document.body.appendChild(rsmsCssLink);
+          });
+        }
+      } else {
+        const rsmsCssLink = document.createElement('link');
+        rsmsCssLink.rel = 'stylesheet';
+        rsmsCssLink.href = '/rsms-inter.css';
+
+        if (document.body) {
+          document.body.appendChild(rsmsCssLink);
+        } else {
+          document.addEventListener('DOMContentLoaded', function () {
+            document.body.appendChild(rsmsCssLink);
           });
         }
       }
