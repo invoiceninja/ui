@@ -9,6 +9,7 @@
  */
 
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Credit } from '$app/common/interfaces/credit';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
@@ -46,6 +47,7 @@ export function CloneOptionsModal(props: Props) {
   const setQuote = useSetAtom(quoteAtom);
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
   const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
+  const company = useCompanyChanges();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -66,6 +68,7 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
       paid_to_date: 0,
       po_number: '',
+      design_id: company.settings.invoice_design_id,
     });
 
     navigate('/invoices/create?action=clone');
@@ -88,6 +91,7 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
       paid_to_date: 0,
       po_number: '',
+      design_id: company.settings.quote_design_id,
     });
 
     navigate('/quotes/create?action=clone');
@@ -109,6 +113,7 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       po_number: '',
+      design_id: company.settings.invoice_design_id,
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -129,6 +134,7 @@ export function CloneOptionsModal(props: Props) {
       status_id: '1',
       vendor_id: '',
       po_number: '',
+      design_id: company.settings.purchase_order_design_id,
     });
 
     navigate('/purchase_orders/create?action=clone');
