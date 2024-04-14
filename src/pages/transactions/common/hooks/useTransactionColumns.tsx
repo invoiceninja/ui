@@ -23,11 +23,14 @@ import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
+import { date } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
   const company = useCurrentCompany();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
@@ -84,7 +87,11 @@ export function useTransactionColumns() {
         }
       },
     },
-    { id: 'date', label: t('date') },
+    {
+      id: 'date',
+      label: t('date'),
+      format: (value) => date(value, dateFormat),
+    },
     {
       id: 'description',
       label: t('description'),
