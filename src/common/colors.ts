@@ -10,6 +10,8 @@
 
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+import { useEffect } from 'react';
+import { useReactSettings } from './hooks/useReactSettings';
 
 // export const $1 = {
 //   name: 'invoiceninja.dark',
@@ -62,7 +64,15 @@ export const $2 = {
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);
 
 export function useColorScheme() {
-  const [colorScheme] = useAtom(colorSchemeAtom);
+  const reactSettings = useReactSettings({ overwrite: false });
+
+  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
+
+  useEffect(() => {
+    if (reactSettings) {
+      reactSettings.dark_mode ? setColorScheme($1) : setColorScheme($2);
+    }
+  }, [reactSettings?.dark_mode]);
 
   return colorScheme;
 }
