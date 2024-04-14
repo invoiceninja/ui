@@ -67,8 +67,6 @@ export function CompanyCreate(props: Props) {
           ? 'settings/online_payments'
           : location.pathname.split('/')[1]);
 
-      console.log(basePage);
-
       navigate(basePage);
     }
 
