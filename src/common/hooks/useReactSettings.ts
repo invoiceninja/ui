@@ -57,6 +57,9 @@ export interface ReactSettings {
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
+  table_footer_columns?: Record<ReactTableColumns, string[]>;
+  show_table_footer?: boolean;
+  dark_mode?: boolean;
 }
 
 export type ReactTableColumns =
@@ -73,7 +76,8 @@ export type ReactTableColumns =
   | 'purchaseOrder'
   | 'expense'
   | 'recurringExpense'
-  | 'clientDocument';
+  | 'clientDocument'
+  | 'transaction';
 
 export const preferencesDefaults: Preferences = {
   dashboard_charts: {
@@ -91,8 +95,12 @@ export const preferencesDefaults: Preferences = {
   },
 };
 
-export function useReactSettings() {
-  const user = useInjectUserChanges();
+interface Options {
+  overwrite?: boolean;
+}
+
+export function useReactSettings(options?: Options) {
+  const user = useInjectUserChanges({ overwrite: options?.overwrite });
 
   const reactSettings =
     useSelector(

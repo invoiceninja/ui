@@ -37,6 +37,15 @@ import {
 import { useEffect, useState } from 'react';
 import { useQuoteQuery } from '../common/queries';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote } from '$app/common/interfaces/quote';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -54,8 +63,10 @@ export default function Quotes() {
   const actions = useActions();
   const filters = useQuoteFilters();
   const columns = useQuoteColumns();
+  const reactSettings = useReactSettings();
   const quoteColumns = useAllQuoteColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   const { data: quoteResponse } = useQuoteQuery({ id: sliderQuoteId });
 
@@ -71,11 +82,18 @@ export default function Quotes() {
     return () => setQuoteSliderVisibility(false);
   }, []);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="quote"
         columns={columns}
+        footerColumns={footerColumns}
         endpoint="/api/v1/quotes?include=client&without_deleted_clients=true&sort=id|desc"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
@@ -93,11 +111,28 @@ export default function Quotes() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={quoteColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="quote"
-          />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="quote"
+                  columns={allFooterColumns}
+                />
+
+                <span>|</span>
+              </>
+            )}
+
+            <DataTableColumnsPicker
+              columns={quoteColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="quote"
+            />
+          </div>
         }
         onTableRowClick={(quote) => {
           setSliderQuoteId(quote.id);
@@ -108,6 +143,15 @@ export default function Quotes() {
       />
 
       {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}
+
+      <ChangeTemplateModal<Quote>
+        entity="quote"
+        entities={changeTemplateResources as Quote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
+      />
     </Default>
   );
 }

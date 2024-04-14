@@ -35,6 +35,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -69,6 +70,8 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -421,6 +424,10 @@ export function useActions() {
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'purchase_order',
   });
+  const downloadEPurchaseOrder = useDownloadEInvoice({
+    resource: 'purchase_order',
+    downloadType: 'download_e_purchase_order',
+  });
 
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
@@ -444,6 +451,9 @@ export function useActions() {
 
     navigate('/purchase_orders/create?action=clone');
   };
+
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
@@ -493,6 +503,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => downloadEPurchaseOrder(purchaseOrder)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_purchase_order')}
       </DropdownElement>
     ),
     (purchaseOrder) =>
@@ -555,6 +573,17 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([purchaseOrder]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

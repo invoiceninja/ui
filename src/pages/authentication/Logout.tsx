@@ -28,6 +28,7 @@ export function Logout() {
     // }
 
     localStorage.clear();
+    sessionStorage.clear();
 
     queryClient.invalidateQueries();
     queryClient.removeQueries();

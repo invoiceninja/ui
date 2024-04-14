@@ -311,6 +311,13 @@ export interface Settings {
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
   custom_sending_email: string;
+  statement_design_id: string;
+  delivery_note_design_id: string;
+  payment_receipt_design_id: string;
+  payment_refund_design_id: string;
+  enable_rappen_rounding: boolean;
+  e_quote_type: string;
+  brevo_secret: string;
 }
 
 export interface TaxData {

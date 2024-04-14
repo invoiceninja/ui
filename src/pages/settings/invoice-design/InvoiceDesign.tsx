@@ -16,7 +16,7 @@ import { Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import axios, { AxiosPromise } from 'axios';
 import { useAtomValue } from 'jotai';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { updatingRecordsAtom } from './common/atoms';
 import { useEffect, useState } from 'react';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
@@ -25,6 +25,9 @@ import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceView
 import { useTabs } from './pages/general-settings/hooks/useTabs';
 import { Settings } from '$app/common/interfaces/company.interface';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { route } from '$app/common/helpers/route';
+import { Page } from '$app/components/Breadcrumbs';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -34,7 +37,10 @@ export interface GeneralSettingsPayload {
   settings_type: 'company';
 }
 export default function InvoiceDesign() {
+  const [t] = useTranslation();
   const { documentTitle } = useTitle('invoice_design');
+
+  const { id } = useParams();
 
   const tabs = useTabs();
   const location = useLocation();
@@ -43,6 +49,24 @@ export default function InvoiceDesign() {
     !location.pathname.includes('custom_designs');
 
   const onSave = useHandleCompanySave();
+
+  const showsMainTabs = location.pathname.includes('custom_designs')
+    ? location.pathname.endsWith('/custom_designs')
+    : true;
+
+  const pages: Page[] = [
+    { name: t('invoice_design'), href: '/settings/invoice_design' },
+    {
+      name: t('custom_designs'),
+      href: '/settings/invoice_design/custom_designs',
+    },
+    {
+      name: t('design'),
+      href: id
+        ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
+        : '/settings/invoice_design/custom_designs/create',
+    },
+  ];
 
   const [payload, setPayload] = useState<GeneralSettingsPayload>({
     client_id: '-1',
@@ -88,10 +112,17 @@ export default function InvoiceDesign() {
   );
 
   return (
-    <Default title={documentTitle}>
-      <Tabs tabs={tabs} />
+    <Default
+      title={documentTitle}
+      breadcrumbs={showsMainTabs ? undefined : pages}
+    >
+      <Tabs tabs={tabs} visible={showsMainTabs} />
 
-      <div className="flex flex-col lg:flex-row gap-4 my-4">
+      <div
+        className={classNames('flex flex-col lg:flex-row gap-4', {
+          'my-4': showsMainTabs,
+        })}
+      >
         <div
           className={classNames('w-full overflow-y-auto', {
             'lg:w-1/2': displaySaveButtonAndPreview,

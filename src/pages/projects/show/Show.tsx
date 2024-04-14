@@ -47,6 +47,13 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Expense } from '$app/common/interfaces/expense';
+import { Quote } from '$app/common/interfaces/quote';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 dayjs.extend(duration);
 
@@ -71,7 +78,9 @@ export default function Show() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/projects/${id}?include=client,tasks`)
+        endpoint(
+          `/api/v1/projects/${id}?include=client,tasks,invoices,quotes,expenses`
+        )
       ).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
@@ -90,6 +99,12 @@ export default function Show() {
 
   const showEditOption = useShowEditOption();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   if (!project) {
     return (
@@ -116,7 +131,7 @@ export default function Show() {
         })}
     >
       <div className="grid grid-cols-3 gap-4">
-        <InfoCard title={t('details')}>
+        <InfoCard title={project.name}>
           {project && (
             <div className="flex space-x-20 my-3">
               <span
@@ -160,8 +175,34 @@ export default function Show() {
           </p>
         </InfoCard>
 
-        <InfoCard title={t('notes')}>
+        <InfoCard title={t('notes')} className="h-56">
           <p>{project.public_notes}</p>
+
+          <div className="mt-3">
+            {project?.invoices?.map((invoice: Invoice, index: number) => (
+              <div key={index}>
+                <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+                  {t('invoice')} #{invoice.number}
+                </Link>
+              </div>
+            ))}
+
+            {project?.quotes?.map((quote: Quote, index: number) => (
+              <div key={index}>
+                <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+                  {t('quote')} #{quote.number}
+                </Link>
+              </div>
+            ))}
+
+            {project?.expenses?.map((expense: Expense, index: number) => (
+              <div key={index}>
+                <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+                  {t('expense')} #{expense.number}
+                </Link>
+              </div>
+            ))}
+          </div>
         </InfoCard>
 
         <InfoCard title={t('summary')}>
@@ -202,6 +243,15 @@ export default function Show() {
           />
         </div>
       )}
+
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
+      />
     </Default>
   );
 }

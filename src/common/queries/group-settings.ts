@@ -19,12 +19,13 @@ import { Params as GlobalParams } from './common/params.interface';
 
 export function useGroupSettingsQuery(params?: GlobalParams) {
   return useQuery<GroupSettings[]>(
-    ['/api/v1/group_settings'],
+    ['/api/v1/group_settings', params],
     () =>
       request(
         'GET',
-        endpoint('/api/v1/group_settings?status=:status', {
+        endpoint('/api/v1/group_settings?status=:status&per_page=:perPage', {
           status: params?.status ?? 'active',
+          perPage: params?.perPage ?? 20,
         })
       ).then(
         (response: GenericSingleResourceResponse<GroupSettings[]>) =>

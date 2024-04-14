@@ -16,6 +16,7 @@ import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
 
 interface Props {
   client: Client;
@@ -24,11 +25,12 @@ interface Props {
 export function Details(props: Props) {
   const [t] = useTranslation();
 
-  const formatMoney = useFormatMoney();
+  const { client } = props;
 
   const company = useCurrentCompany();
 
-  const { client } = props;
+  const getSetting = useGetSetting();
+  const formatMoney = useFormatMoney();
 
   return (
     <>
@@ -75,6 +77,12 @@ export function Details(props: Props) {
                           )}
                     </span>
                   </p>
+                )}
+
+                {import.meta.env.VITE_IS_TEST === 'true' && (
+                  <span data-cy="settingsTestingSpan">
+                    {getSetting(props.client, 'military_time')}
+                  </span>
                 )}
               </>
             }

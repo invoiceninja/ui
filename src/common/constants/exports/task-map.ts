@@ -12,8 +12,11 @@ import { Record } from "./client-map";
 
 export const taskMap: Record[] = [
   { trans: 'start_date', value: 'task.start_date', map: 'task' },
+  { trans: 'start_time', value: 'task.start_time', map: 'task' },
   { trans: 'end_date', value: 'task.end_date', map: 'task' },
+  { trans: 'end_time', value: 'task.end_time', map: 'task' },
   { trans: 'duration', value: 'task.duration', map: 'task' },
+  { trans: 'duration_words', value: 'task.duration_words', map: 'task' },
   { trans: 'rate', value: 'task.rate', map: 'task' },
   { trans: 'number', value: 'task.number', map: 'task' },
   { trans: 'description', value: 'task.description', map: 'task' },

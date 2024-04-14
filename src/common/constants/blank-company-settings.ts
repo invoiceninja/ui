@@ -9,6 +9,8 @@
  */
 
 export const defaultSettings = {
+  industry_id: '',
+  size_id: '',
   lock_invoices: '',
   show_all_tasks_client_portal: '',
   portal_design_id: '',
@@ -181,4 +183,6 @@ export const defaultSettings = {
   e_invoice_type: '',
   default_expense_payment_type_id: '',
   classification: '',
+  e_quote_type: '',
+  brevo_secret: '',
 };

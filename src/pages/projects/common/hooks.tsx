@@ -25,6 +25,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdRestore,
@@ -51,6 +52,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const defaultColumns: string[] = [
   'name',
@@ -344,6 +346,9 @@ export function useActions() {
       });
   };
 
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
+
   const actions = [
     (project: Project) =>
       isShowPage && (
@@ -375,6 +380,17 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([project]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -452,6 +468,9 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       hasPermission('create_invoice') && (
@@ -478,6 +497,17 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

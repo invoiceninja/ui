@@ -310,6 +310,7 @@ export function EmailSettings() {
                 disabled={disableSettingsField('e_invoice_type')}
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
+                <option value="FACT1">FACT1</option>
                 <option value="EN16931">EN16931</option>
                 <option value="XInvoice_3_0">XInvoice_3.0</option>
                 <option value="XInvoice_2_3">XInvoice_2.3</option>
@@ -323,12 +324,35 @@ export function EmailSettings() {
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
                 <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2">Facturae_3.2</option>
+                <option value="FatturaPA">FatturaPA</option>
               </SelectField>
             </Element>
           </>
         ) : null}
 
         <Divider />
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="e_quote_type"
+              labelElement={<SettingsLabel label={t('e_quote_type')} />}
+              defaultValue="OrderX_Comfort"
+            />
+          }
+        >
+          <SelectField
+            value={company?.settings.e_quote_type || 'OrderX_Comfort'}
+            onValueChange={(value) =>
+              handleChange('settings.e_quote_type', value)
+            }
+            disabled={disableSettingsField('e_quote_type')}
+          >
+            <option value="OrderX_Comfort">OrderX_Comfort</option>
+            <option value="OrderX_Basic">OrderX_Basic</option>
+            <option value="OrderX_Extended">OrderX_Extended</option>
+          </SelectField>
+        </Element>
 
         <Element
           leftSide={
@@ -474,9 +498,30 @@ export function EmailSettings() {
           </>
         )}
 
+        {company?.settings.email_sending_method === 'client_brevo' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="brevo_secret"
+                labelElement={<SettingsLabel label={t('secret')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.brevo_secret || ''}
+              onValueChange={(value) =>
+                handleChange('settings.brevo_secret', value)
+              }
+              disabled={disableSettingsField('brevo_secret')}
+              errorMessage={errors?.errors['settings.brevo_secret']}
+            />
+          </Element>
+        )}
+
         {(company?.settings.email_sending_method === 'client_mailgun' ||
           company?.settings.email_sending_method === 'client_postmark' ||
-          company?.settings.email_sending_method === 'smtp') && (
+          company?.settings.email_sending_method === 'smtp' ||
+          company?.settings.email_sending_method === 'client_brevo') && (
           <Element
             leftSide={
               <PropertyCheckbox

@@ -54,6 +54,7 @@ import {
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -86,6 +87,8 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -321,6 +324,10 @@ export function useActions() {
   const markPaid = useMarkPaid();
   const bulk = useBulk();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
+  const downloadECredit = useDownloadEInvoice({
+    resource: 'credit',
+    downloadType: 'download_e_credit',
+  });
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -343,6 +350,9 @@ export function useActions() {
 
     navigate('/credits/create?action=clone');
   };
+
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const actions: Action<Credit>[] = [
     (credit) => (
@@ -368,6 +378,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => downloadECredit(credit)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_credit')}
       </DropdownElement>
     ),
     (credit) =>
@@ -434,6 +452,17 @@ export function useActions() {
           </DropdownElement>
         </div>
       ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([credit]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (credit) =>
       hasPermission('create_credit') && (

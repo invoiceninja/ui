@@ -53,6 +53,7 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdEdit,
@@ -90,6 +91,8 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -318,6 +321,10 @@ export function useActions(params?: Params) {
 
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const downloadEQuote = useDownloadEInvoice({
+    resource: 'quote',
+    downloadType: 'download_e_quote',
+  });
   const printPdf = usePrintPdf({ entity: 'quote' });
   const markSent = useMarkSent();
   const approve = useApprove();
@@ -346,6 +353,9 @@ export function useActions(params?: Params) {
 
     navigate('/quotes/create?action=clone');
   };
+
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const actions: Action<Quote>[] = [
     (quote: Quote) =>
@@ -381,6 +391,14 @@ export function useActions(params?: Params) {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => downloadEQuote(quote)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download_e_quote')}
       </DropdownElement>
     ),
     (quote) =>
@@ -444,6 +462,17 @@ export function useActions(params?: Params) {
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([quote]);
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (quote) =>
       hasPermission('create_quote') && (

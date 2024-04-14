@@ -801,3 +801,124 @@ test('Merge client action', async ({ page }) => {
 
   await logout(page);
 });
+
+test('Testing military_time property on all settings levels', async ({
+  page,
+}) => {
+  await login(page);
+
+  await createClient({
+    page,
+    clientName: 'test settings prop',
+  });
+
+  await page.waitForTimeout(100);
+
+  await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
+    'Company: false'
+  );
+
+  await page
+    .getByRole('link', { name: 'Settings', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Group Settings', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('link', { name: 'New Group', exact: true })
+    .first()
+    .click();
+
+  await page.waitForURL('**/settings/group_settings/create');
+
+  await page.locator('[data-cy="groupSettingsNameField"]').fill('test group');
+
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Successfully created group')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Configure Settings' }).click();
+
+  await page
+    .getByRole('link', { name: 'Localization', exact: true })
+    .first()
+    .click();
+
+  await page.waitForURL('**/settings/localization');
+
+  await page.getByText('24 Hour Time').click();
+  await page.locator('[data-cy="militaryTimeToggle"]').check();
+
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Successfully updated group')).toBeVisible();
+
+  await page
+    .getByRole('link', { name: 'Clients', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('link', { name: 'test settings prop', exact: true })
+    .first()
+    .click();
+
+  await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+
+  await page.waitForURL('**/clients/**/edit');
+
+  await page
+    .locator('#group_settings_id')
+    .selectOption({ label: 'test group' });
+
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Successfully updated client')).toBeVisible();
+
+  await page.waitForURL('**/clients/**');
+
+  await page.waitForTimeout(200);
+
+  await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
+    'Group: true'
+  );
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await page
+    .getByRole('button', { name: 'Settings', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Localization', exact: true })
+    .first()
+    .click();
+
+  await page.waitForURL('**/settings/localization');
+
+  await page.getByText('24 Hour Time').click();
+  await page.locator('[data-cy="militaryTimeToggle"]').check();
+
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+
+  await page
+    .getByRole('link', { name: 'Clients', exact: true })
+    .first()
+    .click();
+
+  await page
+    .getByRole('link', { name: 'test settings prop', exact: true })
+    .first()
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
+    'Client: true'
+  );
+
+  await logout(page);
+});

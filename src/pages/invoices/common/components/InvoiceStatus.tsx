@@ -63,7 +63,7 @@ export function InvoiceStatus(props: Props) {
   }
 
   if (isPastDue() && !isCancelledOrReversed) {
-    return <Badge variant="yellow">{t('overdue')}</Badge>;
+    return <Badge variant="yellow">{t('past_due')}</Badge>;
   }
 
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {

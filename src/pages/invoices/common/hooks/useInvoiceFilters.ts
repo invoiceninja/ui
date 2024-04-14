@@ -40,7 +40,7 @@ export function useInvoiceFilters() {
       backgroundColor: '#F97316',
     },
     {
-      label: t('overdue'),
+      label: t('past_due'),
       value: 'overdue',
       color: 'white',
       backgroundColor: '#CA8A04',
