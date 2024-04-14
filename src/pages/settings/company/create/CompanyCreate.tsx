@@ -23,6 +23,7 @@ import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   isModalOpen: boolean;
@@ -33,11 +34,13 @@ export function CompanyCreate(props: Props) {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const { id } = useParams();
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const colors = useColorScheme();
 
   const switchCompany = (
     index: number,
@@ -55,6 +58,14 @@ export function CompanyCreate(props: Props) {
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
     queryClient.invalidateQueries();
+
+    if (id) {
+      const basePage = '/' + location.pathname.split('/')[1];
+
+      console.log(location.pathname);
+
+      navigate(basePage);
+    }
 
     window.location.reload();
   };
