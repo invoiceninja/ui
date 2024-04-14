@@ -75,9 +75,11 @@ export function CompanySwitcher() {
     queryClient.invalidateQueries();
 
     if (id) {
-      const basePage = '/' + location.pathname.split('/')[1];
-
-      console.log(location.pathname);
+      const basePage =
+        '/' +
+        (location.pathname.includes('/settings/gateways')
+          ? 'settings/online_payments'
+          : location.pathname.split('/')[1]);
 
       navigate(basePage);
     }

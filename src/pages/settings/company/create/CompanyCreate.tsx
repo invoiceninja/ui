@@ -23,7 +23,7 @@ import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   isModalOpen: boolean;
@@ -37,6 +37,7 @@ export function CompanyCreate(props: Props) {
   const navigate = useNavigate();
 
   const { id } = useParams();
+  const location = useLocation();
   const colors = useColorScheme();
   const queryClient = useQueryClient();
 
@@ -60,9 +61,13 @@ export function CompanyCreate(props: Props) {
     queryClient.invalidateQueries();
 
     if (id) {
-      const basePage = '/' + location.pathname.split('/')[1];
+      const basePage =
+        '/' +
+        (location.pathname.includes('/settings/gateways')
+          ? 'settings/online_payments'
+          : location.pathname.split('/')[1]);
 
-      console.log(location.pathname);
+      console.log(basePage);
 
       navigate(basePage);
     }
