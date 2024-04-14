@@ -52,7 +52,10 @@ export function Gateways(props: Props) {
 
   return (
     <div className="col-span-12 lg:col-span-4">
-      <InfoCard title={t('payment_methods')}>
+      <InfoCard
+        title={t('payment_methods')}
+        className="max-h-96 overflow-y-auto"
+      >
         {client.gateway_tokens.map((token) => (
           <div
             key={token.id}
