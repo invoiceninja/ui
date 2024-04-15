@@ -39,9 +39,7 @@ export default function Includes() {
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
-  useDebounce(() => value && handleBlockChange('includes', value), 1000, [
-    value,
-  ]);
+  useDebounce(() => handleBlockChange('includes', value || ''), 500, [value]);
 
   return (
     <Card title={t('includes')} padding="small" height="full">
@@ -54,7 +52,7 @@ export default function Includes() {
             enabled: false,
           },
         }}
-        onChange={(markup) => markup && setValue(markup)}
+        onChange={(markup) => setValue(markup)}
       />
     </Card>
   );

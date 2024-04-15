@@ -22,7 +22,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankExpenseCategoryQuery } from '$app/common/queries/expense-categories';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
@@ -37,12 +37,12 @@ export function Create() {
   const navigate = useNavigate();
   const accentColor: string = useAccentColor();
 
+  const nameFieldRef = useRef<HTMLInputElement>(null);
+
   const { data: blankExpenseCategory } = useBlankExpenseCategoryQuery();
 
   const [errors, setErrors] = useState<ValidationBag>();
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategory>();
 
   const pages = [
@@ -54,12 +54,13 @@ export function Create() {
     },
   ];
 
-  const handleSave = (
-    event: FormEvent<HTMLFormElement>,
-    actionType: string
-  ) => {
-    event.preventDefault();
+  const handleFocusInputField = () => {
+    if (nameFieldRef.current) {
+      nameFieldRef.current.focus();
+    }
+  };
 
+  const handleSave = (actionType: string) => {
     if (!isFormBusy) {
       setIsFormBusy(true);
 
@@ -83,6 +84,8 @@ export function Create() {
                 ...blankExpenseCategory,
                 color: accentColor,
               });
+
+              handleFocusInputField();
             }
           }
         })
@@ -98,8 +101,7 @@ export function Create() {
 
   const saveOptions: ButtonOption[] = [
     {
-      onClick: (event: FormEvent<HTMLFormElement>) =>
-        handleSave(event, 'create'),
+      onClick: () => handleSave('create'),
       text: `${t('save')} / ${t('create')}`,
       icon: <Icon element={BiPlusCircle} />,
     },
@@ -111,16 +113,21 @@ export function Create() {
     }
   }, [blankExpenseCategory]);
 
+  useEffect(() => {
+    handleFocusInputField();
+  }, [nameFieldRef]);
+
   return (
     <Settings title={t('expense_categories')} breadcrumbs={pages}>
       <Card
         title={t('create_expense_category')}
         withSaveButton
         disableSubmitButton={isFormBusy}
-        onSaveClick={(event) => handleSave(event, 'save')}
+        onSaveClick={() => handleSave('save')}
         additionalSaveOptions={saveOptions}
       >
         <CreateExpenseCategoryForm
+          nameFieldRef={nameFieldRef}
           expenseCategory={expenseCategory}
           setExpenseCategory={setExpenseCategory}
           errors={errors}

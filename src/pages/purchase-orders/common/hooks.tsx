@@ -72,6 +72,7 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -404,32 +405,31 @@ export function usePurchaseOrderFilters() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
-  const bulk = useBulk();
-  const markSent = useMarkSent();
-  const hasPermission = useHasPermission();
-
-  const disableNavigation = useDisableNavigation();
-
+  const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-
-  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
-
-  const scheduleEmailRecord = useScheduleEmailRecord({
+  const { isEditPage } = useEntityPageIdentifier({
     entity: 'purchase_order',
   });
-  const printPdf = usePrintPdf({ entity: 'purchase_order' });
 
-  const { isEditPage } = useEntityPageIdentifier({
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const bulk = useBulk();
+  const navigate = useNavigate();
+  const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+  const printPdf = usePrintPdf({ entity: 'purchase_order' });
+  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+  const scheduleEmailRecord = useScheduleEmailRecord({
     entity: 'purchase_order',
   });
   const downloadEPurchaseOrder = useDownloadEInvoice({
     resource: 'purchase_order',
     downloadType: 'download_e_purchase_order',
   });
-
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({
@@ -451,9 +451,6 @@ export function useActions() {
 
     navigate('/purchase_orders/create?action=clone');
   };
-
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
 
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
@@ -505,14 +502,15 @@ export function useActions() {
         {t('download')}
       </DropdownElement>
     ),
-    (purchaseOrder) => (
-      <DropdownElement
-        onClick={() => downloadEPurchaseOrder(purchaseOrder)}
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('download_e_purchase_order')}
-      </DropdownElement>
-    ),
+    (purchaseOrder) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadEPurchaseOrder(purchaseOrder)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_purchase_order')}
+        </DropdownElement>
+      ),
     (purchaseOrder) =>
       purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
         <DropdownElement

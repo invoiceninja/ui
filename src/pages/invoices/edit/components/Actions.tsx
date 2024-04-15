@@ -55,6 +55,7 @@ import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloa
 import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -73,27 +74,26 @@ interface Params {
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const hasPermission = useHasPermission();
-
-  const { isAdmin, isOwner } = useAdmin();
-
   const {
     showEditAction,
     showCommonBulkAction,
     dropdown = true,
   } = params || {};
 
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
+
+  const bulk = useBulk();
   const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
-
-  const reverseInvoice = useReverseInvoice();
-
-  const bulk = useBulk();
-
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
+  const { setChangeTemplateVisible, setChangeTemplateResources } =
+    useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
@@ -117,9 +117,6 @@ export function useActions(params?: Params) {
 
     navigate('/invoices/create?action=clone');
   };
-
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
 
   return [
     (invoice: Invoice) =>
@@ -219,21 +216,22 @@ export function useActions(params?: Params) {
         {t('download')}
       </EntityActionElement>
     ),
-    (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'download_e_invoice',
-        })}
-        entity="invoice"
-        actionKey="download_e_invoice"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('download_e_invoice')}
-        onClick={() => downloadEInvoice(invoice)}
-        icon={MdDownload}
-      >
-        {t('download_e_invoice')}
-      </EntityActionElement>
-    ),
+    (invoice: Invoice) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_invoice',
+          })}
+          entity="invoice"
+          actionKey="download_e_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_invoice')}
+          onClick={() => downloadEInvoice(invoice)}
+          icon={MdDownload}
+        >
+          {t('download_e_invoice')}
+        </EntityActionElement>
+      ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (

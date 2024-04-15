@@ -310,24 +310,26 @@ export function useActions() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
+  const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'credit',
   });
 
   const setCredit = useSetAtom(creditAtom);
 
-  const downloadPdf = useDownloadPdf({ resource: 'credit' });
-  const printPdf = usePrintPdf({ entity: 'credit' });
+  const bulk = useBulk();
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
-  const bulk = useBulk();
+  const printPdf = usePrintPdf({ entity: 'credit' });
+  const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
   const downloadECredit = useDownloadEInvoice({
     resource: 'credit',
     downloadType: 'download_e_credit',
   });
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -350,9 +352,6 @@ export function useActions() {
 
     navigate('/credits/create?action=clone');
   };
-
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
 
   const actions: Action<Credit>[] = [
     (credit) => (
@@ -380,14 +379,15 @@ export function useActions() {
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (credit) => (
-      <DropdownElement
-        onClick={() => downloadECredit(credit)}
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('download_e_credit')}
-      </DropdownElement>
-    ),
+    (credit) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadECredit(credit)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_credit')}
+        </DropdownElement>
+      ),
     (credit) =>
       (isAdmin || isOwner) && (
         <DropdownElement
