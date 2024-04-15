@@ -39,7 +39,7 @@ export default function Footer() {
   const { handleBlockChange } = useDesignUtilities({ payload, setPayload });
   const colors = useColorScheme();
 
-  useDebounce(() => value && handleBlockChange('footer', value), 1000, [value]);
+  useDebounce(() => handleBlockChange('footer', value || ''), 500, [value]);
 
   return (
     <Card title={t('footer')} padding="small" height="full">
@@ -52,7 +52,7 @@ export default function Footer() {
             enabled: false,
           },
         }}
-        onChange={(markup) => markup && setValue(markup)}
+        onChange={(markup) => setValue(markup)}
       />
     </Card>
   );

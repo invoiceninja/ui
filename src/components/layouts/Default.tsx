@@ -75,6 +75,7 @@ interface Props extends CommonProps {
   disableSaveButton?: boolean;
   withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
+  aboveMainContainer?: ReactNode;
 }
 
 export function Default(props: Props) {
@@ -507,6 +508,8 @@ export function Default(props: Props) {
             </div>
           </div>
         </div>
+
+        {props.aboveMainContainer}
 
         <main className="flex-1">
           {(props.breadcrumbs || props.topRight) && (

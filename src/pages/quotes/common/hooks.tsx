@@ -312,26 +312,28 @@ interface Params {
 export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const { isAdmin, isOwner } = useAdmin();
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const setQuote = useSetAtom(quoteAtom);
 
-  const { showCommonBulkAction, showEditAction } = params || {};
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
 
+  const approve = useApprove();
+  const bulk = useBulkAction();
   const navigate = useNavigate();
+  const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+  const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const downloadEQuote = useDownloadEInvoice({
     resource: 'quote',
     downloadType: 'download_e_quote',
   });
-  const printPdf = usePrintPdf({ entity: 'quote' });
-  const markSent = useMarkSent();
-  const approve = useApprove();
-  const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
-
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+  const { setChangeTemplateResources, setChangeTemplateVisible } =
+    useChangeTemplate();
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -353,9 +355,6 @@ export function useActions(params?: Params) {
 
     navigate('/quotes/create?action=clone');
   };
-
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
 
   const actions: Action<Quote>[] = [
     (quote: Quote) =>
@@ -393,14 +392,15 @@ export function useActions(params?: Params) {
         {t('download_pdf')}
       </DropdownElement>
     ),
-    (quote) => (
-      <DropdownElement
-        onClick={() => downloadEQuote(quote)}
-        icon={<Icon element={MdDownload} />}
-      >
-        {t('download_e_quote')}
-      </DropdownElement>
-    ),
+    (quote) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadEQuote(quote)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_quote')}
+        </DropdownElement>
+      ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
       quote.status_id !== QuoteStatus.Approved &&
