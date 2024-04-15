@@ -111,6 +111,8 @@ export default function Kanban() {
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
+  const [isColumnDraggingDisabled, setIsColumnDraggingDisabled] =
+    useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
   const { data: tasks } = useTasksQuery({
@@ -176,10 +178,13 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .finally(() => $refetch(['tasks']));
+      .finally(() => {
+        $refetch(['tasks']);
+        $refetch(['task_statuses']);
+      });
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onCardsDragEnd = (result: DropResult) => {
     const local = cloneDeep(board) as Board;
 
     const source = local.columns.find(
@@ -221,6 +226,21 @@ export default function Kanban() {
         }
       }
     }
+
+    setBoard(local);
+    updateTasks(local);
+  };
+
+  const onColumnsDragEnd = (result: DropResult) => {
+    const local = cloneDeep(board) as Board;
+
+    const sortedColumns = arrayMoveImmutable(
+      local.columns as Column[],
+      result.source.index,
+      result.destination?.index as number
+    );
+
+    local.columns = sortedColumns;
 
     setBoard(local);
     updateTasks(local);
@@ -386,7 +406,7 @@ export default function Kanban() {
           }}
           className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
-          <DragDropContext onDragEnd={() => console.log('okk')}>
+          <DragDropContext onDragEnd={onColumnsDragEnd}>
             <Droppable direction="horizontal" droppableId="taskStatusesColumns">
               {(columnsDroppableProvided) => (
                 <div
@@ -399,7 +419,7 @@ export default function Kanban() {
                       key={board.id}
                       index={index}
                       draggableId={board.id}
-                      isDragDisabled
+                      isDragDisabled={isColumnDraggingDisabled}
                     >
                       {(draggableProvidedColumn) => (
                         <div
@@ -407,7 +427,12 @@ export default function Kanban() {
                           {...draggableProvidedColumn.dragHandleProps}
                           ref={draggableProvidedColumn.innerRef}
                         >
-                          <DragDropContext onDragEnd={onDragEnd}>
+                          <DragDropContext
+                            onDragEnd={(result) => {
+                              onCardsDragEnd(result);
+                              setIsColumnDraggingDisabled(false);
+                            }}
+                          >
                             <Droppable
                               key={board.id}
                               droppableId={board.id}
@@ -592,6 +617,14 @@ export default function Kanban() {
                                             {...provided.dragHandleProps}
                                             ref={provided.innerRef}
                                             className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
+                                            onMouseEnter={() =>
+                                              !isColumnDraggingDisabled &&
+                                              setIsColumnDraggingDisabled(true)
+                                            }
+                                            onMouseLeave={() =>
+                                              isColumnDraggingDisabled &&
+                                              setIsColumnDraggingDisabled(false)
+                                            }
                                           >
                                             <div
                                               className="px-4 sm:px-6 py-4"
