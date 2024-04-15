@@ -79,7 +79,7 @@ export function CompanySwitcher() {
         '/' +
         (location.pathname.includes('/settings/gateways')
           ? 'settings/online_payments'
-          : location.pathname.split('/')[1]);
+          : location.pathname.split('/')[1] || 'dashboard');
 
       navigate(basePage);
     }
