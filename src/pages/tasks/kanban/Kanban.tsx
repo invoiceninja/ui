@@ -131,7 +131,11 @@ export default function Kanban() {
     if (taskStatuses && tasks) {
       const columns: Column[] = [];
 
-      taskStatuses.data.map((taskStatus) =>
+      const reorderedStatuses = [...taskStatuses.data].sort(
+        (a, b) => a.status_order - b.status_order
+      );
+
+      reorderedStatuses.map((taskStatus) =>
         columns.push({ id: taskStatus.id, title: taskStatus.name, cards: [] })
       );
 
