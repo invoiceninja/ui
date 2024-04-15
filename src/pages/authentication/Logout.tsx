@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { clearLocalStorage } from '$app/common/helpers/local-storage';
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -27,7 +28,7 @@ export function Logout() {
     //   // signOut();
     // }
 
-    localStorage.clear();
+    clearLocalStorage();
     sessionStorage.clear();
 
     queryClient.invalidateQueries();
