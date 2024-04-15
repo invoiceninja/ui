@@ -14,6 +14,7 @@ import { ValidationBag } from '../interfaces/validation-bag';
 import { toast } from './toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 import { checkJsonObject } from '../helpers';
+import { clearLocalStorage } from './local-storage';
 
 const client = axios.create();
 
@@ -35,7 +36,7 @@ client.interceptors.response.use(
   (error: AxiosError<ValidationBag>) => {
     if (error.response?.status === 429 || error.response?.status === 403) {
       window.location.reload();
-      localStorage.clear();
+      clearLocalStorage();
     }
 
     if (error.response?.status === 404) {

@@ -143,7 +143,10 @@ export function TaskDetails(props: Props) {
         {!task.project_id && (
           <Element leftSide={t('client')}>
             <div className="flex items-center justify-center">
-              <span className="flex item-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
+              <span
+                className="flex flex-1 item-center gap-2"
+                style={{ color: colors.$3, colorScheme: colors.$0 }}
+              >
                 <ClientSelector
                   onChange={(client) => {
                     handleChange('client_id', client.id);
@@ -163,15 +166,14 @@ export function TaskDetails(props: Props) {
               </span>
 
               {task?.client_id && (
-                <span className="flex item-center gap-2 pl-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
-
+                <span
+                  className="flex item-center gap-2 pl-2"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                >
                   <Link
-                    to={route(
-                      '/clients/:id',
-                      {
-                        id: task.client_id,
-                      }
-                    )}
+                    to={route('/clients/:id', {
+                      id: task.client_id,
+                    })}
                   >
                     <Icon element={MdLaunch} size={18} />
                   </Link>
@@ -182,8 +184,10 @@ export function TaskDetails(props: Props) {
         )}
         <Element leftSide={t('project')}>
           <div className="flex items-center justify-center">
-            <span className="flex item-center gap-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
-
+            <span
+              className="flex flex-1 item-center gap-2"
+              style={{ color: colors.$3, colorScheme: colors.$0 }}
+            >
               <ProjectSelector
                 onChange={(project) => {
                   handleChange('project_id', project.id);
@@ -198,15 +202,14 @@ export function TaskDetails(props: Props) {
             </span>
 
             {task?.project_id && (
-              <span className="flex item-center gap-2 pl-2" style={{ color: colors.$3, colorScheme: colors.$0 }}>
-
+              <span
+                className="flex item-center gap-2 pl-2"
+                style={{ color: colors.$3, colorScheme: colors.$0 }}
+              >
                 <Link
-                  to={route(
-                    '/projects/:id',
-                    {
-                      id: task.project_id,
-                    }
-                  )}
+                  to={route('/projects/:id', {
+                    id: task.project_id,
+                  })}
                 >
                   <Icon element={MdLaunch} size={18} />
                 </Link>
