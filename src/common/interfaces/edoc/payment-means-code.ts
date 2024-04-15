@@ -8,36 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface RootObject {
-    CodeList: CodeList;
-}
-interface CodeList {
+export interface CodeList {
     Identification: Identification;
     ColumnSet: ColumnSet;
     SimpleCodeList: SimpleCodeList;
 }
-interface SimpleCodeList {
+export interface SimpleCodeList {
     Row: Row[];
 }
-interface Row {
+export interface Row {
     Value: Value[];
 }
-interface Value {
+export interface Value {
     SimpleValue: number | string | string;
 }
-interface ColumnSet {
+export interface ColumnSet {
     Column: Column[];
     Key: Key;
 }
-interface Key {
+export interface Key {
     ShortName: string;
     ColumnRef: string;
 }
-interface Column {
+export interface Column {
     ShortName: string;
     Data: string;
 }
-interface Identification {
+export interface Identification {
     ShortName: string;
     LongName: string[];
     Version: string;
@@ -47,7 +44,7 @@ interface Identification {
     AlternateFormatLocationUri: string;
     Agency: Agency;
 }
-interface Agency {
+export interface Agency {
     LongName: string;
     Identifier: number;
 }
