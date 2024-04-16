@@ -89,6 +89,7 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { EntityNumberLinkWithCopy } from '$app/components/EntityNumberLinkWithCopy';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -598,13 +599,12 @@ export function useCreditColumns() {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (field, credit) => (
-        <DynamicLink
-          to={route('/credits/:id/edit', { id: credit.id })}
-          renderSpan={disableNavigation('credit', credit)}
-        >
-          {field}
-        </DynamicLink>
+      format: (_, credit) => (
+        <EntityNumberLinkWithCopy
+          entity="credit"
+          entityRoute="/credits/:id/edit"
+          resource={credit}
+        />
       ),
     },
     {

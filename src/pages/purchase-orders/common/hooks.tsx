@@ -73,6 +73,7 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { EntityNumberLinkWithCopy } from '$app/components/EntityNumberLinkWithCopy';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -209,14 +210,12 @@ export function usePurchaseOrderColumns() {
         column: 'number',
         id: 'number',
         label: t('number'),
-        format: (field, purchaseOrder) => (
-          <Link
-            to={route('/purchase_orders/:id/edit', {
-              id: purchaseOrder.id,
-            })}
-          >
-            {field}
-          </Link>
+        format: (_, purchaseOrder) => (
+          <EntityNumberLinkWithCopy
+            entity="purchase_order"
+            entityRoute="/purchase_orders/:id/edit"
+            resource={purchaseOrder}
+          />
         ),
       },
       {
