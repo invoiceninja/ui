@@ -39,7 +39,7 @@ export function DropdownGroupElement(props: Props) {
   const [isCollapsed, setIsCollapsed] = useState(collapsed ?? true);
 
   if (!showGroup) {
-    return <>children</>;
+    return <>{children}</>;
   }
 
   return (
