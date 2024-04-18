@@ -36,6 +36,7 @@ import {
   MdRefresh,
   MdRestore,
   MdSchedule,
+  MdSettings,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -56,6 +57,7 @@ import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { DropdownGroupElement } from '$app/components/dropdown/DropdownGroupElement';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -70,6 +72,7 @@ interface Params {
   showEditAction?: boolean;
   showCommonBulkAction?: boolean;
   dropdown?: boolean;
+  table?: boolean;
 }
 export function useActions(params?: Params) {
   const { t } = useTranslation();
@@ -78,6 +81,7 @@ export function useActions(params?: Params) {
     showEditAction,
     showCommonBulkAction,
     dropdown = true,
+    table,
   } = params || {};
 
   const company = useCurrentCompany();
@@ -130,142 +134,160 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && dropdown && <Divider withoutPadding />,
     (invoice: Invoice) => (
-      <EmailInvoiceAction
-        {...(!dropdown && {
-          key: 'email_invoice',
-        })}
-        invoice={invoice}
-        isDropdown={dropdown}
-      />
+      <DropdownGroupElement
+        label={t('common')}
+        collapsed={false}
+        showGroup={table}
+        icon={MdSettings}
+      >
+        <EmailInvoiceAction
+          {...(!dropdown && {
+            key: 'email_invoice',
+          })}
+          invoice={invoice}
+          isDropdown={dropdown}
+          underGroup={table}
+        />
+
+        {invoice.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'mark_sent',
+            })}
+            entity="invoice"
+            actionKey="mark_sent"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('mark_sent')}
+            onClick={() => bulk([invoice.id], 'mark_sent')}
+            icon={MdMarkEmailRead}
+            underGroup={table}
+          >
+            {t('mark_sent')}
+          </EntityActionElement>
+        )}
+
+        {parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+          !invoice.is_deleted && (
+            <EntityActionElement
+              {...(!dropdown && {
+                key: 'mark_paid',
+              })}
+              entity="invoice"
+              actionKey="mark_paid"
+              isCommonActionSection={!dropdown}
+              tooltipText={t('mark_paid')}
+              onClick={() => bulk([invoice.id], 'mark_paid')}
+              icon={MdPaid}
+              underGroup={table}
+            >
+              {t('mark_paid')}
+            </EntityActionElement>
+          )}
+
+        {invoice.status_id !== InvoiceStatus.Paid && (isAdmin || isOwner) && (
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'schedule',
+            })}
+            entity="invoice"
+            actionKey="schedule"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('schedule')}
+            onClick={() => scheduleEmailRecord(invoice.id)}
+            icon={MdSchedule}
+            underGroup={table}
+          >
+            {t('schedule')}
+          </EntityActionElement>
+        )}
+      </DropdownGroupElement>
     ),
     (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'view_pdf',
-        })}
-        entity="invoice"
-        actionKey="view_pdf"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('view_pdf')}
-        to={route('/invoices/:id/pdf', { id: invoice.id })}
+      <DropdownGroupElement
+        label={t('pdf')}
+        showGroup={table}
         icon={MdPictureAsPdf}
       >
-        {t('view_pdf')}
-      </EntityActionElement>
-    ),
-    (invoice: Invoice) =>
-      getEntityState(invoice) !== EntityState.Deleted && (
         <EntityActionElement
           {...(!dropdown && {
-            key: 'print_pdf',
+            key: 'view_pdf',
           })}
           entity="invoice"
-          actionKey="print_pdf"
+          actionKey="view_pdf"
           isCommonActionSection={!dropdown}
-          tooltipText={t('print_pdf')}
-          onClick={() => printPdf([invoice.id])}
-          icon={MdPrint}
+          tooltipText={t('view_pdf')}
+          to={route('/invoices/:id/pdf', { id: invoice.id })}
+          icon={MdPictureAsPdf}
+          underGroup={table}
         >
-          {t('print_pdf')}
+          {t('view_pdf')}
         </EntityActionElement>
-      ),
-    (invoice: Invoice) =>
-      invoice.status_id !== InvoiceStatus.Paid &&
-      (isAdmin || isOwner) && (
+
+        {getEntityState(invoice) !== EntityState.Deleted && (
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'print_pdf',
+            })}
+            entity="invoice"
+            actionKey="print_pdf"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('print_pdf')}
+            onClick={() => printPdf([invoice.id])}
+            icon={MdPrint}
+            underGroup={table}
+          >
+            {t('print_pdf')}
+          </EntityActionElement>
+        )}
+
         <EntityActionElement
           {...(!dropdown && {
-            key: 'schedule',
+            key: 'delivery_note',
           })}
           entity="invoice"
-          actionKey="schedule"
+          actionKey="delivery_note"
           isCommonActionSection={!dropdown}
-          tooltipText={t('schedule')}
-          onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={MdSchedule}
+          tooltipText={`${t('delivery_note')} ${t('pdf')}`}
+          to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
+          icon={MdPictureAsPdf}
+          underGroup={table}
         >
-          {t('schedule')}
+          {t('delivery_note')} ({t('pdf')})
         </EntityActionElement>
-      ),
-    (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'delivery_note',
-        })}
-        entity="invoice"
-        actionKey="delivery_note"
-        isCommonActionSection={!dropdown}
-        tooltipText={`${t('delivery_note')} ${t('pdf')}`}
-        to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
-        icon={MdPictureAsPdf}
-      >
-        {t('delivery_note')} ({t('pdf')})
-      </EntityActionElement>
-    ),
-    (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'download',
-        })}
-        entity="invoice"
-        actionKey="download"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('download')}
-        onClick={() => downloadPdf(invoice)}
-        icon={MdDownload}
-      >
-        {t('download')}
-      </EntityActionElement>
-    ),
-    (invoice: Invoice) =>
-      Boolean(company?.settings.enable_e_invoice) && (
+
         <EntityActionElement
           {...(!dropdown && {
-            key: 'download_e_invoice',
+            key: 'download',
           })}
           entity="invoice"
-          actionKey="download_e_invoice"
+          actionKey="download"
           isCommonActionSection={!dropdown}
-          tooltipText={t('download_e_invoice')}
-          onClick={() => downloadEInvoice(invoice)}
+          tooltipText={t('download')}
+          onClick={() => downloadPdf(invoice)}
           icon={MdDownload}
+          underGroup={table}
         >
-          {t('download_e_invoice')}
+          {t('download')}
         </EntityActionElement>
-      ),
-    (invoice: Invoice) =>
-      invoice.status_id === InvoiceStatus.Draft &&
-      !invoice.is_deleted && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'mark_sent',
-          })}
-          entity="invoice"
-          actionKey="mark_sent"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('mark_sent')}
-          onClick={() => bulk([invoice.id], 'mark_sent')}
-          icon={MdMarkEmailRead}
-        >
-          {t('mark_sent')}
-        </EntityActionElement>
-      ),
-    (invoice: Invoice) =>
-      parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
-      !invoice.is_deleted && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'mark_paid',
-          })}
-          entity="invoice"
-          actionKey="mark_paid"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('mark_paid')}
-          onClick={() => bulk([invoice.id], 'mark_paid')}
-          icon={MdPaid}
-        >
-          {t('mark_paid')}
-        </EntityActionElement>
-      ),
+
+        {Boolean(company?.settings.enable_e_invoice) && (
+          <EntityActionElement
+            {...(!dropdown && {
+              key: 'download_e_invoice',
+            })}
+            entity="invoice"
+            actionKey="download_e_invoice"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('download_e_invoice')}
+            onClick={() => downloadEInvoice(invoice)}
+            icon={MdDownload}
+            underGroup={table}
+          >
+            {t('download_e_invoice')}
+          </EntityActionElement>
+        )}
+      </DropdownGroupElement>
+    ),
     (invoice: Invoice) =>
       isInvoiceAutoBillable(invoice) && (
         <EntityActionElement

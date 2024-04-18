@@ -64,7 +64,7 @@ export default function Invoices() {
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: sliderInvoiceId });
 
-  const actions = useActions();
+  const actions = useActions({ table: true });
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
   const reactSettings = useReactSettings();
