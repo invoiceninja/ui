@@ -20,7 +20,6 @@ interface Props {
   label: string;
   collapsed?: boolean;
   children: ReactNode;
-  showGroup?: boolean;
   icon: IconType;
 }
 
@@ -32,15 +31,11 @@ const Div = styled.div`
 `;
 
 export function DropdownGroupElement(props: Props) {
-  const { collapsed, label, children, showGroup, icon } = props;
+  const { collapsed, label, children, icon } = props;
 
   const colors = useColorScheme();
 
   const [isCollapsed, setIsCollapsed] = useState(collapsed ?? true);
-
-  if (!showGroup) {
-    return <>{children}</>;
-  }
 
   return (
     <div className="flex flex-col cursor-pointer">
