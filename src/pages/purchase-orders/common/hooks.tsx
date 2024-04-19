@@ -73,7 +73,8 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { EntityNumberLinkWithCopy } from '$app/components/EntityNumberLinkWithCopy';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -180,6 +181,7 @@ export function usePurchaseOrderColumns() {
 
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
@@ -210,12 +212,20 @@ export function usePurchaseOrderColumns() {
         column: 'number',
         id: 'number',
         label: t('number'),
-        format: (_, purchaseOrder) => (
-          <EntityNumberLinkWithCopy
-            entity="purchase_order"
-            entityRoute="/purchase_orders/:id/edit"
-            resource={purchaseOrder}
-          />
+        format: (field, purchaseOrder) => (
+          <div className="flex space-x-2">
+            <DynamicLink
+              to={route('/purchase_orders/:id/edit', { id: purchaseOrder.id })}
+              renderSpan={disableNavigation('purchase_order', purchaseOrder)}
+            >
+              {field}
+            </DynamicLink>
+
+            <CopyToClipboardIconOnly
+              text={purchaseOrder.number}
+              stopPropagation
+            />
+          </div>
         ),
       },
       {

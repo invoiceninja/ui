@@ -26,7 +26,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { EntityNumberLinkWithCopy } from '$app/components/EntityNumberLinkWithCopy';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -139,12 +139,17 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (_, invoice) => (
-        <EntityNumberLinkWithCopy
-          entity="invoice"
-          entityRoute="/invoices/:id/edit"
-          resource={invoice}
-        />
+      format: (value, invoice) => (
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/invoices/:id/edit', { id: invoice.id })}
+            renderSpan={disableNavigation('invoice', invoice)}
+          >
+            {value}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={invoice.number} stopPropagation />
+        </div>
       ),
     },
     {
