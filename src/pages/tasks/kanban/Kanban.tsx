@@ -222,27 +222,42 @@ export default function Kanban() {
         );
 
         if (result.destination!.index > -1) {
+          if (taskIndex === (result.destination?.index as number)) {
+            return;
+          }
+
           local.columns[targetIndex].cards = arrayMoveImmutable(
             local.columns[targetIndex].cards,
             taskIndex,
-            result.destination?.index || 0
+            result.destination?.index as number
           );
+
+          setBoard(local);
+          updateTasks(local);
         }
       }
     }
-
-    setBoard(local);
-    updateTasks(local);
   };
 
   const onColumnsDragEnd = (result: DropResult) => {
     const local = cloneDeep(board) as Board;
+
+    if (
+      typeof result.destination?.index !== 'number' ||
+      (result.destination?.index as number) < 0
+    ) {
+      return;
+    }
 
     const sortedColumns = arrayMoveImmutable(
       local.columns as Column[],
       result.source.index,
       result.destination?.index as number
     );
+
+    if (result.source.index === (result.destination?.index as number)) {
+      return;
+    }
 
     local.columns = sortedColumns;
 
