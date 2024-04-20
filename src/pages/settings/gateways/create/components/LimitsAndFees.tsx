@@ -193,7 +193,7 @@ export function LimitsAndFees(props: Props) {
             />
           </Element>
 
-          {company && company.enabled_tax_rates > 0 && (
+          {company && company.enabled_item_tax_rates > 0 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
                 defaultValue={
@@ -219,7 +219,7 @@ export function LimitsAndFees(props: Props) {
             </Element>
           )}
 
-          {company && company.enabled_tax_rates > 1 && (
+          {company && company.enabled_item_tax_rates > 1 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
                 defaultValue={
@@ -245,7 +245,7 @@ export function LimitsAndFees(props: Props) {
             </Element>
           )}
 
-          {company && company.enabled_tax_rates > 2 && (
+          {company && company.enabled_item_tax_rates > 2 && (
             <Element leftSide={t('tax')}>
               <TaxRateSelector
                 defaultValue={
