@@ -23,6 +23,10 @@ import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
 import { atom, useAtom } from 'jotai';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { Entry } from '$app/components/forms/Combobox';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   gateway: Gateway;
@@ -37,6 +41,9 @@ const currentGatewayTypeAtom = atom<string | undefined>(undefined);
 
 export function LimitsAndFees(props: Props) {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
+
   const [currentGatewayTypeId, setCurrentGatewayTypeId] = useAtom(
     currentGatewayTypeAtom
   );
@@ -185,6 +192,84 @@ export function LimitsAndFees(props: Props) {
               errorMessage={props.errors?.errors.fee_amount}
             />
           </Element>
+
+          {company && company.enabled_item_tax_rates > 0 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                defaultValue={
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
+                    ?.fee_tax_name1 || ''
+                }
+                onChange={(value: Entry<TaxRate>) => {
+                  handleEntryChange(
+                    'fee_tax_name1',
+                    value.resource?.name || ''
+                  );
+                  handleEntryChange('fee_tax_rate1', value.resource?.rate || 0);
+                }}
+                onClearButtonClick={() => {
+                  handleEntryChange('fee_tax_name1', '');
+                  handleEntryChange('fee_tax_rate1', 0);
+                }}
+                onTaxCreated={(taxRate) => {
+                  handleEntryChange('fee_tax_name1', taxRate.name);
+                  handleEntryChange('fee_tax_rate1', taxRate.rate);
+                }}
+              />
+            </Element>
+          )}
+
+          {company && company.enabled_item_tax_rates > 1 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                defaultValue={
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
+                    ?.fee_tax_name2 || ''
+                }
+                onChange={(value: Entry<TaxRate>) => {
+                  handleEntryChange(
+                    'fee_tax_name2',
+                    value.resource?.name || ''
+                  );
+                  handleEntryChange('fee_tax_rate2', value.resource?.rate || 0);
+                }}
+                onClearButtonClick={() => {
+                  handleEntryChange('fee_tax_name2', '');
+                  handleEntryChange('fee_tax_rate2', 0);
+                }}
+                onTaxCreated={(taxRate) => {
+                  handleEntryChange('fee_tax_name2', taxRate.name);
+                  handleEntryChange('fee_tax_rate2', taxRate.rate);
+                }}
+              />
+            </Element>
+          )}
+
+          {company && company.enabled_item_tax_rates > 2 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                defaultValue={
+                  props.companyGateway?.fees_and_limits[currentGatewayTypeId]
+                    ?.fee_tax_name3 || ''
+                }
+                onChange={(value: Entry<TaxRate>) => {
+                  handleEntryChange(
+                    'fee_tax_name3',
+                    value.resource?.name || ''
+                  );
+                  handleEntryChange('fee_tax_rate3', value.resource?.rate || 0);
+                }}
+                onClearButtonClick={() => {
+                  handleEntryChange('fee_tax_name3', '');
+                  handleEntryChange('fee_tax_rate3', 0);
+                }}
+                onTaxCreated={(taxRate) => {
+                  handleEntryChange('fee_tax_name3', taxRate.name);
+                  handleEntryChange('fee_tax_rate3', taxRate.rate);
+                }}
+              />
+            </Element>
+          )}
 
           <Element leftSide={t('fee_cap')}>
             <InputField
