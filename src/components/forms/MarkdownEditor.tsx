@@ -91,6 +91,7 @@ export function MarkdownEditor(props: Props) {
           body_class: 'h-screen',
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
           paste_data_images: false,
+          newline_behavior: 'invert',
         }}
         onEditorChange={handleChange}
         disabled={props.disabled}
