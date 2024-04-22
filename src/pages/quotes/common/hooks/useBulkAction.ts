@@ -17,6 +17,8 @@ import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { useNavigate } from 'react-router-dom';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 const successMessages = {
   convert_to_invoice: 'converted_quote',
@@ -47,27 +49,36 @@ export const useBulkAction = () => {
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids,
-    }).then((response) => {
-      const message =
-        successMessages[action as keyof typeof successMessages] ||
-        `${action}d_quote`;
+    })
+      .then((response) => {
+        const message =
+          successMessages[action as keyof typeof successMessages] ||
+          `${action}d_quote`;
 
-      if (action === 'approve') {
-        toast.success(trans('approved_quotes', { value: ids.length }));
-      } else {
-        toast.success(message);
-      }
+        if (action === 'approve') {
+          toast.success(trans('approved_quotes', { value: ids.length }));
+        } else {
+          toast.success(message);
+        }
 
-      $refetch(['quotes']);
+        $refetch(['quotes']);
 
-      invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
-      if (action === 'convert_to_project') {
-        navigate(
-          route('/projects/:id', { id: response.data.data[0].project_id })
-        );
-      }
-    });
+        if (action === 'convert_to_project') {
+          navigate(
+            route('/projects/:id', { id: response.data.data[0].project_id })
+          );
+        }
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (
+          error.response?.status === 422 &&
+          error.response.data.errors?.['action']
+        ) {
+          toast.error(error.response.data.errors['action'][0]);
+        }
+      });
   };
 };
