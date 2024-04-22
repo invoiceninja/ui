@@ -39,4 +39,5 @@ export default {
   [GatewayType.MERCADOPAGO]: 'mercadopago',
   [GatewayType.MYBANK]: 'mybank',
   [GatewayType.PAYLATER]: 'paylater',
+  [GatewayType.PAYPAL_ADVANCED_CARDS]: 'paypal_advanced_cards',
 };
