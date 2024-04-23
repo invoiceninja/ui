@@ -76,7 +76,7 @@ export function App() {
     : undefined;
 
   const handleToasterErrors = (event: Event) => {
-    if (!id) {
+    if (!id && !location.pathname.startsWith('/settings')) {
       const { error } = (event as CustomEvent).detail;
 
       if (error.response.data.errors) {
@@ -145,7 +145,7 @@ export function App() {
     return () => {
       window.removeEventListener('display.error.toaster', handleToasterErrors);
     };
-  }, [id]);
+  }, [id, location]);
 
   useEffect(() => {
     const companyName = company?.settings?.name;
