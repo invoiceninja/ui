@@ -93,6 +93,7 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChangeHandler = <T extends keyof Quote>(
@@ -655,12 +656,16 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <DynamicLink
-          to={route('/quotes/:id/edit', { id: quote.id })}
-          renderSpan={disableNavigation('quote', quote)}
-        >
-          {field}
-        </DynamicLink>
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/quotes/:id/edit', { id: quote.id })}
+            renderSpan={disableNavigation('quote', quote)}
+          >
+            {field}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={quote.number} stopPropagation />
+        </div>
       ),
     },
     {
