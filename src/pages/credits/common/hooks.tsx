@@ -89,6 +89,7 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -598,13 +599,17 @@ export function useCreditColumns() {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (field, credit) => (
-        <DynamicLink
-          to={route('/credits/:id/edit', { id: credit.id })}
-          renderSpan={disableNavigation('credit', credit)}
-        >
-          {field}
-        </DynamicLink>
+      format: (value, credit) => (
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/credits/:id/edit', { id: credit.id })}
+            renderSpan={disableNavigation('credit', credit)}
+          >
+            {value}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={credit.number} stopPropagation />
+        </div>
       ),
     },
     {
