@@ -21,7 +21,7 @@ import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 import { dayJSLocaleAtom } from './components/forms';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
@@ -33,6 +33,7 @@ import {
 import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
+import { toast } from './common/helpers/toast/toast';
 
 export function App() {
   const [t] = useTranslation();
@@ -43,6 +44,7 @@ export function App() {
 
   const navigate = useNavigate();
 
+  const { id } = useParams();
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
@@ -72,6 +74,23 @@ export function App() {
           : company.settings.language_id
       )
     : undefined;
+
+  const handleToasterErrors = (event: Event) => {
+    if (!id) {
+      const { error } = (event as CustomEvent).detail;
+
+      if (error.response.data.errors) {
+        const errors = error.response.data.errors || {};
+        const key = Object.keys(errors)?.[0];
+
+        const errorMessage = errors?.[key]?.[0];
+
+        if (errorMessage) {
+          toast.error(errorMessage);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     document.body.style.backgroundColor = colorScheme.$2;
@@ -118,6 +137,15 @@ export function App() {
       refetch(property);
     });
   }, []);
+
+  useEffect(() => {
+    window.removeEventListener('display.error.toaster', handleToasterErrors);
+    window.addEventListener('display.error.toaster', handleToasterErrors);
+
+    return () => {
+      window.removeEventListener('display.error.toaster', handleToasterErrors);
+    };
+  }, [id]);
 
   useEffect(() => {
     const companyName = company?.settings?.name;
