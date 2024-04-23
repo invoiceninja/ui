@@ -117,7 +117,7 @@ export default function InvoiceDesign() {
       breadcrumbs={showsMainTabs ? undefined : pages}
     >
       <Tabs
-        tabBarClassName="space-x-2.5"
+        tabBarClassName="space-x-5"
         tabs={tabs}
         visible={showsMainTabs}
         withoutDefaultTabSpace

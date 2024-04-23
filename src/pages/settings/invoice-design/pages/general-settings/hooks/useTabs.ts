@@ -35,12 +35,12 @@ export function useTabs() {
       enabled: isCompanySettingsActive,
     },
     {
-      name: t('client_details'),
+      name: t('client'),
       href: '/settings/invoice_design/client_details',
       enabled: isCompanySettingsActive,
     },
     {
-      name: t('company_details'),
+      name: t('company'),
       href: '/settings/invoice_design/company_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
@@ -50,27 +50,27 @@ export function useTabs() {
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
     {
-      name: t('invoice_details'),
+      name: t('invoice'),
       href: '/settings/invoice_design/invoice_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
     {
-      name: t('quote_details'),
+      name: t('quote'),
       href: '/settings/invoice_design/quote_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
     {
-      name: t('credit_details'),
+      name: t('credit'),
       href: '/settings/invoice_design/credit_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
     {
-      name: t('vendor_details'),
+      name: t('vendor'),
       href: '/settings/invoice_design/vendor_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
     {
-      name: t('purchase_order_details'),
+      name: t('purchase_order'),
       href: '/settings/invoice_design/purchase_order_details',
       enabled: isCompanySettingsActive && (proPlan() || enterprisePlan()),
     },
