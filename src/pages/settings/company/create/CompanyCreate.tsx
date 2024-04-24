@@ -9,7 +9,7 @@
  */
 
 import { Button } from '$app/components/forms';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -21,7 +21,6 @@ import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -104,14 +103,6 @@ export function CompanyCreate(props: Props) {
             .finally(() =>
               localStorage.setItem('COMPANY-EDIT-OPENED', 'false')
             );
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (
-            error.response?.status === 422 &&
-            error.response.data.errors.name
-          ) {
-            toast.error(error.response.data.errors.name[0]);
-          }
         })
         .finally(() => setIsFormBusy(false));
     }

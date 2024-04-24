@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
@@ -17,7 +17,6 @@ import { useQuery, useQueryClient } from 'react-query';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
-import { ValidationBag } from '../interfaces/validation-bag';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { $refetch } from '../hooks/useRefetch';
@@ -113,28 +112,19 @@ export function useBulk(params?: Params) {
       action,
       ids,
       ...(emailType && { email_type: emailType }),
-    })
-      .then(() => {
-        const message =
-          successMessages[action as keyof typeof successMessages] ||
-          `${action}d_invoice`;
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_invoice`;
 
-        toast.success(message);
+      toast.success(message);
 
-        params?.onSuccess?.();
+      params?.onSuccess?.();
 
-        $refetch(['invoices']);
+      $refetch(['invoices']);
 
-        invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (
-          error.response?.status === 422 &&
-          error.response.data.errors.ids?.length
-        ) {
-          toast.error(error.response.data.errors.ids[0]);
-        }
-      });
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+    });
   };
 }

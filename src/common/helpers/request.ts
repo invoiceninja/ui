@@ -61,6 +61,16 @@ client.interceptors.response.use(
       toast.processing();
     }
 
+    if (error.response?.status === 422) {
+      window.dispatchEvent(
+        new CustomEvent('display.error.toaster', {
+          detail: {
+            error,
+          },
+        })
+      );
+    }
+
     console.error(error);
 
     return Promise.reject(error);
