@@ -92,7 +92,6 @@ export function MarkdownEditor(props: Props) {
           skin: colors.$0 === 'dark' ? 'oxide-dark' : 'oxide',
           paste_data_images: false,
           newline_behavior: 'invert',
-          license_key: undefined,
           browser_spellcheck: true,
         }}
         onEditorChange={handleChange}
