@@ -100,6 +100,15 @@ export function RequiredFields(props: Props) {
           onChange={(value) => handleChange('update_details', value)}
         />
       </Element>
+
+      <Element leftSide={t('always_show_required_fields')}>
+        <Toggle
+          checked={props.companyGateway.always_show_required_fields ?? true}
+          onChange={(value) =>
+            handleChange('always_show_required_fields', value)
+          }
+        />
+      </Element>
     </Card>
   );
 }
