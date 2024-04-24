@@ -45,7 +45,10 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Expense } from '$app/common/interfaces/expense';
@@ -54,6 +57,8 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Icon } from '$app/components/icons/Icon';
+import { MdLockOutline } from 'react-icons/md';
 
 dayjs.extend(duration);
 
@@ -62,6 +67,8 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -175,8 +182,21 @@ export default function Show() {
           </p>
         </InfoCard>
 
-        <InfoCard title={t('notes')} className="h-56">
-          <p>{project.public_notes}</p>
+        <InfoCard title={t('notes')} className="h-56" withoutTruncate>
+          <p className="break-all">{project.public_notes}</p>
+
+          {(isAdmin || isOwner) && project.private_notes && (
+            <div className="flex items-center space-x-1 mt-2 break-all">
+              <div>
+                <Icon element={MdLockOutline} size={24} />
+              </div>
+
+              <span
+                className="whitespace-normal"
+                dangerouslySetInnerHTML={{ __html: project.private_notes }}
+              />
+            </div>
+          )}
 
           <div className="mt-3">
             {project?.invoices?.map((invoice: Invoice, index: number) => (
