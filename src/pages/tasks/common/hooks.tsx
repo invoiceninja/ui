@@ -72,6 +72,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { User } from '$app/common/interfaces/user';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export const defaultColumns: string[] = [
   'status',
@@ -382,6 +383,7 @@ export function useTaskFilters() {
   const [t] = useTranslation();
 
   const adjustColorDarkness = useAdjustColorDarkness();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { data: taskStatuses } = useTaskStatusesQuery({
     status: 'active',
@@ -398,13 +400,13 @@ export function useTaskFilters() {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('uninvoiced'),
       value: 'uninvoiced',
       color: 'white',
-      backgroundColor: '#F87171',
+      backgroundColor: statusThemeColors.$4 || '#F87171',
     },
   ];
 

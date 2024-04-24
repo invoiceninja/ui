@@ -23,6 +23,7 @@ import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
+import { StatusColorTheme } from './StatusColorTheme';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -124,6 +125,8 @@ export function Preferences() {
             }
           />
         </Element>
+
+        <StatusColorTheme />
       </Card>
 
       <PreferenceCard

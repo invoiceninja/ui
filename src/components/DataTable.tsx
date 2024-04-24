@@ -60,6 +60,7 @@ import { DateRangePicker } from './datatables/DateRangePicker';
 import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface DateRangeColumn {
   column: string;
@@ -159,6 +160,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   const options = useDataTableOptions();
 
   const reactSettings = useReactSettings();
+
+  const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -645,6 +648,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
+                backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td

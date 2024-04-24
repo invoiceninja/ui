@@ -73,6 +73,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -727,6 +728,8 @@ export function useRecurringInvoiceColumns() {
 export function useRecurringInvoiceFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -738,19 +741,19 @@ export function useRecurringInvoiceFilters() {
       label: t('active'),
       value: 'active',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('paused'),
       value: 'paused',
       color: 'white',
-      backgroundColor: '#F97316',
+      backgroundColor: statusThemeColors.$4 || '#F97316',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
   ];
 

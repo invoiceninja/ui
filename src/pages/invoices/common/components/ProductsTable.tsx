@@ -26,6 +26,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -53,6 +54,8 @@ interface Props {
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
+  const themeColors = useThemeColorScheme();
 
   const { resource, items, columns, relationType } = props;
 
@@ -100,9 +103,11 @@ export function ProductsTable(props: Props) {
 
   return (
     <Table>
-      <Thead>
+      <Thead backgroundColor={themeColors.$5}>
         {columns.map((column, index) => (
-          <Th key={index}>{resolveTranslation(column)}</Th>
+          <Th key={index} textColor={themeColors.$6}>
+            {resolveTranslation(column)}
+          </Th>
         ))}
       </Thead>
       <DragDropContext onDragEnd={onDragEnd}>
