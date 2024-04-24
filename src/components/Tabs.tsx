@@ -11,6 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import classNames from 'classnames';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   Link,
@@ -27,6 +28,8 @@ interface Props {
   disableBackupNavigation?: boolean;
   visible?: boolean;
   rightSide?: ReactNode;
+  tabBarClassName?: string;
+  withoutDefaultTabSpace?: boolean;
 }
 
 export type Tab = {
@@ -41,7 +44,7 @@ export type Matcher = (params: Readonly<Params<string>>) => string;
 export function Tabs(props: Props) {
   const navigate = useNavigate();
 
-  const { visible = true } = props;
+  const { visible = true, withoutDefaultTabSpace, tabBarClassName } = props;
 
   const params = useParams();
   const location = useLocation();
@@ -121,7 +124,13 @@ export function Tabs(props: Props) {
         >
           <nav
             ref={tabBar}
-            className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
+            className={classNames(
+              '-mb-px flex relative scroll-smooth overflow-x-auto',
+              {
+                'space-x-8': !withoutDefaultTabSpace,
+              },
+              tabBarClassName
+            )}
             aria-label="Tabs"
           >
             {props.tabs.map(

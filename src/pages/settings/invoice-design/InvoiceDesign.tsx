@@ -116,7 +116,12 @@ export default function InvoiceDesign() {
       title={documentTitle}
       breadcrumbs={showsMainTabs ? undefined : pages}
     >
-      <Tabs tabs={tabs} visible={showsMainTabs} />
+      <Tabs
+        tabBarClassName="space-x-5"
+        tabs={tabs}
+        visible={showsMainTabs}
+        withoutDefaultTabSpace
+      />
 
       <div
         className={classNames('flex flex-col lg:flex-row gap-4', {
