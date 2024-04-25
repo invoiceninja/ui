@@ -179,18 +179,19 @@ export default function Show() {
         </InfoCard>
 
         <InfoCard title={t('notes')} className="h-56" withoutTruncate>
-          <p className="break-all">{project.public_notes}</p>
+          <div className="whitespace-normal">
+            <NotesIframe srcDoc={project.public_notes} />
+          </div>
 
           {project.private_notes && (
-            <div className="flex items-center space-x-1 mt-2 break-all">
+            <div className="flex items-center space-x-1">
               <div>
                 <Icon element={MdLockOutline} size={24} />
               </div>
 
-              <span
-                className="whitespace-normal"
-                dangerouslySetInnerHTML={{ __html: project.private_notes }}
-              />
+              <div className="whitespace-normal">
+                <NotesIframe srcDoc={project.private_notes} />
+              </div>
             </div>
           )}
 
