@@ -13,7 +13,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@sentry/react": "^7.77.0",
     "@sentry/tracing": "^7.77.0",
-    "@tinymce/tinymce-react": "^4.3.0",
+    "@tinymce/tinymce-react": "^5.0.1",
     "@tippyjs/react": "^4.2.6",
     "antd": "^5.6.1",
     "array-move": "^4.0.0",
