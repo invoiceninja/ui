@@ -90,6 +90,7 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -813,8 +814,11 @@ export function useCreditColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
@@ -830,8 +834,11 @@ export function useCreditColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}

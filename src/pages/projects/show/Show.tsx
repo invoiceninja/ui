@@ -54,6 +54,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 dayjs.extend(duration);
 
@@ -176,7 +177,9 @@ export default function Show() {
         </InfoCard>
 
         <InfoCard title={t('notes')} className="h-56">
-          <p>{project.public_notes}</p>
+          <div className="whitespace-normal">
+            <NotesIframe srcDoc={project.public_notes} />
+          </div>
 
           <div className="mt-3">
             {project?.invoices?.map((invoice: Invoice, index: number) => (

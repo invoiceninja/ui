@@ -56,6 +56,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 export const defaultColumns: string[] = [
   'status',
@@ -230,8 +231,11 @@ export function useRecurringExpenseColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>

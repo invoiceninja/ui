@@ -95,6 +95,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -881,8 +882,11 @@ export function useQuoteColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}

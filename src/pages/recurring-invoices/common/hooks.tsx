@@ -74,6 +74,7 @@ import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -687,8 +688,11 @@ export function useRecurringInvoiceColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>

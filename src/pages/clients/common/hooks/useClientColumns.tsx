@@ -31,6 +31,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { NotesIframe } from '$app/components/NotesIframe';
 
 export const defaultColumns: string[] = [
   'name',
@@ -317,8 +318,11 @@ export function useClientColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
@@ -332,8 +336,11 @@ export function useClientColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
