@@ -45,10 +45,7 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Expense } from '$app/common/interfaces/expense';
@@ -67,8 +64,6 @@ export default function Show() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const { isAdmin, isOwner } = useAdmin();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -185,7 +180,7 @@ export default function Show() {
         <InfoCard title={t('notes')} className="h-56" withoutTruncate>
           <p className="break-all">{project.public_notes}</p>
 
-          {(isAdmin || isOwner) && project.private_notes && (
+          {project.private_notes && (
             <div className="flex items-center space-x-1 mt-2 break-all">
               <div>
                 <Icon element={MdLockOutline} size={24} />
