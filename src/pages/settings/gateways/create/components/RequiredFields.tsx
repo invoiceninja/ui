@@ -103,6 +103,7 @@ export function RequiredFields(props: Props) {
 
       <Element leftSide={t('always_show_required_fields')}>
         <Toggle
+          label={t('always_show_required_fields_help')}
           checked={props.companyGateway.always_show_required_fields ?? true}
           onChange={(value) =>
             handleChange('always_show_required_fields', value)
