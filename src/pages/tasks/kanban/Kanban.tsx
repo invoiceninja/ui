@@ -461,12 +461,12 @@ export default function Kanban() {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className="px-4 sm:px-6 py-4"
-                                style={{
-                                  color: colors.$3,
-                                  colorScheme: colors.$0,
-                                  backgroundColor: colors.$1,
-                                  borderColor: colors.$4,
-                                }}
+                                // style={{
+                                //   // color: colors.$3,
+                                //   // colorScheme: colors.$0,
+                                //   // backgroundColor: colors.$1,
+                                //   // borderColor: colors.$4,
+                                // }}
                               >
                                 <p>{card.title}</p>
                                 <small>
@@ -574,7 +574,7 @@ export default function Kanban() {
           {(isAdmin || isOwner) && (
             <div>
               <div
-                className="shadow rounded p-1"
+                className="bg-white shadow rounded p-1"
                 style={{
                   color: colors.$3,
                   colorScheme: colors.$0,
