@@ -460,7 +460,7 @@ export default function Kanban() {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="px-4 sm:px-6 py-4"
+                                className="bg-gray-50 px-4 sm:px-6 py-4"
                                 // style={{
                                 //   // color: colors.$3,
                                 //   // colorScheme: colors.$0,
