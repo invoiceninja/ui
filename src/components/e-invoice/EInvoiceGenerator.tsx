@@ -9,6 +9,8 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Button, InputField, SelectField } from '../forms';
+import { useTranslation } from 'react-i18next';
 
 export type Country = 'italy';
 
@@ -28,8 +30,8 @@ interface Rule {
 
 interface Validation {
   name: string;
-  base_type: 'string';
-  resource: Record<string, string>[];
+  base_type: 'string' | 'decimal' | 'number';
+  resource: Record<string, string> | [];
   length: number | null;
   fraction_digits: number | null;
   total_digits: number | null;
@@ -58,11 +60,103 @@ interface Props {
   country: Country | undefined;
 }
 export function EInvoiceGenerator(props: Props) {
+  const [t] = useTranslation();
+
   const { country } = props;
 
   const [rules, setRules] = useState<Rule[]>([]);
-  const [validations, setValidation] = useState<Validation[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
+  const [validations, setValidation] = useState<Validation[]>([]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [payload, setPayload] = useState({});
+
+  const getSectionLabel = (label: string) => {
+    return label.split('Type')[0];
+  };
+
+  const renderElement = (component: Component) => {
+    const validation = validations.find(
+      (validation) => validation.name === component.type
+    );
+
+    if (validation) {
+      let label = '';
+      const rule = rules.find((rule) => `${rule.key}Type` === validation.name);
+
+      if (rule) {
+        label = rule.label;
+      } else {
+        label = getSectionLabel(validation.name);
+      }
+
+      if (
+        typeof validation.resource === 'object' &&
+        validation.resource !== null &&
+        Object.keys(validation.resource).length
+      ) {
+        return (
+          <div className="mt-2">
+            <SelectField label={label} withBlank>
+              {Object.entries(validation.resource).map(
+                ([key, value], index) => (
+                  <option key={index} value={key}>
+                    {value || key}
+                  </option>
+                )
+              )}
+            </SelectField>
+          </div>
+        );
+      }
+
+      if (
+        validation.base_type === 'decimal' ||
+        validation.base_type === 'number'
+      ) {
+        return (
+          <div className="mt-2">
+            <InputField type="number" label={label} />
+          </div>
+        );
+      }
+
+      if (validation.base_type !== null) {
+        return (
+          <div className="mt-2">
+            <InputField label={label} />
+          </div>
+        );
+      }
+    }
+
+    return <></>;
+  };
+
+  const generateEInvoiceUI = (component: Component) => {
+    if (!component) {
+      return <></>;
+    }
+
+    return (
+      <>
+        {Boolean(component.elements.length) &&
+          component.elements.map((element, index) => {
+            const newComponent = components.find(
+              (component) => component.type === `${element.name}Type`
+            );
+
+            if (newComponent) {
+              return <div key={index}>{generateEInvoiceUI(newComponent)}</div>;
+            }
+
+            return <></>;
+          })}
+
+        {Boolean(!component.elements.length) && renderElement(component)}
+      </>
+    );
+  };
 
   useEffect(() => {
     if (country) {
@@ -85,7 +179,13 @@ export function EInvoiceGenerator(props: Props) {
     }
   }, [country]);
 
-  console.log(rules, validations, components);
+  return (
+    <div className="flex flex-col mt-5">
+      {generateEInvoiceUI(components[0])}
 
-  return <div>EInvoiceGenerator</div>;
+      {Boolean(components.length) && (
+        <Button className="self-end mt-4">{t('save')}</Button>
+      )}
+    </div>
+  );
 }

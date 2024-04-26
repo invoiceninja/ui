@@ -289,16 +289,18 @@ export default function Edit() {
         />
       ) : null}
 
-      <SelectField
-        label={t('country')}
-        value={country || ''}
-        onValueChange={(value) => setCountry(value as Country)}
-        withBlank
-      >
-        <option value="italy">Italy</option>
-      </SelectField>
+      <div className="w-1/4">
+        <SelectField
+          label={t('country')}
+          value={country || ''}
+          onValueChange={(value) => setCountry(value as Country)}
+          withBlank
+        >
+          <option value="italy">Italy</option>
+        </SelectField>
 
-      <EInvoiceGenerator country={country} />
+        <EInvoiceGenerator country={country} />
+      </div>
     </Default>
   );
 }
