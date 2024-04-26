@@ -30,7 +30,7 @@ interface Rule {
 
 interface Validation {
   name: string;
-  base_type: 'string' | 'decimal' | 'number';
+  base_type: 'string' | 'decimal' | 'number' | 'date';
   resource: Record<string, string> | [];
   length: number | null;
   fraction_digits: number | null;
@@ -117,6 +117,14 @@ export function EInvoiceGenerator(props: Props) {
         return (
           <div className="mt-2">
             <InputField type="number" label={label} />
+          </div>
+        );
+      }
+
+      if (validation.base_type === 'date') {
+        return (
+          <div className="mt-2">
+            <InputField type="date" label={label} />
           </div>
         );
       }
