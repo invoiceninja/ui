@@ -1,0 +1,3579 @@
+{
+  "rules": [
+    {
+      "key": "RegimeFiscale",
+      "label": "Regime Fiscale",
+      "type": "dropdown",
+      "resource": "RegimeFiscale.json",
+      "required": true
+    },
+    {
+      "key": "TipoDocumento",
+      "label": "Tipo Documento",
+      "type": "dropdown",
+      "resource": "TipoDocumento.json",
+      "required": true
+    },
+    {
+      "key": "ModalitaPagamento",
+      "label": "Modalita Pagamento",
+      "type": "dropdown",
+      "resource": "ModalitaPagamento.json",
+      "required": true
+    },
+    {
+      "key": "CondizioniPagamento",
+      "label": "Condizioni Pagamento",
+      "type": "dropdown",
+      "resource": "CondizioniPagamento.json",
+      "required": true
+    },
+    {
+      "key": "DatiRicezione",
+      "label": "Dati Ricezione",
+      "type": "dropdown",
+      "resource": "CondizioniPagamento",
+      "required": false,
+      "children": []
+    },
+    {
+      "key": "DatiContratto",
+      "label": "Dati Contratto",
+      "type": "object",
+      "resource": "DatiContratto",
+      "required": false,
+      "children": [
+        {
+          "key": "RiferimentoNumeroLinea",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "IdDocumento",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "Data",
+          "validation": {
+            "0": "string",
+            "1": "date",
+            "2": "required",
+            "type": "date",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "NumItem",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCommessaConvenzione",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCUP",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCIG",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "DatiOrdineAcquisto",
+      "label": "Dati Ordine Acquisto",
+      "type": "object",
+      "resource": "DatiOrdineAcquisto",
+      "required": false,
+      "children": [
+        {
+          "key": "RiferimentoNumeroLinea",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "IdDocumento",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "Data",
+          "validation": {
+            "0": "string",
+            "1": "date",
+            "2": "required",
+            "type": "date",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "NumItem",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCommessaConvenzione",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCUP",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCIG",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "DatiAnagraficiVettore",
+      "label": "Dati Anagrafici Vettore",
+      "type": "object",
+      "resource": "DatiAnagraficiVettore",
+      "required": false,
+      "children": [
+        {
+          "key": "RiferimentoNumeroLinea",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "IdDocumento",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "Data",
+          "validation": {
+            "0": "string",
+            "1": "date",
+            "2": "required",
+            "type": "date",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "NumItem",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCommessaConvenzione",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCUP",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        },
+        {
+          "key": "CodiceCIG",
+          "validation": {
+            "0": "string",
+            "1": "min:1",
+            "2": "max:10",
+            "3": "required",
+            "type": "string",
+            "resource": "",
+            "required": true
+          }
+        }
+      ]
+    }
+  ],
+
+  "validations": [
+    {
+      "name": "FatturaElettronicaType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "FatturaElettronicaHeaderType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "FatturaElettronicaBodyType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiTrasmissioneType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CodiceDestinatarioType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z0-9]{6,7}",
+      "whitespace": null
+    },
+    {
+      "name": "IdFiscaleType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CodiceType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "28",
+      "min_length": "1",
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "FormatoTrasmissioneType",
+      "base_type": "string",
+      "resource": {
+        "FPA12": "Fattura verso PA",
+        "FPR12": "Fattura verso privati"
+      },
+      "length": "5",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "ContattiTrasmittenteType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiGeneraliType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiGeneraliDocumentoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiRitenutaType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiBolloType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiCassaPrevidenzialeType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "ScontoMaggiorazioneType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CausalePagamentoType",
+      "base_type": "string",
+      "resource": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": "",
+        "E": "",
+        "G": "",
+        "H": "",
+        "I": "",
+        "L": "",
+        "M": "",
+        "N": "",
+        "O": "",
+        "P": "",
+        "Q": "",
+        "R": "",
+        "S": "",
+        "T": "",
+        "U": "",
+        "V": "",
+        "W": "",
+        "X": "",
+        "Y": "",
+        "Z": "",
+        "L1": "",
+        "M1": "",
+        "M2": "",
+        "O1": "",
+        "V1": "",
+        "ZO": ""
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TipoScontoMaggiorazioneType",
+      "base_type": "string",
+      "resource": {
+        "SC": "SC = Sconto",
+        "MG": "MG = Maggiorazione"
+      },
+      "length": "2",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "Art73Type",
+      "base_type": "string",
+      "resource": {
+        "SI": "SI = Documento emesso secondo modalit\u00e0 e termini stabiliti con DM ai sensi dell'art. 73 DPR 633/72"
+      },
+      "length": "2",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TipoCassaType",
+      "base_type": "string",
+      "resource": {
+        "TC01": "Cassa nazionale previdenza e assistenza avvocati e procuratori legali",
+        "TC02": "Cassa previdenza dottori commercialisti",
+        "TC03": "Cassa previdenza e assistenza geometri",
+        "TC04": "Cassa nazionale previdenza e assistenza ingegneri e architetti liberi professionisti",
+        "TC05": "Cassa nazionale del notariato",
+        "TC06": "Cassa nazionale previdenza e assistenza ragionieri e periti commerciali",
+        "TC07": "Ente nazionale assistenza agenti e rappresentanti di commercio (ENASARCO)",
+        "TC08": "Ente nazionale previdenza e assistenza consulenti del lavoro (ENPACL)",
+        "TC09": "Ente nazionale previdenza e assistenza medici (ENPAM)",
+        "TC10": "Ente nazionale previdenza e assistenza farmacisti (ENPAF)",
+        "TC11": "Ente nazionale previdenza e assistenza veterinari (ENPAV)",
+        "TC12": "Ente nazionale previdenza e assistenza impiegati dell'agricoltura (ENPAIA)",
+        "TC13": "Fondo previdenza impiegati imprese di spedizione e agenzie marittime",
+        "TC14": "Istituto nazionale previdenza giornalisti italiani (INPGI)",
+        "TC15": "Opera nazionale assistenza orfani sanitari italiani (ONAOSI)",
+        "TC16": "Cassa autonoma assistenza integrativa giornalisti italiani (CASAGIT)",
+        "TC17": "Ente previdenza periti industriali e periti industriali laureati (EPPI)",
+        "TC18": "Ente previdenza e assistenza pluricategoriale (EPAP)",
+        "TC19": "Ente nazionale previdenza e assistenza biologi (ENPAB)",
+        "TC20": "Ente nazionale previdenza e assistenza professione infermieristica (ENPAPI)",
+        "TC21": "Ente nazionale previdenza e assistenza psicologi (ENPAP)",
+        "TC22": "INPS"
+      },
+      "length": "4",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TipoDocumentoType",
+      "base_type": "string",
+      "resource": {
+        "TD01": "Fattura",
+        "TD02": "Acconto / anticipo su fattura",
+        "TD03": "Acconto / anticipo su parcella",
+        "TD04": "Nota di credito",
+        "TD05": "Nota di debito",
+        "TD06": "Parcella",
+        "TD16": "Integrazione fattura reverse charge interno",
+        "TD17": "Integrazione/autofattura per acquisto servizi dall'estero",
+        "TD18": "Integrazione per acquisto di beni intracomunitari",
+        "TD19": "Integrazione/autofattura per acquisto di beni ex art.17 c.2 DPR 633/72",
+        "TD20": "Autofattura per regolarizzazione e integrazione delle fatture (ex art.6 c.8 e 9-bis d.lgs.471/97 o art.46 c.5 D.L. 331/93",
+        "TD21": "Autofattura per splafonamento",
+        "TD22": "Estrazione benida Deposito IVA",
+        "TD23": "Estrazione beni da Deposito IVA con versamento dell'IVA",
+        "TD24": "Fattura differita di cui all'art.21, comma 4, terzo periodo lett. a) DPR 633/72",
+        "TD25": "Fattura differita di cui all'art.21, comma 4, terzo periodo lett. b) DPR 633/72",
+        "TD26": "Cessione di beni ammortizzabili e per passaggi interni (ex art.36 DPR 633/72)",
+        "TD27": "Fattura per autoconsumo o per cessioni gratuite senza rivalsa",
+        "TD28": "Acquisti da San Marino con IVA (fattura cartacea)"
+      },
+      "length": "4",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TipoRitenutaType",
+      "base_type": "string",
+      "resource": {
+        "RT01": "Ritenuta di acconto persone fisiche",
+        "RT02": "Ritenuta di acconto persone giuridiche",
+        "RT03": "Contributo INPS",
+        "RT04": "Contributo ENASARCO",
+        "RT05": "Contributo ENPAM",
+        "RT06": "Altro contributo previdenziale"
+      },
+      "length": "4",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiSALType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiDocumentiCorrelatiType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "RiferimentoNumeroLineaType",
+      "base_type": "integer",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "9999",
+      "min_inclusive": "1",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiDDTType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiTrasportoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "IndirizzoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "FatturaPrincipaleType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "SoggettoEmittenteType",
+      "base_type": "string",
+      "resource": {
+        "CC": "Cessionario / Committente",
+        "TZ": "Terzo"
+      },
+      "length": "2",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CedentePrestatoreType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiAnagraficiCedenteType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "RegimeFiscaleType",
+      "base_type": "string",
+      "resource": {
+        "RF01": "Regime ordinario",
+        "RF02": "Regime dei contribuenti minimi (art. 1,c.96-117, L. 244/2007)",
+        "RF04": "Agricoltura e attivit\u00e0 connesse e pesca (artt. 34 e 34-bis, D.P.R. 633/1972)",
+        "RF05": "Vendita sali e tabacchi (art. 74, c.1, D.P.R. 633/1972)",
+        "RF06": "Commercio dei fiammiferi (art. 74, c.1, D.P.R. 633/1972)",
+        "RF07": "Editoria (art. 74, c.1, D.P.R. 633/1972)",
+        "RF08": "Gestione di servizi di telefonia pubblica (art. 74, c.1, D.P.R. 633/1972)",
+        "RF09": "Rivendita di documenti di trasporto pubblico e di sosta (art. 74, c.1, D.P.R. 633/1972)",
+        "RF10": "Intrattenimenti, giochi e altre attivit\u00e0 di cui alla tariffa allegata al D.P.R. 640/72 (art. 74, c.6, D.P.R. 633/1972)",
+        "RF11": "Agenzie di viaggi e turismo (art. 74-ter, D.P.R. 633/1972)",
+        "RF12": "Agriturismo (art. 5, c.2, L. 413/1991)",
+        "RF13": "Vendite a domicilio (art. 25-bis, c.6, D.P.R. 600/1973)",
+        "RF14": "Rivendita di beni usati, di oggetti d\u2019arte, d\u2019antiquariato o da collezione (art. 36, D.L. 41/1995)",
+        "RF15": "Agenzie di vendite all\u2019asta di oggetti d\u2019arte, antiquariato o da collezione (art. 40-bis, D.L. 41/1995)",
+        "RF16": "IVA per cassa P.A. (art. 6, c.5, D.P.R. 633/1972)",
+        "RF17": "IVA per cassa (art. 32-bis, D.L. 83/2012)",
+        "RF19": "Regime forfettario",
+        "RF18": "Altro"
+      },
+      "length": "4",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "AnagraficaType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiAnagraficiVettoreType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "IscrizioneREAType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "ContattiType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "RappresentanteFiscaleType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiAnagraficiRappresentanteType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CessionarioCommittenteType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "RappresentanteFiscaleCessionarioType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiAnagraficiCessionarioType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiBeniServiziType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiVeicoliType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiPagamentoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CondizioniPagamentoType",
+      "base_type": "string",
+      "resource": {
+        "TP01": "pagamento a rate",
+        "TP02": "pagamento completo",
+        "TP03": "anticipo"
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "4",
+      "min_length": "4",
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DettaglioPagamentoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "ModalitaPagamentoType",
+      "base_type": "string",
+      "resource": {
+        "MP01": "contanti",
+        "MP02": "assegno",
+        "MP03": "assegno circolare",
+        "MP04": "contanti presso Tesoreria",
+        "MP05": "bonifico",
+        "MP06": "vaglia cambiario",
+        "MP07": "bollettino bancario",
+        "MP08": "carta di pagamento",
+        "MP09": "RID",
+        "MP10": "RID utenze",
+        "MP11": "RID veloce",
+        "MP12": "RIBA",
+        "MP13": "MAV",
+        "MP14": "quietanza erario",
+        "MP15": "giroconto su conti di contabilit\u00e0 speciale",
+        "MP16": "domiciliazione bancaria",
+        "MP17": "domiciliazione postale",
+        "MP18": "bollettino di c/c postale",
+        "MP19": "SEPA Direct Debit",
+        "MP20": "SEPA Direct Debit CORE",
+        "MP21": "SEPA Direct Debit B2B",
+        "MP22": "Trattenuta su somme gi\u00e0 riscosse",
+        "MP23": "PagoPA"
+      },
+      "length": "4",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "IBANType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}",
+      "whitespace": null
+    },
+    {
+      "name": "BICType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}",
+      "whitespace": null
+    },
+    {
+      "name": "TerzoIntermediarioSoggettoEmittenteType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiAnagraficiTerzoIntermediarioType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "AllegatiType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DettaglioLineeType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CodiceArticoloType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "AltriDatiGestionaliType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "RitenutaType",
+      "base_type": "string",
+      "resource": {
+        "SI": "SI = Cessione / Prestazione soggetta a ritenuta"
+      },
+      "length": "2",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "DatiRiepilogoType",
+      "base_type": null,
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "EsigibilitaIVAType",
+      "base_type": "string",
+      "resource": {
+        "D": "esigibilit\u00e0 differita",
+        "I": "esigibilit\u00e0 immediata",
+        "S": "scissione dei pagamenti"
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "1",
+      "min_length": "1",
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "NaturaType",
+      "base_type": "string",
+      "resource": {
+        "N1": "Escluse ex. art. 15 del D.P.R. 633/1972",
+        "N2": "Non soggette",
+        "N2.1": "Non soggette ad IVA ai sensi degli artt. da 7 a 7-septies del DPR 633/72",
+        "N2.2": "Non soggette - altri casi",
+        "N3": "Non imponibili",
+        "N3.1": "Non Imponibili - esportazioni",
+        "N3.2": "Non Imponibili - cessioni intracomunitarie",
+        "N3.3": "Non Imponibili - cessioni verso San Marino",
+        "N3.4": "Non Imponibili - operazioni assimilate alle cessioni all'esportazione",
+        "N3.5": "Non Imponibili - a seguito di dichiarazioni d'intento",
+        "N3.6": "Non Imponibili - altre operazioni che non concorrono alla formazione del plafond",
+        "N4": "Esenti",
+        "N5": "Regime del margine/IVA non esposta in fattura",
+        "N6": "Inversione contabile (per le operazioni in reverse charge ovvero nei casi di autofatturazione per acquisti extra UE di servizi ovvero per importazioni di beni nei soli casi previsti)",
+        "N6.1": "Inversione contabile - cessione di rottami e altri materiali di recupero",
+        "N6.2": "Inversione contabile - cessione di oro e argento ai sensi della legge 7/2000 nonch\u00e9 di oreficeria usata ad OPO",
+        "N6.3": "Inversione contabile - subappalto nel settore edile",
+        "N6.4": "Inversione contabile - cessione di fabbricati",
+        "N6.5": "Inversione contabile - cessione di telefoni cellulari",
+        "N6.6": "Inversione contabile - cessione di prodotti elettronici",
+        "N6.7": "Inversione contabile - prestazioni comparto edile e settori connessi",
+        "N6.8": "Inversione contabile - operazioni settore energetico",
+        "N6.9": "Inversione contabile - altri casi",
+        "N7": "IVA assolta in altro stato UE (prestazione di servizi di telecomunicazioni, tele-radiodiffusione ed elettronici ex art. 7-octies lett. a, b, art. 74-sexies DPR 633/72)"
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CodiceFiscaleType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z0-9]{11,16}",
+      "whitespace": null
+    },
+    {
+      "name": "CodiceFiscalePFType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z0-9]{16}",
+      "whitespace": null
+    },
+    {
+      "name": "CodEORIType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "17",
+      "min_length": "13",
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "SocioUnicoType",
+      "base_type": "string",
+      "resource": {
+        "SU": "socio unico",
+        "SM": "pi\u00f9 soci"
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "StatoLiquidazioneType",
+      "base_type": "string",
+      "resource": {
+        "LS": "in liquidazione",
+        "LN": "non in liquidazione"
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TipoCessionePrestazioneType",
+      "base_type": "string",
+      "resource": {
+        "SC": "Sconto",
+        "PR": "Premio",
+        "AB": "Abbuono",
+        "AC": "Spesa accessoria"
+      },
+      "length": "2",
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TitoloType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{2,10})",
+      "whitespace": "collapse"
+    },
+    {
+      "name": "String10Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,10})",
+      "whitespace": null
+    },
+    {
+      "name": "String15Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,15})",
+      "whitespace": null
+    },
+    {
+      "name": "String20Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,20})",
+      "whitespace": null
+    },
+    {
+      "name": "String35Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,35})",
+      "whitespace": null
+    },
+    {
+      "name": "String35LatinExtType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "35",
+      "min_length": "1",
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "String60Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,60})",
+      "whitespace": null
+    },
+    {
+      "name": "String80Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,80})",
+      "whitespace": null
+    },
+    {
+      "name": "String100Type",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,100})",
+      "whitespace": null
+    },
+    {
+      "name": "String60LatinType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
+      "whitespace": null
+    },
+    {
+      "name": "String80LatinType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,80}",
+      "whitespace": null
+    },
+    {
+      "name": "String100LatinType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
+      "whitespace": null
+    },
+    {
+      "name": "String200LatinType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,200}",
+      "whitespace": null
+    },
+    {
+      "name": "String1000LatinType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,1000}",
+      "whitespace": null
+    },
+    {
+      "name": "ProvinciaType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z]{2}",
+      "whitespace": null
+    },
+    {
+      "name": "NazioneType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z]{2}",
+      "whitespace": null
+    },
+    {
+      "name": "DivisaType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z]{3}",
+      "whitespace": null
+    },
+    {
+      "name": "TipoResaType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[A-Z]{3}",
+      "whitespace": null
+    },
+    {
+      "name": "NumeroCivicoType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{1,8})",
+      "whitespace": null
+    },
+    {
+      "name": "BolloVirtualeType",
+      "base_type": "string",
+      "resource": {
+        "SI": ""
+      },
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "TelFaxType",
+      "base_type": "normalizedString",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "(\\p{IsBasicLatin}{5,12})",
+      "whitespace": null
+    },
+    {
+      "name": "EmailType",
+      "base_type": "token",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "256",
+      "min_length": null,
+      "pattern": "([!#-'*+/-9=?A-Z^-~-]+(\\.[!#-'*+/-9=?A-Z^-~-]+)*|\"(\\[\\]!#-[^-~ \t]|(\\\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\\.[!#-'*+/-9=?A-Z^-~-]+)*|\\[[\t -Z^-~]*\\])",
+      "whitespace": null
+    },
+    {
+      "name": "EmailContattiType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": "256",
+      "min_length": "7",
+      "pattern": ".+@.+[.]+.+",
+      "whitespace": null
+    },
+    {
+      "name": "PesoType",
+      "base_type": "decimal",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9]{1,4}\\.[0-9]{1,2}",
+      "whitespace": null
+    },
+    {
+      "name": "Amount8DecimalType",
+      "base_type": "decimal",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
+      "whitespace": null
+    },
+    {
+      "name": "Amount2DecimalType",
+      "base_type": "decimal",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
+      "whitespace": null
+    },
+    {
+      "name": "RateType",
+      "base_type": "decimal",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "100.00",
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9]{1,3}\\.[0-9]{2}",
+      "whitespace": null
+    },
+    {
+      "name": "RiferimentoFaseType",
+      "base_type": "integer",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "999",
+      "min_inclusive": "1",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "NumeroColliType",
+      "base_type": "integer",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "9999",
+      "min_inclusive": "1",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "NumeroLineaType",
+      "base_type": "integer",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "9999",
+      "min_inclusive": "1",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "CAPType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9][0-9][0-9][0-9][0-9]",
+      "whitespace": null
+    },
+    {
+      "name": "ABIType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9][0-9][0-9][0-9][0-9]",
+      "whitespace": null
+    },
+    {
+      "name": "CABType",
+      "base_type": "string",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9][0-9][0-9][0-9][0-9]",
+      "whitespace": null
+    },
+    {
+      "name": "GiorniTerminePagamentoType",
+      "base_type": "integer",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": "999",
+      "min_inclusive": "0",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    },
+    {
+      "name": "QuantitaType",
+      "base_type": "decimal",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": null,
+      "max_length": null,
+      "min_length": null,
+      "pattern": "[0-9]{1,12}\\.[0-9]{2,8}",
+      "whitespace": null
+    },
+    {
+      "name": "DataFatturaType",
+      "base_type": "date",
+      "resource": [],
+      "length": null,
+      "fraction_digits": null,
+      "total_digits": null,
+      "max_exclusive": null,
+      "min_exclusive": null,
+      "max_inclusive": null,
+      "min_inclusive": "1970-01-01",
+      "max_length": null,
+      "min_length": null,
+      "pattern": null,
+      "whitespace": null
+    }
+  ],
+
+  "components": [
+    {
+      "type": "FatturaElettronicaType",
+      "elements": [
+        {
+          "name": "FatturaElettronicaHeader",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "FatturaElettronicaBody",
+          "min": 1,
+          "max": -1
+        },
+        {
+          "name": "Signature",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "FatturaElettronicaHeaderType",
+      "elements": [
+        {
+          "name": "DatiTrasmissione",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CedentePrestatore",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "RappresentanteFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CessionarioCommittente",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "TerzoIntermediarioOSoggettoEmittente",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "SoggettoEmittente",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "FatturaElettronicaBodyType",
+      "elements": [
+        {
+          "name": "DatiGenerali",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiBeniServizi",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiVeicoli",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DatiPagamento",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "Allegati",
+          "min": 0,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "DatiTrasmissioneType",
+      "elements": [
+        {
+          "name": "IdTrasmittente",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ProgressivoInvio",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "FormatoTrasmissione",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceDestinatario",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ContattiTrasmittente",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PECDestinatario",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CodiceDestinatarioType",
+      "elements": []
+    },
+    {
+      "type": "IdFiscaleType",
+      "elements": [
+        {
+          "name": "IdPaese",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "IdCodice",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CodiceType",
+      "elements": []
+    },
+    {
+      "type": "FormatoTrasmissioneType",
+      "elements": []
+    },
+    {
+      "type": "ContattiTrasmittenteType",
+      "elements": [
+        {
+          "name": "Telefono",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Email",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiGeneraliType",
+      "elements": [
+        {
+          "name": "DatiGeneraliDocumento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiOrdineAcquisto",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiContratto",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiConvenzione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiRicezione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiFattureCollegate",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiSAL",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiDDT",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiTrasporto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "FatturaPrincipale",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiGeneraliDocumentoType",
+      "elements": [
+        {
+          "name": "TipoDocumento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Divisa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Data",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Numero",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiRitenuta",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiBollo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DatiCassaPrevidenziale",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "ScontoMaggiorazione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "ImportoTotaleDocumento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Arrotondamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Causale",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "Art73",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiRitenutaType",
+      "elements": [
+        {
+          "name": "TipoRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AliquotaRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CausalePagamento",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiBolloType",
+      "elements": [
+        {
+          "name": "BolloVirtuale",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoBollo",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiCassaPrevidenzialeType",
+      "elements": [
+        {
+          "name": "TipoCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AlCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoContributoCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImponibileCassa",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "AliquotaIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Ritenuta",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Natura",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoAmministrazione",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "ScontoMaggiorazioneType",
+      "elements": [
+        {
+          "name": "Tipo",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Percentuale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Importo",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CausalePagamentoType",
+      "elements": []
+    },
+    {
+      "type": "TipoScontoMaggiorazioneType",
+      "elements": []
+    },
+    {
+      "type": "Art73Type",
+      "elements": []
+    },
+    {
+      "type": "TipoCassaType",
+      "elements": []
+    },
+    {
+      "type": "TipoDocumentoType",
+      "elements": []
+    },
+    {
+      "type": "TipoRitenutaType",
+      "elements": []
+    },
+    {
+      "type": "DatiSALType",
+      "elements": [
+        {
+          "name": "RiferimentoFase",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiDocumentiCorrelatiType",
+      "elements": [
+        {
+          "name": "RiferimentoNumeroLinea",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "IdDocumento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Data",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "NumItem",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceCommessaConvenzione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceCUP",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceCIG",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "RiferimentoNumeroLineaType",
+      "elements": []
+    },
+    {
+      "type": "DatiDDTType",
+      "elements": [
+        {
+          "name": "NumeroDDT",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DataDDT",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoNumeroLinea",
+          "min": 0,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "DatiTrasportoType",
+      "elements": [
+        {
+          "name": "DatiAnagraficiVettore",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "MezzoTrasporto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CausaleTrasporto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "NumeroColli",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Descrizione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "UnitaMisuraPeso",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PesoLordo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PesoNetto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataOraRitiro",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataInizioTrasporto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "TipoResa",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "IndirizzoResa",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataOraConsegna",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "IndirizzoType",
+      "elements": [
+        {
+          "name": "Indirizzo",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "NumeroCivico",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CAP",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Comune",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Provincia",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Nazione",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "FatturaPrincipaleType",
+      "elements": [
+        {
+          "name": "NumeroFatturaPrincipale",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DataFatturaPrincipale",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "SoggettoEmittenteType",
+      "elements": []
+    },
+    {
+      "type": "CedentePrestatoreType",
+      "elements": [
+        {
+          "name": "DatiAnagrafici",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Sede",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "StabileOrganizzazione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "IscrizioneREA",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Contatti",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoAmministrazione",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiAnagraficiCedenteType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Anagrafica",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AlboProfessionale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ProvinciaAlbo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "NumeroIscrizioneAlbo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataIscrizioneAlbo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RegimeFiscale",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "RegimeFiscaleType",
+      "elements": []
+    },
+    {
+      "type": "AnagraficaType",
+      "elements": [
+        {
+          "name": "",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Titolo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodEORI",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiAnagraficiVettoreType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Anagrafica",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "NumeroLicenzaGuida",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "IscrizioneREAType",
+      "elements": [
+        {
+          "name": "Ufficio",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "NumeroREA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CapitaleSociale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "SocioUnico",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "StatoLiquidazione",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "ContattiType",
+      "elements": [
+        {
+          "name": "Telefono",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Fax",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Email",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "RappresentanteFiscaleType",
+      "elements": [
+        {
+          "name": "DatiAnagrafici",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiAnagraficiRappresentanteType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Anagrafica",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CessionarioCommittenteType",
+      "elements": [
+        {
+          "name": "DatiAnagrafici",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Sede",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "StabileOrganizzazione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RappresentanteFiscale",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "RappresentanteFiscaleCessionarioType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiAnagraficiCessionarioType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Anagrafica",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiBeniServiziType",
+      "elements": [
+        {
+          "name": "DettaglioLinee",
+          "min": 1,
+          "max": -1
+        },
+        {
+          "name": "DatiRiepilogo",
+          "min": 1,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "DatiVeicoliType",
+      "elements": [
+        {
+          "name": "Data",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "TotalePercorso",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiPagamentoType",
+      "elements": [
+        {
+          "name": "CondizioniPagamento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DettaglioPagamento",
+          "min": 1,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "CondizioniPagamentoType",
+      "elements": []
+    },
+    {
+      "type": "DettaglioPagamentoType",
+      "elements": [
+        {
+          "name": "Beneficiario",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ModalitaPagamento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DataRiferimentoTerminiPagamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "GiorniTerminiPagamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataScadenzaPagamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ImportoPagamento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodUfficioPostale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CognomeQuietanzante",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "NomeQuietanzante",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CFQuietanzante",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "TitoloQuietanzante",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "IstitutoFinanziario",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "IBAN",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ABI",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CAB",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "BIC",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ScontoPagamentoAnticipato",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataLimitePagamentoAnticipato",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PenalitaPagamentiRitardati",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataDecorrenzaPenale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodicePagamento",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "ModalitaPagamentoType",
+      "elements": []
+    },
+    {
+      "type": "IBANType",
+      "elements": []
+    },
+    {
+      "type": "BICType",
+      "elements": []
+    },
+    {
+      "type": "TerzoIntermediarioSoggettoEmittenteType",
+      "elements": [
+        {
+          "name": "DatiAnagrafici",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiAnagraficiTerzoIntermediarioType",
+      "elements": [
+        {
+          "name": "IdFiscaleIVA",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Anagrafica",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "AllegatiType",
+      "elements": [
+        {
+          "name": "NomeAttachment",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AlgoritmoCompressione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "FormatoAttachment",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DescrizioneAttachment",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Attachment",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DettaglioLineeType",
+      "elements": [
+        {
+          "name": "NumeroLinea",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "TipoCessionePrestazione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CodiceArticolo",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "Descrizione",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Quantita",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "UnitaMisura",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataInizioPeriodo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DataFinePeriodo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PrezzoUnitario",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ScontoMaggiorazione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "PrezzoTotale",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AliquotaIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Ritenuta",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Natura",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoAmministrazione",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "AltriDatiGestionali",
+          "min": 0,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "CodiceArticoloType",
+      "elements": [
+        {
+          "name": "CodiceTipo",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceValore",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "AltriDatiGestionaliType",
+      "elements": [
+        {
+          "name": "TipoDato",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoTesto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoNumero",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoData",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "RitenutaType",
+      "elements": []
+    },
+    {
+      "type": "DatiRiepilogoType",
+      "elements": [
+        {
+          "name": "AliquotaIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Natura",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "SpeseAccessorie",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Arrotondamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "ImponibileImporto",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Imposta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "EsigibilitaIVA",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoNormativo",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "EsigibilitaIVAType",
+      "elements": []
+    },
+    {
+      "type": "NaturaType",
+      "elements": []
+    },
+    {
+      "type": "CodiceFiscaleType",
+      "elements": []
+    },
+    {
+      "type": "CodiceFiscalePFType",
+      "elements": []
+    },
+    {
+      "type": "CodEORIType",
+      "elements": []
+    },
+    {
+      "type": "SocioUnicoType",
+      "elements": []
+    },
+    {
+      "type": "StatoLiquidazioneType",
+      "elements": []
+    },
+    {
+      "type": "TipoCessionePrestazioneType",
+      "elements": []
+    },
+    {
+      "type": "TitoloType",
+      "elements": []
+    },
+    {
+      "type": "String10Type",
+      "elements": []
+    },
+    {
+      "type": "String15Type",
+      "elements": []
+    },
+    {
+      "type": "String20Type",
+      "elements": []
+    },
+    {
+      "type": "String35Type",
+      "elements": []
+    },
+    {
+      "type": "String35LatinExtType",
+      "elements": []
+    },
+    {
+      "type": "String60Type",
+      "elements": []
+    },
+    {
+      "type": "String80Type",
+      "elements": []
+    },
+    {
+      "type": "String100Type",
+      "elements": []
+    },
+    {
+      "type": "String60LatinType",
+      "elements": []
+    },
+    {
+      "type": "String80LatinType",
+      "elements": []
+    },
+    {
+      "type": "String100LatinType",
+      "elements": []
+    },
+    {
+      "type": "String200LatinType",
+      "elements": []
+    },
+    {
+      "type": "String1000LatinType",
+      "elements": []
+    },
+    {
+      "type": "ProvinciaType",
+      "elements": []
+    },
+    {
+      "type": "NazioneType",
+      "elements": []
+    },
+    {
+      "type": "DivisaType",
+      "elements": []
+    },
+    {
+      "type": "TipoResaType",
+      "elements": []
+    },
+    {
+      "type": "NumeroCivicoType",
+      "elements": []
+    },
+    {
+      "type": "BolloVirtualeType",
+      "elements": []
+    },
+    {
+      "type": "TelFaxType",
+      "elements": []
+    },
+    {
+      "type": "EmailType",
+      "elements": []
+    },
+    {
+      "type": "EmailContattiType",
+      "elements": []
+    },
+    {
+      "type": "PesoType",
+      "elements": []
+    },
+    {
+      "type": "Amount8DecimalType",
+      "elements": []
+    },
+    {
+      "type": "Amount2DecimalType",
+      "elements": []
+    },
+    {
+      "type": "RateType",
+      "elements": []
+    },
+    {
+      "type": "RiferimentoFaseType",
+      "elements": []
+    },
+    {
+      "type": "NumeroColliType",
+      "elements": []
+    },
+    {
+      "type": "NumeroLineaType",
+      "elements": []
+    },
+    {
+      "type": "CAPType",
+      "elements": []
+    },
+    {
+      "type": "ABIType",
+      "elements": []
+    },
+    {
+      "type": "CABType",
+      "elements": []
+    },
+    {
+      "type": "GiorniTerminePagamentoType",
+      "elements": []
+    },
+    {
+      "type": "QuantitaType",
+      "elements": []
+    },
+    {
+      "type": "DataFatturaType",
+      "elements": []
+    }
+  ]
+}
