@@ -14,10 +14,18 @@ import { useTranslation } from 'react-i18next';
 
 export type Country = 'italy';
 
+type Payload = Record<string, string | number>;
+
+interface PayloadKey {
+  key: string;
+  valueType: 'string' | 'number';
+}
+
 interface Resource {
   rules: Rule[];
   validations: Validation[];
   components: Component[];
+  excluded: string[];
 }
 
 interface Rule {
@@ -65,14 +73,20 @@ export function EInvoiceGenerator(props: Props) {
   const { country } = props;
 
   const [rules, setRules] = useState<Rule[]>([]);
+  const [excluded, setExcluded] = useState<string[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
   const [validations, setValidation] = useState<Validation[]>([]);
+  const [eInvoice, setEInvoice] = useState<JSX.Element | JSX.Element[]>();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [payload, setPayload] = useState({});
+  let payloadKeys: PayloadKey[] = [];
+  const [payload, setPayload] = useState<Payload>({});
 
   const getSectionLabel = (label: string) => {
     return label.split('Type')[0];
+  };
+
+  const handleChange = (property: string, value: string | number) => {
+    setPayload((current) => ({ ...current, [property]: value }));
   };
 
   const renderElement = (component: Component) => {
@@ -82,13 +96,22 @@ export function EInvoiceGenerator(props: Props) {
 
     if (validation) {
       let label = '';
+      const fieldKey = getSectionLabel(validation.name);
       const rule = rules.find((rule) => `${rule.key}Type` === validation.name);
 
       if (rule) {
         label = rule.label;
       } else {
-        label = getSectionLabel(validation.name);
+        label = fieldKey;
       }
+
+      const isNumberTypeField =
+        validation.base_type === 'decimal' || validation.base_type === 'number';
+
+      payloadKeys.push({
+        key: fieldKey,
+        valueType: isNumberTypeField ? 'number' : 'string',
+      });
 
       if (
         typeof validation.resource === 'object' &&
@@ -97,10 +120,16 @@ export function EInvoiceGenerator(props: Props) {
       ) {
         return (
           <div className="mt-2">
-            <SelectField label={label} withBlank>
+            <SelectField
+              key={`${label}select`}
+              label={label}
+              defaultValue={payload[fieldKey] || ''}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+              withBlank
+            >
               {Object.entries(validation.resource).map(
                 ([key, value], index) => (
-                  <option key={index} value={key}>
+                  <option key={`${label}select${index}`} value={key}>
                     {value || key}
                   </option>
                 )
@@ -116,7 +145,15 @@ export function EInvoiceGenerator(props: Props) {
       ) {
         return (
           <div className="mt-2">
-            <InputField type="number" label={label} />
+            <InputField
+              key={`${label}number`}
+              type="number"
+              label={label}
+              value={payload[fieldKey] || 0}
+              onValueChange={(value) =>
+                handleChange(fieldKey, parseFloat(value))
+              }
+            />
           </div>
         );
       }
@@ -124,7 +161,13 @@ export function EInvoiceGenerator(props: Props) {
       if (validation.base_type === 'date') {
         return (
           <div className="mt-2">
-            <InputField type="date" label={label} />
+            <InputField
+              key={`${label}date`}
+              type="date"
+              label={label}
+              value={payload[fieldKey] || ''}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+            />
           </div>
         );
       }
@@ -132,7 +175,12 @@ export function EInvoiceGenerator(props: Props) {
       if (validation.base_type !== null) {
         return (
           <div className="mt-2">
-            <InputField label={label} />
+            <InputField
+              key={`${label}text`}
+              label={label}
+              value={payload[fieldKey] || ''}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+            />
           </div>
         );
       }
@@ -141,29 +189,127 @@ export function EInvoiceGenerator(props: Props) {
     return <></>;
   };
 
-  const generateEInvoiceUI = (component: Component) => {
-    if (!component) {
-      return <></>;
-    }
-
+  const renderComponent = (component: Component, componentIndex: number) => {
     return (
-      <>
+      <div key={`${componentIndex}${component.type}renderer`}>
         {Boolean(component.elements.length) &&
-          component.elements.map((element, index) => {
-            const newComponent = components.find(
+          component.elements.map((element) => {
+            const componentsList = components.filter(
+              (_, index) => componentIndex !== index
+            );
+
+            const newComponentIndex = componentsList.findIndex(
               (component) => component.type === `${element.name}Type`
             );
 
+            const newComponent = componentsList[newComponentIndex];
+
             if (newComponent) {
-              return <div key={index}>{generateEInvoiceUI(newComponent)}</div>;
+              return (
+                <div key={`${newComponentIndex}${newComponent.type}`}>
+                  {renderComponent(newComponent, newComponentIndex)}
+                </div>
+              );
             }
 
             return <></>;
           })}
 
         {Boolean(!component.elements.length) && renderElement(component)}
-      </>
+      </div>
     );
+  };
+
+  const createPayload = () => {
+    let currentPayload: Payload = {};
+
+    payloadKeys.forEach(({ key, valueType }) => {
+      currentPayload = {
+        ...currentPayload,
+        [key]: valueType === 'number' ? 0 : '',
+      };
+    });
+
+    setPayload(currentPayload);
+  };
+
+  const getChildComponentType = (
+    child: Component,
+    childIndex: number,
+    types: string[]
+  ) => {
+    child.elements.map((element) => {
+      const componentsList = components.filter(
+        (_, index) => childIndex !== index
+      );
+
+      const newComponentIndex = componentsList.findIndex(
+        (component) => component.type === `${element.name}Type`
+      );
+
+      const newComponent = componentsList[newComponentIndex];
+
+      if (newComponent) {
+        types.push(newComponent.type);
+        return getChildComponentType(newComponent, newComponentIndex, types);
+      }
+    });
+  };
+
+  const isChildOfExcluded = (componentType: string) => {
+    const typesForExclusion: string[] = [];
+
+    const excludedComponents = components.filter(({ type }) =>
+      excluded.includes(type)
+    );
+    const excludedComponentIndexes = components
+      .filter((_, index) =>
+        excludedComponents.some((_, excludedIndex) => excludedIndex === index)
+      )
+      .map((_, index) => index);
+
+    excludedComponents.forEach((excludedComponent, excludedComponentIndex) => {
+      getChildComponentType(
+        excludedComponent,
+        excludedComponentIndexes[excludedComponentIndex],
+        typesForExclusion
+      );
+    });
+
+    return typesForExclusion.includes(componentType);
+  };
+
+  const generateEInvoiceUI = async (components: Component[]) => {
+    payloadKeys = [];
+
+    if (!components.length) {
+      return <></>;
+    }
+
+    const invoiceComponents = components.map((component, index) => {
+      const isAlreadyRendered = components
+        .filter((_, currentIndex) => currentIndex < index)
+        .some((currentComponent) =>
+          currentComponent.elements.some(
+            (element) => `${element.name}Type` === component.type
+          )
+        );
+
+      const shouldBeExcluded =
+        excluded.includes(component.type) || isChildOfExcluded(component.type);
+
+      if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
+        return (
+          <div key={`${index}main`}>{renderComponent(component, index)}</div>
+        );
+      }
+
+      return <></>;
+    });
+
+    createPayload();
+
+    return invoiceComponents;
   };
 
   useEffect(() => {
@@ -179,19 +325,31 @@ export function EInvoiceGenerator(props: Props) {
           setRules(response.rules);
           setValidation(response.validations);
           setComponents(response.components);
+          setExcluded(response.excluded);
         });
     } else {
       setRules([]);
       setComponents([]);
       setValidation([]);
+      setEInvoice(undefined);
     }
   }, [country]);
 
-  return (
-    <div className="flex flex-col mt-5">
-      {generateEInvoiceUI(components[0])}
+  useEffect(() => {
+    if (components.length) {
+      (async () => {
+        const invoiceUI = await generateEInvoiceUI(components);
 
-      {Boolean(components.length) && (
+        setEInvoice(invoiceUI);
+      })();
+    }
+  }, [components]);
+
+  return (
+    <div key="parent" className="flex flex-col mt-5">
+      {eInvoice ?? null}
+
+      {Boolean(eInvoice) && (
         <Button className="self-end mt-4">{t('save')}</Button>
       )}
     </div>

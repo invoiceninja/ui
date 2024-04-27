@@ -3575,5 +3575,11 @@
       "type": "DataFatturaType",
       "elements": []
     }
+  ],
+
+  "excluded": [
+    "FatturaElettronicaType",
+    "FatturaElettronicaHeaderType",
+    "FatturaElettronicaBodyType"
   ]
 }
