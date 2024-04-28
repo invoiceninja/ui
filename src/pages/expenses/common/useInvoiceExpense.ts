@@ -55,7 +55,7 @@ export function useInvoiceExpense() {
       const item: InvoiceItem = {
         ...blankLineItem(),
         type_id: InvoiceItemType.Product,
-        cost: expense.foreign_amount > 0 ? expense.foreign_amount : expense.amount,
+        cost: expense?.foreign_amount > 0 ? expense.foreign_amount : expense.amount,
         quantity: 1,
         product_key: expense?.category?.name ?? '',
         notes: expense.public_notes,
