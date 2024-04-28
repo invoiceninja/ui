@@ -56,7 +56,6 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLockOutline } from 'react-icons/md';
-import { NotesIframe } from '$app/components/NotesIframe';
 
 dayjs.extend(duration);
 
@@ -179,19 +178,18 @@ export default function Show() {
         </InfoCard>
 
         <InfoCard title={t('notes')} className="h-56" withoutTruncate>
-          <div className="whitespace-normal">
-            <NotesIframe srcDoc={project.public_notes} />
-          </div>
+          <p className="break-all">{project.public_notes}</p>
 
           {project.private_notes && (
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 mt-2 break-all">
               <div>
                 <Icon element={MdLockOutline} size={24} />
               </div>
 
-              <div className="whitespace-normal">
-                <NotesIframe srcDoc={project.private_notes} />
-              </div>
+              <span
+                className="whitespace-normal"
+                dangerouslySetInnerHTML={{ __html: project.private_notes }}
+              />
             </div>
           )}
 

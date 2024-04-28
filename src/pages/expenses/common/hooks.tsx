@@ -54,7 +54,6 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { NotesIframe } from '$app/components/NotesIframe';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -355,11 +354,8 @@ export function useExpenseColumns() {
         <Tooltip
           size="regular"
           truncate
-          tooltipElement={
-            <div className="whitespace-normal">
-              <NotesIframe srcDoc={value as string} />
-            </div>
-          }
+          containsUnsafeHTMLTags
+          message={value as string}
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>

@@ -865,8 +865,11 @@ export function useQuoteColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          tooltipElement={
+            <div className="whitespace-normal">
+              <NotesIframe srcDoc={value as string} />
+            </div>
+          }
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}

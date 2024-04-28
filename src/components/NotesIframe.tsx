@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   srcDoc: string;
@@ -17,6 +17,8 @@ export function NotesIframe(props: Props) {
   const { srcDoc } = props;
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const [currentSrcDoc, setCurrentSrcDoc] = useState<string>('');
 
   const adjustIframeHeight = () => {
     if (iframeRef?.current) {
@@ -51,5 +53,15 @@ export function NotesIframe(props: Props) {
     }
   }, [iframeRef?.current]);
 
-  return <iframe ref={iframeRef} srcDoc={srcDoc} width="100%" />;
+  useEffect(() => {
+    setCurrentSrcDoc(srcDoc);
+  }, [srcDoc]);
+
+  return (
+    <>
+      {currentSrcDoc ? (
+        <iframe ref={iframeRef} srcDoc={currentSrcDoc} width="100%" />
+      ) : null}
+    </>
+  );
 }

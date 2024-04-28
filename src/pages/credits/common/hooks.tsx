@@ -820,9 +820,7 @@ export function useCreditColumns() {
             </div>
           }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: value }} />
         </Tooltip>
       ),
     },
@@ -840,9 +838,7 @@ export function useCreditColumns() {
             </div>
           }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: value }} />
         </Tooltip>
       ),
     },
