@@ -55,11 +55,11 @@ export function useInvoiceExpense() {
       const item: InvoiceItem = {
         ...blankLineItem(),
         type_id: InvoiceItemType.Product,
-        cost: expense.amount,
+        cost: expense.foreign_amount > 0 ? expense.foreign_amount : expense.amount,
         quantity: 1,
         product_key: expense?.category?.name ?? '',
         notes: expense.public_notes,
-        line_total: Number((expense.amount * 1).toPrecision(2)),
+        line_total: Number((expense?.foreign_amount > 0 ? expense.foreign_amount : expense.amount * 1).toPrecision(2)),
         expense_id: expense.id,
         tax_name1: expense.tax_name1,
         tax_rate1: calculatedTaxRate(
