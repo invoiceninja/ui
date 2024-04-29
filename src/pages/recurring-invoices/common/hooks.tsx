@@ -684,7 +684,12 @@ export function useRecurringInvoiceColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate displayAsNotesIframe>
+        <Tooltip
+          size="regular"
+          truncate
+          message={value as string}
+          displayAsNotesIframe
+        >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
@@ -694,7 +699,12 @@ export function useRecurringInvoiceColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate displayAsNotesIframe>
+        <Tooltip
+          size="regular"
+          truncate
+          message={value as string}
+          displayAsNotesIframe
+        >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),

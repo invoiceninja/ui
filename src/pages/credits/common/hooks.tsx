@@ -810,7 +810,12 @@ export function useCreditColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate displayAsNotesIframe>
+        <Tooltip
+          size="regular"
+          truncate
+          message={value as string}
+          displayAsNotesIframe
+        >
           <span dangerouslySetInnerHTML={{ __html: value }} />
         </Tooltip>
       ),
@@ -820,7 +825,12 @@ export function useCreditColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip size="regular" truncate displayAsNotesIframe>
+        <Tooltip
+          size="regular"
+          truncate
+          message={value as string}
+          displayAsNotesIframe
+        >
           <span dangerouslySetInnerHTML={{ __html: value }} />
         </Tooltip>
       ),

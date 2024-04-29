@@ -26,10 +26,10 @@ export function NotesIframe(props: Props) {
 
       if (iframeDocument) {
         const scrollHeight = iframeDocument.body?.scrollHeight + 'px';
-        const scrollWidth = iframeDocument.body?.clientWidth + 'px';
 
         if (iframeDocument.body) {
           iframeDocument.body.style.margin = '0';
+          iframeDocument.body.style.overflow = 'auto';
           iframeDocument.body.style.display = 'flex';
           iframeDocument.body.style.alignItems = 'center';
 
@@ -37,9 +37,7 @@ export function NotesIframe(props: Props) {
             iframeDocument.body.scrollHeight < 150 ? scrollHeight : '150px';
 
           iframeRef.current.height = updatedHeight;
-          iframeRef.current.width = scrollWidth;
           iframeDocument.documentElement.style.height = updatedHeight;
-          iframeDocument.documentElement.style.width = scrollWidth;
         }
       }
     }
