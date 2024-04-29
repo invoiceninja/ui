@@ -95,7 +95,6 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { NotesIframe } from '$app/components/NotesIframe';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -862,15 +861,7 @@ export function useQuoteColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => (
-        <Tooltip
-          size="regular"
-          truncate
-          tooltipElement={
-            <div className="whitespace-normal">
-              <NotesIframe srcDoc={value as string} />
-            </div>
-          }
-        >
+        <Tooltip size="regular" truncate displayAsNotesIframe>
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
           />
@@ -882,15 +873,7 @@ export function useQuoteColumns() {
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => (
-        <Tooltip
-          size="regular"
-          truncate
-          tooltipElement={
-            <div className="whitespace-normal">
-              <NotesIframe srcDoc={value as string} />
-            </div>
-          }
-        >
+        <Tooltip size="regular" truncate displayAsNotesIframe>
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
           />
