@@ -14,7 +14,6 @@ import { InfoCard } from '$app/components/InfoCard';
 import { NotesIframe } from '$app/components/NotesIframe';
 import { Element } from '$app/components/cards';
 import { Icon } from '$app/components/icons/Icon';
-import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdLockOutline } from 'react-icons/md';
 
@@ -28,28 +27,6 @@ export function Standing(props: Props) {
   const formatMoney = useFormatMoney();
 
   const { client } = props;
-
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (iframeRef?.current) {
-      const iframeDocument =
-        iframeRef.current.contentDocument ||
-        iframeRef.current.contentWindow?.document;
-
-      if (iframeDocument) {
-        const scrollHeight = iframeDocument.body.scrollHeight + 'px';
-
-        iframeDocument.body.style.margin = '0';
-        iframeDocument.body.style.display = 'flex';
-        iframeDocument.body.style.alignItems = 'center';
-
-        iframeRef.current.height = scrollHeight;
-        iframeDocument.documentElement.style.height = scrollHeight;
-        console.log(iframeDocument.documentElement.offsetHeight);
-      }
-    }
-  }, [iframeRef]);
 
   return (
     <>
