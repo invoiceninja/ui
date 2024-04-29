@@ -2520,6 +2520,428 @@
       "elements": []
     },
     {
+      "type": "ModalitaPagamentoType",
+      "elements": []
+    },
+    {
+      "type": "String60Type",
+      "elements": []
+    },
+    {
+      "type": "NumeroCivicoType",
+      "elements": []
+    },
+    {
+      "type": "DataFatturaType",
+      "elements": []
+    }
+  ],
+
+  "allComponents": [
+    {
+      "type": "FatturaElettronicaType",
+      "elements": [
+        {
+          "name": "FatturaElettronicaHeader",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "FatturaElettronicaBody",
+          "min": 1,
+          "max": -1
+        },
+        {
+          "name": "Signature",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "FatturaElettronicaHeaderType",
+      "elements": [
+        {
+          "name": "DatiTrasmissione",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CedentePrestatore",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "RappresentanteFiscale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CessionarioCommittente",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "TerzoIntermediarioOSoggettoEmittente",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "SoggettoEmittente",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "FatturaElettronicaBodyType",
+      "elements": [
+        {
+          "name": "DatiGenerali",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiBeniServizi",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiVeicoli",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DatiPagamento",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "Allegati",
+          "min": 0,
+          "max": -1
+        }
+      ]
+    },
+    {
+      "type": "DatiTrasmissioneType",
+      "elements": [
+        {
+          "name": "IdTrasmittente",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ProgressivoInvio",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "FormatoTrasmissione",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CodiceDestinatario",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ContattiTrasmittente",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "PECDestinatario",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CodiceDestinatarioType",
+      "elements": []
+    },
+    {
+      "type": "IdFiscaleType",
+      "elements": [
+        {
+          "name": "IdPaese",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "IdCodice",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CodiceType",
+      "elements": []
+    },
+    {
+      "type": "FormatoTrasmissioneType",
+      "elements": []
+    },
+    {
+      "type": "ContattiTrasmittenteType",
+      "elements": [
+        {
+          "name": "Telefono",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Email",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiGeneraliType",
+      "elements": [
+        {
+          "name": "DatiGeneraliDocumento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiOrdineAcquisto",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiContratto",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiConvenzione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiRicezione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiFattureCollegate",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiSAL",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiDDT",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiTrasporto",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "FatturaPrincipale",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiGeneraliDocumentoType",
+      "elements": [
+        {
+          "name": "TipoDocumento",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Divisa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Data",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Numero",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "DatiRitenuta",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "DatiBollo",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "DatiCassaPrevidenziale",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "ScontoMaggiorazione",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "ImportoTotaleDocumento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Arrotondamento",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Causale",
+          "min": 0,
+          "max": -1
+        },
+        {
+          "name": "Art73",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiRitenutaType",
+      "elements": [
+        {
+          "name": "TipoRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AliquotaRitenuta",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "CausalePagamento",
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiBolloType",
+      "elements": [
+        {
+          "name": "BolloVirtuale",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoBollo",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "DatiCassaPrevidenzialeType",
+      "elements": [
+        {
+          "name": "TipoCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "AlCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImportoContributoCassa",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "ImponibileCassa",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "AliquotaIVA",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Ritenuta",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Natura",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "RiferimentoAmministrazione",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "ScontoMaggiorazioneType",
+      "elements": [
+        {
+          "name": "Tipo",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Percentuale",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Importo",
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "CausalePagamentoType",
+      "elements": []
+    },
+    {
+      "type": "TipoScontoMaggiorazioneType",
+      "elements": []
+    },
+    {
+      "type": "Art73Type",
+      "elements": []
+    },
+    {
+      "type": "TipoCassaType",
+      "elements": []
+    },
+    {
       "type": "TipoDocumentoType",
       "elements": []
     },

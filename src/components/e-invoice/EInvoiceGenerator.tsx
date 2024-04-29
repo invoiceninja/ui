@@ -12,6 +12,10 @@ import { useEffect, useState } from 'react';
 import { Button, InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
+import { v4 } from 'uuid';
+import { Icon } from '../icons/Icon';
+import { MdDelete } from 'react-icons/md';
+import { SearchableSelect } from '../SearchableSelect';
 
 export type Country = 'italy';
 
@@ -26,6 +30,7 @@ interface Resource {
   rules: Rule[];
   validations: Validation[];
   components: Component[];
+  allComponents: Component[];
   excluded: string[];
 }
 
@@ -75,19 +80,32 @@ export function EInvoiceGenerator(props: Props) {
 
   const [rules, setRules] = useState<Rule[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
+  const [isInitial, setIsInitial] = useState<boolean>(true);
   const [components, setComponents] = useState<Component[]>([]);
   const [validations, setValidation] = useState<Validation[]>([]);
   const [eInvoice, setEInvoice] = useState<JSX.Element | JSX.Element[]>();
+  const [defaultComponents, setDefaultComponents] = useState<Component[]>([]);
 
   let payloadKeys: PayloadKey[] = [];
-  const [payload, setPayload] = useState<Payload>({});
+  let availableTypes: string[] = [];
 
-  const getSectionLabel = (label: string) => {
+  const [payload, setPayload] = useState<Payload>({});
+  const [currentAvailableTypes, setCurrentAvailableTypes] = useState<string[]>(
+    []
+  );
+
+  const getFieldLabel = (label: string) => {
     return label.split('Type')[0];
   };
 
   const handleChange = (property: string, value: string | number) => {
     setPayload((current) => ({ ...current, [property]: value }));
+  };
+
+  const showField = (type: string) => {
+    return isInitial
+      ? !availableTypes.find((currentType) => currentType === type)
+      : !currentAvailableTypes.find((currentType) => currentType === type);
   };
 
   const renderElement = (component: Component) => {
@@ -97,7 +115,7 @@ export function EInvoiceGenerator(props: Props) {
 
     if (validation) {
       let label = '';
-      const fieldKey = getSectionLabel(validation.name);
+      const fieldKey = getFieldLabel(validation.name);
       const rule = rules.find((rule) => `${rule.key}Type` === validation.name);
 
       if (rule) {
@@ -114,6 +132,20 @@ export function EInvoiceGenerator(props: Props) {
         valueType: isNumberTypeField ? 'number' : 'string',
       });
 
+      if (isInitial) {
+        const isDefaultField = defaultComponents.find(
+          (defaultComponent) => defaultComponent.type === component.type
+        );
+
+        if (!isDefaultField) {
+          availableTypes.push(component.type);
+        }
+      }
+
+      if (!showField(component.type)) {
+        return null;
+      }
+
       if (
         typeof validation.resource === 'object' &&
         validation.resource !== null &&
@@ -121,20 +153,35 @@ export function EInvoiceGenerator(props: Props) {
       ) {
         return (
           <Element leftSide={label}>
-            <SelectField
-              key={`${label}select`}
-              defaultValue={payload[fieldKey] || ''}
-              onValueChange={(value) => handleChange(fieldKey, value)}
-              withBlank
-            >
-              {Object.entries(validation.resource).map(
-                ([key, value], index) => (
-                  <option key={`${label}select${index}`} value={key}>
-                    {value || key}
-                  </option>
-                )
+            <div className="flex items-center w-full space-x-3">
+              <div className="flex-1">
+                <SelectField
+                  defaultValue={payload[fieldKey] || ''}
+                  onValueChange={(value) => handleChange(fieldKey, value)}
+                  withBlank
+                >
+                  {Object.entries(validation.resource).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value || key}
+                    </option>
+                  ))}
+                </SelectField>
+              </div>
+
+              {!rule?.required && (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setCurrentAvailableTypes((current) => [
+                      ...current,
+                      component.type,
+                    ])
+                  }
+                >
+                  <Icon element={MdDelete} size={28} />
+                </div>
               )}
-            </SelectField>
+            </div>
           </Element>
         );
       }
@@ -145,14 +192,31 @@ export function EInvoiceGenerator(props: Props) {
       ) {
         return (
           <Element leftSide={label}>
-            <InputField
-              key={`${label}number`}
-              type="number"
-              value={payload[fieldKey] || 0}
-              onValueChange={(value) =>
-                handleChange(fieldKey, parseFloat(value))
-              }
-            />
+            <div className="flex items-center w-full space-x-3">
+              <div className="flex-1">
+                <InputField
+                  type="number"
+                  value={payload[fieldKey] || 0}
+                  onValueChange={(value) =>
+                    handleChange(fieldKey, parseFloat(value))
+                  }
+                />
+              </div>
+
+              {!rule?.required && (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setCurrentAvailableTypes((current) => [
+                      ...current,
+                      component.type,
+                    ])
+                  }
+                >
+                  <Icon element={MdDelete} size={28} />
+                </div>
+              )}
+            </div>
           </Element>
         );
       }
@@ -160,12 +224,29 @@ export function EInvoiceGenerator(props: Props) {
       if (validation.base_type === 'date') {
         return (
           <Element leftSide={label}>
-            <InputField
-              key={`${label}date`}
-              type="date"
-              value={payload[fieldKey] || ''}
-              onValueChange={(value) => handleChange(fieldKey, value)}
-            />
+            <div className="flex items-center w-full space-x-3">
+              <div className="flex-1">
+                <InputField
+                  type="date"
+                  value={payload[fieldKey] || ''}
+                  onValueChange={(value) => handleChange(fieldKey, value)}
+                />
+              </div>
+
+              {!rule?.required && (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setCurrentAvailableTypes((current) => [
+                      ...current,
+                      component.type,
+                    ])
+                  }
+                >
+                  <Icon element={MdDelete} size={28} />
+                </div>
+              )}
+            </div>
           </Element>
         );
       }
@@ -173,22 +254,39 @@ export function EInvoiceGenerator(props: Props) {
       if (validation.base_type !== null) {
         return (
           <Element leftSide={label}>
-            <InputField
-              key={`${label}text`}
-              value={payload[fieldKey] || ''}
-              onValueChange={(value) => handleChange(fieldKey, value)}
-            />
+            <div className="flex items-center w-full space-x-3">
+              <div className="flex-1">
+                <InputField
+                  value={payload[fieldKey] || ''}
+                  onValueChange={(value) => handleChange(fieldKey, value)}
+                />
+              </div>
+
+              {!rule?.required && (
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setCurrentAvailableTypes((current) => [
+                      ...current,
+                      component.type,
+                    ])
+                  }
+                >
+                  <Icon element={MdDelete} size={28} />
+                </div>
+              )}
+            </div>
           </Element>
         );
       }
     }
 
-    return <></>;
+    return <div key={v4()}></div>;
   };
 
   const renderComponent = (component: Component, componentIndex: number) => {
     return (
-      <div key={`${componentIndex}${component.type}renderer`}>
+      <div key={v4()}>
         {Boolean(component.elements.length) &&
           component.elements.map((element) => {
             const componentsList = components.filter(
@@ -202,14 +300,10 @@ export function EInvoiceGenerator(props: Props) {
             const newComponent = componentsList[newComponentIndex];
 
             if (newComponent) {
-              return (
-                <div key={`${newComponentIndex}${newComponent.type}`}>
-                  {renderComponent(newComponent, newComponentIndex)}
-                </div>
-              );
+              return renderComponent({ ...newComponent }, newComponentIndex);
             }
 
-            return <></>;
+            return <div key={v4()}></div>;
           })}
 
         {Boolean(!component.elements.length) && renderElement(component)}
@@ -296,12 +390,10 @@ export function EInvoiceGenerator(props: Props) {
         excluded.includes(component.type) || isChildOfExcluded(component.type);
 
       if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
-        return (
-          <div key={`${index}main`}>{renderComponent(component, index)}</div>
-        );
+        return renderComponent(component, index);
       }
 
-      return <></>;
+      return <div key={v4()}></div>;
     });
 
     createPayload();
@@ -321,7 +413,8 @@ export function EInvoiceGenerator(props: Props) {
         .then((response: Resource) => {
           setRules(response.rules);
           setValidation(response.validations);
-          setComponents(response.components);
+          setDefaultComponents(response.components);
+          setComponents(response.allComponents);
           setExcluded(response.excluded);
         });
     } else {
@@ -329,6 +422,10 @@ export function EInvoiceGenerator(props: Props) {
       setComponents([]);
       setValidation([]);
       setEInvoice(undefined);
+      setIsInitial(true);
+      setCurrentAvailableTypes([]);
+      availableTypes = [];
+      payloadKeys = [];
     }
   }, [country]);
 
@@ -337,14 +434,38 @@ export function EInvoiceGenerator(props: Props) {
       (async () => {
         const invoiceUI = await generateEInvoiceUI(components);
 
+        setIsInitial(false);
         setEInvoice(invoiceUI);
+        isInitial && setCurrentAvailableTypes([...availableTypes]);
       })();
     }
-  }, [components]);
+  }, [components, currentAvailableTypes]);
 
   return (
-    <div key="parent" className="flex flex-col mt-5">
-      {eInvoice ?? null}
+    <div className="flex flex-col mt-5">
+      {Boolean(eInvoice) && (
+        <Element leftSide={t('fields')}>
+          <SearchableSelect
+            value=""
+            onValueChange={(value) =>
+              setCurrentAvailableTypes((current) =>
+                current.filter((type) => type !== value)
+              )
+            }
+            clearAfterSelection
+          >
+            <option value=""></option>
+
+            {currentAvailableTypes.map((type, index) => (
+              <option key={index} value={type}>
+                {getFieldLabel(type)}
+              </option>
+            ))}
+          </SearchableSelect>
+        </Element>
+      )}
+
+      <div className="mt-4">{eInvoice ?? null}</div>
 
       {Boolean(eInvoice) && (
         <Button className="self-end mt-4">{t('save')}</Button>
