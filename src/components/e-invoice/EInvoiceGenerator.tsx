@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 import { Button, InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
+import { Element } from '../cards';
 
 export type Country = 'italy';
 
@@ -119,10 +120,9 @@ export function EInvoiceGenerator(props: Props) {
         Object.keys(validation.resource).length
       ) {
         return (
-          <div className="mt-2">
+          <Element leftSide={label}>
             <SelectField
               key={`${label}select`}
-              label={label}
               defaultValue={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
               withBlank
@@ -135,7 +135,7 @@ export function EInvoiceGenerator(props: Props) {
                 )
               )}
             </SelectField>
-          </div>
+          </Element>
         );
       }
 
@@ -144,44 +144,41 @@ export function EInvoiceGenerator(props: Props) {
         validation.base_type === 'number'
       ) {
         return (
-          <div className="mt-2">
+          <Element leftSide={label}>
             <InputField
               key={`${label}number`}
               type="number"
-              label={label}
               value={payload[fieldKey] || 0}
               onValueChange={(value) =>
                 handleChange(fieldKey, parseFloat(value))
               }
             />
-          </div>
+          </Element>
         );
       }
 
       if (validation.base_type === 'date') {
         return (
-          <div className="mt-2">
+          <Element leftSide={label}>
             <InputField
               key={`${label}date`}
               type="date"
-              label={label}
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
             />
-          </div>
+          </Element>
         );
       }
 
       if (validation.base_type !== null) {
         return (
-          <div className="mt-2">
+          <Element leftSide={label}>
             <InputField
               key={`${label}text`}
-              label={label}
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
             />
-          </div>
+          </Element>
         );
       }
     }

@@ -39,7 +39,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -289,15 +289,16 @@ export default function Edit() {
         />
       ) : null}
 
-      <div className="w-1/4">
-        <SelectField
-          label={t('country')}
-          value={country || ''}
-          onValueChange={(value) => setCountry(value as Country)}
-          withBlank
-        >
-          <option value="italy">Italy</option>
-        </SelectField>
+      <div>
+        <Element leftSide={t('country')}>
+          <SelectField
+            value={country || ''}
+            onValueChange={(value) => setCountry(value as Country)}
+            withBlank
+          >
+            <option value="italy">Italy</option>
+          </SelectField>
+        </Element>
 
         <EInvoiceGenerator country={country} />
       </div>
