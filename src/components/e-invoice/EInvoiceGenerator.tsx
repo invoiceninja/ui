@@ -29,8 +29,8 @@ interface PayloadKey {
 interface Resource {
   rules: Rule[];
   validations: Validation[];
+  defaultFields: Record<string, string>;
   components: Component[];
-  allComponents: Component[];
   excluded: string[];
 }
 
@@ -84,7 +84,9 @@ export function EInvoiceGenerator(props: Props) {
   const [components, setComponents] = useState<Component[]>([]);
   const [validations, setValidation] = useState<Validation[]>([]);
   const [eInvoice, setEInvoice] = useState<JSX.Element | JSX.Element[]>();
-  const [defaultComponents, setDefaultComponents] = useState<Component[]>([]);
+  const [defaultFields, setDefaultFields] = useState<Record<string, string>>(
+    {}
+  );
 
   let payloadKeys: PayloadKey[] = [];
   let availableTypes: string[] = [];
@@ -133,8 +135,8 @@ export function EInvoiceGenerator(props: Props) {
       });
 
       if (isInitial) {
-        const isDefaultField = defaultComponents.find(
-          (defaultComponent) => defaultComponent.type === component.type
+        const isDefaultField = Object.keys(defaultFields).includes(
+          component.type.split('Type')[0]
         );
 
         if (!isDefaultField) {
@@ -152,7 +154,7 @@ export function EInvoiceGenerator(props: Props) {
         Object.keys(validation.resource).length
       ) {
         return (
-          <Element leftSide={label}>
+          <Element required={rule?.required} leftSide={label}>
             <div className="flex items-center w-full space-x-3">
               <div className="flex-1">
                 <SelectField
@@ -191,7 +193,7 @@ export function EInvoiceGenerator(props: Props) {
         validation.base_type === 'number'
       ) {
         return (
-          <Element leftSide={label}>
+          <Element required={rule?.required} leftSide={label}>
             <div className="flex items-center w-full space-x-3">
               <div className="flex-1">
                 <InputField
@@ -223,7 +225,7 @@ export function EInvoiceGenerator(props: Props) {
 
       if (validation.base_type === 'date') {
         return (
-          <Element leftSide={label}>
+          <Element required={rule?.required} leftSide={label}>
             <div className="flex items-center w-full space-x-3">
               <div className="flex-1">
                 <InputField
@@ -253,7 +255,7 @@ export function EInvoiceGenerator(props: Props) {
 
       if (validation.base_type !== null) {
         return (
-          <Element leftSide={label}>
+          <Element required={rule?.required} leftSide={label}>
             <div className="flex items-center w-full space-x-3">
               <div className="flex-1">
                 <InputField
@@ -317,7 +319,7 @@ export function EInvoiceGenerator(props: Props) {
     payloadKeys.forEach(({ key, valueType }) => {
       currentPayload = {
         ...currentPayload,
-        [key]: valueType === 'number' ? 0 : '',
+        [key]: defaultFields[key] || (valueType === 'number' ? 0 : ''),
       };
     });
 
@@ -411,11 +413,16 @@ export function EInvoiceGenerator(props: Props) {
       )
         .then((response) => response.json())
         .then((response: Resource) => {
+          setIsInitial(true);
+          setEInvoice(undefined);
           setRules(response.rules);
-          setValidation(response.validations);
-          setDefaultComponents(response.components);
-          setComponents(response.allComponents);
+          setCurrentAvailableTypes([]);
           setExcluded(response.excluded);
+          setValidation(response.validations);
+          setComponents(response.components);
+          setDefaultFields(response.defaultFields);
+          payloadKeys = [];
+          availableTypes = [];
         });
     } else {
       setRules([]);
@@ -423,6 +430,7 @@ export function EInvoiceGenerator(props: Props) {
       setValidation([]);
       setEInvoice(undefined);
       setIsInitial(true);
+      setDefaultFields({});
       setCurrentAvailableTypes([]);
       availableTypes = [];
       payloadKeys = [];
