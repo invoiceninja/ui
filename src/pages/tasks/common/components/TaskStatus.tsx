@@ -21,6 +21,7 @@ import {
 import { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { TaskStatusesDropdown } from './TaskStatusesDropdown';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Task;
@@ -32,6 +33,7 @@ export function TaskStatus(props: Props) {
   const ref = useRef(null);
 
   const adjustColorDarkness = useAdjustColorDarkness();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { invoice_id, archived_at, is_deleted, time_log, status } =
     props.entity;
@@ -58,9 +60,24 @@ export function TaskStatus(props: Props) {
 
   if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
 
-  if (invoice_id) return <Badge variant="green">{t('invoiced')}</Badge>;
+  if (invoice_id) {
+    return (
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+        {t('invoiced')}
+      </Badge>
+    );
+  }
 
-  if (isRunning()) return <Badge variant="light-blue">{t('running')}</Badge>;
+  if (isRunning()) {
+    return (
+      <Badge
+        variant="light-blue"
+        style={{ backgroundColor: statusThemeColors.$2 }}
+      >
+        {t('running')}
+      </Badge>
+    );
+  }
 
   if (status) {
     const { red, green, blue, hex } = hexToRGB(status.color);

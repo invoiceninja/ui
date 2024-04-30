@@ -139,21 +139,23 @@ export default function Kanban() {
         columns.push({ id: taskStatus.id, title: taskStatus.name, cards: [] })
       );
 
-      tasks.data.map((task) => {
-        const index = columns.findIndex(
-          (column) => column.id === task.status_id
-        );
+      tasks.data
+        .filter(({ invoice_id }) => !invoice_id)
+        .map((task) => {
+          const index = columns.findIndex(
+            (column) => column.id === task.status_id
+          );
 
-        if (index >= 0) {
-          columns[index].cards.push({
-            id: task.id,
-            title: task.description,
-            description: calculateHours(task.time_log).toString(),
-            sortOrder: task.status_order,
-            task,
-          });
-        }
-      });
+          if (index >= 0) {
+            columns[index].cards.push({
+              id: task.id,
+              title: task.description,
+              description: calculateHours(task.time_log).toString(),
+              sortOrder: task.status_order,
+              task,
+            });
+          }
+        });
 
       columns.map(
         (c) => (c.cards = c.cards.sort((a, b) => a.sortOrder - b.sortOrder))
@@ -789,7 +791,7 @@ export default function Kanban() {
           {(isAdmin || isOwner) && (
             <div>
               <div
-                className="shadow rounded p-1"
+                className="bg-white shadow rounded p-1"
                 style={{
                   color: colors.$3,
                   colorScheme: colors.$0,

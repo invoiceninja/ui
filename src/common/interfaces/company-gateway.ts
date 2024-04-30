@@ -37,6 +37,7 @@ export interface CompanyGateway {
   label: string;
   token_billing: string;
   test_mode: boolean;
+  always_show_required_fields: boolean;
 }
 
 export interface FeesAndLimitsEntry {

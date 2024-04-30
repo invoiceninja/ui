@@ -9,6 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  withoutTruncate?: boolean;
 }
 
 export function InfoCard(props: Props) {
@@ -32,7 +34,11 @@ export function InfoCard(props: Props) {
       }}
     >
       <dd className="text-xl font-medium">{props.title}</dd>
-      <dt className="text-sm truncate">
+      <dt
+        className={classNames('text-sm', {
+          truncate: !props.withoutTruncate,
+        })}
+      >
         {props.value} {props.children}
       </dt>
     </div>

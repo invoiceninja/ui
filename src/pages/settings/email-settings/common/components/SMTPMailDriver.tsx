@@ -50,7 +50,7 @@ export function SMTPMailDriver() {
 
   return (
     <>
-      <Element leftSide={t('host')}>
+      <Element leftSide={t('host')} leftSideHelp={t('host_help')}>
         <InputField
           value={company?.smtp_host || ''}
           onValueChange={(value) => handleChange('smtp_host', value)}
@@ -58,7 +58,7 @@ export function SMTPMailDriver() {
         />
       </Element>
 
-      <Element leftSide={t('port')}>
+      <Element leftSide={t('port')} leftSideHelp={t('port_help')}>
         <InputField
           value={company?.smtp_port || ''}
           onValueChange={(value) => handleChange('smtp_port', value)}
@@ -94,7 +94,7 @@ export function SMTPMailDriver() {
         />
       </Element>
 
-      <Element leftSide={t('local_domain')}>
+      <Element leftSide={t('local_domain')} leftSideHelp={t('local_domain_help')}>
         <InputField
           value={company?.smtp_local_domain || ''}
           onValueChange={(value) => handleChange('smtp_local_domain', value)}
