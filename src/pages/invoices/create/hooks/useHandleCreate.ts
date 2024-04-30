@@ -64,7 +64,7 @@ export function useHandleCreate(params: Params) {
 
         toast.success('created_invoice');
 
-        $refetch(['products']);
+        $refetch(['products', 'tasks']);
 
         navigate(
           route('/invoices/:id/edit?table=:table', {
