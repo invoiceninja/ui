@@ -25,8 +25,11 @@ import { route } from '$app/common/helpers/route';
 import {
   DragDropContext,
   Draggable,
+  DraggableLocation,
+  DraggableProvided,
   DropResult,
   Droppable,
+  DroppableProvided,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
@@ -55,7 +58,6 @@ import {
   CreateTaskModal,
   TaskDetails,
 } from '../common/components/CreateTaskModal';
-import { TaskClock } from './components/TaskClock';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import {
@@ -63,6 +65,16 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { TaskClock } from './components/TaskClock';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  min-width: ${(props) => props.theme.minWidth}px;
+  background-color: ${(props) => props.theme.backgroundColor};
+  color: ${(props) => props.theme.color};
+  color-scheme: ${(props) => props.theme.colorScheme};
+  border-color: ${(props) => props.theme.borderColor};
+`;
 
 interface CardItem {
   id: string;
@@ -110,8 +122,6 @@ export default function Kanban() {
   const [sliderType, setSliderType] = useState<SliderType>('view');
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
-    useState<boolean>(false);
-  const [isColumnDraggingDisabled, setIsColumnDraggingDisabled] =
     useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
@@ -219,37 +229,20 @@ export default function Kanban() {
 
         local.columns[targetIndex].cards.push(task);
 
-        const taskIndex = local.columns[targetIndex].cards.findIndex(
-          (task) => task.id === result.draggableId
+        local.columns[targetIndex].cards = arrayMoveImmutable(
+          local.columns[targetIndex].cards,
+          local.columns[targetIndex].cards.length - 1,
+          result.destination?.index as number
         );
 
-        if (result.destination!.index > -1) {
-          if (taskIndex === (result.destination?.index as number)) {
-            return;
-          }
-
-          local.columns[targetIndex].cards = arrayMoveImmutable(
-            local.columns[targetIndex].cards,
-            taskIndex,
-            result.destination?.index as number
-          );
-
-          setBoard(local);
-          updateTasks(local);
-        }
+        setBoard(local);
+        updateTasks(local);
       }
     }
   };
 
   const onColumnsDragEnd = (result: DropResult) => {
     const local = cloneDeep(board) as Board;
-
-    if (
-      typeof result.destination?.index !== 'number' ||
-      (result.destination?.index as number) < 0
-    ) {
-      return;
-    }
 
     const sortedColumns = arrayMoveImmutable(
       local.columns as Column[],
@@ -265,6 +258,29 @@ export default function Kanban() {
 
     setBoard(local);
     updateTasks(local);
+  };
+
+  const onDragEnd = (result: DropResult): void => {
+    if (!result.destination) {
+      return;
+    }
+
+    const source: DraggableLocation = result.source;
+    const destination: DraggableLocation = result.destination;
+
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return;
+    }
+
+    if (result.type === 'COLUMN') {
+      onColumnsDragEnd(result);
+      return;
+    }
+
+    onCardsDragEnd(result);
   };
 
   const handleCurrentTask = (id: string, slider: SliderType) => {
@@ -427,362 +443,338 @@ export default function Kanban() {
           }}
           className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
-          <DragDropContext onDragEnd={onColumnsDragEnd}>
-            <Droppable direction="horizontal" droppableId="taskStatusesColumns">
-              {(columnsDroppableProvided) => (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable
+              droppableId="columns"
+              type="COLUMN"
+              direction="horizontal"
+            >
+              {(columnProvided: DroppableProvided) => (
                 <div
                   className="flex space-x-4"
-                  {...columnsDroppableProvided.droppableProps}
-                  ref={columnsDroppableProvided.innerRef}
+                  ref={columnProvided.innerRef}
+                  {...columnProvided.droppableProps}
                 >
-                  {board.columns.map((board, index) => (
+                  {board.columns.map((column, index) => (
                     <Draggable
-                      key={board.id}
+                      key={column.id}
+                      draggableId={column.id}
                       index={index}
-                      draggableId={board.id}
-                      isDragDisabled={isColumnDraggingDisabled}
                     >
-                      {(draggableProvidedColumn) => (
-                        <div
-                          {...draggableProvidedColumn.draggableProps}
-                          {...draggableProvidedColumn.dragHandleProps}
-                          ref={draggableProvidedColumn.innerRef}
+                      {(columnDraggableProvided: DraggableProvided) => (
+                        <Container
+                          className="bg-white rounded border shadow select-none h-max"
+                          ref={columnDraggableProvided.innerRef}
+                          {...columnDraggableProvided.draggableProps}
+                          theme={{
+                            minWidth: 360,
+                            color: colors.$3,
+                            colorScheme: colors.$0,
+                            backgroundColor: colors.$1,
+                            borderColor: colors.$4,
+                          }}
                         >
-                          <DragDropContext
-                            onDragEnd={(result) => {
-                              onCardsDragEnd(result);
-                              setIsColumnDraggingDisabled(false);
+                          <div
+                            {...columnDraggableProvided.dragHandleProps}
+                            className="flex items-center justify-between border-b px-4 py-5"
+                            style={{
+                              color: colors.$3,
+                              colorScheme: colors.$0,
+                              backgroundColor: colors.$1,
+                              borderColor: colors.$4,
                             }}
                           >
-                            <Droppable
-                              key={board.id}
-                              droppableId={board.id}
-                              renderClone={(provided, _, rubric) => {
-                                const card = board.cards.find(
-                                  ({ id }) => id === rubric.draggableId
-                                );
+                            <h3 className="leading-6 font-medium">
+                              {column.title}
+                            </h3>
 
-                                if (!card) {
-                                  return <></>;
-                                }
+                            {hasPermission('create_task') && (
+                              <MdAddCircle
+                                className="cursor-pointer"
+                                fontSize={22}
+                                onClick={() => {
+                                  setTaskDetails({
+                                    taskStatusId: column.id,
+                                    projectId,
+                                  });
+                                  setIsTaskModalOpened(true);
+                                }}
+                              />
+                            )}
+                          </div>
 
-                                return (
-                                  <div
-                                    className="w-full text-leftblock rounded text-sm cursor-pointer"
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div
-                                      className="px-4 sm:px-6 py-4"
-                                      style={{
-                                        color: colors.$3,
-                                        colorScheme: colors.$0,
-                                        backgroundColor: colors.$1,
-                                        borderColor: colors.$4,
-                                      }}
-                                    >
-                                      <p>{card.title}</p>
-                                      <small>
-                                        {isTaskRunning(card.task) ? (
-                                          <TaskClock task={card.task} />
-                                        ) : (
-                                          card.description
-                                        )}
-                                      </small>
-                                    </div>
+                          <Droppable
+                            droppableId={column.id}
+                            type="CARD"
+                            renderClone={(provided, _, rubric) => {
+                              const card = column.cards.find(
+                                ({ id }) => id === rubric.draggableId
+                              );
 
-                                    <div
-                                      className="flex border-t justify-center items-center"
-                                      style={{
-                                        color: colors.$3,
-                                        colorScheme: colors.$0,
-                                        backgroundColor: colors.$1,
-                                        borderColor: colors.$4,
-                                      }}
-                                    >
-                                      {(hasPermission('view_task') ||
-                                        hasPermission('edit_task') ||
-                                        entityAssigned(currentTask)) && (
-                                        <button
-                                          style={{
-                                            color: colors.$3,
-                                            colorScheme: colors.$0,
-                                            backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
-                                          }}
-                                          className="w-full py-2 rounded-bl"
-                                          onClick={() =>
-                                            handleCurrentTask(card.id, 'view')
-                                          }
-                                        >
-                                          {t('view')}
-                                        </button>
-                                      )}
+                              if (!card) {
+                                return <></>;
+                              }
 
-                                      {(hasPermission('edit_task') ||
-                                        entityAssigned(currentTask)) && (
-                                        <button
-                                          style={{
-                                            color: colors.$3,
-                                            colorScheme: colors.$0,
-                                            backgroundColor: colors.$1,
-                                            borderColor: colors.$4,
-                                          }}
-                                          className="w-full text-center py-2"
-                                          onClick={() =>
-                                            handleCurrentTask(card.id, 'edit')
-                                          }
-                                        >
-                                          {t('edit')}
-                                        </button>
-                                      )}
-
-                                      {isTaskRunning(card.task) &&
-                                        (hasPermission('edit_task') ||
-                                          entityAssigned(currentTask)) && (
-                                          <button
-                                            style={{
-                                              color: colors.$3,
-                                              colorScheme: colors.$0,
-                                              backgroundColor: colors.$1,
-                                              borderColor: colors.$4,
-                                            }}
-                                            className="w-full py-2 rounded-br"
-                                            onClick={() => stopTask(card.task)}
-                                          >
-                                            {t('stop')}
-                                          </button>
-                                        )}
-
-                                      {!isTaskRunning(card.task) &&
-                                        (hasPermission('edit_task') ||
-                                          entityAssigned(currentTask)) && (
-                                          <button
-                                            style={{
-                                              color: colors.$3,
-                                              colorScheme: colors.$0,
-                                              backgroundColor: colors.$1,
-                                              borderColor: colors.$4,
-                                            }}
-                                            className="w-full py-2 rounded-br"
-                                            onClick={() => startTask(card.task)}
-                                          >
-                                            {t('start')}
-                                          </button>
-                                        )}
-                                    </div>
-                                  </div>
-                                );
-                              }}
-                            >
-                              {(droppableProvided) => (
+                              return (
                                 <div
-                                  className="bg-white rounded shadow select-none h-max"
+                                  className="w-full text-leftblock rounded text-sm cursor-pointer"
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                                >
+                                  <div
+                                    className="px-4 sm:px-6 py-4"
+                                    style={{
+                                      color: colors.$3,
+                                      colorScheme: colors.$0,
+                                      backgroundColor: colors.$4,
+                                      borderColor: colors.$4,
+                                    }}
+                                  >
+                                    <p>{card.title}</p>
+                                    <small>
+                                      {isTaskRunning(card.task) ? (
+                                        <TaskClock task={card.task} />
+                                      ) : (
+                                        card.description
+                                      )}
+                                    </small>
+                                  </div>
+
+                                  <div
+                                    className="flex border-t justify-center items-center"
+                                    style={{
+                                      color: colors.$3,
+                                      colorScheme: colors.$0,
+                                      backgroundColor: colors.$1,
+                                      borderColor: colors.$4,
+                                    }}
+                                  >
+                                    {(hasPermission('view_task') ||
+                                      hasPermission('edit_task') ||
+                                      entityAssigned(currentTask)) && (
+                                      <button
+                                        style={{
+                                          color: colors.$3,
+                                          colorScheme: colors.$0,
+                                          backgroundColor: colors.$1,
+                                          borderColor: colors.$4,
+                                        }}
+                                        className="w-full py-2 rounded-bl"
+                                        onClick={() =>
+                                          handleCurrentTask(card.id, 'view')
+                                        }
+                                      >
+                                        {t('view')}
+                                      </button>
+                                    )}
+
+                                    {(hasPermission('edit_task') ||
+                                      entityAssigned(currentTask)) && (
+                                      <button
+                                        style={{
+                                          color: colors.$3,
+                                          colorScheme: colors.$0,
+                                          backgroundColor: colors.$1,
+                                          borderColor: colors.$4,
+                                        }}
+                                        className="w-full text-center py-2"
+                                        onClick={() =>
+                                          handleCurrentTask(card.id, 'edit')
+                                        }
+                                      >
+                                        {t('edit')}
+                                      </button>
+                                    )}
+
+                                    {isTaskRunning(card.task) &&
+                                      (hasPermission('edit_task') ||
+                                        entityAssigned(currentTask)) && (
+                                        <button
+                                          style={{
+                                            color: colors.$3,
+                                            colorScheme: colors.$0,
+                                            backgroundColor: colors.$1,
+                                            borderColor: colors.$4,
+                                          }}
+                                          className="w-full py-2 rounded-br"
+                                          onClick={() => stopTask(card.task)}
+                                        >
+                                          {t('stop')}
+                                        </button>
+                                      )}
+
+                                    {!isTaskRunning(card.task) &&
+                                      (hasPermission('edit_task') ||
+                                        entityAssigned(currentTask)) && (
+                                        <button
+                                          style={{
+                                            color: colors.$3,
+                                            colorScheme: colors.$0,
+                                            backgroundColor: colors.$1,
+                                            borderColor: colors.$4,
+                                          }}
+                                          className="w-full py-2 rounded-br"
+                                          onClick={() => startTask(card.task)}
+                                        >
+                                          {t('start')}
+                                        </button>
+                                      )}
+                                  </div>
+                                </div>
+                              );
+                            }}
+                          >
+                            {(dropProvided) => (
+                              <div {...dropProvided.droppableProps}>
+                                <div
+                                  ref={dropProvided.innerRef}
+                                  className="p-4 space-y-4"
                                   style={{
-                                    minWidth: 360,
                                     color: colors.$3,
                                     colorScheme: colors.$0,
                                     backgroundColor: colors.$1,
-                                    borderColor: colors.$4,
+                                    borderColor: colors.$3,
                                   }}
                                 >
-                                  <div
-                                    className="flex items-center justify-between border-b px-4 py-5"
-                                    style={{
-                                      color: colors.$3,
-                                      colorScheme: colors.$0,
-                                      backgroundColor: colors.$1,
-                                      borderColor: colors.$4,
-                                    }}
-                                  >
-                                    <h3 className="leading-6 font-medium ">
-                                      {board.title}
-                                    </h3>
-
-                                    {hasPermission('create_task') && (
-                                      <MdAddCircle
-                                        className="cursor-pointer"
-                                        fontSize={22}
-                                        onClick={() => {
-                                          setTaskDetails({
-                                            taskStatusId: board.id,
-                                            projectId,
-                                          });
-                                          setIsTaskModalOpened(true);
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-
-                                  <div
-                                    {...droppableProvided.droppableProps}
-                                    ref={droppableProvided.innerRef}
-                                    className="p-4 space-y-4"
-                                    style={{
-                                      color: colors.$3,
-                                      colorScheme: colors.$0,
-                                      backgroundColor: colors.$1,
-                                      borderColor: colors.$4,
-                                    }}
-                                  >
-                                    {board.cards.map((card, i) => (
-                                      <Draggable
-                                        draggableId={card.id}
-                                        key={card.id}
-                                        index={i}
-                                      >
-                                        {(provided) => (
-                                          <div
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            ref={provided.innerRef}
-                                            className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
-                                            onMouseEnter={() =>
-                                              !isColumnDraggingDisabled &&
-                                              setIsColumnDraggingDisabled(true)
-                                            }
-                                            onMouseLeave={() =>
-                                              isColumnDraggingDisabled &&
-                                              setIsColumnDraggingDisabled(false)
-                                            }
-                                          >
-                                            <div
-                                              className="px-4 sm:px-6 py-4"
-                                              style={{
-                                                color: colors.$3,
-                                                colorScheme: colors.$0,
-                                                backgroundColor: colors.$1,
-                                                borderColor: colors.$4,
-                                              }}
-                                            >
-                                              <p>{card.title}</p>
-                                              <small>
-                                                {isTaskRunning(card.task) ? (
-                                                  <TaskClock task={card.task} />
-                                                ) : (
-                                                  card.description
-                                                )}
-                                              </small>
-                                            </div>
-
-                                            <div
-                                              className="hidden group-hover:flex border-t justify-center items-center"
-                                              style={{
-                                                color: colors.$3,
-                                                colorScheme: colors.$0,
-                                                backgroundColor: colors.$1,
-                                                borderColor: colors.$4,
-                                              }}
-                                            >
-                                              {(hasPermission('view_task') ||
-                                                hasPermission('edit_task') ||
-                                                entityAssigned(
-                                                  currentTask
-                                                )) && (
-                                                <button
-                                                  style={{
-                                                    color: colors.$3,
-                                                    colorScheme: colors.$0,
-                                                    backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
-                                                  }}
-                                                  className="w-full py-2 rounded-bl"
-                                                  onClick={() =>
-                                                    handleCurrentTask(
-                                                      card.id,
-                                                      'view'
-                                                    )
-                                                  }
-                                                >
-                                                  {t('view')}
-                                                </button>
+                                  {column.cards.map((card, index: number) => (
+                                    <Draggable
+                                      key={card.id}
+                                      draggableId={card.id}
+                                      index={index}
+                                    >
+                                      {(dragProvided) => (
+                                        <Container
+                                          className="w-full text-leftblock rounded text-sm group"
+                                          ref={dragProvided.innerRef}
+                                          {...dragProvided.draggableProps}
+                                          {...dragProvided.dragHandleProps}
+                                          theme={{
+                                            backgroundColor: colors.$7,
+                                            color: colors.$3,
+                                          }}
+                                        >
+                                          <div className="px-4 sm:px-6 py-4">
+                                            <p>{card.title}</p>
+                                            <small>
+                                              {isTaskRunning(card.task) ? (
+                                                <TaskClock task={card.task} />
+                                              ) : (
+                                                card.description
                                               )}
-
-                                              {(hasPermission('edit_task') ||
-                                                entityAssigned(
-                                                  currentTask
-                                                )) && (
-                                                <button
-                                                  style={{
-                                                    color: colors.$3,
-                                                    colorScheme: colors.$0,
-                                                    backgroundColor: colors.$1,
-                                                    borderColor: colors.$4,
-                                                  }}
-                                                  className="w-full text-center py-2"
-                                                  onClick={() =>
-                                                    handleCurrentTask(
-                                                      card.id,
-                                                      'edit'
-                                                    )
-                                                  }
-                                                >
-                                                  {t('edit')}
-                                                </button>
-                                              )}
-
-                                              {isTaskRunning(card.task) &&
-                                                (hasPermission('edit_task') ||
-                                                  entityAssigned(
-                                                    currentTask
-                                                  )) && (
-                                                  <button
-                                                    style={{
-                                                      color: colors.$3,
-                                                      colorScheme: colors.$0,
-                                                      backgroundColor:
-                                                        colors.$1,
-                                                      borderColor: colors.$4,
-                                                    }}
-                                                    className="w-full py-2 rounded-br"
-                                                    onClick={() =>
-                                                      stopTask(card.task)
-                                                    }
-                                                  >
-                                                    {t('stop')}
-                                                  </button>
-                                                )}
-
-                                              {!isTaskRunning(card.task) &&
-                                                (hasPermission('edit_task') ||
-                                                  entityAssigned(
-                                                    currentTask
-                                                  )) && (
-                                                  <button
-                                                    style={{
-                                                      color: colors.$3,
-                                                      colorScheme: colors.$0,
-                                                      backgroundColor:
-                                                        colors.$1,
-                                                      borderColor: colors.$4,
-                                                    }}
-                                                    className="w-full py-2 rounded-br"
-                                                    onClick={() =>
-                                                      startTask(card.task)
-                                                    }
-                                                  >
-                                                    {t('start')}
-                                                  </button>
-                                                )}
-                                            </div>
+                                            </small>
                                           </div>
-                                        )}
-                                      </Draggable>
-                                    ))}
 
-                                    {droppableProvided.placeholder}
-                                  </div>
+                                          <div
+                                            className="hidden group-hover:flex border-t justify-center items-center"
+                                            style={{
+                                              color: colors.$3,
+                                              colorScheme: colors.$0,
+                                              backgroundColor: colors.$1,
+                                              borderColor: colors.$4,
+                                            }}
+                                          >
+                                            {(hasPermission('view_task') ||
+                                              hasPermission('edit_task') ||
+                                              entityAssigned(currentTask)) && (
+                                              <button
+                                                style={{
+                                                  color: colors.$3,
+                                                  colorScheme: colors.$0,
+                                                  backgroundColor: colors.$1,
+                                                  borderColor: colors.$4,
+                                                }}
+                                                className="w-full py-2 rounded-bl"
+                                                onClick={() =>
+                                                  handleCurrentTask(
+                                                    card.id,
+                                                    'view'
+                                                  )
+                                                }
+                                              >
+                                                {t('view')}
+                                              </button>
+                                            )}
+
+                                            {(hasPermission('edit_task') ||
+                                              entityAssigned(currentTask)) && (
+                                              <button
+                                                style={{
+                                                  color: colors.$3,
+                                                  colorScheme: colors.$0,
+                                                  backgroundColor: colors.$1,
+                                                  borderColor: colors.$4,
+                                                }}
+                                                className="w-full text-center py-2"
+                                                onClick={() =>
+                                                  handleCurrentTask(
+                                                    card.id,
+                                                    'edit'
+                                                  )
+                                                }
+                                              >
+                                                {t('edit')}
+                                              </button>
+                                            )}
+
+                                            {isTaskRunning(card.task) &&
+                                              (hasPermission('edit_task') ||
+                                                entityAssigned(
+                                                  currentTask
+                                                )) && (
+                                                <button
+                                                  style={{
+                                                    color: colors.$3,
+                                                    colorScheme: colors.$0,
+                                                    backgroundColor: colors.$1,
+                                                    borderColor: colors.$4,
+                                                  }}
+                                                  className="w-full py-2 rounded-br"
+                                                  onClick={() =>
+                                                    stopTask(card.task)
+                                                  }
+                                                >
+                                                  {t('stop')}
+                                                </button>
+                                              )}
+
+                                            {!isTaskRunning(card.task) &&
+                                              (hasPermission('edit_task') ||
+                                                entityAssigned(
+                                                  currentTask
+                                                )) && (
+                                                <button
+                                                  style={{
+                                                    color: colors.$3,
+                                                    colorScheme: colors.$0,
+                                                    backgroundColor: colors.$1,
+                                                    borderColor: colors.$4,
+                                                  }}
+                                                  className="w-full py-2 rounded-br"
+                                                  onClick={() =>
+                                                    startTask(card.task)
+                                                  }
+                                                >
+                                                  {t('start')}
+                                                </button>
+                                              )}
+                                          </div>
+                                        </Container>
+                                      )}
+                                    </Draggable>
+                                  ))}
+
+                                  {dropProvided.placeholder}
                                 </div>
-                              )}
-                            </Droppable>
-                          </DragDropContext>
-                        </div>
+                              </div>
+                            )}
+                          </Droppable>
+                        </Container>
                       )}
                     </Draggable>
                   ))}
 
-                  {columnsDroppableProvided.placeholder}
+                  {columnProvided.placeholder}
                 </div>
               )}
             </Droppable>
