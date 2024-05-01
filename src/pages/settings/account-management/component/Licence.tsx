@@ -68,7 +68,7 @@ export function License() {
         </form>
       </Modal>
 
-      <Divider />
+      <Divider withoutPadding />
 
       <ClickableElement href={link}>{t('purchase_license')}</ClickableElement>
 

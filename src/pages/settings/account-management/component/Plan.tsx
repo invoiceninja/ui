@@ -25,15 +25,21 @@ export function Plan() {
 
   return (
     <Card title={t('plan')}>
-      <Element leftSide={t('plan')}>
-        <span>
-          {account?.plan
-            ? `${t(account.plan)} ${t('plan')} `
-            : `${t('free')} ${t('plan')} `}
-        </span>
-        <span>
-          / {account.num_users} {t('users')}
-        </span>
+      <Element className="mb-3" leftSide={t('plan')}>
+        {isHosted() ? (
+          <>
+            <span>
+              {account?.plan
+                ? `${t(account.plan)} ${t('plan')} `
+                : `${t('free')} ${t('plan')} `}
+            </span>
+            <span>
+              / {account.num_users} {t('users')}
+            </span>
+          </>
+        ) : (
+          <span>{t('plan_free_self_hosted')}</span>
+        )}
       </Element>
 
       {account?.plan_expires !== '' && (
