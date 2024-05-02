@@ -687,8 +687,8 @@ export function useRecurringInvoiceColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
@@ -702,8 +702,8 @@ export function useRecurringInvoiceColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>

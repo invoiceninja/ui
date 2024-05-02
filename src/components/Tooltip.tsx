@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import { useColorScheme } from '$app/common/colors';
+import { NotesIframe } from './NotesIframe';
 
 interface Props {
   children: ReactElement;
@@ -26,6 +27,7 @@ interface Props {
   tooltipElement?: ReactNode;
   disabled?: boolean;
   withoutWrapping?: boolean;
+  displayAsNotesIframe?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -39,6 +41,7 @@ export function Tooltip(props: Props) {
     message,
     disabled,
     withoutWrapping,
+    displayAsNotesIframe,
   } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
@@ -94,7 +97,7 @@ export function Tooltip(props: Props) {
                 color: colors.$3,
               }}
             >
-              {message && (
+              {message && !displayAsNotesIframe && (
                 <>
                   {props.containsUnsafeHTMLTags ? (
                     <span dangerouslySetInnerHTML={{ __html: message }} />
@@ -105,6 +108,10 @@ export function Tooltip(props: Props) {
               )}
 
               {tooltipElement}
+
+              {displayAsNotesIframe && (
+                <NotesIframe srcDoc={message as string} />
+              )}
             </div>
 
             {!withoutArrow && (
