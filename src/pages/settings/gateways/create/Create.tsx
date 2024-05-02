@@ -34,6 +34,7 @@ import { isHosted } from '$app/common/helpers';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
+import { arrayMoveImmutable } from 'array-move';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -48,7 +49,8 @@ const gatewaysStyles = [
 export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
-  { name: 'paypal', key: '80af24a6a691230bbec33e930ab40666' },
+  { name: 'paypal_platform', key: '80af24a6a691230bbec33e930ab40666' },
+  { name: 'paypal_rest', key: '80af24a6a691230bbec33e930ab40665' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
   { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666' },
   { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
@@ -173,7 +175,21 @@ export function Create() {
         });
         setFilteredGateways(mutated_gateways);
       } else {
-        setFilteredGateways(gateways);
+        const payPalRestIndex = gateways.findIndex(
+          ({ key }) => key === '80af24a6a691230bbec33e930ab40665'
+        );
+
+        if (payPalRestIndex >= 0) {
+          const sortedGateways: Gateway[] = arrayMoveImmutable(
+            gateways as Gateway[],
+            payPalRestIndex,
+            1
+          );
+
+          setFilteredGateways(sortedGateways);
+        } else {
+          setFilteredGateways(gateways);
+        }
       }
     }
   }, [gateways]);
