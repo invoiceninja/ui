@@ -37,7 +37,7 @@ export const availableGatewayLogos = [
   'visa',
   'american_express',
   'mastercard',
-  'paypal',
+  'paypal_platform',
   'authorize',
   'braintree',
   'checkoutcom',
@@ -51,6 +51,7 @@ export const availableGatewayLogos = [
   'wepay',
   'eway',
   'forte',
+  'paypal_rest',
 ];
 
 export function GatewayTypeIcon(props: Props) {
@@ -82,11 +83,20 @@ export function GatewayTypeIcon(props: Props) {
         />
       );
 
-    case 'paypal':
+    case 'paypal_platform':
       return (
         <img
           src={paypalLogo}
           alt="PayPal"
+          style={props.style || { width: 40, height: 40 }}
+        />
+      );
+
+    case 'paypal_rest':
+      return (
+        <img
+          src={paypalLogo}
+          alt="PayPal Rest"
           style={props.style || { width: 40, height: 40 }}
         />
       );
