@@ -1911,7 +1911,7 @@
       "resource": [],
       "length": null,
       "fraction_digits": null,
-      "total_digits": null,
+      "total_digits": "3",
       "max_exclusive": null,
       "min_exclusive": null,
       "max_inclusive": null,
@@ -1960,8 +1960,8 @@
       "length": null,
       "fraction_digits": null,
       "total_digits": null,
-      "max_exclusive": null,
-      "min_exclusive": null,
+      "max_exclusive": "50",
+      "min_exclusive": "40",
       "max_inclusive": "100.00",
       "min_inclusive": null,
       "max_length": null,
@@ -2031,7 +2031,7 @@
       "max_length": null,
       "min_length": null,
       "pattern": "[0-9][0-9][0-9][0-9][0-9]",
-      "whitespace": null
+      "whitespace": "collapse"
     },
     {
       "name": "ABIType",

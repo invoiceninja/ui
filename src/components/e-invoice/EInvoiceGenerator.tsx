@@ -8,14 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
-import { v4 } from 'uuid';
 import { Icon } from '../icons/Icon';
 import { MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import RandExp from 'randexp';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date } from '$app/common/helpers';
 
 export type Country = 'italy';
 
@@ -78,12 +81,17 @@ export function EInvoiceGenerator(props: Props) {
 
   const { country } = props;
 
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   const [rules, setRules] = useState<Rule[]>([]);
+  const [errors, setErrors] = useState<ValidationBag>();
   const [excluded, setExcluded] = useState<string[]>([]);
   const [isInitial, setIsInitial] = useState<boolean>(true);
   const [components, setComponents] = useState<Component[]>([]);
   const [validations, setValidation] = useState<Validation[]>([]);
-  const [eInvoice, setEInvoice] = useState<JSX.Element | JSX.Element[]>();
+  const [eInvoice, setEInvoice] = useState<
+    JSX.Element | (JSX.Element | undefined)[]
+  >();
   const [defaultFields, setDefaultFields] = useState<Record<string, string>>(
     {}
   );
@@ -108,6 +116,20 @@ export function EInvoiceGenerator(props: Props) {
     return isInitial
       ? !availableTypes.find((currentType) => currentType === type)
       : !currentAvailableTypes.find((currentType) => currentType === type);
+  };
+
+  const getKey = (componentType: string) => {
+    return componentType.split('Type')[0];
+  };
+
+  const handleDeleteField = (componentType: string) => {
+    setCurrentAvailableTypes((current) => [...current, componentType]);
+
+    const fieldKey = getKey(componentType);
+    setPayload((current) => ({
+      ...current,
+      [fieldKey]: typeof current[fieldKey] === 'number' ? 0 : '',
+    }));
   };
 
   const renderElement = (component: Component) => {
@@ -136,7 +158,7 @@ export function EInvoiceGenerator(props: Props) {
 
       if (isInitial) {
         const isDefaultField = Object.keys(defaultFields).includes(
-          component.type.split('Type')[0]
+          getKey(component.type)
         );
 
         if (!isDefaultField) {
@@ -158,9 +180,10 @@ export function EInvoiceGenerator(props: Props) {
             <div className="flex items-center w-full space-x-3">
               <div className="flex-1">
                 <SelectField
-                  defaultValue={payload[fieldKey] || ''}
+                  value={payload[fieldKey] || ''}
                   onValueChange={(value) => handleChange(fieldKey, value)}
                   withBlank
+                  errorMessage={errors?.errors[fieldKey]}
                 >
                   {Object.entries(validation.resource).map(([key, value]) => (
                     <option key={key} value={key}>
@@ -173,12 +196,7 @@ export function EInvoiceGenerator(props: Props) {
               {!rule?.required && (
                 <div
                   className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentAvailableTypes((current) => [
-                      ...current,
-                      component.type,
-                    ])
-                  }
+                  onClick={() => handleDeleteField(component.type)}
                 >
                   <Icon element={MdDelete} size={28} />
                 </div>
@@ -200,20 +218,19 @@ export function EInvoiceGenerator(props: Props) {
                   type="number"
                   value={payload[fieldKey] || 0}
                   onValueChange={(value) =>
-                    handleChange(fieldKey, parseFloat(value))
+                    handleChange(
+                      fieldKey,
+                      parseFloat(value).toFixed(value.split('.')?.[1]?.length)
+                    )
                   }
+                  errorMessage={errors?.errors[fieldKey]}
                 />
               </div>
 
               {!rule?.required && (
                 <div
                   className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentAvailableTypes((current) => [
-                      ...current,
-                      component.type,
-                    ])
-                  }
+                  onClick={() => handleDeleteField(component.type)}
                 >
                   <Icon element={MdDelete} size={28} />
                 </div>
@@ -232,18 +249,14 @@ export function EInvoiceGenerator(props: Props) {
                   type="date"
                   value={payload[fieldKey] || ''}
                   onValueChange={(value) => handleChange(fieldKey, value)}
+                  errorMessage={errors?.errors[fieldKey]}
                 />
               </div>
 
               {!rule?.required && (
                 <div
                   className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentAvailableTypes((current) => [
-                      ...current,
-                      component.type,
-                    ])
-                  }
+                  onClick={() => handleDeleteField(component.type)}
                 >
                   <Icon element={MdDelete} size={28} />
                 </div>
@@ -261,18 +274,14 @@ export function EInvoiceGenerator(props: Props) {
                 <InputField
                   value={payload[fieldKey] || ''}
                   onValueChange={(value) => handleChange(fieldKey, value)}
+                  errorMessage={errors?.errors[fieldKey]}
                 />
               </div>
 
               {!rule?.required && (
                 <div
                   className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentAvailableTypes((current) => [
-                      ...current,
-                      component.type,
-                    ])
-                  }
+                  onClick={() => handleDeleteField(component.type)}
                 >
                   <Icon element={MdDelete} size={28} />
                 </div>
@@ -282,13 +291,14 @@ export function EInvoiceGenerator(props: Props) {
         );
       }
     }
-
-    return <div key={v4()}></div>;
   };
 
-  const renderComponent = (component: Component, componentIndex: number) => {
+  const renderComponent = (
+    component: Component,
+    componentIndex: number
+  ): JSX.Element => {
     return (
-      <div key={v4()}>
+      <React.Fragment key={component.type}>
         {Boolean(component.elements.length) &&
           component.elements.map((element) => {
             const componentsList = components.filter(
@@ -304,12 +314,10 @@ export function EInvoiceGenerator(props: Props) {
             if (newComponent) {
               return renderComponent({ ...newComponent }, newComponentIndex);
             }
-
-            return <div key={v4()}></div>;
           })}
 
         {Boolean(!component.elements.length) && renderElement(component)}
-      </div>
+      </React.Fragment>
     );
   };
 
@@ -324,6 +332,289 @@ export function EInvoiceGenerator(props: Props) {
     });
 
     setPayload(currentPayload);
+  };
+
+  const checkValidation = () => {
+    let updatedErrors: ValidationBag = { errors: {}, message: '' };
+
+    Object.entries(payload).forEach(([key, value]) => {
+      if (showField(`${key}Type`)) {
+        const fieldValidation = validations.find(
+          ({ name }) => name === `${key}Type`
+        );
+
+        const fieldRule = rules.find((rule) => rule.key === key);
+
+        const isRequired = fieldRule?.required;
+
+        if (fieldValidation) {
+          const {
+            pattern,
+            min_inclusive,
+            base_type,
+            max_inclusive,
+            min_exclusive,
+            max_exclusive,
+            length,
+            min_length,
+            max_length,
+            fraction_digits,
+            total_digits,
+            whitespace,
+          } = fieldValidation;
+
+          if (isRequired && !value) {
+            updatedErrors = {
+              ...updatedErrors,
+              errors: {
+                ...updatedErrors.errors,
+                [key]: [`${key} is required field!`],
+              },
+            };
+          }
+
+          if (
+            length &&
+            (value?.toString().length < length ||
+              value?.toString().length > length)
+          ) {
+            updatedErrors = {
+              ...updatedErrors,
+              errors: {
+                ...updatedErrors.errors,
+                [key]: [`Value length for the ${key} field must be ${length}!`],
+              },
+            };
+          }
+
+          if (pattern && new RegExp(pattern).test(value.toString()) === false) {
+            updatedErrors = {
+              ...updatedErrors,
+              errors: {
+                ...updatedErrors.errors,
+                [key]: [
+                  `${key} has wrong pattern, the correct pattern is ${new RandExp(
+                    pattern as string
+                  ).gen()} (example)!`,
+                ],
+              },
+            };
+          }
+
+          if (min_inclusive) {
+            const updatedValue = base_type === 'date' ? new Date(value) : value;
+            const updatedMinInclusive =
+              base_type === 'date'
+                ? new Date(min_inclusive)
+                : parseFloat(min_inclusive.toString());
+
+            if (updatedValue < updatedMinInclusive) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Min inclusive value for ${key} is ${
+                      base_type === 'date'
+                        ? date(min_inclusive, dateFormat)
+                        : min_inclusive
+                    }!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (max_inclusive) {
+            const updatedValue = base_type === 'date' ? new Date(value) : value;
+            const updatedMaxInclusive =
+              base_type === 'date'
+                ? new Date(max_inclusive)
+                : parseFloat(max_inclusive.toString());
+
+            if (updatedValue > updatedMaxInclusive) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Max inclusive value for ${key} is ${
+                      base_type === 'date'
+                        ? date(max_inclusive, dateFormat)
+                        : max_inclusive
+                    }!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (min_exclusive && !max_exclusive) {
+            const updatedValue = base_type === 'date' ? new Date(value) : value;
+            const updatedMinExclusive =
+              base_type === 'date'
+                ? new Date(min_exclusive)
+                : parseFloat(min_exclusive.toString());
+
+            if (updatedValue >= updatedMinExclusive) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Min exclusive value for ${key} is ${updatedMinExclusive}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (max_exclusive && !min_exclusive) {
+            const updatedValue = base_type === 'date' ? new Date(value) : value;
+            const updatedMaxExclusive =
+              base_type === 'date'
+                ? new Date(max_exclusive)
+                : parseFloat(max_exclusive.toString());
+
+            if (updatedValue <= updatedMaxExclusive) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Max exclusive value for ${key} is ${updatedMaxExclusive}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (max_exclusive && min_exclusive) {
+            const updatedValue = base_type === 'date' ? new Date(value) : value;
+            const updatedMinExclusive =
+              base_type === 'date'
+                ? new Date(min_exclusive)
+                : parseFloat(min_exclusive.toString());
+            const updatedMaxExclusive =
+              base_type === 'date'
+                ? new Date(max_exclusive)
+                : parseFloat(max_exclusive.toString());
+
+            if (
+              updatedValue <= updatedMaxExclusive &&
+              updatedValue >= updatedMinExclusive
+            ) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Excluded values for ${key} field are from ${updatedMinExclusive} to ${updatedMaxExclusive}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (min_length && !max_length) {
+            if (value?.toString().length < min_length) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [`Min length for ${key} field is ${min_length}!`],
+                },
+              };
+            }
+          }
+
+          if (max_length && !min_length) {
+            if (value?.toString().length > max_length) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [`Max length for ${key} field is ${max_length}!`],
+                },
+              };
+            }
+          }
+
+          if (max_length && min_length) {
+            if (
+              value?.toString().length > max_length ||
+              value?.toString().length < min_length
+            ) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Length for ${key} field should be between ${min_length} and ${max_length}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (fraction_digits) {
+            const numberOfDecimalPlaces = value.toString().split('.')[1].length;
+
+            if (numberOfDecimalPlaces > fraction_digits) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Max number of decimal places for ${key} is ${fraction_digits}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (total_digits) {
+            const numberWithoutSeparators = value
+              .toString()
+              .replace(/[^\d]/g, '');
+
+            if (numberWithoutSeparators.length !== Number(total_digits)) {
+              updatedErrors = {
+                ...updatedErrors,
+                errors: {
+                  ...updatedErrors.errors,
+                  [key]: [
+                    `Number of digits for ${key} must be ${total_digits}!`,
+                  ],
+                },
+              };
+            }
+          }
+
+          if (value && whitespace && /\s/.test(value.toString())) {
+            updatedErrors = {
+              ...updatedErrors,
+              errors: {
+                ...updatedErrors.errors,
+                [key]: [`The ${key} field can not contain whitespace!`],
+              },
+            };
+          }
+        }
+      }
+    });
+
+    setErrors(updatedErrors);
+  };
+
+  const handleSave = () => {
+    setErrors(undefined);
+
+    checkValidation();
+
+    if (errors === undefined) {
+      //console.log('Call API');
+    }
   };
 
   const getChildComponentType = (
@@ -394,11 +685,7 @@ export function EInvoiceGenerator(props: Props) {
       if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
         return renderComponent(component, index);
       }
-
-      return <div key={v4()}></div>;
     });
-
-    createPayload();
 
     return invoiceComponents;
   };
@@ -421,6 +708,7 @@ export function EInvoiceGenerator(props: Props) {
           setValidation(response.validations);
           setComponents(response.components);
           setDefaultFields(response.defaultFields);
+          setErrors(undefined);
           payloadKeys = [];
           availableTypes = [];
         });
@@ -428,6 +716,7 @@ export function EInvoiceGenerator(props: Props) {
       setRules([]);
       setComponents([]);
       setValidation([]);
+      setErrors(undefined);
       setEInvoice(undefined);
       setIsInitial(true);
       setDefaultFields({});
@@ -442,12 +731,20 @@ export function EInvoiceGenerator(props: Props) {
       (async () => {
         const invoiceUI = await generateEInvoiceUI(components);
 
-        setIsInitial(false);
+        isInitial && setIsInitial(false);
+
         setEInvoice(invoiceUI);
+        isInitial && createPayload();
         isInitial && setCurrentAvailableTypes([...availableTypes]);
       })();
     }
-  }, [components, currentAvailableTypes]);
+  }, [components, currentAvailableTypes, errors, payload]);
+
+  useEffect(() => {
+    if (!isInitial) {
+      setErrors(undefined);
+    }
+  }, [payload, currentAvailableTypes]);
 
   return (
     <div className="flex flex-col mt-5">
@@ -476,7 +773,13 @@ export function EInvoiceGenerator(props: Props) {
       <div className="mt-4">{eInvoice ?? null}</div>
 
       {Boolean(eInvoice) && (
-        <Button className="self-end mt-4">{t('save')}</Button>
+        <Button
+          className="self-end mt-4"
+          behavior="button"
+          onClick={handleSave}
+        >
+          {t('save')}
+        </Button>
       )}
     </div>
   );
