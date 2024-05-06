@@ -50,8 +50,7 @@ export function InvoiceTotals(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map(
         (variable, index) =>
-          (variable === '$subtotal'  ||
-            variable === '$taxes') && (
+          (variable === '$subtotal' || variable === '$taxes') && (
             <Fragment key={index}>{resolveVariable(variable)}</Fragment>
           )
       )}
@@ -72,6 +71,8 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_name1', taxRate.name);
               handleChange('tax_rate1', taxRate.rate);
             }}
+            resourceTaxName={resource.tax_name1}
+            resourceTaxRate={resource.tax_rate1}
           />
         </Element>
       )}
@@ -92,6 +93,8 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_name2', taxRate.name);
               handleChange('tax_rate2', taxRate.rate);
             }}
+            resourceTaxName={resource.tax_name2}
+            resourceTaxRate={resource.tax_rate2}
           />
         </Element>
       )}
@@ -112,6 +115,8 @@ export function InvoiceTotals(props: Props) {
               handleChange('tax_name3', taxRate.name);
               handleChange('tax_rate3', taxRate.rate);
             }}
+            resourceTaxName={resource.tax_name3}
+            resourceTaxRate={resource.tax_rate3}
           />
         </Element>
       )}

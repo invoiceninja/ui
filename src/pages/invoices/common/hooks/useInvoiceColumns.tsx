@@ -377,13 +377,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => (
         <Tooltip
           size="regular"
-          truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          truncate
+          displayAsNotesIframe
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },
@@ -395,12 +393,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
       ),
     },

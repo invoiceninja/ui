@@ -23,6 +23,8 @@ interface Props {
   onChange?: (value: Entry<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
+  resourceTaxName?: string;
+  resourceTaxRate?: number;
 }
 
 export function TaxRateSelector(props: Props) {
@@ -30,6 +32,8 @@ export function TaxRateSelector(props: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { isAdmin, isOwner } = useAdmin();
+
+  const { resourceTaxName, resourceTaxRate } = props;
 
   return (
     <>
@@ -49,8 +53,15 @@ export function TaxRateSelector(props: Props) {
           value: 'name',
           label: 'name',
           inputLabelFn: (taxRate) =>
-            taxRate ? `${taxRate.name} ${taxRate.rate}%` : '',
-          dropdownLabelFn: (taxRate) => `${taxRate.name} ${taxRate.rate}%`,
+            taxRate
+              ? resourceTaxName === taxRate.name
+                ? `${taxRate.name} ${resourceTaxRate}%`
+                : `${taxRate.name} ${taxRate.rate}%`
+              : '',
+          dropdownLabelFn: (taxRate) =>
+            resourceTaxName === taxRate.name
+              ? `${taxRate.name} ${resourceTaxRate}%`
+              : `${taxRate.name} ${taxRate.rate}%`,
         }}
         sortBy="name|asc"
         onDismiss={props.onClearButtonClick}
