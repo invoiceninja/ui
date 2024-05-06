@@ -22,6 +22,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 interface Props {
   invoice: Invoice;
   isDropdown?: boolean;
+  underGroup?: boolean;
 }
 export function EmailInvoiceAction(props: Props) {
   const [t] = useTranslation();
@@ -29,7 +30,7 @@ export function EmailInvoiceAction(props: Props) {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, isDropdown = false } = props;
+  const { invoice, isDropdown = false, underGroup } = props;
 
   const hasClientEmailContacts = (client?: Client) => {
     return client?.contacts.some(({ email }) => email);
@@ -53,6 +54,7 @@ export function EmailInvoiceAction(props: Props) {
             }),
           })}
           icon={MdSend}
+          underGroup={underGroup}
         >
           {t('email_invoice')}
         </EntityActionElement>

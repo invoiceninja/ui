@@ -28,6 +28,7 @@ interface Props extends CommonProps {
   entity: Entity;
   actionKey: string;
   excludePreferences?: boolean;
+  underGroup?: boolean;
 }
 
 export function EntityActionElement(props: Props) {
@@ -43,6 +44,7 @@ export function EntityActionElement(props: Props) {
     actionKey,
     excludePreferences,
     setVisible,
+    underGroup,
   } = props;
 
   const showActionByPreferences = useShowActionByPreferences({
@@ -75,6 +77,7 @@ export function EntityActionElement(props: Props) {
       icon={<Icon element={props.icon} />}
       onClick={onClick}
       setVisible={setVisible}
+      underGroup={underGroup}
     >
       {props.children}
     </DropdownElement>
