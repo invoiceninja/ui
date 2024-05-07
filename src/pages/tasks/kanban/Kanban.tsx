@@ -204,19 +204,19 @@ export default function Kanban() {
     const local = cloneDeep(board) as Board;
 
     const source = local.columns.find(
-      (c) => c.id === result.source.droppableId
+      (c) => c.title === result.source.droppableId
     );
 
     const sourceIndex = local.columns.findIndex(
-      (c) => c.id === result.source.droppableId
+      (c) => c.title === result.source.droppableId
     ) as number;
 
     const target = local.columns.find(
-      (c) => c.id === result.destination?.droppableId
+      (c) => c.title === result.destination?.droppableId
     );
 
     const targetIndex = local.columns.findIndex(
-      (c) => c.id === result.destination?.droppableId
+      (c) => c.title === result.destination?.droppableId
     );
 
     if (source && sourceIndex > -1 && target && targetIndex > -1) {
@@ -458,7 +458,7 @@ export default function Kanban() {
                   {board.columns.map((column, index) => (
                     <Draggable
                       key={column.id}
-                      draggableId={column.id}
+                      draggableId={column.title}
                       index={index}
                     >
                       {(columnDraggableProvided: DraggableProvided) => (
@@ -504,7 +504,7 @@ export default function Kanban() {
                           </div>
 
                           <Droppable
-                            droppableId={column.id}
+                            droppableId={column.title}
                             type="CARD"
                             renderClone={(provided, _, rubric) => {
                               const card = column.cards.find(
