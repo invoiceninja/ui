@@ -25,6 +25,7 @@ interface Props {
   withoutWrappingLeftSide?: boolean;
   disabledLabels?: boolean;
   noVerticalPadding?: boolean;
+  setTwoGridColumns?: boolean;
 }
 
 export function Element(props: Props) {
@@ -33,11 +34,13 @@ export function Element(props: Props) {
   return (
     <div
       className={classNames(
-        `sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row ${props.className}`,
+        `sm:grid sm:gap-10 flex flex-col lg:flex-row ${props.className}`,
         {
           'px-5 sm:px-6': !props.noExternalPadding,
           'py-4 sm:py-3': !props.noVerticalPadding,
           'lg:items-center': !props.withoutItemsCenter,
+          'sm:grid-cols-2': props.setTwoGridColumns,
+          'sm:grid-cols-3': !props.setTwoGridColumns,
         }
       )}
       onClick={props.onClick}
@@ -72,8 +75,10 @@ export function Element(props: Props) {
           ))}
       </dt>
       <dd
-        className={classNames('mt-4 text-sm sm:mt-0 sm:col-span-2', {
+        className={classNames('mt-4 text-sm sm:mt-0', {
           'flex flex-col sm:flex-row sm:justify-end': props.pushContentToRight,
+          'sm:col-span-1': props.setTwoGridColumns,
+          'sm:col-span-2': !props.setTwoGridColumns,
         })}
         style={{ color: colors.$3, colorScheme: colors.$0 }}
       >

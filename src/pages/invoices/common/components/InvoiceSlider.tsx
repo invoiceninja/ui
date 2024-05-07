@@ -309,28 +309,28 @@ export function InvoiceSlider() {
                 </h3>
               </Tooltip>
 
-              <Element leftSide={t('next_send_date')}>
+              <Element leftSide={t('next_send_date')} setTwoGridColumns>
                 {invoice ? date(invoice.next_send_date, dateFormat) : null}
               </Element>
 
-              <Element leftSide={t('reminder_last_sent')}>
+              <Element leftSide={t('reminder_last_sent')} setTwoGridColumns>
                 {invoice ? date(invoice.reminder_last_sent, dateFormat) : null}
               </Element>
 
               {invoice.reminder1_sent ? (
-                <Element leftSide={t('first_reminder')}>
+                <Element leftSide={t('first_reminder')} setTwoGridColumns>
                   {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
                 </Element>
               ) : null}
 
               {invoice.reminder2_sent ? (
-                <Element leftSide={t('second_reminder')}>
+                <Element leftSide={t('second_reminder')} setTwoGridColumns>
                   {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
                 </Element>
               ) : null}
 
               {invoice.reminder3_sent ? (
-                <Element leftSide={t('third_reminder')}>
+                <Element leftSide={t('third_reminder')} setTwoGridColumns>
                   {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
                 </Element>
               ) : null}
@@ -339,37 +339,42 @@ export function InvoiceSlider() {
 
           <div className="divide-y">
             {resource?.payments &&
-              resource.payments.map((payment: Payment) => (
-                payment.paymentables.filter((item) => item.invoice_id == invoice?.id && item.archived_at == 0).map((paymentable: Paymentable) => (
-                <ClickableElement
-                  key={payment.id}
-                  to={`/payments/${payment.id}/edit`}
-                  disableNavigation={disableNavigation('payment', payment)}
-                >
-                  <div className="flex flex-col space-y-2">
-                    <p className="font-semibold">
-                      {t('payment')} {payment.number}
-                    </p>
+              resource.payments.map((payment: Payment) =>
+                payment.paymentables
+                  .filter(
+                    (item) =>
+                      item.invoice_id == invoice?.id && item.archived_at == 0
+                  )
+                  .map((paymentable: Paymentable) => (
+                    <ClickableElement
+                      key={payment.id}
+                      to={`/payments/${payment.id}/edit`}
+                      disableNavigation={disableNavigation('payment', payment)}
+                    >
+                      <div className="flex flex-col space-y-2">
+                        <p className="font-semibold">
+                          {t('payment')} {payment.number}
+                        </p>
 
-                    <p className="inline-flex items-center space-x-1">
-                      <p>
-                        {formatMoney(
-                          paymentable.amount,
-                          payment.client?.country_id,
-                          payment.client?.settings.currency_id
-                        )}
-                      </p>
-                      <p>&middot;</p>
-                        <p>{date(paymentable.created_at, dateFormat)}</p>
-                    </p>
+                        <p className="inline-flex items-center space-x-1">
+                          <p>
+                            {formatMoney(
+                              paymentable.amount,
+                              payment.client?.country_id,
+                              payment.client?.settings.currency_id
+                            )}
+                          </p>
+                          <p>&middot;</p>
+                          <p>{date(paymentable.created_at, dateFormat)}</p>
+                        </p>
 
-                    <div>
-                      <PaymentStatus entity={payment} />
-                    </div>
-                  </div>
-                </ClickableElement>
-                ))
-              ))}
+                        <div>
+                          <PaymentStatus entity={payment} />
+                        </div>
+                      </div>
+                    </ClickableElement>
+                  ))
+              )}
           </div>
         </div>
 
