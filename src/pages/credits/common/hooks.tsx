@@ -247,12 +247,18 @@ export function useCreate(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
+          const errorMessages = error.response.data;
 
-          if (error.response.data.errors.invoice_id) {
-            toast.error(error.response.data.errors.invoice_id[0]);
+          if (errorMessages.errors.amount || errorMessages.errors.invoice_id) {
+            toast.error(
+              errorMessages.errors.amount[0] ||
+                errorMessages.errors.invoice_id[0]
+            );
+          } else {
+            toast.dismiss();
           }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -297,8 +303,15 @@ export function useSave(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
