@@ -178,15 +178,6 @@ export function UploadImport(props: Props) {
       });
   };
 
-  const handleClearMapping = () => {
-    Object.keys(payload.column_map[props.entity].mapping).forEach((key) => {
-      payload.column_map[props.entity].mapping[key] = '';
-    });
-
-    setSelectedTemplate('');
-    setPayloadData({ ...payload });
-  };
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
@@ -204,17 +195,15 @@ export function UploadImport(props: Props) {
             response.data?.mappings[props.entity]?.hints.forEach(
               (mapping: number, index: number) => {
                 payload.column_map[props.entity].mapping[index] =
-                  response.data?.mappings[props.entity].available[mapping] ??
-                  '';
+                  response.data?.mappings[props.entity].available[mapping];
                 setPayloadData(payload);
                 setDefaultMapping({
                   ...payload?.column_map?.[props.entity]?.mapping,
                 });
+                setSelectedTemplate('');
               }
             );
           }
-
-          setSelectedTemplate('');
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -526,21 +515,11 @@ export function UploadImport(props: Props) {
             )}
             <Tr>
               <Td colSpan={2}>
-                <div className="flex justify-end space-x-4">
-                  <Button
-                    type="secondary"
-                    behavior="button"
-                    onClick={handleClearMapping}
-                  >
-                    {t('clear')}
-                  </Button>
-
-                  <ImportTemplateModal
-                    entity={props.entity}
-                    importMap={payload}
-                    onImport={processImport}
-                  />
-                </div>
+                <ImportTemplateModal
+                  entity={props.entity}
+                  importMap={payload}
+                  onImport={processImport}
+                />
               </Td>
             </Tr>
           </Tbody>
