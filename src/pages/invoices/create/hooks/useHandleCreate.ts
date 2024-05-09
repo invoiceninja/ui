@@ -75,8 +75,15 @@ export function useHandleCreate(params: Params) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
