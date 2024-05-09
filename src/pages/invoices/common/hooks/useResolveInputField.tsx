@@ -149,6 +149,7 @@ export function useResolveInputField(props: Props) {
   );
 
   const handleProductChange = useHandleProductChange({
+    relationType: props.relationType,
     resource: props.resource,
     type: props.type,
     onChange: props.onLineItemChange,
