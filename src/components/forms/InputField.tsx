@@ -84,6 +84,7 @@ export function InputField(props: Props) {
             ...props.style,
           }}
           min={props.min}
+          max={props.type === 'date' ? '9999-12-31' : undefined}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
