@@ -62,15 +62,31 @@ interface Validation {
   whitespace: boolean | null;
 }
 
-interface Element {
+interface ElementType {
   name: string;
-  min: number;
-  max: number;
+  base_type: ('string' | 'decimal' | 'number' | 'date') | null;
+  resource: Record<string, string> | [];
+  length: number | null;
+  fraction_digits: number | null;
+  total_digits: number | null;
+  max_exclusive: number | null;
+  min_exclusive: number | null;
+  max_inclusive: number | null;
+  min_inclusive: number | null;
+  max_length: number | null;
+  min_length: number | null;
+  pattern: string | null;
+  whitespace: boolean | null;
+  help: string;
+  minOccurs: string;
+  maxOccurs: string;
 }
 
 interface Component {
   type: string;
-  elements: Element[];
+  help: string;
+  choices: Record<string, string>[];
+  elements: ElementType[];
 }
 
 interface Props {
@@ -104,8 +120,8 @@ export function EInvoiceGenerator(props: Props) {
     []
   );
 
-  const getFieldLabel = (label: string) => {
-    return label.split('Type')[0];
+  const getFieldLabel = (label: string | null) => {
+    return label?.split('Type')[0];
   };
 
   const handleChange = (property: string, value: string | number) => {
@@ -132,164 +148,153 @@ export function EInvoiceGenerator(props: Props) {
     }));
   };
 
-  const renderElement = (component: Component) => {
-    const validation = validations.find(
-      (validation) => validation.name === component.type
-    );
+  const renderElement = (element: ElementType) => {
+    let label = '';
+    const fieldKey = element.name;
+    const rule = rules.find((rule) => rule.key === element.name);
 
-    if (validation) {
-      let label = '';
-      const fieldKey = getFieldLabel(validation.name);
-      const rule = rules.find((rule) => `${rule.key}Type` === validation.name);
+    if (rule) {
+      label = rule.label;
+    } else {
+      label = fieldKey;
+    }
 
-      if (rule) {
-        label = rule.label;
-      } else {
-        label = fieldKey;
+    const isNumberTypeField =
+      element.base_type === 'decimal' || element.base_type === 'number';
+
+    payloadKeys.push({
+      key: fieldKey,
+      valueType: isNumberTypeField ? 'number' : 'string',
+    });
+
+    if (isInitial) {
+      const isDefaultField = Object.keys(defaultFields).includes(element.name);
+
+      if (!isDefaultField) {
+        availableTypes.push(element.name);
       }
+    }
 
-      const isNumberTypeField =
-        validation.base_type === 'decimal' || validation.base_type === 'number';
+    if (!showField(element.name)) {
+      return null;
+    }
 
-      payloadKeys.push({
-        key: fieldKey,
-        valueType: isNumberTypeField ? 'number' : 'string',
-      });
-
-      if (isInitial) {
-        const isDefaultField = Object.keys(defaultFields).includes(
-          getKey(component.type)
-        );
-
-        if (!isDefaultField) {
-          availableTypes.push(component.type);
-        }
-      }
-
-      if (!showField(component.type)) {
-        return null;
-      }
-
-      if (
-        typeof validation.resource === 'object' &&
-        validation.resource !== null &&
-        Object.keys(validation.resource).length
-      ) {
-        return (
-          <Element required={rule?.required} leftSide={label}>
-            <div className="flex items-center w-full space-x-3">
-              <div className="flex-1">
-                <SelectField
-                  value={payload[fieldKey] || ''}
-                  onValueChange={(value) => handleChange(fieldKey, value)}
-                  withBlank
-                  errorMessage={errors?.errors[fieldKey]}
-                >
-                  {Object.entries(validation.resource).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value || key}
-                    </option>
-                  ))}
-                </SelectField>
-              </div>
-
-              {!rule?.required && (
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleDeleteField(component.type)}
-                >
-                  <Icon element={MdDelete} size={28} />
-                </div>
-              )}
+    if (
+      typeof element.resource === 'object' &&
+      element.resource !== null &&
+      Object.keys(element.resource).length
+    ) {
+      return (
+        <Element required={rule?.required} leftSide={label}>
+          <div className="flex items-center w-full space-x-3">
+            <div className="flex-1">
+              <SelectField
+                value={payload[fieldKey] || ''}
+                onValueChange={(value) => handleChange(fieldKey, value)}
+                withBlank
+                errorMessage={errors?.errors[fieldKey]}
+              >
+                {Object.entries(element.resource).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value || key}
+                  </option>
+                ))}
+              </SelectField>
             </div>
-          </Element>
-        );
-      }
 
-      if (
-        validation.base_type === 'decimal' ||
-        validation.base_type === 'number'
-      ) {
-        return (
-          <Element required={rule?.required} leftSide={label}>
-            <div className="flex items-center w-full space-x-3">
-              <div className="flex-1">
-                <InputField
-                  type="number"
-                  value={payload[fieldKey] || 0}
-                  onValueChange={(value) =>
-                    handleChange(
-                      fieldKey,
-                      parseFloat(value).toFixed(value.split('.')?.[1]?.length)
-                    )
-                  }
-                  errorMessage={errors?.errors[fieldKey]}
-                />
+            {!rule?.required && (
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteField(element.name)}
+              >
+                <Icon element={MdDelete} size={28} />
               </div>
+            )}
+          </div>
+        </Element>
+      );
+    }
 
-              {!rule?.required && (
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleDeleteField(component.type)}
-                >
-                  <Icon element={MdDelete} size={28} />
-                </div>
-              )}
+    if (element.base_type === 'decimal' || element.base_type === 'number') {
+      return (
+        <Element required={rule?.required} leftSide={label}>
+          <div className="flex items-center w-full space-x-3">
+            <div className="flex-1">
+              <InputField
+                type="number"
+                value={payload[fieldKey] || 0}
+                onValueChange={(value) =>
+                  handleChange(
+                    fieldKey,
+                    parseFloat(value).toFixed(value.split('.')?.[1]?.length)
+                  )
+                }
+                errorMessage={errors?.errors[fieldKey]}
+              />
             </div>
-          </Element>
-        );
-      }
 
-      if (validation.base_type === 'date') {
-        return (
-          <Element required={rule?.required} leftSide={label}>
-            <div className="flex items-center w-full space-x-3">
-              <div className="flex-1">
-                <InputField
-                  type="date"
-                  value={payload[fieldKey] || ''}
-                  onValueChange={(value) => handleChange(fieldKey, value)}
-                  errorMessage={errors?.errors[fieldKey]}
-                />
+            {!rule?.required && (
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteField(element.name)}
+              >
+                <Icon element={MdDelete} size={28} />
               </div>
+            )}
+          </div>
+        </Element>
+      );
+    }
 
-              {!rule?.required && (
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleDeleteField(component.type)}
-                >
-                  <Icon element={MdDelete} size={28} />
-                </div>
-              )}
+    if (element.base_type === 'date') {
+      return (
+        <Element required={rule?.required} leftSide={label}>
+          <div className="flex items-center w-full space-x-3">
+            <div className="flex-1">
+              <InputField
+                type="date"
+                value={payload[fieldKey] || ''}
+                onValueChange={(value) => handleChange(fieldKey, value)}
+                errorMessage={errors?.errors[fieldKey]}
+              />
             </div>
-          </Element>
-        );
-      }
 
-      if (validation.base_type !== null) {
-        return (
-          <Element required={rule?.required} leftSide={label}>
-            <div className="flex items-center w-full space-x-3">
-              <div className="flex-1">
-                <InputField
-                  value={payload[fieldKey] || ''}
-                  onValueChange={(value) => handleChange(fieldKey, value)}
-                  errorMessage={errors?.errors[fieldKey]}
-                />
+            {!rule?.required && (
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteField(element.name)}
+              >
+                <Icon element={MdDelete} size={28} />
               </div>
+            )}
+          </div>
+        </Element>
+      );
+    }
 
-              {!rule?.required && (
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleDeleteField(component.type)}
-                >
-                  <Icon element={MdDelete} size={28} />
-                </div>
-              )}
+    if (element.base_type !== null) {
+      return (
+        <Element required={rule?.required} leftSide={label}>
+          <div className="flex items-center w-full space-x-3">
+            <div className="flex-1">
+              <InputField
+                value={payload[fieldKey] || ''}
+                onValueChange={(value) => handleChange(fieldKey, value)}
+                errorMessage={errors?.errors[fieldKey]}
+              />
             </div>
-          </Element>
-        );
-      }
+
+            {!rule?.required && (
+              <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteField(element.name)}
+              >
+                <Icon element={MdDelete} size={28} />
+              </div>
+            )}
+          </div>
+        </Element>
+      );
     }
   };
 
@@ -301,22 +306,24 @@ export function EInvoiceGenerator(props: Props) {
       <React.Fragment key={component.type}>
         {Boolean(component.elements.length) &&
           component.elements.map((element) => {
-            const componentsList = components.filter(
-              (_, index) => componentIndex !== index
-            );
+            if (element.base_type?.endsWith('Type')) {
+              const componentsList = components.filter(
+                (_, index) => componentIndex !== index
+              );
 
-            const newComponentIndex = componentsList.findIndex(
-              (component) => component.type === `${element.name}Type`
-            );
+              const newComponentIndex = componentsList.findIndex(
+                (component) => component.type === `${element.name}Type`
+              );
 
-            const newComponent = componentsList[newComponentIndex];
+              const newComponent = componentsList[newComponentIndex];
 
-            if (newComponent) {
-              return renderComponent({ ...newComponent }, newComponentIndex);
+              if (newComponent) {
+                return renderComponent({ ...newComponent }, newComponentIndex);
+              }
+            } else {
+              return renderElement(element);
             }
           })}
-
-        {Boolean(!component.elements.length) && renderElement(component)}
       </React.Fragment>
     );
   };
@@ -687,7 +694,7 @@ export function EInvoiceGenerator(props: Props) {
       }
     });
 
-    return invoiceComponents;
+    return invoiceComponents.filter((currentComponent) => currentComponent);
   };
 
   useEffect(() => {
