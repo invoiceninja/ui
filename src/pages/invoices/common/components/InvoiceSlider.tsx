@@ -309,28 +309,28 @@ export function InvoiceSlider() {
                 </h3>
               </Tooltip>
 
-              <Element leftSide={t('next_send_date')} setTwoGridColumns>
+              <Element leftSide={t('next_send_date')} twoGridColumns>
                 {invoice ? date(invoice.next_send_date, dateFormat) : null}
               </Element>
 
-              <Element leftSide={t('reminder_last_sent')} setTwoGridColumns>
+              <Element leftSide={t('reminder_last_sent')} twoGridColumns>
                 {invoice ? date(invoice.reminder_last_sent, dateFormat) : null}
               </Element>
 
               {invoice.reminder1_sent ? (
-                <Element leftSide={t('first_reminder')} setTwoGridColumns>
+                <Element leftSide={t('first_reminder')} twoGridColumns>
                   {invoice ? date(invoice.reminder1_sent, dateFormat) : null}
                 </Element>
               ) : null}
 
               {invoice.reminder2_sent ? (
-                <Element leftSide={t('second_reminder')} setTwoGridColumns>
+                <Element leftSide={t('second_reminder')} twoGridColumns>
                   {invoice ? date(invoice.reminder2_sent, dateFormat) : null}
                 </Element>
               ) : null}
 
               {invoice.reminder3_sent ? (
-                <Element leftSide={t('third_reminder')} setTwoGridColumns>
+                <Element leftSide={t('third_reminder')} twoGridColumns>
                   {invoice ? date(invoice.reminder3_sent, dateFormat) : null}
                 </Element>
               ) : null}
