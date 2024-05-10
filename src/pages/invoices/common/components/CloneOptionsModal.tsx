@@ -60,6 +60,7 @@ export function CloneOptionsModal(props: Props) {
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
+      partial_due_date: '',
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -83,6 +84,7 @@ export function CloneOptionsModal(props: Props) {
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
+      partial_due_date: '',
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -113,6 +115,8 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      due_date: '',
+      partial_due_date: '',
       design_id: company.settings.invoice_design_id,
 
     });
@@ -135,6 +139,8 @@ export function CloneOptionsModal(props: Props) {
       status_id: '1',
       vendor_id: '',
       paid_to_date: 0,
+      due_date: '',
+      partial_due_date: '',
       design_id: company.settings.purchase_order_design_id,
 
     });
