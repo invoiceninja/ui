@@ -27,6 +27,12 @@ type Payload = Record<string, string | number>;
 interface PayloadKey {
   key: string;
   valueType: 'string' | 'number';
+  label: string;
+}
+
+interface AvailableType {
+  key: string;
+  label: string;
 }
 
 interface Resource {
@@ -104,7 +110,6 @@ export function EInvoiceGenerator(props: Props) {
   const [excluded, setExcluded] = useState<string[]>([]);
   const [isInitial, setIsInitial] = useState<boolean>(true);
   const [components, setComponents] = useState<Component[]>([]);
-  const [validations, setValidation] = useState<Validation[]>([]);
   const [eInvoice, setEInvoice] = useState<
     JSX.Element | (JSX.Element | undefined)[]
   >();
@@ -113,14 +118,14 @@ export function EInvoiceGenerator(props: Props) {
   );
 
   let payloadKeys: PayloadKey[] = [];
-  let availableTypes: string[] = [];
+  let availableTypes: AvailableType[] = [];
 
   const [payload, setPayload] = useState<Payload>({});
-  const [currentAvailableTypes, setCurrentAvailableTypes] = useState<string[]>(
-    []
-  );
+  const [currentAvailableTypes, setCurrentAvailableTypes] = useState<
+    AvailableType[]
+  >([]);
 
-  const getFieldLabel = (label: string | null) => {
+  const getFieldKey = (label: string | null) => {
     return label?.split('Type')[0];
   };
 
@@ -128,35 +133,43 @@ export function EInvoiceGenerator(props: Props) {
     setPayload((current) => ({ ...current, [property]: value }));
   };
 
-  const showField = (type: string) => {
+  const showField = (key: string) => {
     return isInitial
-      ? !availableTypes.find((currentType) => currentType === type)
-      : !currentAvailableTypes.find((currentType) => currentType === type);
+      ? !availableTypes.find((currentType) => currentType.key === key)
+      : !currentAvailableTypes.find((currentType) => currentType.key === key);
   };
 
-  const getKey = (componentType: string) => {
-    return componentType.split('Type')[0];
+  const handleDeleteField = (elementName: string) => {
+    const currentType = payloadKeys.find((key) => key.key === elementName);
+
+    if (currentType) {
+      setCurrentAvailableTypes((current) => [
+        ...current,
+        { key: currentType.key, label: currentType.label },
+      ]);
+
+      setPayload((current) => ({
+        ...current,
+        [currentType.key]:
+          typeof current[currentType.key] === 'number' ? 0 : '',
+      }));
+    }
   };
 
-  const handleDeleteField = (componentType: string) => {
-    setCurrentAvailableTypes((current) => [...current, componentType]);
-
-    const fieldKey = getKey(componentType);
-    setPayload((current) => ({
-      ...current,
-      [fieldKey]: typeof current[fieldKey] === 'number' ? 0 : '',
-    }));
-  };
-
-  const renderElement = (element: ElementType) => {
+  const renderElement = (element: ElementType, parentsKey: string) => {
     let label = '';
-    const fieldKey = element.name;
+    let leftSideLabel = '';
+    const fieldKey = `${parentsKey.replace('->', '|')}|${element.name}`;
     const rule = rules.find((rule) => rule.key === element.name);
 
     if (rule) {
       label = rule.label;
+      leftSideLabel = rule.label;
     } else {
-      label = fieldKey;
+      label = `${parentsKey} ${element.name}`;
+      leftSideLabel = `${element.name} (${parentsKey.split('->')[0]}, ${
+        parentsKey.split('->')[1]
+      })`;
     }
 
     const isNumberTypeField =
@@ -165,17 +178,21 @@ export function EInvoiceGenerator(props: Props) {
     payloadKeys.push({
       key: fieldKey,
       valueType: isNumberTypeField ? 'number' : 'string',
+      label,
     });
 
     if (isInitial) {
       const isDefaultField = Object.keys(defaultFields).includes(element.name);
 
       if (!isDefaultField) {
-        availableTypes.push(element.name);
+        availableTypes.push({
+          key: fieldKey,
+          label,
+        });
       }
     }
 
-    if (!showField(element.name)) {
+    if (!showField(fieldKey)) {
       return null;
     }
 
@@ -185,7 +202,7 @@ export function EInvoiceGenerator(props: Props) {
       Object.keys(element.resource).length
     ) {
       return (
-        <Element required={rule?.required} leftSide={label}>
+        <Element required={rule?.required} leftSide={leftSideLabel}>
           <div className="flex items-center w-full space-x-3">
             <div className="flex-1">
               <SelectField
@@ -205,7 +222,7 @@ export function EInvoiceGenerator(props: Props) {
             {!rule?.required && (
               <div
                 className="cursor-pointer"
-                onClick={() => handleDeleteField(element.name)}
+                onClick={() => handleDeleteField(fieldKey)}
               >
                 <Icon element={MdDelete} size={28} />
               </div>
@@ -217,7 +234,7 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type === 'decimal' || element.base_type === 'number') {
       return (
-        <Element required={rule?.required} leftSide={label}>
+        <Element required={rule?.required} leftSide={leftSideLabel}>
           <div className="flex items-center w-full space-x-3">
             <div className="flex-1">
               <InputField
@@ -236,7 +253,7 @@ export function EInvoiceGenerator(props: Props) {
             {!rule?.required && (
               <div
                 className="cursor-pointer"
-                onClick={() => handleDeleteField(element.name)}
+                onClick={() => handleDeleteField(fieldKey)}
               >
                 <Icon element={MdDelete} size={28} />
               </div>
@@ -248,7 +265,7 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type === 'date') {
       return (
-        <Element required={rule?.required} leftSide={label}>
+        <Element required={rule?.required} leftSide={leftSideLabel}>
           <div className="flex items-center w-full space-x-3">
             <div className="flex-1">
               <InputField
@@ -262,7 +279,7 @@ export function EInvoiceGenerator(props: Props) {
             {!rule?.required && (
               <div
                 className="cursor-pointer"
-                onClick={() => handleDeleteField(element.name)}
+                onClick={() => handleDeleteField(fieldKey)}
               >
                 <Icon element={MdDelete} size={28} />
               </div>
@@ -274,7 +291,7 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type !== null) {
       return (
-        <Element required={rule?.required} leftSide={label}>
+        <Element required={rule?.required} leftSide={leftSideLabel}>
           <div className="flex items-center w-full space-x-3">
             <div className="flex-1">
               <InputField
@@ -287,7 +304,7 @@ export function EInvoiceGenerator(props: Props) {
             {!rule?.required && (
               <div
                 className="cursor-pointer"
-                onClick={() => handleDeleteField(element.name)}
+                onClick={() => handleDeleteField(fieldKey)}
               >
                 <Icon element={MdDelete} size={28} />
               </div>
@@ -300,10 +317,14 @@ export function EInvoiceGenerator(props: Props) {
 
   const renderComponent = (
     component: Component,
-    componentIndex: number
+    componentIndex: number,
+    topParentType: string,
+    lastParentType: string
   ): JSX.Element => {
     return (
-      <React.Fragment key={component.type}>
+      <React.Fragment
+        key={`${topParentType}${lastParentType}${component.type}`}
+      >
         {Boolean(component.elements.length) &&
           component.elements.map((element) => {
             if (element.base_type?.endsWith('Type')) {
@@ -312,16 +333,27 @@ export function EInvoiceGenerator(props: Props) {
               );
 
               const newComponentIndex = componentsList.findIndex(
-                (component) => component.type === `${element.name}Type`
+                (component) => component.type === element.base_type
               );
 
               const newComponent = componentsList[newComponentIndex];
 
               if (newComponent) {
-                return renderComponent({ ...newComponent }, newComponentIndex);
+                return renderComponent(
+                  { ...newComponent },
+                  newComponentIndex,
+                  newComponent.elements.length &&
+                    newComponent.elements[0].base_type?.endsWith('Type')
+                    ? newComponent.type
+                    : topParentType,
+                  element.name
+                );
               }
             } else {
-              return renderElement(element);
+              return renderElement(
+                element,
+                `${getFieldKey(topParentType)}->${getFieldKey(lastParentType)}`
+              );
             }
           })}
       </React.Fragment>
@@ -334,24 +366,45 @@ export function EInvoiceGenerator(props: Props) {
     payloadKeys.forEach(({ key, valueType }) => {
       currentPayload = {
         ...currentPayload,
-        [key]: defaultFields[key] || (valueType === 'number' ? 0 : ''),
+        [key]:
+          defaultFields[key.split('|')[2]] || (valueType === 'number' ? 0 : ''),
       };
     });
 
     setPayload(currentPayload);
   };
 
+  const updateErrors = (
+    currentErrors: ValidationBag,
+    key: string,
+    value: string
+  ) => {
+    return {
+      ...currentErrors,
+      errors: {
+        ...currentErrors.errors,
+        [key]: [value],
+      },
+    };
+  };
+
   const checkValidation = () => {
     let updatedErrors: ValidationBag = { errors: {}, message: '' };
 
     Object.entries(payload).forEach(([key, value]) => {
-      if (showField(`${key}Type`)) {
-        const fieldValidation = validations.find(
-          ({ name }) => name === `${key}Type`
-        );
+      if (showField(key)) {
+        const fieldKey = key.split('|')[2];
+        let fieldValidation: ElementType | undefined;
 
-        const fieldRule = rules.find((rule) => rule.key === key);
+        components.forEach((component) => {
+          if (!fieldValidation) {
+            fieldValidation = component.elements.find(
+              ({ name }) => name === fieldKey
+            );
+          }
+        });
 
+        const fieldRule = rules.find((rule) => rule.key === fieldKey);
         const isRequired = fieldRule?.required;
 
         if (fieldValidation) {
@@ -385,27 +438,21 @@ export function EInvoiceGenerator(props: Props) {
             (value?.toString().length < length ||
               value?.toString().length > length)
           ) {
-            updatedErrors = {
-              ...updatedErrors,
-              errors: {
-                ...updatedErrors.errors,
-                [key]: [`Value length for the ${key} field must be ${length}!`],
-              },
-            };
+            updatedErrors = updateErrors(
+              updatedErrors,
+              key,
+              `Value length for the ${fieldKey} field must be ${length}!`
+            );
           }
 
           if (pattern && new RegExp(pattern).test(value.toString()) === false) {
-            updatedErrors = {
-              ...updatedErrors,
-              errors: {
-                ...updatedErrors.errors,
-                [key]: [
-                  `${key} has wrong pattern, the correct pattern is ${new RandExp(
-                    pattern as string
-                  ).gen()} (example)!`,
-                ],
-              },
-            };
+            updatedErrors = updateErrors(
+              updatedErrors,
+              key,
+              `${fieldKey} has wrong pattern, the correct pattern is ${new RandExp(
+                pattern as string
+              ).gen()} (example)!`
+            );
           }
 
           if (min_inclusive) {
@@ -416,19 +463,15 @@ export function EInvoiceGenerator(props: Props) {
                 : parseFloat(min_inclusive.toString());
 
             if (updatedValue < updatedMinInclusive) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Min inclusive value for ${key} is ${
-                      base_type === 'date'
-                        ? date(min_inclusive, dateFormat)
-                        : min_inclusive
-                    }!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Min inclusive value for ${fieldKey} is ${
+                  base_type === 'date'
+                    ? date(min_inclusive, dateFormat)
+                    : min_inclusive
+                }!`
+              );
             }
           }
 
@@ -440,19 +483,15 @@ export function EInvoiceGenerator(props: Props) {
                 : parseFloat(max_inclusive.toString());
 
             if (updatedValue > updatedMaxInclusive) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Max inclusive value for ${key} is ${
-                      base_type === 'date'
-                        ? date(max_inclusive, dateFormat)
-                        : max_inclusive
-                    }!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Max inclusive value for ${fieldKey} is ${
+                  base_type === 'date'
+                    ? date(max_inclusive, dateFormat)
+                    : max_inclusive
+                }!`
+              );
             }
           }
 
@@ -464,15 +503,11 @@ export function EInvoiceGenerator(props: Props) {
                 : parseFloat(min_exclusive.toString());
 
             if (updatedValue >= updatedMinExclusive) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Min exclusive value for ${key} is ${updatedMinExclusive}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Min exclusive value for ${fieldKey} is ${updatedMinExclusive}!`
+              );
             }
           }
 
@@ -484,15 +519,11 @@ export function EInvoiceGenerator(props: Props) {
                 : parseFloat(max_exclusive.toString());
 
             if (updatedValue <= updatedMaxExclusive) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Max exclusive value for ${key} is ${updatedMaxExclusive}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Max exclusive value for ${fieldKey} is ${updatedMaxExclusive}!`
+              );
             }
           }
 
@@ -511,39 +542,31 @@ export function EInvoiceGenerator(props: Props) {
               updatedValue <= updatedMaxExclusive &&
               updatedValue >= updatedMinExclusive
             ) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Excluded values for ${key} field are from ${updatedMinExclusive} to ${updatedMaxExclusive}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Excluded values for ${fieldKey} field are from ${updatedMinExclusive} to ${updatedMaxExclusive}!`
+              );
             }
           }
 
           if (min_length && !max_length) {
             if (value?.toString().length < min_length) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [`Min length for ${key} field is ${min_length}!`],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Min length for ${fieldKey} field is ${min_length}!`
+              );
             }
           }
 
           if (max_length && !min_length) {
             if (value?.toString().length > max_length) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [`Max length for ${key} field is ${max_length}!`],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Max length for ${fieldKey} field is ${max_length}!`
+              );
             }
           }
 
@@ -552,15 +575,11 @@ export function EInvoiceGenerator(props: Props) {
               value?.toString().length > max_length ||
               value?.toString().length < min_length
             ) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Length for ${key} field should be between ${min_length} and ${max_length}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Length for ${fieldKey} field should be between ${min_length} and ${max_length}!`
+              );
             }
           }
 
@@ -568,15 +587,11 @@ export function EInvoiceGenerator(props: Props) {
             const numberOfDecimalPlaces = value.toString().split('.')[1].length;
 
             if (numberOfDecimalPlaces > fraction_digits) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Max number of decimal places for ${key} is ${fraction_digits}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Max number of decimal places for ${fieldKey} is ${fraction_digits}!`
+              );
             }
           }
 
@@ -586,26 +601,20 @@ export function EInvoiceGenerator(props: Props) {
               .replace(/[^\d]/g, '');
 
             if (numberWithoutSeparators.length !== Number(total_digits)) {
-              updatedErrors = {
-                ...updatedErrors,
-                errors: {
-                  ...updatedErrors.errors,
-                  [key]: [
-                    `Number of digits for ${key} must be ${total_digits}!`,
-                  ],
-                },
-              };
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Number of digits for ${fieldKey} must be ${total_digits}!`
+              );
             }
           }
 
           if (value && whitespace && /\s/.test(value.toString())) {
-            updatedErrors = {
-              ...updatedErrors,
-              errors: {
-                ...updatedErrors.errors,
-                [key]: [`The ${key} field can not contain whitespace!`],
-              },
-            };
+            updatedErrors = updateErrors(
+              updatedErrors,
+              key,
+              `The ${fieldKey} field can not contain whitespace!`
+            );
           }
         }
       }
@@ -682,7 +691,7 @@ export function EInvoiceGenerator(props: Props) {
         .filter((_, currentIndex) => currentIndex < index)
         .some((currentComponent) =>
           currentComponent.elements.some(
-            (element) => `${element.name}Type` === component.type
+            (element) => element.base_type === component.type
           )
         );
 
@@ -690,7 +699,12 @@ export function EInvoiceGenerator(props: Props) {
         excluded.includes(component.type) || isChildOfExcluded(component.type);
 
       if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
-        return renderComponent(component, index);
+        return renderComponent(
+          component,
+          index,
+          component.type,
+          component.type
+        );
       }
     });
 
@@ -712,7 +726,6 @@ export function EInvoiceGenerator(props: Props) {
           setRules(response.rules);
           setCurrentAvailableTypes([]);
           setExcluded(response.excluded);
-          setValidation(response.validations);
           setComponents(response.components);
           setDefaultFields(response.defaultFields);
           setErrors(undefined);
@@ -722,7 +735,6 @@ export function EInvoiceGenerator(props: Props) {
     } else {
       setRules([]);
       setComponents([]);
-      setValidation([]);
       setErrors(undefined);
       setEInvoice(undefined);
       setIsInitial(true);
@@ -761,16 +773,14 @@ export function EInvoiceGenerator(props: Props) {
             value=""
             onValueChange={(value) =>
               setCurrentAvailableTypes((current) =>
-                current.filter((type) => type !== value)
+                current.filter((type) => type.key !== value)
               )
             }
             clearAfterSelection
           >
-            <option value=""></option>
-
             {currentAvailableTypes.map((type, index) => (
-              <option key={index} value={type}>
-                {getFieldLabel(type)}
+              <option key={index} value={type.key}>
+                {type.label}
               </option>
             ))}
           </SearchableSelect>
