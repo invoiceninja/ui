@@ -19,6 +19,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date } from '$app/common/helpers';
+import reactStringReplace from 'react-string-replace';
 
 export type Country = 'italy';
 
@@ -28,11 +29,13 @@ interface PayloadKey {
   key: string;
   valueType: 'string' | 'number';
   label: string;
+  fieldName: string;
 }
 
 interface AvailableType {
   key: string;
   label: string;
+  fieldName: string;
 }
 
 interface Resource {
@@ -91,7 +94,7 @@ interface ElementType {
 interface Component {
   type: string;
   help: string;
-  choices: Record<string, string>[];
+  choices: string[][];
   elements: ElementType[];
 }
 
@@ -133,19 +136,74 @@ export function EInvoiceGenerator(props: Props) {
     setPayload((current) => ({ ...current, [property]: value }));
   };
 
-  const showField = (key: string) => {
-    return isInitial
-      ? !availableTypes.find((currentType) => currentType.key === key)
-      : !currentAvailableTypes.find((currentType) => currentType.key === key);
+  const isChoiceFromSameGroup = (
+    currentFieldKey: string,
+    comparingFieldKey: string
+  ) => {
+    const topParentType = `${currentFieldKey.split('|')[0]}Type`;
+    const parentElementName = currentFieldKey.split('|')[1];
+    const elementName = currentFieldKey.split('|')[2];
+    const comparingTopParent = `${comparingFieldKey.split('|')[0]}Type`;
+    const comparingParentElementName = comparingFieldKey.split('|')[1];
+    const comparingElementName = comparingFieldKey.split('|')[2];
+
+    if (
+      topParentType !== comparingTopParent ||
+      parentElementName !== comparingParentElementName
+    ) {
+      return false;
+    }
+
+    if (currentFieldKey === comparingFieldKey) {
+      return false;
+    }
+
+    const topParentComponent = components.find(
+      ({ type }) => type === topParentType
+    );
+    const choiceTopParentElementType = topParentComponent?.elements.find(
+      ({ name }) => name === parentElementName
+    )?.base_type;
+
+    const choiceParentComponent = components.find(
+      ({ type }) => type === choiceTopParentElementType
+    );
+
+    const choiceGroup = choiceParentComponent?.choices.find((choiceGroup) =>
+      choiceGroup.includes(elementName)
+    );
+
+    return choiceGroup?.includes(comparingElementName);
   };
 
-  const handleDeleteField = (elementName: string) => {
-    const currentType = payloadKeys.find((key) => key.key === elementName);
+  const showField = (key: string) => {
+    const fieldsForDisplay = payloadKeys.filter(
+      (currentType) =>
+        !currentAvailableTypes.find(
+          (currentAvailableType) => currentAvailableType.key === currentType.key
+        )
+    );
+    const isInTheGroupWithAnyOther = fieldsForDisplay.some((field) =>
+      isChoiceFromSameGroup(field.key, key)
+    );
+
+    return isInitial
+      ? !availableTypes.find((currentType) => currentType.key === key)
+      : !currentAvailableTypes.find((currentType) => currentType.key === key) &&
+          !isInTheGroupWithAnyOther;
+  };
+
+  const handleDeleteField = (elementKey: string) => {
+    const currentType = payloadKeys.find(({ key }) => key === elementKey);
 
     if (currentType) {
       setCurrentAvailableTypes((current) => [
         ...current,
-        { key: currentType.key, label: currentType.label },
+        {
+          key: currentType.key,
+          label: currentType.label,
+          fieldName: currentType.fieldName,
+        },
       ]);
 
       setPayload((current) => ({
@@ -156,17 +214,43 @@ export function EInvoiceGenerator(props: Props) {
     }
   };
 
+  const isElementChoice = (elementName: string | null, parentsKey: string) => {
+    if (elementName) {
+      const topParentType = `${parentsKey.split('->')[0]}Type`;
+      const parentElementName = parentsKey.split('->')[1];
+
+      const topParentComponent = components.find(
+        ({ type }) => type === topParentType
+      );
+      const choiceTopParentElementType = topParentComponent?.elements.find(
+        ({ name }) => name === parentElementName
+      )?.base_type;
+
+      const choiceParentComponent = components.find(
+        ({ type }) => type === choiceTopParentElementType
+      );
+
+      return choiceParentComponent?.choices.some((choiceGroup) =>
+        choiceGroup.some((choice) => choice === elementName)
+      );
+    }
+
+    return false;
+  };
+
   const renderElement = (element: ElementType, parentsKey: string) => {
     let label = '';
     let leftSideLabel = '';
-    const fieldKey = `${parentsKey.replace('->', '|')}|${element.name}`;
+    const isChoice = isElementChoice(element.name, parentsKey);
+    const choiceLabelPart = isChoice ? '(additional option)' : '';
+    const fieldKey = `${parentsKey.replace('->', '|')}|${element.name || ''}`;
     const rule = rules.find((rule) => rule.key === element.name);
 
     if (rule) {
-      label = rule.label;
+      label = choiceLabelPart ? `${rule.label} ${choiceLabelPart}` : rule.label;
       leftSideLabel = rule.label;
     } else {
-      label = `${parentsKey} ${element.name}`;
+      label = `${parentsKey} ${element.name || ''} ${choiceLabelPart}`;
       leftSideLabel = `${element.name} (${parentsKey.split('->')[0]}, ${
         parentsKey.split('->')[1]
       })`;
@@ -179,6 +263,7 @@ export function EInvoiceGenerator(props: Props) {
       key: fieldKey,
       valueType: isNumberTypeField ? 'number' : 'string',
       label,
+      fieldName: element.name,
     });
 
     if (isInitial) {
@@ -188,6 +273,7 @@ export function EInvoiceGenerator(props: Props) {
         availableTypes.push({
           key: fieldKey,
           label,
+          fieldName: element.name,
         });
       }
     }
@@ -773,14 +859,22 @@ export function EInvoiceGenerator(props: Props) {
             value=""
             onValueChange={(value) =>
               setCurrentAvailableTypes((current) =>
-                current.filter((type) => type.key !== value)
+                current.filter(
+                  (type) =>
+                    !isChoiceFromSameGroup(value, type.key) &&
+                    type.key !== value
+                )
               )
             }
             clearAfterSelection
           >
             {currentAvailableTypes.map((type, index) => (
               <option key={index} value={type.key}>
-                {type.label}
+                <div>
+                  {reactStringReplace(type.label, type.fieldName, (match) => (
+                    <strong>{match}</strong>
+                  ))}
+                </div>
               </option>
             ))}
           </SearchableSelect>
