@@ -11,6 +11,7 @@ import { MdArrowDropDown } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 const Div = styled.div`
   &:hover {
@@ -21,7 +22,7 @@ const Div = styled.div`
 export function QuickCreatePopover() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  const preventNavigation = usePreventNavigation();
 
   const colors = useColorScheme();
   const accentColor = useAccentColor();

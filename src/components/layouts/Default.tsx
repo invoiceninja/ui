@@ -85,11 +85,8 @@ export function Default(props: Props) {
   const location = useLocation();
   const hasPermission = useHasPermission();
 
-  const saveBtn = useSaveBtn();
-  const { isOwner } = useAdmin();
   const colors = useColorScheme();
   const preventNavigation = usePreventNavigation();
-  const navigationTopRightElement = useNavigationTopRightElement();
 
   const enabled = useEnabled();
   const user = useInjectUserChanges();
@@ -368,7 +365,6 @@ export function Default(props: Props) {
 
   const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
-  const colors = useColorScheme();
 
   return (
     <div>
