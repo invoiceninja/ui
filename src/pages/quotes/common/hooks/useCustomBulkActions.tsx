@@ -88,8 +88,11 @@ export function useCustomBulkActions() {
     setSelected?.([]);
   };
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Quote>[] = [
     ({ selectedIds, selectedResources, setSelected }) => (
@@ -208,6 +211,10 @@ export function useCustomBulkActions() {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/quotes/bulk',
+            entity: 'quote',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
