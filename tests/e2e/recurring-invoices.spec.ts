@@ -506,7 +506,6 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -563,7 +562,6 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

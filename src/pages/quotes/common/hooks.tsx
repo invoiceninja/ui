@@ -53,8 +53,10 @@ import {
   MdCloudCircle,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDone,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPictureAsPdf,
   MdPrint,
@@ -88,6 +90,11 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -200,11 +207,15 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
 }
 
 interface CreateProps {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
   setErrors: (validationBag?: ValidationBag) => unknown;
 }
 
 export function useCreate(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
 
@@ -218,8 +229,23 @@ export function useCreate(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('POST', endpoint('/api/v1/quotes'), quote)
-      .then((response: GenericSingleResourceResponse<Quote>) => {
+    let apiEndpoint = '/api/v1/quotes?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('POST', endpoint(apiEndpoint), quote)
+      .then(async (response: GenericSingleResourceResponse<Quote>) => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('created_quote');
 
         $refetch(['quotes']);
@@ -228,8 +254,15 @@ export function useCreate(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -237,7 +270,9 @@ export function useCreate(props: CreateProps) {
 }
 
 export function useSave(props: CreateProps) {
-  const { setErrors } = props;
+  const { setErrors, isDefaultTerms, isDefaultFooter } = props;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
   const saveCompany = useHandleCompanySave();
@@ -248,39 +283,73 @@ export function useSave(props: CreateProps) {
 
     await saveCompany(true);
 
-    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
-      .then(() => {
+    let apiEndpoint = '/api/v1/quotes/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: quote.id }), quote)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_quote');
 
         $refetch(['quotes']);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 
-export function useActions() {
+interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const { isAdmin, isOwner } = useAdmin();
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const setQuote = useSetAtom(quoteAtom);
 
-  const navigate = useNavigate();
-  const downloadPdf = useDownloadPdf({ resource: 'quote' });
-  const printPdf = usePrintPdf({ entity: 'quote' });
-  const markSent = useMarkSent();
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+
   const approve = useApprove();
   const bulk = useBulkAction();
+  const navigate = useNavigate();
+  const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+  const printPdf = usePrintPdf({ entity: 'quote' });
+  const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const downloadEQuote = useDownloadEInvoice({
+    resource: 'quote',
+    downloadType: 'download_e_quote',
+  });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
-
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+  const { setChangeTemplateResources, setChangeTemplateVisible, setChangeTemplateEntityContext } =
+    useChangeTemplate();
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -304,6 +373,16 @@ export function useActions() {
   };
 
   const actions: Action<Quote>[] = [
+    (quote: Quote) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/quotes/:id/edit', { id: quote.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/pdf', { id: quote.id })}
@@ -329,6 +408,15 @@ export function useActions() {
         {t('download_pdf')}
       </DropdownElement>
     ),
+    (quote) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadEQuote(quote)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_quote')}
+        </DropdownElement>
+      ),
     (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
       quote.status_id !== QuoteStatus.Approved &&
@@ -390,6 +478,21 @@ export function useActions() {
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([quote]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/quotes/bulk',
+            entity: 'quote',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (quote) =>
       hasPermission('create_quote') && (
@@ -401,9 +504,12 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) => <CloneOptionsModal quote={quote} />,
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at === 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'archive')}
@@ -413,7 +519,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       quote.archived_at > 0 && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'restore')}
@@ -423,7 +529,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (quote) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !quote?.is_deleted && (
         <DropdownElement
           onClick={() => bulk([quote.id], 'delete')}
@@ -568,12 +674,16 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <DynamicLink
-          to={route('/quotes/:id/edit', { id: quote.id })}
-          renderSpan={disableNavigation('quote', quote)}
-        >
-          {field}
-        </DynamicLink>
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/quotes/:id/edit', { id: quote.id })}
+            renderSpan={disableNavigation('quote', quote)}
+          >
+            {field}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={quote.number} stopPropagation />
+        </div>
       ),
     },
     {
@@ -772,8 +882,8 @@ export function useQuoteColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
@@ -789,8 +899,8 @@ export function useQuoteColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span
             dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
@@ -828,6 +938,8 @@ export function useQuoteColumns() {
 export function useQuoteFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -845,31 +957,31 @@ export function useQuoteFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
     {
       label: t('approved'),
       value: 'approved',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$2 || '#1D4ED8',
     },
     {
       label: t('expired'),
       value: 'expired',
       color: 'white',
-      backgroundColor: '#DC2626',
+      backgroundColor: statusThemeColors.$5 || '#DC2626',
     },
     {
       label: t('upcoming'),
       value: 'upcoming',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColors.$4 || '#e6b05c',
     },
     {
       label: t('converted'),
       value: 'converted',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
   ];
 

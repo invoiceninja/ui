@@ -16,19 +16,17 @@ import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
-
-export const dataTableStaleTime = 50;
+import { useFooterColumns } from '$app/pages/invoices/common/hooks/useFooterColumns';
 
 export default function Invoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
 
-  const columns = useInvoiceColumns();
-
   const actions = useActions();
-
+  const columns = useInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -38,12 +36,14 @@ export default function Invoices() {
         { id }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       customBulkActions={customBulkActions}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id })}
       linkToEdit="/invoices/:id/edit"
+      excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_invoice')]}
       hideEditableOptions={!hasPermission('edit_invoice')}
     />

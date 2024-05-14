@@ -21,37 +21,32 @@ import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { route } from '$app/common/helpers/route';
 import { Gateways } from './components/Gateways';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
-import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Client as IClient } from '$app/common/interfaces/client';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
-  const { id } = useParams();
-  const { data: client, isLoading } = useClientQuery({ id, enabled: true });
-
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
-
-  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
-
-  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+  const [isPurgeOrMergeActionCalled, setIsPurgeOrMergeActionCalled] =
     useState<boolean>(false);
 
-  useEffect(() => {
-    setDocumentTitle(client?.display_name || 'view_client');
-  }, [client]);
+  const { id } = useParams();
+  const { data: client, isLoading } = useClientQuery({
+    id,
+    enabled: Boolean(id) && !isPurgeOrMergeActionCalled,
+  });
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -61,14 +56,32 @@ export default function Client() {
     },
   ];
 
-  const handlePurgeClient = usePurgeClient(id);
-
-  const tabs = useTabs();
-
-  const actions = useActions({
-    setIsMergeModalOpen,
-    setPasswordConfirmModalOpen,
+  const tabs = useTabs({
+    client,
+    isPurgeOrMergeActionCalled,
   });
+  const actions = useActions({
+    setIsPurgeOrMergeActionCalled,
+  });
+
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+
+  useEffect(() => {
+    setDocumentTitle(client?.display_name || 'view_client');
+
+    return () => {
+      setIsPurgeOrMergeActionCalled(false);
+    };
+  }, [client]);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+    changeTemplateEntityContext,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -104,25 +117,25 @@ export default function Client() {
           <Tabs tabs={tabs} className="mt-6" />
 
           <div className="my-4">
-            <Outlet />
+            <Outlet
+              context={{
+                isPurgeOrMergeActionCalled,
+              }}
+            />
           </div>
+
+          <ChangeTemplateModal<IClient>
+            entity={changeTemplateEntityContext?.entity ?? 'client'}
+            entities={changeTemplateResources as IClient[]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(client) => `${t('number')}: ${client.number}`}
+            bulkUrl={
+              changeTemplateEntityContext?.endpoint ?? '/api/v1/clients/bulk'
+            }
+          />
         </>
       )}
-
-      {id && (
-        <MergeClientModal
-          visible={isMergeModalOpen}
-          setVisible={setIsMergeModalOpen}
-          mergeFromClientId={id}
-          editPage
-        />
-      )}
-
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={handlePurgeClient}
-      />
     </Default>
   );
 }

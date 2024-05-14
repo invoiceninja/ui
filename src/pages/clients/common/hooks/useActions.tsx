@@ -16,36 +16,37 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';
+import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCloudCircle,
   MdDelete,
-  MdDeleteForever,
+  MdDesignServices,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
 } from 'react-icons/md';
-import { useBulk } from './useBulk';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useConfigureClientSettings } from './useConfigureClientSettings';
 import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { PurgeClientAction } from '../components/PurgeClientAction';
+import { MergeClientAction } from '../components/MergeClientAction';
+import { Dispatch, SetStateAction } from 'react';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useBulk } from '$app/common/queries/clients';
 
 interface Params {
-  setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
-  setMergeFromClientId?: Dispatch<SetStateAction<string>>;
-  setPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
-  setPurgeClientId?: Dispatch<SetStateAction<string>>;
+  setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
-
-export function useActions(params: Params) {
+export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
+
+  const { setIsPurgeOrMergeActionCalled } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -56,6 +57,12 @@ export function useActions(params: Params) {
   });
 
   const configureClientSettings = useConfigureClientSettings();
+
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -70,7 +77,17 @@ export function useActions(params: Params) {
     (client) =>
       !client.is_deleted && (
         <DropdownElement
-          onClick={() => window.open(client.contacts[0].link, '__blank')}
+          onClick={() =>
+            window.open(
+              route(
+                `${client.contacts[0].link}?silent=true&client_hash=:clientHash`,
+                {
+                  clientHash: client.client_hash,
+                }
+              ),
+              '__blank'
+            )
+          }
           icon={<Icon element={MdCloudCircle} />}
         >
           {t('client_portal')}
@@ -128,24 +145,35 @@ export function useActions(params: Params) {
       ),
     (client) =>
       !client.is_deleted &&
-      (isAdmin || isOwner) && (
-        <DropdownElement
-          onClick={() => {
-            params.setMergeFromClientId?.(client.id);
-            params.setIsMergeModalOpen(true);
-          }}
-          icon={<Icon element={BiGitMerge} />}
-        >
-          {t('merge')}
-        </DropdownElement>
+      (isAdmin || isOwner) &&
+      client && (
+        <MergeClientAction
+          client={client}
+          setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
+        />
       ),
+    (client) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([client]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/clients/bulk',
+            entity: 'clients',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>
       isEditOrShowPage &&
       getEntityState(client) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'archive')}
+          onClick={() => bulk([client.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -156,7 +184,7 @@ export function useActions(params: Params) {
       (getEntityState(client) === EntityState.Archived ||
         getEntityState(client) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'restore')}
+          onClick={() => bulk([client.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -167,24 +195,20 @@ export function useActions(params: Params) {
       (getEntityState(client) === EntityState.Active ||
         getEntityState(client) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'delete')}
+          onClick={() => bulk([client.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
         </DropdownElement>
       ),
     (client) =>
-      (isAdmin || isOwner) && (
-        <DropdownElement
+      (isAdmin || isOwner) &&
+      client && (
+        <PurgeClientAction
           key="purge"
-          onClick={() => {
-            params.setPurgeClientId?.(client.id);
-            params.setPasswordConfirmModalOpen(true);
-          }}
-          icon={<Icon element={MdDeleteForever} />}
-        >
-          {t('purge')}
-        </DropdownElement>
+          client={client}
+          setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
+        />
       ),
   ];
 

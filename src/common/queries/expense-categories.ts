@@ -14,7 +14,7 @@ import { useQuery } from 'react-query';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 
@@ -79,7 +79,7 @@ export function useBulkAction() {
 }
 
 export function useBlankExpenseCategoryQuery() {
-  const { isAdmin, isOwner } = useAdmin();
+  const hasPermission = useHasPermission();
 
   return useQuery<ExpenseCategory>(
     '/api/v1/expense_categories/create',
@@ -88,6 +88,6 @@ export function useBlankExpenseCategoryQuery() {
         (response: GenericSingleResourceResponse<ExpenseCategory>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
+    { staleTime: Infinity, enabled: hasPermission('create_expense') }
   );
 }

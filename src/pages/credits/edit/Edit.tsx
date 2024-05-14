@@ -38,6 +38,11 @@ import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Credit as ICredit } from '$app/common/interfaces/credit';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -64,6 +69,8 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -96,7 +103,13 @@ export default function Edit() {
   }, [credit]);
 
   const actions = useActions();
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -162,7 +175,14 @@ export default function Edit() {
           )}
         </div>
 
-        <CreditFooter handleChange={handleChange} errors={errors} />
+        <CreditFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {credit && (
           <InvoiceTotals
@@ -190,6 +210,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<ICredit>
+        entity="credit"
+        entities={changeTemplateResources as ICredit[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(credit) => `${t('number')}: ${credit.number}`}
+        bulkUrl="/api/v1/credits/bulk"
+      />
     </Default>
   );
 }

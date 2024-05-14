@@ -443,7 +443,6 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -496,7 +495,6 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -634,4 +632,298 @@ test('cloning recurring expense', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Edit Recurring Expense' }).first()
   ).toBeVisible();
+});
+
+test('Checking should_be_invoiced expense settings value on recurring expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="shouldBeInvoicedToggle"]').isChecked())) {
+    await page.locator('[data-cy="shouldBeInvoicedToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="shouldBeInvoicedToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking mark_paid expense settings value on recurring_expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="markPaidToggle"]').isChecked())) {
+    await page.locator('[data-cy="markPaidToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking convert_currency expense settings value on recurring_expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="convertCurrencyToggle"]').isChecked())) {
+    await page.locator('[data-cy="convertCurrencyToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(page.locator('[data-cy="convertCurrencyToggle"]')).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking add_documents_to_invoice expense settings value on recurring_expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (
+    !(await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').isChecked())
+  ) {
+    await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Recurring Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking the gross amount by rate', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.getByTestId('combobox-input-field').nth(5).click();
+  await page.getByText('tax_rate_10').click();
+  await page.getByTestId('combobox-input-field').nth(5).blur();
+
+  await page.getByTestId('combobox-input-field').nth(6).click();
+  await page.getByText('tax_rate_20').click();
+  await page.getByTestId('combobox-input-field').nth(6).blur();
+
+  await page.locator('[type="number"]').first().fill('12222');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated recurring expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 15,888.60')).toBeVisible();
+
+  await logout(page);
+});
+
+test('Checking the gross amount with inclusive taxes turned on', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated recurring expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 12,222.00')).toBeVisible();
+
+  await logout(page);
+});
+
+test('Checking the gross amount by amount', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.locator('[data-cy="inclusiveTaxesToggle"]').first().uncheck();
+
+  await page.locator('#by_amount').click();
+
+  await page.locator('[data-cy="taxNameByAmount1"]').fill('tax_name_1');
+  await page.locator('[data-cy="taxRateByAmount1"]').fill('100');
+  await page.locator('[data-cy="taxNameByAmount2"]').fill('tax_name_2');
+  await page.locator('[data-cy="taxRateByAmount2"]').fill('200');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated recurring expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Recurring Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 12,522.00')).toBeVisible();
+
+  await logout(page);
 });

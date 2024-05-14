@@ -81,6 +81,18 @@ export function useGatewayUtilities(params: Params) {
     }
   };
 
+  const removeDuplicatedGateways = (gateways: CompanyGateway[]) => {
+    const uniqueGateways: Record<string, CompanyGateway> = {};
+
+    gateways.forEach((item) => {
+      if (!uniqueGateways[item.id]) {
+        uniqueGateways[item.id] = item;
+      }
+    });
+
+    return Object.values(uniqueGateways);
+  };
+
   useEffect(() => {
     if (companyGatewaysResponse) {
       if (companyChanges?.settings.company_gateway_ids !== '0') {
@@ -112,9 +124,13 @@ export function useGatewayUtilities(params: Params) {
             );
           }
 
-          setCurrentSettingGateways(filteredCompanyGateways);
+          setCurrentSettingGateways(
+            removeDuplicatedGateways(filteredCompanyGateways)
+          );
         } else {
-          setCurrentSettingGateways(companyGatewaysResponse.data.data);
+          setCurrentSettingGateways(
+            removeDuplicatedGateways(companyGatewaysResponse.data.data)
+          );
         }
       } else {
         setCurrentSettingGateways([]);

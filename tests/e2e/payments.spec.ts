@@ -71,9 +71,7 @@ const checkEditPage = async (
   }
 
   await expect(
-    page
-      .locator('[data-cy="tabs"]')
-      .getByRole('link', { name: 'Documents', exact: true })
+    page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
   ).toBeVisible();
 
   if (!isAdmin) {
@@ -359,7 +357,6 @@ test('payment documents preview with edit_payment', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -409,7 +406,6 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -435,7 +431,7 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await page
     .locator('[data-cy="tabs"]')
-    .getByRole('link', { name: 'Documents', exact: true })
+    .getByRole('link', { name: 'Documents' })
     .click();
 
   await page.waitForURL('**/payments/**/documents');
@@ -459,9 +455,7 @@ test('rendering documents and custom_fields tabs with admin permission', async (
     page.getByRole('link', { name: 'Edit', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.getByRole('link', { name: 'Documents', exact: true })
-  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
 
   await logout(page);
 });

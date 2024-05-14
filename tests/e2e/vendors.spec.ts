@@ -458,7 +458,6 @@ test('vendor documents preview with view_vendor', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -501,7 +500,6 @@ test('vendor documents uploading with edit_vendor', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

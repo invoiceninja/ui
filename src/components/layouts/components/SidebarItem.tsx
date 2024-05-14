@@ -8,11 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { classNames } from '$app/common/helpers';
 import { NavigationItem } from './DesktopSidebar';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import classNames from 'classnames';
 import { Link } from '$app/components/forms';
 import { hexToRGB } from '$app/common/hooks/useAdjustColorDarkness';
 
@@ -47,6 +48,8 @@ export function SidebarItem(props: Props) {
 
   const user = useInjectUserChanges();
 
+  const themeColors = useThemeColorScheme();
+
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
@@ -58,27 +61,36 @@ export function SidebarItem(props: Props) {
   return (
     <Div
       theme={{
-        color: item.current ? colors.$8 : 'transparent',
-        hoverColor: colors.$8,
+        color: item.current
+          ? themeColors.$1 || colors.$8
+          : themeColors.$3 || 'transparent',
+        hoverColor: themeColors.$1 || colors.$8,
       }}
       key={item.name}
       className={classNames(
         'flex items-center justify-between group px-4 text-sm font-medium',
-        item.current
-          ? 'text-white border-l-4 border-transparent'
-          : 'text-gray-300 border-l-4 border-transparent'
+        {
+          'text-white border-l-4 border-transparent': item.current,
+          'text-gray-300 border-l-4 border-transparent': !item.current,
+        }
       )}
     >
       <LinkStyled to={item.href} className="w-full" withoutDefaultStyling>
-        <div className="flex justify-start items-center my-2">
+        <div
+          className="flex justify-start items-center my-2"
+          style={{
+            color: item.current ? themeColors.$2 : themeColors.$4,
+          }}
+        >
           <item.icon
-            className={classNames(
-              'mr-3 flex-shrink-0 h-5 w-5',
-              item.current
-                ? 'text-white'
-                : 'text-gray-300 group-hover:text-white'
-            )}
+            className={classNames('mr-3 flex-shrink-0 h-5 w-5', {
+              'text-white': item.current,
+              'text-gray-300 group-hover:text-white': !item.current,
+            })}
             aria-hidden="true"
+            style={{
+              color: item.current ? themeColors.$2 : themeColors.$4,
+            }}
           />
           {!isMiniSidebar && item.name}
         </div>
@@ -93,7 +105,12 @@ export function SidebarItem(props: Props) {
           className="rounded-full p-1.5"
           withoutDefaultStyling
         >
-          <item.rightButton.icon className="h-5 w-5" />
+          <item.rightButton.icon
+            className="h-5 w-5"
+            style={{
+              color: item.current ? themeColors.$2 : themeColors.$4,
+            }}
+          />
         </LinkStyled>
       )}
     </Div>

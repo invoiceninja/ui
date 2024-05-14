@@ -41,6 +41,11 @@ import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns'
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Quote as IQuote } from '$app/common/interfaces/quote';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -67,6 +72,8 @@ export default function Edit() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -99,11 +106,17 @@ export default function Edit() {
   }, [quote]);
 
   const actions = useActions();
-  const save = useSave({ setErrors });
+  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
 
   const [searchParams] = useSearchParams();
   const taskColumns = useTaskColumns();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -205,7 +218,14 @@ export default function Edit() {
           </TabGroup>
         </div>
 
-        <QuoteFooter handleChange={handleChange} errors={errors} />
+        <QuoteFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {quote && (
           <InvoiceTotals
@@ -233,6 +253,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<IQuote>
+        entity="quote"
+        entities={changeTemplateResources as IQuote[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(quote) => `${t('number')}: ${quote.number}`}
+        bulkUrl="/api/v1/quotes/bulk"
+      />
     </Default>
   );
 }

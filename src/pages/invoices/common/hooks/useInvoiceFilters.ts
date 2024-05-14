@@ -9,10 +9,13 @@
  */
 
 import { SelectOption } from '$app/components/datatables/Actions';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 export function useInvoiceFilters() {
   const [t] = useTranslation();
+
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const filters: SelectOption[] = [
     {
@@ -31,7 +34,7 @@ export function useInvoiceFilters() {
       label: t('paid'),
       value: 'paid',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('unpaid'),
@@ -40,10 +43,16 @@ export function useInvoiceFilters() {
       backgroundColor: '#F97316',
     },
     {
-      label: t('overdue'),
+      label: t('past_due'),
       value: 'overdue',
       color: 'white',
-      backgroundColor: '#CA8A04',
+      backgroundColor: statusThemeColors.$5 || '#CA8A04',
+    },
+    {
+      label: t('cancelled'),
+      value: 'cancelled',
+      color: 'white',
+      backgroundColor: '#000000',
     },
   ];
 

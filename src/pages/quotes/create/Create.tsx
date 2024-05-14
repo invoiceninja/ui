@@ -61,6 +61,8 @@ export default function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const clientResolver = useClientResolver();
   const productColumns = useProductColumns();
@@ -168,7 +170,7 @@ export default function Create() {
     quote && calculateInvoiceSum(quote);
   }, [quote]);
 
-  const save = useCreate({ setErrors });
+  const save = useCreate({ setErrors, isDefaultFooter, isDefaultTerms });
   const taskColumns = useTaskColumns();
 
   return (
@@ -245,7 +247,14 @@ export default function Create() {
           </TabGroup>
         </div>
 
-        <QuoteFooter handleChange={handleChange} errors={errors} />
+        <QuoteFooter
+          handleChange={handleChange}
+          errors={errors}
+          isDefaultFooter={isDefaultFooter}
+          isDefaultTerms={isDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+        />
 
         {quote && (
           <InvoiceTotals

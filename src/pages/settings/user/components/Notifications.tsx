@@ -17,6 +17,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '$app/components/forms';
 import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -25,6 +28,8 @@ export function Notifications() {
   const options = useNotificationOptions();
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
+
+  const handleChange = useHandleCurrentUserChangeProperty();
 
   const [allEvents, setAllEvents] = useState<string>('');
 
@@ -104,7 +109,22 @@ export function Notifications() {
 
   return (
     <Card title={t('notifications')}>
-      <Element className="mb-4" leftSide={t('all_events')}>
+      <Element
+        className="mb-4"
+        leftSide={t('login_notification')}
+        leftSideHelp={t('login_notification_help')}
+      >
+        <Toggle
+          checked={userChanges?.user_logged_in_notification}
+          onChange={(value) =>
+            handleChange('user_logged_in_notification', value)
+          }
+        />
+      </Element>
+
+      <Divider withoutPadding />
+
+      <Element className="my-4" leftSide={t('all_events')}>
         <SelectField
           value={allEvents}
           onValueChange={(value) => handleAllEventsChange(value)}
@@ -115,7 +135,9 @@ export function Notifications() {
         </SelectField>
       </Element>
 
-      <div className="flex flex-col border-t border-gray-200 pt-4">
+      <Divider withoutPadding />
+
+      <div className="flex flex-col">
         {options.map((notification, index) => (
           <Element key={index} className="mt-0" leftSide={notification.label}>
             <SelectField

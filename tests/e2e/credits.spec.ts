@@ -457,7 +457,6 @@ test('credit documents preview with edit_credit', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -505,7 +504,6 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

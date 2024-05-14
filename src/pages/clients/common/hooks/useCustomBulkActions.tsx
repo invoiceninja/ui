@@ -14,9 +14,11 @@ import { CustomBulkAction } from '$app/components/DataTable';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdDownload } from 'react-icons/md';
+import { MdDesignServices, MdDownload } from 'react-icons/md';
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { AssignToGroupBulkAction } from '../components/AssignToGroupBulkAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -35,6 +37,10 @@ export const useCustomBulkActions = () => {
     return clients.every(({ is_deleted }) => !is_deleted);
   };
 
+  const showAssignGroupAction = (clients: Client[]) => {
+    return clients.every(({ is_deleted }) => !is_deleted);
+  };
+
   const handleDownloadDocuments = (
     selectedClients: Client[],
     setSelected: Dispatch<SetStateAction<string[]>>
@@ -44,6 +50,12 @@ export const useCustomBulkActions = () => {
     documentsBulk(clientIds, 'download');
     setSelected([]);
   };
+
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Client>[] = [
     ({ selectedResources, setSelected }) =>
@@ -58,6 +70,28 @@ export const useCustomBulkActions = () => {
         >
           {t('documents')}
         </DropdownElement>
+      ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/clients/bulk',
+            entity: 'client',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
+    ({ selectedResources, setSelected }) =>
+      showAssignGroupAction(selectedResources) && (
+        <AssignToGroupBulkAction
+          clients={selectedResources}
+          setSelected={setSelected}
+        />
       ),
   ];
 

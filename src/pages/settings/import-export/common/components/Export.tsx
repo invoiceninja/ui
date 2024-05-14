@@ -25,7 +25,24 @@ type Date =
   | 'partial_due_date'
   | 'payment_date';
 
-type ExportType = 'tasks' | 'activities';
+type ExportType =
+  | 'tasks'
+  | 'activities'
+  | 'clients'
+  | 'client_contacts'
+  | 'invoices'
+  | 'invoice_items'
+  | 'quotes'
+  | 'quote_items'
+  | 'credits'
+  | 'documents'
+  | 'expenses'
+  | 'purchase_orders'
+  | 'purchase_order_items'
+  | 'recurring_invoices'
+  | 'payments'
+  | 'products'
+  | 'vendors';
 
 interface Range {
   identifier: string;
@@ -43,6 +60,21 @@ interface Export {
 
 const EXPORTS_DATES: Record<ExportType, Date[]> = {
   activities: [],
+  clients: ['created_at'],
+  client_contacts: ['created_at'],
+  invoices: ['date', 'due_date', 'partial_due_date'],
+  invoice_items: ['date', 'due_date', 'partial_due_date'],
+  quotes: ['date', 'due_date', 'partial_due_date'],
+  quote_items: ['date', 'due_date', 'partial_due_date'],
+  credits: ['date', 'due_date', 'partial_due_date'],
+  documents: ['created_at'],
+  expenses: ['date', 'payment_date'],
+  purchase_orders: [],
+  purchase_order_items: [],
+  recurring_invoices: ['date', 'due_date', 'partial_due_date'],
+  payments: ['date'],
+  products: ['created_at'],
+  vendors: [],
   tasks: ['created_at'],
 };
 

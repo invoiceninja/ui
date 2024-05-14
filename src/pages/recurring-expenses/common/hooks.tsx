@@ -55,6 +55,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 
 export const defaultColumns: string[] = [
   'status',
@@ -131,6 +132,7 @@ export function useRecurringExpenseColumns() {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
+  const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
   type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
@@ -212,9 +214,9 @@ export function useRecurringExpenseColumns() {
       column: 'amount',
       id: 'amount',
       label: t('amount'),
-      format: (value, recurringExpense) =>
+      format: (_, recurringExpense) =>
         formatMoney(
-          value,
+          calculateExpenseAmount(recurringExpense),
           recurringExpense.client?.country_id,
           recurringExpense.currency_id ||
             recurringExpense.client?.settings.currency_id

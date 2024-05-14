@@ -63,6 +63,9 @@ export function Actions(props: Props) {
     request('DELETE', endpoint('/api/v1/users/:id/detach_from_company', { id }))
       .then(() => {
         toast.success('removed_user');
+
+        $refetch(['users']);
+
         navigate('/settings/users');
       })
       .catch((error: AxiosError<ValidationBag>) => {

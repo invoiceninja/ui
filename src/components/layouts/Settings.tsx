@@ -162,9 +162,10 @@ export function Settings(props: Props) {
           </nav>
 
           {advanced.filter((route) => route.enabled).length > 0 && (
-            <a className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8">
-              <span className="truncate">{t('advanced_settings')}</span>
-            </a>
+            <div className="flex items-center py-4 px-3 text-xs uppercase font-medium mt-8 truncate space-x-1">
+              <span>{t('advanced_settings')}</span>
+              <sup>{t('pro')}</sup>
+            </div>
           )}
 
           <SelectField

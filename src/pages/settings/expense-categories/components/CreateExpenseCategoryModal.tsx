@@ -19,13 +19,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankExpenseCategoryQuery } from '$app/common/queries/expense-categories';
 import { Modal } from '$app/components/Modal';
-import {
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryForm } from './CreateExpenseCategoryForm';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -48,9 +42,7 @@ export function CreateExpenseCategoryModal(props: Props) {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategory>();
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSave = () => {
     if (!isFormBusy) {
       toast.processing();
       setIsFormBusy(true);
@@ -106,16 +98,21 @@ export function CreateExpenseCategoryModal(props: Props) {
       title={t('create_expense_category')}
       visible={props.visible}
       onClose={() => props.setVisible(false)}
+      stopPropagationInHeader
     >
-      <CreateExpenseCategoryForm
-        expenseCategory={expenseCategory}
-        setExpenseCategory={setExpenseCategory}
-        errors={errors}
-        setErrors={setErrors}
-      />
+      <div onClick={(event) => event.stopPropagation()}>
+        <CreateExpenseCategoryForm
+          expenseCategory={expenseCategory}
+          setExpenseCategory={setExpenseCategory}
+          errors={errors}
+          setErrors={setErrors}
+        />
 
-      <div className="flex justify-end space-x-4 mt-5">
-        <Button onClick={handleSave}>{t('save')}</Button>
+        <div className="flex justify-end space-x-4 mt-5">
+          <Button behavior="button" onClick={handleSave}>
+            {t('save')}
+          </Button>
+        </div>
       </div>
     </Modal>
   );

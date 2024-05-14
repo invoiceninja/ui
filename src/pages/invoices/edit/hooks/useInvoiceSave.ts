@@ -17,34 +17,59 @@ import { useSetAtom } from 'jotai';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Dispatch, SetStateAction } from 'react';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 
-export function useHandleSave(
-  setErrors: (errors: ValidationBag | undefined) => unknown
-) {
-  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+interface Params {
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+export function useHandleSave(params: Params) {
+  const { setErrors, isDefaultTerms, isDefaultFooter } = params;
+
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const saveCompany = useHandleCompanySave();
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
     setErrors(undefined);
-
     toast.processing();
 
     await saveCompany(true);
 
-    request(
-      'PUT',
-      endpoint('/api/v1/invoices/:id', { id: invoice.id }),
-      invoice
-    )
-      .then(() => {
+    let apiEndpoint = '/api/v1/invoices/:id?';
+
+    if (isDefaultTerms) {
+      apiEndpoint += 'save_default_terms=true';
+      if (isDefaultFooter) {
+        apiEndpoint += '&save_default_footer=true';
+      }
+    } else if (isDefaultFooter) {
+      apiEndpoint += 'save_default_footer=true';
+    }
+
+    request('PUT', endpoint(apiEndpoint, { id: invoice.id }), invoice)
+      .then(async () => {
+        if (isDefaultTerms || isDefaultFooter) {
+          await refreshCompanyUsers();
+        }
+
         toast.success('updated_invoice');
 
         $refetch(['products', 'invoices']);
       })
       .catch((error) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));

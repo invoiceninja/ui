@@ -32,12 +32,14 @@ import { useTransactionQuery } from '$app/common/queries/transactions';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useCleanDescriptionText } from '../common/hooks/useCleanDescription';
 
 export default function Edit() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const cleanDescriptionText = useCleanDescriptionText();
 
   const { id } = useParams<string>();
 
@@ -100,7 +102,10 @@ export default function Edit() {
 
   useEffect(() => {
     if (data) {
-      setTransaction(data);
+      setTransaction({
+        ...data,
+        description: cleanDescriptionText(data.description),
+      });
     }
   }, [data]);
 

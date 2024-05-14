@@ -220,6 +220,33 @@ export function Settings() {
               )
             }
             disabled={disableSettingsField('military_time')}
+            cypressRef="militaryTimeToggle"
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="enable_rappen_rounding"
+              labelElement={
+                <SettingsLabel label={t('enable_rappen_rounding')} />
+              }
+              defaultValue={false}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(company?.settings?.enable_rappen_rounding)}
+            onChange={(value: boolean) =>
+              dispatch(
+                updateChanges({
+                  object: 'company',
+                  property: 'settings.enable_rappen_rounding',
+                  value,
+                })
+              )
+            }
+            disabled={disableSettingsField('enable_rappen_rounding')}
           />
         </Element>
 

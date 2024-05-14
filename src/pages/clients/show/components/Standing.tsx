@@ -11,6 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
+import { NotesIframe } from '$app/components/NotesIframe';
 import { Element } from '$app/components/cards';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
@@ -97,16 +98,17 @@ export function Standing(props: Props) {
                   </Element>
                 )}
 
-                <div className="flex items-center space-x-1">
-                  <div>
-                    <Icon element={MdLockOutline} size={24} />
-                  </div>
+                {client.private_notes && (
+                  <div className="flex items-center space-x-1">
+                    <div>
+                      <Icon element={MdLockOutline} size={24} />
+                    </div>
 
-                  <span
-                    className="whitespace-normal"
-                    dangerouslySetInnerHTML={{ __html: client.private_notes }}
-                  />
-                </div>
+                    <div className="whitespace-normal">
+                      <NotesIframe srcDoc={client.private_notes} />
+                    </div>
+                  </div>
+                )}
               </div>
             }
             className="h-full"

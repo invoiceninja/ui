@@ -15,11 +15,22 @@ import { GenericSingleResourceResponse } from '../interfaces/generic-api-respons
 import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { Params as GlobalParams } from './common/params.interface';
 
-export function useGroupSettingsQuery() {
-  return useQuery(
-    ['/api/v1/group_settings'],
-    () => request('GET', endpoint('/api/v1/group_settings')),
+export function useGroupSettingsQuery(params?: GlobalParams) {
+  return useQuery<GroupSettings[]>(
+    ['/api/v1/group_settings', params],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/group_settings?status=:status&per_page=:perPage', {
+          status: params?.status ?? 'active',
+          perPage: params?.perPage ?? 20,
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<GroupSettings[]>) =>
+          response.data.data
+      ),
     { staleTime: Infinity }
   );
 }

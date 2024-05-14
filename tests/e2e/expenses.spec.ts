@@ -10,6 +10,7 @@ import {
 import test, { expect, Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
+import { createTaxRate } from './taxes-helpers';
 
 interface Params {
   permissions: Permission[];
@@ -42,9 +43,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
@@ -54,9 +53,7 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 };
@@ -189,7 +186,9 @@ test('can edit expense', async ({ page }) => {
     page.getByText('Successfully updated expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'expenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
   await logout(page);
 });
@@ -222,7 +221,9 @@ test('can create a expense', async ({ page }) => {
     page.getByText('Successfully updated expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'expenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
   await logout(page);
 });
@@ -271,7 +272,9 @@ test('can view and edit assigned expense with create_expense', async ({
     page.getByText('Successfully updated expense', { exact: true })
   ).toBeVisible();
 
-  await checkDropdownActions(page, actions, 'expenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
   await logout(page);
 });
@@ -302,11 +305,7 @@ test('deleting expense with edit_expense', async ({ page }) => {
   if (!doRecordsExist) {
     await createExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
   } else {
@@ -348,11 +347,7 @@ test('archiving expense with edit_expense', async ({ page }) => {
   if (!doRecordsExist) {
     await createExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
@@ -412,7 +407,6 @@ test('expense documents preview with edit_expense', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -461,7 +455,6 @@ test('expense documents uploading with edit_expense', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -499,7 +492,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'expenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
   await logout(page);
 });
@@ -525,7 +520,9 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkEditPage(page, true);
 
-  await checkDropdownActions(page, actions, 'expenseActionDropdown');
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
   await logout(page);
 });
@@ -559,18 +556,13 @@ test('cloning expense', async ({ page }) => {
   if (!doRecordsExist) {
     await createExpense({ page });
 
-    await page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'More Actions', exact: true })
-      .first()
-      .click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
-    const moreActionsButton = tableRow
+    await tableRow
       .getByRole('button')
       .filter({ has: page.getByText('More Actions') })
-      .first();
-
-    await moreActionsButton.click();
+      .first()
+      .click();
   }
 
   await page.getByText('Clone').first().click();
@@ -679,6 +671,452 @@ test('Expense categories endpoint contains with but not sort parameter', async (
 
     route.continue();
   });
+
+  await logout(page);
+});
+test('Checking should_be_invoiced expense settings value on expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="shouldBeInvoicedToggle"]').isChecked())) {
+    await page.locator('[data-cy="shouldBeInvoicedToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="shouldBeInvoicedToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking mark_paid expense settings value on expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="markPaidToggle"]').isChecked())) {
+    await page.locator('[data-cy="markPaidToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking convert_currency expense settings value on expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (!(await page.locator('[data-cy="convertCurrencyToggle"]').isChecked())) {
+    await page.locator('[data-cy="convertCurrencyToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await expect(page.locator('[data-cy="convertCurrencyToggle"]')).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking add_documents_to_invoice expense settings value on expense creation page', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+
+  await page
+    .getByRole('link', { name: 'Expense Settings', exact: true })
+    .click();
+
+  if (
+    !(await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').isChecked())
+  ) {
+    await page.locator('[data-cy="addDocumentsToInvoiceToggle"]').check();
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await expect(
+    page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
+  ).toBeChecked();
+
+  await logout(page);
+});
+
+test('Checking the gross amount by rate', async ({ page }) => {
+  await login(page);
+
+  await createTaxRate({ page, taxName: 'tax_rate_10', rate: 10 });
+
+  await createTaxRate({ page, taxName: 'tax_rate_20', rate: 20 });
+
+  await page
+    .getByRole('link', { name: 'Tax Settings', exact: true })
+    .first()
+    .click();
+
+  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
+    await page
+      .locator('#enabled_expense_tax_rates')
+      .selectOption({ label: 'Two Tax Rates' });
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.getByTestId('combobox-input-field').nth(5).click();
+  await page.getByText('tax_rate_10').click();
+  await page.getByTestId('combobox-input-field').nth(5).blur();
+
+  await page.getByTestId('combobox-input-field').nth(6).click();
+  await page.getByText('tax_rate_20').click();
+  await page.getByTestId('combobox-input-field').nth(6).blur();
+
+  await page.locator('[type="number"]').first().fill('12222');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 15,888.60')).toBeVisible();
+
+  await logout(page);
+});
+
+test('Checking the gross amount with inclusive taxes turned on', async ({
+  page,
+}) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 12,222.00')).toBeVisible();
+
+  await logout(page);
+});
+
+test('Checking the gross amount by amount', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  const tableBody = page.locator('tbody').first();
+
+  const tableRow = tableBody.getByRole('row').first();
+
+  await tableRow
+    .getByRole('button')
+    .filter({ has: page.getByText('More Actions') })
+    .first()
+    .click();
+
+  await page.getByText('Edit', { exact: true }).first().click();
+
+  await page.locator('[data-cy="inclusiveTaxesToggle"]').first().uncheck();
+
+  await page.locator('#by_amount').click();
+
+  await page.locator('[data-cy="taxNameByAmount1"]').fill('tax_name_1');
+  await page.locator('[data-cy="taxRateByAmount1"]').fill('100');
+  await page.locator('[data-cy="taxNameByAmount2"]').fill('tax_name_2');
+  await page.locator('[data-cy="taxRateByAmount2"]').fill('200');
+
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  await expect(
+    page.getByText('Successfully updated expense', { exact: true })
+  ).toBeVisible();
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await expect(page.getByText('$ 12,522.00')).toBeVisible();
+
+  await logout(page);
+});
+
+test('The new_expense_category action is not shown on the badge dropdown', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('edit_expense');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.getByRole('button', { name: 'Columns', exact: true }).click();
+
+  await page.waitForTimeout(100);
+
+  await page
+    .locator('[data-cy="columSelector"]')
+    .selectOption({ label: 'Category' });
+
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+  await expect(
+    page.getByText('Successfully saved settings').first()
+  ).toBeVisible();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).not.toBeVisible();
+
+  await logout(page);
+});
+
+test('The new_expense_category action is shown on the badge dropdown', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('admin');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).toBeVisible();
+
+  await logout(page);
+});
+
+test('The new_expense_category action is shown on the badge dropdown with only create_expense permission', async ({
+  page,
+}) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense');
+  await save();
+
+  await logout(page);
+
+  await login(page, 'expenses@example.com', 'password');
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+
+  await expect(
+    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+  ).toBeVisible();
+
+  await logout(page);
+});
+
+test('Creating expense with Save / Create button', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Expenses', exact: true })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
+    .click();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await page.getByRole('button', { name: 'Save / Create' }).click();
+
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/create');
 
   await logout(page);
 });

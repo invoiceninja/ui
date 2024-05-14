@@ -11,7 +11,7 @@
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { date as formatDate } from '$app/common/helpers';
+import { date as formatDate, useParseDayjs } from '$app/common/helpers';
 import { ChartData, TotalColors } from './Totals';
 import {
   Line,
@@ -45,11 +45,12 @@ type LineChartData = {
 
 export function Chart(props: Props) {
   const { t } = useTranslation();
-  const { currency } = props;
+  const { currency, chartSensitivity } = props;
 
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const parseDayjs = useParseDayjs();
   const generateWeekDateRange = useGenerateWeekDateRange();
 
   const formatMoney = useFormatMoney();
@@ -82,6 +83,10 @@ export function Chart(props: Props) {
 
       case 'month':
         while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+          if (currentDate.isSame(start, 'day')) {
+            dates.push(start.toDate());
+          }
+
           dates.push(currentDate.endOf('month').toDate());
           currentDate = currentDate.add(1, 'month');
         }
@@ -103,18 +108,27 @@ export function Chart(props: Props) {
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
+    let isMatchingWithLastPointDay = false;
+
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
 
       if (nextEntry) {
-        const dateToCheck = dayjs(date);
+        const dateToCheck = parseDayjs(date);
 
-        const startDate = dayjs(entry.date);
-        const endDate = dayjs(nextEntry.date);
+        const startDate = parseDayjs(entry.date);
+        const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
-          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
+          dateToCheck.isAfter(startDate) &&
+          dateToCheck.isBefore(endDate) &&
+          !dateToCheck.isSame(parseDayjs(data[0].date));
+
         const isEntryDateMatch = entry.date === date;
+
+        isMatchingWithLastPointDay =
+          startDate.isSame(dateToCheck) &&
+          !dateToCheck.isSame(parseDayjs(data[0].date));
 
         return isDateInRange || isEntryDateMatch;
       }
@@ -122,7 +136,11 @@ export function Chart(props: Props) {
       return false;
     });
 
-    return recordIndex;
+    return chartSensitivity !== 'day' &&
+      recordIndex > -1 &&
+      !isMatchingWithLastPointDay
+      ? recordIndex + 1
+      : recordIndex;
   };
 
   const yAxisWidth = useMemo(() => {
@@ -144,23 +162,19 @@ export function Chart(props: Props) {
   }, [chartData]);
 
   useEffect(() => {
-    const data: LineChartData = [];
-
     const dates = generateDateRange(
       new Date(props.dates.start_date),
       new Date(props.dates.end_date),
       props.chartSensitivity
     );
 
-    dates.map((date) => {
-      data.push({
-        date: formatDate(date.toString(), dateFormat),
-        invoices: 0,
-        outstanding: 0,
-        payments: 0,
-        expenses: 0,
-      });
-    });
+    const data: LineChartData = dates.map((date) => ({
+      date: formatDate(date.toString(), dateFormat),
+      invoices: 0,
+      outstanding: 0,
+      payments: 0,
+      expenses: 0,
+    }));
 
     props.data?.invoices.forEach((invoice) => {
       const date = formatDate(invoice.date, dateFormat);

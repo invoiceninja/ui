@@ -14,11 +14,11 @@ import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 import { useCustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-export function ProductColumns() {
+export default function ProductColumns() {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
+  const company = useCompanyChanges();
   const handleValueChange = useHandleSettingsValueChange();
   const customField = useCustomField();
 
@@ -66,7 +66,6 @@ export function ProductColumns() {
           : t('invoice_product_columns')
       }
       padding="small"
-      collapsed={true}
     >
       <SortableVariableList
         for="product_columns"

@@ -14,8 +14,6 @@ import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { Frequency } from '$app/common/enums/frequency';
-import { EXPORT_DOCUMENTS_REPORTS } from '$app/pages/reports/index/Reports';
-import { Identifier } from '$app/pages/reports/common/useReports';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
@@ -41,7 +39,12 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   is_expense_billed: false,
   is_income_billed: false,
   include_tax: false,
+  document_email_attachment: false,
   client_id: '',
+  vendors: '',
+  projects: '',
+  categories: '',
+  report_keys: [],
 };
 
 export function useHandleChange(params: Params) {
@@ -75,9 +78,6 @@ export function useHandleChange(params: Params) {
             parameters: {
               ...DEFAULT_SCHEDULE_PARAMETERS,
               report_name: value as string,
-              ...(EXPORT_DOCUMENTS_REPORTS.includes(value as Identifier) && {
-                document_email_attachment: false,
-              }),
             },
           }
       );

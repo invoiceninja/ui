@@ -15,16 +15,17 @@ import { useColorScheme } from '$app/common/colors';
 interface Props extends CommonProps {
   isLoading?: boolean;
   onClick?: () => unknown;
+  backgroundColor?: string;
 }
 
 export function Tr(props: Props) {
-  const { onClick, innerRef, ...otherProps } = props;
+  const { onClick, innerRef, backgroundColor, ...otherProps } = props;
   const colors = useColorScheme();
 
   return (
     <tr
       style={{
-        backgroundColor: colors.$1,
+        backgroundColor: backgroundColor || colors.$1,
       }}
       onClick={(event) =>
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

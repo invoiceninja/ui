@@ -72,6 +72,8 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -228,8 +230,15 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -433,8 +442,15 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -493,8 +509,10 @@ export function useAllRecurringInvoiceColumns() {
 
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const dateTime = useDateTime();
   const disableNavigation = useDisableNavigation();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -568,9 +586,9 @@ export function useRecurringInvoiceColumns() {
     },
     {
       column: 'next_send_date',
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => dateTime(value),
     },
     {
       column: 'frequency',
@@ -683,8 +701,8 @@ export function useRecurringInvoiceColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
@@ -698,8 +716,8 @@ export function useRecurringInvoiceColumns() {
         <Tooltip
           size="regular"
           truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          displayAsNotesIframe
         >
           <span dangerouslySetInnerHTML={{ __html: value as string }} />
         </Tooltip>
@@ -724,6 +742,8 @@ export function useRecurringInvoiceColumns() {
 export function useRecurringInvoiceFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
     {
       label: t('all'),
@@ -735,19 +755,19 @@ export function useRecurringInvoiceFilters() {
       label: t('active'),
       value: 'active',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('paused'),
       value: 'paused',
       color: 'white',
-      backgroundColor: '#F97316',
+      backgroundColor: statusThemeColors.$4 || '#F97316',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
   ];
 

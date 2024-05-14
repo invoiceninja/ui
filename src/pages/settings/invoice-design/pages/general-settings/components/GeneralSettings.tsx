@@ -10,7 +10,7 @@
 
 import colors from '$app/common/constants/colors';
 import { Design } from '$app/common/interfaces/design';
-import { useDesignsQuery } from '$app/common/queries/designs';
+import { useDesignsQuery, useTemplateQuery } from '$app/common/queries/designs';
 import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom, useAtomValue } from 'jotai';
@@ -767,7 +767,7 @@ const fonts = [
   { value: 'Zeyada', label: 'Zeyada' },
 ];
 
-export function GeneralSettings() {
+export default function GeneralSettings() {
   const [t] = useTranslation();
 
   const currentCompany = useCurrentCompany();
@@ -781,6 +781,9 @@ export function GeneralSettings() {
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
   const { data: designs } = useDesignsQuery();
+  const { data: invoiceDesigns } = useTemplateQuery('invoice');
+  const { data: paymentDesigns } = useTemplateQuery('payment');
+  const { data: statementDesigns } = useTemplateQuery('statement');
 
   const isDesignChanged = (property: keyof Company['settings']) => {
     return currentCompany?.settings[property] !== company?.settings[property];
@@ -828,8 +831,17 @@ export function GeneralSettings() {
     setUpdatingRecords([]);
   }, []);
 
+  const designsFilter = (entity: string, designs: Design[]) => {
+    return (
+      designs.filter(
+        (design: Design) =>
+          design.is_template === false || design.entities.match(entity)
+      ) ?? designs
+    );
+  };
+
   return (
-    <Card title={t('general_settings')} padding="small" collapsed={false}>
+    <Card title={t('general_settings')} padding="small">
       <Element
         leftSide={
           <PropertyCheckbox
@@ -848,7 +860,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.invoice_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('invoice', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -898,7 +910,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.quote_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('quote', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -948,7 +960,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.credit_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('credit', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1000,7 +1012,7 @@ export function GeneralSettings() {
             errorMessage={errors?.errors['settings.purchase_order_design_id']}
           >
             {designs &&
-              designs.map((design: Design) => (
+              designsFilter('purchase_order', designs).map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1031,6 +1043,126 @@ export function GeneralSettings() {
               />
             </div>
           )}
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="statement_design_id"
+            labelElement={<SettingsLabel label={t('statement_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.statement_design_id"
+            value={company?.settings?.statement_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('statement_design_id', value)
+            }
+            disabled={disableSettingsField('statement_design_id')}
+            errorMessage={errors?.errors['settings.statement_design_id']}
+            withBlank={true}
+          >
+            {statementDesigns &&
+              statementDesigns.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="delivery_note_design_id"
+            labelElement={<SettingsLabel label={t('delivery_note_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.delivery_note_design_id"
+            value={company?.settings?.delivery_note_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('delivery_note_design_id', value)
+            }
+            disabled={disableSettingsField('delivery_note_design_id')}
+            errorMessage={errors?.errors['settings.delivery_note_design_id']}
+            withBlank={true}
+          >
+            {invoiceDesigns &&
+              invoiceDesigns.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="payment_receipt_design_id"
+            labelElement={<SettingsLabel label={t('payment_receipt_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.payment_receipt_design_id"
+            value={company?.settings?.payment_receipt_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('payment_receipt_design_id', value)
+            }
+            disabled={disableSettingsField('payment_receipt_design_id')}
+            errorMessage={errors?.errors['settings.payment_receipt_design_id']}
+            withBlank={true}
+          >
+            {paymentDesigns &&
+              paymentDesigns.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+        </div>
+      </Element>
+
+      <Element
+        leftSide={
+          <PropertyCheckbox
+            propertyKey="payment_refund_design_id"
+            labelElement={<SettingsLabel label={t('payment_refund_design')} />}
+            defaultValue=""
+          />
+        }
+      >
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.payment_refund_design_id"
+            value={company?.settings?.payment_refund_design_id || ''}
+            onValueChange={(value) =>
+              handleChange('payment_refund_design_id', value)
+            }
+            disabled={disableSettingsField('payment_refund_design_id')}
+            errorMessage={errors?.errors['settings.payment_refund_design_id']}
+            withBlank={true}
+          >
+            {paymentDesigns &&
+              paymentDesigns.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
         </div>
       </Element>
 
@@ -1216,6 +1348,7 @@ export function GeneralSettings() {
             }
           }}
           disabled={disableSettingsField('primary_color')}
+          includeDefaultPalette
         />
       </Element>
 
@@ -1238,6 +1371,7 @@ export function GeneralSettings() {
             }
           }}
           disabled={disableSettingsField('secondary_color')}
+          includeDefaultPalette
         />
       </Element>
 

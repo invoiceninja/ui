@@ -33,6 +33,8 @@ const TemplateProperties = {
   ],
 };
 
+const NullableProperties = ['vendors', 'projects', 'categories'];
+
 export function useFormatSchedulePayload(params: Params) {
   const { schedule } = params;
 
@@ -62,6 +64,20 @@ export function useFormatSchedulePayload(params: Params) {
       Object.entries(schedule).forEach(([property, value]) => {
         if (scheduleMainProperties.includes(property)) {
           formattedSchedule = { ...formattedSchedule, [property]: value };
+        }
+      });
+
+      Object.entries(schedule.parameters).forEach(([property, value]) => {
+        if (NullableProperties.includes(property)) {
+          formattedSchedule = {
+            ...formattedSchedule,
+            parameters: {
+              ...(formattedSchedule[
+                'parameters' as keyof typeof formattedSchedule
+              ] as object),
+              [property]: value || '',
+            },
+          };
         }
       });
 

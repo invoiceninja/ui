@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import paymentType from '$app/common/constants/payment-type';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Payment } from '$app/common/interfaces/payment';
@@ -25,6 +24,7 @@ import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -36,6 +36,8 @@ interface Context {
 export default function Edit() {
   const { documentTitle } = useTitle('edit_payment');
   const [t] = useTranslation();
+
+  const paymentTypes = usePaymentTypes();
 
   const context = useOutletContext<Context>();
 
@@ -96,13 +98,11 @@ export default function Edit() {
           errorMessage={errors?.errors.type_id}
           withBlank
         >
-          {Object.entries(paymentType).map((value: any, index: any) => {
-            return (
-              <option key={index} value={String(value[0])}>
-                {t(value[1])}
-              </option>
-            );
-          })}
+          {paymentTypes.map(([key, value], index) => (
+            <option value={key} key={index}>
+              {value}
+            </option>
+          ))}
         </SelectField>
       </Element>
 

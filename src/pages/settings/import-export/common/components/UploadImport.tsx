@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ImportedFile } from './Import';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface Props {
   group: string;
@@ -37,12 +38,55 @@ export function UploadImport(props: Props) {
     );
   };
 
+  const checkRowsLengthInCSV = (file: File) => {
+    return new Promise((resolve) => {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const csvData = (event.target?.result as string) || '';
+          const rowData = csvData.split('\n');
+
+          if (!rowData.length || rowData.length === 1) {
+            resolve(false);
+          } else if (rowData.length === 2 && !rowData[1]) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+
+        reader.readAsText(file);
+      } catch (error) {
+        resolve(false);
+      }
+    });
+  };
+
+  const shouldUploadFiles = async (files: File[]) => {
+    for (let i = 0; i < files.length; i++) {
+      const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
+
+      if (!hasCorrectRowsLength) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'text/*': ['.csv'] },
-    onDrop: (acceptedFiles) => {
-      acceptedFiles.forEach((file) => {
-        setFiles((prevState) => [...prevState, { group, file }]);
-      });
+    onDrop: async (acceptedFiles) => {
+      const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
+
+      if (shouldAddFiles) {
+        acceptedFiles.forEach((file) => {
+          setFiles((prevState) => [...prevState, { group, file }]);
+        });
+      } else {
+        toast.error('csv_rows_length');
+      }
     },
   });
 

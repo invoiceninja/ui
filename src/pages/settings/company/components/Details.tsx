@@ -260,10 +260,11 @@ export function Details() {
                 handleChange('settings.classification', value.toString())
               }
               disabled={disableSettingsField('classification')}
+              withBlank
             >
-              <option value=""></option>
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>
+              <option value="company">{t('company')}</option>
               <option value="partnership">{t('partnership')}</option>
               <option value="trust">{t('trust')}</option>
               <option value="charity">{t('charity')}</option>

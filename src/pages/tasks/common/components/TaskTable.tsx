@@ -220,7 +220,12 @@ export function TaskTable(props: Props) {
                         type="date"
                         value={parseTimeToDate(stop)}
                         onValueChange={(value) =>
-                          handleDateChange(stop, value, index, LogPosition.End)
+                          handleDateChange(
+                            stop,
+                            value || parseTimeToDate(start) || '',
+                            index,
+                            LogPosition.End
+                          )
                         }
                       />
                     </Td>
@@ -231,9 +236,14 @@ export function TaskTable(props: Props) {
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
-                      value={parseTime(stop) || 0}
+                      value={parseTime(stop)}
                       onValueChange={(value) =>
-                        handleTimeChange(stop, value, LogPosition.End, index)
+                        handleTimeChange(
+                          stop,
+                          value || parseTime(start) || '',
+                          LogPosition.End,
+                          index
+                        )
                       }
                     />
                   </Td>

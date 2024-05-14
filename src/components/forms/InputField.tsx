@@ -84,6 +84,7 @@ export function InputField(props: Props) {
             ...props.style,
           }}
           min={props.min}
+          max={props.type === 'date' ? '9999-12-31' : undefined}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
@@ -101,6 +102,11 @@ export function InputField(props: Props) {
           )}
           placeholder={props.placeholder || ''}
           onBlur={(event) => {
+            event.target.value =
+              event.target.value === '' && props.type === 'number'
+                ? '0'
+                : event.target.value;
+
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}

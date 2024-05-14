@@ -11,7 +11,7 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 
-export function TotalFields() {
+export default function TotalFields() {
   const [t] = useTranslation();
 
   const defaultVariables = [
@@ -30,7 +30,7 @@ export function TotalFields() {
   ];
 
   return (
-    <Card title={t('total_fields')} padding="small" collapsed={true}>
+    <Card title={t('total_fields')} padding="small">
       <SortableVariableList
         for="total_columns"
         defaultVariables={defaultVariables}

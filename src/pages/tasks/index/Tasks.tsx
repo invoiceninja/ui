@@ -31,34 +31,73 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  TaskSlider,
+  taskSliderAtom,
+  taskSliderVisibilityAtom,
+} from '../common/components/TaskSlider';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useTaskQuery } from '$app/common/queries/tasks';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { ExtensionBanner } from '../common/components/ExtensionBanner';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const showEditOption = useShowEditOption();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
-  const columns = useTaskColumns();
-
-  const filters = useTaskFilters();
-
   const actions = useActions();
-
+  const filters = useTaskFilters();
+  const columns = useTaskColumns();
   const taskColumns = useAllTaskColumns();
-
   const customBulkActions = useCustomBulkActions();
 
-  const showEditOption = useShowEditOption();
+  const [sliderTaskId, setSliderTaskId] = useState<string>('');
+  const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
+  const [taskSliderVisibility, setTaskSliderVisibility] = useAtom(
+    taskSliderVisibilityAtom
+  );
+
+  const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
+
+  useEffect(() => {
+    if (taskResponse && taskSliderVisibility) {
+      setTaskSlider(taskResponse);
+    }
+  }, [taskResponse, taskSliderVisibility]);
+
+  useEffect(() => {
+    return () => setTaskSliderVisibility(false);
+  }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      aboveMainContainer={<ExtensionBanner />}
+      withoutBackButton
+    >
       <DataTable
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client,project&without_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"
@@ -93,6 +132,21 @@ export default function Tasks() {
         }
         linkToCreateGuards={[permission('create_task')]}
         hideEditableOptions={!hasPermission('edit_task')}
+        onTableRowClick={(quote) => {
+          setSliderTaskId(quote.id);
+          setTaskSliderVisibility(true);
+        }}
+      />
+
+      {!disableNavigation('task', taskSlider) && <TaskSlider />}
+
+      <ChangeTemplateModal<Task>
+        entity="task"
+        entities={changeTemplateResources as Task[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
       />
     </Default>
   );

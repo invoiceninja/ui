@@ -47,6 +47,7 @@ export default function Expenses() {
       bulkRoute="/api/v1/expenses/bulk"
       linkToCreate={route('/expenses/create?vendor=:id', { id })}
       linkToEdit="/expenses/:id/edit"
+      excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_expense')]}
       hideEditableOptions={!hasPermission('edit_expense')}
     />

@@ -28,6 +28,11 @@ export interface Parameters {
   include_tax: boolean;
   client_id: string;
   document_email_attachment?: boolean;
+  vendors: string;
+  categories: string;
+  projects: string;
+  report_keys: string[];
+  include_deleted?: boolean;
 }
 
 export interface Schedule {

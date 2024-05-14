@@ -51,6 +51,7 @@ export default function PurchaseOrders() {
       bulkRoute="/api/v1/purchase_orders/bulk"
       linkToCreate={route('/purchase_orders/create?vendor=:id', { id })}
       linkToEdit="/purchase_orders/:id/edit"
+      excludeColumns={['vendor_id']}
       linkToCreateGuards={[permission('create_purchase_order')]}
       hideEditableOptions={!hasPermission('edit_purchase_order')}
     />

@@ -57,6 +57,10 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { emitter } from '$app';
+import { TFooter } from './tables/TFooter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface DateRangeColumn {
   column: string;
@@ -67,6 +71,15 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+}[];
+
+export type FooterColumns<T = any> = {
+  id: string;
+  label: string;
+  format: (
+    field: (string | number)[],
+    resource: T[]
+  ) => ReactNode | string | number;
 }[];
 
 type CustomBulkActionContext<T> = {
@@ -126,6 +139,15 @@ interface Props<T> extends CommonProps {
   ) => void;
   hideEditableOptions?: boolean;
   dateRangeColumns?: DateRangeColumn[];
+  excludeColumns?: string[];
+  methodType?: 'GET' | 'POST';
+  showArchive?: (resource: T) => boolean;
+  showDelete?: (resource: T) => boolean;
+  withoutDefaultBulkActions?: boolean;
+  withoutStatusFilter?: boolean;
+  queryIdentificator?: string;
+  disableQuery?: boolean;
+  footerColumns?: FooterColumns;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -136,6 +158,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
   const options = useDataTableOptions();
+
+  const reactSettings = useReactSettings();
+
+  const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -154,6 +180,11 @@ export function DataTable<T extends object>(props: Props<T>) {
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeColumns = [],
+    excludeColumns = [],
+    methodType = 'GET',
+    queryIdentificator,
+    disableQuery,
+    footerColumns = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -268,6 +299,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { data, isLoading, isError } = useQuery(
     [
+      ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
       props.endpoint,
       perPage,
@@ -279,9 +311,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       dateRange,
       dateRangeQueryParameter,
     ],
-    () => request('GET', apiEndpoint.href),
+    () => request(methodType, apiEndpoint.href),
     {
       staleTime: props.staleTime ?? Infinity,
+      enabled: !disableQuery,
     }
   );
 
@@ -357,6 +390,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       setDateRangeQueryParameter(queryParameterOfCurrentColumn);
   };
 
+  const getFooterColumn = (columnId: string) => {
+    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  };
+
+  const getColumnValues = (columnId: string) => {
+    return data?.data.data.map(
+      (resource: T) => resource[columnId as keyof typeof resource]
+    );
+  };
+
   useEffect(() => {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
@@ -376,6 +419,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
+
+  useEffect(() => {
+    emitter.on('bulk.completed', () => setSelected([]));
+  }, []);
 
   return (
     <div data-cy="dataTable">
@@ -409,6 +456,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             </>
           }
           beforeFilter={props.beforeFilter}
+          withoutStatusFilter={props.withoutStatusFilter}
         >
           {!hideEditableOptions && (
             <Dropdown
@@ -433,45 +481,49 @@ export function DataTable<T extends object>(props: Props<T>) {
                 <Divider withoutPadding />
               )}
 
-              <DropdownElement
-                onClick={() => {
-                  if (onBulkActionCall) {
-                    onBulkActionCall(selected, 'archive');
-                  } else {
-                    bulk('archive');
-                  }
-                }}
-                icon={<Icon element={MdArchive} />}
-              >
-                {t('archive')}
-              </DropdownElement>
+              {!props.withoutDefaultBulkActions && (
+                <>
+                  <DropdownElement
+                    onClick={() => {
+                      if (onBulkActionCall) {
+                        onBulkActionCall(selected, 'archive');
+                      } else {
+                        bulk('archive');
+                      }
+                    }}
+                    icon={<Icon element={MdArchive} />}
+                  >
+                    {t('archive')}
+                  </DropdownElement>
 
-              <DropdownElement
-                onClick={() => {
-                  if (onBulkActionCall) {
-                    onBulkActionCall(selected, 'delete');
-                  } else {
-                    bulk('delete');
-                  }
-                }}
-                icon={<Icon element={MdDelete} />}
-              >
-                {t('delete')}
-              </DropdownElement>
+                  <DropdownElement
+                    onClick={() => {
+                      if (onBulkActionCall) {
+                        onBulkActionCall(selected, 'delete');
+                      } else {
+                        bulk('delete');
+                      }
+                    }}
+                    icon={<Icon element={MdDelete} />}
+                  >
+                    {t('delete')}
+                  </DropdownElement>
 
-              {showRestoreBulkAction() && (
-                <DropdownElement
-                  onClick={() => {
-                    if (onBulkActionCall) {
-                      onBulkActionCall(selected, 'restore');
-                    } else {
-                      bulk('restore');
-                    }
-                  }}
-                  icon={<Icon element={MdRestore} />}
-                >
-                  {t('restore')}
-                </DropdownElement>
+                  {showRestoreBulkAction() && (
+                    <DropdownElement
+                      onClick={() => {
+                        if (onBulkActionCall) {
+                          onBulkActionCall(selected, 'restore');
+                        } else {
+                          bulk('restore');
+                        }
+                      }}
+                      icon={<Icon element={MdRestore} />}
+                    >
+                      {t('restore')}
+                    </DropdownElement>
+                  )}
+                </>
               )}
             </Dropdown>
           )}
@@ -516,31 +568,34 @@ export function DataTable<T extends object>(props: Props<T>) {
             </Th>
           )}
 
-          {props.columns.map((column, index) => (
-            <Th
-              id={column.id}
-              key={index}
-              className={styleOptions?.thClassName}
-              isCurrentlyUsed={sortedBy === column.id}
-              onColumnClick={(data: ColumnSortPayload) => {
-                setSortedBy(data.field);
-                setSort(data.sort);
-              }}
-              childrenClassName={styleOptions?.thChildrenClassName}
-            >
-              <div className="flex items-center space-x-3">
-                {dateRangeColumns.some(
-                  (dateRangeColumn) => column.id === dateRangeColumn.column
-                ) && (
-                  <DateRangePicker
-                    setDateRange={setDateRange}
-                    onClick={() => handleDateRangeColumnClick(column.id)}
-                  />
-                )}
-                <span>{column.label}</span>
-              </div>
-            </Th>
-          ))}
+          {props.columns.map(
+            (column, index) =>
+              Boolean(!excludeColumns.includes(column.id)) && (
+                <Th
+                  id={column.id}
+                  key={index}
+                  className={styleOptions?.thClassName}
+                  isCurrentlyUsed={sortedBy === column.id}
+                  onColumnClick={(data: ColumnSortPayload) => {
+                    setSortedBy(data.field);
+                    setSort(data.sort);
+                  }}
+                  childrenClassName={styleOptions?.thChildrenClassName}
+                >
+                  <div className="flex items-center space-x-3">
+                    {dateRangeColumns.some(
+                      (dateRangeColumn) => column.id === dateRangeColumn.column
+                    ) && (
+                      <DateRangePicker
+                        setDateRange={setDateRange}
+                        onClick={() => handleDateRangeColumnClick(column.id)}
+                      />
+                    )}
+                    <span>{column.label}</span>
+                  </div>
+                </Th>
+              )
+          )}
 
           {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
         </Thead>
@@ -593,6 +648,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
+                backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
@@ -615,29 +671,32 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 )}
 
-                {props.columns.map((column, index) => (
-                  <Td
-                    key={index}
-                    className={classNames(
-                      {
-                        'cursor-pointer': index < 3,
-                        'py-4': hideEditableOptions,
-                      },
-                      styleOptions?.tdClassName
-                    )}
-                    onClick={() => {
-                      if (index < 3) {
-                        props.onTableRowClick
-                          ? props.onTableRowClick(resource)
-                          : document.getElementById(resource.id)?.click();
-                      }
-                    }}
-                  >
-                    {column.format
-                      ? column.format(resource[column.id], resource)
-                      : resource[column.id]}
-                  </Td>
-                ))}
+                {props.columns.map(
+                  (column, index) =>
+                    Boolean(!excludeColumns.includes(column.id)) && (
+                      <Td
+                        key={index}
+                        className={classNames(
+                          {
+                            'cursor-pointer': index < 3,
+                            'py-4': hideEditableOptions,
+                          },
+                          styleOptions?.tdClassName
+                        )}
+                        onClick={() => {
+                          if (index < 3) {
+                            props.onTableRowClick
+                              ? props.onTableRowClick(resource)
+                              : document.getElementById(resource.id)?.click();
+                          }
+                        }}
+                      >
+                        {column.format
+                          ? column.format(resource[column.id], resource)
+                          : resource[column.id]}
+                      </Td>
+                    )
+                )}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Td>
@@ -676,14 +735,16 @@ export function DataTable<T extends object>(props: Props<T>) {
                         (props.showRestore?.(resource) ||
                           !props.showRestore) && <Divider withoutPadding />}
 
-                      {resource?.archived_at === 0 && (
-                        <DropdownElement
-                          onClick={() => bulk('archive', resource.id)}
-                          icon={<Icon element={MdArchive} />}
-                        >
-                          {t('archive')}
-                        </DropdownElement>
-                      )}
+                      {resource?.archived_at === 0 &&
+                        (props.showArchive?.(resource) ||
+                          !props.showArchive) && (
+                          <DropdownElement
+                            onClick={() => bulk('archive', resource.id)}
+                            icon={<Icon element={MdArchive} />}
+                          >
+                            {t('archive')}
+                          </DropdownElement>
+                        )}
 
                       {resource?.archived_at > 0 &&
                         (props.showRestore?.(resource) ||
@@ -696,14 +757,15 @@ export function DataTable<T extends object>(props: Props<T>) {
                           </DropdownElement>
                         )}
 
-                      {!resource?.is_deleted && (
-                        <DropdownElement
-                          onClick={() => bulk('delete', resource.id)}
-                          icon={<Icon element={MdDelete} />}
-                        >
-                          {t('delete')}
-                        </DropdownElement>
-                      )}
+                      {!resource?.is_deleted &&
+                        (props.showDelete?.(resource) || !props.showDelete) && (
+                          <DropdownElement
+                            onClick={() => bulk('delete', resource.id)}
+                            icon={<Icon element={MdDelete} />}
+                          >
+                            {t('delete')}
+                          </DropdownElement>
+                        )}
 
                       {props.customActions &&
                         props.customActions.map(
@@ -721,6 +783,36 @@ export function DataTable<T extends object>(props: Props<T>) {
               </Tr>
             ))}
         </Tbody>
+
+        {Boolean(footerColumns.length) &&
+          Boolean(data?.data.data.length) &&
+          Boolean(reactSettings.show_table_footer) && (
+            <TFooter>
+              {!props.withoutActions && !hideEditableOptions && <Th></Th>}
+
+              {props.columns.map(
+                (column, index) =>
+                  Boolean(!excludeColumns.includes(column.id)) && (
+                    <Td key={index} customizeTextColor>
+                      {getFooterColumn(column.id) ? (
+                        <div className="flex items-center space-x-3">
+                          {getFooterColumn(column.id)?.format(
+                            getColumnValues(column.id) || [],
+                            data?.data.data || []
+                          ) ?? '-/-'}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </Td>
+                  )
+              )}
+
+              {props.withResourcefulActions && !hideEditableOptions && (
+                <Th></Th>
+              )}
+            </TFooter>
+          )}
       </Table>
 
       {data && !props.withoutPagination && (

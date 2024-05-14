@@ -11,6 +11,7 @@
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
+import { NotesIframe } from '$app/components/NotesIframe';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -46,10 +47,9 @@ export function Address(props: Props) {
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
 
-                <span
-                  className="whitespace-normal"
-                  dangerouslySetInnerHTML={{ __html: client.public_notes }}
-                />
+                <div className="whitespace-normal">
+                  <NotesIframe srcDoc={client.public_notes} />
+                </div>
               </>
             }
             className="h-full"

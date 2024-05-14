@@ -69,6 +69,8 @@ export function useAllPaymentColumns() {
     'is_deleted',
     'private_notes',
     'refunded',
+    'applied',
+    'credits',
     'updated_at',
   ] as const;
 
@@ -225,8 +227,8 @@ export function usePaymentColumns() {
     },
     {
       column: 'converted_amount',
-      id: 'amount',
-      label: t('amount'),
+      id: 'converted_amount' as keyof Payment,
+      label: t('converted_amount'),
       format: (value, payment) =>
         formatMoney(
           calculateConvertedAmount(payment),
@@ -303,6 +305,30 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'applied',
+      id: 'applied',
+      label: t('applied'),
+      format: (value, payment) =>
+        formatMoney(
+          value,
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'credits',
+      id: 'credits',
+      label: t('credits'),
+      format: (value, payment) =>
+        formatMoney(
+          payment.paymentables
+            .filter((item) => item.credit_id != undefined)
+            .reduce((sum, paymentable) => sum + paymentable.amount, 0),
           payment.client?.country_id,
           payment.client?.settings.currency_id
         ),

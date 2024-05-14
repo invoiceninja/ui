@@ -477,7 +477,6 @@ test('quote documents preview with edit_quote', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -525,7 +524,6 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
   await page
     .getByRole('button', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

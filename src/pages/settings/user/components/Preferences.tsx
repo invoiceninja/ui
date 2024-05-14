@@ -23,8 +23,7 @@ import { Inline } from '$app/components/Inline';
 import { X } from 'react-feather';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
-import { $1, $2, colorSchemeAtom } from '$app/common/colors';
-import { useAtom } from 'jotai';
+import { StatusColorTheme } from './StatusColorTheme';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -39,8 +38,6 @@ export function Preferences() {
       })
     );
   };
-
-  const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
   return (
     <div className="space-y-4">
@@ -107,10 +104,29 @@ export function Preferences() {
 
         <Element leftSide={t('dark_mode')}>
           <Toggle
-            checked={JSON.stringify(colorScheme) === JSON.stringify($1)}
-            onChange={(v) => (v ? setColorScheme($1) : setColorScheme($2))}
+            checked={Boolean(reactSettings?.dark_mode)}
+            onChange={(value) =>
+              handleChange('company_user.react_settings.dark_mode', value)
+            }
           />
         </Element>
+
+        <Element
+          leftSide={t('show_table_footer')}
+          leftSideHelp={t('show_table_footer_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings?.show_table_footer)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.show_table_footer',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <StatusColorTheme />
       </Card>
 
       <PreferenceCard

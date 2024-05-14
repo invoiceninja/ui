@@ -34,7 +34,7 @@ import { isHosted } from '$app/common/helpers';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
-
+import { arrayMoveImmutable } from 'array-move';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -49,9 +49,10 @@ const gatewaysStyles = [
 export const gatewaysDetails = [
   { name: 'stripe', key: 'd14dd26a37cecc30fdd65700bfb55b23' },
   { name: 'stripe', key: 'd14dd26a47cecc30fdd65700bfb67b34' },
-  { name: 'paypal', key: '80af24a6a691230bbec33e930ab40666' },
+  { name: 'paypal_platform', key: '80af24a6a691230bbec33e930ab40666' },
+  { name: 'paypal_rest', key: '80af24a6a691230bbec33e930ab40665' },
   { name: 'braintree', key: 'f7ec488676d310683fb51802d076d713' },
-  { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666'},
+  { name: 'paypal_ppcp', key: '80af24a6a691230bbec33e930ab40666' },
   { name: 'authorize', key: '3b6621f970ab18887c4f6dca78d3f8bb' },
   { name: 'mollie', key: '1bd651fb213ca0c9d66ae3c336dc77e8' },
   { name: 'gocardless', key: 'b9886f9257f0c6ee7c302f1c74475f6c' },
@@ -94,19 +95,15 @@ export function Create() {
   const onSave = useHandleCreate(companyGateway, setErrors);
 
   const handleChange = (value: string, isManualChange?: boolean) => {
-
     const gateway = gateways.find((gateway) => gateway.id === value);
 
     setGateway(gateway);
 
-    if(gateway?.key === '80af24a6a691230bbec33e930ab40666') {
+    if (gateway?.key === '80af24a6a691230bbec33e930ab40666') {
       handleSetup();
-    }
-    else if(gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
+    } else if (gateway?.key === 'd14dd26a47cecc30fdd65700bfb67b34') {
       handleStripeSetup();
-    }
-    else
-      isManualChange && setTabIndex(1);
+    } else isManualChange && setTabIndex(1);
   };
 
   const handleSetup = () => {
@@ -139,7 +136,7 @@ export function Create() {
     );
   };
 
-  const defaultTab = [t('provider')];
+  const defaultTab = [t('payment_provider')];
 
   const additionalTabs = [
     t('credentials'),
@@ -172,17 +169,28 @@ export function Create() {
 
   useEffect(() => {
     if (gateways) {
+      if (isHosted()) {
+        const mutated_gateways = gateways.filter((gateway) => {
+          return !hostedGatewayFilter.includes(gateway.key);
+        });
+        setFilteredGateways(mutated_gateways);
+      } else {
+        const payPalRestIndex = gateways.findIndex(
+          ({ key }) => key === '80af24a6a691230bbec33e930ab40665'
+        );
 
-      if(isHosted()){
-      const mutated_gateways = gateways.filter((gateway) => {
-        return !hostedGatewayFilter.includes(gateway.key);   
-      });
-      setFilteredGateways(mutated_gateways);  
+        if (payPalRestIndex >= 0) {
+          const sortedGateways: Gateway[] = arrayMoveImmutable(
+            gateways as Gateway[],
+            payPalRestIndex,
+            1
+          );
+
+          setFilteredGateways(sortedGateways);
+        } else {
+          setFilteredGateways(gateways);
+        }
       }
-      else {
-        setFilteredGateways(gateways);
-      }
-      
     }
   }, [gateways]);
 
@@ -257,7 +265,7 @@ export function Create() {
         onTabChange={(index) => setTabIndex(index)}
       >
         <Card title={t('add_gateway')}>
-          <Element leftSide={t('provider')}>
+          <Element leftSide={t('payment_provider')}>
             <SelectField
               onValueChange={(value) => handleChange(value, true)}
               value={gateway?.id}
@@ -346,8 +354,9 @@ export function Create() {
                     <Button
                       behavior="button"
                       onClick={() => {
-                        
-                        if(gateway.key !== '80af24a6a691230bbec33e930ab40666' ){
+                        if (
+                          gateway.key !== '80af24a6a691230bbec33e930ab40666'
+                        ) {
                           setCreateBySetup(true);
                         }
 

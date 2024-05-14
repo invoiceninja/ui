@@ -20,9 +20,9 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useProductsQuery } from '$app/common/queries/products';
 import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
@@ -30,18 +30,18 @@ import { useHandleChange } from '../common/hooks/useHandleChange';
 import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useActions } from '../common/hooks/useActions';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Steps } from '../common/components/Steps';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment_link');
-
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  const actions = useActions();
 
   const { id } = useParams();
-
   const { data } = useSubscriptionQuery({ id });
-
   const { data: productsData } = useProductsQuery({ status: ['active'] });
 
   const pages = [
@@ -55,13 +55,12 @@ export function Edit() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
-  const tabs = [t('overview'), t('settings'), t('webhook')];
-
-  const [subscription, setSubscription] = useState<Subscription>();
+  const tabs = [t('overview'), t('settings'), t('webhook'), t('steps')];
 
   const [products, setProducts] = useState<Product[]>();
-
+  const [subscription, setSubscription] = useState<Subscription>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const handleChange = useHandleChange({
     setErrors,
@@ -101,35 +100,47 @@ export function Edit() {
     }
   }, [productsData]);
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSave = () => {
+    if (!isFormBusy) {
+      setErrors(undefined);
+      setIsFormBusy(true);
 
-    setErrors(undefined);
+      toast.processing();
 
-    toast.processing();
+      request(
+        'PUT',
+        endpoint('/api/v1/subscriptions/:id', { id }),
+        subscription
+      )
+        .then(() => {
+          toast.success('updated_subscription');
 
-    request('PUT', endpoint('/api/v1/subscriptions/:id', { id }), subscription)
-      .then(() => {
-        toast.success('updated_subscription');
-
-        $refetch(['subscriptions']);
-
-        navigate('/settings/subscriptions');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
-        }
-      });
+          $refetch(['subscriptions']);
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   return (
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={handleSave}
-      disableSaveButton={!subscription || showPlanAlert}
+      navigationTopRight={
+        subscription && (
+          <ResourceActions
+            resource={subscription}
+            onSaveClick={handleSave}
+            actions={actions}
+            disableSaveButton={!subscription || showPlanAlert || isFormBusy}
+          />
+        )
+      }
     >
       <TabGroup tabs={tabs}>
         <div>
@@ -156,6 +167,16 @@ export function Edit() {
         <div>
           {subscription && (
             <Webhook
+              subscription={subscription}
+              handleChange={handleChange}
+              errors={errors}
+            />
+          )}
+        </div>
+
+        <div>
+          {subscription && (
+            <Steps
               subscription={subscription}
               handleChange={handleChange}
               errors={errors}

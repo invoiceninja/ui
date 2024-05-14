@@ -33,6 +33,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { Settings as SettingsIcon } from 'react-feather';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -97,7 +98,18 @@ export function Edit() {
         )
       }
     >
-      <TabGroup tabs={[t('overview'), t('clients'), t('documents')]}>
+      <TabGroup
+        tabs={[t('overview'), t('clients'), t('documents')]}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={groupSettings?.documents.length}
+              />
+            );
+          }
+        }}
+      >
         <div>
           {groupSettings && groupSettingsResponse && (
             <Card

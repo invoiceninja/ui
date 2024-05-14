@@ -32,8 +32,25 @@ export function TaxSettings(props: Props) {
   const { recurringExpense, handleChange, taxInputType, setTaxInputType } =
     props;
 
+  const handleResetTaxValues = (value: 'by_rate' | 'by_amount') => {
+    if (value === 'by_amount') {
+      handleChange('tax_rate1', 0);
+      handleChange('tax_rate2', 0);
+      handleChange('tax_rate3', 0);
+    } else {
+      handleChange('tax_amount1', 0);
+      handleChange('tax_amount2', 0);
+      handleChange('tax_amount3', 0);
+    }
+
+    handleChange('tax_name1', '');
+    handleChange('tax_name2', '');
+    handleChange('tax_name3', '');
+  };
+
   const taxTypeChange = (value: string) => {
     setTaxInputType(value as 'by_rate' | 'by_amount');
+    handleResetTaxValues(value as 'by_rate' | 'by_amount');
     handleChange('calculate_tax_by_amount', value === 'by_amount');
   };
 
@@ -77,6 +94,7 @@ export function TaxSettings(props: Props) {
           <Toggle
             checked={recurringExpense.uses_inclusive_taxes}
             onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+            cypressRef="inclusiveTaxesToggle"
           />
         </Element>
       )}

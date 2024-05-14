@@ -44,3 +44,32 @@ export function Unauthorized() {
     </Default>
   );
 }
+
+export function SubPageUnauthorized() {
+  const [t] = useTranslation();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => {
+      setIsLoading(true);
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center mt-14 space-y-4">
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          <AlertTriangle size={128} />
+
+          <h1 className="text-2xl">{t('not_allowed')}.</h1>
+        </>
+      )}
+    </div>
+  );
+}

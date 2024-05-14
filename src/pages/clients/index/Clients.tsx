@@ -21,15 +21,16 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
-import { MergeClientModal } from '../common/components/MergeClientModal';
-import { useState } from 'react';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Client } from '$app/common/interfaces/client';
 
 export default function Clients() {
   useTitle('clients');
@@ -39,25 +40,16 @@ export default function Clients() {
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
-  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
-  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState<boolean>(false);
-
-  const [mergeFromClientId, setMergeFromClientId] = useState<string>('');
-  const [purgeClientId, setPurgeClientId] = useState<string>('');
-
-  const actions = useActions({
-    setIsMergeModalOpen,
-    setMergeFromClientId,
-    setPasswordConfirmModalOpen,
-    setPurgeClientId,
-  });
-
+  const actions = useActions();
   const columns = useClientColumns();
   const clientColumns = useAllClientColumns();
-  const handlePurgeClient = usePurgeClient(purgeClientId);
-
   const customBulkActions = useCustomBulkActions();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -96,16 +88,13 @@ export default function Clients() {
         hideEditableOptions={!hasPermission('edit_client')}
       />
 
-      <MergeClientModal
-        visible={isMergeModalOpen}
-        setVisible={setIsMergeModalOpen}
-        mergeFromClientId={mergeFromClientId}
-      />
-
-      <PasswordConfirmation
-        show={isPasswordConfirmModalOpen}
-        onClose={setPasswordConfirmModalOpen}
-        onSave={handlePurgeClient}
+      <ChangeTemplateModal<Client>
+        entity="client"
+        entities={changeTemplateResources as Client[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(client) => `${t('number')}: ${client.number}`}
+        bulkUrl="/api/v1/clients/bulk"
       />
     </Default>
   );

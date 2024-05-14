@@ -167,19 +167,30 @@ export function Form(props: Props) {
             />
           </Element>
 
+          <Element leftSide={t('routing_id')}>
+            <InputField
+              value={vendor.routing_id || ''}
+              onValueChange={(value) => handleChange('routing_id', value)}
+              errorMessage={props.errors?.errors.routing_id}
+            />
+          </Element>
+
           <Element leftSide={t('classification')}>
             <SelectField
               id="classification"
               defaultValue={vendor.classification ?? ''}
               onValueChange={(value) => handleChange('classification', value)}
+              errorMessage={errors?.errors.classification}
+              withBlank
             >
-              <option value=""></option>
               <option value="individual">{t('individual')}</option>
               <option value="business">{t('business')}</option>
+              <option value="company">{t('company')}</option>
               <option value="partnership">{t('partnership')}</option>
               <option value="trust">{t('trust')}</option>
               <option value="charity">{t('charity')}</option>
               <option value="government">{t('government')}</option>
+              <option value="other">{t('other')}</option>
             </SelectField>
           </Element>
 

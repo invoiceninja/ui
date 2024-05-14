@@ -10,7 +10,7 @@ import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MdArrowDropDown } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 const Div = styled.div`
   &:hover {
@@ -21,12 +21,18 @@ const Div = styled.div`
 export function QuickCreatePopover() {
   const [t] = useTranslation();
 
+  const navigate = useNavigate();
+
   const colors = useColorScheme();
   const accentColor = useAccentColor();
   const actions = useQuickCreateActions();
   const sections = useQuickCreateSections();
 
-  const preventNavigation = usePreventNavigation();
+  const user = useInjectUserChanges();
+
+  const isMiniSidebar = Boolean(
+    user?.company_user?.react_settings.show_mini_sidebar
+  );
 
   return (
     <Popover className="relative mt-2">
@@ -55,10 +61,16 @@ export function QuickCreatePopover() {
           >
             <Popover.Panel
               className={classNames(
-                'absolute left-5 lg:left-full z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2',
+                'absolute z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2',
                 {
-                  'md:-left-20 md:max-w-2xl lg:max-w-3xl': isHosted(),
-                  'md:left-8 lg:max-w-lg': isSelfHosted(),
+                  'left-14 md:-left-12 md:max-w-2xl lg:max-w-3xl lg:left-full':
+                    isHosted() && !isMiniSidebar,
+                  'left-14 md:left-52 md:max-w-2xl lg:max-w-3xl':
+                    isHosted() && isMiniSidebar,
+                  'left-14 md:left-8 lg:max-w-lg lg:left-full':
+                    isSelfHosted() && !isMiniSidebar,
+                  'left-14 md:left-8 lg:max-w-lg lg:left-20':
+                    isSelfHosted() && isMiniSidebar,
                 }
               )}
             >

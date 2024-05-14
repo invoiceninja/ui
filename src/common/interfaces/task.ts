@@ -11,6 +11,7 @@
 import { Project } from './project';
 import { Client } from './client';
 import { TaskStatus } from './task-status';
+import { User } from './user';
 
 export interface Task {
   id: string;
@@ -43,4 +44,6 @@ export interface Task {
   documents: any[];
   date: string;
   calculated_start_date: string;
+  user: User;
+  assigned_user: User;
 }

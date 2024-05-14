@@ -15,10 +15,14 @@ import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { ProductItemsSelector } from '$app/pages/reports/common/components/ProductItemsSelector';
 import { StatusSelector } from '$app/pages/reports/common/components/StatusSelector';
-import { useReports } from '$app/pages/reports/common/useReports';
+import { Identifier, useReports } from '$app/pages/reports/common/useReports';
 import { ranges } from '$app/pages/reports/index/Reports';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { MultiClientSelector } from '$app/pages/reports/common/components/MultiClientSelector';
+import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
+import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
+import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
 
 interface Props {
   schedule: Schedule;
@@ -40,7 +44,13 @@ type ReportFiled =
   | 'start_date'
   | 'end_date'
   | 'include_tax'
-  | 'document_email_attachment';
+  | 'document_email_attachment'
+  | 'clients'
+  | 'vendors'
+  | 'categories'
+  | 'projects'
+  | 'report_keys'
+  | 'include_deleted';
 
 export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
   'send_email',
@@ -50,11 +60,22 @@ export const DEFAULT_REPORT_FIELDS: ReportFiled[] = [
 ];
 
 export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
-  invoice: [...DEFAULT_REPORT_FIELDS, 'status', 'document_email_attachment'],
+  invoice: [
+    ...DEFAULT_REPORT_FIELDS,
+    'status',
+    'document_email_attachment',
+    'report_keys',
+    'include_deleted',
+    'client',
+  ],
   invoice_item: [
     ...DEFAULT_REPORT_FIELDS,
     'products',
     'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+    'client',
   ],
   product_sales: [...DEFAULT_REPORT_FIELDS, 'products', 'client'],
   profitloss: [
@@ -63,18 +84,91 @@ export const REPORTS_FIELDS: Record<string, ReportFiled[]> = {
     'income_billed',
     'include_tax',
   ],
-  client: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  quote: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  quote_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  credit: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  client: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'include_deleted',
+  ],
+  contact: [...DEFAULT_REPORT_FIELDS, 'report_keys'],
+  recurring_invoice: [
+    ...DEFAULT_REPORT_FIELDS,
+    'report_keys',
+    'status',
+    'include_deleted',
+    'client',
+  ],
+  quote: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+    'client',
+  ],
+  quote_item: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+    'client',
+  ],
+  credit: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'include_deleted',
+    'status',
+    'client',
+  ],
   document: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  payment: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  expense: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  task: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  payment: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'client',
+  ],
+  expense: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'clients',
+    'vendors',
+    'projects',
+    'categories',
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
+  task: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+    'client',
+  ],
   product: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  vendor: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  purchase_order: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
-  purchase_order_item: [...DEFAULT_REPORT_FIELDS, 'document_email_attachment'],
+  vendor: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+  ],
+  purchase_order: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
+  purchase_order_item: [
+    ...DEFAULT_REPORT_FIELDS,
+    'document_email_attachment',
+    'report_keys',
+    'status',
+    'include_deleted',
+  ],
 };
 
 export function EmailReport(props: Props) {
@@ -101,7 +195,10 @@ export function EmailReport(props: Props) {
           cypressRef="scheduleReportName"
         >
           {reports.map((report, i) => (
-            <option value={report.identifier} key={i}>
+            <option
+              key={i}
+              value={report.schedule_identifier || report.identifier}
+            >
               {t(report.label)}
             </option>
           ))}
@@ -178,9 +275,28 @@ export function EmailReport(props: Props) {
         </Element>
       )}
 
+      {showReportFiled('include_deleted') && (
+        <Element
+          leftSide={t('include_deleted')}
+          leftSideHelp={t('include_deleted_help')}
+        >
+          <Toggle
+            checked={schedule.parameters.include_deleted}
+            onValueChange={(value) =>
+              handleChange(
+                'parameters.include_deleted' as keyof Schedule,
+                value
+              )
+            }
+            cypressRef="includeDeleted"
+          />
+        </Element>
+      )}
+
       {showReportFiled('status') && (
         <Element leftSide={t('status')}>
           <StatusSelector
+            report={schedule.parameters.report_name as Identifier}
             value={schedule.parameters.status}
             onValueChange={(value) =>
               handleChange('parameters.status' as keyof Schedule, value)
@@ -263,6 +379,55 @@ export function EmailReport(props: Props) {
             errorMessage={errors?.errors['parameters.client_id']}
           />
         </Element>
+      )}
+
+      {showReportFiled('clients') && (
+        <MultiClientSelector
+          value={schedule.parameters.clients.join(',')}
+          onValueChange={(clientIds) => {
+            const updatedParameters = { ...schedule.parameters };
+
+            updatedParameters.clients = clientIds
+              ? [...clientIds.split(',')]
+              : [];
+
+            handleChange('parameters', updatedParameters);
+          }}
+          errorMessage={errors?.errors['parameters.clients']}
+        />
+      )}
+
+      {showReportFiled('vendors') && (
+        <MultiVendorSelector
+          value={schedule.parameters.vendors}
+          onValueChange={(vendorIds) =>
+            handleChange('parameters.vendors' as keyof Schedule, vendorIds)
+          }
+          errorMessage={errors?.errors['parameters.vendors']}
+        />
+      )}
+
+      {showReportFiled('projects') && (
+        <MultiProjectSelector
+          value={schedule.parameters.projects}
+          onValueChange={(projectIds) =>
+            handleChange('parameters.projects' as keyof Schedule, projectIds)
+          }
+          errorMessage={errors?.errors['parameters.projects']}
+        />
+      )}
+
+      {showReportFiled('categories') && (
+        <MultiExpenseCategorySelector
+          value={schedule.parameters.categories}
+          onValueChange={(expenseCategoryIds) =>
+            handleChange(
+              'parameters.categories' as keyof Schedule,
+              expenseCategoryIds
+            )
+          }
+          errorMessage={errors?.errors['parameters.categories']}
+        />
       )}
     </>
   );

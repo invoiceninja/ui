@@ -9,6 +9,7 @@
  */
 
 import { BankAccount } from './bank-accounts';
+import { Document } from './document.interface';
 
 export interface Company {
   id: string;
@@ -65,6 +66,16 @@ export interface Company {
   fill_products: boolean;
   convert_products: boolean;
   bank_integrations: BankAccount[];
+  documents: Document[];
+  calculate_expense_tax_by_amount: boolean;
+  expense_inclusive_taxes: boolean;
+  smtp_host: string;
+  smtp_port: string;
+  smtp_encryption: string;
+  smtp_username: string;
+  smtp_password: string;
+  smtp_local_domain: string;
+  smtp_verify_peer: boolean;
 }
 
 export interface Settings {
@@ -277,6 +288,7 @@ export interface Settings {
   client_portal_under_payment_minimum: number;
   client_portal_allow_over_payment: boolean;
   use_credits_payment: string;
+  use_unapplied_payment: string;
   hide_empty_columns_on_pdf: boolean;
   email_from_name: string;
   auto_archive_invoice_cancelled: boolean;
@@ -298,6 +310,14 @@ export interface Settings {
   classification: string;
   payment_email_all_contacts: boolean;
   show_pdfhtml_on_mobile: boolean;
+  custom_sending_email: string;
+  statement_design_id: string;
+  delivery_note_design_id: string;
+  payment_receipt_design_id: string;
+  payment_refund_design_id: string;
+  enable_rappen_rounding: boolean;
+  e_quote_type: string;
+  brevo_secret: string;
 }
 
 export interface TaxData {

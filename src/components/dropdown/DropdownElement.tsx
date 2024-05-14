@@ -22,6 +22,7 @@ interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
+  cypressRef?: string;
   actionKey?: 'switchCompany';
 }
 
@@ -105,6 +106,7 @@ export function DropdownElement(props: Props) {
         },
         `w-full text-left z-50 block px-4 py-2 text-sm rounded-lg ${props.className} `
       )}
+      data-cy={props.cypressRef}
     >
       {props.icon}
       <div

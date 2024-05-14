@@ -41,13 +41,13 @@ export function Edit() {
 
   const { data } = useCompanyGatewayQuery({ id });
 
-  const { documentTitle } = useTitle('edit_company_gateway');
+  const { documentTitle } = useTitle('edit_gateway');
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
-  const defaultTab = [t('provider')];
+  const defaultTab = [t('payment_provider')];
 
   const additionalTabs = [
     t('credentials'),
@@ -122,7 +122,7 @@ export function Edit() {
           {companyGateway && (
             <div className="space-y-4">
               <Card title={t('edit_gateway')}>
-                <Element leftSide={t('provider')}>
+                <Element leftSide={t('payment_provider')}>
                   {companyGateway.label}
                 </Element>
               </Card>

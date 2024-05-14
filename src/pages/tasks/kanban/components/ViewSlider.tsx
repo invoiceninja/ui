@@ -33,6 +33,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 export function ViewSlider() {
   const [t] = useTranslation();
@@ -57,7 +58,19 @@ export function ViewSlider() {
   };
 
   return (
-    <TabGroup tabs={[t('overview'), t('documents')]} width="full">
+    <TabGroup
+      tabs={[t('overview'), t('documents')]}
+      width="full"
+      formatTabLabel={(tabIndex) => {
+        if (tabIndex === 1) {
+          return (
+            <DocumentsTabLabel
+              numberOfDocuments={currentTask?.documents.length}
+            />
+          );
+        }
+      }}
+    >
       <div>
         {currentTask && (
           <>

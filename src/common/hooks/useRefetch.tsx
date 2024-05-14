@@ -19,6 +19,7 @@ export const keys = {
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/activities/entity',
       '/api/v1/activities',
+      '/api/v1/documents',
     ],
   },
   designs: {
@@ -45,7 +46,7 @@ export const keys = {
   },
   credits: {
     path: '/api/v1/credits',
-    dependencies: ['/api/v1/clients'],
+    dependencies: ['/api/v1/clients', '/api/v1/documents'],
   },
   expense_categories: {
     path: '/api/v1/expense_categories',
@@ -62,6 +63,7 @@ export const keys = {
     dependencies: [
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/documents',
     ],
   },
   group_settings: {
@@ -77,6 +79,7 @@ export const keys = {
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
       '/api/v1/activities',
+      '/api/v1/documents',
     ],
   },
   purchase_orders: {
@@ -85,7 +88,7 @@ export const keys = {
   },
   recurring_expenses: {
     path: '/api/v1/recurring_expenses',
-    dependencies: ['/api/v1/vendors'],
+    dependencies: ['/api/v1/vendors', '/api/v1/documents'],
   },
   task_statuses: {
     path: '/api/v1/task_statuses',
@@ -93,7 +96,7 @@ export const keys = {
   },
   tasks: {
     path: '/api/v1/tasks',
-    dependencies: ['/api/v1/projects'],
+    dependencies: ['/api/v1/projects', '/api/v1/documents'],
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
@@ -159,6 +162,7 @@ export const keys = {
       '/api/v1/tasks',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/documents',
     ],
   },
   products: {
@@ -167,15 +171,23 @@ export const keys = {
   },
   projects: {
     path: '/api/v1/projects',
-    dependencies: ['/api/v1/tasks'],
+    dependencies: ['/api/v1/tasks', '/api/v1/documents'],
   },
   quotes: {
     path: '/api/v1/quotes',
-    dependencies: ['/api/v1/clients', '/api/v1/activities'],
+    dependencies: [
+      '/api/v1/clients',
+      '/api/v1/activities',
+      '/api/v1/documents',
+    ],
   },
   recurring_invoices: {
     path: '/api/v1/recurring_invoices',
-    dependencies: ['/api/v1/clients', '/api/v1/activities/entity'],
+    dependencies: [
+      '/api/v1/clients',
+      '/api/v1/activities/entity',
+      '/api/v1/documents',
+    ],
   },
   bank_integrations: {
     path: '/api/v1/bank_integrations',
@@ -200,6 +212,10 @@ export const keys = {
   subscriptions: {
     path: '/api/v1/subscriptions',
     dependencies: [],
+  },
+  activities: {
+    path: '/api/v1/activities',
+    dependencies: ['/api/v1/activities/entity'],
   },
 };
 

@@ -26,6 +26,32 @@ interface Props {
   disableClosing?: boolean;
   overflowVisible?: boolean;
   closeButtonCypressRef?: string;
+  stopPropagationInHeader?: boolean;
+  renderTransitionChildAsFragment?: boolean;
+}
+
+interface TransitionChildProps {
+  renderFragmentOnly: boolean;
+  children: ReactNode;
+}
+function TransitionChild(props: TransitionChildProps) {
+  const { renderFragmentOnly, children } = props;
+
+  return renderFragmentOnly ? (
+    <>{children}</>
+  ) : (
+    <Transition.Child
+      as={Fragment}
+      enter="ease-out duration-300"
+      enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      enterTo="opacity-100 translate-y-0 sm:scale-100"
+      leave="ease-in duration-200"
+      leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+      leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+    >
+      {children}
+    </Transition.Child>
+  );
 }
 
 export function Modal(props: Props) {
@@ -67,14 +93,10 @@ export function Modal(props: Props) {
           >
             &#8203;
           </span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            enterTo="opacity-100 translate-y-0 sm:scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          <TransitionChild
+            renderFragmentOnly={
+              Boolean(props.renderTransitionChildAsFragment) && open
+            }
           >
             <div
               style={{
@@ -96,6 +118,9 @@ export function Modal(props: Props) {
                   'overflow-hidden': !props.overflowVisible,
                 }
               )}
+              onClick={(event) =>
+                props.stopPropagationInHeader && event.stopPropagation()
+              }
             >
               <div
                 className="flex flex-col justify-between items-start"
@@ -160,7 +185,7 @@ export function Modal(props: Props) {
                 </div>
               )}
             </div>
-          </Transition.Child>
+          </TransitionChild>
         </div>
       </Dialog>
     </Transition.Root>

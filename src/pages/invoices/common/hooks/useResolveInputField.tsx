@@ -55,6 +55,12 @@ const numberInputs = [
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
+const defaultCurrencySeparators: DecimalInputSeparators = {
+  decimalSeparator: '.',
+  precision: 2,
+  thousandSeparator: ',',
+};
+
 interface Props {
   resource: ProductTableResource;
   type: 'product' | 'task';
@@ -143,6 +149,7 @@ export function useResolveInputField(props: Props) {
   );
 
   const handleProductChange = useHandleProductChange({
+    relationType: props.relationType,
     resource: props.resource,
     type: props.type,
     onChange: props.onLineItemChange,
@@ -176,29 +183,28 @@ export function useResolveInputField(props: Props) {
     setIsDeleteActionTriggered(false);
 
     if (product && company && company.enabled_tax_rates === 0) {
-        product.tax_name1 = '';
-        product.tax_rate1 = 0;
-        product.tax_name2 = '';
-        product.tax_rate2 = 0;
-        product.tax_name3 = '';
-        product.tax_rate3 = 0;
+      product.tax_name1 = '';
+      product.tax_rate1 = 0;
+      product.tax_name2 = '';
+      product.tax_rate2 = 0;
+      product.tax_name3 = '';
+      product.tax_rate3 = 0;
     }
 
     if (product && company && company.enabled_tax_rates === 1) {
-        product.tax_name2 = '';
-        product.tax_rate2 = 0;
-        product.tax_name3 = '';
-        product.tax_rate3 = 0;
+      product.tax_name2 = '';
+      product.tax_rate2 = 0;
+      product.tax_name3 = '';
+      product.tax_rate3 = 0;
     }
 
     if (product && company && company.enabled_tax_rates === 2) {
-        product.tax_name3 = '';
-        product.tax_rate3 = 0;
+      product.tax_name3 = '';
+      product.tax_rate3 = 0;
     }
 
     await handleProductChange(index, value, product);
   };
-
 
   const formatMoney = useFormatMoney({
     resource: props.resource,
@@ -208,8 +214,11 @@ export function useResolveInputField(props: Props) {
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
-    resource[props.relationType] &&
+    if (resource[props.relationType]) {
       getCurrency(resource[props.relationType], props.relationType);
+    } else {
+      setInputCurrencySeparators(defaultCurrencySeparators);
+    }
   }, [resource?.[props.relationType]]);
 
   useEffect(() => {

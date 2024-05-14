@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import dayjs from 'dayjs';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Invoice;
@@ -23,6 +24,8 @@ export function InvoiceStatus(props: Props) {
 
   const { status_id, due_date, partial_due_date, partial, balance } =
     props.entity;
+
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const checkInvoiceInvitationsViewedDate = () => {
     return props.entity.invitations.some(
@@ -63,11 +66,19 @@ export function InvoiceStatus(props: Props) {
   }
 
   if (isPastDue() && !isCancelledOrReversed) {
-    return <Badge variant="yellow">{t('overdue')}</Badge>;
+    return (
+      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$5 }}>
+        {t('past_due')}
+      </Badge>
+    );
   }
 
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {
-    return <Badge variant="yellow">{t('viewed')}</Badge>;
+    return (
+      <Badge variant="yellow" style={{ backgroundColor: statusThemeColors.$4 }}>
+        {t('viewed')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Draft) {
@@ -75,15 +86,33 @@ export function InvoiceStatus(props: Props) {
   }
 
   if (status_id === InvoiceStatusEnum.Sent) {
-    return <Badge variant="light-blue">{t('sent')}</Badge>;
+    return (
+      <Badge
+        variant="light-blue"
+        style={{ backgroundColor: statusThemeColors.$1 }}
+      >
+        {t('sent')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Partial) {
-    return <Badge variant="dark-blue">{t('partial')}</Badge>;
+    return (
+      <Badge
+        variant="dark-blue"
+        style={{ backgroundColor: statusThemeColors.$2 }}
+      >
+        {t('partial')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Paid) {
-    return <Badge variant="green">{t('paid')}</Badge>;
+    return (
+      <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+        {t('paid')}
+      </Badge>
+    );
   }
 
   if (status_id === InvoiceStatusEnum.Cancelled) {

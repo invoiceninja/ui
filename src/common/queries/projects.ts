@@ -45,3 +45,24 @@ export function useProjectQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
+
+interface Params {
+  status?: string[];
+}
+
+export function useProjectsQuery(params?: Params) {
+  return useQuery<Project[]>(
+    ['/api/v1/projects', params],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/projects?status=:status', {
+          status: params?.status?.join(',') ?? 'all',
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<Project[]>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}

@@ -36,6 +36,15 @@ import { useEffect, useState } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import classNames from 'classnames';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -58,9 +67,11 @@ export default function Invoices() {
   const actions = useActions();
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
+  const reactSettings = useReactSettings();
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns, allFooterColumns } = useFooterColumns();
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -71,6 +82,12 @@ export default function Invoices() {
   useEffect(() => {
     return () => setInvoiceSliderVisibility(false);
   }, []);
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -83,6 +100,7 @@ export default function Invoices() {
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&sort=id|desc"
         columns={columns}
+        footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
@@ -101,11 +119,28 @@ export default function Invoices() {
           />
         }
         leftSideChevrons={
-          <DataTableColumnsPicker
-            table="invoice"
-            columns={invoiceColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-          />
+          <div
+            className={classNames('flex items-center space-x-1', {
+              'pr-4': Boolean(reactSettings.show_table_footer),
+            })}
+          >
+            {Boolean(reactSettings.show_table_footer) && (
+              <>
+                <DataTableFooterColumnsPicker
+                  table="invoice"
+                  columns={allFooterColumns}
+                />
+
+                <span>|</span>
+              </>
+            )}
+
+            <DataTableColumnsPicker
+              table="invoice"
+              columns={invoiceColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}
@@ -117,6 +152,15 @@ export default function Invoices() {
       />
 
       {!disableNavigation('invoice', invoiceSlider) && <InvoiceSlider />}
+
+      <ChangeTemplateModal<Invoice>
+        entity="invoice"
+        entities={changeTemplateResources as Invoice[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
+        bulkUrl="/api/v1/invoices/bulk"
+      />
     </Default>
   );
 }

@@ -13,9 +13,13 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
-import { ProductTableResource } from '../components/ProductsTable';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
 
 interface Props {
+  relationType: RelationType;
   resource: ProductTableResource;
   type: 'product' | 'task';
   onChange: (index: number, lineItem: InvoiceItem) => unknown;
@@ -41,9 +45,16 @@ export function useHandleProductChange(props: Props) {
       return props.onChange(index, lineItem);
     }
 
-    lineItem.quantity = company?.default_quantity ? 1 : product?.quantity ?? 0;
+    const currentPrice =
+      product?.cost > 0 && props.relationType === 'vendor_id'
+        ? product?.cost
+        : product?.price || 0;
 
     if (company.fill_products) {
+      lineItem.quantity = company?.default_quantity
+        ? 1
+        : product?.quantity ?? 0;
+
       if (resource.client_id) {
         resolveClient.find(resource.client_id).then((client) => {
           const clientCurrencyId = client.settings.currency_id;
@@ -59,15 +70,15 @@ export function useHandleProductChange(props: Props) {
 
             if (clientCurrency && companyCurrency) {
               lineItem.cost =
-                (product?.price || 0) *
+                currentPrice *
                 (clientCurrency.exchange_rate / companyCurrency.exchange_rate);
             }
           } else {
-            lineItem.cost = product?.price || 0;
+            lineItem.cost = currentPrice;
           }
         });
       } else {
-        lineItem.cost = product?.price || 0;
+        lineItem.cost = currentPrice;
       }
     }
 

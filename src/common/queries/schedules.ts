@@ -14,6 +14,8 @@ import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankScheduleQuery() {
   const { isAdmin, isOwner } = useAdmin();
@@ -48,4 +50,19 @@ export function useScheduleQuery(params: ScheduleParams) {
       ),
     { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
+}
+
+export function useBulkAction() {
+  return (ids: string[], action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/task_schedulers/bulk'), {
+      action,
+      ids,
+    }).then(() => {
+      toast.success(`${action}d_schedule`);
+
+      $refetch(['task_schedulers']);
+    });
+  };
 }

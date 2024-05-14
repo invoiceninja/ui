@@ -31,10 +31,7 @@ import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
@@ -47,8 +44,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import {
+  saveBtnAtom,
   useNavigationTopRightElement,
-  useSaveBtn,
 } from '$app/components/layouts/common/hooks';
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
@@ -57,6 +54,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export interface SaveOption {
@@ -78,6 +76,7 @@ interface Props extends CommonProps {
   disableSaveButton?: boolean;
   withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
+  aboveMainContainer?: ReactNode;
 }
 
 export function Default(props: Props) {
@@ -367,6 +366,10 @@ export function Default(props: Props) {
     },
   ];
 
+  const saveBtn = useAtomValue(saveBtnAtom);
+  const navigationTopRightElement = useNavigationTopRightElement();
+  const colors = useColorScheme();
+
   return (
     <div>
       <ActivateCompany />
@@ -429,9 +432,7 @@ export function Default(props: Props) {
                   }
                 >
                   <span>
-                    {isSelfHosted() && isOwner
-                      ? t('white_label_button')
-                      : t('unlock_pro')}
+                    {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>
               )}
@@ -515,6 +516,8 @@ export function Default(props: Props) {
             </div>
           </div>
         </div>
+
+        {props.aboveMainContainer}
 
         <main className="flex-1">
           {(props.breadcrumbs || props.topRight) && (

@@ -60,7 +60,7 @@ interface TasksParams {
 
 export function useTasksQuery(params: TasksParams) {
   return useQuery<GenericManyResponse<Task>>(
-    [params.endpoint || '/api/v1/tasks'],
+    ['/api/v1/tasks', params],
     () =>
       request(
         'GET',

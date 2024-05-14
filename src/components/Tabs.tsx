@@ -11,7 +11,8 @@
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { MouseEvent, useEffect, useRef } from 'react';
+import classNames from 'classnames';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   Link,
   Params,
@@ -25,6 +26,10 @@ interface Props {
   className?: string;
   tabs: Tab[];
   disableBackupNavigation?: boolean;
+  visible?: boolean;
+  rightSide?: ReactNode;
+  tabBarClassName?: string;
+  withoutDefaultTabSpace?: boolean;
 }
 
 export type Tab = {
@@ -32,15 +37,21 @@ export type Tab = {
   href: string;
   matcher?: Matcher[];
   enabled?: boolean;
+  formatName?: () => ReactNode | undefined;
 };
 export type Matcher = (params: Readonly<Params<string>>) => string;
 
 export function Tabs(props: Props) {
-  const accentColor = useAccentColor();
-  const location = useLocation();
-  const params = useParams();
-
   const navigate = useNavigate();
+
+  const { visible = true, withoutDefaultTabSpace, tabBarClassName } = props;
+
+  const params = useParams();
+  const location = useLocation();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
+  const [searchParams] = useSearchParams();
+  const tabBar = useRef<HTMLDivElement>(null);
 
   const isActive = (tab: Tab) => {
     return (
@@ -50,8 +61,6 @@ export function Tabs(props: Props) {
       )
     );
   };
-
-  const tabBar = useRef<HTMLDivElement>(null);
 
   const handleScroll = (event: MouseEvent<HTMLAnchorElement>) => {
     const clickedTab = event.currentTarget;
@@ -66,8 +75,6 @@ export function Tabs(props: Props) {
       left: clickedTab!.offsetLeft - scrollWidth - scrollBy,
     });
   };
-
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (props.tabs.length && !props.disableBackupNavigation) {
@@ -85,11 +92,9 @@ export function Tabs(props: Props) {
     }
   }, []);
 
-  const colors = useColorScheme();
-
-  return (
+  return visible ? (
     <div className={props.className} data-cy="tabs">
-      <div className="sm:hidden">
+      <div className="flex flex-col space-y-5 sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
@@ -104,17 +109,28 @@ export function Tabs(props: Props) {
           {props.tabs.map(
             (tab) =>
               (typeof tab.enabled === 'undefined' || tab.enabled) && (
-                <option key={tab.name}>{tab.name}</option>
+                <option key={tab.name}>{tab.formatName?.() || tab.name}</option>
               )
           )}
         </select>
+
+        {props.rightSide}
       </div>
 
       <div className="hidden sm:block">
-        <div className="border-b" style={{ borderColor: colors.$5 }}>
+        <div
+          className="flex justify-between border-b"
+          style={{ borderColor: colors.$5 }}
+        >
           <nav
             ref={tabBar}
-            className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
+            className={classNames(
+              '-mb-px flex relative scroll-smooth overflow-x-auto',
+              {
+                'space-x-8': !withoutDefaultTabSpace,
+              },
+              tabBarClassName
+            )}
             aria-label="Tabs"
           >
             {props.tabs.map(
@@ -131,13 +147,17 @@ export function Tabs(props: Props) {
                     className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                     aria-current={isActive(tab) ? 'page' : undefined}
                   >
-                    {tab.name}
+                    {tab.formatName?.() || tab.name}
                   </Link>
                 )
             )}
           </nav>
+
+          {props.rightSide}
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 }

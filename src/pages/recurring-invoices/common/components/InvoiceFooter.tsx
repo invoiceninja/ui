@@ -29,6 +29,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -62,7 +63,18 @@ export function InvoiceFooter(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup tabs={tabs}>
+      <TabGroup
+        tabs={tabs}
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={recurringInvoice?.documents.length}
+              />
+            );
+          }
+        }}
+      >
         <div>
           <MarkdownEditor
             value={recurringInvoice?.public_notes}

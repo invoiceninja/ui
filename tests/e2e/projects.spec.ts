@@ -485,7 +485,6 @@ test('project documents preview with edit_project', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 
@@ -533,7 +532,6 @@ test('project documents uploading with edit_project', async ({ page }) => {
   await page
     .getByRole('link', {
       name: 'Documents',
-      exact: true,
     })
     .click();
 

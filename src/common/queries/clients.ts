@@ -8,14 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericQueryOptions } from './invoices';
 import { Client } from '../interfaces/client';
 import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '../atoms/data-table';
+import { toast } from '../helpers/toast/toast';
+import { $refetch } from '../hooks/useRefetch';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
@@ -40,19 +43,21 @@ export function useBlankClientQuery(params: BlankQueryParams) {
 
 interface Props {
   enabled?: boolean;
+  status?: string[];
 }
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    [
-      '/api/v1/clients',
-      'filter_deleted_clients=true',
-      'per_page=500',
-      'include=group_settings',
-    ],
+    ['/api/v1/clients', 'per_page=500', props],
     () =>
-      request('GET', endpoint('/api/v1/clients?per_page=500')).then(
-        (response) => response.data.data
+      request(
+        'GET',
+        endpoint('/api/v1/clients?per_page=500&status=:status', {
+          status: props.status?.join(',') ?? 'all',
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<Client[]>) =>
+          response.data.data
       ),
     { enabled: props.enabled ?? true, staleTime: Infinity }
   );
@@ -75,12 +80,36 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
   );
 }
 
-export function bulk(
-  id: string[],
-  action: 'archive' | 'delete'
-): Promise<AxiosResponse> {
-  return request('POST', endpoint('/api/v1/clients/bulk'), {
-    action,
-    ids: Array.from(id),
-  });
+const successMessages = {
+  assign_group: 'updated_group',
+};
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (
+    ids: string[],
+    action: 'archive' | 'restore' | 'delete' | 'assign_group',
+    groupSettingsId?: string
+  ) => {
+    toast.processing();
+
+    return request('POST', endpoint('/api/v1/clients/bulk'), {
+      action,
+      ids,
+      ...(groupSettingsId && { group_settings_id: groupSettingsId }),
+    }).then(() => {
+      const message =
+        successMessages[action as keyof typeof successMessages] ||
+        `${action}d_client`;
+
+      toast.success(message);
+
+      invalidateQueryValue &&
+        queryClient.invalidateQueries([invalidateQueryValue]);
+
+      $refetch(['clients']);
+    });
+  };
 }

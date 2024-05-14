@@ -34,6 +34,7 @@ export function GroupSettingsForm(props: Props) {
         value={groupSettings.name}
         onValueChange={(value) => handleChange('name', value)}
         errorMessage={errors?.errors.name}
+        cypressRef="groupSettingsNameField"
       />
     </Element>
   );

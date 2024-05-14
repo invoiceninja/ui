@@ -17,6 +17,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
 import {
   MdCreditCard,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPrint,
@@ -30,6 +31,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import collect from 'collect.js';
 import { useApplyCredits } from './useApplyCredits';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -88,6 +90,12 @@ export const useCustomBulkActions = () => {
         client_id && amount > 0 && status_id !== CreditStatus.Applied
     );
   };
+
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Credit>[] = [
     ({ selectedIds, setSelected }) => (
@@ -153,6 +161,21 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/credits/bulk',
+            entity: 'credit',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

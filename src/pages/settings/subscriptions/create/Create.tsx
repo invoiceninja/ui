@@ -33,6 +33,7 @@ import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanA
 import { useBlankSubscriptionQuery } from '$app/common/queries/subscriptions';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Steps } from '../common/components/Steps';
 
 export function Create() {
   const { documentTitle } = useTitle('new_payment_link');
@@ -56,7 +57,7 @@ export function Create() {
     { name: t('new_payment_link'), href: '/settings/subscriptions/create' },
   ];
 
-  const tabs = [t('overview'), t('settings'), t('webhook')];
+  const tabs = [t('overview'), t('settings'), t('webhook'), t('steps')];
 
   const [subscription, setSubscription] = useState<Subscription>();
 
@@ -136,6 +137,7 @@ export function Create() {
               handleChange={handleChange}
               errors={errors}
               products={products}
+              page="create"
             />
           )}
         </div>
@@ -153,6 +155,16 @@ export function Create() {
         <div>
           {subscription && (
             <Webhook
+              subscription={subscription}
+              handleChange={handleChange}
+              errors={errors}
+            />
+          )}
+        </div>
+
+        <div>
+          {subscription && (
+            <Steps
               subscription={subscription}
               handleChange={handleChange}
               errors={errors}

@@ -44,6 +44,10 @@ import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -85,6 +89,8 @@ export default function Edit() {
     InvoiceSum | InvoiceSumInclusive
   >();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
+  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const productColumns = useProductColumns();
 
@@ -109,10 +115,16 @@ export default function Edit() {
     setInvoiceSum
   );
 
-  const onSave = useSave(setErrors);
+  const onSave = useSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   const actions = useActions();
   const colors = useColorScheme();
+
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
     <Default
@@ -201,6 +213,10 @@ export default function Edit() {
               purchaseOrder={purchaseOrder}
               handleChange={handleChange}
               errors={errors}
+              isDefaultFooter={isDefaultFooter}
+              isDefaultTerms={isDefaultTerms}
+              setIsDefaultFooter={setIsDefaultFooter}
+              setIsDefaultTerms={setIsDefaultTerms}
             />
 
             <InvoiceTotals
@@ -229,6 +245,15 @@ export default function Edit() {
           )}
         </div>
       )}
+
+      <ChangeTemplateModal<PurchaseOrder>
+        entity="purchase_order"
+        entities={changeTemplateResources as PurchaseOrder[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+        bulkUrl="/api/v1/purchase_orders/bulk"
+      />
     </Default>
   );
 }

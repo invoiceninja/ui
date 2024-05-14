@@ -21,7 +21,7 @@ import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tabs } from '$app/components/Tabs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
@@ -59,7 +59,7 @@ export default function Product() {
     },
   ];
 
-  const tabs = useTabs({ product: productValue });
+  const tabs = useTabs({ product: productData?.data.data });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -94,6 +94,12 @@ export default function Product() {
         .finally(() => setIsFormBusy(false));
     }
   };
+
+  useEffect(() => {
+    if (productData) {
+      setProductValue(productData.data.data);
+    }
+  }, [productData]);
 
   return (
     <Default
