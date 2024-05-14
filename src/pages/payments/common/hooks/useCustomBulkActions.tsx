@@ -28,8 +28,11 @@ export const useCustomBulkActions = () => {
     );
   };
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Payment>[] = [
     ({ selectedResources, selectedIds, setSelected }) =>
@@ -49,6 +52,10 @@ export const useCustomBulkActions = () => {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/payments/bulk',
+            entity: 'payment',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

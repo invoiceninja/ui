@@ -80,6 +80,7 @@ export default function Client() {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
+    changeTemplateEntityContext,
   } = useChangeTemplate();
 
   return (
@@ -124,12 +125,14 @@ export default function Client() {
           </div>
 
           <ChangeTemplateModal<IClient>
-            entity="client"
+            entity={changeTemplateEntityContext?.entity ?? 'client'}
             entities={changeTemplateResources as IClient[]}
             visible={changeTemplateVisible}
             setVisible={setChangeTemplateVisible}
             labelFn={(client) => `${t('number')}: ${client.number}`}
-            bulkUrl="/api/v1/clients/bulk"
+            bulkUrl={
+              changeTemplateEntityContext?.endpoint ?? '/api/v1/clients/bulk'
+            }
           />
         </>
       )}

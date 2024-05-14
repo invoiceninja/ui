@@ -58,8 +58,11 @@ export function useActions(params?: Params) {
 
   const configureClientSettings = useConfigureClientSettings();
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -154,6 +157,10 @@ export function useActions(params?: Params) {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([client]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/clients/bulk',
+            entity: 'clients',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

@@ -31,6 +31,7 @@
     "js-sha256": "^0.11.0",
     "lodash": "^4.17.21",
     "mitt": "^3.0.1",
+    "playwright": "^1.44.0",
     "pretty-bytes": "^6.0.0",
     "randexp": "^0.5.3",
     "react": "^18.2.0",

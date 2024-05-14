@@ -42,6 +42,10 @@ export const changeTemplateModalAtom = atom<boolean>(false);
 export const templatePdfUrlAtom = atom<string | null>(null);
 export const isChangeTemplateVisibleAtom = atom(false);
 export const changeTemplateResourcesAtom = atom<ChangeTemplateResource[]>([]);
+export const changeTemplateEntityContextAtom = atom<{
+  entity: string;
+  endpoint: string;
+} | null>(null);
 
 interface Props<T = any> {
   entity: string;
@@ -241,10 +245,16 @@ export function useChangeTemplate() {
     changeTemplateResourcesAtom
   );
 
+  const [changeTemplateEntityContext, setChangeTemplateEntityContext] = useAtom(
+    changeTemplateEntityContextAtom
+  );
+
   return {
     changeTemplateVisible,
     changeTemplateResources,
+    changeTemplateEntityContext,
     setChangeTemplateVisible,
     setChangeTemplateResources,
+    setChangeTemplateEntityContext,
   };
 }
