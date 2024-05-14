@@ -92,8 +92,11 @@ export function useActions(params?: Params) {
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
@@ -359,6 +362,10 @@ export function useActions(params?: Params) {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([invoice]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/invoices/bulk',
+            entity: 'invoice',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
