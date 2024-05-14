@@ -321,719 +321,431 @@
     "CondizioniPagamento": "TP02"
   },
 
-  "components": [
-    {
+  "components": {
+    "FatturaElettronicaType": {
       "type": "FatturaElettronicaType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "FatturaElettronicaHeader": {
           "name": "FatturaElettronicaHeader",
           "base_type": "FatturaElettronicaHeaderType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "FatturaElettronicaBody": {
           "name": "FatturaElettronicaBody",
           "base_type": "FatturaElettronicaBodyType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "maxOccurs": "-1",
-          "help": "",
-          "minOccurs": "1"
-        },
-        {
-          "name": null,
-          "base_type": null,
-          "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": -1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "FatturaElettronicaHeaderType": {
       "type": "FatturaElettronicaHeaderType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiTrasmissione": {
           "name": "DatiTrasmissione",
           "base_type": "DatiTrasmissioneType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CedentePrestatore": {
           "name": "CedentePrestatore",
           "base_type": "CedentePrestatoreType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RappresentanteFiscale": {
           "name": "RappresentanteFiscale",
           "base_type": "RappresentanteFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CessionarioCommittente": {
           "name": "CessionarioCommittente",
           "base_type": "CessionarioCommittenteType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "TerzoIntermediarioOSoggettoEmittente": {
           "name": "TerzoIntermediarioOSoggettoEmittente",
           "base_type": "TerzoIntermediarioSoggettoEmittenteType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "SoggettoEmittente": {
           "name": "SoggettoEmittente",
           "base_type": "string",
           "resource": {
             "CC": "Cessionario / Committente",
             "TZ": "Terzo"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "FatturaElettronicaBodyType": {
       "type": "FatturaElettronicaBodyType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiGenerali": {
           "name": "DatiGenerali",
           "base_type": "DatiGeneraliType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiBeniServizi": {
           "name": "DatiBeniServizi",
           "base_type": "DatiBeniServiziType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiVeicoli": {
           "name": "DatiVeicoli",
           "base_type": "DatiVeicoliType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiPagamento": {
           "name": "DatiPagamento",
           "base_type": "DatiPagamentoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "Allegati": {
           "name": "Allegati",
           "base_type": "AllegatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiTrasmissioneType": {
       "type": "DatiTrasmissioneType",
       "help": "Blocco relativo ai dati di trasmissione della Fattura Elettronica",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdTrasmittente": {
           "name": "IdTrasmittente",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ProgressivoInvio": {
           "name": "ProgressivoInvio",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "FormatoTrasmissione": {
           "name": "FormatoTrasmissione",
           "base_type": "string",
           "resource": {
             "FPA12": "Fattura verso PA",
             "FPR12": "Fattura verso privati"
           },
-          "length": "5",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceDestinatario": {
           "name": "CodiceDestinatario",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 7,
+          "min_length": 6,
           "pattern": "[A-Z0-9]{6,7}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ContattiTrasmittente": {
           "name": "ContattiTrasmittente",
           "base_type": "ContattiTrasmittenteType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "PECDestinatario": {
           "name": "PECDestinatario",
-          "base_type": "string",
+          "base_type": "token",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "([!#-'*+/-9=?A-Z^-~-]+(\\.[!#-'*+/-9=?A-Z^-~-]+)*|\"(\\[\\]!#-[^-~ \\t]|(\\\\[\\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\\.[!#-'*+/-9=?A-Z^-~-]+)*|\\[[\\t -Z^-~]*\\])",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxLength": "256",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "IdFiscaleType": {
       "type": "IdFiscaleType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdPaese": {
           "name": "IdPaese",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 2,
+          "min_length": 2,
           "pattern": "[A-Z]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "IdCodice": {
           "name": "IdCodice",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minLength": "1",
-          "maxLength": "28",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "ContattiTrasmittenteType": {
       "type": "ContattiTrasmittenteType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Telefono": {
           "name": "Telefono",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 12,
+          "min_length": 5,
           "pattern": "(\\p{IsBasicLatin}{5,12})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Email": {
           "name": "Email",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": ".+@.+[.]+.+",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minLength": "7",
-          "maxLength": "256",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiGeneraliType": {
       "type": "DatiGeneraliType",
       "help": "\n\t\t\t\tBlocco relativo ai Dati Generali della Fattura Elettronica\n\t\t\t",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiGeneraliDocumento": {
           "name": "DatiGeneraliDocumento",
           "base_type": "DatiGeneraliDocumentoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiOrdineAcquisto": {
           "name": "DatiOrdineAcquisto",
           "base_type": "DatiDocumentiCorrelatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiContratto": {
           "name": "DatiContratto",
           "base_type": "DatiDocumentiCorrelatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiConvenzione": {
           "name": "DatiConvenzione",
           "base_type": "DatiDocumentiCorrelatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiRicezione": {
           "name": "DatiRicezione",
           "base_type": "DatiDocumentiCorrelatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiFattureCollegate": {
           "name": "DatiFattureCollegate",
           "base_type": "DatiDocumentiCorrelatiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiSAL": {
           "name": "DatiSAL",
           "base_type": "DatiSALType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiDDT": {
           "name": "DatiDDT",
           "base_type": "DatiDDTType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiTrasporto": {
           "name": "DatiTrasporto",
           "base_type": "DatiTrasportoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "FatturaPrincipale": {
           "name": "FatturaPrincipale",
           "base_type": "FatturaPrincipaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiGeneraliDocumentoType": {
       "type": "DatiGeneraliDocumentoType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "TipoDocumento": {
           "name": "TipoDocumento",
           "base_type": "string",
           "resource": {
@@ -1057,241 +769,144 @@
             "TD27": "Fattura per autoconsumo o per cessioni gratuite senza rivalsa",
             "TD28": "Acquisti da San Marino con IVA (fattura cartacea)"
           },
-          "length": "4",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Divisa": {
           "name": "Divisa",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 3,
+          "min_length": 3,
           "pattern": "[A-Z]{3}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Data": {
           "name": "Data",
           "base_type": "date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minInclusive": "1970-01-01",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Numero": {
           "name": "Numero",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiRitenuta": {
           "name": "DatiRitenuta",
           "base_type": "DatiRitenutaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "DatiBollo": {
           "name": "DatiBollo",
           "base_type": "DatiBolloType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DatiCassaPrevidenziale": {
           "name": "DatiCassaPrevidenziale",
           "base_type": "DatiCassaPrevidenzialeType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "ScontoMaggiorazione": {
           "name": "ScontoMaggiorazione",
           "base_type": "ScontoMaggiorazioneType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "ImportoTotaleDocumento": {
           "name": "ImportoTotaleDocumento",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Arrotondamento": {
           "name": "Arrotondamento",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Causale": {
           "name": "Causale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 200,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,200}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "Art73": {
           "name": "Art73",
           "base_type": "string",
           "resource": {
             "SI": "SI = Documento emesso secondo modalit\u00e0 e termini stabiliti con DM ai sensi dell'art. 73 DPR 633/72"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiRitenutaType": {
       "type": "DatiRitenutaType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "TipoRitenuta": {
           "name": "TipoRitenuta",
           "base_type": "string",
           "resource": {
@@ -1302,61 +917,36 @@
             "RT05": "Contributo ENPAM",
             "RT06": "Altro contributo previdenziale"
           },
-          "length": "4",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImportoRitenuta": {
           "name": "ImportoRitenuta",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AliquotaRitenuta": {
           "name": "AliquotaRitenuta",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "maxInclusive": "100.00",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CausalePagamento": {
           "name": "CausalePagamento",
           "base_type": "string",
           "resource": {
@@ -1390,76 +980,52 @@
             "V1": "V1",
             "ZO": "ZO"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiBolloType": {
       "type": "DatiBolloType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "BolloVirtuale": {
           "name": "BolloVirtuale",
           "base_type": "string",
           "resource": {
             "SI": "SI"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImportoBollo": {
           "name": "ImportoBollo",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiCassaPrevidenzialeType": {
       "type": "DatiCassaPrevidenzialeType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "TipoCassa": {
           "name": "TipoCassa",
           "base_type": "string",
           "resource": {
@@ -1486,121 +1052,71 @@
             "TC21": "Ente nazionale previdenza e assistenza psicologi (ENPAP)",
             "TC22": "INPS"
           },
-          "length": "4",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AlCassa": {
           "name": "AlCassa",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "maxInclusive": "100.00",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImportoContributoCassa": {
           "name": "ImportoContributoCassa",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImponibileCassa": {
           "name": "ImponibileCassa",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AliquotaIVA": {
           "name": "AliquotaIVA",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "maxInclusive": "100.00",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Ritenuta": {
           "name": "Ritenuta",
           "base_type": "string",
           "resource": {
             "SI": "SI = Cessione / Prestazione soggetta a ritenuta"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Natura": {
           "name": "Natura",
           "base_type": "string",
           "resource": {
@@ -1629,1028 +1145,619 @@
             "N6.9": "Inversione contabile - altri casi",
             "N7": "IVA assolta in altro stato UE (prestazione di servizi di telecomunicazioni, tele-radiodiffusione ed elettronici ex art. 7-octies lett. a, b, art. 74-sexies DPR 633/72)"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoAmministrazione": {
           "name": "RiferimentoAmministrazione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "ScontoMaggiorazioneType": {
       "type": "ScontoMaggiorazioneType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Tipo": {
           "name": "Tipo",
           "base_type": "string",
           "resource": {
             "SC": "SC = Sconto",
             "MG": "MG = Maggiorazione"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Percentuale": {
           "name": "Percentuale",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxInclusive": "100.00",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Importo": {
           "name": "Importo",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiSALType": {
       "type": "DatiSALType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "RiferimentoFase": {
           "name": "RiferimentoFase",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minInclusive": "1",
-          "maxInclusive": "999",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiDocumentiCorrelatiType": {
       "type": "DatiDocumentiCorrelatiType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "RiferimentoNumeroLinea": {
           "name": "RiferimentoNumeroLinea",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
-          "help": "",
-          "minInclusive": "1",
-          "maxInclusive": "9999"
+          "min_occurs": 0,
+          "max_occurs": -1,
+          "help": ""
         },
-        {
+        "IdDocumento": {
           "name": "IdDocumento",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Data": {
           "name": "Data",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumItem": {
           "name": "NumItem",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceCommessaConvenzione": {
           "name": "CodiceCommessaConvenzione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 100,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceCUP": {
           "name": "CodiceCUP",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 15,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,15})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceCIG": {
           "name": "CodiceCIG",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 15,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,15})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiDDTType": {
       "type": "DatiDDTType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "NumeroDDT": {
           "name": "NumeroDDT",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataDDT": {
           "name": "DataDDT",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoNumeroLinea": {
           "name": "RiferimentoNumeroLinea",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
-          "help": "",
-          "minInclusive": "1",
-          "maxInclusive": "9999"
+          "min_occurs": 0,
+          "max_occurs": -1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiTrasportoType": {
       "type": "DatiTrasportoType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiAnagraficiVettore": {
           "name": "DatiAnagraficiVettore",
           "base_type": "DatiAnagraficiVettoreType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "MezzoTrasporto": {
           "name": "MezzoTrasporto",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 80,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,80}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CausaleTrasporto": {
           "name": "CausaleTrasporto",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 100,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumeroColli": {
           "name": "NumeroColli",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minInclusive": "1",
-          "maxInclusive": "9999",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Descrizione": {
           "name": "Descrizione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 100,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "UnitaMisuraPeso": {
           "name": "UnitaMisuraPeso",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "PesoLordo": {
           "name": "PesoLordo",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,4}\\.[0-9]{1,2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "PesoNetto": {
           "name": "PesoNetto",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,4}\\.[0-9]{1,2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataOraRitiro": {
           "name": "DataOraRitiro",
-          "base_type": "datetime",
+          "base_type": "xs:dateTime",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataInizioTrasporto": {
           "name": "DataInizioTrasporto",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "TipoResa": {
           "name": "TipoResa",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 3,
+          "min_length": 3,
           "pattern": "[A-Z]{3}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "IndirizzoResa": {
           "name": "IndirizzoResa",
           "base_type": "IndirizzoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataOraConsegna": {
           "name": "DataOraConsegna",
-          "base_type": "datetime",
+          "base_type": "xs:dateTime",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "IndirizzoType": {
       "type": "IndirizzoType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Indirizzo": {
           "name": "Indirizzo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumeroCivico": {
           "name": "NumeroCivico",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 8,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,8})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CAP": {
           "name": "CAP",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9][0-9][0-9][0-9][0-9]",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Comune": {
           "name": "Comune",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Provincia": {
           "name": "Provincia",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 2,
+          "min_length": 2,
           "pattern": "[A-Z]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Nazione": {
           "name": "Nazione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 2,
+          "min_length": 2,
           "pattern": "[A-Z]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "FatturaPrincipaleType": {
       "type": "FatturaPrincipaleType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "NumeroFatturaPrincipale": {
           "name": "NumeroFatturaPrincipale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataFatturaPrincipale": {
           "name": "DataFatturaPrincipale",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "CedentePrestatoreType": {
       "type": "CedentePrestatoreType",
       "help": "Blocco relativo ai dati del Cedente / Prestatore",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiAnagrafici": {
           "name": "DatiAnagrafici",
           "base_type": "DatiAnagraficiCedenteType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Sede": {
           "name": "Sede",
           "base_type": "IndirizzoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "StabileOrganizzazione": {
           "name": "StabileOrganizzazione",
           "base_type": "IndirizzoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "IscrizioneREA": {
           "name": "IscrizioneREA",
           "base_type": "IscrizioneREAType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Contatti": {
           "name": "Contatti",
           "base_type": "ContattiType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoAmministrazione": {
           "name": "RiferimentoAmministrazione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiAnagraficiCedenteType": {
       "type": "DatiAnagraficiCedenteType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceFiscale": {
           "name": "CodiceFiscale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 11,
           "pattern": "[A-Z0-9]{11,16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Anagrafica": {
           "name": "Anagrafica",
           "base_type": "AnagraficaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AlboProfessionale": {
           "name": "AlboProfessionale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ProvinciaAlbo": {
           "name": "ProvinciaAlbo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 2,
+          "min_length": 2,
           "pattern": "[A-Z]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumeroIscrizioneAlbo": {
           "name": "NumeroIscrizioneAlbo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,60})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataIscrizioneAlbo": {
           "name": "DataIscrizioneAlbo",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RegimeFiscale": {
           "name": "RegimeFiscale",
           "base_type": "string",
           "resource": {
@@ -2673,795 +1780,494 @@
             "RF19": "Regime forfettario",
             "RF18": "Altro"
           },
-          "length": "4",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "AnagraficaType": {
       "type": "AnagraficaType",
       "help": "Il campo Denominazione \u00e8 in alternativa ai campi Nome e Cognome",
       "choices": [["Denominazione"], ["Nome", "Cognome"]],
-      "elements": [
-        {
+      "elements": {
+        "0": {
           "name": "Denominazione",
-          "base_type": "string",
+          "base_type": "String80LatinType",
           "resource": [],
-          "length": 80,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "1": {
           "name": "Nome",
-          "base_type": "string",
+          "base_type": "String60LatinType",
           "resource": [],
-          "length": 60,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "2": {
           "name": "Cognome",
-          "base_type": "string",
+          "base_type": "String60LatinType",
           "resource": [],
-          "length": 60,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "Titolo": {
           "name": "Titolo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 2,
           "pattern": "(\\p{IsBasicLatin}{2,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "whiteSpace": "collapse",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodEORI": {
           "name": "CodEORI",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minLength": "13",
-          "maxLength": "17",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiAnagraficiVettoreType": {
       "type": "DatiAnagraficiVettoreType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceFiscale": {
           "name": "CodiceFiscale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 11,
           "pattern": "[A-Z0-9]{11,16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Anagrafica": {
           "name": "Anagrafica",
           "base_type": "AnagraficaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumeroLicenzaGuida": {
           "name": "NumeroLicenzaGuida",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "IscrizioneREAType": {
       "type": "IscrizioneREAType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Ufficio": {
           "name": "Ufficio",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 2,
+          "min_length": 2,
           "pattern": "[A-Z]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NumeroREA": {
           "name": "NumeroREA",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CapitaleSociale": {
           "name": "CapitaleSociale",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "SocioUnico": {
           "name": "SocioUnico",
           "base_type": "string",
           "resource": {
             "SU": "socio unico",
             "SM": "pi\u00f9 soci"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "StatoLiquidazione": {
           "name": "StatoLiquidazione",
           "base_type": "string",
           "resource": {
             "LS": "in liquidazione",
             "LN": "non in liquidazione"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "ContattiType": {
       "type": "ContattiType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Telefono": {
           "name": "Telefono",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 12,
+          "min_length": 5,
           "pattern": "(\\p{IsBasicLatin}{5,12})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Fax": {
           "name": "Fax",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 12,
+          "min_length": 5,
           "pattern": "(\\p{IsBasicLatin}{5,12})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Email": {
           "name": "Email",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": ".+@.+[.]+.+",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minLength": "7",
-          "maxLength": "256",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "RappresentanteFiscaleType": {
       "type": "RappresentanteFiscaleType",
       "help": "Blocco relativo ai dati del Rappresentante Fiscale",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiAnagrafici": {
           "name": "DatiAnagrafici",
           "base_type": "DatiAnagraficiRappresentanteType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiAnagraficiRappresentanteType": {
       "type": "DatiAnagraficiRappresentanteType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceFiscale": {
           "name": "CodiceFiscale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 11,
           "pattern": "[A-Z0-9]{11,16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Anagrafica": {
           "name": "Anagrafica",
           "base_type": "AnagraficaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "CessionarioCommittenteType": {
       "type": "CessionarioCommittenteType",
       "help": "Blocco relativo ai dati del Cessionario / Committente",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiAnagrafici": {
           "name": "DatiAnagrafici",
           "base_type": "DatiAnagraficiCessionarioType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Sede": {
           "name": "Sede",
           "base_type": "IndirizzoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "StabileOrganizzazione": {
           "name": "StabileOrganizzazione",
           "base_type": "IndirizzoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RappresentanteFiscale": {
           "name": "RappresentanteFiscale",
           "base_type": "RappresentanteFiscaleCessionarioType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "RappresentanteFiscaleCessionarioType": {
       "type": "RappresentanteFiscaleCessionarioType",
       "help": "",
       "choices": [["Denominazione"], ["Nome", "Cognome"]],
-      "elements": [
-        {
+      "elements": {
+        "0": {
           "name": "Denominazione",
-          "base_type": "string",
+          "base_type": "String80LatinType",
           "resource": [],
-          "length": 80,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "1": {
           "name": "Nome",
-          "base_type": "string",
+          "base_type": "String60LatinType",
           "resource": [],
-          "length": 60,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "2": {
           "name": "Cognome",
-          "base_type": "string",
+          "base_type": "String60LatinType",
           "resource": [],
-          "length": 60,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1
         },
-        {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiAnagraficiCessionarioType": {
       "type": "DatiAnagraficiCessionarioType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceFiscale": {
           "name": "CodiceFiscale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 11,
           "pattern": "[A-Z0-9]{11,16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Anagrafica": {
           "name": "Anagrafica",
           "base_type": "AnagraficaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiBeniServiziType": {
       "type": "DatiBeniServiziType",
       "help": "Blocco relativo ai dati di Beni Servizi della Fattura\tElettronica",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DettaglioLinee": {
           "name": "DettaglioLinee",
           "base_type": "DettaglioLineeType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "maxOccurs": "-1",
-          "help": "",
-          "minOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": -1,
+          "help": ""
         },
-        {
+        "DatiRiepilogo": {
           "name": "DatiRiepilogo",
           "base_type": "DatiRiepilogoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "maxOccurs": "-1",
-          "help": "",
-          "minOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": -1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiVeicoliType": {
       "type": "DatiVeicoliType",
       "help": "Blocco relativo ai dati dei Veicoli della Fattura Elettronica (da indicare nei casi di cessioni tra Paesi\n\t\t\tmembri di mezzi di trasporto nuovi, in base all'art. 38, comma 4 del dl 331 del 1993)",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Data": {
           "name": "Data",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "TotalePercorso": {
           "name": "TotalePercorso",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 15,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,15})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiPagamentoType": {
       "type": "DatiPagamentoType",
       "help": "Blocco relativo ai dati di Pagamento della Fattura Elettronica",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "CondizioniPagamento": {
           "name": "CondizioniPagamento",
           "base_type": "string",
           "resource": {
@@ -3469,69 +2275,43 @@
             "TP02": "pagamento completo",
             "TP03": "anticipo"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minLength": "4",
-          "maxLength": "4",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DettaglioPagamento": {
           "name": "DettaglioPagamento",
           "base_type": "DettaglioPagamentoType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "maxOccurs": "-1",
-          "help": "",
-          "minOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": -1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DettaglioPagamentoType": {
       "type": "DettaglioPagamentoType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "Beneficiario": {
           "name": "Beneficiario",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 200,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,200}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ModalitaPagamento": {
           "name": "ModalitaPagamento",
           "base_type": "string",
           "resource": {
@@ -3559,606 +2339,361 @@
             "MP22": "Trattenuta su somme gi\u00e0 riscosse",
             "MP23": "PagoPA"
           },
-          "length": "4",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataRiferimentoTerminiPagamento": {
           "name": "DataRiferimentoTerminiPagamento",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "GiorniTerminiPagamento": {
           "name": "GiorniTerminiPagamento",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minInclusive": "0",
-          "maxInclusive": "999",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataScadenzaPagamento": {
           "name": "DataScadenzaPagamento",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImportoPagamento": {
           "name": "ImportoPagamento",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodUfficioPostale": {
           "name": "CodUfficioPostale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CognomeQuietanzante": {
           "name": "CognomeQuietanzante",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "NomeQuietanzante": {
           "name": "NomeQuietanzante",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CFQuietanzante": {
           "name": "CFQuietanzante",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 16,
           "pattern": "[A-Z0-9]{16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "TitoloQuietanzante": {
           "name": "TitoloQuietanzante",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 2,
           "pattern": "(\\p{IsBasicLatin}{2,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "whiteSpace": "collapse",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "IstitutoFinanziario": {
           "name": "IstitutoFinanziario",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 80,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,80}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "IBAN": {
           "name": "IBAN",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 30,
+          "min_length": 11,
           "pattern": "[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ABI": {
           "name": "ABI",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9][0-9][0-9][0-9][0-9]",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CAB": {
           "name": "CAB",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9][0-9][0-9][0-9][0-9]",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "BIC": {
           "name": "BIC",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 1,
+          "min_length": 0,
           "pattern": "[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ScontoPagamentoAnticipato": {
           "name": "ScontoPagamentoAnticipato",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataLimitePagamentoAnticipato": {
           "name": "DataLimitePagamentoAnticipato",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "PenalitaPagamentiRitardati": {
           "name": "PenalitaPagamentiRitardati",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataDecorrenzaPenale": {
           "name": "DataDecorrenzaPenale",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodicePagamento": {
           "name": "CodicePagamento",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,60})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "TerzoIntermediarioSoggettoEmittenteType": {
       "type": "TerzoIntermediarioSoggettoEmittenteType",
       "help": "Blocco relativo ai dati del Terzo Intermediario che emette fattura elettronica per conto del Cedente/Prestatore",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "DatiAnagrafici": {
           "name": "DatiAnagrafici",
           "base_type": "DatiAnagraficiTerzoIntermediarioType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiAnagraficiTerzoIntermediarioType": {
       "type": "DatiAnagraficiTerzoIntermediarioType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "IdFiscaleIVA": {
           "name": "IdFiscaleIVA",
           "base_type": "IdFiscaleType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceFiscale": {
           "name": "CodiceFiscale",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 16,
+          "min_length": 11,
           "pattern": "[A-Z0-9]{11,16}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Anagrafica": {
           "name": "Anagrafica",
           "base_type": "AnagraficaType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "AllegatiType": {
       "type": "AllegatiType",
       "help": "Blocco relativo ai dati di eventuali allegati",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "NomeAttachment": {
           "name": "NomeAttachment",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AlgoritmoCompressione": {
           "name": "AlgoritmoCompressione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "FormatoAttachment": {
           "name": "FormatoAttachment",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DescrizioneAttachment": {
           "name": "DescrizioneAttachment",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 100,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Attachment": {
           "name": "Attachment",
-          "base_type": "base64",
+          "base_type": "xs:base64Binary",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DettaglioLineeType": {
       "type": "DettaglioLineeType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "NumeroLinea": {
           "name": "NumeroLinea",
           "base_type": "integer",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minInclusive": "1",
-          "maxInclusive": "9999",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "TipoCessionePrestazione": {
           "name": "TipoCessionePrestazione",
           "base_type": "string",
           "resource": {
@@ -4167,234 +2702,137 @@
             "AB": "Abbuono",
             "AC": "Spesa accessoria"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceArticolo": {
           "name": "CodiceArticolo",
           "base_type": "CodiceArticoloType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "Descrizione": {
           "name": "Descrizione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 1000,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,1000}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Quantita": {
           "name": "Quantita",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,12}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "UnitaMisura": {
           "name": "UnitaMisura",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataInizioPeriodo": {
           "name": "DataInizioPeriodo",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "DataFinePeriodo": {
           "name": "DataFinePeriodo",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "PrezzoUnitario": {
           "name": "PrezzoUnitario",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ScontoMaggiorazione": {
           "name": "ScontoMaggiorazione",
           "base_type": "ScontoMaggiorazioneType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         },
-        {
+        "PrezzoTotale": {
           "name": "PrezzoTotale",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AliquotaIVA": {
           "name": "AliquotaIVA",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "maxInclusive": "100.00",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Ritenuta": {
           "name": "Ritenuta",
           "base_type": "string",
           "resource": {
             "SI": "SI = Cessione / Prestazione soggetta a ritenuta"
           },
-          "length": "2",
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Natura": {
           "name": "Natura",
           "base_type": "string",
           "resource": {
@@ -4423,217 +2861,134 @@
             "N6.9": "Inversione contabile - altri casi",
             "N7": "IVA assolta in altro stato UE (prestazione di servizi di telecomunicazioni, tele-radiodiffusione ed elettronici ex art. 7-octies lett. a, b, art. 74-sexies DPR 633/72)"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoAmministrazione": {
           "name": "RiferimentoAmministrazione",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 20,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,20})",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "AltriDatiGestionali": {
           "name": "AltriDatiGestionali",
           "base_type": "AltriDatiGestionaliType",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "maxOccurs": "-1",
+          "min_occurs": 0,
+          "max_occurs": -1,
           "help": ""
         }
-      ]
+      }
     },
-    {
+    "CodiceArticoloType": {
       "type": "CodiceArticoloType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "CodiceTipo": {
           "name": "CodiceTipo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 35,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,35})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "CodiceValore": {
           "name": "CodiceValore",
-          "base_type": "string",
+          "base_type": "normalizedString",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "help": "",
-          "minLength": "1",
-          "maxLength": "35",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "AltriDatiGestionaliType": {
       "type": "AltriDatiGestionaliType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "TipoDato": {
           "name": "TipoDato",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 10,
+          "min_length": 1,
           "pattern": "(\\p{IsBasicLatin}{1,10})",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoTesto": {
           "name": "RiferimentoTesto",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 60,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoNumero": {
           "name": "RiferimentoNumero",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoData": {
           "name": "RiferimentoData",
-          "base_type": "date",
+          "base_type": "xs:date",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     },
-    {
+    "DatiRiepilogoType": {
       "type": "DatiRiepilogoType",
       "help": "",
       "choices": [],
-      "elements": [
-        {
+      "elements": {
+        "AliquotaIVA": {
           "name": "AliquotaIVA",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[0-9]{1,3}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "maxInclusive": "100.00",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Natura": {
           "name": "Natura",
           "base_type": "string",
           "resource": {
@@ -4662,98 +3017,58 @@
             "N6.9": "Inversione contabile - altri casi",
             "N7": "IVA assolta in altro stato UE (prestazione di servizi di telecomunicazioni, tele-radiodiffusione ed elettronici ex art. 7-octies lett. a, b, art. 74-sexies DPR 633/72)"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "SpeseAccessorie": {
           "name": "SpeseAccessorie",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Arrotondamento": {
           "name": "Arrotondamento",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2,8}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "ImponibileImporto": {
           "name": "ImponibileImporto",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "Imposta": {
           "name": "Imposta",
           "base_type": "decimal",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": "[\\-]?[0-9]{1,11}\\.[0-9]{2}",
-          "whitespace": null,
-          "help": "",
-          "minOccurs": "1",
-          "maxOccurs": "1"
+          "min_occurs": 1,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "EsigibilitaIVA": {
           "name": "EsigibilitaIVA",
           "base_type": "string",
           "resource": {
@@ -4761,45 +3076,27 @@
             "I": "esigibilit\u00e0 immediata",
             "S": "scissione dei pagamenti"
           },
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "minLength": "1",
-          "maxLength": "1",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         },
-        {
+        "RiferimentoNormativo": {
           "name": "RiferimentoNormativo",
           "base_type": "string",
           "resource": [],
-          "length": null,
-          "fraction_digits": null,
-          "total_digits": null,
-          "max_exclusive": null,
-          "min_exclusive": null,
-          "max_inclusive": null,
-          "min_inclusive": null,
-          "max_length": null,
-          "min_length": null,
+          "max_length": 100,
+          "min_length": 1,
           "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,100}",
-          "whitespace": null,
-          "minOccurs": "0",
-          "help": "",
-          "maxOccurs": "1"
+          "min_occurs": 0,
+          "max_occurs": 1,
+          "help": ""
         }
-      ]
+      }
     }
-  ],
+  },
 
   "excluded": [
     "FatturaElettronicaTypee",

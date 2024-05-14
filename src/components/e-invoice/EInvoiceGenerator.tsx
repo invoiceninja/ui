@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -8,7 +9,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Button, InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
@@ -17,9 +18,6 @@ import { MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date } from '$app/common/helpers';
-import reactStringReplace from 'react-string-replace';
 
 export type Country = 'italy';
 
@@ -28,21 +26,18 @@ type Payload = Record<string, string | number>;
 interface PayloadKey {
   key: string;
   valueType: 'string' | 'number';
-  label: string;
-  fieldName: string;
 }
 
 interface AvailableType {
   key: string;
   label: string;
-  fieldName: string;
 }
 
 interface Resource {
   rules: Rule[];
   validations: Validation[];
   defaultFields: Record<string, string>;
-  components: Component[];
+  components: Record<string, Component>;
   excluded: string[];
 }
 
@@ -76,43 +71,51 @@ interface ElementType {
   base_type: ('string' | 'decimal' | 'number' | 'date') | null;
   resource: Record<string, string> | [];
   length: number | null;
-  fraction_digits: number | null;
-  total_digits: number | null;
-  max_exclusive: number | null;
-  min_exclusive: number | null;
-  max_inclusive: number | null;
-  min_inclusive: number | null;
   max_length: number | null;
   min_length: number | null;
   pattern: string | null;
-  whitespace: boolean | null;
   help: string;
-  minOccurs: string;
-  maxOccurs: string;
+  min_occurs: number;
+  max_occurs: number;
 }
 
 interface Component {
   type: string;
   help: string;
   choices: string[][];
-  elements: ElementType[];
+  elements: Record<string, ElementType>;
 }
 
 interface Props {
   country: Country | undefined;
 }
+
+interface ContainerProps {
+  renderFragment: boolean;
+  children: ReactNode;
+  className: string;
+}
+
+function Container(props: ContainerProps) {
+  const { renderFragment, children, className } = props;
+
+  if (renderFragment) {
+    return <React.Fragment>{children}</React.Fragment>;
+  }
+
+  return <div className={className}>{children}</div>;
+}
+
 export function EInvoiceGenerator(props: Props) {
   const [t] = useTranslation();
 
   const { country } = props;
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
   const [rules, setRules] = useState<Rule[]>([]);
   const [errors, setErrors] = useState<ValidationBag>();
   const [excluded, setExcluded] = useState<string[]>([]);
   const [isInitial, setIsInitial] = useState<boolean>(true);
-  const [components, setComponents] = useState<Component[]>([]);
+  const [components, setComponents] = useState<Record<string, Component>>({});
   const [eInvoice, setEInvoice] = useState<
     JSX.Element | (JSX.Element | undefined)[]
   >();
@@ -128,7 +131,7 @@ export function EInvoiceGenerator(props: Props) {
     AvailableType[]
   >([]);
 
-  const getFieldKey = (label: string | null) => {
+  const getComponentKey = (label: string | null) => {
     return label?.split('Type')[0];
   };
 
@@ -158,14 +161,14 @@ export function EInvoiceGenerator(props: Props) {
       return false;
     }
 
-    const topParentComponent = components.find(
+    const topParentComponent = Object.values(components).find(
       ({ type }) => type === topParentType
     );
-    const choiceTopParentElementType = topParentComponent?.elements.find(
-      ({ name }) => name === parentElementName
-    )?.base_type;
+    const choiceTopParentElementType = Object.values(
+      topParentComponent?.elements || {}
+    ).find(({ name }) => name === parentElementName)?.base_type;
 
-    const choiceParentComponent = components.find(
+    const choiceParentComponent = Object.values(components).find(
       ({ type }) => type === choiceTopParentElementType
     );
 
@@ -174,6 +177,20 @@ export function EInvoiceGenerator(props: Props) {
     );
 
     return choiceGroup?.includes(comparingElementName);
+  };
+
+  const isChildOfTheComponent = (fieldKey: string, componentKey: string) => {
+    const parentComponentType = componentKey.split('|')[1];
+
+    const currentFieldName = fieldKey.split('|')[2];
+
+    const parentComponent = components[parentComponentType];
+
+    if (parentComponent && currentFieldName) {
+      return parentComponent.elements[currentFieldName];
+    }
+
+    return false;
   };
 
   const showField = (key: string) => {
@@ -188,21 +205,23 @@ export function EInvoiceGenerator(props: Props) {
     );
 
     return isInitial
-      ? !availableTypes.find((currentType) => currentType.key === key)
-      : !currentAvailableTypes.find((currentType) => currentType.key === key) &&
-          !isInTheGroupWithAnyOther;
+      ? !availableTypes.some((currentType) =>
+          isChildOfTheComponent(key, currentType.key)
+        )
+      : !currentAvailableTypes.find((currentType) =>
+          isChildOfTheComponent(key, currentType.key)
+        );
   };
 
-  const handleDeleteField = (elementKey: string) => {
-    const currentType = payloadKeys.find(({ key }) => key === elementKey);
+  const handleDeleteField = (componentKey: string) => {
+    const currentType = payloadKeys.find(({ key }) => key === componentKey);
 
     if (currentType) {
       setCurrentAvailableTypes((current) => [
         ...current,
         {
           key: currentType.key,
-          label: currentType.label,
-          fieldName: currentType.fieldName,
+          label: 'asdasd',
         },
       ]);
 
@@ -216,17 +235,17 @@ export function EInvoiceGenerator(props: Props) {
 
   const isElementChoice = (elementName: string | null, parentsKey: string) => {
     if (elementName) {
-      const topParentType = `${parentsKey.split('->')[0]}Type`;
-      const parentElementName = parentsKey.split('->')[1];
+      const topParentType = `${parentsKey.split('|')[0]}Type`;
+      const parentElementName = parentsKey.split('|')[1];
 
-      const topParentComponent = components.find(
+      const topParentComponent = Object.values(components).find(
         ({ type }) => type === topParentType
       );
-      const choiceTopParentElementType = topParentComponent?.elements.find(
-        ({ name }) => name === parentElementName
-      )?.base_type;
+      const choiceTopParentElementType = Object.values(
+        topParentComponent?.elements || {}
+      ).find(({ name }) => name === parentElementName)?.base_type;
 
-      const choiceParentComponent = components.find(
+      const choiceParentComponent = Object.values(components).find(
         ({ type }) => type === choiceTopParentElementType
       );
 
@@ -239,20 +258,15 @@ export function EInvoiceGenerator(props: Props) {
   };
 
   const renderElement = (element: ElementType, parentsKey: string) => {
-    let label = '';
     let leftSideLabel = '';
-    const isChoice = isElementChoice(element.name, parentsKey);
-    const choiceLabelPart = isChoice ? '(additional option)' : '';
-    const fieldKey = `${parentsKey.replace('->', '|')}|${element.name || ''}`;
+    const fieldKey = `${parentsKey}|${element.name || ''}`;
     const rule = rules.find((rule) => rule.key === element.name);
 
     if (rule) {
-      label = choiceLabelPart ? `${rule.label} ${choiceLabelPart}` : rule.label;
       leftSideLabel = rule.label;
     } else {
-      label = `${parentsKey} ${element.name || ''} ${choiceLabelPart}`;
-      leftSideLabel = `${element.name} (${parentsKey.split('->')[0]}, ${
-        parentsKey.split('->')[1]
+      leftSideLabel = `${element.name} (${parentsKey.split('|')[0]}, ${
+        parentsKey.split('|')[1]
       })`;
     }
 
@@ -262,21 +276,7 @@ export function EInvoiceGenerator(props: Props) {
     payloadKeys.push({
       key: fieldKey,
       valueType: isNumberTypeField ? 'number' : 'string',
-      label,
-      fieldName: element.name,
     });
-
-    if (isInitial) {
-      const isDefaultField = Object.keys(defaultFields).includes(element.name);
-
-      if (!isDefaultField) {
-        availableTypes.push({
-          key: fieldKey,
-          label,
-          fieldName: element.name,
-        });
-      }
-    }
 
     if (!showField(fieldKey)) {
       return null;
@@ -289,31 +289,18 @@ export function EInvoiceGenerator(props: Props) {
     ) {
       return (
         <Element required={rule?.required} leftSide={leftSideLabel}>
-          <div className="flex items-center w-full space-x-3">
-            <div className="flex-1">
-              <SelectField
-                value={payload[fieldKey] || ''}
-                onValueChange={(value) => handleChange(fieldKey, value)}
-                withBlank
-                errorMessage={errors?.errors[fieldKey]}
-              >
-                {Object.entries(element.resource).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value || key}
-                  </option>
-                ))}
-              </SelectField>
-            </div>
-
-            {!rule?.required && (
-              <div
-                className="cursor-pointer"
-                onClick={() => handleDeleteField(fieldKey)}
-              >
-                <Icon element={MdDelete} size={28} />
-              </div>
-            )}
-          </div>
+          <SelectField
+            value={payload[fieldKey] || ''}
+            onValueChange={(value) => handleChange(fieldKey, value)}
+            withBlank
+            errorMessage={errors?.errors[fieldKey]}
+          >
+            {Object.entries(element.resource).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value || key}
+              </option>
+            ))}
+          </SelectField>
         </Element>
       );
     }
@@ -321,30 +308,17 @@ export function EInvoiceGenerator(props: Props) {
     if (element.base_type === 'decimal' || element.base_type === 'number') {
       return (
         <Element required={rule?.required} leftSide={leftSideLabel}>
-          <div className="flex items-center w-full space-x-3">
-            <div className="flex-1">
-              <InputField
-                type="number"
-                value={payload[fieldKey] || 0}
-                onValueChange={(value) =>
-                  handleChange(
-                    fieldKey,
-                    parseFloat(value).toFixed(value.split('.')?.[1]?.length)
-                  )
-                }
-                errorMessage={errors?.errors[fieldKey]}
-              />
-            </div>
-
-            {!rule?.required && (
-              <div
-                className="cursor-pointer"
-                onClick={() => handleDeleteField(fieldKey)}
-              >
-                <Icon element={MdDelete} size={28} />
-              </div>
-            )}
-          </div>
+          <InputField
+            type="number"
+            value={payload[fieldKey] || 0}
+            onValueChange={(value) =>
+              handleChange(
+                fieldKey,
+                parseFloat(value).toFixed(value.split('.')?.[1]?.length)
+              )
+            }
+            errorMessage={errors?.errors[fieldKey]}
+          />
         </Element>
       );
     }
@@ -352,25 +326,12 @@ export function EInvoiceGenerator(props: Props) {
     if (element.base_type === 'date') {
       return (
         <Element required={rule?.required} leftSide={leftSideLabel}>
-          <div className="flex items-center w-full space-x-3">
-            <div className="flex-1">
-              <InputField
-                type="date"
-                value={payload[fieldKey] || ''}
-                onValueChange={(value) => handleChange(fieldKey, value)}
-                errorMessage={errors?.errors[fieldKey]}
-              />
-            </div>
-
-            {!rule?.required && (
-              <div
-                className="cursor-pointer"
-                onClick={() => handleDeleteField(fieldKey)}
-              >
-                <Icon element={MdDelete} size={28} />
-              </div>
-            )}
-          </div>
+          <InputField
+            type="date"
+            value={payload[fieldKey] || ''}
+            onValueChange={(value) => handleChange(fieldKey, value)}
+            errorMessage={errors?.errors[fieldKey]}
+          />
         </Element>
       );
     }
@@ -378,24 +339,11 @@ export function EInvoiceGenerator(props: Props) {
     if (element.base_type !== null) {
       return (
         <Element required={rule?.required} leftSide={leftSideLabel}>
-          <div className="flex items-center w-full space-x-3">
-            <div className="flex-1">
-              <InputField
-                value={payload[fieldKey] || ''}
-                onValueChange={(value) => handleChange(fieldKey, value)}
-                errorMessage={errors?.errors[fieldKey]}
-              />
-            </div>
-
-            {!rule?.required && (
-              <div
-                className="cursor-pointer"
-                onClick={() => handleDeleteField(fieldKey)}
-              >
-                <Icon element={MdDelete} size={28} />
-              </div>
-            )}
-          </div>
+          <InputField
+            value={payload[fieldKey] || ''}
+            onValueChange={(value) => handleChange(fieldKey, value)}
+            errorMessage={errors?.errors[fieldKey]}
+          />
         </Element>
       );
     }
@@ -405,46 +353,118 @@ export function EInvoiceGenerator(props: Props) {
     component: Component,
     componentIndex: number,
     topParentType: string,
-    lastParentType: string
-  ): JSX.Element => {
+    lastParentType: string,
+    lastParentName: string,
+    isDefaultComponent: boolean
+  ) => {
+    const isCurrentComponentLastParent =
+      Object.keys(component.elements).length &&
+      !Object.values(component.elements).some(({ base_type }) =>
+        base_type?.endsWith('Type')
+      );
+
+    const shouldBeRendered = isInitial
+      ? !availableTypes.some(
+          (currentType) =>
+            currentType.key === `${topParentType}|${component.type}`
+        )
+      : !currentAvailableTypes.find(
+          (currentType) =>
+            currentType.key === `${topParentType}|${component.type}`
+        );
+
     return (
-      <React.Fragment
-        key={`${topParentType}${lastParentType}${component.type}`}
+      <Container
+        className="flex items-center"
+        key={`${topParentType}${lastParentType}${lastParentName}`}
+        renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
       >
-        {Boolean(component.elements.length) &&
-          component.elements.map((element) => {
-            if (element.base_type?.endsWith('Type')) {
-              const componentsList = components.filter(
-                (_, index) => componentIndex !== index
-              );
+        <Container
+          className="flex flex-1 flex-col"
+          renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
+        >
+          {Boolean(Object.keys(component.elements).length) &&
+            Object.values(component.elements).map((element) => {
+              if (element.base_type?.endsWith('Type')) {
+                const componentsList = Object.values(components).filter(
+                  (_, index) => componentIndex !== index
+                );
 
-              const newComponentIndex = componentsList.findIndex(
-                (component) => component.type === element.base_type
-              );
+                const newComponentIndex = componentsList.findIndex(
+                  (component) => component.type === element.base_type
+                );
 
-              const newComponent = componentsList[newComponentIndex];
+                const newComponent = componentsList[newComponentIndex];
 
-              if (newComponent) {
-                return renderComponent(
-                  { ...newComponent },
-                  newComponentIndex,
-                  newComponent.elements.length &&
-                    newComponent.elements[0].base_type?.endsWith('Type')
-                    ? newComponent.type
-                    : topParentType,
-                  element.name
+                if (newComponent) {
+                  const isCurrentComponentLastParent =
+                    Object.keys(component.elements).length &&
+                    !Object.values(component.elements).some(({ base_type }) =>
+                      base_type?.endsWith('Type')
+                    );
+                  const isNewComponentLastParent =
+                    Object.keys(newComponent.elements).length &&
+                    !Object.values(newComponent.elements).some(
+                      ({ base_type }) => base_type?.endsWith('Type')
+                    );
+
+                  const label = `${getComponentKey(newComponent.type)} (${
+                    element.name
+                  }, ${getComponentKey(
+                    component.type || ''
+                  )}, ${getComponentKey(lastParentType || '')})`;
+
+                  const isCurrentDefaultComponent = element.min_occurs !== 0;
+
+                  if (
+                    isInitial &&
+                    !isCurrentDefaultComponent &&
+                    isNewComponentLastParent &&
+                    !isCurrentComponentLastParent
+                  ) {
+                    availableTypes.push({
+                      key: `${topParentType}|${newComponent.type}`,
+                      label,
+                    });
+                  }
+
+                  return renderComponent(
+                    { ...newComponent },
+                    newComponentIndex,
+                    !isNewComponentLastParent
+                      ? newComponent.type
+                      : topParentType,
+                    component.type,
+                    element.name,
+                    Boolean(isCurrentDefaultComponent)
+                  );
+                }
+              } else {
+                return renderElement(
+                  element,
+                  `${getComponentKey(topParentType)}|${lastParentName}`
                 );
               }
-            } else {
-              return renderElement(
-                element,
-                `${getFieldKey(topParentType)}->${getFieldKey(lastParentType)}`
-              );
-            }
-          })}
-      </React.Fragment>
+            })}
+        </Container>
+
+        {shouldBeRendered &&
+          !isDefaultComponent &&
+          isCurrentComponentLastParent && (
+            <div
+              className="cursor-pointer"
+              onClick={() =>
+                handleDeleteField(`${topParentType}|${component.type}`)
+              }
+            >
+              <Icon element={MdDelete} size={28} />
+            </div>
+          )}
+      </Container>
     );
   };
+
+  console.log(currentAvailableTypes);
 
   const createPayload = () => {
     let currentPayload: Payload = {};
@@ -482,41 +502,27 @@ export function EInvoiceGenerator(props: Props) {
         const fieldKey = key.split('|')[2];
         let fieldValidation: ElementType | undefined;
 
-        components.forEach((component) => {
+        Object.values(components).forEach((component) => {
           if (!fieldValidation) {
-            fieldValidation = component.elements.find(
+            fieldValidation = Object.values(component.elements).find(
               ({ name }) => name === fieldKey
             );
           }
         });
 
-        const fieldRule = rules.find((rule) => rule.key === fieldKey);
-        const isRequired = fieldRule?.required;
+        const isRequired = rules.find(
+          (rule) => rule.key === fieldKey
+        )?.required;
 
         if (fieldValidation) {
-          const {
-            pattern,
-            min_inclusive,
-            base_type,
-            max_inclusive,
-            min_exclusive,
-            max_exclusive,
-            length,
-            min_length,
-            max_length,
-            fraction_digits,
-            total_digits,
-            whitespace,
-          } = fieldValidation;
+          const { pattern, length, min_length, max_length } = fieldValidation;
 
           if (isRequired && !value) {
-            updatedErrors = {
-              ...updatedErrors,
-              errors: {
-                ...updatedErrors.errors,
-                [key]: [`${key} is required field!`],
-              },
-            };
+            updatedErrors = updateErrors(
+              updatedErrors,
+              key,
+              `${key} is required field!`
+            );
           }
 
           if (
@@ -539,101 +545,6 @@ export function EInvoiceGenerator(props: Props) {
                 pattern as string
               ).gen()} (example)!`
             );
-          }
-
-          if (min_inclusive) {
-            const updatedValue = base_type === 'date' ? new Date(value) : value;
-            const updatedMinInclusive =
-              base_type === 'date'
-                ? new Date(min_inclusive)
-                : parseFloat(min_inclusive.toString());
-
-            if (updatedValue < updatedMinInclusive) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Min inclusive value for ${fieldKey} is ${
-                  base_type === 'date'
-                    ? date(min_inclusive, dateFormat)
-                    : min_inclusive
-                }!`
-              );
-            }
-          }
-
-          if (max_inclusive) {
-            const updatedValue = base_type === 'date' ? new Date(value) : value;
-            const updatedMaxInclusive =
-              base_type === 'date'
-                ? new Date(max_inclusive)
-                : parseFloat(max_inclusive.toString());
-
-            if (updatedValue > updatedMaxInclusive) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Max inclusive value for ${fieldKey} is ${
-                  base_type === 'date'
-                    ? date(max_inclusive, dateFormat)
-                    : max_inclusive
-                }!`
-              );
-            }
-          }
-
-          if (min_exclusive && !max_exclusive) {
-            const updatedValue = base_type === 'date' ? new Date(value) : value;
-            const updatedMinExclusive =
-              base_type === 'date'
-                ? new Date(min_exclusive)
-                : parseFloat(min_exclusive.toString());
-
-            if (updatedValue >= updatedMinExclusive) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Min exclusive value for ${fieldKey} is ${updatedMinExclusive}!`
-              );
-            }
-          }
-
-          if (max_exclusive && !min_exclusive) {
-            const updatedValue = base_type === 'date' ? new Date(value) : value;
-            const updatedMaxExclusive =
-              base_type === 'date'
-                ? new Date(max_exclusive)
-                : parseFloat(max_exclusive.toString());
-
-            if (updatedValue <= updatedMaxExclusive) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Max exclusive value for ${fieldKey} is ${updatedMaxExclusive}!`
-              );
-            }
-          }
-
-          if (max_exclusive && min_exclusive) {
-            const updatedValue = base_type === 'date' ? new Date(value) : value;
-            const updatedMinExclusive =
-              base_type === 'date'
-                ? new Date(min_exclusive)
-                : parseFloat(min_exclusive.toString());
-            const updatedMaxExclusive =
-              base_type === 'date'
-                ? new Date(max_exclusive)
-                : parseFloat(max_exclusive.toString());
-
-            if (
-              updatedValue <= updatedMaxExclusive &&
-              updatedValue >= updatedMinExclusive
-            ) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Excluded values for ${fieldKey} field are from ${updatedMinExclusive} to ${updatedMaxExclusive}!`
-              );
-            }
           }
 
           if (min_length && !max_length) {
@@ -668,40 +579,6 @@ export function EInvoiceGenerator(props: Props) {
               );
             }
           }
-
-          if (fraction_digits) {
-            const numberOfDecimalPlaces = value.toString().split('.')[1].length;
-
-            if (numberOfDecimalPlaces > fraction_digits) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Max number of decimal places for ${fieldKey} is ${fraction_digits}!`
-              );
-            }
-          }
-
-          if (total_digits) {
-            const numberWithoutSeparators = value
-              .toString()
-              .replace(/[^\d]/g, '');
-
-            if (numberWithoutSeparators.length !== Number(total_digits)) {
-              updatedErrors = updateErrors(
-                updatedErrors,
-                key,
-                `Number of digits for ${fieldKey} must be ${total_digits}!`
-              );
-            }
-          }
-
-          if (value && whitespace && /\s/.test(value.toString())) {
-            updatedErrors = updateErrors(
-              updatedErrors,
-              key,
-              `The ${fieldKey} field can not contain whitespace!`
-            );
-          }
         }
       }
     });
@@ -724,8 +601,8 @@ export function EInvoiceGenerator(props: Props) {
     childIndex: number,
     types: string[]
   ) => {
-    child.elements.map((element) => {
-      const componentsList = components.filter(
+    Object.values(child.elements).map((element) => {
+      const componentsList = Object.values(components).filter(
         (_, index) => childIndex !== index
       );
 
@@ -745,10 +622,10 @@ export function EInvoiceGenerator(props: Props) {
   const isChildOfExcluded = (componentType: string) => {
     const typesForExclusion: string[] = [];
 
-    const excludedComponents = components.filter(({ type }) =>
+    const excludedComponents = Object.values(components).filter(({ type }) =>
       excluded.includes(type)
     );
-    const excludedComponentIndexes = components
+    const excludedComponentIndexes = Object.values(components)
       .filter((_, index) =>
         excludedComponents.some((_, excludedIndex) => excludedIndex === index)
       )
@@ -765,34 +642,45 @@ export function EInvoiceGenerator(props: Props) {
     return typesForExclusion.includes(componentType);
   };
 
-  const generateEInvoiceUI = async (components: Component[]) => {
+  const generateEInvoiceUI = async (components: Record<string, Component>) => {
     payloadKeys = [];
 
-    if (!components.length) {
+    if (!Object.keys(components).length) {
       return <></>;
     }
 
-    const invoiceComponents = components.map((component, index) => {
-      const isAlreadyRendered = components
-        .filter((_, currentIndex) => currentIndex < index)
-        .some((currentComponent) =>
-          currentComponent.elements.some(
-            (element) => element.base_type === component.type
-          )
-        );
+    const invoiceComponents = Object.values(components).map(
+      (component, index) => {
+        const isAlreadyRendered = Object.values(components)
+          .filter((_, currentIndex) => currentIndex < index)
+          .some((currentComponent) =>
+            Object.values(currentComponent.elements).some(
+              (element) => element.base_type === component.type
+            )
+          );
 
-      const shouldBeExcluded =
-        excluded.includes(component.type) || isChildOfExcluded(component.type);
+        const shouldBeExcluded =
+          excluded.includes(component.type) ||
+          isChildOfExcluded(component.type);
 
-      if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
-        return renderComponent(
-          component,
-          index,
-          component.type,
-          component.type
-        );
+        if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
+          const isLastParent =
+            Object.keys(component.elements).length &&
+            !Object.values(component.elements).some(({ base_type }) =>
+              base_type?.endsWith('Type')
+            );
+
+          return renderComponent(
+            component,
+            index,
+            component.type,
+            component.type,
+            component.type,
+            Boolean(isLastParent)
+          );
+        }
       }
-    });
+    );
 
     return invoiceComponents.filter((currentComponent) => currentComponent);
   };
@@ -820,7 +708,7 @@ export function EInvoiceGenerator(props: Props) {
         });
     } else {
       setRules([]);
-      setComponents([]);
+      setComponents({});
       setErrors(undefined);
       setEInvoice(undefined);
       setIsInitial(true);
@@ -832,7 +720,7 @@ export function EInvoiceGenerator(props: Props) {
   }, [country]);
 
   useEffect(() => {
-    if (components.length) {
+    if (Object.keys(components).length) {
       (async () => {
         const invoiceUI = await generateEInvoiceUI(components);
 
@@ -868,13 +756,9 @@ export function EInvoiceGenerator(props: Props) {
             }
             clearAfterSelection
           >
-            {currentAvailableTypes.map((type, index) => (
-              <option key={index} value={type.key}>
-                <div>
-                  {reactStringReplace(type.label, type.fieldName, (match) => (
-                    <strong>{match}</strong>
-                  ))}
-                </div>
+            {currentAvailableTypes.map(({ key, label }, index) => (
+              <option key={index} value={key}>
+                {label}
               </option>
             ))}
           </SearchableSelect>
