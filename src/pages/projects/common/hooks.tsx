@@ -346,8 +346,11 @@ export function useActions() {
       });
   };
 
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const actions = [
     (project: Project) =>
@@ -385,6 +388,10 @@ export function useActions() {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([project]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/projects/bulk',
+            entity: 'project',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
@@ -468,8 +475,11 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
@@ -504,6 +514,10 @@ export const useCustomBulkActions = () => {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/projects/bulk',
+            entity: 'project',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

@@ -85,8 +85,11 @@ export function useCustomBulkActions() {
     );
   };
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
     ({ selectedIds, setSelected }) => (
@@ -188,6 +191,10 @@ export function useCustomBulkActions() {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/purchase_orders/bulk',
+            entity: 'purchase_order',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
