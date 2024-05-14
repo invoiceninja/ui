@@ -50,6 +50,7 @@ export function useActions(params?: Params) {
   const {
     setChangeTemplateVisible,
     setChangeTemplateResources,
+    setChangeTemplateEntityContext,
   } = useChangeTemplate();
 
   const actions: Action<Payment>[] = [
@@ -96,6 +97,10 @@ export function useActions(params?: Params) {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([payment]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/payments/bulk',
+            entity: 'payment',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
