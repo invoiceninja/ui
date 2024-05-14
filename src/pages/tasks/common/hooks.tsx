@@ -461,8 +461,11 @@ export function useActions(params?: Params) {
     navigate('/tasks/create?action=clone');
   };
 
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const actions = [
     (task: Task) =>
@@ -521,6 +524,10 @@ export function useActions(params?: Params) {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([task]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
@@ -620,8 +627,11 @@ export const useCustomBulkActions = () => {
     setSelected?.([]);
   };
 
-  const { setChangeTemplateVisible, setChangeTemplateResources } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Task>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
@@ -690,6 +700,10 @@ export const useCustomBulkActions = () => {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

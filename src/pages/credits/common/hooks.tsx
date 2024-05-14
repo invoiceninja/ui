@@ -342,8 +342,11 @@ export function useActions() {
     resource: 'credit',
     downloadType: 'download_e_credit',
   });
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -471,6 +474,10 @@ export function useActions() {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([credit]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/credits/bulk',
+            entity: 'credit',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

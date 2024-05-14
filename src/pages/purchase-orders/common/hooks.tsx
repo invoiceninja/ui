@@ -447,8 +447,11 @@ export function useActions() {
     resource: 'purchase_order',
     downloadType: 'download_e_purchase_order',
   });
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({
@@ -595,6 +598,10 @@ export function useActions() {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([purchaseOrder]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/purchase_orders/bulk',
+            entity: 'purchase_order',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >

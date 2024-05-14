@@ -348,7 +348,7 @@ export function useActions(params?: Params) {
     downloadType: 'download_e_quote',
   });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
-  const { setChangeTemplateResources, setChangeTemplateVisible } =
+  const { setChangeTemplateResources, setChangeTemplateVisible, setChangeTemplateEntityContext } =
     useChangeTemplate();
 
   const cloneToQuote = (quote: Quote) => {
@@ -483,6 +483,10 @@ export function useActions(params?: Params) {
         onClick={() => {
           setChangeTemplateVisible(true);
           setChangeTemplateResources([quote]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/quotes/bulk',
+            entity: 'quote',
+          });
         }}
         icon={<Icon element={MdDesignServices} />}
       >
