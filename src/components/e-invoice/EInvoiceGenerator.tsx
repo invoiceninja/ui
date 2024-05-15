@@ -359,8 +359,8 @@ export function EInvoiceGenerator(props: Props) {
   ) => {
     const isCurrentComponentLastParent =
       Object.keys(component.elements).length &&
-      !Object.values(component.elements).some(({ base_type }) =>
-        base_type?.endsWith('Type')
+      Object.values(component.elements).some(
+        ({ base_type }) => !base_type?.endsWith('Type')
       );
 
     const shouldBeRendered = isInitial
@@ -399,22 +399,24 @@ export function EInvoiceGenerator(props: Props) {
                 if (newComponent) {
                   const isCurrentComponentLastParent =
                     Object.keys(component.elements).length &&
-                    !Object.values(component.elements).some(({ base_type }) =>
-                      base_type?.endsWith('Type')
+                    Object.values(component.elements).some(
+                      ({ base_type }) => !base_type?.endsWith('Type')
                     );
                   const isNewComponentLastParent =
                     Object.keys(newComponent.elements).length &&
-                    !Object.values(newComponent.elements).some(
-                      ({ base_type }) => base_type?.endsWith('Type')
+                    Object.values(newComponent.elements).some(
+                      ({ base_type }) => !base_type?.endsWith('Type')
                     );
 
                   const label = `${getComponentKey(newComponent.type)} (${
                     element.name
-                  }, ${getComponentKey(
-                    component.type || ''
-                  )}, ${getComponentKey(lastParentType || '')})`;
+                  }, ${getComponentKey(component.type || '')})`;
 
                   const isCurrentDefaultComponent = element.min_occurs !== 0;
+
+                  if (!isCurrentComponentLastParent) {
+                    console.log(component.type);
+                  }
 
                   if (
                     isInitial &&
@@ -463,8 +465,6 @@ export function EInvoiceGenerator(props: Props) {
       </Container>
     );
   };
-
-  console.log(currentAvailableTypes);
 
   const createPayload = () => {
     let currentPayload: Payload = {};
@@ -666,8 +666,8 @@ export function EInvoiceGenerator(props: Props) {
         if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
           const isLastParent =
             Object.keys(component.elements).length &&
-            !Object.values(component.elements).some(({ base_type }) =>
-              base_type?.endsWith('Type')
+            Object.values(component.elements).some(
+              ({ base_type }) => !base_type?.endsWith('Type')
             );
 
           return renderComponent(
