@@ -130,6 +130,7 @@ export function EInvoiceGenerator(props: Props) {
   const [currentAvailableTypes, setCurrentAvailableTypes] = useState<
     AvailableType[]
   >([]);
+  const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
 
   const getComponentKey = (label: string | null) => {
     return label?.split('Type')[0];
@@ -179,15 +180,17 @@ export function EInvoiceGenerator(props: Props) {
     return choiceGroup?.includes(comparingElementName);
   };
 
-  const isChildOfTheComponent = (fieldKey: string, componentKey: string) => {
-    const parentComponentType = componentKey.split('|')[1];
+  const isFieldChoice = (fieldKey: string) => {
+    const parentComponentType = `${fieldKey.split('|')[1]}Type`;
 
-    const currentFieldName = fieldKey.split('|')[2];
+    const fieldName = fieldKey.split('|')[2];
 
     const parentComponent = components[parentComponentType];
 
-    if (parentComponent && currentFieldName) {
-      return parentComponent.elements[currentFieldName];
+    if (parentComponent && fieldName) {
+      return parentComponent?.choices.some((choiceGroup) =>
+        choiceGroup.some((choice) => choice === fieldName)
+      );
     }
 
     return false;
@@ -204,57 +207,42 @@ export function EInvoiceGenerator(props: Props) {
       isChoiceFromSameGroup(field.key, key)
     );
 
+    const fieldParentsKey = `${key.split('|')[0]}Type|${
+      key.split('|')[1]
+    }Type|${key.split('|')[2]}|${key.split('|')[3]}Type`;
+
     return isInitial
-      ? !availableTypes.some((currentType) =>
-          isChildOfTheComponent(key, currentType.key)
+      ? !availableTypes.find(
+          (currentType) => fieldParentsKey === currentType.key
         )
-      : !currentAvailableTypes.find((currentType) =>
-          isChildOfTheComponent(key, currentType.key)
-        );
+      : !currentAvailableTypes.find(
+          (currentType) => fieldParentsKey === currentType.key
+        ) &&
+          (selectedChoices.includes(key) || !isFieldChoice(key));
   };
 
   const handleDeleteField = (componentKey: string) => {
-    const currentType = payloadKeys.find(({ key }) => key === componentKey);
+    const topParentComponentKey = getComponentKey(componentKey.split('|')[0]);
+    const parentComponentKey = getComponentKey(componentKey.split('|')[3]);
+    const parentName = getComponentKey(componentKey.split('|')[2]);
 
-    if (currentType) {
-      setCurrentAvailableTypes((current) => [
-        ...current,
-        {
-          key: currentType.key,
-          label: 'asdasd',
-        },
-      ]);
+    const label = `${parentComponentKey} (${parentName}, ${topParentComponentKey})`;
 
-      setPayload((current) => ({
-        ...current,
-        [currentType.key]:
-          typeof current[currentType.key] === 'number' ? 0 : '',
-      }));
-    }
-  };
+    setCurrentAvailableTypes((current) => [
+      ...current,
+      {
+        key: componentKey,
+        label,
+      },
+    ]);
 
-  const isElementChoice = (elementName: string | null, parentsKey: string) => {
-    if (elementName) {
-      const topParentType = `${parentsKey.split('|')[0]}Type`;
-      const parentElementName = parentsKey.split('|')[1];
+    const parentComponent = components[`${parentComponentKey}Type` as string];
 
-      const topParentComponent = Object.values(components).find(
-        ({ type }) => type === topParentType
-      );
-      const choiceTopParentElementType = Object.values(
-        topParentComponent?.elements || {}
-      ).find(({ name }) => name === parentElementName)?.base_type;
-
-      const choiceParentComponent = Object.values(components).find(
-        ({ type }) => type === choiceTopParentElementType
-      );
-
-      return choiceParentComponent?.choices.some((choiceGroup) =>
-        choiceGroup.some((choice) => choice === elementName)
-      );
-    }
-
-    return false;
+    // setPayload((current) => ({
+    //   ...current,
+    //   [currentType.key]:
+    //     typeof current[currentType.key] === 'number' ? 0 : '',
+    // }));
   };
 
   const renderElement = (element: ElementType, parentsKey: string) => {
@@ -266,7 +254,7 @@ export function EInvoiceGenerator(props: Props) {
       leftSideLabel = rule.label;
     } else {
       leftSideLabel = `${element.name} (${parentsKey.split('|')[0]}, ${
-        parentsKey.split('|')[1]
+        parentsKey.split('|')[2]
       })`;
     }
 
@@ -288,7 +276,11 @@ export function EInvoiceGenerator(props: Props) {
       Object.keys(element.resource).length
     ) {
       return (
-        <Element required={rule?.required} leftSide={leftSideLabel}>
+        <Element
+          key={fieldKey}
+          required={rule?.required}
+          leftSide={leftSideLabel}
+        >
           <SelectField
             value={payload[fieldKey] || ''}
             onValueChange={(value) => handleChange(fieldKey, value)}
@@ -307,7 +299,11 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type === 'decimal' || element.base_type === 'number') {
       return (
-        <Element required={rule?.required} leftSide={leftSideLabel}>
+        <Element
+          key={fieldKey}
+          required={rule?.required}
+          leftSide={leftSideLabel}
+        >
           <InputField
             type="number"
             value={payload[fieldKey] || 0}
@@ -325,7 +321,11 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type === 'date') {
       return (
-        <Element required={rule?.required} leftSide={leftSideLabel}>
+        <Element
+          key={fieldKey}
+          required={rule?.required}
+          leftSide={leftSideLabel}
+        >
           <InputField
             type="date"
             value={payload[fieldKey] || ''}
@@ -338,7 +338,11 @@ export function EInvoiceGenerator(props: Props) {
 
     if (element.base_type !== null) {
       return (
-        <Element required={rule?.required} leftSide={leftSideLabel}>
+        <Element
+          key={fieldKey}
+          required={rule?.required}
+          leftSide={leftSideLabel}
+        >
           <InputField
             value={payload[fieldKey] || ''}
             onValueChange={(value) => handleChange(fieldKey, value)}
@@ -349,6 +353,15 @@ export function EInvoiceGenerator(props: Props) {
     }
   };
 
+  const isComponentLastParent = (component: Component) => {
+    return (
+      Object.keys(component.elements).length &&
+      Object.values(component.elements).some(
+        ({ base_type }) => !base_type?.endsWith('Type')
+      )
+    );
+  };
+
   const renderComponent = (
     component: Component,
     componentIndex: number,
@@ -357,29 +370,14 @@ export function EInvoiceGenerator(props: Props) {
     lastParentName: string,
     isDefaultComponent: boolean
   ) => {
-    const lastComponent = Object.values(components).find(
-      ({ type }) => type === lastParentType
-    );
-    const isLastComponentLastParent =
-      Object.keys(lastComponent?.elements || {}).length &&
-      Object.values(lastComponent?.elements || {}).some(
-        ({ base_type }) => !base_type?.endsWith('Type')
-      );
+    const isCurrentComponentLastParent = isComponentLastParent(component);
 
-    const isCurrentComponentLastParent =
-      Object.keys(component.elements).length &&
-      Object.values(component.elements).some(
-        ({ base_type }) => !base_type?.endsWith('Type')
-      );
+    const componentKey = `${topParentType}|${lastParentType}|${lastParentName}|${component.type}`;
 
     const shouldBeRendered = isInitial
-      ? !availableTypes.some(
-          (currentType) =>
-            currentType.key === `${topParentType}|${component.type}`
-        )
+      ? !availableTypes.some((currentType) => currentType.key === componentKey)
       : !currentAvailableTypes.find(
-          (currentType) =>
-            currentType.key === `${topParentType}|${component.type}`
+          (currentType) => currentType.key === componentKey
         );
 
     return (
@@ -399,57 +397,50 @@ export function EInvoiceGenerator(props: Props) {
                   (_, index) => componentIndex !== index
                 );
 
-                const newComponentIndex = componentsList.findIndex(
+                const nextComponentIndex = componentsList.findIndex(
                   (component) => component.type === element.base_type
                 );
 
-                const newComponent = componentsList[newComponentIndex];
+                const nextComponent = componentsList[nextComponentIndex];
 
-                if (newComponent) {
-                  const isCurrentComponentLastParent =
-                    Object.keys(component.elements).length &&
-                    Object.values(component.elements).some(
-                      ({ base_type }) => !base_type?.endsWith('Type')
-                    );
+                if (nextComponent) {
                   const isNewComponentLastParent =
-                    Object.keys(newComponent.elements).length &&
-                    Object.values(newComponent.elements).some(
-                      ({ base_type }) => !base_type?.endsWith('Type')
-                    );
+                    isComponentLastParent(nextComponent);
 
-                  const label = `${getComponentKey(newComponent.type)} (${
+                  const label = `${getComponentKey(nextComponent.type)} (${
                     element.name
                   }, ${getComponentKey(component.type || '')})`;
 
-                  const isCurrentDefaultComponent = element.min_occurs !== 0;
+                  const isNewComponentDefault = element.min_occurs !== 0;
 
                   if (
                     isInitial &&
-                    !isCurrentDefaultComponent &&
-                    isNewComponentLastParent &&
-                    !isCurrentComponentLastParent
+                    !isNewComponentDefault &&
+                    isNewComponentLastParent
                   ) {
                     availableTypes.push({
-                      key: `${topParentType}|${newComponent.type}`,
+                      key: `${topParentType}|${component.type}|${element.name}|${nextComponent.type}`,
                       label,
                     });
                   }
 
                   return renderComponent(
-                    { ...newComponent },
-                    newComponentIndex,
+                    { ...nextComponent },
+                    nextComponentIndex,
                     !isNewComponentLastParent
-                      ? newComponent.type
+                      ? nextComponent.type
                       : topParentType,
                     component.type,
                     element.name,
-                    Boolean(isCurrentDefaultComponent)
+                    Boolean(isNewComponentDefault)
                   );
                 }
               } else {
                 return renderElement(
                   element,
-                  `${getComponentKey(topParentType)}|${lastParentName}`
+                  `${getComponentKey(topParentType)}|${getComponentKey(
+                    lastParentType
+                  )}|${lastParentName}|${getComponentKey(component.type)}`
                 );
               }
             })}
@@ -457,13 +448,10 @@ export function EInvoiceGenerator(props: Props) {
 
         {shouldBeRendered &&
           !isDefaultComponent &&
-          isCurrentComponentLastParent &&
-          !isLastComponentLastParent && (
+          isCurrentComponentLastParent && (
             <div
               className="cursor-pointer"
-              onClick={() =>
-                handleDeleteField(`${topParentType}|${component.type}`)
-              }
+              onClick={() => handleDeleteField(componentKey)}
             >
               <Icon element={MdDelete} size={28} />
             </div>
@@ -479,7 +467,7 @@ export function EInvoiceGenerator(props: Props) {
       currentPayload = {
         ...currentPayload,
         [key]:
-          defaultFields[key.split('|')[2]] || (valueType === 'number' ? 0 : ''),
+          defaultFields[key.split('|')[4]] || (valueType === 'number' ? 0 : ''),
       };
     });
 
@@ -505,7 +493,7 @@ export function EInvoiceGenerator(props: Props) {
 
     Object.entries(payload).forEach(([key, value]) => {
       if (showField(key)) {
-        const fieldKey = key.split('|')[2];
+        const fieldKey = key.split('|')[4];
         let fieldValidation: ElementType | undefined;
 
         Object.values(components).forEach((component) => {
@@ -543,7 +531,11 @@ export function EInvoiceGenerator(props: Props) {
             );
           }
 
-          if (pattern && new RegExp(pattern).test(value.toString()) === false) {
+          if (
+            pattern &&
+            !pattern.includes('Latin') &&
+            new RegExp(pattern).test(value.toString()) === false
+          ) {
             updatedErrors = updateErrors(
               updatedErrors,
               key,
@@ -575,13 +567,23 @@ export function EInvoiceGenerator(props: Props) {
 
           if (max_length && min_length) {
             if (
+              (value?.toString().length > max_length ||
+                value?.toString().length < min_length) &&
+              max_length !== min_length
+            ) {
+              updatedErrors = updateErrors(
+                updatedErrors,
+                key,
+                `Length for ${fieldKey} field should be between ${min_length} and ${max_length}!`
+              );
+            } else if (
               value?.toString().length > max_length ||
               value?.toString().length < min_length
             ) {
               updatedErrors = updateErrors(
                 updatedErrors,
                 key,
-                `Length for ${fieldKey} field should be between ${min_length} and ${max_length}!`
+                `Length for ${fieldKey} field should be ${min_length}!`
               );
             }
           }
@@ -751,15 +753,12 @@ export function EInvoiceGenerator(props: Props) {
         <Element leftSide={t('fields')}>
           <SearchableSelect
             value=""
-            onValueChange={(value) =>
+            onValueChange={(value) => {
+              console.log(value);
               setCurrentAvailableTypes((current) =>
-                current.filter(
-                  (type) =>
-                    !isChoiceFromSameGroup(value, type.key) &&
-                    type.key !== value
-                )
-              )
-            }
+                current.filter((type) => type.key !== value)
+              );
+            }}
             clearAfterSelection
           >
             {currentAvailableTypes.map(({ key, label }, index) => (
