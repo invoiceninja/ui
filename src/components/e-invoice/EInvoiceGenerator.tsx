@@ -357,6 +357,15 @@ export function EInvoiceGenerator(props: Props) {
     lastParentName: string,
     isDefaultComponent: boolean
   ) => {
+    const lastComponent = Object.values(components).find(
+      ({ type }) => type === lastParentType
+    );
+    const isLastComponentLastParent =
+      Object.keys(lastComponent?.elements || {}).length &&
+      Object.values(lastComponent?.elements || {}).some(
+        ({ base_type }) => !base_type?.endsWith('Type')
+      );
+
     const isCurrentComponentLastParent =
       Object.keys(component.elements).length &&
       Object.values(component.elements).some(
@@ -414,10 +423,6 @@ export function EInvoiceGenerator(props: Props) {
 
                   const isCurrentDefaultComponent = element.min_occurs !== 0;
 
-                  if (!isCurrentComponentLastParent) {
-                    console.log(component.type);
-                  }
-
                   if (
                     isInitial &&
                     !isCurrentDefaultComponent &&
@@ -452,7 +457,8 @@ export function EInvoiceGenerator(props: Props) {
 
         {shouldBeRendered &&
           !isDefaultComponent &&
-          isCurrentComponentLastParent && (
+          isCurrentComponentLastParent &&
+          !isLastComponentLastParent && (
             <div
               className="cursor-pointer"
               onClick={() =>
