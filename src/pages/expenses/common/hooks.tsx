@@ -578,6 +578,12 @@ export function useExpenseFilters() {
       color: 'white',
       backgroundColor: statusThemeColors.$4 || '#e6b05c',
     },
+    {
+      label: t('uncategorized'),
+      value: 'uncategorized',
+      color: 'white',
+      backgroundColor: '#b5812c',
+    },
   ];
 
   return filters;
