@@ -221,12 +221,16 @@ export function EInvoiceGenerator(props: Props) {
           (selectedChoices.includes(key) || !isFieldChoice(key));
   };
 
-  const handleDeleteField = (componentKey: string) => {
+  const handleDeleteComponent = (componentKey: string) => {
     const topParentComponentKey = getComponentKey(componentKey.split('|')[0]);
     const parentComponentKey = getComponentKey(componentKey.split('|')[3]);
     const parentName = getComponentKey(componentKey.split('|')[2]);
 
     const label = `${parentComponentKey} (${parentName}, ${topParentComponentKey})`;
+
+    const fieldsGroupKey = `${topParentComponentKey}|${getComponentKey(
+      componentKey.split('|')[1]
+    )}|${parentName}|${parentComponentKey}`;
 
     setCurrentAvailableTypes((current) => [
       ...current,
@@ -236,13 +240,23 @@ export function EInvoiceGenerator(props: Props) {
       },
     ]);
 
-    const parentComponent = components[`${parentComponentKey}Type` as string];
+    let updatedPartOfPayload = {};
 
-    // setPayload((current) => ({
-    //   ...current,
-    //   [currentType.key]:
-    //     typeof current[currentType.key] === 'number' ? 0 : '',
-    // }));
+    Object.keys(payload)
+      .filter((key) => key.startsWith(fieldsGroupKey))
+      .forEach((currentKey) => {
+        updatedPartOfPayload = {
+          ...updatedPartOfPayload,
+          [currentKey]: typeof payload[currentKey] === 'number' ? 0 : '',
+        };
+      });
+
+    console.log(updatedPartOfPayload);
+
+    setPayload((current) => ({
+      ...current,
+      ...updatedPartOfPayload,
+    }));
   };
 
   const renderElement = (element: ElementType, parentsKey: string) => {
@@ -451,7 +465,7 @@ export function EInvoiceGenerator(props: Props) {
           isCurrentComponentLastParent && (
             <div
               className="cursor-pointer"
-              onClick={() => handleDeleteField(componentKey)}
+              onClick={() => handleDeleteComponent(componentKey)}
             >
               <Icon element={MdDelete} size={28} />
             </div>
@@ -753,12 +767,11 @@ export function EInvoiceGenerator(props: Props) {
         <Element leftSide={t('fields')}>
           <SearchableSelect
             value=""
-            onValueChange={(value) => {
-              console.log(value);
+            onValueChange={(value) =>
               setCurrentAvailableTypes((current) =>
                 current.filter((type) => type.key !== value)
-              );
-            }}
+              )
+            }
             clearAfterSelection
           >
             {currentAvailableTypes.map(({ key, label }, index) => (
