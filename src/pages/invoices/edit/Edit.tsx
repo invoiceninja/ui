@@ -21,7 +21,7 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -76,7 +76,9 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
-  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -103,38 +105,44 @@ export default function Edit() {
 
     const currentInvoice = isAnyAction && invoice ? invoice : data;
 
-    if (currentInvoice) {
+    if (currentInvoice && !preventLeavingPage.prevent) {
       const _invoice = cloneDeep(currentInvoice);
 
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
-      setInitialInvoiceValue(_invoice);
+      setInitialInvoiceValue(cloneDeep(_invoice));
       setInvoice(_invoice);
 
       if (_invoice?.client) {
         setClient(_invoice.client);
       }
     }
+  }, [data, preventLeavingPage.prevent]);
 
+  useEffect(() => {
     return () => {
       setPreventLeavingPage({
         prevent: false,
         actionKey: undefined,
       });
     };
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
 
     if (invoice && initialInvoiceValue) {
-      setPreventLeavingPage(
-        (current) =>
-          current && {
-            ...current,
-            prevent: !isEqual(invoice, initialInvoiceValue),
-          }
-      );
+      const isDifferent =
+        preventLeavingPage.prevent !== !isEqual(invoice, initialInvoiceValue);
+
+      isDifferent &&
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: !isEqual(invoice, initialInvoiceValue),
+            }
+        );
     }
   }, [invoice]);
 
@@ -201,7 +209,7 @@ export default function Edit() {
               {invoice && client ? (
                 <ProductsTable
                   type="product"
-                  resource={invoice}
+                  resource={{ ...invoice }}
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }

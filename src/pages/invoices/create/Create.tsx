@@ -23,7 +23,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +68,9 @@ export default function Create() {
 
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
-  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
+  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
+    preventLeavingPageAtom
+  );
 
   const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
@@ -113,50 +115,54 @@ export default function Create() {
   useEffect(() => {
     setInvoiceSum(undefined);
 
-    setInvoice((current) => {
-      let value = current;
+    if (!preventLeavingPage.prevent) {
+      setInvoice((current) => {
+        let value = current;
 
-      if (
-        searchParams.get('action') !== 'clone' &&
-        searchParams.get('action') !== 'invoice_project' &&
-        searchParams.get('action') !== 'invoice_task' &&
-        searchParams.get('action') !== 'invoice_expense' &&
-        searchParams.get('action') !== 'invoice_product'
-      ) {
-        value = undefined;
-      }
-
-      if (
-        typeof data !== 'undefined' &&
-        typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone'
-      ) {
-        const _invoice = cloneDeep(data);
-
-        if (typeof _invoice.line_items === 'string') {
-          _invoice.line_items = [];
+        if (
+          searchParams.get('action') !== 'clone' &&
+          searchParams.get('action') !== 'invoice_project' &&
+          searchParams.get('action') !== 'invoice_task' &&
+          searchParams.get('action') !== 'invoice_expense' &&
+          searchParams.get('action') !== 'invoice_product'
+        ) {
+          value = undefined;
         }
 
-        if (searchParams.get('client')) {
-          _invoice.client_id = searchParams.get('client')!;
+        if (
+          typeof data !== 'undefined' &&
+          typeof value === 'undefined' &&
+          searchParams.get('action') !== 'clone'
+        ) {
+          const _invoice = cloneDeep(data);
+
+          if (typeof _invoice.line_items === 'string') {
+            _invoice.line_items = [];
+          }
+
+          if (searchParams.get('client')) {
+            _invoice.client_id = searchParams.get('client')!;
+          }
+
+          _invoice.uses_inclusive_taxes =
+            company?.settings?.inclusive_taxes ?? false;
+
+          value = _invoice;
         }
 
-        _invoice.uses_inclusive_taxes =
-          company?.settings?.inclusive_taxes ?? false;
+        setInitialInvoiceValue(cloneDeep(value));
 
-        value = _invoice;
-      }
+        return value;
+      });
+    }
+  }, [data, preventLeavingPage.prevent]);
 
-      setInitialInvoiceValue(value);
-
-      return value;
-    });
-
+  useEffect(() => {
     return () => {
       setInvoice(undefined);
       setPreventLeavingPage({ prevent: false, actionKey: undefined });
     };
-  }, [data]);
+  }, []);
 
   const settingResolver = (client: Client, prop: string) => {
     if (client?.settings && client?.settings[prop]) {
@@ -212,13 +218,17 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
 
     if (invoice && initialInvoiceValue) {
-      setPreventLeavingPage(
-        (current) =>
-          current && {
-            ...current,
-            prevent: !isEqual(invoice, initialInvoiceValue),
-          }
-      );
+      const isDifferent =
+        preventLeavingPage.prevent !== !isEqual(invoice, initialInvoiceValue);
+
+      isDifferent &&
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: !isEqual(invoice, initialInvoiceValue),
+            }
+        );
     }
   }, [invoice]);
 
