@@ -29,6 +29,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { trans } from '$app/common/helpers';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -328,6 +329,79 @@ export function TaskSettings() {
             <option value="all">{t('all')}</option>
           </SelectField>
         </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="task_round_up"
+              labelElement={<SettingsLabel label={t('task_round_up')} />}
+              defaultValue={true}
+            />
+          }
+        >
+          <Toggle
+            checked={Boolean(companyChanges?.settings?.task_round_up ?? true)}
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.task_round_up', value)
+            }
+            disabled={disableSettingsField('task_round_up')}
+          />
+        </Element>
+
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="task_round_to_nearest"
+              labelElement={
+                <SettingsLabel label={t('task_round_to_nearest')} />
+              }
+              defaultValue={1}
+            />
+          }
+        >
+          <SelectField
+            id="settings.task_round_to_nearest"
+            onChange={handleChange}
+            disabled={disableSettingsField('task_round_to_nearest')}
+            value={
+              companyChanges?.settings?.task_round_to_nearest?.toString() ?? '1'
+            }
+            errorMessage={errors?.errors['settings.task_round_to_nearest']}
+          >
+            <option value="1">{t('one_second')}</option>
+            <option value="60">{trans('count_minutes', { count: 1 })}</option>
+            <option value="300">{trans('count_minutes', { count: 5 })}</option>
+            <option value="900">{trans('count_minutes', { count: 15 })}</option>
+            <option value="3600">{trans('count_days', { count: 1 })}</option>
+            <option value="-1">{t('custom')}</option>
+          </SelectField>
+        </Element>
+
+        {companyChanges?.settings?.task_round_to_nearest === -1 ||
+          (!['1', '60', '300', '900', '3600'].includes(
+            companyChanges?.settings?.task_round_to_nearest.toString()
+          ) && (
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="task_round_to_nearest"
+                  labelElement={
+                    <SettingsLabel label={t('task_round_to_nearest')} />
+                  }
+                  defaultValue={'1'}
+                />
+              }
+            >
+              <InputField
+                type="number"
+                id="settings.task_round_to_nearest"
+                onChange={handleChange}
+                value={companyChanges?.settings?.task_round_to_nearest || -1}
+                disabled={disableSettingsField('task_round_to_nearest')}
+                errorMessage={errors?.errors['settings.task_round_to_nearest']}
+              />
+            </Element>
+          ))}
       </Card>
 
       {isCompanySettingsActive && <TaskStatuses />}
