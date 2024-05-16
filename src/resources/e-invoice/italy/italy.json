@@ -1794,33 +1794,33 @@
       "help": "Il campo Denominazione \u00e8 in alternativa ai campi Nome e Cognome",
       "choices": [["Denominazione"], ["Nome", "Cognome"]],
       "elements": {
-        "0": {
+        "Denominazione": {
           "name": "Denominazione",
-          "base_type": "String80LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 80,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,80}",
           "min_occurs": 1,
           "max_occurs": 1
         },
-        "1": {
+        "Nome": {
           "name": "Nome",
-          "base_type": "String60LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 60,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
           "min_occurs": 1,
           "max_occurs": 1
         },
-        "2": {
+        "Cognome": {
           "name": "Cognome",
-          "base_type": "String60LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 60,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
           "min_occurs": 1,
           "max_occurs": 1
         },
@@ -2121,33 +2121,33 @@
       "help": "",
       "choices": [["Denominazione"], ["Nome", "Cognome"]],
       "elements": {
-        "0": {
+        "Denominazione": {
           "name": "Denominazione",
-          "base_type": "String80LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 80,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,80}",
           "min_occurs": 1,
           "max_occurs": 1
         },
-        "1": {
+        "Nome": {
           "name": "Nome",
-          "base_type": "String60LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 60,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
           "min_occurs": 1,
           "max_occurs": 1
         },
-        "2": {
+        "Cognome": {
           "name": "Cognome",
-          "base_type": "String60LatinType",
+          "base_type": "string",
           "resource": [],
-          "max_length": null,
-          "min_length": null,
-          "pattern": null,
+          "max_length": 60,
+          "min_length": 1,
+          "pattern": "[\\p{IsBasicLatin}\\p{IsLatin-1Supplement}]{1,60}",
           "min_occurs": 1,
           "max_occurs": 1
         },

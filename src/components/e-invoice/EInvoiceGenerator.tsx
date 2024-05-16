@@ -251,8 +251,6 @@ export function EInvoiceGenerator(props: Props) {
         };
       });
 
-    console.log(updatedPartOfPayload);
-
     setPayload((current) => ({
       ...current,
       ...updatedPartOfPayload,
@@ -497,7 +495,10 @@ export function EInvoiceGenerator(props: Props) {
       ...currentErrors,
       errors: {
         ...currentErrors.errors,
-        [key]: [value],
+        [key]: [
+          ...(currentErrors.errors[key] ? currentErrors.errors[key] : []),
+          `\n ${value}`,
+        ],
       },
     };
   };
