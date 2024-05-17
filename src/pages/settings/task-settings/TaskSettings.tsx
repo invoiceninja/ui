@@ -55,7 +55,7 @@ export function TaskSettings() {
   const isTaskRoundToNearestCustom = () => {
     return Boolean(
       companyChanges?.settings?.task_round_to_nearest === -1 ||
-        ![1, 60, 300, 900, 3600].find(
+        ![1, 60, 300, 900, 1800, 3600, 86400].find(
           (value) => value === companyChanges?.settings?.task_round_to_nearest
         )
     );
@@ -387,7 +387,11 @@ export function TaskSettings() {
             <option value="60">{t('one_minute')}</option>
             <option value="300">{trans('count_minutes', { count: 5 })}</option>
             <option value="900">{trans('count_minutes', { count: 15 })}</option>
-            <option value="3600">{trans('count_days', { count: 1 })}</option>
+            <option value="1800">
+              {trans('count_minutes', { count: 30 })}
+            </option>
+            <option value="3600">{t('one_hour')}</option>
+            <option value="86400">{t('one_day')}</option>
             <option value="-1">{t('custom')}</option>
           </SelectField>
         </Element>
