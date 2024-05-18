@@ -181,19 +181,34 @@ export function EInvoiceGenerator(props: Props) {
   };
 
   const isFieldChoice = (fieldKey: string) => {
-    const parentComponentType = `${fieldKey.split('|')[1]}Type`;
+    const keysLength = fieldKey.split('|').length;
+    const parentComponentType = `${fieldKey.split('|')[keysLength - 2]}Type`;
 
-    const fieldName = fieldKey.split('|')[2];
+    const fieldName = fieldKey.split('|')[keysLength - 1];
 
     const parentComponent = components[parentComponentType];
 
     if (parentComponent && fieldName) {
       return parentComponent?.choices.some((choiceGroup) =>
-        choiceGroup.some((choice) => choice === fieldName)
+        choiceGroup.some(
+          (choice) => choice === fieldName && choiceGroup.length > 1
+        )
       );
     }
 
     return false;
+  };
+
+  const isChoiceSelected = (fieldKey: string) => {
+    const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
+      fieldKey.split('|')[1]
+    }Type|${fieldKey.split('|')[2]}|${fieldKey.split('|')[3]}Type|${
+      fieldKey.split('|')[4]
+    }`;
+
+    return Boolean(
+      selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
+    );
   };
 
   const showField = (key: string) => {
@@ -211,14 +226,17 @@ export function EInvoiceGenerator(props: Props) {
       key.split('|')[1]
     }Type|${key.split('|')[2]}|${key.split('|')[3]}Type`;
 
+    if (isFieldChoice(key)) {
+      return isChoiceSelected(key);
+    }
+
     return isInitial
       ? !availableTypes.find(
           (currentType) => fieldParentsKey === currentType.key
         )
       : !currentAvailableTypes.find(
           (currentType) => fieldParentsKey === currentType.key
-        ) &&
-          (selectedChoices.includes(key) || !isFieldChoice(key));
+        );
   };
 
   const handleDeleteComponent = (componentKey: string) => {
@@ -395,13 +413,56 @@ export function EInvoiceGenerator(props: Props) {
     return (
       <Container
         className="flex items-center"
-        key={`${topParentType}${lastParentType}${lastParentName}`}
+        key={componentKey}
         renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
       >
         <Container
           className="flex flex-1 flex-col"
           renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
         >
+          {(isCurrentComponentLastParent || shouldBeRendered) &&
+            component.help && (
+              <span className="font-bold text-base pl-6 mt-5">
+                {component.help}
+              </span>
+            )}
+
+          {isCurrentComponentLastParent &&
+            shouldBeRendered &&
+            Boolean(component.choices.length) && (
+              <>
+                {component.choices.map(
+                  (choiceGroup, index) =>
+                    Boolean(choiceGroup.length > 1) && (
+                      <Element key={index} leftSide={t('Choices')}>
+                        <SelectField
+                          defaultValue=""
+                          onValueChange={(value) => {
+                            setSelectedChoices((current) => {
+                              const updatedCurrentList = current.filter(
+                                (choice) => !choice.startsWith(componentKey)
+                              );
+
+                              return [
+                                ...updatedCurrentList,
+                                ...(value ? [`${componentKey}|${value}`] : []),
+                              ];
+                            });
+                          }}
+                          withBlank
+                        >
+                          {choiceGroup.map((choice) => (
+                            <option key={choice} value={choice}>
+                              {choice}
+                            </option>
+                          ))}
+                        </SelectField>
+                      </Element>
+                    )
+                )}
+              </>
+            )}
+
           {Boolean(Object.keys(component.elements).length) &&
             Object.values(component.elements).map((element) => {
               if (element.base_type?.endsWith('Type')) {
@@ -726,6 +787,7 @@ export function EInvoiceGenerator(props: Props) {
           setComponents(response.components);
           setDefaultFields(response.defaultFields);
           setErrors(undefined);
+          setSelectedChoices([]);
           payloadKeys = [];
           availableTypes = [];
         });
@@ -737,6 +799,7 @@ export function EInvoiceGenerator(props: Props) {
       setIsInitial(true);
       setDefaultFields({});
       setCurrentAvailableTypes([]);
+      setSelectedChoices([]);
       availableTypes = [];
       payloadKeys = [];
     }
@@ -754,13 +817,13 @@ export function EInvoiceGenerator(props: Props) {
         isInitial && setCurrentAvailableTypes([...availableTypes]);
       })();
     }
-  }, [components, currentAvailableTypes, errors, payload]);
+  }, [components, currentAvailableTypes, errors, payload, selectedChoices]);
 
   useEffect(() => {
     if (!isInitial) {
       setErrors(undefined);
     }
-  }, [payload, currentAvailableTypes]);
+  }, [payload, currentAvailableTypes, selectedChoices]);
 
   return (
     <div className="flex flex-col mt-5">
