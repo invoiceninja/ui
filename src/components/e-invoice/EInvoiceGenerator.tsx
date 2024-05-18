@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -140,46 +139,6 @@ export function EInvoiceGenerator(props: Props) {
     setPayload((current) => ({ ...current, [property]: value }));
   };
 
-  const isChoiceFromSameGroup = (
-    currentFieldKey: string,
-    comparingFieldKey: string
-  ) => {
-    const topParentType = `${currentFieldKey.split('|')[0]}Type`;
-    const parentElementName = currentFieldKey.split('|')[1];
-    const elementName = currentFieldKey.split('|')[2];
-    const comparingTopParent = `${comparingFieldKey.split('|')[0]}Type`;
-    const comparingParentElementName = comparingFieldKey.split('|')[1];
-    const comparingElementName = comparingFieldKey.split('|')[2];
-
-    if (
-      topParentType !== comparingTopParent ||
-      parentElementName !== comparingParentElementName
-    ) {
-      return false;
-    }
-
-    if (currentFieldKey === comparingFieldKey) {
-      return false;
-    }
-
-    const topParentComponent = Object.values(components).find(
-      ({ type }) => type === topParentType
-    );
-    const choiceTopParentElementType = Object.values(
-      topParentComponent?.elements || {}
-    ).find(({ name }) => name === parentElementName)?.base_type;
-
-    const choiceParentComponent = Object.values(components).find(
-      ({ type }) => type === choiceTopParentElementType
-    );
-
-    const choiceGroup = choiceParentComponent?.choices.find((choiceGroup) =>
-      choiceGroup.includes(elementName)
-    );
-
-    return choiceGroup?.includes(comparingElementName);
-  };
-
   const isFieldChoice = (fieldKey: string) => {
     const keysLength = fieldKey.split('|').length;
     const parentComponentType = `${fieldKey.split('|')[keysLength - 2]}Type`;
@@ -190,9 +149,7 @@ export function EInvoiceGenerator(props: Props) {
 
     if (parentComponent && fieldName) {
       return parentComponent?.choices.some((choiceGroup) =>
-        choiceGroup.some(
-          (choice) => choice === fieldName && choiceGroup.length > 1
-        )
+        choiceGroup.some((choice) => choice === fieldName)
       );
     }
 
@@ -200,28 +157,31 @@ export function EInvoiceGenerator(props: Props) {
   };
 
   const isChoiceSelected = (fieldKey: string) => {
-    const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
-      fieldKey.split('|')[1]
-    }Type|${fieldKey.split('|')[2]}|${fieldKey.split('|')[3]}Type|${
-      fieldKey.split('|')[4]
-    }`;
+    const keysLength = fieldKey.split('|').length;
+    const parentComponentType = `${fieldKey.split('|')[keysLength - 2]}Type`;
 
-    return Boolean(
-      selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
-    );
+    const fieldName = fieldKey.split('|')[keysLength - 1];
+
+    const parentComponent = components[parentComponentType];
+
+    if (parentComponent && fieldName) {
+      const choiceGroupIndex = parentComponent?.choices.findIndex(
+        (choiceGroup) => choiceGroup.some((choice) => choice === fieldName)
+      );
+
+      const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
+        fieldKey.split('|')[1]
+      }Type|${fieldKey.split('|')[2]}|${
+        fieldKey.split('|')[3]
+      }Type|${choiceGroupIndex}|${fieldKey.split('|')[4]}`;
+
+      return Boolean(
+        selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
+      );
+    }
   };
 
   const showField = (key: string) => {
-    const fieldsForDisplay = payloadKeys.filter(
-      (currentType) =>
-        !currentAvailableTypes.find(
-          (currentAvailableType) => currentAvailableType.key === currentType.key
-        )
-    );
-    const isInTheGroupWithAnyOther = fieldsForDisplay.some((field) =>
-      isChoiceFromSameGroup(field.key, key)
-    );
-
     const fieldParentsKey = `${key.split('|')[0]}Type|${
       key.split('|')[1]
     }Type|${key.split('|')[2]}|${key.split('|')[3]}Type`;
@@ -431,35 +391,50 @@ export function EInvoiceGenerator(props: Props) {
             shouldBeRendered &&
             Boolean(component.choices.length) && (
               <>
-                {component.choices.map(
-                  (choiceGroup, index) =>
-                    Boolean(choiceGroup.length > 1) && (
-                      <Element key={index} leftSide={t('Choices')}>
-                        <SelectField
-                          defaultValue=""
-                          onValueChange={(value) => {
-                            setSelectedChoices((current) => {
-                              const updatedCurrentList = current.filter(
-                                (choice) => !choice.startsWith(componentKey)
-                              );
+                {component.choices.map((choiceGroup, index) => (
+                  <Element key={index} leftSide={`Choice Group ${index + 1}`}>
+                    <SelectField
+                      defaultValue=""
+                      onValueChange={(value) => {
+                        setSelectedChoices((current) => {
+                          const updatedCurrentList = current.filter(
+                            (choice) =>
+                              !choice.startsWith(`${componentKey}|${index}`)
+                          );
+                          const selectionGroup = component.choices.find(
+                            (choiceGroup) =>
+                              choiceGroup.some((choice) => choice === value)
+                          );
 
-                              return [
-                                ...updatedCurrentList,
-                                ...(value ? [`${componentKey}|${value}`] : []),
-                              ];
-                            });
-                          }}
-                          withBlank
-                        >
-                          {choiceGroup.map((choice) => (
-                            <option key={choice} value={choice}>
-                              {choice}
-                            </option>
-                          ))}
-                        </SelectField>
-                      </Element>
-                    )
-                )}
+                          const isAnyChoiceFromGroupSelected =
+                            selectionGroup?.some((choice) =>
+                              selectedChoices.some(
+                                (selectedChoice) =>
+                                  selectedChoice ===
+                                  `${componentKey}|${index}|${choice}`
+                              )
+                            );
+
+                          return [
+                            ...(isAnyChoiceFromGroupSelected || !value
+                              ? updatedCurrentList
+                              : current),
+                            ...(value
+                              ? [`${componentKey}|${index}|${value}`]
+                              : []),
+                          ];
+                        });
+                      }}
+                      withBlank
+                    >
+                      {choiceGroup.map((choice) => (
+                        <option key={choice} value={choice}>
+                          {choice}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </Element>
+                ))}
               </>
             )}
 
