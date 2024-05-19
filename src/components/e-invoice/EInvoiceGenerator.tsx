@@ -711,11 +711,7 @@ export function EInvoiceGenerator(props: Props) {
           isChildOfExcluded(component.type);
 
         if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
-          const isLastParent =
-            Object.keys(component.elements).length &&
-            Object.values(component.elements).some(
-              ({ base_type }) => !base_type?.endsWith('Type')
-            );
+          const isLastParent = isComponentLastParent(component);
 
           return renderComponent(
             component,
@@ -724,7 +720,7 @@ export function EInvoiceGenerator(props: Props) {
             component.type,
             component.type,
             Boolean(isLastParent),
-            component.type
+            getComponentKey(component.type) || ''
           );
         }
       }
