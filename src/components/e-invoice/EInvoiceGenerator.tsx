@@ -17,6 +17,7 @@ import { MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
+import { set } from 'lodash';
 
 export type Country = 'italy';
 
@@ -157,28 +158,15 @@ export function EInvoiceGenerator(props: Props) {
   };
 
   const isChoiceSelected = (fieldKey: string) => {
-    const keysLength = fieldKey.split('|').length;
-    const parentComponentType = `${fieldKey.split('|')[keysLength - 2]}Type`;
+    const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
+      fieldKey.split('|')[1]
+    }Type|${fieldKey.split('|')[2]}|${fieldKey.split('|')[3]}Type|${
+      fieldKey.split('|')[4]
+    }`;
 
-    const fieldName = fieldKey.split('|')[keysLength - 1];
-
-    const parentComponent = components[parentComponentType];
-
-    if (parentComponent && fieldName) {
-      const choiceGroupIndex = parentComponent?.choices.findIndex(
-        (choiceGroup) => choiceGroup.some((choice) => choice === fieldName)
-      );
-
-      const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
-        fieldKey.split('|')[1]
-      }Type|${fieldKey.split('|')[2]}|${
-        fieldKey.split('|')[3]
-      }Type|${choiceGroupIndex}|${fieldKey.split('|')[4]}`;
-
-      return Boolean(
-        selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
-      );
-    }
+    return Boolean(
+      selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
+    );
   };
 
   const showField = (key: string) => {
@@ -243,9 +231,11 @@ export function EInvoiceGenerator(props: Props) {
     if (rule) {
       leftSideLabel = rule.label;
     } else {
-      leftSideLabel = `${element.name} (${parentsKey.split('|')[0]}, ${
-        parentsKey.split('|')[2]
-      })`;
+      const parentKeysLength = parentsKey.split('|').length;
+
+      leftSideLabel = `${element.name} (${getComponentKey(
+        parentsKey.split('|')[parentKeysLength - 3]
+      )}, ${getComponentKey(parentsKey.split('|')[parentKeysLength - 2])})`;
     }
 
     const isNumberTypeField =
@@ -358,7 +348,8 @@ export function EInvoiceGenerator(props: Props) {
     topParentType: string,
     lastParentType: string,
     lastParentName: string,
-    isDefaultComponent: boolean
+    isDefaultComponent: boolean,
+    componentPath: string
   ) => {
     const isCurrentComponentLastParent = isComponentLastParent(component);
 
@@ -380,62 +371,40 @@ export function EInvoiceGenerator(props: Props) {
           className="flex flex-1 flex-col"
           renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
         >
-          {(isCurrentComponentLastParent || shouldBeRendered) &&
-            component.help && (
-              <span className="font-bold text-base pl-6 mt-5">
-                {component.help}
-              </span>
-            )}
-
           {isCurrentComponentLastParent &&
             shouldBeRendered &&
             Boolean(component.choices.length) && (
-              <>
-                {component.choices.map((choiceGroup, index) => (
-                  <Element key={index} leftSide={`Choice Group ${index + 1}`}>
-                    <SelectField
-                      defaultValue=""
-                      onValueChange={(value) => {
-                        setSelectedChoices((current) => {
-                          const updatedCurrentList = current.filter(
-                            (choice) =>
-                              !choice.startsWith(`${componentKey}|${index}`)
-                          );
-                          const selectionGroup = component.choices.find(
-                            (choiceGroup) =>
-                              choiceGroup.some((choice) => choice === value)
-                          );
+              <Element
+                key={`${componentKey}ChoiceSelector`}
+                leftSide={`${t('Choices')} (${getComponentKey(
+                  lastParentType
+                )}, ${lastParentName})`}
+              >
+                <SelectField
+                  defaultValue=""
+                  onValueChange={(value) => {
+                    setSelectedChoices((current) => {
+                      const updatedCurrentList = current.filter(
+                        (choice) => !choice.startsWith(componentKey)
+                      );
 
-                          const isAnyChoiceFromGroupSelected =
-                            selectionGroup?.some((choice) =>
-                              selectedChoices.some(
-                                (selectedChoice) =>
-                                  selectedChoice ===
-                                  `${componentKey}|${index}|${choice}`
-                              )
-                            );
-
-                          return [
-                            ...(isAnyChoiceFromGroupSelected || !value
-                              ? updatedCurrentList
-                              : current),
-                            ...(value
-                              ? [`${componentKey}|${index}|${value}`]
-                              : []),
-                          ];
-                        });
-                      }}
-                      withBlank
-                    >
-                      {choiceGroup.map((choice) => (
-                        <option key={choice} value={choice}>
-                          {choice}
-                        </option>
-                      ))}
-                    </SelectField>
-                  </Element>
-                ))}
-              </>
+                      return [
+                        ...updatedCurrentList,
+                        ...(value ? [`${componentKey}|${value}`] : []),
+                      ];
+                    });
+                  }}
+                  withBlank
+                >
+                  {component.choices.map((choiceGroup) =>
+                    choiceGroup.map((choice) => (
+                      <option key={choice} value={choice}>
+                        {choice}
+                      </option>
+                    ))
+                  )}
+                </SelectField>
+              </Element>
             )}
 
           {Boolean(Object.keys(component.elements).length) &&
@@ -473,23 +442,19 @@ export function EInvoiceGenerator(props: Props) {
                   }
 
                   return renderComponent(
-                    { ...nextComponent },
+                    nextComponent,
                     nextComponentIndex,
                     !isNewComponentLastParent
                       ? nextComponent.type
                       : topParentType,
                     component.type,
                     element.name,
-                    Boolean(isNewComponentDefault)
+                    Boolean(isNewComponentDefault),
+                    `${componentPath}|${element.name}`
                   );
                 }
               } else {
-                return renderElement(
-                  element,
-                  `${getComponentKey(topParentType)}|${getComponentKey(
-                    lastParentType
-                  )}|${lastParentName}|${getComponentKey(component.type)}`
-                );
+                return renderElement(element, componentPath);
               }
             })}
         </Container>
@@ -512,10 +477,13 @@ export function EInvoiceGenerator(props: Props) {
     let currentPayload: Payload = {};
 
     payloadKeys.forEach(({ key, valueType }) => {
+      const keysLength = key.split('|').length;
+
       currentPayload = {
         ...currentPayload,
         [key]:
-          defaultFields[key.split('|')[4]] || (valueType === 'number' ? 0 : ''),
+          defaultFields[key.split('|')[keysLength - 1]] ||
+          (valueType === 'number' ? 0 : ''),
       };
     });
 
@@ -582,18 +550,23 @@ export function EInvoiceGenerator(props: Props) {
             );
           }
 
-          if (
-            pattern &&
-            !pattern.includes('Latin') &&
-            new RegExp(pattern).test(value.toString()) === false
-          ) {
-            updatedErrors = updateErrors(
-              updatedErrors,
-              key,
-              `${fieldKey} has wrong pattern, the correct pattern is ${new RandExp(
-                pattern as string
-              ).gen()} (example)!`
-            );
+          if (pattern) {
+            try {
+              const isPatternFailed =
+                new RegExp(pattern).test(value.toString()) === false;
+
+              if (isPatternFailed) {
+                updatedErrors = updateErrors(
+                  updatedErrors,
+                  key,
+                  `${fieldKey} has wrong pattern, the correct pattern is ${new RandExp(
+                    pattern as string
+                  ).gen()} (example)!`
+                );
+              }
+            } catch (error) {
+              console.error(error);
+            }
           }
 
           if (min_length && !max_length) {
@@ -645,10 +618,25 @@ export function EInvoiceGenerator(props: Props) {
     setErrors(updatedErrors);
   };
 
+  const formatPayload = () => {
+    const formattedPayload = {};
+
+    Object.entries(payload).forEach(([key, value]) => {
+      const prefix = `${key.split('|')[0]}|`;
+      const path = key.split(prefix)[1];
+
+      set(formattedPayload, path.replaceAll('|', '.'), value);
+    });
+
+    console.log(JSON.stringify(formattedPayload));
+  };
+
   const handleSave = () => {
     setErrors(undefined);
 
     checkValidation();
+
+    formatPayload();
 
     if (errors === undefined) {
       //console.log('Call API');
@@ -735,7 +723,8 @@ export function EInvoiceGenerator(props: Props) {
             component.type,
             component.type,
             component.type,
-            Boolean(isLastParent)
+            Boolean(isLastParent),
+            component.type
           );
         }
       }
