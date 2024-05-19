@@ -100,7 +100,7 @@ export function Tooltip(props: Props) {
               {message && !displayAsNotesIframe && (
                 <>
                   {props.containsUnsafeHTMLTags ? (
-                    <span dangerouslySetInnerHTML={{ __html: message }} />
+                    <span className="prose">{message}</span>
                   ) : (
                     message
                   )}
