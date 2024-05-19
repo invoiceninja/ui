@@ -26,6 +26,8 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -120,6 +122,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
+  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -371,14 +374,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
           message={value as string}
+          truncate
+          width="auto"
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>{extractTextFromHTML(value as string).slice(0, 50)}</span>
         </Tooltip>
       ),
     },
