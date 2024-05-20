@@ -12,7 +12,8 @@ import classNames from 'classnames';
 import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import { useColorScheme } from '$app/common/colors';
-import { NotesIframe } from './NotesIframe';
+import { Icon } from './icons/Icon';
+import { MdPlayArrow } from 'react-icons/md';
 
 interface Props {
   children: ReactElement;
@@ -22,12 +23,10 @@ interface Props {
   size?: 'small' | 'regular' | 'large';
   width?: number | string;
   placement?: 'top' | 'bottom' | 'right';
-  containsUnsafeHTMLTags?: boolean;
   withoutArrow?: boolean;
   tooltipElement?: ReactNode;
   disabled?: boolean;
   withoutWrapping?: boolean;
-  displayAsNotesIframe?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -41,7 +40,6 @@ export function Tooltip(props: Props) {
     message,
     disabled,
     withoutWrapping,
-    displayAsNotesIframe,
   } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
@@ -79,10 +77,13 @@ export function Tooltip(props: Props) {
         placement={placement || 'top-start'}
         interactive={true}
         render={() => (
-          <div className="flex flex-col items-center">
+          <div
+            className="flex flex-col items-center"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div
               className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md',
+                'relative p-2 text-xs text-center text-white rounded-md max-w-lg',
                 {
                   'leading-1': includeLeading,
                   'leading-none': !includeLeading,
@@ -97,28 +98,18 @@ export function Tooltip(props: Props) {
                 color: colors.$3,
               }}
             >
-              {message && !displayAsNotesIframe && (
-                <>
-                  {props.containsUnsafeHTMLTags ? (
-                    <span className="prose">{message}</span>
-                  ) : (
-                    message
-                  )}
-                </>
-              )}
+              {message}
 
               {tooltipElement}
-
-              {displayAsNotesIframe && (
-                <NotesIframe srcDoc={message as string} />
-              )}
             </div>
 
             {!withoutArrow && (
-              <div
-                className="w-3 h-3 -mt-2 rotate-45 opacity-90"
-                style={{ backgroundColor: colors.$5 }}
-              ></div>
+              <Icon
+                className="rotate-90 -mt-2.5"
+                element={MdPlayArrow}
+                size={24}
+                style={{ color: colors.$5 }}
+              />
             )}
           </div>
         )}

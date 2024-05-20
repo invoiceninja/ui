@@ -52,6 +52,7 @@ import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-his
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -113,6 +114,7 @@ export function QuoteSlider() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const sanitizeHTML = useSanitizeHTML();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -275,8 +277,16 @@ export function QuoteSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                containsUnsafeHTMLTags
-                message={(resource?.reminder_schedule as string) ?? ''}
+                tooltipElement={
+                  <article
+                    className="prose prose-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(
+                        (resource?.reminder_schedule as string) ?? ''
+                      ),
+                    }}
+                  />
+                }
               >
                 <h3 className="flex ml-3 mt-2 italic">
                   {t('reminders')} <MdInfo className="mt-1 ml-1" />

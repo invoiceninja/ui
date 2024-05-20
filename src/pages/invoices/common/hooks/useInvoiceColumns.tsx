@@ -28,6 +28,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -120,6 +121,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
+  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
   const extractTextFromHTML = useExtractTextFromHTML();
@@ -378,12 +380,21 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          message={value as string}
-          truncate
-          displayAsNotesIframe
           width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span>{extractTextFromHTML(value as string).slice(0, 50)}</span>
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -393,12 +404,21 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          message={value as string}
-          displayAsNotesIframe
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

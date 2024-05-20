@@ -9,9 +9,9 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
-import { NotesIframe } from '$app/components/NotesIframe';
 import { Element } from '$app/components/cards';
 import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,10 @@ interface Props {
 export function Standing(props: Props) {
   const [t] = useTranslation();
 
-  const formatMoney = useFormatMoney();
-
   const { client } = props;
+
+  const formatMoney = useFormatMoney();
+  const sanitizeHTML = useSanitizeHTML();
 
   return (
     <>
@@ -104,8 +105,13 @@ export function Standing(props: Props) {
                       <Icon element={MdLockOutline} size={24} />
                     </div>
 
-                    <div className="whitespace-normal">
-                      <NotesIframe srcDoc={client.private_notes} />
+                    <div className="whitespace-normal max-h-56 overflow-y-auto">
+                      <article
+                        className="prose prose-sm"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHTML(client.private_notes),
+                        }}
+                      />
                     </div>
                   </div>
                 )}
