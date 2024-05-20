@@ -72,6 +72,9 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { User } from '$app/common/interfaces/user';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
+import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
 
 export const defaultColumns: string[] = [
   'status',
@@ -126,8 +129,10 @@ export function useTaskColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const accentColor = useAccentColor();
 
+  const sanitizeHTML = useSanitizeHTML();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
+  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
@@ -228,12 +233,21 @@ export function useTaskColumns() {
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

@@ -51,6 +51,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -119,6 +120,7 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const sanitizeHTML = useSanitizeHTML();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
@@ -301,8 +303,16 @@ export function InvoiceSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                containsUnsafeHTMLTags
-                message={(resource?.reminder_schedule as string) ?? ''}
+                tooltipElement={
+                  <article
+                    className="prose prose-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(
+                        (resource?.reminder_schedule as string) ?? ''
+                      ),
+                    }}
+                  />
+                }
               >
                 <h3 className="flex ml-3 mt-2 italic">
                   {t('reminders')} <MdInfo className="mt-1 ml-1" />

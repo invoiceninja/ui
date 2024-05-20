@@ -73,6 +73,9 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
+import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -498,7 +501,9 @@ export function useRecurringInvoiceColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const dateTime = useDateTime();
+  const sanitizeHTML = useSanitizeHTML();
   const disableNavigation = useDisableNavigation();
+  const extractTextFromHTML = useExtractTextFromHTML();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
@@ -684,12 +689,21 @@ export function useRecurringInvoiceColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -699,12 +713,21 @@ export function useRecurringInvoiceColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

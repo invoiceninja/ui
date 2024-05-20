@@ -31,6 +31,8 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
+import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
 
 export const defaultColumns: string[] = [
   'name',
@@ -101,9 +103,11 @@ export function useClientColumns() {
   const reactSettings = useReactSettings();
 
   const formatMoney = useFormatMoney();
+  const sanitizeHTML = useSanitizeHTML();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const resolveLanguage = useResolveLanguage();
+  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const getContactsColumns = useCallback((client: Client) => {
@@ -315,12 +319,21 @@ export function useClientColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -330,12 +343,21 @@ export function useClientColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

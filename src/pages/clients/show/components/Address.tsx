@@ -9,6 +9,7 @@
  */
 
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +21,10 @@ interface Props {
 export function Address(props: Props) {
   const { t } = useTranslation();
 
-  const resolveCountry = useResolveCountry();
-
   const { client } = props;
+
+  const sanitizeHTML = useSanitizeHTML();
+  const resolveCountry = useResolveCountry();
 
   return (
     <>
@@ -46,10 +48,14 @@ export function Address(props: Props) {
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
 
-                <span
-                  className="whitespace-normal"
-                  dangerouslySetInnerHTML={{ __html: client.public_notes }}
-                />
+                <div className="whitespace-normal max-h-56 overflow-y-auto">
+                  <article
+                    className="prose prose-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(client.public_notes),
+                    }}
+                  />
+                </div>
               </>
             }
             className="h-full"
