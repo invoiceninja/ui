@@ -139,6 +139,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('e_invoice'),
+      href: '/settings/e_invoice',
+      current: location.pathname.startsWith('/settings/e_invoice'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
       name: t('email_settings'),
       href: '/settings/email_settings',
       current: location.pathname.startsWith('/settings/email_settings'),

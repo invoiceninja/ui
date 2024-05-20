@@ -39,7 +39,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
-import { Card, Element } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -49,11 +49,6 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
-import { SelectField } from '$app/components/forms';
-import {
-  Country,
-  EInvoiceGenerator,
-} from '$app/components/e-invoice/EInvoiceGenerator';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -86,8 +81,6 @@ export default function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
-
-  const [country, setCountry] = useState<Country>();
 
   const {
     handleChange,
@@ -288,20 +281,6 @@ export default function Edit() {
           bulkUrl="/api/v1/invoices/bulk"
         />
       ) : null}
-
-      <div>
-        <Element leftSide={t('country')}>
-          <SelectField
-            value={country || ''}
-            onValueChange={(value) => setCountry(value as Country)}
-            withBlank
-          >
-            <option value="italy">Italy</option>
-          </SelectField>
-        </Element>
-
-        <EInvoiceGenerator country={country} />
-      </div>
     </Default>
   );
 }
