@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
-import { NotesIframe } from '$app/components/NotesIframe';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -21,9 +21,9 @@ interface Props {
 export function Address(props: Props) {
   const { t } = useTranslation();
 
-  const resolveCountry = useResolveCountry();
-
   const { client } = props;
+
+  const resolveCountry = useResolveCountry();
 
   return (
     <>
@@ -47,8 +47,13 @@ export function Address(props: Props) {
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
 
-                <div className="whitespace-normal">
-                  <NotesIframe srcDoc={client.public_notes} />
+                <div className="whitespace-normal max-h-56 overflow-y-auto">
+                  <article
+                    className="prose prose-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(client.public_notes),
+                    }}
+                  />
                 </div>
               </>
             }
