@@ -25,6 +25,10 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'number',
@@ -248,14 +252,21 @@ export function useVendorColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
