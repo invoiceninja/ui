@@ -45,6 +45,10 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -129,18 +133,25 @@ export function useProductColumns() {
       column: 'description',
       id: 'notes',
       label: t('notes'),
-      format: (value) => {
-        return (
-          <Tooltip
-            size="regular"
-            truncate
-            containsUnsafeHTMLTags
-            message={value as string}
-          >
-            <span dangerouslySetInnerHTML={{ __html: value as string }} />
-          </Tooltip>
-        );
-      },
+      format: (value) => (
+        <Tooltip
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
+        >
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       column: 'price',

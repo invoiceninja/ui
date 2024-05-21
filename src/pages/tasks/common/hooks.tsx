@@ -73,6 +73,10 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { User } from '$app/common/interfaces/user';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'status',
@@ -229,12 +233,21 @@ export function useTaskColumns() {
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

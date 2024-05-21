@@ -25,6 +25,10 @@ import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -97,16 +101,23 @@ export function useTransactionColumns() {
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={cleanDescriptionText(value as string)}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(cleanDescriptionText(value as string)),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{
-              __html: cleanDescriptionText(value as string),
-            }}
-          />
+          <span>
+            {extractTextFromHTML(
+              sanitizeHTML(cleanDescriptionText(value as string))
+            ).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
