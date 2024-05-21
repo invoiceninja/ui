@@ -83,7 +83,7 @@ export function Tooltip(props: Props) {
           >
             <div
               className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md max-w-lg',
+                'relative p-2 text-xs text-center text-white rounded-md',
                 {
                   'leading-1': includeLeading,
                   'leading-none': !includeLeading,
