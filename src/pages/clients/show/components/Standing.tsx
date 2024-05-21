@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { Element } from '$app/components/cards';
@@ -27,7 +27,6 @@ export function Standing(props: Props) {
   const { client } = props;
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
 
   return (
     <>

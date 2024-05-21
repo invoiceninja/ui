@@ -95,8 +95,10 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -619,10 +621,8 @@ export function useQuoteColumns() {
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const quoteViewedAt = useCallback((quote: Quote) => {

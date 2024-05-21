@@ -74,8 +74,10 @@ import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -515,9 +517,7 @@ export function useRecurringInvoiceColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const dateTime = useDateTime();
-  const sanitizeHTML = useSanitizeHTML();
   const disableNavigation = useDisableNavigation();
-  const extractTextFromHTML = useExtractTextFromHTML();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];

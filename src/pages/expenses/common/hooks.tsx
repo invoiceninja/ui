@@ -54,8 +54,10 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -232,9 +234,7 @@ export function useExpenseColumns() {
 
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 

@@ -90,8 +90,10 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -601,10 +603,8 @@ export function useCreditColumns() {
   type CreditColumns = (typeof creditColumns)[number];
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =

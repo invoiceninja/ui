@@ -56,8 +56,10 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'status',
@@ -132,9 +134,7 @@ export function useRecurringExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 

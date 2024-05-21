@@ -25,8 +25,10 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'number',
@@ -82,11 +84,9 @@ export function useVendorColumns() {
 
   const disableNavigation = useDisableNavigation();
 
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const vendorColumns = useAllVendorColumns();

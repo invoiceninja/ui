@@ -10,10 +10,15 @@
 
 import DOMPurify from 'dompurify';
 
-export function useSanitizeHTML() {
-  return (html: string) => {
-    return DOMPurify.sanitize(html, {
-      USE_PROFILES: { html: true },
-    });
-  };
+export function extractTextFromHTML(html: string) {
+  return (
+    new DOMParser().parseFromString(html, 'text/html').documentElement
+      .textContent || ''
+  );
+}
+
+export function sanitizeHTML(html: string) {
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+  });
 }
