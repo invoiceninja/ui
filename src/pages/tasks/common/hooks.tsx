@@ -73,8 +73,10 @@ import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFiel
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { User } from '$app/common/interfaces/user';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export const defaultColumns: string[] = [
   'status',
@@ -129,10 +131,8 @@ export function useTaskColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const accentColor = useAccentColor();
 
-  const sanitizeHTML = useSanitizeHTML();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();

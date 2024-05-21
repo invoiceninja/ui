@@ -27,8 +27,10 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -121,10 +123,8 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =

@@ -52,7 +52,7 @@ import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-his
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -114,7 +114,6 @@ export function QuoteSlider() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();

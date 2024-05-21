@@ -25,8 +25,10 @@ import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
-import { useExtractTextFromHTML } from '$app/common/hooks/useExtractTextFromHTML';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -34,9 +36,7 @@ export function useTransactionColumns() {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
-  const sanitizeHTML = useSanitizeHTML();
   const disableNavigation = useDisableNavigation();
-  const extractTextFromHTML = useExtractTextFromHTML();
   const cleanDescriptionText = useCleanDescriptionText();
 
   const { data: invoices } = useInvoicesQuery({ perPage: 1000 });

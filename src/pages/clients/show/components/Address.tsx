@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { useSanitizeHTML } from '$app/common/hooks/useSanitizeHTML';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,6 @@ export function Address(props: Props) {
 
   const { client } = props;
 
-  const sanitizeHTML = useSanitizeHTML();
   const resolveCountry = useResolveCountry();
 
   return (
