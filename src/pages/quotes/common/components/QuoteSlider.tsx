@@ -52,6 +52,7 @@ import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-his
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -275,8 +276,16 @@ export function QuoteSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                containsUnsafeHTMLTags
-                message={(resource?.reminder_schedule as string) ?? ''}
+                tooltipElement={
+                  <article
+                    className="prose prose-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(
+                        (resource?.reminder_schedule as string) ?? ''
+                      ),
+                    }}
+                  />
+                }
               >
                 <h3 className="flex ml-3 mt-2 italic">
                   {t('reminders')} <MdInfo className="mt-1 ml-1" />

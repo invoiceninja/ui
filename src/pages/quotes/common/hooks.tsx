@@ -95,6 +95,10 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -348,8 +352,11 @@ export function useActions(params?: Params) {
     downloadType: 'download_e_quote',
   });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
-  const { setChangeTemplateResources, setChangeTemplateVisible, setChangeTemplateEntityContext } =
-    useChangeTemplate();
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -880,14 +887,21 @@ export function useQuoteColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          message={value as string}
-          displayAsNotesIframe
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -897,14 +911,21 @@ export function useQuoteColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          message={value as string}
-          displayAsNotesIframe
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className="prose prose-sm"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
