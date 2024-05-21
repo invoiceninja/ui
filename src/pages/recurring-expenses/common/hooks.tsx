@@ -60,6 +60,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export const defaultColumns: string[] = [
   'status',
@@ -134,6 +135,7 @@ export function useRecurringExpenseColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
@@ -302,6 +304,7 @@ export function useRecurringExpenseColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',

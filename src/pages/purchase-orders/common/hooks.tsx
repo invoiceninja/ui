@@ -76,6 +76,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -188,6 +189,7 @@ export function usePurchaseOrderColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -370,6 +372,7 @@ export function usePurchaseOrderColumns() {
         column: 'exchange_rate',
         id: 'exchange_rate',
         label: t('exchange_rate'),
+        format: (value) => formatNumber(value),
       },
     ];
 

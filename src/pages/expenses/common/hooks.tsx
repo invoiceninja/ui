@@ -58,6 +58,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -229,6 +230,7 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
@@ -426,6 +428,7 @@ export function useExpenseColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
