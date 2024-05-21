@@ -53,7 +53,6 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import {
   extractTextFromHTML,
   sanitizeHTML,

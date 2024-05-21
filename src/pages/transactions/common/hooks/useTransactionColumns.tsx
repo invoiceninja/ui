@@ -23,8 +23,6 @@ import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
-import { date } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import {
   extractTextFromHTML,
   sanitizeHTML,

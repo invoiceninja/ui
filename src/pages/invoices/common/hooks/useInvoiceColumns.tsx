@@ -26,7 +26,6 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import {
   extractTextFromHTML,
   sanitizeHTML,

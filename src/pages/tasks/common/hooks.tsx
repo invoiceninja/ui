@@ -72,7 +72,6 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { User } from '$app/common/interfaces/user';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import {
   extractTextFromHTML,
   sanitizeHTML,
