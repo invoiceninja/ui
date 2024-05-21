@@ -20,5 +20,9 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/forms'), require('tailwind-scrollbar')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('tailwind-scrollbar'),
+    require('@tailwindcss/typography'),
+  ],
 };

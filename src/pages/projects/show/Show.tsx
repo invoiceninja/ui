@@ -56,6 +56,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLockOutline } from 'react-icons/md';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 dayjs.extend(duration);
 
@@ -188,7 +189,9 @@ export default function Show() {
 
               <span
                 className="whitespace-normal"
-                dangerouslySetInnerHTML={{ __html: project.private_notes }}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(project.private_notes),
+                }}
               />
             </div>
           )}
