@@ -32,7 +32,7 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { TurnstileWidget } from './components/TurnstileWidget';
 import { useTurnstile } from 'react-turnstile';
 
@@ -40,6 +40,8 @@ export function Register() {
   useTitle('register');
 
   const [t] = useTranslation();
+
+  const { rc } = useParams();
 
   const turnstile = useTurnstile();
 
@@ -93,6 +95,10 @@ export function Register() {
       ].forEach((key) => {
         if (searchParams.has(key)) {
           endpoint.searchParams.append(key, searchParams.get(key) as string);
+        }
+
+        if (rc) {
+          endpoint.searchParams.append('rc', rc);
         }
       });
 

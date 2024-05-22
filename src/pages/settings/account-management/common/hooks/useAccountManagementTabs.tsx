@@ -32,7 +32,7 @@ export function useAccountManagementTabs() {
     },
   ];
 
-  tabs = !isHosted()
+  tabs = isHosted()
     ? [
         ...tabs,
         {
