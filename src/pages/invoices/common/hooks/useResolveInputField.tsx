@@ -182,7 +182,7 @@ export function useResolveInputField(props: Props) {
   ) => {
     setIsDeleteActionTriggered(false);
 
-    if (product && company && company.enabled_item_tax_rates === 0) {
+    if (product && company && company.enabled_tax_rates === 0) {
       product.tax_name1 = '';
       product.tax_rate1 = 0;
       product.tax_name2 = '';
@@ -191,14 +191,14 @@ export function useResolveInputField(props: Props) {
       product.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_item_tax_rates === 1) {
+    if (product && company && company.enabled_tax_rates === 1) {
       product.tax_name2 = '';
       product.tax_rate2 = 0;
       product.tax_name3 = '';
       product.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_item_tax_rates === 2) {
+    if (product && company && company.enabled_tax_rates === 2) {
       product.tax_name3 = '';
       product.tax_rate3 = 0;
     }
