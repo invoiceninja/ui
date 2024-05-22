@@ -14,3 +14,4 @@ export { Overview as AccountManagementOverview } from './Overview';
 export * from './Plan';
 export * from './SecuritySettings';
 export * from './DangerZone';
+export * from './ReferralProgram';
