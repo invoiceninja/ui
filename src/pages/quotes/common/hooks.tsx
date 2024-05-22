@@ -817,11 +817,13 @@ export function useQuoteColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, quote) =>
-        formatMoney(
-          value,
-          quote.client?.country_id,
-          quote.client?.settings.currency_id
-        ),
+        quote.is_amount_discount
+          ? formatMoney(
+              value,
+              quote.client?.country_id,
+              quote.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',

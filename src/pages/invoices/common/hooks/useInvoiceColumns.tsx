@@ -298,11 +298,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'discount',
       label: t('discount'),
       format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id,
-          invoice.client?.settings.currency_id
-        ),
+        invoice.is_amount_discount
+          ? formatMoney(
+              value,
+              invoice.client?.country_id,
+              invoice.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',

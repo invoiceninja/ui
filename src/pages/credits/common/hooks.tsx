@@ -765,11 +765,13 @@ export function useCreditColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, credit) =>
-        formatMoney(
-          value,
-          credit.client?.country_id,
-          credit.client?.settings.currency_id
-        ),
+        credit.is_amount_discount
+          ? formatMoney(
+              value,
+              credit.client?.country_id,
+              credit.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',

@@ -667,7 +667,7 @@ export function useRecurringInvoiceColumns() {
               recurringInvoice.client?.country_id,
               recurringInvoice.client?.settings.currency_id
             )
-          : `${recurringInvoice.discount}%`,
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
