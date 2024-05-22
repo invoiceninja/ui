@@ -348,11 +348,13 @@ export function usePurchaseOrderColumns() {
         id: 'discount',
         label: t('discount'),
         format: (value, purchaseOrder) =>
-          formatMoney(
-            value,
-            purchaseOrder.vendor?.country_id,
-            purchaseOrder.vendor?.currency_id
-          ),
+          purchaseOrder.is_amount_discount
+            ? formatMoney(
+                value,
+                purchaseOrder.vendor?.country_id,
+                purchaseOrder.vendor?.currency_id
+              )
+            : `${formatNumber(value)} %`,
       },
       {
         column: 'documents',

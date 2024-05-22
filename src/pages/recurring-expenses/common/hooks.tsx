@@ -388,16 +388,19 @@ export function useRecurringExpenseColumns() {
       column: 'tax_rate1',
       id: 'tax_rate1',
       label: t('tax_rate1'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate2',
       id: 'tax_rate2',
       label: t('tax_rate2'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate3',
       id: 'tax_rate3',
       label: t('tax_rate3'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'transaction_reference',
