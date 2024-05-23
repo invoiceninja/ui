@@ -23,11 +23,14 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { Icon } from '$app/components/icons/Icon';
+import { MdLaunch } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -52,6 +55,7 @@ export function Details(props: Props) {
 
   const company = useCurrentCompany();
 
+  const navigate = useNavigate();
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 
@@ -89,7 +93,28 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('vendor')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('vendor')}</span>
+
+                {recurringExpense.vendor_id && (
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdLaunch}
+                    size={18}
+                    onClick={() =>
+                      navigate(
+                        route('/vendors/:id', {
+                          id: recurringExpense.vendor_id,
+                        })
+                      )
+                    }
+                  />
+                )}
+              </div>
+            }
+          >
             <VendorSelector
               value={recurringExpense.vendor_id}
               onChange={(vendor) => handleChange('vendor_id', vendor.id)}
@@ -100,7 +125,28 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('client')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('client')}</span>
+
+                {recurringExpense.client_id && (
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdLaunch}
+                    size={18}
+                    onClick={() =>
+                      navigate(
+                        route('/clients/:id', {
+                          id: recurringExpense.client_id,
+                        })
+                      )
+                    }
+                  />
+                )}
+              </div>
+            }
+          >
             <ClientSelector
               value={recurringExpense.client_id}
               clearButton={Boolean(recurringExpense.client_id)}
@@ -113,7 +159,28 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('project')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('project')}</span>
+
+                {recurringExpense.project_id && (
+                  <Icon
+                    className="cursor-pointer"
+                    element={MdLaunch}
+                    size={18}
+                    onClick={() =>
+                      navigate(
+                        route('/projects/:id', {
+                          id: recurringExpense.project_id,
+                        })
+                      )
+                    }
+                  />
+                )}
+              </div>
+            }
+          >
             <ProjectSelector
               value={recurringExpense.project_id}
               clearButton={Boolean(recurringExpense.project_id)}
