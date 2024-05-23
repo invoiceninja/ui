@@ -43,6 +43,7 @@ import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useLocation } from 'react-router-dom';
+import { cloneDeep } from 'lodash';
 
 const numberInputs = [
   'discount',
@@ -181,28 +182,30 @@ export function useResolveInputField(props: Props) {
   ) => {
     setIsDeleteActionTriggered(false);
 
-    if (product && company && company.enabled_tax_rates === 0) {
-      product.tax_name1 = '';
-      product.tax_rate1 = 0;
-      product.tax_name2 = '';
-      product.tax_rate2 = 0;
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    const updatedProduct = cloneDeep(product) as Product;
+
+    if (product && company && company.enabled_item_tax_rates === 0) {
+      updatedProduct.tax_name1 = '';
+      updatedProduct.tax_rate1 = 0;
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_tax_rates === 1) {
-      product.tax_name2 = '';
-      product.tax_rate2 = 0;
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    if (product && company && company.enabled_item_tax_rates === 1) {
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_tax_rates === 2) {
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    if (product && company && company.enabled_item_tax_rates === 2) {
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    await handleProductChange(index, value, product);
+    await handleProductChange(index, value, updatedProduct);
   };
 
   const formatMoney = useFormatMoney({
