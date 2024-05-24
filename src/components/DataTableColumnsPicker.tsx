@@ -107,7 +107,7 @@ export function DataTableColumnsPicker(props: Props) {
 
   const handleDelete = (columnKey: string) => {
     const updatedCurrentColumns = currentColumns.filter(
-      (columns) => !columns.includes(columnKey)
+      (column) => column !== columnKey
     );
 
     setCurrentColumns(updatedCurrentColumns);
