@@ -10,7 +10,7 @@
 
 import { PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 
@@ -20,6 +20,8 @@ type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 export function useAtomWithPrevent(
   atom: PrimitiveAtom<Entity | undefined>
 ): [Entity | undefined, SetAtom<[SetStateAction<Invoice | undefined>], void>] {
+  const initialValueTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const [entity, setEntity] = useAtom(atom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
     preventLeavingPageAtom
@@ -44,19 +46,23 @@ export function useAtomWithPrevent(
   }, [entity, currentInitialValue]);
 
   useEffect(() => {
-    if (entity) {
+    if (entity && currentInitialValue) {
       setCurrentInitialValue(entity);
     }
   }, [entity?.updated_at]);
 
   useEffect(() => {
-    return () => {
-      setPreventLeavingPage({
-        prevent: false,
-        actionKey: undefined,
-      });
-    };
-  }, []);
+    if (entity && !currentInitialValue) {
+      clearTimeout(initialValueTimeOut.current);
+
+      const currentTimeout = setTimeout(
+        () => setCurrentInitialValue(entity),
+        100
+      );
+
+      initialValueTimeOut.current = currentTimeout;
+    }
+  }, [entity]);
 
   return [entity, setEntity];
 }
