@@ -57,6 +57,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export const defaultColumns: string[] = [
   'name',
@@ -107,6 +108,7 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
@@ -219,13 +221,13 @@ export function useProjectColumns() {
       column: 'budgeted_hours',
       id: 'budgeted_hours',
       label: t('budgeted_hours'),
-      format: (value) => value,
+      format: (value) => formatNumber(value),
     },
     {
       column: 'total_hours',
       id: 'current_hours',
       label: t('total_hours'),
-      format: (value) => value,
+      format: (value) => formatNumber(value),
     },
     {
       column: 'entity_state',
