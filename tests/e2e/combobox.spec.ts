@@ -3,159 +3,153 @@ import test, { expect } from '@playwright/test';
 
 test('ComboBox Async value selecting', async ({ page }) => {
   await login(page);
+
+  await page.goto('/testing');
+
+  await page.waitForURL('/testing');
+
+  const comboBoxInputField = page
+    .locator('[data-testid="combobox-input-field"]')
+    .first();
+
+  comboBoxInputField.click();
+
+  await page.getByRole('option').first().click();
+
+  await page.waitForTimeout(200);
+
+  const selectedValue = await comboBoxInputField.inputValue();
+
+  expect(selectedValue.length > 0).toBeTruthy();
+
+  expect(
+    page.locator('[data-testid="combobox-clear-icon"]').first()
+  ).toBeVisible();
+
+  expect(
+    page.locator('[data-testid="combobox-chevrondown-icon"]').first()
+  ).not.toBeVisible();
 });
-//   await page.goto('/testing');
 
-//   await page.waitForURL('/testing');
+test('ComboBox Async available clearing', async ({ page }) => {
+  await login(page);
 
-//   const comboBoxInputField = page
-//     .locator('[data-testid="combobox-input-field"]')
-//     .first();
+  await page.goto('/testing');
 
-//   comboBoxInputField.click();
+  await page.waitForURL('/testing');
 
-//   await page.getByRole('option').first().click();
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
-//   await page.waitForTimeout(200);
+  await page.getByRole('option').first().click();
 
-//   const selectedValue = await comboBoxInputField.inputValue();
+  await page.waitForTimeout(200);
 
-//   expect(selectedValue.length > 0).toBeTruthy();
+  expect(
+    page.locator('[data-testid="combobox-clear-icon"]').first()
+  ).toBeVisible();
 
-//   expect(
-//     page.locator('[data-testid="combobox-clear-icon"]').first()
-//   ).toBeVisible();
+  expect(
+    page.locator('[data-testid="combobox-chevrondown-icon"]').first()
+  ).not.toBeVisible();
 
-//   expect(
-//     page.locator('[data-testid="combobox-chevrondown-icon"]').first()
-//   ).not.toBeVisible();
-// });
+  expect(
+    (
+      await page
+        .locator('[data-testid="combobox-input-field"]')
+        .first()
+        .inputValue()
+    ).length > 0
+  ).toBeTruthy();
+});
 
-// test('ComboBox Async available clearing', async ({ page }) => {
-//   await login(page);
+test('ComboBox Async value clearing', async ({ page }) => {
+  await login(page);
 
-//   await page.goto('/testing');
+  await page.goto('/testing');
 
-//   await page.waitForURL('/testing');
+  await page.waitForURL('/testing');
 
-//   await page.locator('[data-testid="combobox-input-field"]').first().click();
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
-//   await page.getByRole('option').first().click();
+  await page.getByRole('option').first().click();
 
-//   await page.waitForTimeout(200);
+  await page.waitForTimeout(200);
 
-//   expect(
-//     page.locator('[data-testid="combobox-clear-icon"]').first()
-//   ).toBeVisible();
+  const clearComboBoxIcon = page
+    .locator('[data-testid="combobox-clear-icon"]')
+    .first();
 
-//   expect(
-//     page.locator('[data-testid="combobox-chevrondown-icon"]').first()
-//   ).not.toBeVisible();
+  expect(clearComboBoxIcon).toBeVisible();
 
-//   expect(
-//     (
-//       await page
-//         .locator('[data-testid="combobox-input-field"]')
-//         .first()
-//         .inputValue()
-//     ).length > 0
-//   ).toBeTruthy();
-// });
+  expect(
+    page.locator('[data-testid="combobox-chevrondown-icon"]').first()
+  ).not.toBeVisible();
 
-// test('ComboBox Async value clearing', async ({ page }) => {
-//   await login(page);
+  await clearComboBoxIcon.click();
 
-//   await page.goto('/testing');
+  await page.waitForTimeout(200);
 
-//   await page.waitForURL('/testing');
+  expect(
+    (
+      await page
+        .locator('[data-testid="combobox-input-field"]')
+        .first()
+        .inputValue()
+    ).length === 0
+  ).toBeTruthy();
 
-//   await page.locator('[data-testid="combobox-input-field"]').first().click();
+  expect(
+    page.locator('[data-testid="combobox-chevrondown-icon"]').first()
+  ).toBeVisible();
+});
 
-//   await page.getByRole('option').first().click();
+test('ComboBox Async action opening slider', async ({ page }) => {
+  await login(page);
 
-//   await page.waitForTimeout(200);
+  await page.goto('/testing');
 
-//   const clearComboBoxIcon = page
-//     .locator('[data-testid="combobox-clear-icon"]')
-//     .first();
+  await page.waitForURL('/testing');
 
-//   expect(clearComboBoxIcon).toBeVisible();
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
-//   expect(
-//     page.locator('[data-testid="combobox-chevrondown-icon"]').first()
-//   ).not.toBeVisible();
+  const actionComboBoxButton = page
+    .locator('[data-testid="combobox-action-button"]')
+    .first();
 
-//   await clearComboBoxIcon.click();
+  expect(actionComboBoxButton).toBeVisible();
 
-//   await page.waitForTimeout(200);
+  await actionComboBoxButton.click();
 
-//   expect(
-//     (
-//       await page
-//         .locator('[data-testid="combobox-input-field"]')
-//         .first()
-//         .inputValue()
-//     ).length === 0
-//   ).toBeTruthy();
+  await expect(
+    page.locator('[data-headlessui-state="open"]').getByText('New Client')
+  ).toBeVisible();
+});
 
-//   expect(
-//     page.locator('[data-testid="combobox-chevrondown-icon"]').first()
-//   ).toBeVisible();
-// });
+test('ComboBox Async filtering', async ({ page }) => {
+  await login(page);
 
-// test('ComboBox Async action opening modal', async ({ page }) => {
-//   await login(page);
+  await page.goto('/testing');
 
-//   await page.goto('/testing');
+  await page.waitForURL('/testing');
 
-//   await page.waitForURL('/testing');
+  await page
+    .locator('[data-testid="combobox-input-field"]')
+    .first()
+    .fill('test merge one');
 
-//   await page.locator('[data-testid="combobox-input-field"]').first().click();
+  await page.locator('[data-testid="combobox-input-field"]').first().click();
 
-//   await page.getByRole('option').first().click();
+  await page.waitForTimeout(200);
 
-//   const actionComboBoxButton = page
-//     .locator('[data-testid="combobox-action-button"]')
-//     .first();
+  const numberOfAvailableOptions = (await page.getByRole('option').all())
+    .length;
 
-//   expect(actionComboBoxButton).toBeVisible();
+  const firstOptionTextContent = await page
+    .getByRole('option')
+    .first()
+    .textContent();
 
-//   await actionComboBoxButton.click();
+  expect(firstOptionTextContent === 'test merge one').toBeTruthy();
 
-//   const actionText = await actionComboBoxButton.textContent();
-
-//   await expect(
-//     page
-//       .getByRole('heading', {
-//         name: actionText?.toString(),
-//       })
-//       .first()
-//   ).toBeVisible();
-// });
-
-// test('ComboBox Async filtering', async ({ page }) => {
-//   await login(page);
-
-//   await page.goto('/testing');
-
-//   await page.waitForURL('/testing');
-
-//   await page
-//     .locator('[data-testid="combobox-input-field"]')
-//     .first()
-//     .fill('cypress');
-
-//   await page.waitForTimeout(200);
-
-//   const numberOfAvailableOptions = (await page.getByRole('option').all())
-//     .length;
-
-//   const firstOptionTextContent = await page
-//     .getByRole('option')
-//     .first()
-//     .textContent();
-
-//   expect(firstOptionTextContent === 'cypress').toBeTruthy();
-
-//   expect(numberOfAvailableOptions === 1).toBeTruthy();
-// });
+  expect(numberOfAvailableOptions === 1).toBeTruthy();
+});

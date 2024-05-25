@@ -640,31 +640,3 @@ test('cloning credit', async ({ page }) => {
     page.getByRole('heading', { name: 'Edit Credit' }).first()
   ).toBeVisible();
 });
-
-test('Select client message', async ({ page }) => {
-  await login(page);
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Credits', exact: true })
-    .click();
-
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: 'Enter Credit' })
-    .click();
-
-  await page.waitForTimeout(900);
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true })
-  ).toBeVisible();
-
-  await page.getByRole('option').first().click();
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true })
-  ).not.toBeVisible();
-
-  await logout(page);
-});

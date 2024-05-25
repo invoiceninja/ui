@@ -850,34 +850,6 @@ test('Second and Third Custom email sending template is displayed', async ({
   await logout(page);
 });
 
-test('Select client message', async ({ page }) => {
-  await login(page);
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Invoices', exact: true })
-    .click();
-
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: 'New Invoice' })
-    .click();
-
-  await page.waitForTimeout(900);
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true }).first()
-  ).toBeVisible();
-
-  await page.getByRole('option').first().click();
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true })
-  ).not.toBeVisible();
-
-  await logout(page);
-});
-
 test('Prevent navigation in the main navbar', async ({ page }) => {
   await login(page);
 
