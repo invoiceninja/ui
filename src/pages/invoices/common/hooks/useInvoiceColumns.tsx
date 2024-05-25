@@ -31,6 +31,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -120,6 +121,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
@@ -296,11 +298,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'discount',
       label: t('discount'),
       format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id,
-          invoice.client?.settings.currency_id
-        ),
+        invoice.is_amount_discount
+          ? formatMoney(
+              value,
+              invoice.client?.country_id,
+              invoice.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -318,6 +322,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
