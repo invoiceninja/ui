@@ -109,29 +109,32 @@ jobs:
           vendor/bin/snappdf download
           sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
           sudo find ./ -type d -exec chmod 755 {} \;
+          php artisan serve --port=8000 &
           php artisan migrate:fresh --seed
           php artisan db:seed --class=RandomDataSeeder
-          php artisan serve --port=8000 &
 
       - name: Prepare React FrontEnd
         run: |
-          git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
+          git clone https://github.com/Civolilah/ui.git
           cd ui
-          git checkout develop
+          git checkout bugfix/1298-failing-tests
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
           npm run build
-          npx playwright test --workers=1 --reporter=list --max-failures=1
+          npm run preview &
+          npx playwright test --trace on --workers=1 --reporter=list --max-failures=5
           env:
             VITE_API_URL: http://ninja.test:8000
             PLAYWRIGHT_BASE_URL: http://localhost:4173
             PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
+            VITE_IS_HOSTED: false
             VITE_IS_TEST: true
             VITE_ROUTER: browser
+            CI: true
       - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: ui/test-results/
           retention-days: 30

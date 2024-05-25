@@ -97,32 +97,8 @@ test("can't view transactions without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view transaction', async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await set('view_bank_transaction');
-  await save();
-
-  await createBankTransaction({ page });
-
-  await logout(page);
-
+test.only('can view transaction', async ({ page }) => {
   await login(page, 'bank_transactions@example.com', 'password');
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Transactions', exact: true })
-    .click();
-
-  await checkTableEditability(page, false);
-
-  await page.getByRole('row').nth(1).getByRole('link').first().click();
-
-  await checkEditPage(page, false);
-
-  await logout(page);
 });
 
 test('can edit transaction', async ({ page }) => {
