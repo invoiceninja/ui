@@ -11,7 +11,7 @@
 import { PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
 import { useEffect, useRef, useState } from 'react';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 
 type Entity = Invoice;
@@ -47,7 +47,7 @@ export function useAtomWithPrevent(
 
   useEffect(() => {
     if (entity && currentInitialValue) {
-      setCurrentInitialValue(entity);
+      setCurrentInitialValue(cloneDeep(entity));
     }
   }, [entity?.updated_at]);
 
@@ -56,7 +56,7 @@ export function useAtomWithPrevent(
       clearTimeout(initialValueTimeOut.current);
 
       const currentTimeout = setTimeout(
-        () => setCurrentInitialValue(entity),
+        () => setCurrentInitialValue(cloneDeep(entity)),
         100
       );
 
