@@ -24,7 +24,7 @@ import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -41,7 +41,6 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
-import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export type ChangeHandler = <T extends keyof Invoice>(
@@ -68,12 +67,6 @@ export default function Create() {
   const taskColumns = useTaskColumns();
 
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
-
-  const [preventLeavingPage, setPreventLeavingPage] = useAtom(
-    preventLeavingPageAtom
-  );
-
-  const [initialInvoiceValue, setInitialInvoiceValue] = useState<Invoice>();
 
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -116,54 +109,43 @@ export default function Create() {
   useEffect(() => {
     setInvoiceSum(undefined);
 
-    if (!preventLeavingPage.prevent) {
-      setInvoice((current) => {
-        let value = current;
+    setInvoice((current) => {
+      let value = current;
 
-        if (
-          searchParams.get('action') !== 'clone' &&
-          searchParams.get('action') !== 'invoice_project' &&
-          searchParams.get('action') !== 'invoice_task' &&
-          searchParams.get('action') !== 'invoice_expense' &&
-          searchParams.get('action') !== 'invoice_product'
-        ) {
-          value = undefined;
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'invoice_project' &&
+        searchParams.get('action') !== 'invoice_task' &&
+        searchParams.get('action') !== 'invoice_expense' &&
+        searchParams.get('action') !== 'invoice_product'
+      ) {
+        value = undefined;
+      }
+
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _invoice = cloneDeep(data);
+
+        if (typeof _invoice.line_items === 'string') {
+          _invoice.line_items = [];
         }
 
-        if (
-          typeof data !== 'undefined' &&
-          typeof value === 'undefined' &&
-          searchParams.get('action') !== 'clone'
-        ) {
-          const _invoice = cloneDeep(data);
-
-          if (typeof _invoice.line_items === 'string') {
-            _invoice.line_items = [];
-          }
-
-          if (searchParams.get('client')) {
-            _invoice.client_id = searchParams.get('client')!;
-          }
-
-          _invoice.uses_inclusive_taxes =
-            company?.settings?.inclusive_taxes ?? false;
-
-          value = _invoice;
+        if (searchParams.get('client')) {
+          _invoice.client_id = searchParams.get('client')!;
         }
 
-        setInitialInvoiceValue(cloneDeep(value));
+        _invoice.uses_inclusive_taxes =
+          company?.settings?.inclusive_taxes ?? false;
 
-        return value;
-      });
-    }
-  }, [data, preventLeavingPage.prevent]);
+        value = _invoice;
+      }
 
-  useEffect(() => {
-    return () => {
-      setInvoice(undefined);
-      setPreventLeavingPage({ prevent: false, actionKey: undefined });
-    };
-  }, []);
+      return value;
+    });
+  }, [data]);
 
   const settingResolver = (client: Client, prop: string) => {
     if (client?.settings && client?.settings[prop]) {
@@ -217,20 +199,6 @@ export default function Create() {
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
-
-    if (invoice && initialInvoiceValue) {
-      const isDifferent =
-        preventLeavingPage.prevent !== !isEqual(invoice, initialInvoiceValue);
-
-      isDifferent &&
-        setPreventLeavingPage(
-          (current) =>
-            current && {
-              ...current,
-              prevent: !isEqual(invoice, initialInvoiceValue),
-            }
-        );
-    }
   }, [invoice]);
 
   return (
