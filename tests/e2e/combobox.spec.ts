@@ -8,11 +8,15 @@ test('ComboBox Async value selecting', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   const comboBoxInputField = page
     .locator('[data-testid="combobox-input-field"]')
     .first();
 
   comboBoxInputField.click();
+
+  await page.waitForTimeout(200);
 
   await page.getByRole('option').first().click();
 
@@ -38,7 +42,11 @@ test('ComboBox Async available clearing', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-testid="combobox-input-field"]').first().click();
+
+  await page.waitForTimeout(200);
 
   await page.getByRole('option').first().click();
 
@@ -68,6 +76,8 @@ test('ComboBox Async value clearing', async ({ page }) => {
   await page.goto('/testing');
 
   await page.waitForURL('/testing');
+
+  await page.waitForTimeout(1000);
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
@@ -110,6 +120,8 @@ test('ComboBox Async action opening slider', async ({ page }) => {
 
   await page.waitForURL('/testing');
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
   const actionComboBoxButton = page
@@ -131,6 +143,8 @@ test('ComboBox Async filtering', async ({ page }) => {
   await page.goto('/testing');
 
   await page.waitForURL('/testing');
+
+  await page.waitForTimeout(1000);
 
   await page
     .locator('[data-testid="combobox-input-field"]')

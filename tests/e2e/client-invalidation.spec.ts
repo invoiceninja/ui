@@ -1,7 +1,7 @@
 import { login, permissions } from '$tests/e2e/helpers';
 import { test, expect } from '@playwright/test';
 
-test.only('test appropriate invalidation of clients', async ({ page }) => {
+test('test appropriate invalidation of clients', async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
