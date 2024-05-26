@@ -23,7 +23,7 @@ export function License() {
   const [t] = useTranslation();
   const link =
     import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
-    'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3';
+    'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase';
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
