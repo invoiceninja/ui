@@ -21,7 +21,9 @@ import { toast } from '$app/common/helpers/toast/toast';
 
 export function License() {
   const [t] = useTranslation();
-  const link = import.meta.env.VITE_WHITELABEL_INVOICE_URL as unknown as string;
+  const link =
+    import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+    'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3';
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
