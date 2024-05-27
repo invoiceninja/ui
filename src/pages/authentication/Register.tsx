@@ -203,7 +203,7 @@ export function Register() {
                 disabled={isFormBusy}
                 className="mt-4"
                 variant="block"
-                onClick={() => form.submitForm()}
+                onClick={() => setIsTrunstileVisible(true)}
               >
                 {t('register')}
               </Button>
