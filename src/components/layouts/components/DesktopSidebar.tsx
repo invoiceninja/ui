@@ -91,9 +91,8 @@ export function DesktopSidebar(props: Props) {
                   message={item.name as string}
                   width="auto"
                   placement="right"
-                  truncate={false}
-                  size="large"
                   withoutArrow={true}
+                  withoutWrapping
                 >
                   <SidebarItem key={index} item={item} />
                 </Tooltip>
