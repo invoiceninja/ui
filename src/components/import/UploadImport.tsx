@@ -30,6 +30,7 @@ import { ImportTemplateModal } from './ImportTemplateModal';
 import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
+import { Icon } from '../icons/Icon';
 
 interface Props {
   entity: string;
@@ -178,13 +179,13 @@ export function UploadImport(props: Props) {
       });
   };
 
-  const handleClearMapping = () => {
-    Object.keys(payload.column_map[props.entity].mapping).forEach((key) => {
-      payload.column_map[props.entity].mapping[key] = '';
-    });
+  const handleClearMapping = (index: number) => {
+    if (payload.column_map[props.entity].mapping[index]) {
+      payload.column_map[props.entity].mapping[index] = '';
 
-    setSelectedTemplate('');
-    setPayloadData({ ...payload });
+      setSelectedTemplate('');
+      setPayloadData({ ...payload });
+    }
   };
 
   const formik = useFormik({
@@ -481,20 +482,31 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField
-                      id={index}
-                      value={getColumnValue(index)}
-                      onChange={handleChange}
-                      withBlank
-                    >
-                      {mapData.mappings[props.entity].available.map(
-                        (mapping: any, index: number) => (
-                          <option value={mapping} key={index}>
-                            {decorateMapping(mapping)}
-                          </option>
-                        )
-                      )}
-                    </SelectField>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <SelectField
+                          id={index}
+                          value={getColumnValue(index)}
+                          onChange={handleChange}
+                          withBlank
+                        >
+                          {mapData.mappings[props.entity].available.map(
+                            (mapping: any, index: number) => (
+                              <option value={mapping} key={index}>
+                                {decorateMapping(mapping)}
+                              </option>
+                            )
+                          )}
+                        </SelectField>
+                      </div>
+
+                      <Icon
+                        className="cursor-pointer"
+                        element={MdClose}
+                        size={24}
+                        onClick={() => handleClearMapping(index)}
+                      />
+                    </div>
                   </Td>
                 </Tr>
               )
@@ -526,21 +538,11 @@ export function UploadImport(props: Props) {
             )}
             <Tr>
               <Td colSpan={2}>
-                <div className="flex justify-end space-x-4">
-                  <Button
-                    type="secondary"
-                    behavior="button"
-                    onClick={handleClearMapping}
-                  >
-                    {t('clear')}
-                  </Button>
-
-                  <ImportTemplateModal
-                    entity={props.entity}
-                    importMap={payload}
-                    onImport={processImport}
-                  />
-                </div>
+                <ImportTemplateModal
+                  entity={props.entity}
+                  importMap={payload}
+                  onImport={processImport}
+                />
               </Td>
             </Tr>
           </Tbody>
