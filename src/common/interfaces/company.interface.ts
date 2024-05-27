@@ -320,6 +320,8 @@ export interface Settings {
   enable_rappen_rounding: boolean;
   e_quote_type: string;
   brevo_secret: string;
+  task_round_up: boolean;
+  task_round_to_nearest: number;
 }
 
 export interface TaxData {

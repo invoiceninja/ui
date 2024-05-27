@@ -30,6 +30,7 @@ import { ImportTemplateModal } from './ImportTemplateModal';
 import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
+import { Icon } from '../icons/Icon';
 
 interface Props {
   entity: string;
@@ -178,6 +179,15 @@ export function UploadImport(props: Props) {
       });
   };
 
+  const handleClearMapping = (index: number) => {
+    if (payload.column_map[props.entity].mapping[index]) {
+      payload.column_map[props.entity].mapping[index] = '';
+
+      setSelectedTemplate('');
+      setPayloadData({ ...payload });
+    }
+  };
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
@@ -195,15 +205,17 @@ export function UploadImport(props: Props) {
             response.data?.mappings[props.entity]?.hints.forEach(
               (mapping: number, index: number) => {
                 payload.column_map[props.entity].mapping[index] =
-                  response.data?.mappings[props.entity].available[mapping];
+                  response.data?.mappings[props.entity].available[mapping] ??
+                  '';
                 setPayloadData(payload);
                 setDefaultMapping({
                   ...payload?.column_map?.[props.entity]?.mapping,
                 });
-                setSelectedTemplate('');
               }
             );
           }
+
+          setSelectedTemplate('');
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -470,20 +482,31 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField
-                      id={index}
-                      value={getColumnValue(index)}
-                      onChange={handleChange}
-                      withBlank
-                    >
-                      {mapData.mappings[props.entity].available.map(
-                        (mapping: any, index: number) => (
-                          <option value={mapping} key={index}>
-                            {decorateMapping(mapping)}
-                          </option>
-                        )
-                      )}
-                    </SelectField>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <SelectField
+                          id={index}
+                          value={getColumnValue(index)}
+                          onChange={handleChange}
+                          withBlank
+                        >
+                          {mapData.mappings[props.entity].available.map(
+                            (mapping: any, index: number) => (
+                              <option value={mapping} key={index}>
+                                {decorateMapping(mapping)}
+                              </option>
+                            )
+                          )}
+                        </SelectField>
+                      </div>
+
+                      <Icon
+                        className="cursor-pointer"
+                        element={MdClose}
+                        size={24}
+                        onClick={() => handleClearMapping(index)}
+                      />
+                    </div>
                   </Td>
                 </Tr>
               )

@@ -34,4 +34,5 @@ export interface User extends Timestamps {
   company_user?: CompanyUser;
   language_id: string;
   user_logged_in_notification: boolean;
+  referral_code?: string;
 }
