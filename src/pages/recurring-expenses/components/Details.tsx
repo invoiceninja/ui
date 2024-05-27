@@ -23,7 +23,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -55,7 +55,6 @@ export function Details(props: Props) {
 
   const company = useCurrentCompany();
 
-  const navigate = useNavigate();
   const formatMoney = useFormatMoney();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 
@@ -104,7 +103,7 @@ export function Details(props: Props) {
                     element={MdLaunch}
                     size={18}
                     onClick={() =>
-                      navigate(
+                      window.open(
                         route('/vendors/:id', {
                           id: recurringExpense.vendor_id,
                         })
@@ -136,7 +135,7 @@ export function Details(props: Props) {
                     element={MdLaunch}
                     size={18}
                     onClick={() =>
-                      navigate(
+                      window.open(
                         route('/clients/:id', {
                           id: recurringExpense.client_id,
                         })
@@ -170,7 +169,7 @@ export function Details(props: Props) {
                     element={MdLaunch}
                     size={18}
                     onClick={() =>
-                      navigate(
+                      window.open(
                         route('/projects/:id', {
                           id: recurringExpense.project_id,
                         })
