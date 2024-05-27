@@ -180,10 +180,12 @@ export function UploadImport(props: Props) {
   };
 
   const handleClearMapping = (index: number) => {
-    payload.column_map[props.entity].mapping[index] = '';
+    if (payload.column_map[props.entity].mapping[index]) {
+      payload.column_map[props.entity].mapping[index] = '';
 
-    setSelectedTemplate('');
-    setPayloadData({ ...payload });
+      setSelectedTemplate('');
+      setPayloadData({ ...payload });
+    }
   };
 
   const formik = useFormik({
