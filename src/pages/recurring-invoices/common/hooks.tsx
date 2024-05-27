@@ -78,6 +78,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -517,6 +518,7 @@ export function useRecurringInvoiceColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const dateTime = useDateTime();
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -665,7 +667,7 @@ export function useRecurringInvoiceColumns() {
               recurringInvoice.client?.country_id,
               recurringInvoice.client?.settings.currency_id
             )
-          : `${recurringInvoice.discount}%`,
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -685,6 +687,7 @@ export function useRecurringInvoiceColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',

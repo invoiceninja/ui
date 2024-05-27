@@ -30,6 +30,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export const defaultColumns: string[] = [
   'status',
@@ -91,6 +92,7 @@ export function usePaymentColumns() {
   type PaymentColumns = (typeof paymentColumns)[number];
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const resolveCurrency = useResolveCurrency();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -280,6 +282,7 @@ export function usePaymentColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',

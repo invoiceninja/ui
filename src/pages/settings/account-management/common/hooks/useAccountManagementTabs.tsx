@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo } from '$app/common/helpers';
+import { isDemo, isHosted } from '$app/common/helpers';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useAccountManagementTabs() {
   const [t] = useTranslation();
 
-  const tabs: Tab[] = [
+  let tabs: Tab[] = [
     { name: t('plan'), href: '/settings/account_management' },
     { name: t('overview'), href: '/settings/account_management/overview' },
     {
@@ -31,6 +31,16 @@ export function useAccountManagementTabs() {
       href: '/settings/account_management/security_settings',
     },
   ];
+
+  tabs = isHosted()
+    ? [
+        ...tabs,
+        {
+          name: t('referral_program'),
+          href: '/settings/account_management/referral_program',
+        },
+      ]
+    : tabs;
 
   const updatedTabsList = !isDemo()
     ? [

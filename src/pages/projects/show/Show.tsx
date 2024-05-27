@@ -57,6 +57,7 @@ import {
 import { Icon } from '$app/components/icons/Icon';
 import { MdLockOutline } from 'react-icons/md';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 dayjs.extend(duration);
 
@@ -66,6 +67,7 @@ export default function Show() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
@@ -165,7 +167,7 @@ export default function Show() {
           )}
 
           <p>
-            {t('budgeted_hours')}: {project.budgeted_hours}
+            {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
           </p>
 
           <p>
@@ -229,7 +231,7 @@ export default function Show() {
           </p>
 
           <p>
-            {t('total_hours')}: {project.current_hours}
+            {t('total_hours')}: {formatNumber(project.current_hours)}
           </p>
         </InfoCard>
       </div>
