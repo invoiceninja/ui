@@ -99,6 +99,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -617,6 +618,7 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
@@ -815,11 +817,13 @@ export function useQuoteColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, quote) =>
-        formatMoney(
-          value,
-          quote.client?.country_id,
-          quote.client?.settings.currency_id
-        ),
+        quote.is_amount_discount
+          ? formatMoney(
+              value,
+              quote.client?.country_id,
+              quote.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -837,6 +841,7 @@ export function useQuoteColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',

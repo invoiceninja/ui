@@ -94,6 +94,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -597,6 +598,7 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const creditColumns = useAllCreditColumns();
@@ -763,11 +765,13 @@ export function useCreditColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, credit) =>
-        formatMoney(
-          value,
-          credit.client?.country_id,
-          credit.client?.settings.currency_id
-        ),
+        credit.is_amount_discount
+          ? formatMoney(
+              value,
+              credit.client?.country_id,
+              credit.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -785,6 +789,7 @@ export function useCreditColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',

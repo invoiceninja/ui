@@ -69,6 +69,7 @@ export const settingsRoutes = (
           path="security_settings"
           element={<Settings.SecuritySettings />}
         />
+        <Route path="referral_program" element={<Settings.ReferralProgram />} />
         {!isDemo() && (
           <Route path="danger_zone" element={<Settings.DangerZone />} />
         )}
