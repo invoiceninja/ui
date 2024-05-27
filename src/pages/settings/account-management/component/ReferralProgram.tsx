@@ -22,7 +22,7 @@ export function ReferralProgram() {
     <Card title={t('referral_program')}>
       <Element leftSide={t('referral_code')}>
         <CopyToClipboard
-          text={`https://app.invoicing.co/#/register?rc=${user?.id}`}
+          text={`https://app.invoicing.co/#/register?rc=${user?.referral_code}`}
         />
       </Element>
     </Card>

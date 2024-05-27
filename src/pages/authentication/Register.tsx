@@ -32,7 +32,7 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useColorScheme } from '$app/common/colors';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { TurnstileWidget } from './components/TurnstileWidget';
 import { useTurnstile } from 'react-turnstile';
 
@@ -40,8 +40,6 @@ export function Register() {
   useTitle('register');
 
   const [t] = useTranslation();
-
-  const { rc } = useParams();
 
   const turnstile = useTurnstile();
 
@@ -96,11 +94,13 @@ export function Register() {
         if (searchParams.has(key)) {
           endpoint.searchParams.append(key, searchParams.get(key) as string);
         }
-
-        if (rc) {
-          endpoint.searchParams.append('rc', rc);
-        }
       });
+
+      const rc = searchParams.get('rc');
+
+      if (rc) {
+        endpoint.searchParams.append('rc', rc as string);
+      }
 
       request('POST', endpoint.href, {
         ...values,
@@ -203,7 +203,7 @@ export function Register() {
                 disabled={isFormBusy}
                 className="mt-4"
                 variant="block"
-                onClick={() => setIsTrunstileVisible(true)}
+                onClick={() => form.submitForm()}
               >
                 {t('register')}
               </Button>
