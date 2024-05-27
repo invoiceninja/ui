@@ -96,6 +96,12 @@ export function Register() {
         }
       });
 
+      const rc = searchParams.get('rc');
+
+      if (rc) {
+        endpoint.searchParams.append('rc', rc as string);
+      }
+
       request('POST', endpoint.href, {
         ...values,
         ['cf-turnstile']: turnstileToken,
