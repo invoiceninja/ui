@@ -42,6 +42,7 @@ export const $1 = {
   $10: 0.87, // High emphasis text
   $11: 0.6, // Medium emphasis text
   $12: 0.38, // Disabled text
+  $13: '#E5E7EB', // Navbar right icon hover
 };
 
 export const $2 = {
@@ -59,6 +60,7 @@ export const $2 = {
   $10: 1, // High emphasis text
   $11: 0.8, // Secondary text opacity
   $12: 0.5, // Disabled text opacity
+  $13: '#E5E7EB', // Navbar right icon hover
 };
 
 export const colorSchemeAtom = atomWithStorage('colorScheme', $2);

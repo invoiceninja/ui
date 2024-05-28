@@ -17,7 +17,7 @@ import { X } from 'react-feather';
 interface Props {
   visible: boolean;
   onClose: (status: boolean) => any;
-  title: string;
+  title?: string | null;
   text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;

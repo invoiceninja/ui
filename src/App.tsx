@@ -34,6 +34,8 @@ import { colorSchemeAtom } from './common/colors';
 import { useCurrentUser } from './common/hooks/useCurrentUser';
 import { useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
+import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
 
 export function App() {
   const [t] = useTranslation();
@@ -48,6 +50,7 @@ export function App() {
   const user = useCurrentUser();
   const location = useLocation();
   const company = useCurrentCompany();
+  useAddPreventNavigationEvents();
 
   const refetch = useRefetch();
   const hasPermission = useHasPermission();
@@ -199,6 +202,8 @@ export function App() {
         isModalOpen={isCompanyEditModalOpened && isOwner}
         setIsModalOpen={setIsCompanyEditModalOpened}
       />
+
+      <PreventNavigationModal />
     </>
   );
 }

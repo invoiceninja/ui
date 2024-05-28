@@ -3,7 +3,6 @@ import { Popover, Transition } from '@headlessui/react';
 import { BiPlus } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
-import { useNavigate } from 'react-router-dom';
 import { useQuickCreateSections } from '$app/common/hooks/entities/useQuickCreateSections';
 import { useQuickCreateActions } from '$app/common/hooks/entities/useQuickCreateActions';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -12,6 +11,7 @@ import { MdArrowDropDown } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 const Div = styled.div`
   &:hover {
@@ -22,7 +22,7 @@ const Div = styled.div`
 export function QuickCreatePopover() {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  const preventNavigation = usePreventNavigation();
 
   const colors = useColorScheme();
   const accentColor = useAccentColor();
@@ -40,6 +40,7 @@ export function QuickCreatePopover() {
       {() => (
         <>
           <Popover.Button
+            data-cy="quickPopoverButton"
             style={{ backgroundColor: colors.$1, color: colors.$3 }}
             className={classNames(
               'group inline-flex items-center rounded text-base font-medium  focus:outline-none focus:ring-1 focus:ring-gray-200 focus:ring-offset-2'
@@ -117,13 +118,12 @@ export function QuickCreatePopover() {
                                     theme={{ hoverColor: colors.$2 }}
                                     key={action.key}
                                     className="flex items-center pl-3 space-x-1 py-1 cursor-pointer rounded"
-                                    onClick={() => {
-                                      !action.externalLink &&
-                                        navigate(action.url);
-
-                                      action.externalLink &&
-                                        window.open(action.url, '_blank');
-                                    }}
+                                    onClick={() =>
+                                      preventNavigation({
+                                        url: action.url,
+                                        externalLink: action.externalLink,
+                                      })
+                                    }
                                   >
                                     <BiPlus
                                       className="text-base"

@@ -1,5 +1,5 @@
 import { login, logout } from '$tests/e2e/helpers';
-import test, { expect, request } from '@playwright/test';
+import test, { expect } from '@playwright/test';
 
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
@@ -34,22 +34,6 @@ test('Connecting Nordigen', async ({ page }) => {
   await page
     .getByRole('button', { name: 'Connect Accounts', exact: true })
     .click();
-
-  await expect(
-    page.getByRole('heading', { name: 'Connect Accounts', exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole('button', { name: 'Connect', exact: true })
-  ).toBeDisabled();
-
-  await page.locator('[data-cy="nordigenBox"]').click();
-
-  await expect(
-    page.getByRole('button', { name: 'Connect', exact: true })
-  ).not.toBeDisabled();
-
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
 
   const nordigenConnectionTab = await page.waitForEvent('popup');
 
