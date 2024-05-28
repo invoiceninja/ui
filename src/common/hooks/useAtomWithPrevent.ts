@@ -57,7 +57,7 @@ export function useAtomWithPrevent(
 
       const currentTimeout = setTimeout(
         () => setCurrentInitialValue(cloneDeep(entity)),
-        100
+        350
       );
 
       initialValueTimeOut.current = currentTimeout;
