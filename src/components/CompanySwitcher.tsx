@@ -152,7 +152,10 @@ export function CompanySwitcher() {
               {state?.api?.length >= 1 &&
                 state?.api?.map((record: any, index: number) => (
                   <Menu.Item key={index}>
-                    <DropdownElement onClick={() => switchCompany(index)}>
+                    <DropdownElement
+                      actionKey="switchCompany"
+                      onClick={() => switchCompany(index)}
+                    >
                       <div className="flex items-center space-x-3">
                         <span>
                           {record.company.settings.name ||

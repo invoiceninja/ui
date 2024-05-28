@@ -14,12 +14,16 @@ import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
+import { useAtomValue } from 'jotai';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 
 interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
   icon?: ReactElement;
   cypressRef?: string;
+  actionKey?: 'switchCompany';
 }
 
 const Button = styled.button`
@@ -39,6 +43,12 @@ const StyledLink = styled(Link)`
 export function DropdownElement(props: Props) {
   const colors = useColorScheme();
 
+  const { prevent: preventLeavingPage } = useAtomValue(preventLeavingPageAtom);
+
+  const preventNavigation = usePreventNavigation();
+
+  const { actionKey } = props;
+
   if (props.to) {
     return (
       <StyledLink
@@ -53,6 +63,13 @@ export function DropdownElement(props: Props) {
           },
           `w-full text-left z-50 block px-4 py-2 text-sm text-gray-700 rounded-lg ${props.className}`
         )}
+        onClick={(event) => {
+          if (preventLeavingPage) {
+            event.preventDefault();
+
+            preventNavigation({ url: props.to });
+          }
+        }}
       >
         {props.icon}
         <div
@@ -73,10 +90,15 @@ export function DropdownElement(props: Props) {
         hoverColor: colors.$7,
       }}
       type="button"
-      onClick={(event) => {
-        props.onClick?.(event);
-        props.setVisible?.(false);
-      }}
+      onClick={(event) =>
+        preventNavigation({
+          fn: () => {
+            props.onClick?.(event);
+            props.setVisible?.(false);
+          },
+          actionKey,
+        })
+      }
       ref={props.innerRef}
       className={classNames(
         {
