@@ -31,6 +31,7 @@ import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useC
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
+import { url } from '$app/common/helpers';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -98,18 +99,22 @@ export function Details(props: Props) {
                 <span>{t('vendor')}</span>
 
                 {recurringExpense.vendor_id && (
-                  <Icon
-                    className="cursor-pointer"
-                    element={MdLaunch}
-                    size={18}
-                    onClick={() =>
-                      window.open(
-                        route('/vendors/:id', {
-                          id: recurringExpense.vendor_id,
-                        })
-                      )
-                    }
-                  />
+                  <div>
+                    <Icon
+                      className="cursor-pointer"
+                      element={MdLaunch}
+                      size={18}
+                      onClick={() =>
+                        window.open(
+                          url(
+                            route('/vendors/:id', {
+                              id: recurringExpense.vendor_id,
+                            })
+                          )
+                        )
+                      }
+                    />
+                  </div>
                 )}
               </div>
             }
@@ -130,18 +135,22 @@ export function Details(props: Props) {
                 <span>{t('client')}</span>
 
                 {recurringExpense.client_id && (
-                  <Icon
-                    className="cursor-pointer"
-                    element={MdLaunch}
-                    size={18}
-                    onClick={() =>
-                      window.open(
-                        route('/clients/:id', {
-                          id: recurringExpense.client_id,
-                        })
-                      )
-                    }
-                  />
+                  <div>
+                    <Icon
+                      className="cursor-pointer"
+                      element={MdLaunch}
+                      size={18}
+                      onClick={() =>
+                        window.open(
+                          url(
+                            route('/clients/:id', {
+                              id: recurringExpense.client_id,
+                            })
+                          )
+                        )
+                      }
+                    />
+                  </div>
                 )}
               </div>
             }
@@ -164,18 +173,22 @@ export function Details(props: Props) {
                 <span>{t('project')}</span>
 
                 {recurringExpense.project_id && (
-                  <Icon
-                    className="cursor-pointer"
-                    element={MdLaunch}
-                    size={18}
-                    onClick={() =>
-                      window.open(
-                        route('/projects/:id', {
-                          id: recurringExpense.project_id,
-                        })
-                      )
-                    }
-                  />
+                  <div>
+                    <Icon
+                      className="cursor-pointer"
+                      element={MdLaunch}
+                      size={18}
+                      onClick={() =>
+                        window.open(
+                          url(
+                            route('/projects/:id', {
+                              id: recurringExpense.project_id,
+                            })
+                          )
+                        )
+                      }
+                    />
+                  </div>
                 )}
               </div>
             }
