@@ -86,7 +86,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
   const table = tableContainer.getByRole('table');
   const tableBody = table.locator('tbody');
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(1000);
 
   const numberOfTableMoreActionDropdowns = await tableContainer
     .getByRole('button')

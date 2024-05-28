@@ -26,7 +26,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
@@ -55,6 +55,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export interface SaveOption {
   label: string;
@@ -79,25 +80,26 @@ interface Props extends CommonProps {
 }
 
 export function Default(props: Props) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const company = useCurrentCompany();
-
-  const shouldShowUnlockButton =
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
-
   const [t] = useTranslation();
-  const user = useInjectUserChanges();
 
-  const hasPermission = useHasPermission();
   const location = useLocation();
-  const navigate = useNavigate();
-  const companyUser = useCurrentCompanyUser();
+  const hasPermission = useHasPermission();
+
+  const colors = useColorScheme();
+  const preventNavigation = usePreventNavigation();
+
   const enabled = useEnabled();
+  const user = useInjectUserChanges();
+  const company = useCurrentCompany();
+  const companyUser = useCurrentCompanyUser();
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
+  const shouldShowUnlockButton =
+    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const navigation: NavigationItem[] = [
     {
@@ -363,7 +365,6 @@ export function Default(props: Props) {
 
   const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
-  const colors = useColorScheme();
 
   return (
     <div>
@@ -417,13 +418,13 @@ export function Default(props: Props) {
                 <button
                   className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                   onClick={() =>
-                    window.open(
-                      isSelfHosted()
+                    preventNavigation({
+                      url: (isSelfHosted()
                         ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
-                            'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase'
-                        : user?.company_user?.ninja_portal_url,
-                      '_blank'
-                    )
+                          'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase'
+                        : user?.company_user?.ninja_portal_url) as string,
+                      externalLink: true,
+                    })
                   }
                 >
                   <span>
@@ -439,7 +440,10 @@ export function Default(props: Props) {
               )}
 
               {!props.withoutBackButton && (
-                <Button onClick={() => navigate(-1)} type="secondary">
+                <Button
+                  onClick={() => preventNavigation({ url: 'back' })}
+                  type="secondary"
+                >
                   {t('back')}
                 </Button>
               )}
