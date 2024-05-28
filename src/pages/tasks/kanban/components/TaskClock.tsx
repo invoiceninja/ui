@@ -11,7 +11,7 @@
 import { Task } from '$app/common/interfaces/task';
 import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   task: Task;
@@ -23,8 +23,28 @@ export function TaskClock(props: Props) {
 
   const isTaskActive = props.task && isTaskRunning(props.task);
 
-  let mainIntervalLocalValue: ReturnType<typeof setInterval> | undefined =
-    undefined;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  );
+
+  const handleVisibilityChange = () => {
+    const calculation = calculateTime(props.task.time_log, {
+      inSeconds: true,
+      calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
+    });
+
+    if (isTaskActive) {
+      setSeconds(Number(calculation));
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      intervalRef.current = setInterval(() => {
+        setSeconds((current) => current + 1);
+      }, 1000);
+    }
+  };
 
   useEffect(() => {
     const calculation = calculateTime(props.task.time_log, {
@@ -35,15 +55,18 @@ export function TaskClock(props: Props) {
     if (isTaskActive) {
       setSeconds(Number(calculation));
 
-      mainIntervalLocalValue = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setSeconds((current) => current + 1);
       }, 1000);
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
     return () => {
-      if (mainIntervalLocalValue) {
-        clearInterval(mainIntervalLocalValue);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
