@@ -88,7 +88,7 @@ const successMessages = {
 interface Details {
   groupSettingsId?: string;
   column?: string;
-  newValue?: string;
+  newValue?: string | number | boolean;
 }
 
 export function useBulk() {

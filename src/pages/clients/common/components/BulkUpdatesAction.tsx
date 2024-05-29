@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -11,7 +10,6 @@
 
 import { useBulkUpdatesColumns } from '$app/common/hooks/useBulkUpdatesColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Client } from '$app/common/interfaces/client';
 import { useBulk } from '$app/common/queries/clients';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { CountrySelector } from '$app/components/CountrySelector';
@@ -27,7 +25,7 @@ import { MdUpdate } from 'react-icons/md';
 
 interface Props {
   entity: 'client';
-  resources: Client[];
+  resourceIds: string[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
 
@@ -55,7 +53,7 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
 export function BulkUpdatesAction(props: Props) {
   const [t] = useTranslation();
 
-  const { setSelected } = props;
+  const { setSelected, resourceIds } = props;
 
   const bulk = useBulk();
 
@@ -80,6 +78,16 @@ export function BulkUpdatesAction(props: Props) {
     return bulkUpdateFieldsTypes.find(({ key }) => key === column)?.type || '';
   };
 
+  const showColumn = (columnKey: string) => {
+    if (columnKey.startsWith('custom_value')) {
+      return Boolean(
+        company.custom_fields[columnKey.replace('custom_value', props.entity)]
+      );
+    }
+
+    return true;
+  };
+
   const getCustomFieldKey = () => {
     return column.replace('custom_value', props.entity);
   };
@@ -94,7 +102,7 @@ export function BulkUpdatesAction(props: Props) {
       </DropdownElement>
 
       <Modal
-        title={t('update')}
+        title={t('update_records')}
         size="regular"
         visible={isModalOpen}
         onClose={handleOnClose}
@@ -110,11 +118,14 @@ export function BulkUpdatesAction(props: Props) {
             }}
             withBlank
           >
-            {bulkUpdatesColumns?.[props.entity].map((column) => (
-              <option key={column} value={column}>
-                {t(column)}
-              </option>
-            ))}
+            {bulkUpdatesColumns?.[props.entity].map(
+              (currentColumn) =>
+                showColumn(currentColumn) && (
+                  <option key={currentColumn} value={currentColumn}>
+                    {t(currentColumn)}
+                  </option>
+                )
+            )}
           </SelectField>
 
           <div className="flex flex-col">
@@ -185,8 +196,14 @@ export function BulkUpdatesAction(props: Props) {
             <Button
               behavior="button"
               onClick={() => {
+                bulk(resourceIds, 'bulk_update', {
+                  column,
+                  newValue: newColumnValue,
+                }).then(() => handleOnClose());
+
                 setSelected([]);
               }}
+              disabled={!column}
               disableWithoutIcon
             >
               {t('update')}

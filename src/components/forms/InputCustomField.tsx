@@ -31,7 +31,7 @@ export function InputCustomField(props: Props) {
       : [props.value, 'multi_line_text'];
 
     setType(fieldType);
-  }, []);
+  }, [props.field]);
 
   return (
     <>

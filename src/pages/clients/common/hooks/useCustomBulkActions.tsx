@@ -94,10 +94,10 @@ export const useCustomBulkActions = () => {
           setSelected={setSelected}
         />
       ),
-    ({ selectedResources, setSelected }) => (
+    ({ selectedIds, setSelected }) => (
       <BulkUpdatesAction
         entity="client"
-        resources={selectedResources}
+        resourceIds={selectedIds}
         setSelected={setSelected}
       />
     ),
