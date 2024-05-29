@@ -14,13 +14,13 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 import { GenericQueryOptions } from './invoices';
 
 export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
-  const hasPermission = useHasPermission();
+  const { isAdmin } = useAdmin();
 
   return useQuery<TaskStatus>(
     ['/api/v1/task_statuses', 'create'],
@@ -31,7 +31,7 @@ export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
       ),
     {
       staleTime: Infinity,
-      enabled: hasPermission('create_task') ? options?.enabled ?? true : false,
+      enabled: isAdmin ? options?.enabled ?? true : false,
     }
   );
 }
