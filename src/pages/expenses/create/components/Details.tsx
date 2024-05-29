@@ -28,7 +28,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
-import { url } from '$app/common/helpers';
+import { Link } from 'react-router-dom';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -93,22 +93,14 @@ export function Details(props: Props) {
                 <span>{t('vendor')}</span>
 
                 {expense.vendor_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/vendors/:id', {
-                              id: expense.vendor_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/vendors/:id', {
+                      id: expense.vendor_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }
@@ -129,22 +121,14 @@ export function Details(props: Props) {
                 <span>{t('client')}</span>
 
                 {expense.client_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/clients/:id', {
-                              id: expense.client_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/clients/:id', {
+                      id: expense.client_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }
@@ -166,22 +150,14 @@ export function Details(props: Props) {
                 <span>{t('project')}</span>
 
                 {expense.project_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/projects/:id', {
-                              id: expense.project_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/projects/:id', {
+                      id: expense.project_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }
