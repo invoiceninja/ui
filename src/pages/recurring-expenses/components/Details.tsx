@@ -23,7 +23,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -31,7 +31,6 @@ import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useC
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
-import { url } from '$app/common/helpers';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -99,22 +98,14 @@ export function Details(props: Props) {
                 <span>{t('vendor')}</span>
 
                 {recurringExpense.vendor_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/vendors/:id', {
-                              id: recurringExpense.vendor_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/vendors/:id', {
+                      id: recurringExpense.vendor_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }
@@ -135,22 +126,14 @@ export function Details(props: Props) {
                 <span>{t('client')}</span>
 
                 {recurringExpense.client_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/clients/:id', {
-                              id: recurringExpense.client_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/clients/:id', {
+                      id: recurringExpense.client_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }
@@ -173,22 +156,14 @@ export function Details(props: Props) {
                 <span>{t('project')}</span>
 
                 {recurringExpense.project_id && (
-                  <div>
-                    <Icon
-                      className="cursor-pointer"
-                      element={MdLaunch}
-                      size={18}
-                      onClick={() =>
-                        window.open(
-                          url(
-                            route('/projects/:id', {
-                              id: recurringExpense.project_id,
-                            })
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <Link
+                    to={route('/projects/:id', {
+                      id: recurringExpense.project_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
                 )}
               </div>
             }

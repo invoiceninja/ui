@@ -131,15 +131,3 @@ export function checkJsonObject(text: string) {
     return false;
   }
 }
-
-export function url(route: string) {
-  let url = window.location.origin;
-
-  if (import.meta.env.VITE_ROUTER === 'hash') {
-    url += '/#';
-  }
-
-  url += route;
-
-  return url;
-}
