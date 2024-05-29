@@ -21,7 +21,7 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdUpdate } from 'react-icons/md';
+import { MdCached } from 'react-icons/md';
 
 interface Props {
   entity: 'client';
@@ -96,7 +96,7 @@ export function BulkUpdatesAction(props: Props) {
     <>
       <DropdownElement
         onClick={() => setIsModalOpen(true)}
-        icon={<Icon element={MdUpdate} />}
+        icon={<Icon element={MdCached} />}
       >
         {t('update_records')}
       </DropdownElement>
