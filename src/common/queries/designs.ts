@@ -20,6 +20,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
 import { enterprisePlan } from '../guards/guards/enterprise-plan';
 import { proPlan } from '../guards/guards/pro-plan';
+import { useAdmin } from '../hooks/permissions/useHasPermission';
 
 export function useDesignsQuery() {
   const freePlanDesigns = useFreePlanDesigns();
@@ -61,6 +62,8 @@ export function useDesignQuery(params: DesignQueryOptions) {
 }
 
 export function useBlankDesignQuery(options?: GenericQueryOptions) {
+  const { isAdmin } = useAdmin();
+
   return useQuery<Design>(
     route('/api/v1/designs/create'),
     () =>
@@ -70,6 +73,7 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
+      enabled: isAdmin ? options?.enabled ?? true : false,
     }
   );
 }
@@ -80,7 +84,10 @@ export function useTemplateQuery(entity: string) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/designs?template=true&status=active&sort=name|asc&entities=' + entity)
+        endpoint(
+          '/api/v1/designs?template=true&status=active&sort=name|asc&entities=' +
+            entity
+        )
       ).then(
         (response: AxiosResponse<GenericManyResponse<Design>>) =>
           response.data.data
