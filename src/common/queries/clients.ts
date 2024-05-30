@@ -85,23 +85,34 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
 
 const successMessages = {
   assign_group: 'updated_group',
+  bulk_update: 'updated_records',
 };
+
+interface Details {
+  groupSettingsId?: string;
+  column?: string;
+  newValue?: string | number | boolean;
+}
 
 export function useBulk() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (
+  return async (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'assign_group',
-    groupSettingsId?: string
+    action: 'archive' | 'restore' | 'delete' | 'assign_group' | 'bulk_update',
+    details?: Details
   ) => {
+    const { groupSettingsId, column, newValue } = details || {};
+
     toast.processing();
 
     return request('POST', endpoint('/api/v1/clients/bulk'), {
       action,
       ids,
       ...(groupSettingsId && { group_settings_id: groupSettingsId }),
+      ...(column && { column }),
+      ...(action === 'bulk_update' && { new_value: newValue }),
     }).then(() => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
