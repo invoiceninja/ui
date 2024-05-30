@@ -172,7 +172,7 @@ export default function Settings() {
                   onClearButtonClick={() =>
                     setPayload((current) => ({
                       ...current,
-                      entity_id: '',
+                      entity_id: '-1',
                     }))
                   }
                   errorMessage={errors?.errors.entity_id}
