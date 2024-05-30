@@ -98,11 +98,11 @@ export function BulkUpdatesAction(props: Props) {
         onClick={() => setIsModalOpen(true)}
         icon={<Icon element={MdCached} />}
       >
-        {t('update_records')}
+        {t('bulk_update')}
       </DropdownElement>
 
       <Modal
-        title={t('update_records')}
+        title={t('bulk_update')}
         size="regular"
         visible={isModalOpen}
         onClose={handleOnClose}
