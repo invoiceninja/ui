@@ -65,7 +65,7 @@ export function AssignToGroupBulkAction(props: Props) {
             bulk(
               clients.map(({ id }) => id),
               'assign_group',
-              groupSettingsId
+              { groupSettingsId }
             ).then(() => handleOnClose());
 
             setSelected([]);
