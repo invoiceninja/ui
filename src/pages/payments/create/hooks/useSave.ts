@@ -18,38 +18,48 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { generate64CharHash } from '$app/common/hooks/useGenerateHash';
+import { Dispatch, SetStateAction } from 'react';
 
-export function useSave(
-  setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
-) {
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  isFormBusy: boolean;
+}
+export function useSave(params: Params) {
+  const { setErrors, setIsFormBusy, isFormBusy } = params;
+
   const navigate = useNavigate();
 
   return (payment: Payment, sendEmail: boolean) => {
-    setErrors(undefined);
+    if (!isFormBusy) {
+      toast.processing();
 
-    toast.processing();
+      setErrors(undefined);
+      setIsFormBusy(true);
 
-    const idempotencyKey = generate64CharHash();
+      const idempotencyKey = generate64CharHash();
 
-    request(
-      'POST',
-      endpoint('/api/v1/payments?email_receipt=:email', {
-        email: sendEmail,
-      }),
-      { ...payment, idempotency_key: idempotencyKey }
-    )
-      .then((data) => {
-        toast.success('created_payment');
-        navigate(route('/payments/:id/edit', { id: data.data.data.id }));
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
-        }
-      })
-      .finally(() => {
-        $refetch(['payments', 'credits', 'invoices', 'clients']);
-      });
+      request(
+        'POST',
+        endpoint('/api/v1/payments?email_receipt=:email', {
+          email: sendEmail,
+        }),
+        { ...payment, idempotency_key: idempotencyKey }
+      )
+        .then((data) => {
+          toast.success('created_payment');
+          navigate(route('/payments/:id/edit', { id: data.data.data.id }));
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => {
+          setIsFormBusy(false);
+          $refetch(['payments', 'credits', 'invoices', 'clients']);
+        });
+    }
   };
 }

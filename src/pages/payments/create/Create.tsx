@@ -28,7 +28,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -82,6 +82,7 @@ export default function Create() {
 
   const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
   );
@@ -208,17 +209,14 @@ export default function Create() {
     setPayment((current) => current && { ...current, [field]: value });
   };
 
-  const onSubmit = useSave(setErrors);
+  const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSubmit(payment as unknown as Payment, sendEmail);
-      }}
-      disableSaveButton={!payment}
+      onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
+      disableSaveButton={!payment || isFormBusy}
     >
       <Container>
         <Card title={t('enter_payment')}>
