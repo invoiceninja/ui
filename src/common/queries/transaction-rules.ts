@@ -13,8 +13,11 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useAdmin } from '../hooks/permissions/useHasPermission';
 
 export function useBlankTransactionRuleQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery<TransactionRule>(
     ['/api/v1/bank_transaction_rules', 'create'],
     () =>
@@ -22,7 +25,7 @@ export function useBlankTransactionRuleQuery() {
         (response: GenericSingleResourceResponse<TransactionRule>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 
