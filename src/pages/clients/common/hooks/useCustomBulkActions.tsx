@@ -19,6 +19,7 @@ import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { AssignToGroupBulkAction } from '../components/AssignToGroupBulkAction';
+import { BulkUpdatesAction } from '../components/BulkUpdatesAction';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
@@ -93,6 +94,13 @@ export const useCustomBulkActions = () => {
           setSelected={setSelected}
         />
       ),
+    ({ selectedIds, setSelected }) => (
+      <BulkUpdatesAction
+        entity="client"
+        resourceIds={selectedIds}
+        setSelected={setSelected}
+      />
+    ),
   ];
 
   return customBulkActions;
