@@ -61,7 +61,7 @@ export function InputCustomField(props: Props) {
           onChange={props.onValueChange}
           checked={
             typeof props.defaultValue === 'string'
-              ? props.defaultValue === 'true'
+              ? props.defaultValue === 'true' || props.defaultValue === '1'
               : props.defaultValue
           }
         />
