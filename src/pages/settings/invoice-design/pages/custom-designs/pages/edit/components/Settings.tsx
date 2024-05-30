@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '$app/components/cards';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
-import { Checkbox, InputField } from '$app/components/forms';
+import { Checkbox, InputField, SelectField } from '$app/components/forms';
 import { Divider } from '$app/components/cards/Divider';
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -23,7 +23,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { templateEntites } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
-import { PreviewPayload } from '../../../CustomDesign';
+import { EntityType, PreviewPayload } from '../../../CustomDesign';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -136,6 +137,50 @@ export default function Settings() {
             }
           />
         </Element>
+
+        {!payload.design?.is_template && (
+          <>
+            <Element leftSide={t('entity')}>
+              <SelectField
+                value={payload.entity_type || 'invoice'}
+                onValueChange={(value) =>
+                  setPayload((current) => ({
+                    ...current,
+                    entity_type: value as EntityType,
+                    entity_id: '',
+                  }))
+                }
+                errorMessage={errors?.errors.entity_type}
+              >
+                <option value="invoice">{t('invoice')}</option>
+                <option value="quote">{t('quote')}</option>
+                <option value="credit">{t('credit')}</option>
+                <option value="purchase_order">{t('purchase_order')}</option>
+              </SelectField>
+            </Element>
+
+            {payload.entity_type === 'invoice' && (
+              <Element leftSide={t('invoice')}>
+                <InvoiceSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id,
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
+          </>
+        )}
 
         <Divider />
 

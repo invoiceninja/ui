@@ -33,8 +33,10 @@ import { useTitle } from '$app/common/hooks/useTitle';
 export interface PreviewPayload {
   design: Design | null;
   entity_id: string;
-  entity_type: 'invoice';
+  entity_type: EntityType;
 }
+
+export type EntityType = 'invoice' | 'quote' | 'credit' | 'purchase_order';
 
 export const payloadAtom = atom<PreviewPayload>({
   design: null,
