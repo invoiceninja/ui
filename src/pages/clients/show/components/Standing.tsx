@@ -8,14 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { Element } from '$app/components/cards';
-import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdLockOutline } from 'react-icons/md';
 
 interface Props {
   client: Client;
@@ -96,23 +93,6 @@ export function Standing(props: Props) {
                       client.settings.currency_id
                     )}
                   </Element>
-                )}
-
-                {client.private_notes && (
-                  <div className="flex items-center space-x-1">
-                    <div>
-                      <Icon element={MdLockOutline} size={24} />
-                    </div>
-
-                    <div className="whitespace-normal max-h-56 overflow-y-auto">
-                      <article
-                        className="prose prose-sm"
-                        dangerouslySetInnerHTML={{
-                          __html: sanitizeHTML(client.private_notes),
-                        }}
-                      />
-                    </div>
-                  </div>
                 )}
               </div>
             }

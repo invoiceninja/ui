@@ -78,10 +78,6 @@ export function useTabs(params: Params) {
       href: route('/clients/:id/recurring_expenses', { id }),
     },
     {
-      name: t('activity'),
-      href: route('/clients/:id/activities', { id }),
-    },
-    {
       name: t('documents'),
       href: route('/clients/:id/documents', { id }),
       enabled:

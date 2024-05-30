@@ -34,6 +34,9 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client as IClient } from '$app/common/interfaces/client';
+import { ClientPublicNotes } from './components/ClientPublicNotes';
+import { ClientPrivateNotes } from './components/ClientPrivateNotes';
+import Activities from './components/Activities';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -83,6 +86,8 @@ export default function Client() {
     changeTemplateEntityContext,
   } = useChangeTemplate();
 
+  console.log(client);
+
   return (
     <Default
       title={documentTitle}
@@ -106,6 +111,9 @@ export default function Client() {
         <>
           <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
             <Details client={client} />
+            <Activities />
+            <ClientPublicNotes client={client} />
+            <ClientPrivateNotes client={client} />
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
