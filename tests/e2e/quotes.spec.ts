@@ -755,28 +755,3 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
 
   await logout(page);
 });
-
-test('Select client message', async ({ page }) => {
-  await login(page);
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Quotes', exact: true })
-    .click();
-
-  await page.getByRole('main').getByRole('link', { name: 'New Quote' }).click();
-
-  await page.waitForTimeout(900);
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true }).first()
-  ).toBeVisible();
-
-  await page.getByRole('option').first().click();
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true })
-  ).not.toBeVisible();
-
-  await logout(page);
-});

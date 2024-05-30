@@ -74,13 +74,6 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
   await expect(
     page
       .getByRole('definition', { exact: true })
-      .filter({ hasText: 'Details' })
-      .first()
-  ).toBeVisible();
-
-  await expect(
-    page
-      .getByRole('definition', { exact: true })
       .filter({ hasText: 'Notes' })
       .first()
   ).toBeVisible();

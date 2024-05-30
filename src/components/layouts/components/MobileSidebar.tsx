@@ -98,7 +98,7 @@ export function MobileSidebar(props: Props) {
             <div className="flex flex-col flex-1 h-0 overflow-y-auto mt-4">
               <nav className="flex-1 space-y-1">
                 {props.navigation.map((item, index) => (
-                  <SidebarItem key={index} item={item} colors={colors} />
+                  <SidebarItem key={index} item={item} />
                 ))}
               </nav>
 

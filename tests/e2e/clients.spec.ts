@@ -83,6 +83,8 @@ const createClient = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Client' })
     .click();
 
+  await page.waitForTimeout(200);
+
   await page.locator('#name').fill(clientName || 'Company Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
