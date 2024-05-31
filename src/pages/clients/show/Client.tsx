@@ -85,8 +85,6 @@ export default function Client() {
     changeTemplateEntityContext,
   } = useChangeTemplate();
 
-  console.log(client);
-
   return (
     <Default
       title={documentTitle}
@@ -108,7 +106,7 @@ export default function Client() {
 
       {client && (
         <>
-          <div className="grid grid-cols-12 gap-y-4 lg:space-y-0 md:gap-4">
+          <div className="grid grid-cols-12 lg:space-y-0 gap-4">
             <Details client={client} />
             <Address client={client} />
             <Contacts client={client} />
