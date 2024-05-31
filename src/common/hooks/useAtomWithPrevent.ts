@@ -47,7 +47,7 @@ export function useAtomWithPrevent(
 
   useEffect(() => {
     if (entity && currentInitialValue) {
-      setCurrentInitialValue(cloneDeep(entity));
+      setCurrentInitialValue(undefined);
     }
   }, [entity?.updated_at]);
 
@@ -62,7 +62,7 @@ export function useAtomWithPrevent(
 
       initialValueTimeOut.current = currentTimeout;
     }
-  }, [entity]);
+  }, [entity, currentInitialValue]);
 
   return [entity, setEntity];
 }
