@@ -49,7 +49,6 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -75,7 +74,7 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
-  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client | undefined>();
