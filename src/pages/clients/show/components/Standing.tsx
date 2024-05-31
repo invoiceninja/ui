@@ -28,7 +28,7 @@ export function Standing(props: Props) {
   return (
     <>
       {client && (
-        <div className="col-span-12 lg:col-span-3">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard
             title={t('standing')}
             value={

@@ -36,7 +36,6 @@ import {
 import { Client as IClient } from '$app/common/interfaces/client';
 import { ClientPublicNotes } from './components/ClientPublicNotes';
 import { ClientPrivateNotes } from './components/ClientPrivateNotes';
-import Activities from './components/Activities';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -109,17 +108,15 @@ export default function Client() {
 
       {client && (
         <>
-          <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
+          <div className="grid grid-cols-12 gap-y-4 lg:space-y-0 md:gap-4">
             <Details client={client} />
-            <Activities />
-            <ClientPublicNotes client={client} />
-            <ClientPrivateNotes client={client} />
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}
-
             <EmailHistory />
+            <ClientPublicNotes client={client} />
+            <ClientPrivateNotes client={client} />
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />
