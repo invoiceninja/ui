@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { Banner } from '../Banner';
 import { Link } from 'react-router-dom';
 import { buttonStyles } from './VerifyEmail';
-import { isHosted } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
@@ -20,10 +19,6 @@ export function ActivateCompany() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const user = useCurrentUser();
-
-  if (!isHosted()) {
-    return null;
-  }
 
   if (!company || !user?.email_verified_at) {
     return null;

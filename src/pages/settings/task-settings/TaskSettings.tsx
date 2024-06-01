@@ -341,11 +341,13 @@ export function TaskSettings() {
           leftSide={
             <PropertyCheckbox
               propertyKey="task_round_up"
-              labelElement={<SettingsLabel label={t('task_round_up')} />}
+              labelElement={<SettingsLabel label={t('round_tasks')} helpLabel={t('round_tasks_help')}/>}
               defaultValue={true}
             />
           }
+          
         >
+          <div className="flex items-center space-x-7">
           <Toggle
             checked={Boolean(companyChanges?.settings?.task_round_up ?? true)}
             onChange={(value: boolean) =>
@@ -353,9 +355,16 @@ export function TaskSettings() {
             }
             disabled={disableSettingsField('task_round_up')}
           />
+            {companyChanges?.settings.task_round_up ? (
+              <span>{t('round_up')}</span>
+            ) : (
+              <span>{t('round_down')}</span>
+            )}
+          </div>
         </Element>
 
         <Element
+          leftSideHelp={t('task_round_to_nearest_help')}
           leftSide={
             <PropertyCheckbox
               propertyKey="task_round_to_nearest"
@@ -383,17 +392,18 @@ export function TaskSettings() {
             }
             disabled={disableSettingsField('task_round_to_nearest')}
           >
-            <option value="1">{t('one_second')}</option>
-            <option value="60">{t('one_minute')}</option>
+            <option value="1">{t('1_second')} ({t('disabled')})</option>
+            <option value="60">{t('1_minute')}</option>
             <option value="300">{trans('count_minutes', { count: 5 })}</option>
             <option value="900">{trans('count_minutes', { count: 15 })}</option>
             <option value="1800">
               {trans('count_minutes', { count: 30 })}
             </option>
-            <option value="3600">{t('one_hour')}</option>
-            <option value="86400">{t('one_day')}</option>
+            <option value="3600">{t('1_hour')}</option>
+            <option value="86400">{t('1_day')}</option>
             <option value="-1">{t('custom')}</option>
           </SelectField>
+          
         </Element>
 
         {isTaskRoundToNearestCustom() && (
