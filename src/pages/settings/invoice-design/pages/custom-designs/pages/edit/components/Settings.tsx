@@ -169,7 +169,7 @@ export default function Settings() {
                   onChange={(value) =>
                     setPayload((current) => ({
                       ...current,
-                      entity_id: value.id,
+                      entity_id: value.id || '-1',
                     }))
                   }
                   onClearButtonClick={() =>
@@ -190,7 +190,7 @@ export default function Settings() {
                   onChange={(value) =>
                     setPayload((current) => ({
                       ...current,
-                      entity_id: value.id,
+                      entity_id: value.id || '-1',
                     }))
                   }
                   onClearButtonClick={() =>
@@ -211,7 +211,7 @@ export default function Settings() {
                   onChange={(value) =>
                     setPayload((current) => ({
                       ...current,
-                      entity_id: value.id,
+                      entity_id: value.id || '-1',
                     }))
                   }
                   onClearButtonClick={() =>
@@ -232,7 +232,7 @@ export default function Settings() {
                   onChange={(value) =>
                     setPayload((current) => ({
                       ...current,
-                      entity_id: value.id,
+                      entity_id: value.id || '-1',
                     }))
                   }
                   onClearButtonClick={() =>
