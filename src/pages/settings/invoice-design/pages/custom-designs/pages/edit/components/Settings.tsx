@@ -25,6 +25,9 @@ import { templateEntites } from '../../create/Create';
 import { useOutletContext } from 'react-router-dom';
 import { EntityType, PreviewPayload } from '../../../CustomDesign';
 import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
+import { QuoteSelector } from '$app/components/quotes/QuoteSelector';
+import { CreditSelector } from '$app/components/credit/CreditSelector';
+import { PurchaseOrderSelector } from '$app/components/purchase-order/PurchaseOrderSelector';
 
 export interface Context {
   errors: ValidationBag | undefined;
@@ -162,6 +165,69 @@ export default function Settings() {
             {payload.entity_type === 'invoice' && (
               <Element leftSide={t('invoice')}>
                 <InvoiceSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id,
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
+
+            {payload.entity_type === 'quote' && (
+              <Element leftSide={t('quote')}>
+                <QuoteSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id,
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
+
+            {payload.entity_type === 'credit' && (
+              <Element leftSide={t('credit')}>
+                <CreditSelector
+                  value={payload.entity_id}
+                  onChange={(value) =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: value.id,
+                    }))
+                  }
+                  onClearButtonClick={() =>
+                    setPayload((current) => ({
+                      ...current,
+                      entity_id: '-1',
+                    }))
+                  }
+                  errorMessage={errors?.errors.entity_id}
+                />
+              </Element>
+            )}
+
+            {payload.entity_type === 'purchase_order' && (
+              <Element leftSide={t('purchase_order')}>
+                <PurchaseOrderSelector
                   value={payload.entity_id}
                   onChange={(value) =>
                     setPayload((current) => ({

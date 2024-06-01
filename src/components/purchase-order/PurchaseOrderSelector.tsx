@@ -9,41 +9,44 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
-interface Props extends GenericSelectorProps<Invoice> {
+interface Props extends GenericSelectorProps<PurchaseOrder> {
   clearButton?: boolean;
   onClearButtonClick?: () => void;
 }
-export function InvoiceSelector(props: Props) {
+export function PurchaseOrderSelector(props: Props) {
   const formatMoney = useFormatMoney();
 
-  const formatLabel = (invoice: Invoice) => {
-    return `#${invoice.number} (${formatMoney(
-      invoice.amount,
-      invoice?.client?.country_id,
-      invoice?.client?.settings.currency_id
+  const formatLabel = (purchaseOrder: PurchaseOrder) => {
+    return `#${purchaseOrder.number} (${formatMoney(
+      purchaseOrder.amount,
+      purchaseOrder?.vendor?.country_id,
+      purchaseOrder?.vendor?.currency_id
     )})`;
   };
 
   return (
-    <ComboboxAsync<Invoice>
+    <ComboboxAsync<PurchaseOrder>
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint('/api/v1/invoices?include=client&status=active')}
-      onChange={(invoice: Entry<Invoice>) =>
-        invoice.resource && props.onChange(invoice.resource)
+      endpoint={endpoint(
+        '/api/v1/purchase_orders?include=vendor&status=active'
+      )}
+      onChange={(purchaseOrder: Entry<PurchaseOrder>) =>
+        purchaseOrder.resource && props.onChange(purchaseOrder.resource)
       }
       entryOptions={{
         id: 'id',
         value: 'id',
         label: 'number',
-        dropdownLabelFn: (invoice) => formatLabel(invoice),
-        inputLabelFn: (invoice) => (invoice ? formatLabel(invoice) : ''),
+        dropdownLabelFn: (purchaseOrder) => formatLabel(purchaseOrder),
+        inputLabelFn: (purchaseOrder) =>
+          purchaseOrder ? formatLabel(purchaseOrder) : '',
       }}
       onDismiss={props.onClearButtonClick}
       errorMessage={props.errorMessage}

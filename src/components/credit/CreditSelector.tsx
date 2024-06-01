@@ -9,41 +9,41 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { Credit } from '$app/common/interfaces/credit';
 
-interface Props extends GenericSelectorProps<Invoice> {
+interface Props extends GenericSelectorProps<Credit> {
   clearButton?: boolean;
   onClearButtonClick?: () => void;
 }
-export function InvoiceSelector(props: Props) {
+export function CreditSelector(props: Props) {
   const formatMoney = useFormatMoney();
 
-  const formatLabel = (invoice: Invoice) => {
-    return `#${invoice.number} (${formatMoney(
-      invoice.amount,
-      invoice?.client?.country_id,
-      invoice?.client?.settings.currency_id
+  const formatLabel = (credit: Credit) => {
+    return `#${credit.number} (${formatMoney(
+      credit.amount,
+      credit?.client?.country_id,
+      credit?.client?.settings.currency_id
     )})`;
   };
 
   return (
-    <ComboboxAsync<Invoice>
+    <ComboboxAsync<Credit>
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint('/api/v1/invoices?include=client&status=active')}
-      onChange={(invoice: Entry<Invoice>) =>
-        invoice.resource && props.onChange(invoice.resource)
+      endpoint={endpoint('/api/v1/credits?include=client&status=active')}
+      onChange={(credit: Entry<Credit>) =>
+        credit.resource && props.onChange(credit.resource)
       }
       entryOptions={{
         id: 'id',
         value: 'id',
         label: 'number',
-        dropdownLabelFn: (invoice) => formatLabel(invoice),
-        inputLabelFn: (invoice) => (invoice ? formatLabel(invoice) : ''),
+        dropdownLabelFn: (credit) => formatLabel(credit),
+        inputLabelFn: (credit) => (credit ? formatLabel(credit) : ''),
       }}
       onDismiss={props.onClearButtonClick}
       errorMessage={props.errorMessage}
