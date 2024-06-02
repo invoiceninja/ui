@@ -150,7 +150,7 @@ export default function Settings() {
                   setPayload((current) => ({
                     ...current,
                     entity_type: value as EntityType,
-                    entity_id: '',
+                    entity_id: '-1',
                   }))
                 }
                 errorMessage={errors?.errors.entity_type}
