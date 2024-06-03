@@ -62,7 +62,7 @@ export const useBankAccountColumns = () => {
           {bankAccount.integration_type === IntegrationType.Nordigen &&
             bankAccount.disabled_upstream && (
               <Tooltip
-                message={t('reconnect_account') as string}
+                message={t('reconnect') as string}
                 width="auto"
                 placement="top"
               >
