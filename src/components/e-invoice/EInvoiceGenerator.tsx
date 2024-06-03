@@ -18,6 +18,7 @@ import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
 import { set } from 'lodash';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export type Country = 'italy';
 
@@ -77,6 +78,7 @@ interface ElementType {
   help: string;
   min_occurs: number;
   max_occurs: number;
+  visibility: 0 | 1 | 2 | 4 | 6 | 7;
 }
 
 interface Component {
@@ -110,6 +112,9 @@ export function EInvoiceGenerator(props: Props) {
   const [t] = useTranslation();
 
   const { country } = props;
+
+  const { isCompanySettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   const [rules, setRules] = useState<Rule[]>([]);
   const [errors, setErrors] = useState<ValidationBag>();
@@ -169,7 +174,26 @@ export function EInvoiceGenerator(props: Props) {
     );
   };
 
-  const showField = (key: string) => {
+  const showField = (key: string, visibility: number) => {
+    if (!visibility) {
+      return false;
+    }
+
+    if (visibility === 1 && !isCompanySettingsActive) {
+      return false;
+    }
+
+    if (visibility === 2 && !isClientSettingsActive) {
+      return false;
+    }
+
+    if (
+      visibility === 3 &&
+      (!isClientSettingsActive || !isCompanySettingsActive)
+    ) {
+      return false;
+    }
+
     const fieldParentsKey = `${key.split('|')[0]}Type|${
       key.split('|')[1]
     }Type|${key.split('|')[2]}|${key.split('|')[3]}Type`;
@@ -246,7 +270,7 @@ export function EInvoiceGenerator(props: Props) {
       valueType: isNumberTypeField ? 'number' : 'string',
     });
 
-    if (!showField(fieldKey)) {
+    if (!showField(fieldKey, element.visibility)) {
       return null;
     }
 
@@ -511,8 +535,16 @@ export function EInvoiceGenerator(props: Props) {
     let updatedErrors: ValidationBag = { errors: {}, message: '' };
 
     Object.entries(payload).forEach(([key, value]) => {
-      if (showField(key)) {
-        const fieldKey = key.split('|')[4];
+      const fieldKey = key.split('|')[4];
+      let field: ElementType | undefined;
+
+      Object.values(components).forEach((component) => {
+        field = Object.values(component.elements).find(
+          ({ name }) => name === fieldKey
+        );
+      });
+
+      if (showField(key, field?.visibility || 0)) {
         let fieldValidation: ElementType | undefined;
 
         Object.values(components).forEach((component) => {
