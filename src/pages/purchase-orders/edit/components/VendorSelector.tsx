@@ -8,13 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox } from '$app/components/forms';
+import { Checkbox, Link } from '$app/components/forms';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorSelector as Selector } from '$app/components/vendors/VendorSelector';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface Props {
   resource?: PurchaseOrder;
@@ -30,6 +32,8 @@ export function VendorSelector(props: Props) {
   const { t } = useTranslation();
 
   const { resource, initiallyVisible } = props;
+
+  const hasPermission = useHasPermission();
 
   const vendorResolver = useVendorResolver();
 
@@ -58,16 +62,38 @@ export function VendorSelector(props: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <Selector
-          inputLabel={t('vendor')}
-          onChange={(vendor) => props.onChange(vendor.id)}
-          value={vendorId}
-          readonly={props.readonly}
-          onClearButtonClick={props.onClearButtonClick}
-          initiallyVisible={initiallyVisible}
-          errorMessage={props.errorMessage}
-        />
+      <div className="flex flex-col justify-between space-y-2">
+        {props.readonly ? (
+          <p className="text-sm">{vendor?.name}</p>
+        ) : (
+          <Selector
+            inputLabel={t('vendor')}
+            onChange={(vendor) => props.onChange(vendor.id)}
+            value={vendorId}
+            readonly={props.readonly}
+            onClearButtonClick={props.onClearButtonClick}
+            initiallyVisible={initiallyVisible}
+            errorMessage={props.errorMessage}
+          />
+        )}
+
+        {vendor && (
+          <div className="space-x-2">
+            {hasPermission('edit_vendor') && (
+              <Link to={route('/vendors/:id/edit', { id: vendor.id })}>
+                {t('edit_vendor')}
+              </Link>
+            )}
+
+            {hasPermission('edit_vendor') && <span className="text-sm">/</span>}
+
+            {(hasPermission('view_vendor') || hasPermission('edit_vendor')) && (
+              <Link to={route('/vendors/:id', { id: vendor.id })}>
+                {t('view_vendor')}
+              </Link>
+            )}
+          </div>
+        )}
       </div>
 
       {vendorId &&

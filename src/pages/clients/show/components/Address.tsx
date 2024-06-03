@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
@@ -28,7 +27,7 @@ export function Address(props: Props) {
   return (
     <>
       {client && (
-        <div className="col-span-12 lg:col-span-3">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard
             title={t('address')}
             value={
@@ -46,15 +45,6 @@ export function Address(props: Props) {
                 </p>
 
                 <p>{resolveCountry(client.country_id)?.name}</p>
-
-                <div className="whitespace-normal max-h-56 overflow-y-auto">
-                  <article
-                    className="prose prose-sm"
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHTML(client.public_notes),
-                    }}
-                  />
-                </div>
               </>
             }
             className="h-full"

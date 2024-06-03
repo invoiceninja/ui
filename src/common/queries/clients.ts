@@ -69,7 +69,10 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/clients/:id?include=group_settings', { id })
+        endpoint(
+          '/api/v1/clients/:id?include=group_settings,activities.history',
+          { id }
+        )
       ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),

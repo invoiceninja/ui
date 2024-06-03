@@ -65,7 +65,13 @@ export const useGenerateActivityElement = () => {
           {activity.client?.label}
         </Link>
       ),
-
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', { id: activity?.invoice?.hashed_id })}
+        >
+          {activity?.invoice?.label}
+        </Link>
+      ),
       user: activity.user?.label ?? t('system'),
       recurring_invoice: (
         <Link
