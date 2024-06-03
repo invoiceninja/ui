@@ -125,7 +125,7 @@ export function Form(props: Props) {
             onValueChange={(value) =>
               handleContactChange('first_name', value, 0)
             }
-            errorMessage={errors?.errors.name}
+            errorMessage={errors?.errors['contacts.0.first_name']}
           />
 
           <InputField
@@ -134,7 +134,7 @@ export function Form(props: Props) {
             onValueChange={(value) =>
               handleContactChange('last_name', value, 0)
             }
-            errorMessage={errors?.errors.name}
+            errorMessage={errors?.errors['contacts.0.last_name']}
           />
 
           <InputField
