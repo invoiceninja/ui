@@ -175,6 +175,22 @@ export function EInvoiceGenerator(props: Props) {
   };
 
   const showField = (key: string, visibility: number) => {
+    // 1, 2, 4; all levels active
+
+    // 1;  company level active //done
+
+    // 2;  client level only //done
+
+    // 4;  entity level only //done
+
+    // 1, 2;  company and client levels //done
+
+    // 1, 4;  company and entity levels //done
+
+    // 2, 4;  client and entity levels //done
+
+    const isEntityLevelActive = false;
+
     if (!visibility) {
       return false;
     }
@@ -187,10 +203,23 @@ export function EInvoiceGenerator(props: Props) {
       return false;
     }
 
+    if (visibility === 4 && !isEntityLevelActive) {
+      return false;
+    }
+
     if (
       visibility === 3 &&
-      (!isClientSettingsActive || !isCompanySettingsActive)
+      !isClientSettingsActive &&
+      !isCompanySettingsActive
     ) {
+      return false;
+    }
+
+    if (visibility === 5 && !isEntityLevelActive && !isCompanySettingsActive) {
+      return false;
+    }
+
+    if (visibility === 6 && !isEntityLevelActive && !isClientSettingsActive) {
       return false;
     }
 
