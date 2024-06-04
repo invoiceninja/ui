@@ -35,6 +35,7 @@ export default {
   [PaymentType.GOCARDLESS]: 'payment_type_GoCardless',
   [PaymentType.HOSTED_PAGE]: 'payment_type_Hosted Page',
   [PaymentType.IDEAL]: 'ideal',
+  [PaymentType.IZETTLE]: 'payment_type_iZettle',
   [PaymentType.INSTANT_BANK_PAY]: 'instant_bank_pay',
   [PaymentType.INTERAC]: 'payment_type_Interac E-Transfer',
   [PaymentType.JCB]: 'payment_type_JCB',
