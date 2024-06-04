@@ -145,15 +145,15 @@ export default function Settings() {
           <>
             <Element leftSide={t('entity')}>
               <SelectField
-                value={payload.entity_type || 'invoice'}
+                value={payload.entity || 'invoice'}
                 onValueChange={(value) =>
                   setPayload((current) => ({
                     ...current,
-                    entity_type: value as EntityType,
+                    entity: value as EntityType,
                     entity_id: '-1',
                   }))
                 }
-                errorMessage={errors?.errors.entity_type}
+                errorMessage={errors?.errors.entity}
               >
                 <option value="invoice">{t('invoice')}</option>
                 <option value="quote">{t('quote')}</option>
@@ -162,7 +162,7 @@ export default function Settings() {
               </SelectField>
             </Element>
 
-            {payload.entity_type === 'invoice' && (
+            {payload.entity === 'invoice' && (
               <Element leftSide={t('invoice')}>
                 <InvoiceSelector
                   value={payload.entity_id}
@@ -183,7 +183,7 @@ export default function Settings() {
               </Element>
             )}
 
-            {payload.entity_type === 'quote' && (
+            {payload.entity === 'quote' && (
               <Element leftSide={t('quote')}>
                 <QuoteSelector
                   value={payload.entity_id}
@@ -204,7 +204,7 @@ export default function Settings() {
               </Element>
             )}
 
-            {payload.entity_type === 'credit' && (
+            {payload.entity === 'credit' && (
               <Element leftSide={t('credit')}>
                 <CreditSelector
                   value={payload.entity_id}
@@ -225,7 +225,7 @@ export default function Settings() {
               </Element>
             )}
 
-            {payload.entity_type === 'purchase_order' && (
+            {payload.entity === 'purchase_order' && (
               <Element leftSide={t('purchase_order')}>
                 <PurchaseOrderSelector
                   value={payload.entity_id}

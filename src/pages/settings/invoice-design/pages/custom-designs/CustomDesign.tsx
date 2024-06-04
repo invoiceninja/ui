@@ -33,7 +33,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 export interface PreviewPayload {
   design: Design | null;
   entity_id: string;
-  entity_type: EntityType;
+  entity: EntityType;
 }
 
 export type EntityType = 'invoice' | 'quote' | 'credit' | 'purchase_order';
@@ -41,7 +41,7 @@ export type EntityType = 'invoice' | 'quote' | 'credit' | 'purchase_order';
 export const payloadAtom = atom<PreviewPayload>({
   design: null,
   entity_id: '-1',
-  entity_type: 'invoice',
+  entity: 'invoice',
 });
 
 export default function CustomDesign() {
@@ -58,7 +58,7 @@ export default function CustomDesign() {
   const [payload, setPayload] = useState<PreviewPayload>({
     design: null,
     entity_id: '-1',
-    entity_type: 'invoice',
+    entity: 'invoice',
   });
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -108,7 +108,7 @@ export default function CustomDesign() {
     }
 
     return () =>
-      setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
+      setPayload({ design: null, entity_id: '-1', entity: 'invoice' });
   }, [data]);
 
   return (
