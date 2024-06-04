@@ -1930,7 +1930,8 @@
           "min_length": 1,
           "pattern": "/[\\x{0020}-\\x{007E}\\x{00A0}-\\x{00FF}]{1,80}/u",
           "min_occurs": 1,
-          "max_occurs": 1
+          "max_occurs": 1,
+          "visibility": 7
         },
         "Nome": {
           "name": "Nome",
@@ -1940,7 +1941,8 @@
           "min_length": 1,
           "pattern": "/[\\x{0020}-\\x{007E}\\x{00A0}-\\x{00FF}]{1,60}/u",
           "min_occurs": 1,
-          "max_occurs": 1
+          "max_occurs": 1,
+          "visibility": 7
         },
         "Cognome": {
           "name": "Cognome",
@@ -1950,7 +1952,8 @@
           "min_length": 1,
           "pattern": "/[\\x{0020}-\\x{007E}\\x{00A0}-\\x{00FF}]{1,60}/u",
           "min_occurs": 1,
-          "max_occurs": 1
+          "max_occurs": 1,
+          "visibility": 7
         },
         "Titolo": {
           "name": "Titolo",
@@ -1962,7 +1965,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 3
         },
         "CodEORI": {
           "name": "CodEORI",
@@ -1974,7 +1977,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 5
         }
       },
       "visibility": 7
@@ -2006,7 +2009,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 2
         },
         "Anagrafica": {
           "name": "Anagrafica",
@@ -2030,7 +2033,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 4
         }
       },
       "visibility": 7
@@ -2050,7 +2053,7 @@
           "min_occurs": 1,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 6
         },
         "NumeroREA": {
           "name": "NumeroREA",
@@ -2062,7 +2065,7 @@
           "min_occurs": 1,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 5
         },
         "CapitaleSociale": {
           "name": "CapitaleSociale",
@@ -2074,7 +2077,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 3
         },
         "SocioUnico": {
           "name": "SocioUnico",
@@ -2089,7 +2092,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 1
         },
         "StatoLiquidazione": {
           "name": "StatoLiquidazione",
@@ -2104,7 +2107,7 @@
           "min_occurs": 1,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 1
         }
       },
       "visibility": 7
@@ -2124,7 +2127,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         },
         "Fax": {
           "name": "Fax",
@@ -2136,7 +2139,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         },
         "Email": {
           "name": "Email",
@@ -2148,7 +2151,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         }
       },
       "visibility": 7
@@ -2200,7 +2203,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         },
         "Anagrafica": {
           "name": "Anagrafica",

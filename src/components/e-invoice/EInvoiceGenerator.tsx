@@ -29,7 +29,7 @@ interface PayloadKey {
   valueType: 'string' | 'number';
 }
 
-interface AvailableType {
+interface AvailableGroup {
   key: string;
   label: string;
 }
@@ -90,6 +90,7 @@ interface Component {
 
 interface Props {
   country: Country | undefined;
+  entityLevel?: boolean;
 }
 
 interface ContainerProps {
@@ -111,7 +112,7 @@ function Container(props: ContainerProps) {
 export function EInvoiceGenerator(props: Props) {
   const [t] = useTranslation();
 
-  const { country } = props;
+  const { country, entityLevel } = props;
 
   const { isCompanySettingsActive, isClientSettingsActive } =
     useCurrentSettingsLevel();
@@ -129,11 +130,11 @@ export function EInvoiceGenerator(props: Props) {
   );
 
   let payloadKeys: PayloadKey[] = [];
-  let availableTypes: AvailableType[] = [];
+  let availableGroups: AvailableGroup[] = [];
 
   const [payload, setPayload] = useState<Payload>({});
-  const [currentAvailableTypes, setCurrentAvailableTypes] = useState<
-    AvailableType[]
+  const [currentAvailableGroups, setCurrentAvailableGroups] = useState<
+    AvailableGroup[]
   >([]);
   const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
 
@@ -147,31 +148,25 @@ export function EInvoiceGenerator(props: Props) {
 
   const isFieldChoice = (fieldKey: string) => {
     const keysLength = fieldKey.split('|').length;
-    const parentComponentType = `${fieldKey.split('|')[keysLength - 2]}Type`;
+    if (keysLength > 1) {
+      const parentComponentType = fieldKey.split('|')[keysLength - 2];
 
-    const fieldName = fieldKey.split('|')[keysLength - 1];
+      const fieldName = fieldKey.split('|')[keysLength - 1];
 
-    const parentComponent = components[parentComponentType];
+      const parentComponent = components[parentComponentType];
 
-    if (parentComponent && fieldName) {
-      return parentComponent?.choices.some((choiceGroup) =>
-        choiceGroup.some((choice) => choice === fieldName)
-      );
+      if (parentComponent && fieldName) {
+        return parentComponent?.choices.some((choiceGroup) =>
+          choiceGroup.some((choice) => choice === fieldName)
+        );
+      }
     }
 
     return false;
   };
 
   const isChoiceSelected = (fieldKey: string) => {
-    const updatedFieldKey = `${fieldKey.split('|')[0]}Type|${
-      fieldKey.split('|')[1]
-    }Type|${fieldKey.split('|')[2]}|${fieldKey.split('|')[3]}Type|${
-      fieldKey.split('|')[4]
-    }`;
-
-    return Boolean(
-      selectedChoices.find((choiceKey) => choiceKey === updatedFieldKey)
-    );
+    return Boolean(selectedChoices.find((choiceKey) => choiceKey === fieldKey));
   };
 
   const showField = (key: string, visibility: number) => {
@@ -189,8 +184,6 @@ export function EInvoiceGenerator(props: Props) {
 
     // 2, 4;  client and entity levels //done
 
-    const isEntityLevelActive = false;
-
     if (!visibility) {
       return false;
     }
@@ -203,7 +196,7 @@ export function EInvoiceGenerator(props: Props) {
       return false;
     }
 
-    if (visibility === 4 && !isEntityLevelActive) {
+    if (visibility === 4 && !entityLevel) {
       return false;
     }
 
@@ -215,27 +208,38 @@ export function EInvoiceGenerator(props: Props) {
       return false;
     }
 
-    if (visibility === 5 && !isEntityLevelActive && !isCompanySettingsActive) {
+    if (visibility === 5 && !entityLevel && !isCompanySettingsActive) {
       return false;
     }
 
-    if (visibility === 6 && !isEntityLevelActive && !isClientSettingsActive) {
+    if (visibility === 6 && !entityLevel && !isClientSettingsActive) {
       return false;
     }
 
-    const fieldParentsKey = `${key.split('|')[0]}Type|${
-      key.split('|')[1]
-    }Type|${key.split('|')[2]}|${key.split('|')[3]}Type`;
+    const updatedKey = key
+      .split('|')
+      .filter((_, index) => index < 4)
+      .join('|');
+    const updatedKeyLength = updatedKey.split('|').length;
+
+    const fieldParentsKey = updatedKey
+      .split('|')
+      .map((currentUpdatedKey, index) =>
+        index !== updatedKeyLength - 2
+          ? `${currentUpdatedKey}Type`
+          : currentUpdatedKey
+      )
+      .join('|');
 
     if (isFieldChoice(key)) {
       return isChoiceSelected(key);
     }
 
     return isInitial
-      ? !availableTypes.find(
+      ? !availableGroups.find(
           (currentType) => fieldParentsKey === currentType.key
         )
-      : !currentAvailableTypes.find(
+      : !currentAvailableGroups.find(
           (currentType) => fieldParentsKey === currentType.key
         );
   };
@@ -251,7 +255,7 @@ export function EInvoiceGenerator(props: Props) {
       componentKey.split('|')[1]
     )}|${parentName}|${parentComponentKey}`;
 
-    setCurrentAvailableTypes((current) => [
+    setCurrentAvailableGroups((current) => [
       ...current,
       {
         key: componentKey,
@@ -276,6 +280,33 @@ export function EInvoiceGenerator(props: Props) {
     }));
   };
 
+  const getFieldLabel = (
+    fieldElement: ElementType,
+    fieldParentKeys: string
+  ) => {
+    const parentKeysLength = fieldParentKeys.split('|').length;
+
+    let topParentType = '';
+    let lastParentType = '';
+
+    if (parentKeysLength > 2) {
+      topParentType = fieldParentKeys.split('|')[parentKeysLength - 3];
+      lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
+
+      return `${fieldElement.name} (${getComponentKey(
+        topParentType
+      )}, ${getComponentKey(lastParentType)})`;
+    }
+
+    if (parentKeysLength > 1) {
+      lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
+
+      return `${fieldElement.name} (${getComponentKey(lastParentType)})`;
+    }
+
+    return fieldElement.name;
+  };
+
   const renderElement = (element: ElementType, parentsKey: string) => {
     let leftSideLabel = '';
     const fieldKey = `${parentsKey}|${element.name || ''}`;
@@ -284,11 +315,7 @@ export function EInvoiceGenerator(props: Props) {
     if (rule) {
       leftSideLabel = rule.label;
     } else {
-      const parentKeysLength = parentsKey.split('|').length;
-
-      leftSideLabel = `${element.name} (${getComponentKey(
-        parentsKey.split('|')[parentKeysLength - 3]
-      )}, ${getComponentKey(parentsKey.split('|')[parentKeysLength - 2])})`;
+      leftSideLabel = getFieldLabel(element, parentsKey);
     }
 
     const isNumberTypeField =
@@ -395,29 +422,56 @@ export function EInvoiceGenerator(props: Props) {
     );
   };
 
+  const getChoiceSelectorLabel = (componentKey: string) => {
+    const keysLength = componentKey.split('|').length;
+
+    let lastParentType = '';
+    let lastParentName = '';
+
+    if (keysLength > 2) {
+      lastParentType = componentKey.split('|')[keysLength - 3];
+      lastParentName = componentKey.split('|')[keysLength - 2];
+    }
+
+    if (keysLength > 3) {
+      lastParentType = componentKey.split('|')[keysLength - 4];
+    }
+
+    if (keysLength > 2 || keysLength > 3) {
+      return `${t('Choices')} (${getComponentKey(
+        lastParentType
+      )}, ${lastParentName})`;
+    }
+
+    if (keysLength > 1) {
+      lastParentName = componentKey.split('|')[keysLength - 2];
+
+      return `${t('Choices')} (${lastParentName})`;
+    }
+
+    return t('Choices');
+  };
+
   const renderComponent = (
     component: Component,
     componentIndex: number,
-    topParentType: string,
-    lastParentType: string,
-    lastParentName: string,
     isDefaultComponent: boolean,
     componentPath: string
   ) => {
     const isCurrentComponentLastParent = isComponentLastParent(component);
 
-    const componentKey = `${topParentType}|${lastParentType}|${lastParentName}|${component.type}`;
+    const componentKey = `${componentPath}|${component.type}`;
 
     const shouldBeRendered = isInitial
-      ? !availableTypes.some((currentType) => currentType.key === componentKey)
-      : !currentAvailableTypes.find(
+      ? !availableGroups.some((currentType) => currentType.key === componentKey)
+      : !currentAvailableGroups.find(
           (currentType) => currentType.key === componentKey
         );
 
     return (
       <Container
         className="flex items-center"
-        key={componentKey}
+        key={componentPath}
         renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
       >
         <Container
@@ -429,9 +483,7 @@ export function EInvoiceGenerator(props: Props) {
             Boolean(component.choices.length) && (
               <Element
                 key={`${componentKey}ChoiceSelector`}
-                leftSide={`${t('Choices')} (${getComponentKey(
-                  lastParentType
-                )}, ${lastParentName})`}
+                leftSide={getChoiceSelectorLabel(componentKey)}
               >
                 <SelectField
                   defaultValue=""
@@ -477,10 +529,6 @@ export function EInvoiceGenerator(props: Props) {
                   const isNewComponentLastParent =
                     isComponentLastParent(nextComponent);
 
-                  const label = `${getComponentKey(nextComponent.type)} (${
-                    element.name
-                  }, ${getComponentKey(component.type || '')})`;
-
                   const isNewComponentDefault = element.min_occurs !== 0;
 
                   if (
@@ -488,8 +536,12 @@ export function EInvoiceGenerator(props: Props) {
                     !isNewComponentDefault &&
                     isNewComponentLastParent
                   ) {
-                    availableTypes.push({
-                      key: `${topParentType}|${component.type}|${element.name}|${nextComponent.type}`,
+                    const label = `${getComponentKey(nextComponent.type)} (${
+                      element.name
+                    }, ${getComponentKey(component.type)})`;
+
+                    availableGroups.push({
+                      key: `${componentPath}|${element.name}|${nextComponent.type}`,
                       label,
                     });
                   }
@@ -497,17 +549,12 @@ export function EInvoiceGenerator(props: Props) {
                   return renderComponent(
                     nextComponent,
                     nextComponentIndex,
-                    !isNewComponentLastParent
-                      ? nextComponent.type
-                      : topParentType,
-                    component.type,
-                    element.name,
                     Boolean(isNewComponentDefault),
                     `${componentPath}|${element.name}`
                   );
                 }
               } else {
-                return renderElement(element, componentPath);
+                return renderElement(element, componentKey);
               }
             })}
         </Container>
@@ -777,9 +824,6 @@ export function EInvoiceGenerator(props: Props) {
           return renderComponent(
             component,
             index,
-            component.type,
-            component.type,
-            component.type,
             Boolean(isLastParent),
             getComponentKey(component.type) || ''
           );
@@ -803,14 +847,14 @@ export function EInvoiceGenerator(props: Props) {
           setIsInitial(true);
           setEInvoice(undefined);
           setRules(response.rules);
-          setCurrentAvailableTypes([]);
+          setCurrentAvailableGroups([]);
           setExcluded(response.excluded);
           setComponents(response.components);
           setDefaultFields(response.defaultFields);
           setErrors(undefined);
           setSelectedChoices([]);
           payloadKeys = [];
-          availableTypes = [];
+          availableGroups = [];
         });
     } else {
       setRules([]);
@@ -819,9 +863,9 @@ export function EInvoiceGenerator(props: Props) {
       setEInvoice(undefined);
       setIsInitial(true);
       setDefaultFields({});
-      setCurrentAvailableTypes([]);
+      setCurrentAvailableGroups([]);
       setSelectedChoices([]);
-      availableTypes = [];
+      availableGroups = [];
       payloadKeys = [];
     }
   }, [country]);
@@ -835,16 +879,16 @@ export function EInvoiceGenerator(props: Props) {
 
         setEInvoice(invoiceUI);
         isInitial && createPayload();
-        isInitial && setCurrentAvailableTypes([...availableTypes]);
+        isInitial && setCurrentAvailableGroups([...availableGroups]);
       })();
     }
-  }, [components, currentAvailableTypes, errors, payload, selectedChoices]);
+  }, [components, currentAvailableGroups, errors, payload, selectedChoices]);
 
   useEffect(() => {
     if (!isInitial) {
       setErrors(undefined);
     }
-  }, [payload, currentAvailableTypes, selectedChoices]);
+  }, [payload, currentAvailableGroups, selectedChoices]);
 
   return (
     <div className="flex flex-col mt-5">
@@ -853,13 +897,13 @@ export function EInvoiceGenerator(props: Props) {
           <SearchableSelect
             value=""
             onValueChange={(value) =>
-              setCurrentAvailableTypes((current) =>
+              setCurrentAvailableGroups((current) =>
                 current.filter((type) => type.key !== value)
               )
             }
             clearAfterSelection
           >
-            {currentAvailableTypes.map(({ key, label }, index) => (
+            {currentAvailableGroups.map(({ key, label }, index) => (
               <option key={index} value={key}>
                 {label}
               </option>

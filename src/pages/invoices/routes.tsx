@@ -18,11 +18,15 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { lazy } from 'react';
 
 const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
+const Invoice = lazy(() => import('$app/pages/invoices/Invoice'));
 const Import = lazy(() => import('$app/pages/invoices/import/Import'));
 const Create = lazy(() => import('$app/pages/invoices/create/Create'));
 const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/invoices/email/Email'));
+const EInvoice = lazy(
+  () => import('$app/pages/invoices/edit/components/EInvoice')
+);
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -67,7 +71,7 @@ export const invoiceRoutes = (
       }
     />
     <Route
-      path=":id/edit"
+      path=":id"
       element={
         <Guard
           guards={[
@@ -78,10 +82,13 @@ export const invoiceRoutes = (
               assigned('/api/v1/invoices/:id')
             ),
           ]}
-          component={<Edit />}
+          component={<Invoice />}
         />
       }
-    />
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="e_invoice" element={<EInvoice />} />
+    </Route>
     <Route
       path=":id/pdf"
       element={
