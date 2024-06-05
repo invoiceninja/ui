@@ -27,7 +27,7 @@ import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTab
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
@@ -43,16 +43,20 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Credit as ICredit } from '$app/common/interfaces/credit';
+import { useLineItemActions } from '$app/pages/invoices/edit/hooks/useLineItemActions';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
 
+  const [searchParams] = useSearchParams();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
+  const lineItemActions = useLineItemActions({ entity: 'credit' });
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -85,8 +89,12 @@ export default function Edit() {
   } = useCreditUtilities({ client });
 
   useEffect(() => {
-    if (data) {
-      const _credit = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentCredit = isAnyAction && credit ? credit : data;
+
+    if (currentCredit) {
+      const _credit = cloneDeep(currentCredit);
 
       _credit.line_items.map((item) => (item._id = v4()));
 
@@ -162,6 +170,7 @@ export default function Edit() {
                   InvoiceItemType.LateFee,
                 ].includes(item.type_id)
               )}
+              lineItemActions={lineItemActions}
               columns={productColumns}
               relationType="client_id"
               onLineItemChange={handleLineItemChange}

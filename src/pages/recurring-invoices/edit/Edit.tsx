@@ -53,6 +53,7 @@ import {
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
+import { useLineItemActions } from '$app/pages/invoices/edit/hooks/useLineItemActions';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -60,7 +61,11 @@ export default function Edit() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
+  const colors = useColorScheme();
+  const taskColumns = useTaskColumns();
+  const [searchParams] = useSearchParams();
   const reactSettings = useReactSettings();
+  const lineItemActions = useLineItemActions({ entity: 'recurring_invoice' });
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -94,8 +99,13 @@ export default function Edit() {
   const productColumns = useProductColumns();
 
   useEffect(() => {
-    if (data) {
-      const ri = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentRecurringInvoice =
+      isAnyAction && recurringInvoice ? recurringInvoice : data;
+
+    if (currentRecurringInvoice) {
+      const ri = cloneDeep(currentRecurringInvoice);
 
       ri.line_items.map((item) => (item._id = v4()));
 
@@ -152,10 +162,6 @@ export default function Edit() {
       initializeSaveOptions(recurringInvoice);
     }
   }, [recurringInvoice]);
-
-  const [searchParams] = useSearchParams();
-  const taskColumns = useTaskColumns();
-  const colors = useColorScheme();
 
   return (
     <Default
@@ -225,6 +231,7 @@ export default function Edit() {
                       InvoiceItemType.LateFee,
                     ].includes(item.type_id)
                   )}
+                  lineItemActions={lineItemActions}
                   columns={productColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
@@ -248,6 +255,7 @@ export default function Edit() {
                   items={recurringInvoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}
+                  lineItemActions={lineItemActions}
                   columns={taskColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}

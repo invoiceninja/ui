@@ -46,16 +46,21 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Quote as IQuote } from '$app/common/interfaces/quote';
+import { useLineItemActions } from '$app/pages/invoices/edit/hooks/useLineItemActions';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
   const { t } = useTranslation();
   const { id } = useParams();
 
+  const colors = useColorScheme();
+  const taskColumns = useTaskColumns();
+  const [searchParams] = useSearchParams();
+  const reactSettings = useReactSettings();
+  const lineItemActions = useLineItemActions({ entity: 'quote' });
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
-  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -88,8 +93,12 @@ export default function Edit() {
   } = useQuoteUtilities({ client });
 
   useEffect(() => {
-    if (data) {
-      const _quote = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentQuote = isAnyAction && quote ? quote : data;
+
+    if (currentQuote) {
+      const _quote = cloneDeep(currentQuote);
 
       _quote.line_items.map((item) => (item._id = v4()));
 
@@ -107,10 +116,6 @@ export default function Edit() {
 
   const actions = useActions();
   const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
-
-  const [searchParams] = useSearchParams();
-  const taskColumns = useTaskColumns();
-  const colors = useColorScheme();
 
   const {
     changeTemplateVisible,
@@ -178,6 +183,7 @@ export default function Edit() {
                   items={quote.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Product
                   )}
+                  lineItemActions={lineItemActions}
                   columns={productColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
@@ -201,6 +207,7 @@ export default function Edit() {
                   items={quote.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}
+                  lineItemActions={lineItemActions}
                   columns={taskColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}

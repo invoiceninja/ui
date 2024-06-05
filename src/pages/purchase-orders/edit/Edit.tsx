@@ -25,7 +25,7 @@ import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTab
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useActions } from '../common/hooks';
 import { Details } from './components/Details';
@@ -48,6 +48,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useLineItemActions } from '$app/pages/invoices/edit/hooks/useLineItemActions';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -55,10 +56,13 @@ export default function Edit() {
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
 
+  const [searchParams] = useSearchParams();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
+  const lineItemActions = useLineItemActions({ entity: 'purchase_order' });
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -71,8 +75,13 @@ export default function Edit() {
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
 
   useEffect(() => {
-    if (data) {
-      const po = cloneDeep(data);
+    const isAnyAction = searchParams.get('action');
+
+    const currentPurchaseOrder =
+      isAnyAction && purchaseOrder ? purchaseOrder : data;
+
+    if (currentPurchaseOrder) {
+      const po = cloneDeep(currentPurchaseOrder);
 
       po.line_items.forEach((item) => (item._id = v4()));
 
@@ -193,6 +202,7 @@ export default function Edit() {
               onLineItemChange={(index, lineItem) =>
                 handleProductChange(purchaseOrder, index, lineItem)
               }
+              lineItemActions={lineItemActions}
               onSort={(lineItems) => handleChange('line_items', lineItems)}
               onLineItemPropertyChange={(key, value, index) =>
                 handleLineItemPropertyChange(purchaseOrder, key, value, index)
