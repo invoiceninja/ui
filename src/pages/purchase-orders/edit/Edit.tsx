@@ -49,6 +49,8 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useLineItemActions } from '$app/pages/invoices/edit/hooks/useLineItemActions';
+import { useAtom } from 'jotai';
+import { purchaseOrderAtom } from '../common/atoms';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -72,7 +74,7 @@ export default function Edit() {
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
+  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   useEffect(() => {
     const isAnyAction = searchParams.get('action');

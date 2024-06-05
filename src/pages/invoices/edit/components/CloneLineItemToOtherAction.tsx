@@ -12,7 +12,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, SelectField } from '$app/components/forms';
+import { Button, InputLabel, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 import { creditAtom } from '$app/pages/credits/common/atoms';
@@ -32,6 +32,9 @@ import { Quote } from '$app/common/interfaces/quote';
 import { CreditSelector } from '$app/components/credits/CreditSelector';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { QuoteSelector } from '$app/components/quotes/QuoteSelector';
+import { RecurringInvoiceSelector } from '$app/components/recurring-invoices/RecurringInvoiceSelector';
+import { PurchaseOrderSelector } from '$app/components/purchase-orders/PurchaseOrderSelector';
 
 type SelectedEntity =
   | Invoice
@@ -119,6 +122,14 @@ export function CloneLineItemToOtherAction(props: Props) {
           ],
         });
 
+        console.log({
+          ...(selectedEntity as PurchaseOrder),
+          line_items: [
+            ...selectedEntity.line_items,
+            { ...lineItem, _id: v4() },
+          ],
+        });
+
         navigate(
           route('/purchase_orders/:id/edit?action=clone_line_item', {
             id: selectedEntity.id,
@@ -174,7 +185,10 @@ export function CloneLineItemToOtherAction(props: Props) {
         <SelectField
           label={t('entity')}
           value={currentEntity}
-          onValueChange={(value) => setCurrentEntity(value)}
+          onValueChange={(value) => {
+            setCurrentEntity(value);
+            setSelectedEntity(undefined);
+          }}
           withBlank
         >
           {availableEntities
@@ -186,21 +200,55 @@ export function CloneLineItemToOtherAction(props: Props) {
             ))}
         </SelectField>
 
-        {currentEntity === 'invoice' && (
-          <InvoiceSelector
-            value={selectedEntity?.id || ''}
-            onChange={(invoice) => setSelectedEntity(invoice)}
-          />
+        {currentEntity && (
+          <div className="flex flex-col space-y-1">
+            <InputLabel>{t('resource')}</InputLabel>
+
+            {currentEntity === 'invoice' && (
+              <InvoiceSelector
+                value={selectedEntity?.id || ''}
+                onChange={(invoice) => setSelectedEntity(invoice)}
+              />
+            )}
+
+            {currentEntity === 'credit' && (
+              <CreditSelector
+                value={selectedEntity?.id || ''}
+                onChange={(credit) => setSelectedEntity(credit)}
+              />
+            )}
+
+            {currentEntity === 'quote' && (
+              <QuoteSelector
+                value={selectedEntity?.id || ''}
+                onChange={(quote) => setSelectedEntity(quote)}
+              />
+            )}
+
+            {currentEntity === 'recurring_invoice' && (
+              <RecurringInvoiceSelector
+                value={selectedEntity?.id || ''}
+                onChange={(recurringInvoice) =>
+                  setSelectedEntity(recurringInvoice)
+                }
+              />
+            )}
+
+            {currentEntity === 'purchase_order' && (
+              <PurchaseOrderSelector
+                value={selectedEntity?.id || ''}
+                onChange={(purchaseOrder) => setSelectedEntity(purchaseOrder)}
+              />
+            )}
+          </div>
         )}
 
-        {currentEntity === 'credit' && (
-          <CreditSelector
-            value={selectedEntity?.id || ''}
-            onChange={(credit) => setSelectedEntity(credit)}
-          />
-        )}
-
-        <Button behavior="button" onClick={handleClone}>
+        <Button
+          behavior="button"
+          onClick={handleClone}
+          disableWithoutIcon
+          disabled={!selectedEntity}
+        >
           {t('clone')}
         </Button>
       </Modal>
