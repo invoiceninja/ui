@@ -778,10 +778,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         const prefix = `${key.split('|')[0]}|`;
         const path = key.split(prefix)[1];
 
-        set(formattedPayload, path.replaceAll('|', '.'), value);
+        const pathKeysLength = path.split('|').length;
+
+        const updatedPath = path
+          .split('|')
+          .filter((_, index) => index !== pathKeysLength - 2)
+          .join('|');
+
+        set(formattedPayload, updatedPath.replaceAll('|', '.'), value);
       });
 
-      console.log(JSON.stringify(formattedPayload));
+      console.log(formattedPayload);
     };
 
     const handleSave = () => {
