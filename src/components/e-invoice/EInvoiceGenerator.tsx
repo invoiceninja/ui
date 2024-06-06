@@ -216,44 +216,53 @@ export function EInvoiceGenerator(props: Props) {
       return false;
     }
 
-    const updatedKey = key
-      .split('|')
-      .filter((_, index) => index < 4)
-      .join('|');
-    const updatedKeyLength = updatedKey.split('|').length;
+    const keysLength = key.split('|').length;
 
-    const fieldParentsKey = updatedKey
+    const parentsKey = key
       .split('|')
-      .map((currentUpdatedKey, index) =>
-        index !== updatedKeyLength - 2
-          ? `${currentUpdatedKey}Type`
-          : currentUpdatedKey
-      )
+      .filter((_, index) => index !== keysLength - 1)
       .join('|');
+
+    if (
+      key ===
+      'FatturaElettronica|FatturaElettronicaBody|DatiGenerali|DatiFattureCollegate|DatiDocumentiCorrelatiType|CodiceCUP'
+    ) {
+      console.log(
+        isInitial
+          ? !availableGroups.find(
+              (currentType) => parentsKey === currentType.key
+            )
+          : !currentAvailableGroups.find(
+              (currentType) => parentsKey === currentType.key
+            )
+      );
+    }
 
     if (isFieldChoice(key)) {
       return isChoiceSelected(key);
     }
 
     return isInitial
-      ? !availableGroups.find(
-          (currentType) => fieldParentsKey === currentType.key
-        )
+      ? !availableGroups.find((currentType) => parentsKey === currentType.key)
       : !currentAvailableGroups.find(
-          (currentType) => fieldParentsKey === currentType.key
+          (currentType) => parentsKey === currentType.key
         );
   };
 
   const handleDeleteComponent = (componentKey: string) => {
-    const topParentComponentKey = getComponentKey(componentKey.split('|')[0]);
-    const parentComponentKey = getComponentKey(componentKey.split('|')[3]);
-    const parentName = getComponentKey(componentKey.split('|')[2]);
+    const keysLength = componentKey.split('|').length;
+
+    console.log(componentKey);
+
+    const topParentComponentKey = getComponentKey(
+      componentKey.split('|')[keysLength - 3]
+    );
+    const parentComponentKey = getComponentKey(
+      componentKey.split('|')[keysLength - 1]
+    );
+    const parentName = getComponentKey(componentKey.split('|')[keysLength - 2]);
 
     const label = `${parentComponentKey} (${parentName}, ${topParentComponentKey})`;
-
-    const fieldsGroupKey = `${topParentComponentKey}|${getComponentKey(
-      componentKey.split('|')[1]
-    )}|${parentName}|${parentComponentKey}`;
 
     setCurrentAvailableGroups((current) => [
       ...current,
@@ -266,7 +275,7 @@ export function EInvoiceGenerator(props: Props) {
     let updatedPartOfPayload = {};
 
     Object.keys(payload)
-      .filter((key) => key.startsWith(fieldsGroupKey))
+      .filter((key) => key.startsWith(componentKey))
       .forEach((currentKey) => {
         updatedPartOfPayload = {
           ...updatedPartOfPayload,
@@ -288,6 +297,15 @@ export function EInvoiceGenerator(props: Props) {
 
     let topParentType = '';
     let lastParentType = '';
+
+    if (parentKeysLength > 3) {
+      topParentType = fieldParentKeys.split('|')[parentKeysLength - 4];
+      lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
+
+      return `${fieldElement.name} (${getComponentKey(
+        topParentType
+      )}, ${getComponentKey(lastParentType)})`;
+    }
 
     if (parentKeysLength > 2) {
       topParentType = fieldParentKeys.split('|')[parentKeysLength - 3];
@@ -452,6 +470,23 @@ export function EInvoiceGenerator(props: Props) {
     return t('Choices');
   };
 
+  const shouldAnyElementBeVisible = (groupComponent: Component) => {
+    const groupElements: ElementType[] = getGroupElements(groupComponent, []);
+
+    if (groupComponent.type === 'DatiDocumentiCorrelatiType') {
+      console.log(
+        getFieldKeyFromPayload(groupComponent, groupElements[5].name)
+      );
+    }
+
+    return groupElements.some((element) =>
+      showField(
+        getFieldKeyFromPayload(groupComponent, element.name),
+        element.visibility
+      )
+    );
+  };
+
   const renderComponent = (
     component: Component,
     componentIndex: number,
@@ -607,7 +642,7 @@ export function EInvoiceGenerator(props: Props) {
         ...currentErrors.errors,
         [key]: [
           ...(currentErrors.errors[key] ? currentErrors.errors[key] : []),
-          `\n ${value}`,
+          currentErrors.errors[key]?.length ? `\n ${value}` : value,
         ],
       },
     };
@@ -799,23 +834,6 @@ export function EInvoiceGenerator(props: Props) {
     return fieldKey;
   };
 
-  const shouldAnyElementBeVisible = (groupComponent: Component) => {
-    const groupElements: ElementType[] = getGroupElements(groupComponent, []);
-
-    return groupElements.some((element) =>
-      showField(
-        getFieldKeyFromPayload(groupComponent, element.name),
-        element.visibility
-      )
-    );
-  };
-
-  const getComponentFromKey = (componentKey: string) => {
-    const keysLength = componentKey.split('|').length;
-    const componentType = componentKey.split('|')[keysLength - 1];
-    return components[componentType];
-  };
-
   const getChildComponentType = (
     child: Component,
     childIndex: number,
@@ -944,13 +962,8 @@ export function EInvoiceGenerator(props: Props) {
 
         setEInvoice(invoiceUI);
         isInitial && createPayload();
-        const updatedAvailableGroups = [...availableGroups].filter((groupKey) =>
-          shouldAnyElementBeVisible(getComponentFromKey(groupKey.key))
-        );
 
-        console.log(availableGroups, updatedAvailableGroups);
-
-        isInitial && setCurrentAvailableGroups(updatedAvailableGroups);
+        isInitial && setCurrentAvailableGroups([...availableGroups]);
       })();
     }
   }, [components, currentAvailableGroups, errors, payload, selectedChoices]);
