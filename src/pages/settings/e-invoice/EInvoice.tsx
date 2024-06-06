@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -11,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Country,
   EInvoiceGenerator,
@@ -24,18 +23,20 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
 };
+
+export interface EInvoiceComponent {
+  saveEInvoice: () => unknown;
+}
 export function EInvoice() {
   const [t] = useTranslation();
 
-  const onCancel = useDiscardChanges();
-  const onSave = useHandleCompanySave();
+  const eInvoiceRef = useRef<EInvoiceComponent>(null);
+
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -47,6 +48,7 @@ export function EInvoice() {
     { name: t('e_invoice'), href: '/settings/e_invoice' },
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [country, setCountry] = useState<Country>('italy');
 
   return (
@@ -54,8 +56,7 @@ export function EInvoice() {
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={onSave}
-      onCancelClick={onCancel}
+      onSaveClick={() => eInvoiceRef?.current?.saveEInvoice()}
       disableSaveButton={showPlanAlert}
       withoutBackButton
     >
@@ -96,7 +97,7 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        <EInvoiceGenerator country={country} />
+        <EInvoiceGenerator ref={eInvoiceRef} country={country} />
       </Card>
     </Settings>
   );
