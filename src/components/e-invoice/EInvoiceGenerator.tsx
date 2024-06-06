@@ -462,11 +462,13 @@ export function EInvoiceGenerator(props: Props) {
 
     const componentKey = `${componentPath}|${component.type}`;
 
+    const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(component);
+
     const shouldBeRendered = isInitial
       ? !availableGroups.some((currentType) => currentType.key === componentKey)
       : !currentAvailableGroups.find(
           (currentType) => currentType.key === componentKey
-        );
+        ) && isAnyElementFromGroupVisible;
 
     return (
       <Container
@@ -531,10 +533,14 @@ export function EInvoiceGenerator(props: Props) {
 
                   const isNewComponentDefault = element.min_occurs !== 0;
 
+                  const isAnyElementFromGroupVisible =
+                    shouldAnyElementBeVisible(nextComponent);
+
                   if (
                     isInitial &&
                     !isNewComponentDefault &&
-                    isNewComponentLastParent
+                    isNewComponentLastParent &&
+                    isAnyElementFromGroupVisible
                   ) {
                     const label = `${getComponentKey(nextComponent.type)} (${
                       element.name
@@ -755,6 +761,61 @@ export function EInvoiceGenerator(props: Props) {
     }
   };
 
+  const getGroupElements = (
+    component: Component,
+    currentElements: ElementType[]
+  ): ElementType[] => {
+    const elements = Object.values(component.elements);
+
+    for (let index = 0; index < elements.length; index++) {
+      const element = elements[index];
+
+      if (element.base_type?.endsWith('Type')) {
+        return getGroupElements(components[element.base_type], currentElements);
+      } else {
+        currentElements.push(element);
+      }
+    }
+
+    return currentElements;
+  };
+
+  const getFieldKeyFromPayload = (
+    parentComponent: Component,
+    fieldName: string
+  ) => {
+    let fieldKey = '';
+
+    Object.keys(payload).forEach((key) => {
+      if (
+        !fieldKey &&
+        key.includes(parentComponent.type) &&
+        key.includes(fieldName)
+      ) {
+        fieldKey = key;
+      }
+    });
+
+    return fieldKey;
+  };
+
+  const shouldAnyElementBeVisible = (groupComponent: Component) => {
+    const groupElements: ElementType[] = getGroupElements(groupComponent, []);
+
+    return groupElements.some((element) =>
+      showField(
+        getFieldKeyFromPayload(groupComponent, element.name),
+        element.visibility
+      )
+    );
+  };
+
+  const getComponentFromKey = (componentKey: string) => {
+    const keysLength = componentKey.split('|').length;
+    const componentType = componentKey.split('|')[keysLength - 1];
+    return components[componentType];
+  };
+
   const getChildComponentType = (
     child: Component,
     childIndex: number,
@@ -883,7 +944,13 @@ export function EInvoiceGenerator(props: Props) {
 
         setEInvoice(invoiceUI);
         isInitial && createPayload();
-        isInitial && setCurrentAvailableGroups([...availableGroups]);
+        const updatedAvailableGroups = [...availableGroups].filter((groupKey) =>
+          shouldAnyElementBeVisible(getComponentFromKey(groupKey.key))
+        );
+
+        console.log(availableGroups, updatedAvailableGroups);
+
+        isInitial && setCurrentAvailableGroups(updatedAvailableGroups);
       })();
     }
   }, [components, currentAvailableGroups, errors, payload, selectedChoices]);
