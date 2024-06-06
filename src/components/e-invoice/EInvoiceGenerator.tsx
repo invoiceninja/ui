@@ -611,13 +611,17 @@ export function EInvoiceGenerator(props: Props) {
     let updatedErrors: ValidationBag = { errors: {}, message: '' };
 
     Object.entries(payload).forEach(([key, value]) => {
-      const fieldKey = key.split('|')[4];
+      const keysLength = key.split('|').length;
+      const fieldKey = key.split('|')[keysLength - 1];
+
       let field: ElementType | undefined;
 
       Object.values(components).forEach((component) => {
-        field = Object.values(component.elements).find(
-          ({ name }) => name === fieldKey
-        );
+        if (!field) {
+          field = Object.values(component.elements).find(
+            ({ name }) => name === fieldKey
+          );
+        }
       });
 
       if (showField(key, field?.visibility || 0)) {

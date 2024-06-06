@@ -603,7 +603,7 @@
           "min_occurs": 1,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         },
         "IdCodice": {
           "name": "IdCodice",
@@ -1377,7 +1377,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         },
         "CodiceCIG": {
           "name": "CodiceCIG",
@@ -1389,7 +1389,7 @@
           "min_occurs": 0,
           "max_occurs": 1,
           "help": "",
-          "visibility": 0
+          "visibility": 7
         }
       },
       "visibility": 7
