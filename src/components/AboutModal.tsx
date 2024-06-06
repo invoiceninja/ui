@@ -217,18 +217,21 @@ export function AboutModal(props: Props) {
           </Button>
         )}
 
-        {isSelfHosted() && currentSystemInfo?.api_version !== latestVersion && (
-          <Button
-            behavior="button"
-            className="flex items-center"
-            onClick={() => setIsForceUpdateModalOpen(true)}
-            disableWithoutIcon
-            disabled={isFormBusy}
-          >
-            <Icon element={DownloadCloud} color="white" />
-            <span>{t('force_update')}</span>
-          </Button>
-        )}
+        {isSelfHosted() &&
+          latestVersion &&
+          currentSystemInfo?.api_version &&
+          currentSystemInfo.api_version !== latestVersion && (
+            <Button
+              behavior="button"
+              className="flex items-center"
+              onClick={() => setIsForceUpdateModalOpen(true)}
+              disableWithoutIcon
+              disabled={isFormBusy}
+            >
+              <Icon element={DownloadCloud} color="white" />
+              <span>{t('force_update')}</span>
+            </Button>
+          )}
 
         <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
           <a
