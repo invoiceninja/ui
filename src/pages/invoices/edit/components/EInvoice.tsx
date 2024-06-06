@@ -10,14 +10,26 @@
 
 import { Card } from '$app/components/cards';
 import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { EInvoiceComponent } from '$app/pages/settings';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function EInvoice() {
   const [t] = useTranslation();
 
+  const eInvoiceRef = useRef<EInvoiceComponent>(null);
+
+  useSaveBtn(
+    {
+      onClick: () => eInvoiceRef?.current?.saveEInvoice(),
+    },
+    []
+  );
+
   return (
     <Card title={t('e_invoice')}>
-      <EInvoiceGenerator country={'italy'} entityLevel />
+      <EInvoiceGenerator ref={eInvoiceRef} country={'italy'} entityLevel />
     </Card>
   );
 }
