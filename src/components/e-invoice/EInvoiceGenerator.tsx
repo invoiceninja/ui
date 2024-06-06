@@ -223,21 +223,6 @@ export function EInvoiceGenerator(props: Props) {
       .filter((_, index) => index !== keysLength - 1)
       .join('|');
 
-    if (
-      key ===
-      'FatturaElettronica|FatturaElettronicaBody|DatiGenerali|DatiFattureCollegate|DatiDocumentiCorrelatiType|CodiceCUP'
-    ) {
-      console.log(
-        isInitial
-          ? !availableGroups.find(
-              (currentType) => parentsKey === currentType.key
-            )
-          : !currentAvailableGroups.find(
-              (currentType) => parentsKey === currentType.key
-            )
-      );
-    }
-
     if (isFieldChoice(key)) {
       return isChoiceSelected(key);
     }
@@ -251,8 +236,6 @@ export function EInvoiceGenerator(props: Props) {
 
   const handleDeleteComponent = (componentKey: string) => {
     const keysLength = componentKey.split('|').length;
-
-    console.log(componentKey);
 
     const topParentComponentKey = getComponentKey(
       componentKey.split('|')[keysLength - 3]
@@ -470,18 +453,15 @@ export function EInvoiceGenerator(props: Props) {
     return t('Choices');
   };
 
-  const shouldAnyElementBeVisible = (groupComponent: Component) => {
+  const shouldAnyElementBeVisible = (
+    groupComponent: Component,
+    componentPath: string
+  ) => {
     const groupElements: ElementType[] = getGroupElements(groupComponent, []);
-
-    if (groupComponent.type === 'DatiDocumentiCorrelatiType') {
-      console.log(
-        getFieldKeyFromPayload(groupComponent, groupElements[5].name)
-      );
-    }
 
     return groupElements.some((element) =>
       showField(
-        getFieldKeyFromPayload(groupComponent, element.name),
+        getFieldKeyFromPayload(componentPath, element.name),
         element.visibility
       )
     );
@@ -497,7 +477,10 @@ export function EInvoiceGenerator(props: Props) {
 
     const componentKey = `${componentPath}|${component.type}`;
 
-    const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(component);
+    const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(
+      component,
+      componentPath
+    );
 
     const shouldBeRendered = isInitial
       ? !availableGroups.some((currentType) => currentType.key === componentKey)
@@ -569,7 +552,10 @@ export function EInvoiceGenerator(props: Props) {
                   const isNewComponentDefault = element.min_occurs !== 0;
 
                   const isAnyElementFromGroupVisible =
-                    shouldAnyElementBeVisible(nextComponent);
+                    shouldAnyElementBeVisible(
+                      nextComponent,
+                      `${componentPath}|${element.name}|${nextComponent.type}`
+                    );
 
                   if (
                     isInitial &&
@@ -815,16 +801,13 @@ export function EInvoiceGenerator(props: Props) {
     return currentElements;
   };
 
-  const getFieldKeyFromPayload = (
-    parentComponent: Component,
-    fieldName: string
-  ) => {
+  const getFieldKeyFromPayload = (componentPath: string, fieldName: string) => {
     let fieldKey = '';
 
     Object.keys(payload).forEach((key) => {
       if (
         !fieldKey &&
-        key.includes(parentComponent.type) &&
+        key.startsWith(componentPath) &&
         key.includes(fieldName)
       ) {
         fieldKey = key;
