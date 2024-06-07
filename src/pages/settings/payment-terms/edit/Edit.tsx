@@ -74,7 +74,7 @@ export function Edit() {
   return (
     <Settings
       title={t('payment_terms')}
-      navigationTopRight={<Actions paymentTerm={data?.data.data} />}
+      navigationTopRight={data && <Actions paymentTerm={data.data.data} />}
     >
       {!data && (
         <div className="flex justify-center">
