@@ -72,7 +72,10 @@ export function Edit() {
   });
 
   return (
-    <Settings title={t('payment_terms')}>
+    <Settings
+      title={t('payment_terms')}
+      navigationTopRight={<Actions paymentTerm={data?.data.data} />}
+    >
       {!data && (
         <div className="flex justify-center">
           <Spinner />
@@ -87,7 +90,6 @@ export function Edit() {
             title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
             onFormSubmit={formik.handleSubmit}
-            additionalAction={<Actions paymentTerm={data.data.data} />}
             withSaveButton
           >
             <Element leftSide="Status">
