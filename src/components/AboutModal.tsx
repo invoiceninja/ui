@@ -99,7 +99,7 @@ export function AboutModal(props: Props) {
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo>();
 
-  const { data: installedVersion } = useQuery({
+  const { data: latestVersion } = useQuery({
     queryKey: ['/api/v1/self-update/check_version'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/self-update/check_version')).then(
@@ -108,10 +108,10 @@ export function AboutModal(props: Props) {
     staleTime: Infinity,
   });
 
-  const { data: latestVersion } = useQuery({
-    queryKey: ['https://pdf.invoicing.co/api/version'],
+  const { data: currentSystemInfo } = useQuery({
+    queryKey: ['/api/v1/health_check'],
     queryFn: () =>
-      request('GET', 'https://pdf.invoicing.co/api/version').then(
+      request('GET', endpoint('/api/v1/health_check')).then(
         (response) => response.data
       ),
     staleTime: Infinity,
@@ -217,18 +217,21 @@ export function AboutModal(props: Props) {
           </Button>
         )}
 
-        {isSelfHosted() && installedVersion !== latestVersion && (
-          <Button
-            behavior="button"
-            className="flex items-center"
-            onClick={() => setIsForceUpdateModalOpen(true)}
-            disableWithoutIcon
-            disabled={isFormBusy}
-          >
-            <Icon element={DownloadCloud} color="white" />
-            <span>{t('force_update')}</span>
-          </Button>
-        )}
+        {isSelfHosted() &&
+          latestVersion &&
+          currentSystemInfo?.api_version &&
+          currentSystemInfo.api_version !== latestVersion && (
+            <Button
+              behavior="button"
+              className="flex items-center"
+              onClick={() => setIsForceUpdateModalOpen(true)}
+              disableWithoutIcon
+              disabled={isFormBusy}
+            >
+              <Icon element={DownloadCloud} color="white" />
+              <span>{t('force_update')}</span>
+            </Button>
+          )}
 
         <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
           <a
@@ -475,7 +478,8 @@ export function AboutModal(props: Props) {
 
           <div className="flex flex-col">
             <span>
-              &middot; {t('installed_version')}: {installedVersion}
+              &middot; {t('installed_version')}:{' '}
+              {currentSystemInfo?.api_version}
             </span>
             <span>
               &middot; {t('latest_version')}: {latestVersion}
