@@ -22,7 +22,7 @@ export function PaymentTerms() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
   ];
 
