@@ -58,6 +58,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdLockOutline } from 'react-icons/md';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 dayjs.extend(duration);
 
@@ -153,31 +154,30 @@ export default function Show() {
             </div>
           )}
 
-          <Link
-            className="block"
-            to={route('/clients/:id', { id: project.client_id })}
-          >
-            {project.client?.display_name}
-          </Link>
-
-          {project.due_date.length > 0 && (
-            <p>
-              {t('due_date')}: {date(project.due_date, dateFormat)}
-            </p>
+          {project.client && (
+            <ClientActionButtons displayClientName client={project.client} />
           )}
 
-          <p>
-            {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
-          </p>
-
-          <p>
-            {t('task_rate')}:
-            {formatMoney(
-              project.task_rate,
-              project.client?.country_id,
-              project.client?.settings.currency_id
+          <div className="mt-2">
+            {project.due_date.length > 0 && (
+              <p>
+                {t('due_date')}: {date(project.due_date, dateFormat)}
+              </p>
             )}
-          </p>
+
+            <p>
+              {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
+            </p>
+
+            <p>
+              {t('task_rate')}:
+              {formatMoney(
+                project.task_rate,
+                project.client?.country_id,
+                project.client?.settings.currency_id
+              )}
+            </p>
+          </div>
         </InfoCard>
 
         <InfoCard title={t('notes')} className="h-56" withoutTruncate>
