@@ -35,7 +35,8 @@ export default function Body() {
     <Card title={t('body')} padding="small" height="full">
       <Editor
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
-        defaultLanguage="html"
+        defaultLanguage="twig"
+        language="twig"
         value={payload.design?.design.body}
         options={{
           minimap: {

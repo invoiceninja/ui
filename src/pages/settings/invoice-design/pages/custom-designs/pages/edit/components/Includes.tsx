@@ -44,7 +44,8 @@ export default function Includes() {
   return (
     <Card title={t('includes')} padding="small" height="full">
       <Editor
-        defaultLanguage="html"
+        defaultLanguage="twig"
+        language="twig"
         value={payload.design?.design.includes}
         theme={colors.name === 'invoiceninja.dark' ? 'vs-dark' : 'light'}
         options={{
