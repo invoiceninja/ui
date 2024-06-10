@@ -13,7 +13,6 @@ import { InputField } from '$app/components/forms';
 import { Project } from '$app/common/interfaces/project';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useProjectQuery } from '$app/common/queries/projects';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
@@ -21,6 +20,7 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -77,13 +77,11 @@ export default function Edit() {
         />
       </Element>
 
-      <Element leftSide={t('client')} required>
-        <ClientSelector
-          value={project?.client_id}
-          onChange={(id) => handleChange('client_id', id)}
-          readonly
-        />
-      </Element>
+      {project?.client && (
+        <Element leftSide={t('client')} required>
+          <ClientActionButtons displayClientName client={project.client} />
+        </Element>
+      )}
 
       <Element leftSide={t('user')}>
         <UserSelector

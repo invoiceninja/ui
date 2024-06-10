@@ -54,7 +54,8 @@ export function useSettingsRoutes() {
       href: '/settings/online_payments',
       current:
         location.pathname.startsWith('/settings/online_payments') ||
-        location.pathname.startsWith('/settings/gateways'),
+        location.pathname.startsWith('/settings/gateways') ||
+        location.pathname.startsWith('/settings/payment_terms'),
       enabled: isAdmin || isOwner || false,
     },
     {

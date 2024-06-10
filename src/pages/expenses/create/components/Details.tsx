@@ -29,6 +29,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { Link } from 'react-router-dom';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -115,31 +116,20 @@ export function Details(props: Props) {
         )}
 
         {expense && (
-          <Element
-            leftSide={
-              <div className="flex items-center space-x-2">
-                <span>{t('client')}</span>
+          <Element leftSide={t('client')}>
+            <div className="flex flex-col space-y-2">
+              <ClientSelector
+                value={expense.client_id}
+                clearButton={Boolean(expense.client_id)}
+                onClearButtonClick={() => handleChange('client_id', '')}
+                onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
+              />
 
-                {expense.client_id && (
-                  <Link
-                    to={route('/clients/:id', {
-                      id: expense.client_id,
-                    })}
-                    target="_blank"
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
-                )}
-              </div>
-            }
-          >
-            <ClientSelector
-              value={expense.client_id}
-              clearButton={Boolean(expense.client_id)}
-              onClearButtonClick={() => handleChange('client_id', '')}
-              onChange={(client) => handleChange('client_id', client.id)}
-              errorMessage={errors?.errors.client_id}
-            />
+              {expense.client_id && (
+                <ClientActionButtons clientId={expense.client_id} />
+              )}
+            </div>
           </Element>
         )}
 
