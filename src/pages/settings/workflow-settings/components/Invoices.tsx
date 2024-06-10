@@ -155,6 +155,7 @@ export function Invoices() {
           <option value="off">{t('off')}</option>
           <option value="when_sent">{t('when_sent')}</option>
           <option value="when_paid">{t('when_paid')}</option>
+          <option value="end_of_month">{t('end_of_month')}</option>
         </SelectField>
       </Element>
     </Card>

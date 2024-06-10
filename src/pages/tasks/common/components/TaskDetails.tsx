@@ -39,6 +39,7 @@ import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 interface Props {
   task: Task;
@@ -142,42 +143,26 @@ export function TaskDetails(props: Props) {
 
         {!task.project_id && (
           <Element leftSide={t('client')}>
-            <div className="flex items-center justify-center">
-              <span
-                className="flex flex-1 item-center gap-2"
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
-              >
-                <ClientSelector
-                  onChange={(client) => {
-                    handleChange('client_id', client.id);
+            <div className="flex flex-col space-y-2">
+              <ClientSelector
+                onChange={(client) => {
+                  handleChange('client_id', client.id);
 
-                    if (!task.id) {
-                      handleChange(
-                        'rate',
-                        client?.settings?.default_task_rate ?? 0
-                      );
-                    }
-                  }}
-                  value={task.client_id}
-                  clearButton={Boolean(task.client_id)}
-                  onClearButtonClick={() => handleChange('client_id', '')}
-                  errorMessage={errors?.errors.client_id}
-                />
-              </span>
+                  if (!task.id) {
+                    handleChange(
+                      'rate',
+                      client?.settings?.default_task_rate ?? 0
+                    );
+                  }
+                }}
+                value={task.client_id}
+                clearButton={Boolean(task.client_id)}
+                onClearButtonClick={() => handleChange('client_id', '')}
+                errorMessage={errors?.errors.client_id}
+              />
 
-              {task?.client_id && (
-                <span
-                  className="flex item-center gap-2 pl-2"
-                  style={{ color: colors.$3, colorScheme: colors.$0 }}
-                >
-                  <Link
-                    to={route('/clients/:id', {
-                      id: task.client_id,
-                    })}
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
-                </span>
+              {task.client_id && (
+                <ClientActionButtons clientId={task.client_id} />
               )}
             </div>
           </Element>

@@ -21,11 +21,15 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useHandleCreate } from '../common/hooks/useHandleCreate';
 import { Card } from '$app/components/cards';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 
 export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_group');
+
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -59,8 +63,10 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      disableSaveButton={isFormBusy || !groupSettings}
+      disableSaveButton={isFormBusy || !groupSettings || showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       {groupSettings && (
         <Card title={t('new_group')}>
           <GroupSettingsForm
