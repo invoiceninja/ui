@@ -320,21 +320,7 @@ export function useActions(params?: Params) {
         {t('client_portal')}
       </EntityActionElement>
     ),
-    (invoice: Invoice) =>
-      (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && (
-        <EntityActionElement
-          key="cancel_invoice"
-          entity="invoice"
-          actionKey="cancel_invoice"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('cancel_invoice')}
-          onClick={() => bulk([invoice.id], 'cancel')}
-          icon={MdCancel}
-        >
-          {t('cancel_invoice')}
-        </EntityActionElement>
-      ),
+
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Paid ||
         invoice.status_id === InvoiceStatus.Partial) &&
@@ -452,6 +438,21 @@ export function useActions(params?: Params) {
           excludePreferences
         >
           {t('delete')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Sent ||
+        invoice.status_id === InvoiceStatus.Partial) && (
+        <EntityActionElement
+          key="cancel_invoice"
+          entity="invoice"
+          actionKey="cancel_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('cancel_invoice')}
+          onClick={() => bulk([invoice.id], 'cancel')}
+          icon={MdCancel}
+        >
+          {t('cancel_invoice')}
         </EntityActionElement>
       ),
   ];
