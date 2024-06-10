@@ -16,11 +16,10 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
+import { ClientActionButtons } from './ClientActionButtons';
 
 interface Props {
   readonly?: boolean;
@@ -36,8 +35,6 @@ interface Props {
 export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
-
-  const hasPermission = useHasPermission();
 
   const { resource } = props;
 
@@ -82,23 +79,7 @@ export function ClientSelector(props: Props) {
           />
         )}
 
-        {client && (
-          <div className="space-x-2">
-            {hasPermission('edit_client') && (
-              <Link to={route('/clients/:id/edit', { id: client.id })}>
-                {t('edit_client')}
-              </Link>
-            )}
-
-            {hasPermission('edit_client') && <span className="text-sm">/</span>}
-
-            {(hasPermission('view_client') || hasPermission('edit_client')) && (
-              <Link to={route('/clients/:id', { id: client.id })}>
-                {t('view_client')}
-              </Link>
-            )}
-          </div>
-        )}
+        {client && <ClientActionButtons client={client} />}
       </div>
 
       {resource?.client_id &&

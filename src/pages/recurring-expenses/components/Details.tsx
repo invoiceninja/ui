@@ -31,6 +31,7 @@ import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useC
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -120,32 +121,21 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element
-            leftSide={
-              <div className="flex items-center space-x-2">
-                <span>{t('client')}</span>
+          <Element leftSide={t('client')}>
+            <div className="flex flex-col space-y-2">
+              <ClientSelector
+                value={recurringExpense.client_id}
+                clearButton={Boolean(recurringExpense.client_id)}
+                onClearButtonClick={() => handleChange('client_id', '')}
+                onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
+                disableWithSpinner={searchParams.get('action') === 'create'}
+              />
 
-                {recurringExpense.client_id && (
-                  <Link
-                    to={route('/clients/:id', {
-                      id: recurringExpense.client_id,
-                    })}
-                    target="_blank"
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
-                )}
-              </div>
-            }
-          >
-            <ClientSelector
-              value={recurringExpense.client_id}
-              clearButton={Boolean(recurringExpense.client_id)}
-              onClearButtonClick={() => handleChange('client_id', '')}
-              onChange={(client) => handleChange('client_id', client.id)}
-              errorMessage={errors?.errors.client_id}
-              disableWithSpinner={searchParams.get('action') === 'create'}
-            />
+              {recurringExpense.client_id && (
+                <ClientActionButtons clientId={recurringExpense.client_id} />
+              )}
+            </div>
           </Element>
         )}
 
