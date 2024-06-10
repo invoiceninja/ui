@@ -33,6 +33,7 @@ export function Clients() {
         linkToEdit="/clients/:id/edit"
         columns={columns}
         customActions={actions}
+        bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
         withResourcefulActions
         linkToCreate={route('/clients/create?group=:groupId', {
