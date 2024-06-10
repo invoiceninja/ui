@@ -119,10 +119,10 @@ export default function CustomDesign() {
       <PanelGroup>
         <Panel>
           <div className="space-y-4 h-full max-h-[80vh] overflow-y-auto">
-            {errors?.errors.syntax ? (
+            {errors?.errors['design.design.body'] ? (
               <Alert type="danger">
                 <p>{errors.message}</p>
-                <small>{errors.errors.syntax}</small>
+                <small>{errors.errors['design.design.body']}</small>
               </Alert>
             ) : null}
 
