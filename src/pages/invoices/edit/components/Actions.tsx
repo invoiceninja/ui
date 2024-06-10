@@ -444,7 +444,9 @@ export function useActions(params?: Params) {
       (invoice.status_id === InvoiceStatus.Sent ||
         invoice.status_id === InvoiceStatus.Partial) && (
         <EntityActionElement
-          key="cancel_invoice"
+          {...(!dropdown && {
+            key: 'cancel_invoice',
+          })}
           entity="invoice"
           actionKey="cancel_invoice"
           isCommonActionSection={!dropdown}
