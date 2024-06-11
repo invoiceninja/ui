@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { License } from '.';
 import { Card, Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
+import dayjs from 'dayjs';
 
 export function Plan() {
   const [t] = useTranslation();
@@ -44,7 +45,9 @@ export function Plan() {
 
       {account?.plan_expires !== '' && (
         <Element leftSide={t('expires_on')}>
-          {date(account?.plan_expires, dateFormat)}
+          {dayjs(account.plan_expires).year() > 2000
+            ? date(account.plan_expires, dateFormat)
+            : t('forever_free')}
         </Element>
       )}
 
