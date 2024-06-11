@@ -30,6 +30,7 @@ interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
   cypressRef?: string;
+  labelElement?: ReactNode;
 }
 
 const LabelButton = styled.button`
@@ -111,7 +112,7 @@ export function Dropdown(props: Props) {
       >
         <LabelButton
           theme={{
-            backgroundColor: accentColor,
+            backgroundColor: !props.labelElement ? accentColor : '',
             color: colors.$9,
             borderColor: colors.$5,
           }}
@@ -119,10 +120,12 @@ export function Dropdown(props: Props) {
           disabled={props.disabled}
           onClick={() => setVisible(!visible)}
           className={classNames(
-            `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 py-2 ${props.className}`,
+            `items-center space-x-2 justify-center rounded text-sm disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
             {
               'hover:bg-white hover:border-gray-300': !props.cardActions,
               'hover:opacity-90': props.cardActions,
+              'inline-flex border px-4 py-2': !props.labelElement,
+              flex: props.labelElement,
             }
           )}
           style={{
@@ -131,8 +134,15 @@ export function Dropdown(props: Props) {
           }}
           data-cy="chevronDownButton"
         >
-          {!props.cardActions && <span>{props.label}</span>}
-          <ChevronDown size={props.cardActions ? 18 : 14} />
+          {Boolean(!props.cardActions && props.label) && (
+            <span>{props.label}</span>
+          )}
+
+          {!props.labelElement && (
+            <ChevronDown size={props.cardActions ? 18 : 14} />
+          )}
+
+          {props.labelElement}
         </LabelButton>
       </Tippy>
     </div>

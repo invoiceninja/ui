@@ -49,6 +49,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
+import { useLineItemActions } from '../common/hooks/useLineItemActions';
 
 export default function Edit() {
   const { t } = useTranslation();
@@ -59,6 +60,7 @@ export default function Edit() {
   const entityAssigned = useEntityAssigned();
 
   const reactSettings = useReactSettings();
+  const lineItemActions = useLineItemActions();
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -190,6 +192,7 @@ export default function Edit() {
                     ].includes(item.type_id)
                   )}
                   columns={productColumns}
+                  lineItemActions={lineItemActions}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
@@ -216,6 +219,7 @@ export default function Edit() {
                     (item) => item.type_id === InvoiceItemType.Task
                   )}
                   columns={taskColumns}
+                  lineItemActions={lineItemActions}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}

@@ -24,6 +24,7 @@ interface Props extends CommonProps {
   icon?: ReactElement;
   cypressRef?: string;
   actionKey?: 'switchCompany';
+  linkTarget?: '_blank';
 }
 
 const Button = styled.button`
@@ -70,6 +71,7 @@ export function DropdownElement(props: Props) {
             preventNavigation({ url: props.to });
           }
         }}
+        target={props.linkTarget}
       >
         {props.icon}
         <div

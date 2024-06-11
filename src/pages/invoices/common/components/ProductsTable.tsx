@@ -27,6 +27,10 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  LineItemAction,
+  LineItemActions,
+} from '$app/components/LineItemActions';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -49,6 +53,7 @@ interface Props {
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
+  lineItemActions?: LineItemAction[];
 }
 
 export function ProductsTable(props: Props) {
@@ -84,6 +89,12 @@ export function ProductsTable(props: Props) {
 
   const getLineItemIndex = (lineItem: InvoiceItem) => {
     return resource.line_items.indexOf(lineItem);
+  };
+
+  const onLineItemDelete = (lineItem: InvoiceItem) => {
+    setIsDeleteActionTriggered(true);
+
+    props.onDeleteRowClick(getLineItemIndex(lineItem));
   };
 
   // This portion of the code pertains to the automatic creation of line items.
@@ -160,19 +171,25 @@ export function ProductsTable(props: Props) {
                               )}
 
                               {resource && (
-                                <button
-                                  style={{ color: colors.$3 }}
-                                  className="ml-2 text-gray-600 hover:text-red-600"
-                                  onClick={() => {
-                                    setIsDeleteActionTriggered(true);
-
-                                    props.onDeleteRowClick(
-                                      getLineItemIndex(lineItem)
-                                    );
-                                  }}
-                                >
-                                  <Trash2 size={18} />
-                                </button>
+                                <>
+                                  {props.lineItemActions?.length ? (
+                                    <LineItemActions
+                                      lineItem={lineItem}
+                                      actions={props.lineItemActions}
+                                      onLineItemDelete={() =>
+                                        onLineItemDelete(lineItem)
+                                      }
+                                    />
+                                  ) : (
+                                    <button
+                                      style={{ color: colors.$3 }}
+                                      className="ml-2 text-gray-600 hover:text-red-600"
+                                      onClick={() => onLineItemDelete(lineItem)}
+                                    >
+                                      <Trash2 size={18} />
+                                    </button>
+                                  )}
+                                </>
                               )}
                             </div>
                           )}
