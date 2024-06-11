@@ -29,6 +29,7 @@ import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
 import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './pages/edit/common/hooks/useTabs';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Alert } from '$app/components/Alert';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -118,6 +119,13 @@ export default function CustomDesign() {
       <PanelGroup>
         <Panel>
           <div className="space-y-4 h-full max-h-[80vh] overflow-y-auto">
+            {errors?.errors['design.design.body'] ? (
+              <Alert type="danger">
+                <p>{errors.message}</p>
+                <small>{errors.errors['design.design.body']}</small>
+              </Alert>
+            ) : null}
+
             <Outlet
               context={{
                 errors,
@@ -144,6 +152,18 @@ export default function CustomDesign() {
                 method="POST"
                 withToast
                 renderAsHTML={shouldRenderHTML}
+                onError={(error: AxiosError<ArrayBuffer>) => {
+                  if (error.response?.status === 422 && error.response.data) {
+                    const response = new TextDecoder('utf-8').decode(
+                      error.response.data
+                    );
+
+                    const body = JSON.parse(response) as ValidationBag;
+
+                    setErrors(body);
+                  }
+                }}
+                onRequest={() => setErrors(undefined)}
               />
             ) : null}
           </div>
