@@ -60,7 +60,7 @@ export default function Clients() {
     >
       <DataTable
         resource="client"
-        endpoint="/api/v1/clients?sort=id|desc"
+        endpoint="/api/v1/clients?include=group_settings&sort=id|desc"
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
         linkToCreate="/clients/create"

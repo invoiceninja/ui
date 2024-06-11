@@ -77,7 +77,7 @@ export function useAllClientColumns() {
     fourthCustom,
     'documents',
     'entity_state',
-    //   'group',
+    'group',
     'id_number',
     'is_deleted',
     'language',
@@ -406,6 +406,21 @@ export function useClientColumns() {
           </Inline>
         </Link>
       ),
+    },
+    {
+      column: 'group',
+      id: 'group_settings_id',
+      label: t('group'),
+      format: (value, client) =>
+        Boolean(client.group_settings_id) && (
+          <Link
+            to={route('/settings/group_settings/:id/edit', {
+              id: value,
+            })}
+          >
+            {client.group_settings?.name}
+          </Link>
+        ),
     },
   ];
 
