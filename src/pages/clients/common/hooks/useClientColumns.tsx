@@ -412,7 +412,7 @@ export function useClientColumns() {
       id: 'group_settings_id',
       label: t('group'),
       format: (value, client) =>
-        Boolean(client.group_settings_id) && (
+        Boolean(value) && (
           <Link
             to={route('/settings/group_settings/:id/edit', {
               id: value,
