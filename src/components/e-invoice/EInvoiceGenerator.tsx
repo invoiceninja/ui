@@ -91,7 +91,7 @@ interface ElementType {
 interface Component {
   type: string;
   help: string;
-  choices: string[][];
+  choices: string[][] | undefined;
   elements: Record<string, ElementType>;
 }
 
@@ -164,7 +164,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         const parentComponent = components[parentComponentType];
 
         if (parentComponent && fieldName) {
-          return parentComponent?.choices.some((choiceGroup) =>
+          return parentComponent?.choices?.some((choiceGroup) =>
             choiceGroup.some((choice) => choice === fieldName)
           );
         }
@@ -514,7 +514,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           >
             {isCurrentComponentLastParent &&
               shouldBeRendered &&
-              Boolean(component.choices.length) && (
+              Boolean(component.choices?.length) && (
                 <Element
                   key={`${componentKey}ChoiceSelector`}
                   leftSide={getChoiceSelectorLabel(componentKey)}
@@ -535,7 +535,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     }}
                     withBlank
                   >
-                    {component.choices.map((choiceGroup) =>
+                    {component.choices?.map((choiceGroup) =>
                       choiceGroup.map((choice) => (
                         <option key={choice} value={choice}>
                           {choice}
