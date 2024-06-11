@@ -44,7 +44,7 @@ export function Plan() {
 
       {account?.plan_expires !== '' && (
         <Element leftSide={t('expires_on')}>
-          {date(account.plan_expires, dateFormat)}
+          {date(account?.plan_expires, dateFormat)}
         </Element>
       )}
 
