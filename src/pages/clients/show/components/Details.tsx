@@ -17,6 +17,7 @@ import { InfoCard } from '$app/components/InfoCard';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   client: Client;
@@ -43,6 +44,18 @@ export function Details(props: Props) {
                 <Element leftSide={t('status')} noExternalPadding>
                   <EntityStatus entity={client} />
                 </Element>
+
+                {client.group_settings_id && (
+                  <Element leftSide={t('group')} noExternalPadding>
+                    <Link
+                      to={route('/settings/group_settings/:id/edit', {
+                        id: client.group_settings_id,
+                      })}
+                    >
+                      {client.group_settings?.name}
+                    </Link>
+                  </Element>
+                )}
 
                 <Link to={client.website} external>
                   {client.website}
