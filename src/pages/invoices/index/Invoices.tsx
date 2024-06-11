@@ -106,6 +106,7 @@ export default function Invoices() {
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
         customActions={actions}
+        bottomActionsKeys={['cancel_invoice']}
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"

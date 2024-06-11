@@ -67,6 +67,7 @@ export default function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
+        bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
         rightSide={
           <Guard
