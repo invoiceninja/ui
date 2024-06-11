@@ -114,6 +114,7 @@ interface Props<T> extends CommonProps {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
+  bottomActionsKeys?: string[];
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
@@ -185,6 +186,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     queryIdentificator,
     disableQuery,
     footerColumns = [],
+    bottomActionsKeys = [],
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -726,9 +728,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource)?.key !== 'purge' && (
-                              <div key={index}>{action(resource)}</div>
-                            )
+                            !bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
 
                       {props.customActions &&
@@ -773,9 +775,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource)?.key === 'purge' && (
-                              <div key={index}>{action(resource)}</div>
-                            )
+                            bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
                     </Dropdown>
                   </Td>
