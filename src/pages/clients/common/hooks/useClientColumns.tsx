@@ -90,6 +90,7 @@ export function useAllClientColumns() {
     'updated_at',
     'vat_number',
     'website',
+    'city',
   ] as const;
 
   return clientColumns;
@@ -421,6 +422,11 @@ export function useClientColumns() {
             {client.group_settings?.name}
           </Link>
         ),
+    },
+    {
+      column: 'city',
+      id: 'city',
+      label: t('city'),
     },
   ];
 
