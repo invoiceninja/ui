@@ -150,12 +150,18 @@ export function Create() {
   };
 
   const handleGoCardless = () => {
-    window
-      .open(
-        `https://invoicing.co/gocardless/oauth/connect/${company.company_key}`,
-        '_blank'
-      )
-      ?.focus();
+    request('POST', endpoint('/api/v1/one_time_token'), {
+      context: 'gocardless_oauth2',
+    }).then((response) =>
+      window
+        .open(
+          route('https://invoicing.co/gocardless/oauth/connect/:token', {
+            token: response.data.hash,
+          }),
+          '_blank'
+        )
+        ?.focus()
+      );
   };
 
   const defaultTab = [t('payment_provider')];
