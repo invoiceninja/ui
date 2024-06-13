@@ -23,10 +23,10 @@ import { LogPosition } from '$app/pages/tasks/common/components/TaskTable';
 import {
   duration,
   handleTaskDurationChange,
-  handleTaskTimeChange,
   parseTime,
   parseTimeToDate,
   useHandleTaskDateChange,
+  useHandleTaskTimeChange,
 } from '$app/pages/tasks/common/helpers';
 import {
   parseTimeLog,
@@ -47,6 +47,7 @@ export function EditSlider() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const handleTaskTimeChange = useHandleTaskTimeChange();
   const handleTaskDateChange = useHandleTaskDateChange();
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);

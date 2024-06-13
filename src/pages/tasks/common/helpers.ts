@@ -79,22 +79,34 @@ export function duration(
   }
 }
 
-export function handleTaskTimeChange(
-  log: string,
-  unix: number,
-  time: string,
-  position: number,
-  index: number
-) {
-  const date = unix ? parseTimeToDate(unix) : parseTimeToDate(dayjs().unix());
+export function useHandleTaskTimeChange() {
+  const company = useCurrentCompany();
 
-  const unixTimestamp = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm:ss').unix();
+  return (
+    log: string,
+    unix: number,
+    time: string,
+    position: number,
+    index: number
+  ) => {
+    const logs = parseTimeLog(log);
 
-  const logs = parseTimeLog(log);
+    const startLog = logs[index][LogPosition.Start];
 
-  logs[index][position] = unixTimestamp;
+    const date =
+      unix && company.show_task_end_date
+        ? parseTimeToDate(unix)
+        : parseTimeToDate(startLog || dayjs().unix());
 
-  return JSON.stringify(logs);
+    const unixTimestamp = dayjs(
+      `${date} ${time}`,
+      'YYYY-MM-DD HH:mm:ss'
+    ).unix();
+
+    logs[index][position] = unixTimestamp;
+
+    return JSON.stringify(logs);
+  };
 }
 
 export function useHandleTaskDateChange() {
