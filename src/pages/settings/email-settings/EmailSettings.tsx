@@ -559,45 +559,41 @@ export function EmailSettings() {
           />
         </Element>
 
-        {company?.settings.email_sending_method !== 'smtp' && (
-          <Element
-            leftSide={
-              <PropertyCheckbox
-                propertyKey="reply_to_name"
-                labelElement={<SettingsLabel label={t('reply_to_name')} />}
-              />
-            }
-          >
-            <InputField
-              value={company?.settings.reply_to_name || ''}
-              onValueChange={(value) =>
-                handleChange('settings.reply_to_name', value)
-              }
-              disabled={disableSettingsField('reply_to_name')}
-              errorMessage={errors?.errors['settings.reply_to_name']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_name"
+              labelElement={<SettingsLabel label={t('reply_to_name')} />}
             />
-          </Element>
-        )}
+          }
+        >
+          <InputField
+            value={company?.settings.reply_to_name || ''}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_name', value)
+            }
+            disabled={disableSettingsField('reply_to_name')}
+            errorMessage={errors?.errors['settings.reply_to_name']}
+          />
+        </Element>
 
-        {company?.settings.email_sending_method !== 'smtp' && (
-          <Element
-            leftSide={
-              <PropertyCheckbox
-                propertyKey="reply_to_email"
-                labelElement={<SettingsLabel label={t('reply_to_email')} />}
-              />
-            }
-          >
-            <InputField
-              value={company?.settings.reply_to_email || ''}
-              onValueChange={(value) =>
-                handleChange('settings.reply_to_email', value)
-              }
-              disabled={disableSettingsField('reply_to_email')}
-              errorMessage={errors?.errors['settings.reply_to_email']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_email"
+              labelElement={<SettingsLabel label={t('reply_to_email')} />}
             />
-          </Element>
-        )}
+          }
+        >
+          <InputField
+            value={company?.settings.reply_to_email || ''}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_email', value)
+            }
+            disabled={disableSettingsField('reply_to_email')}
+            errorMessage={errors?.errors['settings.reply_to_email']}
+          />
+        </Element>
 
         {company?.settings.email_sending_method !== 'smtp' && (
           <Element
