@@ -110,7 +110,8 @@ export function DropdownElement(props: Props) {
       )}
       data-cy={props.cypressRef}
     >
-      {props.icon}
+      {props.icon && <div>{props.icon}</div>}
+
       <div
         className={classNames({
           'ml-2': props.icon,
