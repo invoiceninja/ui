@@ -25,6 +25,7 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
+import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 
 interface Props {
   gateway: Gateway;
@@ -46,8 +47,9 @@ export function Credentials(props: Props) {
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
+  const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
 
-  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
+  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP, GOCARDLESS];
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
   const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
@@ -96,6 +98,10 @@ export function Credentials(props: Props) {
             setCompanyGateway={props.setCompanyGateway}
             errors={props.errors}
           />
+        )}
+  
+        {props.gateway && props.gateway.key === GOCARDLESS && (
+          <GoCardlessOAuth2 companyGateway={props.companyGateway} />
         )}
 
         {props.gateway &&
