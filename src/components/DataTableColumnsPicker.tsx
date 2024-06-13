@@ -151,11 +151,13 @@ export function DataTableColumnsPicker(props: Props) {
           withBlank
           cypressRef="columSelector"
         >
-          {filteredColumns.map((column, index) => (
-            <option key={index} value={column}>
-              {t(column)}
-            </option>
-          ))}
+          {filteredColumns
+            .sort((a, b) => t(a).localeCompare(t(b)))
+            .map((column, index) => (
+              <option key={index} value={column}>
+                {t(column)}
+              </option>
+            ))}
         </SelectField>
 
         <DragDropContext onDragEnd={onDragEnd}>
