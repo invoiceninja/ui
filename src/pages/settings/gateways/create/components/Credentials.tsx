@@ -21,11 +21,14 @@ import { WePay } from './gateways/WePay';
 import { PayPalPPCP } from './gateways/PayPalPPCP';
 import { Divider } from '$app/components/cards/Divider';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
+import { route } from '$app/common/helpers/route';
+import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
+import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 
 interface Props {
   gateway: Gateway;
@@ -44,12 +47,22 @@ export function Credentials(props: Props) {
     props.setCompanyGateway
   );
 
+  const config = useResolveConfigValue(props.companyGateway);
+
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
   const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
 
-  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP, GOCARDLESS];
+  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
+
+  if (
+    isHosted() &&
+    props.gateway.key === GOCARDLESS &&
+    config('oauth2') === true
+  ) {
+    hostedGateways.push(GOCARDLESS);
+  }
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
   const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
@@ -73,6 +86,8 @@ export function Credentials(props: Props) {
         });
     }
   };
+
+  const handleGoCardless = useHandleGoCardless();
 
   return (
     <>
@@ -99,10 +114,16 @@ export function Credentials(props: Props) {
             errors={props.errors}
           />
         )}
-  
-        {props.gateway && props.gateway.key === GOCARDLESS && (
-          <GoCardlessOAuth2 companyGateway={props.companyGateway} />
-        )}
+
+        {props.gateway &&
+          props.gateway.key === GOCARDLESS &&
+          isHosted() &&
+          config('oauth2') === true && (
+            <GoCardlessOAuth2
+              companyGateway={props.companyGateway}
+              setCompanyGateway={props.setCompanyGateway}
+            />
+          )}
 
         {props.gateway &&
           !hostedGateways.includes(props.gateway.key) &&
@@ -115,6 +136,21 @@ export function Credentials(props: Props) {
               )}
             </Element>
           ))}
+
+        {props.gateway &&
+          props.gateway.key === GOCARDLESS &&
+          isHosted() &&
+          config('oauth2') !== true && (
+            <Element leftSide={t('OAuth 2.0')}>
+              <Button
+                behavior="button"
+                type="minimal"
+                onClick={handleGoCardless}
+              >
+                {t('connect')}
+              </Button>
+            </Element>
+          )}
 
         <Divider />
 
