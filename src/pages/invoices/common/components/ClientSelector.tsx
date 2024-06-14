@@ -124,7 +124,7 @@ export function ClientSelector(props: Props) {
                     <Tooltip
                       width="auto"
                       placement="bottom"
-                      message={t('copy_portal_url') as string}
+                      message={t('copy_link') as string}
                       withoutArrow
                     >
                       <CopyToClipboardIconOnly
