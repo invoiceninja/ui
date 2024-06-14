@@ -35,7 +35,6 @@ import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 
 const gatewaysStyles = [
@@ -95,8 +94,6 @@ export function Create() {
   const gateways = useGateways();
 
   const onSave = useHandleCreate(companyGateway, setErrors);
-
-  const company = useCurrentCompany();
 
   const handleChange = (value: string, isManualChange?: boolean) => {
     const gateway = gateways.find((gateway) => gateway.id === value);

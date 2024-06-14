@@ -26,7 +26,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
-import { route } from '$app/common/helpers/route';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 

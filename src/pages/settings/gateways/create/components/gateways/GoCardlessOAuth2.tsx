@@ -16,9 +16,6 @@ import { Field } from '$app/pages/settings/gateways/create/hooks/useResolveInput
 import Toggle from '$app/components/forms/Toggle';
 import { Check } from 'react-feather';
 import { useHandleCredentialsChange } from '$app/pages/settings/gateways/create/hooks/useHandleCredentialsChange';
-import { isHosted } from '$app/common/helpers';
-import { Button } from '$app/components/forms';
-import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 
 interface Props {
   companyGateway: CompanyGateway;
