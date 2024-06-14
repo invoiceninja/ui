@@ -22,11 +22,11 @@ import { useAtom } from 'jotai';
 import { LogPosition } from '$app/pages/tasks/common/components/TaskTable';
 import {
   duration,
-  handleTaskDateChange,
   handleTaskDurationChange,
-  handleTaskTimeChange,
   parseTime,
   parseTimeToDate,
+  useHandleTaskDateChange,
+  useHandleTaskTimeChange,
 } from '$app/pages/tasks/common/helpers';
 import {
   parseTimeLog,
@@ -46,6 +46,9 @@ export function EditSlider() {
   const [task, setTask] = useAtom(currentTaskAtom);
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const handleTaskTimeChange = useHandleTaskTimeChange();
+  const handleTaskDateChange = useHandleTaskDateChange();
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
 
