@@ -18,10 +18,10 @@ import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   duration,
-  handleTaskDateChange,
   handleTaskDurationChange,
-  handleTaskTimeChange,
   parseTimeToDate,
+  useHandleTaskDateChange,
+  useHandleTaskTimeChange,
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
@@ -47,6 +47,9 @@ export function TaskTable(props: Props) {
   const colors = useColorScheme();
 
   const company = useCurrentCompany();
+
+  const handleTaskTimeChange = useHandleTaskTimeChange();
+  const handleTaskDateChange = useHandleTaskDateChange();
 
   const [lastChangedIndex, setLastChangedIndex] = useState<number>();
 
