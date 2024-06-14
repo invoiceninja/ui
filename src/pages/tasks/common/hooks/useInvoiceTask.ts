@@ -168,6 +168,10 @@ export function useInvoiceTask() {
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
           task_id: task.id,
           tax_id: '',
+          custom_value1: task.custom_value1,
+          custom_value2: task.custom_value2,
+          custom_value3: task.custom_value3,
+          custom_value4: task.custom_value4,
         };
 
         const projectName =
