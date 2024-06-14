@@ -36,6 +36,7 @@ import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },
@@ -149,20 +150,7 @@ export function Create() {
     );
   };
 
-  const handleGoCardless = () => {
-    request('POST', endpoint('/api/v1/one_time_token'), {
-      context: 'gocardless_oauth2',
-    }).then((response) =>
-      window
-        .open(
-          route('https://invoicing.co/gocardless/oauth/connect/:token', {
-            token: response.data.hash,
-          }),
-          '_blank'
-        )
-        ?.focus()
-      );
-  };
+  const handleGoCardless = useHandleGoCardless();
 
   const defaultTab = [t('payment_provider')];
 
