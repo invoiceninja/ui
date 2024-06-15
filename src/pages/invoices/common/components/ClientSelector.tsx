@@ -20,6 +20,7 @@ import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly
 import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { ClientActionButtons } from './ClientActionButtons';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   readonly?: boolean;
@@ -104,7 +105,7 @@ export function ClientSelector(props: Props) {
                 }
               />
 
-              <div>
+              <div className="relative">
                 {contact.first_name && (
                   <p className="text-sm" style={{ color: colors.$3 }}>
                     {contact.email}
@@ -112,17 +113,25 @@ export function ClientSelector(props: Props) {
                 )}
 
                 {resource.invitations.length >= 1 && (
-                  <>
+                  <div className="flex space-x-2 mt-1">
                     <Link
                       to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
                       external
                     >
                       {t('view_in_portal')}
                     </Link>
-                    <CopyToClipboardIconOnly
-                      text={resource.invitations[0].link}
-                    />
-                  </>
+
+                    <Tooltip
+                      width="auto"
+                      placement="bottom"
+                      message={t('copy_link') as string}
+                      withoutArrow
+                    >
+                      <CopyToClipboardIconOnly
+                        text={resource.invitations[0].link}
+                      />
+                    </Tooltip>
+                  </div>
                 )}
               </div>
             </div>
