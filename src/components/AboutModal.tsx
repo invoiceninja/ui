@@ -115,6 +115,7 @@ export function AboutModal(props: Props) {
         (response) => response.data
       ),
     staleTime: Infinity,
+    enabled: isSelfHosted(),
   });
 
   const handleHealthCheck = (allowAction?: boolean) => {
