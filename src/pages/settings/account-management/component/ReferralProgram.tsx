@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Card, Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
@@ -16,13 +16,13 @@ import { useTranslation } from 'react-i18next';
 export function ReferralProgram() {
   const [t] = useTranslation();
 
-  const user = useCurrentUser();
+  const account = useCurrentAccount();
 
   return (
     <Card title={t('referral_program')}>
       <Element leftSide={t('referral_code')}>
         <CopyToClipboard
-          text={`https://app.invoicing.co/#/register?rc=${user?.referral_code}`}
+          text={`https://app.invoicing.co/#/register?rc=${account?.referral_code}`}
         />
       </Element>
     </Card>
