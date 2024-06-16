@@ -107,7 +107,7 @@ export function CompanyEdit(props: Props) {
       let url = 'stripe/signup/:token';
 
       if (gateway === 'paypal_ppcp') {
-        url = 'paypal?token=:token';
+        url = 'paypal?hash=:token';
       }
 
       window
