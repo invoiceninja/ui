@@ -228,9 +228,7 @@ export function Settings() {
           leftSide={
             <PropertyCheckbox
               propertyKey="enable_rappen_rounding"
-              labelElement={
-                <SettingsLabel label={t('enable_rappen_rounding')} />
-              }
+              labelElement={<SettingsLabel label={t('rappen_rounding')} />}
               defaultValue={false}
             />
           }
