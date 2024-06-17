@@ -414,7 +414,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
       setSelectedResources(filteredSelectedResources);
 
-      if (Number(perPage) !== selected.length && mainCheckbox.current) {
+      const shouldDeselectMainCheckbox = data.data.data.some(
+        (resource: any) => !selected.includes(resource.id)
+      );
+
+      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
         mainCheckbox.current.checked = false;
       } else if (mainCheckbox.current) {
         mainCheckbox.current.checked = true;
