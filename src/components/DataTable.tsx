@@ -413,6 +413,12 @@ export function DataTable<T extends object>(props: Props<T>) {
       );
 
       setSelectedResources(filteredSelectedResources);
+
+      if (Number(perPage) !== selected.length && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      } else if (mainCheckbox.current) {
+        mainCheckbox.current.checked = true;
+      }
     }
   }, [selected]);
 
@@ -421,6 +427,23 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      if (
+        Number(perPage) < selected.length ||
+        Number(perPage) === selected.length
+      ) {
+        setSelected(
+          data.data.data
+            .map((resource: any) => resource.id)
+            .filter((resourceId: string) => selected.includes(resourceId))
+        );
+      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      }
+    }
+  }, [perPage]);
 
   useEffect(() => {
     emitter.on('bulk.completed', () => setSelected([]));
@@ -558,11 +581,17 @@ export function DataTable<T extends object>(props: Props<T>) {
                   ).forEach((checkbox: HTMLInputElement | any) => {
                     checkbox.checked = event.target.checked;
 
-                    event.target.checked
-                      ? setSelected((current) => [...current, checkbox.id])
-                      : setSelected((current) =>
-                          current.filter((value) => value !== checkbox.id)
-                        );
+                    if (event.target.checked) {
+                      const isAlreadyAdded = selected.find(
+                        (resourceId) => resourceId === checkbox.id
+                      );
+
+                      if (!isAlreadyAdded) {
+                        setSelected((current) => [...current, checkbox.id]);
+                      }
+                    } else {
+                      setSelected([]);
+                    }
                   });
                 }}
                 cypressRef="dataTableCheckbox"
