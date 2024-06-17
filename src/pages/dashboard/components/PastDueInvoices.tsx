@@ -19,12 +19,16 @@ import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useState } from 'react';
+import { Button } from '$app/components/forms';
 
 export function PastDueInvoices() {
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
+
+  const [filter, setFilter] = useState<'filter_1' | 'filter_2'>();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -82,6 +86,35 @@ export function PastDueInvoices() {
       className="h-96 relative"
       withoutBodyPadding
       withoutHeaderBorder
+      topRight={
+        <div className="flex space-x-3">
+          <Button
+            behavior="button"
+            type={filter === 'filter_1' ? 'primary' : 'minimal'}
+            onClick={() =>
+              setFilter((current) =>
+                current === 'filter_1' ? undefined : 'filter_1'
+              )
+            }
+            minimalTypePadding
+          >
+            {t('filter_1')}
+          </Button>
+
+          <Button
+            behavior="button"
+            type={filter === 'filter_2' ? 'primary' : 'minimal'}
+            onClick={() =>
+              setFilter((current) =>
+                current === 'filter_2' ? undefined : 'filter_2'
+              )
+            }
+            minimalTypePadding
+          >
+            {t('filter_2')}
+          </Button>
+        </div>
+      }
     >
       <div className="pl-6 pr-4">
         <DataTable

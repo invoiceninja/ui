@@ -27,6 +27,7 @@ interface Props extends CommonProps {
   behavior?: 'button' | 'submit';
   disableWithoutIcon?: boolean;
   noBackgroundColor?: boolean;
+  minimalTypePadding?: boolean;
 }
 
 const defaultProps: Props = {
@@ -75,9 +76,9 @@ export function Button(props: Props) {
         className={classNames(
           `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
           {
-            'py-2 px-4': props.type !== 'minimal',
+            'py-2 px-4': props.type !== 'minimal' && !props.minimalTypePadding,
             'w-full': props.variant === 'block',
-            'p-0 m-0': props.type === 'minimal',
+            'p-0 m-0': props.type === 'minimal' || !props.minimalTypePadding,
           }
         )}
         style={css}
@@ -99,9 +100,9 @@ export function Button(props: Props) {
       className={classNames(
         `border inline-flex items-center space-x-2 px-4 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
         {
-          'py-2 px-4': props.type !== 'minimal',
+          'py-2 px-4': props.type !== 'minimal' && !props.minimalTypePadding,
           'w-full': props.variant === 'block',
-          'p-0 m-0': props.type === 'minimal',
+          'p-0 m-0': props.type === 'minimal' || !props.minimalTypePadding,
         }
       )}
       style={css}
