@@ -23,9 +23,10 @@ import { MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
-import { set } from 'lodash';
+import { get, set } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { EInvoiceComponent } from '$app/pages/settings';
+import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
+import { Spinner } from '../Spinner';
 
 export type Country = 'italy';
 
@@ -45,7 +46,7 @@ interface Resource {
   rules: Rule[];
   validations: Validation[];
   defaultFields: Record<string, string>;
-  components: Record<string, Component>;
+  components: Record<string, Component | undefined>;
   excluded: string[];
 }
 
@@ -98,6 +99,7 @@ interface Component {
 interface Props {
   country: Country | undefined;
   entityLevel?: boolean;
+  currentEInvoice: EInvoiceType;
 }
 
 interface ContainerProps {
@@ -120,7 +122,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
   (props, ref) => {
     const [t] = useTranslation();
 
-    const { country, entityLevel } = props;
+    const { country, entityLevel, currentEInvoice } = props;
 
     const { isCompanySettingsActive, isClientSettingsActive } =
       useCurrentSettingsLevel();
@@ -129,7 +131,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const [errors, setErrors] = useState<ValidationBag>();
     const [excluded, setExcluded] = useState<string[]>([]);
     const [isInitial, setIsInitial] = useState<boolean>(true);
-    const [components, setComponents] = useState<Record<string, Component>>({});
+    const [components, setComponents] = useState<
+      Record<string, Component | undefined>
+    >({});
     const [eInvoice, setEInvoice] = useState<
       JSX.Element | (JSX.Element | undefined)[]
     >();
@@ -145,6 +149,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       AvailableGroup[]
     >([]);
     const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
+    const [isEInvoiceGenerating, setIsEInvoiceGenerating] =
+      useState<boolean>(false);
 
     const getComponentKey = (label: string | null) => {
       return label?.split('Type')[0];
@@ -179,7 +185,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       );
     };
 
-    const showField = (key: string, visibility: number) => {
+    const showField = (
+      key: string,
+      visibility: number,
+      isChildOfFirstLevelComponent: boolean
+    ) => {
       // 1, 2, 4; all levels active
 
       // 1;  company level active //done
@@ -193,6 +203,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       // 1, 4;  company and entity levels //done
 
       // 2, 4;  client and entity levels //done
+
+      if (!isChildOfFirstLevelComponent) {
+        return false;
+      }
 
       if (!visibility) {
         return false;
@@ -320,7 +334,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return fieldElement.name;
     };
 
-    const renderElement = (element: ElementType, parentsKey: string) => {
+    const renderElement = (
+      element: ElementType,
+      parentsKey: string,
+      isChildOfFirstLevelComponent: boolean
+    ) => {
       let leftSideLabel = '';
       const fieldKey = `${parentsKey}|${element.name || ''}`;
       const rule = rules.find((rule) => rule.key === element.name);
@@ -339,7 +357,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         valueType: isNumberTypeField ? 'number' : 'string',
       });
 
-      if (!showField(fieldKey, element.visibility)) {
+      if (
+        !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
+      ) {
         return null;
       }
 
@@ -467,14 +487,16 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     const shouldAnyElementBeVisible = (
       groupComponent: Component,
-      componentPath: string
+      componentPath: string,
+      isFirstLevelComponent: boolean
     ) => {
       const groupElements: ElementType[] = getGroupElements(groupComponent, []);
 
       return groupElements.some((element) =>
         showField(
           getFieldKeyFromPayload(componentPath, element.name),
-          element.visibility
+          element.visibility,
+          isFirstLevelComponent
         )
       );
     };
@@ -483,15 +505,21 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       component: Component,
       componentIndex: number,
       isDefaultComponent: boolean,
-      componentPath: string
+      componentPath: string,
+      isFirstLevelComponent: boolean
     ) => {
+      if (!isDefaultComponent && !isFirstLevelComponent) {
+        return <></>;
+      }
+
       const isCurrentComponentLastParent = isComponentLastParent(component);
 
       const componentKey = `${componentPath}|${component.type}`;
 
       const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(
         component,
-        componentPath
+        componentPath,
+        isFirstLevelComponent
       );
 
       const shouldBeRendered = isInitial
@@ -554,7 +582,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   );
 
                   const nextComponentIndex = componentsList.findIndex(
-                    (component) => component.type === element.base_type
+                    (component) => component?.type === element.base_type
                   );
 
                   const nextComponent = componentsList[nextComponentIndex];
@@ -568,7 +596,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     const isAnyElementFromGroupVisible =
                       shouldAnyElementBeVisible(
                         nextComponent,
-                        `${componentPath}|${element.name}|${nextComponent.type}`
+                        `${componentPath}|${element.name}|${nextComponent.type}`,
+                        false
                       );
 
                     if (
@@ -591,11 +620,16 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       nextComponent,
                       nextComponentIndex,
                       Boolean(isNewComponentDefault),
-                      `${componentPath}|${element.name}`
+                      `${componentPath}|${element.name}`,
+                      false
                     );
                   }
                 } else {
-                  return renderElement(element, componentKey);
+                  return renderElement(
+                    element,
+                    componentKey,
+                    isFirstLevelComponent
+                  );
                 }
               })}
           </Container>
@@ -620,9 +654,18 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       payloadKeys.forEach(({ key, valueType }) => {
         const keysLength = key.split('|').length;
 
+        const fieldPath = key
+          .split('|')
+          .filter((_, index) => index !== keysLength - 2)
+          .join('|')
+          .replaceAll('|', '.');
+
+        const currentFieldValue = get(currentEInvoice, fieldPath);
+
         currentPayload = {
           ...currentPayload,
           [key]:
+            (currentFieldValue as string | number) ||
             defaultFields[key.split('|')[keysLength - 1]] ||
             (valueType === 'number' ? 0 : ''),
         };
@@ -654,23 +697,31 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       Object.entries(payload).forEach(([key, value]) => {
         const keysLength = key.split('|').length;
         const fieldKey = key.split('|')[keysLength - 1];
+        const firstParentComponentType = key.split('|')[keysLength - 2];
 
         let field: ElementType | undefined;
 
         Object.values(components).forEach((component) => {
           if (!field) {
-            field = Object.values(component.elements).find(
+            field = Object.values(component?.elements || {}).find(
               ({ name }) => name === fieldKey
             );
           }
         });
 
-        if (showField(key, field?.visibility || 0)) {
+        const isFirstLevelComponent = !Object.values(components).some(
+          (currentComponent) =>
+            Object.values(currentComponent?.elements || {}).some(
+              (element) => element.base_type === firstParentComponentType
+            )
+        );
+
+        if (showField(key, field?.visibility || 0, isFirstLevelComponent)) {
           let fieldValidation: ElementType | undefined;
 
           Object.values(components).forEach((component) => {
             if (!fieldValidation) {
-              fieldValidation = Object.values(component.elements).find(
+              fieldValidation = Object.values(component?.elements || {}).find(
                 ({ name }) => name === fieldKey
               );
             }
@@ -768,27 +819,49 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         }
       });
 
-      setErrors(updatedErrors);
+      if (Object.keys(updatedErrors.errors).length) {
+        setErrors(updatedErrors);
+      } else {
+        setErrors(undefined);
+      }
     };
 
     const formatPayload = () => {
       const formattedPayload = {};
 
       Object.entries(payload).forEach(([key, value]) => {
-        const prefix = `${key.split('|')[0]}|`;
-        const path = key.split(prefix)[1];
+        const keysLength = key.split('|').length;
+        const fieldKey = key.split('|')[keysLength - 1];
+        const firstParentComponentType = key.split('|')[keysLength - 2];
 
-        const pathKeysLength = path.split('|').length;
+        let field: ElementType | undefined;
 
-        const updatedPath = path
-          .split('|')
-          .filter((_, index) => index !== pathKeysLength - 2)
-          .join('|');
+        Object.values(components).forEach((component) => {
+          if (!field) {
+            field = Object.values(component?.elements || {}).find(
+              ({ name }) => name === fieldKey
+            );
+          }
+        });
 
-        set(formattedPayload, updatedPath.replaceAll('|', '.'), value);
+        const isFirstLevelComponent = !Object.values(components).some(
+          (currentComponent) =>
+            Object.values(currentComponent?.elements || {}).some(
+              (element) => element.base_type === firstParentComponentType
+            )
+        );
+
+        if (showField(key, field?.visibility || 0, isFirstLevelComponent)) {
+          const updatedPath = key
+            .split('|')
+            .filter((_, index) => index !== keysLength - 2)
+            .join('|');
+
+          set(formattedPayload, updatedPath.replaceAll('|', '.'), value);
+        }
       });
 
-      console.log(formattedPayload);
+      return formattedPayload;
     };
 
     const handleSave = () => {
@@ -796,18 +869,16 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
       checkValidation();
 
-      formatPayload();
-
       if (errors === undefined) {
-        //console.log('Call API');
+        return formatPayload();
       }
     };
 
     const getGroupElements = (
-      component: Component,
+      component: Component | undefined,
       currentElements: ElementType[]
     ): ElementType[] => {
-      const elements = Object.values(component.elements);
+      const elements = Object.values(component?.elements || {});
 
       for (let index = 0; index < elements.length; index++) {
         const element = elements[index];
@@ -845,17 +916,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     };
 
     const getChildComponentType = (
-      child: Component,
+      child: Component | undefined,
       childIndex: number,
       types: string[]
     ) => {
-      Object.values(child.elements).map((element) => {
+      Object.values(child?.elements || {}).map((element) => {
         const componentsList = Object.values(components).filter(
           (_, index) => childIndex !== index
         );
 
         const newComponentIndex = componentsList.findIndex(
-          (component) => component.type === `${element.name}Type`
+          (component) => component?.type === `${element.name}Type`
         );
 
         const newComponent = componentsList[newComponentIndex];
@@ -870,8 +941,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const isChildOfExcluded = (componentType: string) => {
       const typesForExclusion: string[] = [];
 
-      const excludedComponents = Object.values(components).filter(({ type }) =>
-        excluded.includes(type)
+      const excludedComponents = Object.values(components).filter(
+        (component) => component && excluded.includes(component.type)
       );
       const excludedComponentIndexes = Object.values(components)
         .filter((_, index) =>
@@ -893,7 +964,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     };
 
     const generateEInvoiceUI = async (
-      components: Record<string, Component>
+      components: Record<string, Component | undefined>
     ) => {
       payloadKeys = [];
 
@@ -906,23 +977,28 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           const isAlreadyRendered = Object.values(components)
             .filter((_, currentIndex) => currentIndex < index)
             .some((currentComponent) =>
-              Object.values(currentComponent.elements).some(
-                (element) => element.base_type === component.type
+              Object.values(currentComponent?.elements || {}).some(
+                (element) => element.base_type === component?.type
               )
             );
 
           const shouldBeExcluded =
-            excluded.includes(component.type) ||
-            isChildOfExcluded(component.type);
+            component &&
+            (excluded.includes(component.type) ||
+              isChildOfExcluded(component.type));
 
           if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
-            const isLastParent = isComponentLastParent(component);
+            const isLastParent = component && isComponentLastParent(component);
 
-            return renderComponent(
-              component,
-              index,
-              Boolean(isLastParent),
-              getComponentKey(component.type) || ''
+            return (
+              component &&
+              renderComponent(
+                component,
+                index,
+                Boolean(isLastParent),
+                getComponentKey(component.type) || '',
+                true
+              )
             );
           }
         }
@@ -970,6 +1046,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     useEffect(() => {
       if (Object.keys(components).length) {
         (async () => {
+          setIsEInvoiceGenerating(true);
+
           const invoiceUI = await generateEInvoiceUI(components);
 
           isInitial && setIsInitial(false);
@@ -978,6 +1056,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           isInitial && createPayload();
 
           isInitial && setCurrentAvailableGroups([...availableGroups]);
+          setIsEInvoiceGenerating(false);
         })();
       }
     }, [components, currentAvailableGroups, errors, payload, selectedChoices]);
@@ -993,7 +1072,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       () => {
         return {
           saveEInvoice() {
-            handleSave();
+            return handleSave();
           },
         };
       },
@@ -1022,7 +1101,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           </Element>
         )}
 
-        <div className="mt-4">{eInvoice ?? null}</div>
+        {isEInvoiceGenerating ? (
+          <Spinner />
+        ) : (
+          <div className="mt-4">{eInvoice ?? null}</div>
+        )}
       </div>
     );
   }

@@ -29,7 +29,12 @@ export default function EInvoice() {
 
   return (
     <Card title={t('e_invoice')}>
-      <EInvoiceGenerator ref={eInvoiceRef} country={'italy'} entityLevel />
+      <EInvoiceGenerator
+        ref={eInvoiceRef}
+        country={'italy'}
+        entityLevel
+        currentEInvoice={{}}
+      />
     </Card>
   );
 }

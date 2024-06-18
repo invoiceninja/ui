@@ -10,11 +10,8 @@
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '$app/components/layouts/Settings';
-import { useRef, useState } from 'react';
-import {
-  Country,
-  EInvoiceGenerator,
-} from '$app/components/e-invoice/EInvoiceGenerator';
+import { useEffect, useRef, useState } from 'react';
+import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
 import { Card, Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -24,19 +21,21 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
 };
 
 export interface EInvoiceComponent {
-  saveEInvoice: () => unknown;
+  saveEInvoice: () => EInvoiceType | undefined;
 }
 export function EInvoice() {
   const [t] = useTranslation();
 
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
+  const onSave = useHandleCompanySave();
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
@@ -48,15 +47,25 @@ export function EInvoice() {
     { name: t('e_invoice'), href: '/settings/e_invoice' },
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [country, setCountry] = useState<Country>('italy');
+  const [isInitial, setIsInitial] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!isInitial) {
+      onSave();
+    } else {
+      setIsInitial(false);
+    }
+  }, [company?.e_invoice]);
 
   return (
     <Settings
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={() => eInvoiceRef?.current?.saveEInvoice()}
+      onSaveClick={() =>
+        eInvoiceRef?.current?.saveEInvoice() &&
+        handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice())
+      }
       disableSaveButton={showPlanAlert}
       withoutBackButton
     >
@@ -97,7 +106,11 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        <EInvoiceGenerator ref={eInvoiceRef} country={country} />
+        <EInvoiceGenerator
+          ref={eInvoiceRef}
+          country={'italy'}
+          currentEInvoice={company?.e_invoice || {}}
+        />
       </Card>
     </Settings>
   );
