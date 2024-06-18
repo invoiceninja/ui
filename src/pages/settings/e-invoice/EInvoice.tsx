@@ -47,25 +47,25 @@ export function EInvoice() {
     { name: t('e_invoice'), href: '/settings/e_invoice' },
   ];
 
-  const [isInitial, setIsInitial] = useState<boolean>(true);
+  const [saveChanges, setSaveChanges] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!isInitial) {
+    if (saveChanges) {
       onSave();
-    } else {
-      setIsInitial(false);
+      setSaveChanges(false);
     }
-  }, [company?.e_invoice]);
+  }, [saveChanges]);
 
   return (
     <Settings
       title={t('e_invoice')}
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
-      onSaveClick={() =>
+      onSaveClick={() => {
         eInvoiceRef?.current?.saveEInvoice() &&
-        handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice())
-      }
+          handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
+        setSaveChanges(true);
+      }}
       disableSaveButton={showPlanAlert}
       withoutBackButton
     >
