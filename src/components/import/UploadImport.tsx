@@ -313,10 +313,8 @@ export function UploadImport(props: Props) {
                 const textDecoder = new TextDecoder();
                 const text = textDecoder.decode(arrayBuffer);
 
-                const modifiedText = text.replaceAll(/;/g, ',');
-
                 const textEncoder = new TextEncoder();
-                const utf8ArrayBuffer = textEncoder.encode(modifiedText);
+                const utf8ArrayBuffer = textEncoder.encode(text);
 
                 const modifiedFile = new File([utf8ArrayBuffer], file.name, {
                   type: file.type,
