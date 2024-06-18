@@ -93,6 +93,7 @@ export function MarkdownEditor(props: Props) {
           paste_data_images: false,
           newline_behavior: 'invert',
           browser_spellcheck: true,
+          convert_urls: false,
         }}
         onEditorChange={handleChange}
         disabled={props.disabled}
