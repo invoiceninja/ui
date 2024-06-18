@@ -244,6 +244,23 @@ export function EmailSettings() {
         </Element>
         {company?.settings.enable_e_invoice ? (
           <>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="merge_e_invoice_to_pdf"
+                  labelElement={<SettingsLabel label={t('merge_e_invoice_to_pdf')} />}
+                />
+              }
+            >
+              <Toggle
+                checked={Boolean(company?.settings.merge_e_invoice_to_pdf)}
+                onValueChange={(value) =>
+                  handleChange('settings.merge_e_invoice_to_pdf', value)
+                }
+                disabled={disableSettingsField('merge_e_invoice_to_pdf')}
+              />
+            </Element>
+
             {isCompanySettingsActive && (
               <Element
                 leftSide={t('upload_certificate')}

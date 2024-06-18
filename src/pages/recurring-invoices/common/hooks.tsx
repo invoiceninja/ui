@@ -771,12 +771,6 @@ export function useRecurringInvoiceFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('active'),
       value: 'active',
       color: 'white',

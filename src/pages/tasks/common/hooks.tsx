@@ -404,12 +404,6 @@ export function useTaskFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
