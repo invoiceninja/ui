@@ -16,13 +16,6 @@ export function useDocumentFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-      queryKey: 'type',
-    },
-    {
       label: t('public'),
       value: 'public',
       color: 'white',

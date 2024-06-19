@@ -63,9 +63,9 @@ export function UpcomingRecurringInvoices() {
     },
     {
       id: 'balance',
-      label: t('balance'),
+      label: t('amount'),
       format: (value, recurringInvoice) => (
-        <Badge variant="red">
+        <Badge variant="blue">
           {formatMoney(
             value,
             recurringInvoice.client?.country_id,

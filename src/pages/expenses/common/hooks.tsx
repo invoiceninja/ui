@@ -571,12 +571,6 @@ export function useExpenseFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('logged'),
       value: 'logged',
       color: 'white',

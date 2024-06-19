@@ -107,7 +107,7 @@ export function CompanyEdit(props: Props) {
       let url = 'stripe/signup/:token';
 
       if (gateway === 'paypal_ppcp') {
-        url = 'paypal?token=:token';
+        url = 'paypal?hash=:token';
       }
 
       window
@@ -218,7 +218,7 @@ export function CompanyEdit(props: Props) {
               onClick={() => handleConnectPaymentGateway('paypal_ppcp')}
             >
               <GatewayTypeIcon
-                name="paypal"
+                name="paypal_ppcp"
                 style={{
                   width: '38%',
                   transform: 'scale(1.7)',
@@ -232,7 +232,7 @@ export function CompanyEdit(props: Props) {
               className="w-full mt-4"
               onClick={() => {
                 props.setIsModalOpen(false);
-                navigate('/settings/online_payments');
+                navigate('/settings/gateways/create');
               }}
             >
               {t('all_payment_gateways')}

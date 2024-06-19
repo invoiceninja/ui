@@ -448,11 +448,24 @@ export function Default(props: Props) {
                 </Button>
               )}
 
-              {(props.onSaveClick || saveBtn) && (
+              {(Boolean(props.onSaveClick) || saveBtn) && (
                 <div>
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    !props.additionalSaveOptions && (
+                  {!props.additionalSaveOptions && (
+                    <Button
+                      onClick={saveBtn?.onClick || props.onSaveClick}
+                      disabled={
+                        saveBtn?.disableSaveButton || props.disableSaveButton
+                      }
+                      disableWithoutIcon
+                    >
+                      {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
+                    </Button>
+                  )}
+
+                  {props.additionalSaveOptions && (
+                    <div className="flex">
                       <Button
+                        className="rounded-br-none rounded-tr-none px-3"
                         onClick={saveBtn?.onClick || props.onSaveClick}
                         disabled={
                           saveBtn?.disableSaveButton || props.disableSaveButton
@@ -461,45 +474,27 @@ export function Default(props: Props) {
                       >
                         {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
                       </Button>
-                    )}
 
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    props.additionalSaveOptions && (
-                      <div className="flex">
-                        <Button
-                          className="rounded-br-none rounded-tr-none px-3"
-                          onClick={saveBtn?.onClick || props.onSaveClick}
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                          disableWithoutIcon
-                        >
-                          {(saveBtn?.label || props.saveButtonLabel) ??
-                            t('save')}
-                        </Button>
-
-                        <Dropdown
-                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                          cardActions
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                        >
-                          {props.additionalSaveOptions.map((option, index) => (
-                            <DropdownElement
-                              key={index}
-                              icon={option.icon}
-                              disabled={props.disableSaveButton}
-                              onClick={option.onClick}
-                            >
-                              {option.label}
-                            </DropdownElement>
-                          ))}
-                        </Dropdown>
-                      </div>
-                    )}
+                      <Dropdown
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        cardActions
+                        disabled={
+                          saveBtn?.disableSaveButton || props.disableSaveButton
+                        }
+                      >
+                        {props.additionalSaveOptions.map((option, index) => (
+                          <DropdownElement
+                            key={index}
+                            icon={option.icon}
+                            disabled={props.disableSaveButton}
+                            onClick={option.onClick}
+                          >
+                            {option.label}
+                          </DropdownElement>
+                        ))}
+                      </Dropdown>
+                    </div>
+                  )}
                 </div>
               )}
 

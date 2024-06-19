@@ -91,7 +91,7 @@ export function useDataTablePreferences(params: Params) {
       user?.company_user?.react_settings.table_filters?.[tableKey];
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: ['all'] }),
+      ...(customFilters && { customFilter: [] }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       perPage: '10',
@@ -135,7 +135,7 @@ export function useDataTablePreferences(params: Params) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);
         } else {
-          setCustomFilter(['all']);
+          setCustomFilter([]);
         }
       } else {
         setCustomFilter([]);

@@ -320,6 +320,7 @@ export interface Settings {
   brevo_secret: string;
   task_round_up: boolean;
   task_round_to_nearest: number;
+  merge_e_invoice_to_pdf: boolean;
 }
 
 export interface TaxData {
