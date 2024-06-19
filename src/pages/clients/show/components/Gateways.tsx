@@ -13,7 +13,7 @@ import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { MdChevronRight, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
-import { GatewayTypeIcon } from './GatewayTypeIcon';
+import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
@@ -81,7 +81,7 @@ export function Gateways(props: Props) {
               </div>
 
               <div className="flex items-center space-x-2">
-                <GatewayTypeIcon name={token.meta.brand} />
+                <GatewayTypeIcon name={token.meta.brand as GatewayLogoName} />
 
                 <div className="flex items-center">
                   <span className="mt-1">****</span>
