@@ -20,12 +20,16 @@ import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { Button } from '$app/components/forms';
+import { useState } from 'react';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
+
+  const [filter, setFilter] = useState<'filter_1' | 'filter_2'>();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -95,6 +99,36 @@ export function RecentPayments() {
       title={t('recent_payments')}
       className="h-96 relative"
       withoutBodyPadding
+      topRight={
+        <div className="flex space-x-3">
+          <Button
+            behavior="button"
+            type="minimal"
+            onClick={() => setFilter(undefined)}
+            minimalTypePadding
+          >
+            {t('both')}
+          </Button>
+
+          <Button
+            behavior="button"
+            type={filter === 'filter_1' ? 'primary' : 'minimal'}
+            onClick={() => setFilter('filter_1')}
+            minimalTypePadding
+          >
+            {t('filter_1')}
+          </Button>
+
+          <Button
+            behavior="button"
+            type={filter === 'filter_2' ? 'primary' : 'minimal'}
+            onClick={() => setFilter('filter_2')}
+            minimalTypePadding
+          >
+            {t('filter_2')}
+          </Button>
+        </div>
+      }
     >
       <div className="pl-6 pr-4">
         <DataTable
