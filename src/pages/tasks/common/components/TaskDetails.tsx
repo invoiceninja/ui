@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link } from '$app/components/forms';
+import { InputField, InputLabel, Link } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
@@ -74,77 +74,78 @@ export function TaskDetails(props: Props) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 xl:col-span-4 h-max">
-        {task && page === 'edit' && (
-          <Element leftSide={t('status')}>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="flex items-center">
-                <TaskStatusBadge entity={task} />
-              </div>
-              {isTaskRunning(task) && (
+        <div className="flex flex-col space-y-4 pt-3">
+          {task && page === 'edit' && (
+            <Element leftSide={t('status')} noVerticalPadding>
+              <div className="grid grid-cols-3 gap-2">
                 <div className="flex items-center">
-                  <TaskClock task={task} />
+                  <TaskStatusBadge entity={task} />
                 </div>
-              )}
+                {isTaskRunning(task) && (
+                  <div className="flex items-center">
+                    <TaskClock task={task} />
+                  </div>
+                )}
 
-              {!isTaskRunning(task) && (
-                <div className="flex items-center">
-                  {!isTaskRunning(task) && calculation && (
-                    <p>
-                      {new Date(Number(calculation) * 1000)
-                        .toISOString()
-                        .slice(11, 19)}
-                    </p>
+                {!isTaskRunning(task) && (
+                  <div className="flex items-center">
+                    {!isTaskRunning(task) && calculation && (
+                      <p>
+                        {new Date(Number(calculation) * 1000)
+                          .toISOString()
+                          .slice(11, 19)}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div>
+                  {!isTaskRunning(task) && !task.invoice_id && (
+                    <PlayCircle
+                      className="mr-0 ml-auto"
+                      color="#808080"
+                      size={60}
+                      stroke={accent}
+                      strokeWidth="1"
+                      onClick={() =>
+                        (hasPermission('edit_task') || entityAssigned(task)) &&
+                        start(task)
+                      }
+                      cursor={
+                        hasPermission('edit_task') || entityAssigned(task)
+                          ? 'pointer'
+                          : 'not-allowed'
+                      }
+                    />
+                  )}
+
+                  {isTaskRunning(task) && !task.invoice_id && (
+                    <PauseCircle
+                      className="mr-0 ml-auto cursor-pointer"
+                      color="#808080"
+                      size={60}
+                      stroke={accent}
+                      strokeWidth="1"
+                      onClick={() =>
+                        (hasPermission('edit_task') || entityAssigned(task)) &&
+                        stop(task)
+                      }
+                      cursor={
+                        hasPermission('edit_task') || entityAssigned(task)
+                          ? 'pointer'
+                          : 'not-allowed'
+                      }
+                    />
                   )}
                 </div>
-              )}
-
-              <div>
-                {!isTaskRunning(task) && !task.invoice_id && (
-                  <PlayCircle
-                    className="mr-0 ml-auto"
-                    color="#808080"
-                    size={60}
-                    stroke={accent}
-                    strokeWidth="1"
-                    onClick={() =>
-                      (hasPermission('edit_task') || entityAssigned(task)) &&
-                      start(task)
-                    }
-                    cursor={
-                      hasPermission('edit_task') || entityAssigned(task)
-                        ? 'pointer'
-                        : 'not-allowed'
-                    }
-                  />
-                )}
-
-                {isTaskRunning(task) && !task.invoice_id && (
-                  <PauseCircle
-                    className="mr-0 ml-auto cursor-pointer"
-                    color="#808080"
-                    size={60}
-                    stroke={accent}
-                    strokeWidth="1"
-                    onClick={() =>
-                      (hasPermission('edit_task') || entityAssigned(task)) &&
-                      stop(task)
-                    }
-                    cursor={
-                      hasPermission('edit_task') || entityAssigned(task)
-                        ? 'pointer'
-                        : 'not-allowed'
-                    }
-                  />
-                )}
               </div>
-            </div>
-          </Element>
-        )}
+            </Element>
+          )}
 
-        {!task.project_id && (
-          <Element leftSide={t('client')}>
-            <div className="flex flex-col space-y-2">
+          {!task.project_id && (
+            <div className="flex flex-col space-y-2 px-6">
               <ClientSelector
+                inputLabel={t('client')}
                 onChange={(client) => {
                   handleChange('client_id', client.id);
 
@@ -165,15 +166,15 @@ export function TaskDetails(props: Props) {
                 <ClientActionButtons clientId={task.client_id} />
               )}
             </div>
-          </Element>
-        )}
-        <Element leftSide={t('project')}>
-          <div className="flex items-center justify-center">
+          )}
+
+          <div className="flex items-center justify-center px-6">
             <span
               className="flex flex-1 item-center gap-2"
               style={{ color: colors.$3, colorScheme: colors.$0 }}
             >
               <ProjectSelector
+                inputLabel={t('project')}
                 onChange={(project) => {
                   handleChange('project_id', project.id);
                   handleChange('client_id', '');
@@ -201,57 +202,71 @@ export function TaskDetails(props: Props) {
               </span>
             )}
           </div>
-        </Element>
 
-        <Element leftSide={t('user')}>
-          <UserSelector
-            value={task?.assigned_user_id}
-            onChange={(user) => handleChange('assigned_user_id', user.id)}
-            onClearButtonClick={() => handleChange('assigned_user_id', '')}
-            errorMessage={errors?.errors.assigned_user_id}
-            readonly={!hasPermission('edit_task')}
-          />
-        </Element>
+          <div className="px-6">
+            <UserSelector
+              inputLabel={t('user')}
+              value={task?.assigned_user_id}
+              onChange={(user) => handleChange('assigned_user_id', user.id)}
+              onClearButtonClick={() => handleChange('assigned_user_id', '')}
+              errorMessage={errors?.errors.assigned_user_id}
+              readonly={!hasPermission('edit_task')}
+            />
+          </div>
 
-        {task && company?.custom_fields?.task1 && (
-          <CustomField
-            field="task1"
-            defaultValue={task.custom_value1 || ''}
-            value={company.custom_fields.task1}
-            onValueChange={(value) => handleChange('custom_value1', value)}
-          />
-        )}
+          {task && company?.custom_fields?.task1 && (
+            <div className="flex flex-col space-y-1 px-6">
+              <InputLabel>
+                {company.custom_fields.task1.split('|')[0]}
+              </InputLabel>
 
-        {task && company?.custom_fields?.task2 && (
-          <CustomField
-            field="task2"
-            defaultValue={task.custom_value2 || ''}
-            value={company.custom_fields.task2}
-            onValueChange={(value) => handleChange('custom_value2', value)}
-          />
-        )}
+              <CustomField
+                field="task1"
+                defaultValue={task.custom_value1 || ''}
+                value={company.custom_fields.task1}
+                onValueChange={(value) => handleChange('custom_value1', value)}
+                fieldOnly
+              />
+            </div>
+          )}
+
+          {task && company?.custom_fields?.task2 && (
+            <div className="flex flex-col space-y-1 px-6">
+              <InputLabel>
+                {company.custom_fields.task2.split('|')[0]}
+              </InputLabel>
+
+              <CustomField
+                field="task2"
+                defaultValue={task.custom_value2 || ''}
+                value={company.custom_fields.task2}
+                onValueChange={(value) => handleChange('custom_value2', value)}
+                fieldOnly
+              />
+            </div>
+          )}
+        </div>
       </Card>
 
       <Card className="col-span-12 xl:col-span-4 h-max">
-        <Element leftSide={t('task_number')}>
+        <div className="flex flex-col space-y-4 px-6 pt-3">
           <InputField
+            label={t('task_number')}
             value={task.number}
             onValueChange={(value) => handleChange('number', value)}
             errorMessage={errors?.errors.number}
           />
-        </Element>
 
-        <Element leftSide={t('rate')}>
           <InputField
+            label={t('rate')}
             type="number"
             value={task.rate}
             onValueChange={(value) => handleChange('rate', parseFloat(value))}
             errorMessage={errors?.errors.rate}
           />
-        </Element>
 
-        <Element leftSide={t('status')}>
           <TaskStatusSelector
+            inputLabel={t('status')}
             value={task.status_id}
             onChange={(taskStatus: TaskStatus) =>
               taskStatus && handleChange('status_id', taskStatus.id)
@@ -260,25 +275,39 @@ export function TaskDetails(props: Props) {
             readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
           />
-        </Element>
 
-        {task && company?.custom_fields?.task3 && (
-          <CustomField
-            field="task3"
-            defaultValue={task.custom_value3 || ''}
-            value={company.custom_fields.task3}
-            onValueChange={(value) => handleChange('custom_value3', value)}
-          />
-        )}
+          {task && company?.custom_fields?.task3 && (
+            <div className="flex flex-col space-y-1">
+              <InputLabel>
+                {company.custom_fields.task3.split('|')[0]}
+              </InputLabel>
 
-        {task && company?.custom_fields?.task4 && (
-          <CustomField
-            field="task4"
-            defaultValue={task.custom_value4 || ''}
-            value={company.custom_fields.task4}
-            onValueChange={(value) => handleChange('custom_value4', value)}
-          />
-        )}
+              <CustomField
+                field="task3"
+                defaultValue={task.custom_value3 || ''}
+                value={company.custom_fields.task3}
+                onValueChange={(value) => handleChange('custom_value3', value)}
+                fieldOnly
+              />
+            </div>
+          )}
+
+          {task && company?.custom_fields?.task4 && (
+            <div className="flex flex-col space-y-1">
+              <InputLabel>
+                {company.custom_fields.task4.split('|')[0]}
+              </InputLabel>
+
+              <CustomField
+                field="task4"
+                defaultValue={task.custom_value4 || ''}
+                value={company.custom_fields.task4}
+                onValueChange={(value) => handleChange('custom_value4', value)}
+                fieldOnly
+              />
+            </div>
+          )}
+        </div>
       </Card>
 
       {location.pathname.endsWith('/edit') && (
