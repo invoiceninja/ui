@@ -27,14 +27,15 @@ import { get, set } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
+import Toggle from '../forms/Toggle';
 
 export type Country = 'italy';
 
-type Payload = Record<string, string | number>;
+type Payload = Record<string, string | number | boolean>;
 
 interface PayloadKey {
   key: string;
-  valueType: 'string' | 'number';
+  valueType: 'string' | 'number' | 'boolean';
 }
 
 interface AvailableGroup {
@@ -75,9 +76,13 @@ interface Validation {
   whitespace: boolean | null;
 }
 
+type Visibility = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 interface ElementType {
   name: string;
-  base_type: ('string' | 'decimal' | 'number' | 'date') | null;
+  base_type:
+    | ('string' | 'decimal' | 'number' | 'date' | 'boolean' | 'time')
+    | null;
   resource: Record<string, string> | [];
   length: number | null;
   max_length: number | null;
@@ -86,7 +91,7 @@ interface ElementType {
   help: string;
   min_occurs: number;
   max_occurs: number;
-  visibility: 0 | 1 | 2 | 4 | 6 | 7;
+  visibility: Visibility;
 }
 
 interface Component {
@@ -94,6 +99,7 @@ interface Component {
   help: string;
   choices: string[][] | undefined;
   elements: Record<string, ElementType>;
+  visibility: Visibility;
 }
 
 interface Props {
@@ -129,7 +135,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     const [rules, setRules] = useState<Rule[]>([]);
     const [errors, setErrors] = useState<ValidationBag>();
-    const [excluded, setExcluded] = useState<string[]>([]);
     const [isInitial, setIsInitial] = useState<boolean>(true);
     const [components, setComponents] = useState<
       Record<string, Component | undefined>
@@ -156,7 +161,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return label?.split('Type')[0];
     };
 
-    const handleChange = (property: string, value: string | number) => {
+    const handleChange = (
+      property: string,
+      value: string | number | boolean
+    ) => {
       setPayload((current) => ({ ...current, [property]: value }));
     };
 
@@ -188,23 +196,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const showField = (
       key: string,
       visibility: number,
-      isChildOfFirstLevelComponent: boolean
+      isChildOfFirstLevelComponent: boolean,
+      minOccurs: number
     ) => {
-      // 1, 2, 4; all levels active
-
-      // 1;  company level active //done
-
-      // 2;  client level only //done
-
-      // 4;  entity level only //done
-
-      // 1, 2;  company and client levels //done
-
-      // 1, 4;  company and entity levels //done
-
-      // 2, 4;  client and entity levels //done
-
-      if (!isChildOfFirstLevelComponent) {
+      if (!isChildOfFirstLevelComponent && minOccurs !== 0) {
         return false;
       }
 
@@ -247,15 +242,89 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         .filter((_, index) => index !== keysLength - 1)
         .join('|');
 
+      let updatedParentsKeys = '';
+      let isLastParentFound = false;
+
+      parentsKey.split('|').forEach((keyPart, index) => {
+        let currentParentElement!: ElementType;
+
+        Object.values(components).forEach((component) =>
+          Object.values(component?.elements || {}).forEach((element) => {
+            if (!currentParentElement) {
+              currentParentElement = element;
+            }
+          })
+        );
+
+        // isInitial &&
+        //   element.min_occurs === 0 &&
+        //   isNewComponentLastParent &&
+        //   isAnyElementFromGroupVisible &&
+        //   isComponentVisible;
+
+        console.log('okkkk', currentParentElement.base_type);
+
+        if (
+          !isLastParentFound &&
+          currentParentElement &&
+          currentParentElement.base_type
+        ) {
+          const currentComponent = components[currentParentElement.base_type];
+
+          const isCurrentComponentLastParent =
+            currentComponent && isComponentLastParent(currentComponent);
+
+          if (updatedParentsKeys) {
+            updatedParentsKeys += `|${keyPart}`;
+          } else {
+            updatedParentsKeys = keyPart;
+          }
+
+          if (
+            isCurrentComponentLastParent &&
+            currentParentElement.min_occurs === 0 &&
+            index !== 0
+          ) {
+            isLastParentFound = true;
+
+            const lastUpdatedParentsKeyIndex =
+              updatedParentsKeys.split('|').length - 1;
+
+            const lastUpdatedParentsKey =
+              updatedParentsKeys.split('|')[lastUpdatedParentsKeyIndex];
+
+            let lastParentBaseType = '';
+
+            Object.values(components).forEach((component) => {
+              if (!lastParentBaseType) {
+                const lastParentElement = Object.values(
+                  component?.elements || {}
+                ).find((element) => element.name === lastUpdatedParentsKey);
+
+                if (lastParentElement) {
+                  lastParentBaseType = lastParentElement.base_type || '';
+                }
+              }
+            });
+
+            if (lastParentBaseType) {
+              updatedParentsKeys += `|${lastParentBaseType}`;
+            }
+          }
+        }
+      });
+
+      if (key === 'Invoice|AllowanceCharge|PaymentMeans|ID|IDType|value') {
+        console.log(updatedParentsKeys, currentAvailableGroups);
+      }
+
       if (isFieldChoice(key)) {
         return isChoiceSelected(key);
       }
 
-      return isInitial
-        ? !availableGroups.find((currentType) => parentsKey === currentType.key)
-        : !currentAvailableGroups.find(
-            (currentType) => parentsKey === currentType.key
-          );
+      return !currentAvailableGroups.find(
+        (currentType) => updatedParentsKeys === currentType.key
+      );
     };
 
     const handleDeleteComponent = (componentKey: string) => {
@@ -352,13 +421,24 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       const isNumberTypeField =
         element.base_type === 'decimal' || element.base_type === 'number';
 
+      const isBooleanTypeField = element.base_type === 'boolean';
+
       payloadKeys.push({
         key: fieldKey,
-        valueType: isNumberTypeField ? 'number' : 'string',
+        valueType: isNumberTypeField
+          ? 'number'
+          : isBooleanTypeField
+          ? 'boolean'
+          : 'string',
       });
 
       if (
-        !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
+        !showField(
+          fieldKey,
+          element.visibility,
+          isChildOfFirstLevelComponent,
+          element.min_occurs
+        )
       ) {
         return null;
       }
@@ -429,6 +509,38 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         );
       }
 
+      if (element.base_type === 'boolean') {
+        return (
+          <Element
+            key={fieldKey}
+            required={rule?.required}
+            leftSide={leftSideLabel}
+          >
+            <Toggle
+              checked={Boolean(payload[fieldKey]) || false}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+            />
+          </Element>
+        );
+      }
+
+      if (element.base_type === 'time') {
+        return (
+          <Element
+            key={fieldKey}
+            required={rule?.required}
+            leftSide={leftSideLabel}
+          >
+            <InputField
+              type="time"
+              value={payload[fieldKey] || ''}
+              onValueChange={(value) => handleChange(fieldKey, value)}
+              errorMessage={errors?.errors[fieldKey]}
+            />
+          </Element>
+        );
+      }
+
       if (element.base_type !== null) {
         return (
           <Element
@@ -485,20 +597,85 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return t('Choices');
     };
 
+    const getGroupElements = (
+      component: Component | undefined,
+      currentElements: ElementType[],
+      resolvedTypes: string[]
+    ): ElementType[] => {
+      component && resolvedTypes.push(component.type);
+
+      Object.values(component?.elements || {}).map((element) => {
+        if (element.base_type && !resolvedTypes.includes(element.base_type)) {
+          if (element.base_type?.endsWith('Type')) {
+            getGroupElements(
+              components[element.base_type],
+              currentElements,
+              resolvedTypes
+            );
+          } else {
+            currentElements.push(element);
+          }
+        }
+      });
+
+      return currentElements;
+    };
+
     const shouldAnyElementBeVisible = (
       groupComponent: Component,
       componentPath: string,
       isFirstLevelComponent: boolean
     ) => {
-      const groupElements: ElementType[] = getGroupElements(groupComponent, []);
+      const groupElements: ElementType[] = getGroupElements(
+        groupComponent,
+        [],
+        []
+      );
 
       return groupElements.some((element) =>
         showField(
           getFieldKeyFromPayload(componentPath, element.name),
           element.visibility,
-          isFirstLevelComponent
+          isFirstLevelComponent,
+          element.min_occurs
         )
       );
+    };
+
+    const checkComponentVisibility = (visibility: number) => {
+      if (visibility === 0) {
+        return false;
+      }
+
+      if (visibility === 1 && !isCompanySettingsActive) {
+        return false;
+      }
+
+      if (visibility === 2 && !isClientSettingsActive) {
+        return false;
+      }
+
+      if (visibility === 4 && !entityLevel) {
+        return false;
+      }
+
+      if (
+        visibility === 3 &&
+        !isClientSettingsActive &&
+        !isCompanySettingsActive
+      ) {
+        return false;
+      }
+
+      if (visibility === 5 && !entityLevel && !isCompanySettingsActive) {
+        return false;
+      }
+
+      if (visibility === 6 && !entityLevel && !isClientSettingsActive) {
+        return false;
+      }
+
+      return true;
     };
 
     const renderComponent = (
@@ -506,9 +683,16 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       componentIndex: number,
       isDefaultComponent: boolean,
       componentPath: string,
-      isFirstLevelComponent: boolean
+      isFirstLevelComponent: boolean,
+      isLastParent: boolean,
+      resolvedTypes: string[],
+      isVisible: boolean
     ) => {
-      if (!isDefaultComponent && !isFirstLevelComponent) {
+      if (!isFirstLevelComponent && !isLastParent) {
+        return <></>;
+      }
+
+      if (!isVisible || resolvedTypes.includes(component.type)) {
         return <></>;
       }
 
@@ -519,7 +703,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(
         component,
         componentPath,
-        isFirstLevelComponent
+        !isDefaultComponent || isFirstLevelComponent
       );
 
       const shouldBeRendered = isInitial
@@ -576,7 +760,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
             {Boolean(Object.keys(component.elements).length) &&
               Object.values(component.elements).map((element) => {
-                if (element.base_type?.endsWith('Type')) {
+                if (
+                  element.base_type?.endsWith('Type') &&
+                  element.base_type !== component.type
+                ) {
                   const componentsList = Object.values(components).filter(
                     (_, index) => componentIndex !== index
                   );
@@ -597,14 +784,19 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       shouldAnyElementBeVisible(
                         nextComponent,
                         `${componentPath}|${element.name}|${nextComponent.type}`,
-                        false
+                        !isNewComponentDefault
                       );
+
+                    const isComponentVisible = checkComponentVisibility(
+                      element.visibility
+                    );
 
                     if (
                       isInitial &&
-                      !isNewComponentDefault &&
+                      element.min_occurs === 0 &&
                       isNewComponentLastParent &&
-                      isAnyElementFromGroupVisible
+                      isAnyElementFromGroupVisible &&
+                      isComponentVisible
                     ) {
                       const label = `${getComponentKey(nextComponent.type)} (${
                         element.name
@@ -621,14 +813,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       nextComponentIndex,
                       Boolean(isNewComponentDefault),
                       `${componentPath}|${element.name}`,
-                      false
+                      false,
+                      isLastParent,
+                      resolvedTypes,
+                      isComponentVisible
                     );
                   }
                 } else {
                   return renderElement(
                     element,
                     componentKey,
-                    isFirstLevelComponent
+                    isFirstLevelComponent || element.min_occurs === 0
                   );
                 }
               })}
@@ -667,7 +862,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           [key]:
             (currentFieldValue as string | number) ||
             defaultFields[key.split('|')[keysLength - 1]] ||
-            (valueType === 'number' ? 0 : ''),
+            (valueType === 'number' ? 0 : valueType === 'boolean' ? false : ''),
         };
       });
 
@@ -716,7 +911,15 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (showField(key, field?.visibility || 0, isFirstLevelComponent)) {
+        if (
+          field &&
+          showField(
+            key,
+            field.visibility,
+            isFirstLevelComponent,
+            field.min_occurs
+          )
+        ) {
           let fieldValidation: ElementType | undefined;
 
           Object.values(components).forEach((component) => {
@@ -851,7 +1054,15 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (showField(key, field?.visibility || 0, isFirstLevelComponent)) {
+        if (
+          field &&
+          showField(
+            key,
+            field.visibility,
+            isFirstLevelComponent,
+            field.min_occurs
+          )
+        ) {
           const updatedPath = key
             .split('|')
             .filter((_, index) => index !== keysLength - 2)
@@ -874,28 +1085,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       }
     };
 
-    const getGroupElements = (
-      component: Component | undefined,
-      currentElements: ElementType[]
-    ): ElementType[] => {
-      const elements = Object.values(component?.elements || {});
-
-      for (let index = 0; index < elements.length; index++) {
-        const element = elements[index];
-
-        if (element.base_type?.endsWith('Type')) {
-          return getGroupElements(
-            components[element.base_type],
-            currentElements
-          );
-        } else {
-          currentElements.push(element);
-        }
-      }
-
-      return currentElements;
-    };
-
     const getFieldKeyFromPayload = (
       componentPath: string,
       fieldName: string
@@ -913,54 +1102,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       });
 
       return fieldKey;
-    };
-
-    const getChildComponentType = (
-      child: Component | undefined,
-      childIndex: number,
-      types: string[]
-    ) => {
-      Object.values(child?.elements || {}).map((element) => {
-        const componentsList = Object.values(components).filter(
-          (_, index) => childIndex !== index
-        );
-
-        const newComponentIndex = componentsList.findIndex(
-          (component) => component?.type === `${element.name}Type`
-        );
-
-        const newComponent = componentsList[newComponentIndex];
-
-        if (newComponent) {
-          types.push(newComponent.type);
-          return getChildComponentType(newComponent, newComponentIndex, types);
-        }
-      });
-    };
-
-    const isChildOfExcluded = (componentType: string) => {
-      const typesForExclusion: string[] = [];
-
-      const excludedComponents = Object.values(components).filter(
-        (component) => component && excluded.includes(component.type)
-      );
-      const excludedComponentIndexes = Object.values(components)
-        .filter((_, index) =>
-          excludedComponents.some((_, excludedIndex) => excludedIndex === index)
-        )
-        .map((_, index) => index);
-
-      excludedComponents.forEach(
-        (excludedComponent, excludedComponentIndex) => {
-          getChildComponentType(
-            excludedComponent,
-            excludedComponentIndexes[excludedComponentIndex],
-            typesForExclusion
-          );
-        }
-      );
-
-      return typesForExclusion.includes(componentType);
     };
 
     const generateEInvoiceUI = async (
@@ -982,12 +1123,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
               )
             );
 
-          const shouldBeExcluded =
-            component &&
-            (excluded.includes(component.type) ||
-              isChildOfExcluded(component.type));
-
-          if ((index === 0 || !isAlreadyRendered) && !shouldBeExcluded) {
+          if (index === 0 || !isAlreadyRendered) {
             const isLastParent = component && isComponentLastParent(component);
 
             return (
@@ -997,6 +1133,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 index,
                 Boolean(isLastParent),
                 getComponentKey(component.type) || '',
+                true,
+                Boolean(isLastParent),
+                [],
                 true
               )
             );
@@ -1021,7 +1160,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             setEInvoice(undefined);
             setRules(response.rules);
             setCurrentAvailableGroups([]);
-            setExcluded(response.excluded);
             setComponents(response.components);
             setDefaultFields(response.defaultFields);
             setErrors(undefined);

@@ -386,7 +386,7 @@
           "max_length": null,
           "min_length": null,
           "pattern": null,
-          "min_occurs": 1,
+          "min_occurs": 0,
           "max_occurs": 1,
           "help": "An identifier for this document, assigned by the sender.",
           "namespace": "cbc",
@@ -455,7 +455,7 @@
           "max_occurs": 1,
           "help": "The date on which Invoice is due.",
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "InvoiceTypeCode": {
           "name": "InvoiceTypeCode",
@@ -1586,7 +1586,7 @@
           "pattern": null,
           "min_occurs": 0,
           "max_occurs": 1,
-          "visibility": 0
+          "visibility": 7
         },
         "schemeID": {
           "name": "schemeID",
@@ -2922,7 +2922,7 @@
           "visibility": 0
         }
       },
-      "visibility": 0
+      "visibility": 7
     },
     "BillingReferenceType": {
       "type": "BillingReferenceType",
@@ -4252,7 +4252,7 @@
           "max_occurs": -1,
           "min_occurs": 0,
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "LossRiskResponsibilityCode": {
           "name": "LossRiskResponsibilityCode",
@@ -42072,11 +42072,5 @@
       },
       "visibility": 0
     }
-  },
-
-  "excluded": [
-    "FatturaElettronicaTypee",
-    "FatturaElettronicaHeaderTypee",
-    "FatturaElettronicaBodyTypee"
-  ]
+  }
 }
