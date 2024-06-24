@@ -115,7 +115,9 @@ export function AboutModal(props: Props) {
         (response) => response.data
       ),
     staleTime: Infinity,
-    enabled: isSelfHosted(),
+    enabled:
+      isSelfHosted() &&
+      !(import.meta.env.VITE_API_URL as string).includes('staging'),
   });
 
   const handleHealthCheck = (allowAction?: boolean) => {
