@@ -22,6 +22,7 @@ import { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { TaskStatusesDropdown } from './TaskStatusesDropdown';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   entity: Task;
@@ -86,17 +87,24 @@ export function TaskStatus(props: Props) {
 
     return (
       <div ref={ref} onClick={(event) => event.stopPropagation()}>
-        <StatusBadge
-          for={{}}
-          code={status.name}
-          style={{
-            color: adjustColorDarkness(hex, darknessAmount),
-            backgroundColor: status.color,
-          }}
-          onClick={() =>
-            !isFormBusy && setVisibleDropdown((current) => !current)
-          }
-        />
+        <Tooltip
+          width="auto"
+          message={t('change_status') as string}
+          withoutArrow
+          placement="bottom"
+        >
+          <StatusBadge
+            for={{}}
+            code={status.name}
+            style={{
+              color: adjustColorDarkness(hex, darknessAmount),
+              backgroundColor: status.color,
+            }}
+            onClick={() =>
+              !isFormBusy && setVisibleDropdown((current) => !current)
+            }
+          />
+        </Tooltip>
 
         <TaskStatusesDropdown
           visible={visibleDropdown}
@@ -111,11 +119,20 @@ export function TaskStatus(props: Props) {
 
   return (
     <div ref={ref} onClick={(event) => event.stopPropagation()}>
-      <StatusBadge
-        for={{}}
-        code="logged"
-        onClick={() => !isFormBusy && setVisibleDropdown((current) => !current)}
-      />
+      <Tooltip
+        width="auto"
+        message={t('change_status') as string}
+        withoutArrow
+        placement="bottom"
+      >
+        <StatusBadge
+          for={{}}
+          code="logged"
+          onClick={() =>
+            !isFormBusy && setVisibleDropdown((current) => !current)
+          }
+        />
+      </Tooltip>
 
       <TaskStatusesDropdown
         visible={visibleDropdown}
