@@ -73,13 +73,12 @@ export function TaskDetails(props: Props) {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <Card className="col-span-12 xl:col-span-4 h-max">
+      <Card className="col-span-12 xl:col-span-5 h-max">
         {task && page === 'edit' && (
-          <Element leftSide={t('status')}>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="flex items-center">
-                <TaskStatusBadge entity={task} />
-              </div>
+          <div className="flex items-center justify-between px-5">
+            <TaskStatusBadge entity={task} />
+
+            <div className="flex items-center gap-3">
               {isTaskRunning(task) && (
                 <div className="flex items-center">
                   <TaskClock task={task} />
@@ -98,47 +97,45 @@ export function TaskDetails(props: Props) {
                 </div>
               )}
 
-              <div>
-                {!isTaskRunning(task) && !task.invoice_id && (
-                  <PlayCircle
-                    className="mr-0 ml-auto"
-                    color="#808080"
-                    size={60}
-                    stroke={accent}
-                    strokeWidth="1"
-                    onClick={() =>
-                      (hasPermission('edit_task') || entityAssigned(task)) &&
-                      start(task)
-                    }
-                    cursor={
-                      hasPermission('edit_task') || entityAssigned(task)
-                        ? 'pointer'
-                        : 'not-allowed'
-                    }
-                  />
-                )}
+              {!isTaskRunning(task) && !task.invoice_id && (
+                <PlayCircle
+                  className="mr-0 ml-auto"
+                  color="#808080"
+                  size={60}
+                  stroke={accent}
+                  strokeWidth="1"
+                  onClick={() =>
+                    (hasPermission('edit_task') || entityAssigned(task)) &&
+                    start(task)
+                  }
+                  cursor={
+                    hasPermission('edit_task') || entityAssigned(task)
+                      ? 'pointer'
+                      : 'not-allowed'
+                  }
+                />
+              )}
 
-                {isTaskRunning(task) && !task.invoice_id && (
-                  <PauseCircle
-                    className="mr-0 ml-auto cursor-pointer"
-                    color="#808080"
-                    size={60}
-                    stroke={accent}
-                    strokeWidth="1"
-                    onClick={() =>
-                      (hasPermission('edit_task') || entityAssigned(task)) &&
-                      stop(task)
-                    }
-                    cursor={
-                      hasPermission('edit_task') || entityAssigned(task)
-                        ? 'pointer'
-                        : 'not-allowed'
-                    }
-                  />
-                )}
-              </div>
+              {isTaskRunning(task) && !task.invoice_id && (
+                <PauseCircle
+                  className="mr-0 ml-auto cursor-pointer"
+                  color="#808080"
+                  size={60}
+                  stroke={accent}
+                  strokeWidth="1"
+                  onClick={() =>
+                    (hasPermission('edit_task') || entityAssigned(task)) &&
+                    stop(task)
+                  }
+                  cursor={
+                    hasPermission('edit_task') || entityAssigned(task)
+                      ? 'pointer'
+                      : 'not-allowed'
+                  }
+                />
+              )}
             </div>
-          </Element>
+          </div>
         )}
 
         {!task.project_id && (
@@ -232,7 +229,7 @@ export function TaskDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 xl:col-span-4 h-max">
+      <Card className="col-span-12 xl:col-span-5 h-max">
         <Element leftSide={t('task_number')}>
           <InputField
             value={task.number}
@@ -279,46 +276,16 @@ export function TaskDetails(props: Props) {
             onValueChange={(value) => handleChange('custom_value4', value)}
           />
         )}
-      </Card>
 
-      {location.pathname.endsWith('/edit') && (
-        <Card className="col-span-12 xl:col-span-4 h-max px-6">
-          <TabGroup
-            tabs={[
-              t('description'),
-              ...(isAdmin || isOwner ? [t('custom_fields')] : []),
-            ]}
-          >
-            <div>
-              <InputField
-                element="textarea"
-                value={task.description}
-                onValueChange={(value) => handleChange('description', value)}
-                errorMessage={errors?.errors.description}
-              />
-            </div>
-
-            <div>
-              <span className="text-sm">{t('custom_fields')} &nbsp;</span>
-              <Link to="/settings/custom_fields/tasks" className="capitalize">
-                {t('click_here')}
-              </Link>
-            </div>
-          </TabGroup>
-        </Card>
-      )}
-
-      {!location.pathname.endsWith('/edit') && (
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+        <Element leftSide={t('description')}>
           <InputField
-            label={t('description')}
             element="textarea"
             value={task.description}
             onValueChange={(value) => handleChange('description', value)}
             errorMessage={errors?.errors.description}
           />
-        </Card>
-      )}
+        </Element>
+      </Card>
     </div>
   );
 }
