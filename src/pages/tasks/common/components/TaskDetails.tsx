@@ -17,9 +17,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { TabGroup } from '$app/components/TabGroup';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
@@ -31,7 +29,6 @@ import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { TaskClock } from '../../kanban/components/TaskClock';
 import { calculateTime } from '../helpers/calculate-time';
 import {
-  useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
@@ -53,15 +50,12 @@ export function TaskDetails(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const { isAdmin, isOwner } = useAdmin();
-
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const { task, handleChange, errors, page } = props;
 
   const company = useCurrentCompany();
-  const location = useLocation();
   const accent = useAccentColor();
   const start = useStart();
   const stop = useStop();
