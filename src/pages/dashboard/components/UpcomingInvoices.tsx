@@ -95,6 +95,7 @@ export function UpcomingInvoices() {
           withoutActions
           withoutPagination
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
