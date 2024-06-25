@@ -21,11 +21,9 @@ export function CopyToClipboard(props: Props) {
   const value = props.text || '';
 
   const handleClick = () => {
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(value);
+    navigator.clipboard.writeText(value);
 
-      toast.success('copied_to_clipboard', { value: '' });
-    }
+    toast.success('copied_to_clipboard', { value: '' });
   };
 
   return (
