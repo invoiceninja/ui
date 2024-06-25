@@ -259,6 +259,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       );
 
       if (deletedComponent) {
+        setSelectedChoices((currentChoices) =>
+          currentChoices.filter(
+            (choiceKey) => !choiceKey.startsWith(componentKey)
+          )
+        );
         setCurrentAvailableGroups((current) => [...current, deletedComponent]);
       }
 
@@ -599,6 +604,22 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       );
     };
 
+    const getDefaultChoiceSelectorValue = (componentKey: string) => {
+      const selectedComponentChoice = selectedChoices.find((choiceKey) =>
+        choiceKey.startsWith(componentKey)
+      );
+
+      if (selectedComponentChoice) {
+        const choiceKeysLength = selectedComponentChoice.split('|').length;
+        const choiceName =
+          selectedComponentChoice.split('|')[choiceKeysLength - 1];
+
+        return choiceName;
+      }
+
+      return '';
+    };
+
     const renderComponent = (
       component: Component,
       componentIndex: number,
@@ -660,12 +681,32 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   leftSide={getChoiceSelectorLabel(componentKey)}
                 >
                   <SelectField
-                    defaultValue=""
+                    defaultValue={getDefaultChoiceSelectorValue(componentKey)}
                     onValueChange={(value) => {
                       setSelectedChoices((current) => {
                         const updatedCurrentList = current.filter(
                           (choice) => !choice.startsWith(componentKey)
                         );
+
+                        if (!value) {
+                          const choiceFieldKey = current.find((choice) =>
+                            choice.startsWith(componentKey)
+                          );
+
+                          if (choiceFieldKey) {
+                            setPayload((currentPayload) => ({
+                              ...currentPayload,
+                              [choiceFieldKey]:
+                                typeof currentPayload[choiceFieldKey] ===
+                                'number'
+                                  ? 0
+                                  : typeof currentPayload[choiceFieldKey] ===
+                                    'boolean'
+                                  ? false
+                                  : '',
+                            }));
+                          }
+                        }
 
                         return [
                           ...updatedCurrentList,
@@ -1177,10 +1218,20 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 (currentGroup) => currentGroup.key === fieldGroup.key
               );
 
+              const isChoice = isFieldChoice(key);
+
               if (!isAlreadyRemoved) {
                 setCurrentAvailableGroups((current) =>
                   current.filter((group) => group.key !== fieldGroup.key)
                 );
+              }
+
+              if (isChoice) {
+                const isAlreadyAdded = selectedChoices.includes(key);
+
+                if (!isAlreadyAdded) {
+                  setSelectedChoices((current) => [...current, key]);
+                }
               }
             }
           });
