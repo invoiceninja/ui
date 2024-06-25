@@ -61,6 +61,12 @@ export function date(date: number | string, format: string) {
     return dayjs.unix(date).format(format);
   }
 
+  const formats = ['DD-MM-YYYY', 'D.MM.YYYY', 'DD/MM/YYYY'];
+
+  if (formats.includes(format)) {
+    return dayjs(date, format).format(format);
+  }
+
   return dayjs(date).format(format);
 }
 
