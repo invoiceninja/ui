@@ -325,7 +325,7 @@
     "InvoiceType": {
       "type": "InvoiceType",
       "help": "",
-      "choices": [["CopyIndicator", "IssueDate"]],
+      "choices": [],
       "elements": {
         "UBLVersionID": {
           "name": "UBLVersionID",

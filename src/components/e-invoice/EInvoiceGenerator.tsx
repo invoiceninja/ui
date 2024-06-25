@@ -1218,13 +1218,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 (currentGroup) => currentGroup.key === fieldGroup.key
               );
 
-              const isChoice = isFieldChoice(key);
-
               if (!isAlreadyRemoved) {
                 setCurrentAvailableGroups((current) =>
                   current.filter((group) => group.key !== fieldGroup.key)
                 );
               }
+
+              const isChoice = isFieldChoice(key);
+
+              if (isChoice) {
+                const isAlreadyAdded = selectedChoices.includes(key);
+
+                if (!isAlreadyAdded) {
+                  setSelectedChoices((current) => [...current, key]);
+                }
+              }
+            }
+
+            if (!fieldGroup && value) {
+              const isChoice = isFieldChoice(key);
 
               if (isChoice) {
                 const isAlreadyAdded = selectedChoices.includes(key);
