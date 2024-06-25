@@ -188,14 +188,21 @@ export function useTaskColumns() {
           <TaskStatus entity={task} />
 
           {task.invoice_id && (
-            <MdTextSnippet
-              className="cursor-pointer"
-              fontSize={19}
-              color={accentColor}
-              onClick={() =>
-                navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
-              }
-            />
+            <Tooltip
+              width="auto"
+              message={t('view_invoice') as string}
+              withoutArrow
+              placement="bottom"
+            >
+              <MdTextSnippet
+                className="cursor-pointer"
+                fontSize={19}
+                color={accentColor}
+                onClick={() =>
+                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                }
+              />
+            </Tooltip>
           )}
         </div>
       ),
