@@ -325,7 +325,7 @@
     "InvoiceType": {
       "type": "InvoiceType",
       "help": "",
-      "choices": [],
+      "choices": [["CopyIndicator", "IssueDate"]],
       "elements": {
         "UBLVersionID": {
           "name": "UBLVersionID",
@@ -403,7 +403,7 @@
           "max_occurs": 1,
           "help": "Indicates whether this document is a copy (true) or not (false).",
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "UUID": {
           "name": "UUID",
@@ -429,7 +429,7 @@
           "max_occurs": 1,
           "help": "The date, assigned by the sender, on which this document was issued.",
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "IssueTime": {
           "name": "IssueTime",
@@ -2703,7 +2703,7 @@
     "PeriodType": {
       "type": "PeriodType",
       "help": "",
-      "choices": [],
+      "choices": [["StartTime"]],
       "elements": {
         "StartDate": {
           "name": "StartDate",
@@ -2729,7 +2729,7 @@
           "max_occurs": 1,
           "min_occurs": 0,
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "EndDate": {
           "name": "EndDate",
@@ -2742,7 +2742,7 @@
           "max_occurs": 1,
           "min_occurs": 0,
           "namespace": "cbc",
-          "visibility": 0
+          "visibility": 7
         },
         "EndTime": {
           "name": "EndTime",

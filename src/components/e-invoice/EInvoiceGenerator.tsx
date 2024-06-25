@@ -653,7 +653,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
           >
             {isCurrentComponentLastParent &&
-              shouldBeRendered &&
+              (shouldBeRendered || isFirstLevelComponent) &&
               Boolean(component.choices?.length) && (
                 <Element
                   key={`${componentKey}ChoiceSelector`}
