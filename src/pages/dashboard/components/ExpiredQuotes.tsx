@@ -86,6 +86,7 @@ export function ExpiredQuotes() {
           withoutActions
           withoutPagination
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
