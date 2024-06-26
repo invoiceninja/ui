@@ -67,7 +67,7 @@ export function TaskDetails(props: Props) {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <Card className="col-span-12 xl:col-span-5 h-max">
+      <Card className="col-span-12 xl:col-span-6 h-max">
         {task && page === 'edit' && (
           <div className="flex items-center justify-between px-5">
             <TaskStatusBadge entity={task} />
@@ -223,7 +223,7 @@ export function TaskDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 xl:col-span-5 h-max">
+      <Card className="col-span-12 xl:col-span-6 h-max">
         <Element leftSide={t('task_number')}>
           <InputField
             value={task.number}
