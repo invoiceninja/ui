@@ -149,6 +149,7 @@ interface Props<T> extends CommonProps {
   queryIdentificator?: string;
   disableQuery?: boolean;
   footerColumns?: FooterColumns;
+  withoutPerPageAsPreference?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -187,6 +188,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     disableQuery,
     footerColumns = [],
     bottomActionsKeys = [],
+    withoutPerPageAsPreference = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -197,7 +199,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<PerPage>(
-    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
+    (apiEndpoint.searchParams.get('per_page') as PerPage) || '10'
   );
   const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
@@ -228,6 +230,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setStatus,
     tableKey,
     customFilters,
+    withoutStoringPerPage: withoutPerPageAsPreference,
   });
 
   const {
