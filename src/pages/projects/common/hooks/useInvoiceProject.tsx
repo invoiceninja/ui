@@ -36,12 +36,14 @@ export const calculateTaskHours = (timeLog: string) => {
 
   if (parsedTimeLogs.length) {
     parsedTimeLogs.forEach(([start, stop]) => {
-      const unixStart = dayjs.unix(start);
-      const unixStop = dayjs.unix(stop);
+      if (start && stop) {
+        const unixStart = dayjs.unix(start);
+        const unixStop = dayjs.unix(stop);
 
-      hoursSum += Number(
-        (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-      );
+        hoursSum += Number(
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+        );
+      }
     });
   }
 
