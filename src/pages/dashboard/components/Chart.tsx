@@ -108,7 +108,7 @@ export function Chart(props: Props) {
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
-    let isMatchingWithLastPointDay = false;
+    let isEntryDateMatch = false;
 
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
@@ -120,25 +120,23 @@ export function Chart(props: Props) {
         const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
-          dateToCheck.isAfter(startDate) &&
-          dateToCheck.isBefore(endDate) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
+          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
 
-        const isEntryDateMatch = entry.date === date;
-
-        isMatchingWithLastPointDay =
-          startDate.isSame(dateToCheck) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
+        isEntryDateMatch = entry.date === date;
 
         return isDateInRange || isEntryDateMatch;
+      }
+
+      if (!nextEntry && entry) {
+        isEntryDateMatch = entry.date === date;
+
+        return isEntryDateMatch;
       }
 
       return false;
     });
 
-    return chartSensitivity !== 'day' &&
-      recordIndex > -1 &&
-      !isMatchingWithLastPointDay
+    return chartSensitivity !== 'day' && recordIndex > -1 && !isEntryDateMatch
       ? recordIndex + 1
       : recordIndex;
   };
