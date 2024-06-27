@@ -117,7 +117,7 @@ export function AboutModal(props: Props) {
     staleTime: Infinity,
     enabled:
       isSelfHosted() &&
-      !(import.meta.env.VITE_API_URL as string).includes('staging'),
+      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
   });
 
   const handleHealthCheck = (allowAction?: boolean) => {
