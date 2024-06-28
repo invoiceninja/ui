@@ -149,8 +149,8 @@ export function Notifications() {
 
       <Element
         className="mb-4"
-        leftSide={t('task_assigned')}
-        leftSideHelp={t('task_assigned_help')}
+        leftSide={t('task_assigned_notification')}
+        leftSideHelp={t('task_assigned_notification_help')}
       >
         <Toggle
           checked={Boolean(
