@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -19,7 +20,7 @@ import { InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
 import { Icon } from '../icons/Icon';
-import { MdDelete } from 'react-icons/md';
+import { MdAdd, MdDelete, MdRemove } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
@@ -159,6 +160,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
     const [isEInvoiceGenerating, setIsEInvoiceGenerating] =
       useState<boolean>(false);
+    const [resolvedComplexTypes, setResolvedComplexTypes] = useState<string[]>(
+      []
+    );
 
     const getComponentKey = (label: string | null) => {
       return label?.split('Type')[0];
@@ -199,13 +203,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const showField = (
       key: string,
       visibility: number,
-      isChildOfFirstLevelComponent: boolean,
-      minOccurs: number
+      isChildOfFirstLevelComponent: boolean
     ) => {
-      if (!isChildOfFirstLevelComponent && minOccurs !== 0) {
-        return false;
-      }
-
       if (!visibility) {
         return false;
       }
@@ -242,9 +241,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return isChoiceSelected(key);
       }
 
-      return !currentAvailableGroups.some((currentType) => {
-        const typeKeysLength = currentType.key.split('|').length;
-        const updatedCurrentType = currentType.key
+      if (isChildOfFirstLevelComponent) {
+        return true;
+      }
+
+      return resolvedComplexTypes.some((currentType) => {
+        const typeKeysLength = currentType.split('|').length;
+        const updatedCurrentType = currentType
           .split('|')
           .filter((_, index) => index !== typeKeysLength - 1)
           .join('|');
@@ -354,16 +357,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           : 'string',
       });
 
-      if (
-        !showField(
-          fieldKey,
-          element.visibility,
-          isChildOfFirstLevelComponent,
-          element.min_occurs
-        )
-      ) {
-        return null;
-      }
+      // if (
+      //   !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
+      // ) {
+      //   return null;
+      // }
 
       if (
         typeof element.resource === 'object' &&
@@ -478,6 +476,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           </Element>
         );
       }
+
+      return null;
     };
 
     const checkElementVisibility = (visibility: number) => {
@@ -557,24 +557,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return t('Choices');
     };
 
-    const getGroupElements = (
+    const getComponentFields = (
       component: Component | undefined,
-      currentElements: ElementType[],
-      resolvedTypes: string[]
+      currentElements: ElementType[]
     ): ElementType[] => {
-      component && resolvedTypes.push(component.type);
-
       Object.values(component?.elements || {}).map((element) => {
-        if (element.base_type && !resolvedTypes.includes(element.base_type)) {
-          if (element.base_type?.endsWith('Type')) {
-            if (checkElementVisibility(element.visibility)) {
-              getGroupElements(
-                components[element.base_type],
-                currentElements,
-                resolvedTypes
-              );
-            }
-          } else {
+        if (element.base_type) {
+          if (!element.base_type?.endsWith('Type')) {
             currentElements.push(element);
           }
         }
@@ -583,23 +572,18 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return currentElements;
     };
 
-    const shouldAnyElementBeVisible = (
-      groupComponent: Component,
+    const shouldAnyFieldBeVisible = (
+      component: Component,
       componentPath: string,
       isFirstLevelComponent: boolean
     ) => {
-      const groupElements: ElementType[] = getGroupElements(
-        groupComponent,
-        [],
-        []
-      );
+      const componentFields: ElementType[] = getComponentFields(component, []);
 
-      return groupElements.some((element) =>
+      return componentFields.some((element) =>
         showField(
           getFieldKeyFromPayload(componentPath, element.name),
           element.visibility,
-          isFirstLevelComponent,
-          element.min_occurs
+          isFirstLevelComponent
         )
       );
     };
@@ -618,6 +602,74 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       }
 
       return '';
+    };
+
+    const renderComponentResolvingElements = (
+      component: Component,
+      componentPath: string
+    ) => {
+      const resolvingElements = Object.values(component.elements || {}).map(
+        (element) => {
+          const nextComponent =
+            element.base_type && components[element.base_type];
+
+          const componentKeyPath = `${componentPath}|${element.name}|${nextComponent?.type}`;
+
+          const isComplexTypeResolved = resolvedComplexTypes.find(
+            (complexType) => complexType === componentKeyPath
+          );
+
+          return (
+            element && (
+              <div key={componentKeyPath} className="px-6 py-2">
+                {element.base_type?.endsWith('Type') ? (
+                  <div className="flex justify-between px-6 py-2">
+                    <span className="text-sm">{element.name}</span>
+
+                    <div
+                      className="cursor-pointer"
+                      onClick={() =>
+                        isComplexTypeResolved
+                          ? setResolvedComplexTypes((current) =>
+                              current.filter(
+                                (complexType) =>
+                                  complexType !== componentKeyPath
+                              )
+                            )
+                          : setResolvedComplexTypes((current) => [
+                              ...current,
+                              componentKeyPath as string,
+                            ])
+                      }
+                    >
+                      <Icon
+                        element={isComplexTypeResolved ? MdRemove : MdAdd}
+                        size={27}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  renderElement(
+                    element,
+                    componentPath,
+                    element.min_occurs === 0
+                  )
+                )}
+
+                {element.base_type?.endsWith('Type') &&
+                  nextComponent &&
+                  isComplexTypeResolved &&
+                  renderComponentResolvingElements(
+                    nextComponent,
+                    componentKeyPath
+                  )}
+              </div>
+            )
+          );
+        }
+      );
+
+      return <div className="flex flex-col">{resolvingElements}</div>;
     };
 
     const renderComponent = (
@@ -642,10 +694,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
       const componentKey = `${componentPath}|${component.type}`;
 
-      const isAnyElementFromGroupVisible = shouldAnyElementBeVisible(
+      const isAnyElementFromGroupVisible = shouldAnyFieldBeVisible(
         component,
         componentPath,
-        !isDefaultComponent || isFirstLevelComponent
+        !isDefaultComponent
       );
 
       const currentGroupsList = isInitial
@@ -666,13 +718,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return (
         <Container
           className="flex items-center"
-          key={componentPath}
-          renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
+          key={componentKey}
+          renderFragment={false}
         >
-          <Container
-            className="flex flex-1 flex-col"
-            renderFragment={!isCurrentComponentLastParent || !shouldBeRendered}
-          >
+          <Container className="flex flex-1 flex-col" renderFragment={false}>
             {isCurrentComponentLastParent &&
               (shouldBeRendered || isFirstLevelComponent) &&
               Boolean(component.choices?.length) && (
@@ -729,10 +778,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
             {Boolean(Object.keys(component.elements).length) &&
               Object.values(component.elements).map((element) => {
-                if (
-                  element.base_type?.endsWith('Type') &&
-                  element.base_type !== component.type
-                ) {
+                if (element.base_type?.endsWith('Type')) {
                   const componentsList = Object.values(components).filter(
                     (_, index) => componentIndex !== index
                   );
@@ -749,38 +795,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
                     const isNewComponentDefault = element.min_occurs !== 0;
 
-                    const isAnyElementFromGroupVisible =
-                      shouldAnyElementBeVisible(
+                    const isAnyFieldFromComponentVisible =
+                      shouldAnyFieldBeVisible(
                         nextComponent,
                         `${componentPath}|${element.name}|${nextComponent.type}`,
                         !isNewComponentDefault
                       );
 
-                    const isParentAlreadyAdded = availableGroups.some(
-                      (group) => {
-                        const typeKeysLength = group.key.split('|').length;
-                        const updatedCurrentType = group.key
-                          .split('|')
-                          .filter((_, index) => index !== typeKeysLength - 1)
-                          .join('|');
-
-                        return `${componentPath}|${element.name}|${nextComponent.type}`.startsWith(
-                          updatedCurrentType
-                        );
-                      }
-                    );
-
                     const isComponentVisible = checkElementVisibility(
                       element.visibility
                     );
+
+                    const componentKeyPath = `${componentPath}|${element.name}|${nextComponent.type}`;
 
                     if (
                       isInitial &&
                       element.min_occurs === 0 &&
                       isNewComponentLastParent &&
-                      isAnyElementFromGroupVisible &&
-                      isComponentVisible &&
-                      !isParentAlreadyAdded
+                      isAnyFieldFromComponentVisible &&
+                      isComponentVisible
                     ) {
                       const label = `${getComponentKey(nextComponent.type)} (${
                         element.name
@@ -792,15 +825,49 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       });
                     }
 
-                    return renderComponent(
-                      nextComponent,
-                      nextComponentIndex,
-                      Boolean(isNewComponentDefault),
-                      `${componentPath}|${element.name}`,
-                      false,
-                      isLastParent,
-                      resolvedTypes,
-                      isComponentVisible
+                    const isComplexTypeResolved = resolvedComplexTypes.find(
+                      (complexType) => complexType === componentKeyPath
+                    );
+
+                    return (
+                      <div key={componentKeyPath} className="flex flex-col">
+                        <div className="px-6 py-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm">{element.name}</span>
+
+                            <div
+                              className="cursor-pointer"
+                              onClick={() =>
+                                isComplexTypeResolved
+                                  ? setResolvedComplexTypes((current) =>
+                                      current.filter(
+                                        (complexType) =>
+                                          complexType !== componentKeyPath
+                                      )
+                                    )
+                                  : setResolvedComplexTypes((current) => [
+                                      ...current,
+                                      componentKeyPath,
+                                    ])
+                              }
+                            >
+                              <Icon
+                                element={
+                                  isComplexTypeResolved ? MdRemove : MdAdd
+                                }
+                                size={27}
+                              />
+                            </div>
+                          </div>
+
+                          {isComplexTypeResolved
+                            ? renderComponentResolvingElements(
+                                nextComponent,
+                                componentKeyPath
+                              )
+                            : null}
+                        </div>
+                      </div>
                     );
                   }
                 } else {
@@ -899,15 +966,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (
-          field &&
-          showField(
-            key,
-            field.visibility,
-            isFirstLevelComponent,
-            field.min_occurs
-          )
-        ) {
+        if (field && showField(key, field.visibility, isFirstLevelComponent)) {
           let fieldValidation: ElementType | undefined;
 
           Object.values(components).forEach((component) => {
@@ -1046,15 +1105,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (
-          field &&
-          showField(
-            key,
-            field.visibility,
-            isFirstLevelComponent,
-            field.min_occurs
-          )
-        ) {
+        if (field && showField(key, field.visibility, isFirstLevelComponent)) {
           const updatedPath = key
             .split('|')
             .filter((_, index) => index !== keysLength - 2)
@@ -1195,7 +1246,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           setIsEInvoiceGenerating(false);
         })();
       }
-    }, [components, currentAvailableGroups, errors, payload, selectedChoices]);
+    }, [
+      components,
+      currentAvailableGroups,
+      errors,
+      payload,
+      selectedChoices,
+      resolvedComplexTypes,
+    ]);
 
     useEffect(() => {
       if (!isInitial) {
@@ -1249,7 +1307,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           });
         }
       }
-    }, [payload, currentAvailableGroups, allAvailableGroups, selectedChoices]);
+    }, [
+      payload,
+      currentAvailableGroups,
+      allAvailableGroups,
+      resolvedComplexTypes,
+      selectedChoices,
+    ]);
 
     useImperativeHandle(
       ref,
