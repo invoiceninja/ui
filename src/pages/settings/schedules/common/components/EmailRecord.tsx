@@ -67,7 +67,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('invoice')}>
           <ComboboxAsync<Invoice>
             endpoint={endpoint(
-              '/api/v1/invoices?include=client.group_settings&status=active'
+              '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active'
             )}
             onChange={(invoice: Entry<Invoice>) =>
               invoice.resource &&
@@ -98,7 +98,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'quote' && (
         <Element leftSide={t('quote')}>
           <ComboboxAsync<Quote>
-            endpoint={endpoint('/api/v1/quotes?include=client&status=active')}
+            endpoint={endpoint(
+              '/api/v1/quotes?include=client&filter_deleted_clients=true&status=active'
+            )}
             onChange={(quote: Entry<Quote>) =>
               quote.resource &&
               handleChange(

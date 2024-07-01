@@ -91,7 +91,7 @@ export function UpcomingInvoices() {
           resource="invoice"
           columns={columns}
           className="pr-4"
-          endpoint="/api/v1/invoices?include=client.group_settings&upcoming=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+          endpoint="/api/v1/invoices?include=client.group_settings&upcoming=true&filter_deleted_clients=true&per_page=50&page=1&sort=id|desc"
           withoutActions
           withoutPagination
           withoutPadding
