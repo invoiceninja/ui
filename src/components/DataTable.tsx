@@ -150,6 +150,7 @@ interface Props<T> extends CommonProps {
   disableQuery?: boolean;
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
+  withoutSortQueryParameter?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -189,6 +190,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     footerColumns = [],
     bottomActionsKeys = [],
     withoutPerPageAsPreference = false,
+    withoutSortQueryParameter = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -271,7 +273,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     handleChangingCustomFilters();
 
-    apiEndpoint.searchParams.set('sort', sort);
+    if (
+      !withoutSortQueryParameter ||
+      (withoutSortQueryParameter && sort !== 'id|asc')
+    ) {
+      apiEndpoint.searchParams.set('sort', sort);
+    }
+
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     if (dateRangeColumns.length && dateRangeQueryParameter) {
