@@ -41,6 +41,7 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -53,7 +54,7 @@ export default function Create() {
 
   const reactSettings = useReactSettings();
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const { data } = useBlankInvoiceQuery({
     enabled: typeof invoice === 'undefined',

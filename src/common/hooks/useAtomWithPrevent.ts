@@ -10,9 +10,11 @@
 
 import { PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cloneDeep, isEqual } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
+import { useDebounce } from 'react-use';
+import { useParams } from 'react-router-dom';
 
 type Entity = Invoice;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
@@ -20,7 +22,7 @@ type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 export function useAtomWithPrevent(
   atom: PrimitiveAtom<Entity | undefined>
 ): [Entity | undefined, SetAtom<[SetStateAction<Invoice | undefined>], void>] {
-  const initialValueTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
+  const { id } = useParams();
 
   const [entity, setEntity] = useAtom(atom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
@@ -31,38 +33,40 @@ export function useAtomWithPrevent(
 
   useEffect(() => {
     if (entity && currentInitialValue) {
-      const isDifferent =
-        preventLeavingPage.prevent !== !isEqual(entity, currentInitialValue);
+      const currentPreventValue = isEqual(entity, currentInitialValue);
+
+      const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
 
       isDifferent &&
         setPreventLeavingPage(
           (current) =>
             current && {
               ...current,
-              prevent: !isEqual(entity, currentInitialValue),
+              prevent: !currentPreventValue,
             }
         );
     }
   }, [entity, currentInitialValue]);
 
-  useEffect(() => {
-    if (entity && currentInitialValue) {
-      setCurrentInitialValue(cloneDeep(entity));
-    }
-  }, [entity?.updated_at]);
+  useDebounce(
+    () => {
+      if (entity && entity.id === id && currentInitialValue) {
+        setCurrentInitialValue(cloneDeep(entity));
+      }
+    },
+    450,
+    [entity?.updated_at]
+  );
 
-  useEffect(() => {
-    if (entity && !currentInitialValue) {
-      clearTimeout(initialValueTimeOut.current);
-
-      const currentTimeout = setTimeout(
-        () => setCurrentInitialValue(cloneDeep(entity)),
-        350
-      );
-
-      initialValueTimeOut.current = currentTimeout;
-    }
-  }, [entity]);
+  useDebounce(
+    () => {
+      if (entity && (entity.id === id || !id) && !currentInitialValue) {
+        setCurrentInitialValue(cloneDeep(entity));
+      }
+    },
+    450,
+    [entity]
+  );
 
   return [entity, setEntity];
 }
