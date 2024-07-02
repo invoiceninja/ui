@@ -60,7 +60,7 @@ export default function Credits() {
     >
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/credits?include=client&filter_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"

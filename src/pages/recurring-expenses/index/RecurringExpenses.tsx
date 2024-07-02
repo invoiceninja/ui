@@ -50,7 +50,7 @@ export default function RecurringExpenses() {
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc"
+        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true"
         columns={columns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"

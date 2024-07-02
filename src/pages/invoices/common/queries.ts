@@ -30,7 +30,7 @@ export function useInvoicesQuery(params: InvoiceParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page&include=:include',
+          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&filter_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page&include=:include',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',

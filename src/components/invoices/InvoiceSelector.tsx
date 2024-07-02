@@ -34,7 +34,9 @@ export function InvoiceSelector(props: Props) {
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint('/api/v1/invoices?include=client&status=active')}
+      endpoint={endpoint(
+        '/api/v1/invoices?include=client&filter_deleted_clients=true&status=active'
+      )}
       onChange={(invoice: Entry<Invoice>) =>
         invoice.resource && props.onChange(invoice.resource)
       }

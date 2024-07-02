@@ -53,7 +53,7 @@ export function useCombineProjectsTasks() {
             request(
               'GET',
               endpoint(
-                '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+                '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active&without_deleted_clients=true',
                 {
                   projectId,
                 }
