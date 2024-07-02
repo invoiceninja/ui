@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -8,7 +9,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -17,8 +17,6 @@ import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
@@ -41,7 +39,6 @@ import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import { CommonActions } from './components/CommonActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import {
@@ -121,27 +118,7 @@ export default function Edit() {
     useChangeTemplate();
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
-        invoice && {
-          navigationTopRight: (
-            <ResourceActions
-              resource={invoice}
-              actions={actions}
-              onSaveClick={() => invoice && save(invoice)}
-              disableSaveButton={
-                invoice &&
-                (invoice.status_id === InvoiceStatus.Cancelled ||
-                  invoice.is_deleted)
-              }
-              cypressRef="invoiceActionDropdown"
-            />
-          ),
-          topRight: <CommonActions invoice={invoice} />,
-        })}
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {invoice && (
@@ -281,6 +258,6 @@ export default function Edit() {
           bulkUrl="/api/v1/invoices/bulk"
         />
       ) : null}
-    </Default>
+    </>
   );
 }

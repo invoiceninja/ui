@@ -22,6 +22,7 @@ export * from './import-export/index/ImportExport';
 export * from './account-management';
 export * from './custom-fields';
 export * from './generated-numbers';
+export * from './e-invoice/EInvoice';
 export * from './email-settings/EmailSettings';
 export * from './client-portal';
 export * from './templates-and-reminders/TemplatesAndReminders';

@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 
@@ -76,4 +77,5 @@ export interface Credit {
   invitations: any[];
   documents: any[];
   client?: Client;
+  e_invoice?: EInvoiceType;
 }
