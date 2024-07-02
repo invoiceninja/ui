@@ -129,7 +129,9 @@ export function EmailRecord(props: Props) {
       {schedule.parameters.entity === 'credit' && (
         <Element leftSide={t('credit')}>
           <ComboboxAsync<Credit>
-            endpoint={endpoint('/api/v1/credits?include=client&status=active')}
+            endpoint={endpoint(
+              '/api/v1/credits?include=client&filter_deleted_clients=true&status=active'
+            )}
             onChange={(credit: Entry<Credit>) =>
               credit.resource &&
               handleChange(
