@@ -40,6 +40,6 @@ export function useFormatMoney() {
       );
     }
 
-    return value;
+    return Number(value.toString()).toFixed(2);
   };
 }
