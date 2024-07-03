@@ -21,7 +21,8 @@ export function useFormatMoney() {
   return (
     value: string | number,
     countryId: string | undefined,
-    currencyId: string | undefined
+    currencyId: string | undefined,
+    fractionDigits?: number
   ) => {
     const currentCountryId = countryId || company?.settings.country_id;
     const currentCurrencyId = currencyId || company?.settings.currency_id;
@@ -40,6 +41,10 @@ export function useFormatMoney() {
       );
     }
 
-    return Number(value.toString()).toFixed(2);
+    if (fractionDigits) {
+      return Number(value).toFixed(fractionDigits);
+    }
+
+    return value;
   };
 }
