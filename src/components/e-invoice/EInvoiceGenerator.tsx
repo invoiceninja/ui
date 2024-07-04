@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -622,7 +623,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
           return (
             element && (
-              <div key={componentKeyPath} className="px-2 py-2">
+              <div key={componentKeyPath} className="py-2">
                 {isElementVisible && (
                   <>
                     {element.base_type?.endsWith('Type') ? (
@@ -802,7 +803,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       shouldAnyFieldBeVisible(
                         nextComponent,
                         `${componentPath}|${element.name}|${nextComponent.type}`,
-                        !isNewComponentDefault
+                        isFirstLevelComponent
                       );
 
                     const isElementVisible = checkElementVisibility(
@@ -815,15 +816,34 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       ? availableGroups
                       : allAvailableGroups;
 
+                    const isAnyElementOfNewComponentVisible = Object.values(
+                      nextComponent.elements
+                    ).some((currentElement) =>
+                      checkElementVisibility(currentElement.visibility)
+                    );
+
+                    if (
+                      componentKeyPath ===
+                      'Invoice|BillingReference|BillingReferenceType'
+                    ) {
+                      console.log(componentKeyPath);
+                    }
+
                     if (
                       element.min_occurs === 0 &&
                       isNewComponentLastParent &&
                       isAnyFieldFromComponentVisible &&
                       isElementVisible
                     ) {
-                      const isAlreadyAdded = currentTypesList.some(
-                        (group) => group.key === componentKeyPath
-                      );
+                      const isAlreadyAdded = currentTypesList.some((group) => {
+                        const typeKeysLength = group.key.split('|').length;
+                        const updatedCurrentType = group.key
+                          .split('|')
+                          .filter((_, index) => index !== typeKeysLength - 1)
+                          .join('|');
+
+                        return componentKeyPath.startsWith(updatedCurrentType);
+                      });
 
                       if (!isAlreadyAdded) {
                         const label = `${getComponentKey(
@@ -852,13 +872,21 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       (complexType) => complexType === componentKeyPath
                     );
 
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const isNewTypeIncludedInAllGroups = currentTypesList.some(
-                      (currentType) => componentKey === currentType.key
-                    );
+                    const isTypeFromSelectedGroup =
+                      !currentAvailableGroups.some((currentType) => {
+                        const typeKeysLength =
+                          currentType.key.split('|').length;
+                        const updatedCurrentType = currentType.key
+                          .split('|')
+                          .filter((_, index) => index !== typeKeysLength - 1)
+                          .join('|');
+
+                        return componentKeyPath.startsWith(updatedCurrentType);
+                      });
 
                     const shouldResolvingComponentBeRendered =
-                      isElementVisible && isFirstLevelComponent;
+                      isElementVisible &&
+                      (isFirstLevelComponent || isTypeFromSelectedGroup);
 
                     return (
                       <>
@@ -867,7 +895,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                             key={componentKeyPath}
                             className="flex flex-col border-b border-t mt-1"
                           >
-                            <div className="px-2 py-2">
+                            <div className="py-2">
                               <div className="flex items-center justify-between">
                                 <span className="text-sm">{`${element.name} ${component.type}`}</span>
 
