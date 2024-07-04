@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -29,6 +28,7 @@ import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLev
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
 import Toggle from '../forms/Toggle';
+import { TabGroup } from '../TabGroup';
 
 export type Country = 'italy';
 
@@ -143,6 +143,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const [eInvoice, setEInvoice] = useState<
       JSX.Element | (JSX.Element | undefined)[]
     >();
+    const [eInvoiceResolvedType, setEInvoiceResolvedType] = useState<
+      JSX.Element | (JSX.Element | undefined)[]
+    >();
     const [defaultFields, setDefaultFields] = useState<Record<string, string>>(
       {}
     );
@@ -205,35 +208,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       visibility: number,
       isChildOfFirstLevelComponent: boolean
     ) => {
-      if (!visibility) {
-        return false;
-      }
+      const isFieldVisible = checkElementVisibility(visibility);
 
-      if (visibility === 1 && !isCompanySettingsActive) {
-        return false;
-      }
-
-      if (visibility === 2 && !isClientSettingsActive) {
-        return false;
-      }
-
-      if (visibility === 4 && !entityLevel) {
-        return false;
-      }
-
-      if (
-        visibility === 3 &&
-        !isClientSettingsActive &&
-        !isCompanySettingsActive
-      ) {
-        return false;
-      }
-
-      if (visibility === 5 && !entityLevel && !isCompanySettingsActive) {
-        return false;
-      }
-
-      if (visibility === 6 && !entityLevel && !isClientSettingsActive) {
+      if (!isFieldVisible) {
         return false;
       }
 
@@ -245,15 +222,31 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return true;
       }
 
-      return resolvedComplexTypes.some((currentType) => {
-        const typeKeysLength = currentType.split('|').length;
-        const updatedCurrentType = currentType
-          .split('|')
-          .filter((_, index) => index !== typeKeysLength - 1)
-          .join('|');
+      const isFieldFromResolvedComplexType = resolvedComplexTypes.some(
+        (currentType) => {
+          const typeKeysLength = currentType.split('|').length;
+          const updatedCurrentType = currentType
+            .split('|')
+            .filter((_, index) => index !== typeKeysLength - 1)
+            .join('|');
 
-        return key.startsWith(updatedCurrentType);
-      });
+          return key.startsWith(updatedCurrentType);
+        }
+      );
+
+      const isFieldFromSelectedGroup = !currentAvailableGroups.some(
+        (currentType) => {
+          const typeKeysLength = currentType.key.split('|').length;
+          const updatedCurrentType = currentType.key
+            .split('|')
+            .filter((_, index) => index !== typeKeysLength - 1)
+            .join('|');
+
+          return key.startsWith(updatedCurrentType);
+        }
+      );
+
+      return isFieldFromResolvedComplexType || isFieldFromSelectedGroup;
     };
 
     const handleDeleteComponent = (componentKey: string) => {
@@ -357,11 +350,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           : 'string',
       });
 
-      // if (
-      //   !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
-      // ) {
-      //   return null;
-      // }
+      if (
+        !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
+      ) {
+        return null;
+      }
 
       if (
         typeof element.resource === 'object' &&
@@ -373,6 +366,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <SelectField
               value={payload[fieldKey] || ''}
@@ -396,6 +390,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <InputField
               type="number"
@@ -418,6 +413,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <InputField
               type="date"
@@ -435,6 +431,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <Toggle
               checked={Boolean(payload[fieldKey]) || false}
@@ -450,6 +447,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <InputField
               type="time"
@@ -467,6 +465,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            noExternalPadding
           >
             <InputField
               value={payload[fieldKey] || ''}
@@ -619,50 +618,56 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             (complexType) => complexType === componentKeyPath
           );
 
+          const isElementVisible = checkElementVisibility(element.visibility);
+
           return (
             element && (
-              <div key={componentKeyPath} className="px-6 py-2">
-                {element.base_type?.endsWith('Type') ? (
-                  <div className="flex justify-between px-6 py-2">
-                    <span className="text-sm">{element.name}</span>
+              <div key={componentKeyPath} className="px-2 py-2">
+                {isElementVisible && (
+                  <>
+                    {element.base_type?.endsWith('Type') ? (
+                      <div className="flex justify-between px-6 py-2">
+                        <span className="text-sm">{element.name}</span>
 
-                    <div
-                      className="cursor-pointer"
-                      onClick={() =>
-                        isComplexTypeResolved
-                          ? setResolvedComplexTypes((current) =>
-                              current.filter(
-                                (complexType) =>
-                                  complexType !== componentKeyPath
-                              )
-                            )
-                          : setResolvedComplexTypes((current) => [
-                              ...current,
-                              componentKeyPath as string,
-                            ])
-                      }
-                    >
-                      <Icon
-                        element={isComplexTypeResolved ? MdRemove : MdAdd}
-                        size={27}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  renderElement(
-                    element,
-                    componentPath,
-                    element.min_occurs === 0
-                  )
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            isComplexTypeResolved
+                              ? setResolvedComplexTypes((current) =>
+                                  current.filter(
+                                    (complexType) =>
+                                      complexType !== componentKeyPath
+                                  )
+                                )
+                              : setResolvedComplexTypes((current) => [
+                                  ...current,
+                                  componentKeyPath as string,
+                                ])
+                          }
+                        >
+                          <Icon
+                            element={isComplexTypeResolved ? MdRemove : MdAdd}
+                            size={27}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      renderElement(
+                        element,
+                        componentPath,
+                        element.min_occurs === 0
+                      )
+                    )}
+
+                    {element.base_type?.endsWith('Type') &&
+                      nextComponent &&
+                      isComplexTypeResolved &&
+                      renderComponentResolvingElements(
+                        nextComponent,
+                        componentKeyPath
+                      )}
+                  </>
                 )}
-
-                {element.base_type?.endsWith('Type') &&
-                  nextComponent &&
-                  isComplexTypeResolved &&
-                  renderComponentResolvingElements(
-                    nextComponent,
-                    componentKeyPath
-                  )}
               </div>
             )
           );
@@ -678,15 +683,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       isDefaultComponent: boolean,
       componentPath: string,
       isFirstLevelComponent: boolean,
-      isLastParent: boolean,
-      resolvedTypes: string[],
-      isVisible: boolean
+      isLastParent: boolean
     ) => {
       if (!isFirstLevelComponent && !isLastParent) {
-        return <></>;
-      }
-
-      if (!isVisible || resolvedTypes.includes(component.type)) {
         return <></>;
       }
 
@@ -717,17 +716,21 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
       return (
         <Container
-          className="flex items-center"
+          className="flex items-center space-x-4"
           key={componentKey}
-          renderFragment={false}
+          renderFragment={!shouldBeRendered}
         >
-          <Container className="flex flex-1 flex-col" renderFragment={false}>
+          <Container
+            className="flex flex-1 flex-col"
+            renderFragment={!shouldBeRendered}
+          >
             {isCurrentComponentLastParent &&
               (shouldBeRendered || isFirstLevelComponent) &&
               Boolean(component.choices?.length) && (
                 <Element
                   key={`${componentKey}ChoiceSelector`}
                   leftSide={getChoiceSelectorLabel(componentKey)}
+                  noExternalPadding
                 >
                   <SelectField
                     defaultValue={getDefaultChoiceSelectorValue(componentKey)}
@@ -802,79 +805,114 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                         !isNewComponentDefault
                       );
 
-                    const isComponentVisible = checkElementVisibility(
+                    const isElementVisible = checkElementVisibility(
                       element.visibility
                     );
 
                     const componentKeyPath = `${componentPath}|${element.name}|${nextComponent.type}`;
 
+                    const currentTypesList = isInitial
+                      ? availableGroups
+                      : allAvailableGroups;
+
                     if (
-                      isInitial &&
                       element.min_occurs === 0 &&
                       isNewComponentLastParent &&
                       isAnyFieldFromComponentVisible &&
-                      isComponentVisible
+                      isElementVisible
                     ) {
-                      const label = `${getComponentKey(nextComponent.type)} (${
-                        element.name
-                      }, ${getComponentKey(component.type)})`;
+                      const isAlreadyAdded = currentTypesList.some(
+                        (group) => group.key === componentKeyPath
+                      );
 
-                      availableGroups.push({
-                        key: `${componentPath}|${element.name}|${nextComponent.type}`,
-                        label,
-                      });
+                      if (!isAlreadyAdded) {
+                        const label = `${getComponentKey(
+                          nextComponent.type
+                        )} (${element.name}, ${getComponentKey(
+                          component.type
+                        )})`;
+
+                        availableGroups.push({
+                          key: `${componentPath}|${element.name}|${nextComponent.type}`,
+                          label,
+                        });
+                      }
+
+                      return renderComponent(
+                        nextComponent,
+                        nextComponentIndex,
+                        Boolean(isNewComponentDefault),
+                        `${componentPath}|${element.name}`,
+                        false,
+                        true
+                      );
                     }
 
                     const isComplexTypeResolved = resolvedComplexTypes.find(
                       (complexType) => complexType === componentKeyPath
                     );
 
-                    return (
-                      <div key={componentKeyPath} className="flex flex-col">
-                        <div className="px-6 py-2">
-                          <div className="flex justify-between">
-                            <span className="text-sm">{element.name}</span>
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const isNewTypeIncludedInAllGroups = currentTypesList.some(
+                      (currentType) => componentKey === currentType.key
+                    );
 
-                            <div
-                              className="cursor-pointer"
-                              onClick={() =>
-                                isComplexTypeResolved
-                                  ? setResolvedComplexTypes((current) =>
-                                      current.filter(
-                                        (complexType) =>
-                                          complexType !== componentKeyPath
-                                      )
-                                    )
-                                  : setResolvedComplexTypes((current) => [
-                                      ...current,
-                                      componentKeyPath,
-                                    ])
-                              }
-                            >
-                              <Icon
-                                element={
-                                  isComplexTypeResolved ? MdRemove : MdAdd
-                                }
-                                size={27}
-                              />
+                    const shouldResolvingComponentBeRendered =
+                      isElementVisible && isFirstLevelComponent;
+
+                    return (
+                      <>
+                        {shouldResolvingComponentBeRendered && (
+                          <div
+                            key={componentKeyPath}
+                            className="flex flex-col border-b border-t mt-1"
+                          >
+                            <div className="px-2 py-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm">{`${element.name} ${component.type}`}</span>
+
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() =>
+                                    isComplexTypeResolved
+                                      ? setResolvedComplexTypes((current) =>
+                                          current.filter(
+                                            (complexType) =>
+                                              complexType !== componentKeyPath
+                                          )
+                                        )
+                                      : setResolvedComplexTypes((current) => [
+                                          ...current,
+                                          componentKeyPath,
+                                        ])
+                                  }
+                                >
+                                  <Icon
+                                    element={
+                                      isComplexTypeResolved ? MdRemove : MdAdd
+                                    }
+                                    size={27}
+                                  />
+                                </div>
+                              </div>
+
+                              {isComplexTypeResolved
+                                ? renderComponentResolvingElements(
+                                    nextComponent,
+                                    componentKeyPath
+                                  )
+                                : null}
                             </div>
                           </div>
-
-                          {isComplexTypeResolved
-                            ? renderComponentResolvingElements(
-                                nextComponent,
-                                componentKeyPath
-                              )
-                            : null}
-                        </div>
-                      </div>
+                        )}
+                      </>
                     );
                   }
                 } else {
                   return renderElement(
                     element,
                     componentKey,
-                    isFirstLevelComponent || element.min_occurs === 0
+                    isFirstLevelComponent
                   );
                 }
               })}
@@ -1148,7 +1186,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     };
 
     const generateEInvoiceUI = async (
-      components: Record<string, Component | undefined>
+      components: Record<string, Component | undefined>,
+      firstLevelComponents?: boolean
     ) => {
       payloadKeys = [];
 
@@ -1176,10 +1215,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 index,
                 Boolean(isLastParent),
                 getComponentKey(component.type) || '',
-                true,
-                Boolean(isLastParent),
-                [],
-                true
+                firstLevelComponents ?? true,
+                Boolean(isLastParent)
               )
             );
           }
@@ -1255,6 +1292,34 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       resolvedComplexTypes,
     ]);
 
+    const getTabName = () => {
+      const componentTypeKeysLength = resolvedComplexTypes[0].split('|').length;
+
+      return resolvedComplexTypes[0].split('|')[componentTypeKeysLength - 2];
+    };
+
+    useEffect(() => {
+      if (Object.keys(components).length && resolvedComplexTypes.length) {
+        (async () => {
+          const componentTypeKeysLength =
+            resolvedComplexTypes[0].split('|').length;
+          const componentForResolving =
+            components[
+              resolvedComplexTypes[0].split('|')[componentTypeKeysLength - 1]
+            ];
+
+          const eInvoiceResolvedTypeUI = await generateEInvoiceUI(
+            {
+              componentType: componentForResolving,
+            },
+            false
+          );
+
+          setEInvoiceResolvedType(eInvoiceResolvedTypeUI);
+        })();
+      }
+    }, [errors, payload, selectedChoices, resolvedComplexTypes]);
+
     useEffect(() => {
       if (!isInitial) {
         setErrors(undefined);
@@ -1329,30 +1394,43 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     return (
       <div className="flex flex-col mt-5">
-        {Boolean(eInvoice) && (
-          <Element leftSide={t('fields')}>
-            <SearchableSelect
-              value=""
-              onValueChange={(value) =>
-                setCurrentAvailableGroups((current) =>
-                  current.filter((type) => type.key !== value)
-                )
-              }
-              clearAfterSelection
-            >
-              {currentAvailableGroups.map(({ key, label }, index) => (
-                <option key={index} value={key}>
-                  {label}
-                </option>
-              ))}
-            </SearchableSelect>
-          </Element>
-        )}
+        {!resolvedComplexTypes.length ? (
+          <>
+            {Boolean(eInvoice) && (
+              <Element leftSide={t('fields')}>
+                <SearchableSelect
+                  value=""
+                  onValueChange={(value) =>
+                    setCurrentAvailableGroups((current) =>
+                      current.filter((type) => type.key !== value)
+                    )
+                  }
+                  clearAfterSelection
+                >
+                  {currentAvailableGroups.map(({ key, label }, index) => (
+                    <option key={index} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </SearchableSelect>
+              </Element>
+            )}
 
-        {isEInvoiceGenerating ? (
-          <Spinner />
+            {isEInvoiceGenerating ? (
+              <Spinner />
+            ) : (
+              <div className="mt-4 px-6">{eInvoice ?? null}</div>
+            )}
+          </>
         ) : (
-          <div className="mt-4">{eInvoice ?? null}</div>
+          <TabGroup
+            tabs={[t('overall'), getTabName()]}
+            defaultTabIndex={1}
+            onTabChange={(index) => !index && setResolvedComplexTypes([])}
+          >
+            <div className="mt-4 px-6">{eInvoice ?? null}</div>
+            <div className="mt-4 px-6">{eInvoiceResolvedType ?? null}</div>
+          </TabGroup>
         )}
       </div>
     );
