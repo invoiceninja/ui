@@ -34,7 +34,9 @@ export function CreditSelector(props: Props) {
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint('/api/v1/credits?include=client&status=active')}
+      endpoint={endpoint(
+        '/api/v1/credits?include=client&filter_deleted_clients=true&status=active'
+      )}
       onChange={(credit: Entry<Credit>) =>
         credit.resource && props.onChange(credit.resource)
       }
