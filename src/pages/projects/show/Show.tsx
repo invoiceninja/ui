@@ -242,7 +242,7 @@ export default function Show() {
             resource="task"
             columns={columns}
             customActions={taskActions}
-            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
+            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
             bulkRoute="/api/v1/tasks/bulk"
             linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
             linkToEdit="/tasks/:id/edit"
