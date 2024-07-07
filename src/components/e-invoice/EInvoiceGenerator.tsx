@@ -30,6 +30,7 @@ import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
 import Toggle from '../forms/Toggle';
 import { EInvoiceBreadcrumbs } from './EInvoiceBreadcrumbs';
+import { ValidationAlert } from '../ValidationAlert';
 
 export type Country = 'italy';
 
@@ -263,26 +264,26 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         setCurrentAvailableGroups((current) => [...current, deletedComponent]);
       }
 
-      let updatedPartOfPayload = {};
+      // let updatedPartOfPayload = {};
 
-      Object.keys(payload)
-        .filter((key) => key.startsWith(componentKey))
-        .forEach((currentKey) => {
-          updatedPartOfPayload = {
-            ...updatedPartOfPayload,
-            [currentKey]:
-              typeof payload[currentKey] === 'number'
-                ? 0
-                : typeof payload[currentKey] === 'boolean'
-                ? false
-                : '',
-          };
-        });
+      // Object.keys(payload)
+      //   .filter((key) => key.startsWith(componentKey))
+      //   .forEach((currentKey) => {
+      //     updatedPartOfPayload = {
+      //       ...updatedPartOfPayload,
+      //       [currentKey]:
+      //         typeof payload[currentKey] === 'number'
+      //           ? 0
+      //           : typeof payload[currentKey] === 'boolean'
+      //           ? false
+      //           : '',
+      //     };
+      //   });
 
-      setPayload((current) => ({
-        ...current,
-        ...updatedPartOfPayload,
-      }));
+      // setPayload((current) => ({
+      //   ...current,
+      //   ...updatedPartOfPayload,
+      // }));
     };
 
     const getFieldLabel = (
@@ -398,7 +399,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
               withBlank
-              errorMessage={errors?.errors[fieldKey]}
+              //errorMessage={errors?.errors[fieldKey]}
             >
               {Object.entries(element.resource).map(([key, value]) => (
                 <option key={key} value={key}>
@@ -428,7 +429,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   parseFloat(value).toFixed(value.split('.')?.[1]?.length)
                 )
               }
-              errorMessage={errors?.errors[fieldKey]}
+              //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
         );
@@ -447,7 +448,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
               type="date"
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
-              errorMessage={errors?.errors[fieldKey]}
+              //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
         );
@@ -483,7 +484,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
               type="time"
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
-              errorMessage={errors?.errors[fieldKey]}
+              //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
         );
@@ -501,7 +502,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             <InputField
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
-              errorMessage={errors?.errors[fieldKey]}
+              //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
         );
@@ -1042,7 +1043,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (field && showField(key, field.visibility, isFirstLevelComponent)) {
+        if (field) {
           let fieldValidation: ElementType | undefined;
 
           Object.values(components).forEach((component) => {
@@ -1449,56 +1450,62 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     return (
       <div className="flex flex-col mt-5">
-        {!resolvedComplexTypes.length ? (
-          <>
-            {Boolean(eInvoice) && (
-              <Element leftSide={t('fields')}>
-                <SearchableSelect
-                  value=""
-                  onValueChange={(value) =>
-                    setCurrentAvailableGroups((current) =>
-                      current.filter((type) => type.key !== value)
-                    )
-                  }
-                  clearAfterSelection
-                >
-                  {currentAvailableGroups.map(({ key, label }, index) => (
-                    <option key={index} value={key}>
-                      {label}
-                    </option>
-                  ))}
-                </SearchableSelect>
-              </Element>
-            )}
+        <div className="flex px-6">
+          {errors && <ValidationAlert errors={errors} />}
+        </div>
 
-            {isEInvoiceGenerating ? (
-              <Spinner />
-            ) : (
-              <div className="mt-4 px-6">{eInvoice ?? null}</div>
-            )}
-          </>
-        ) : (
-          <>
-            {eInvoice && eInvoiceResolvedType && (
-              <EInvoiceBreadcrumbs
-                resolvedTypes={[t('general'), ...getBreadcrumbsLabels()]}
-                resolvedUIComponents={[
-                  eInvoice as unknown as JSX.Element,
-                  ...(eInvoiceResolvedType as unknown as JSX.Element[]),
-                ]}
-                onBreadCrumbIndexChange={(index) =>
-                  !index
-                    ? setResolvedComplexTypes([])
-                    : setResolvedComplexTypes((currentResolvedComplexTypes) =>
-                        currentResolvedComplexTypes.filter(
-                          (_, typeIndex) => typeIndex < index
-                        )
+        <div>
+          {!resolvedComplexTypes.length ? (
+            <>
+              {Boolean(eInvoice) && (
+                <Element leftSide={t('fields')}>
+                  <SearchableSelect
+                    value=""
+                    onValueChange={(value) =>
+                      setCurrentAvailableGroups((current) =>
+                        current.filter((type) => type.key !== value)
                       )
-                }
-              />
-            )}
-          </>
-        )}
+                    }
+                    clearAfterSelection
+                  >
+                    {currentAvailableGroups.map(({ key, label }, index) => (
+                      <option key={index} value={key}>
+                        {label}
+                      </option>
+                    ))}
+                  </SearchableSelect>
+                </Element>
+              )}
+
+              {isEInvoiceGenerating ? (
+                <Spinner />
+              ) : (
+                <div className="mt-4 px-6">{eInvoice ?? null}</div>
+              )}
+            </>
+          ) : (
+            <>
+              {eInvoice && eInvoiceResolvedType && (
+                <EInvoiceBreadcrumbs
+                  resolvedTypes={[t('general'), ...getBreadcrumbsLabels()]}
+                  resolvedUIComponents={[
+                    eInvoice as unknown as JSX.Element,
+                    ...(eInvoiceResolvedType as unknown as JSX.Element[]),
+                  ]}
+                  onBreadCrumbIndexChange={(index) =>
+                    !index
+                      ? setResolvedComplexTypes([])
+                      : setResolvedComplexTypes((currentResolvedComplexTypes) =>
+                          currentResolvedComplexTypes.filter(
+                            (_, typeIndex) => typeIndex < index
+                          )
+                        )
+                  }
+                />
+              )}
+            </>
+          )}
+        </div>
       </div>
     );
   }
