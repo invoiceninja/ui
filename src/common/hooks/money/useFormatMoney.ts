@@ -25,7 +25,10 @@ export function useFormatMoney() {
     fractionDigits?: number
   ) => {
     const currentCountryId = countryId || company?.settings.country_id;
-    const currentCurrencyId = currencyId || company?.settings.currency_id;
+    const currentCurrencyId =
+      currencyId && currencyId !== '999'
+        ? currencyId
+        : company?.settings.currency_id;
 
     const country = resolveCountry(currentCountryId);
     const currency = resolveCurrency(currentCurrencyId);
