@@ -42,33 +42,14 @@ export function Users() {
   const columns: DataTableColumns<User> = [
     {
       id: 'name',
-      label: t('name'),
+      label: 'name',
       format: (field, resource) => (
         <Link to={route('/settings/users/:id/edit', { id: resource.id })}>
           {resource.first_name} {resource.last_name}
         </Link>
       ),
     },
-    { id: 'email', label: t('email') },
-    {
-      id: 'referrals',
-      label: t('referrals'),
-      format: (_, user) => (
-        <div className="flex space-x-1">
-          <span>
-            {t('free')}: {user.referral_meta?.free} |
-          </span>
-
-          <span>
-            {t('pro')}: {user.referral_meta?.pro} |
-          </span>
-
-          <span>
-            {t('enterprise')}: {user.referral_meta?.enterprise}
-          </span>
-        </div>
-      ),
-    },
+    { id: 'email', label: 'email' },
   ];
 
   return (
