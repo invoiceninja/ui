@@ -368,7 +368,7 @@ export function Totals() {
                       {formatMoney(
                         totalsData[currency]?.expenses?.amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id,
+                        currency.toString(),
                         2
                       )}
                     </span>
