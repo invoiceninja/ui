@@ -20,7 +20,7 @@ import { InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
 import { Element } from '../cards';
 import { Icon } from '../icons/Icon';
-import { MdAdd, MdDelete, MdRemove } from 'react-icons/md';
+import { MdAdd, MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
@@ -150,7 +150,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       {}
     );
 
-    let payloadKeys: PayloadKey[] = [];
+    const payloadKeys: PayloadKey[] = [];
     let availableGroups: AvailableGroup[] = [];
 
     const [payload, setPayload] = useState<Payload>({});
@@ -328,6 +328,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     ) => {
       let leftSideLabel = '';
       const fieldKey = `${parentsKey}|${element.name || ''}`;
+
       const rule = rules.find((rule) => rule.key === element.name);
 
       if (rule) {
@@ -341,19 +342,43 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
       const isBooleanTypeField = element.base_type === 'boolean';
 
-      payloadKeys.push({
-        key: fieldKey,
-        valueType: isNumberTypeField
-          ? 'number'
-          : isBooleanTypeField
-          ? 'boolean'
-          : 'string',
-      });
+      // payloadKeys.push({
+      //   key: fieldKey,
+      //   valueType: isNumberTypeField
+      //     ? 'number'
+      //     : isBooleanTypeField
+      //     ? 'boolean'
+      //     : 'string',
+      // });
 
       if (
         !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
       ) {
         return null;
+      }
+
+      if (payload[fieldKey] === undefined) {
+        const keysLength = fieldKey.split('|').length;
+
+        const fieldPath = fieldKey
+          .split('|')
+          .filter((_, index) => index !== keysLength - 2)
+          .join('|')
+          .replaceAll('|', '.');
+
+        const currentFieldValue = get(currentEInvoice, fieldPath);
+
+        if (
+          (currentFieldValue as string | number) ||
+          defaultFields[fieldKey.split('|')[keysLength - 1]]
+        ) {
+          setPayload((current) => ({
+            ...current,
+            [fieldKey]:
+              (currentFieldValue as string | number) ||
+              defaultFields[fieldKey.split('|')[keysLength - 1]],
+          }));
+        }
       }
 
       if (
@@ -366,6 +391,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <SelectField
@@ -390,6 +416,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <InputField
@@ -413,6 +440,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <InputField
@@ -431,6 +459,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <Toggle
@@ -447,6 +476,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <InputField
@@ -465,6 +495,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             key={fieldKey}
             required={rule?.required}
             leftSide={leftSideLabel}
+            {...(element.help && { leftSideHelp: element.help })}
             noExternalPadding
           >
             <InputField
@@ -619,10 +650,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             element.base_type && components[element.base_type];
 
           const componentKeyPath = `${componentPath}|${element.name}|${nextComponent?.type}`;
-
-          const isComplexTypeResolved = resolvedComplexTypes.find(
-            (complexType) => complexType === componentKeyPath
-          );
 
           const isElementVisible = checkElementVisibility(element.visibility);
 
@@ -846,8 +873,19 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     }
 
                     const isComplexTypeResolved = resolvedComplexTypes.find(
-                      (complexType) => complexType === componentKeyPath
+                      (currentType) => componentKeyPath === currentType
                     );
+
+                    const shouldResolvingComponentBeRenderedByParent =
+                      resolvedComplexTypes.find((currentType) => {
+                        const typeKeysLength = currentType.split('|').length;
+                        const updatedCurrentType = currentType
+                          .split('|')
+                          .filter((_, index) => index !== typeKeysLength - 1)
+                          .join('|');
+
+                        return componentKeyPath.startsWith(updatedCurrentType);
+                      });
 
                     const isTypeFromSelectedGroup =
                       !currentAvailableGroups.some((currentType) => {
@@ -868,7 +906,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     const shouldResolvingComponentBeRendered =
                       isElementVisible &&
                       ((isFirstLevelComponent && !isTypeAddedAsGroup) ||
-                        isTypeFromSelectedGroup);
+                        isTypeFromSelectedGroup ||
+                        shouldResolvingComponentBeRenderedByParent);
 
                     return (
                       <>
@@ -887,25 +926,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                                   <div
                                     className="cursor-pointer"
                                     onClick={() =>
-                                      isComplexTypeResolved
-                                        ? setResolvedComplexTypes((current) =>
-                                            current.filter(
-                                              (complexType) =>
-                                                complexType !== componentKeyPath
-                                            )
-                                          )
-                                        : setResolvedComplexTypes((current) => [
-                                            ...current,
-                                            componentKeyPath,
-                                          ])
+                                      setResolvedComplexTypes((current) => [
+                                        ...current,
+                                        componentKeyPath,
+                                      ])
                                     }
                                   >
-                                    <Icon
-                                      element={
-                                        isComplexTypeResolved ? MdRemove : MdAdd
-                                      }
-                                      size={27}
-                                    />
+                                    <Icon element={MdAdd} size={27} />
                                   </div>
                                 </div>
 
@@ -1154,7 +1181,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             )
         );
 
-        if (field && showField(key, field.visibility, isFirstLevelComponent)) {
+        if (payload[key] !== undefined) {
           const updatedPath = key
             .split('|')
             .filter((_, index) => index !== keysLength - 2)
@@ -1206,9 +1233,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     const generateEInvoiceUI = async (
       components: Record<string, Component | undefined>,
-      firstLevelComponents?: boolean
+      firstLevelComponents?: boolean,
+      preComponentPath?: string
     ) => {
-      payloadKeys = [];
+      //payloadKeys = [];
 
       if (!Object.keys(components).length) {
         return <></>;
@@ -1233,7 +1261,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 component,
                 index,
                 Boolean(isLastParent),
-                getComponentKey(component.type) || '',
+                preComponentPath
+                  ? `${preComponentPath}|${getComponentKey(component.type)}`
+                  : getComponentKey(component.type) || '',
                 firstLevelComponents ?? true,
                 Boolean(isLastParent)
               )
@@ -1264,7 +1294,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             setDefaultFields(response.defaultFields);
             setErrors(undefined);
             setSelectedChoices([]);
-            payloadKeys = [];
+            //payloadKeys = [];
             availableGroups = [];
           });
       } else {
@@ -1278,7 +1308,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         setAllAvailableGroups([]);
         setSelectedChoices([]);
         availableGroups = [];
-        payloadKeys = [];
+        //payloadKeys = [];
       }
     }, [country]);
 
@@ -1310,9 +1340,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       resolvedComplexTypes,
     ]);
 
-    useEffect(() => {
-      createPayload();
-    }, [resolvedComplexTypes, currentAvailableGroups]);
+    // useEffect(() => {
+    //   createPayload();
+    // }, [resolvedComplexTypes, currentAvailableGroups]);
 
     useEffect(() => {
       if (Object.keys(components).length && resolvedComplexTypes.length) {
@@ -1325,11 +1355,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 currentResolvedType.split('|')[componentTypeKeysLength - 1];
               const componentForResolving = components[componentType];
 
+              const componentPrePath = currentResolvedType
+                .split('|')
+                .filter((_, index) => index < componentTypeKeysLength - 2)
+                .join('|');
+
               return await generateEInvoiceUI(
                 {
                   [componentType]: componentForResolving,
                 },
-                false
+                false,
+                componentPrePath
               );
             })
           )) as EInvoiceUIComponents | undefined;
@@ -1343,53 +1379,53 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       if (!isInitial) {
         setErrors(undefined);
 
-        if (Object.keys(payload).length && allAvailableGroups.length) {
-          Object.entries(payload).forEach(([key, value]) => {
-            const fieldGroup = allAvailableGroups.find((group) => {
-              const typeKeysLength = group.key.split('|').length;
-              const updatedCurrentGroupKey = group.key
-                .split('|')
-                .filter((_, index) => index !== typeKeysLength - 1)
-                .join('|');
+        // if (Object.keys(payload).length && allAvailableGroups.length) {
+        //   Object.entries(payload).forEach(([key, value]) => {
+        //     const fieldGroup = allAvailableGroups.find((group) => {
+        //       const typeKeysLength = group.key.split('|').length;
+        //       const updatedCurrentGroupKey = group.key
+        //         .split('|')
+        //         .filter((_, index) => index !== typeKeysLength - 1)
+        //         .join('|');
 
-              return key.startsWith(updatedCurrentGroupKey);
-            });
+        //       return key.startsWith(updatedCurrentGroupKey);
+        //     });
 
-            if (fieldGroup && value) {
-              const isAlreadyRemoved = !currentAvailableGroups.some(
-                (currentGroup) => currentGroup.key === fieldGroup.key
-              );
+        //     if (fieldGroup && value) {
+        //       const isAlreadyRemoved = !currentAvailableGroups.some(
+        //         (currentGroup) => currentGroup.key === fieldGroup.key
+        //       );
 
-              if (!isAlreadyRemoved) {
-                setCurrentAvailableGroups((current) =>
-                  current.filter((group) => group.key !== fieldGroup.key)
-                );
-              }
+        //       if (!isAlreadyRemoved) {
+        //         setCurrentAvailableGroups((current) =>
+        //           current.filter((group) => group.key !== fieldGroup.key)
+        //         );
+        //       }
 
-              const isChoice = isFieldChoice(key);
+        //       const isChoice = isFieldChoice(key);
 
-              if (isChoice) {
-                const isAlreadyAdded = selectedChoices.includes(key);
+        //       if (isChoice) {
+        //         const isAlreadyAdded = selectedChoices.includes(key);
 
-                if (!isAlreadyAdded) {
-                  setSelectedChoices((current) => [...current, key]);
-                }
-              }
-            }
+        //         if (!isAlreadyAdded) {
+        //           setSelectedChoices((current) => [...current, key]);
+        //         }
+        //       }
+        //     }
 
-            if (!fieldGroup && value) {
-              const isChoice = isFieldChoice(key);
+        //     if (!fieldGroup && value) {
+        //       const isChoice = isFieldChoice(key);
 
-              if (isChoice) {
-                const isAlreadyAdded = selectedChoices.includes(key);
+        //       if (isChoice) {
+        //         const isAlreadyAdded = selectedChoices.includes(key);
 
-                if (!isAlreadyAdded) {
-                  setSelectedChoices((current) => [...current, key]);
-                }
-              }
-            }
-          });
-        }
+        //         if (!isAlreadyAdded) {
+        //           setSelectedChoices((current) => [...current, key]);
+        //         }
+        //       }
+        //     }
+        //   });
+        // }
       }
     }, [
       payload,
