@@ -30,10 +30,11 @@ import { Spinner } from '../Spinner';
 import Toggle from '../forms/Toggle';
 import { EInvoiceBreadcrumbs } from './EInvoiceBreadcrumbs';
 import { ValidationAlert } from '../ValidationAlert';
+import { EInvoiceFieldCheckbox } from './EInvoiceFieldCheckbox';
 
 export type Country = 'italy';
 
-type Payload = Record<string, string | number | boolean>;
+export type Payload = Record<string, string | number | boolean>;
 
 interface AvailableGroup {
   key: string;
@@ -75,7 +76,7 @@ interface Validation {
 
 type Visibility = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-interface ElementType {
+export interface ElementType {
   name: string;
   base_type:
     | ('string' | 'decimal' | 'number' | 'date' | 'boolean' | 'time')
@@ -216,29 +217,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return true;
       }
 
-      const isFieldFromResolvedComplexType = resolvedComplexTypes.some(
-        (currentType) => {
-          const typeKeysLength = currentType.split('|').length;
-          const updatedCurrentType = currentType
-            .split('|')
-            .filter((_, index) => index !== typeKeysLength - 1)
-            .join('|');
+      const isFieldFromResolvedComplexType =
+        doesKeyStartsWithAnyResolvedComplexType(key);
 
-          return key.startsWith(updatedCurrentType);
-        }
-      );
-
-      const isFieldFromSelectedGroup = !currentAvailableGroups.some(
-        (currentType) => {
-          const typeKeysLength = currentType.key.split('|').length;
-          const updatedCurrentType = currentType.key
-            .split('|')
-            .filter((_, index) => index !== typeKeysLength - 1)
-            .join('|');
-
-          return key.startsWith(updatedCurrentType);
-        }
-      );
+      const isFieldFromSelectedGroup = !doesKeyStartsWithAnyGroupType(key);
 
       return isFieldFromResolvedComplexType || isFieldFromSelectedGroup;
     };
@@ -326,6 +308,36 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return element.name;
     };
 
+    const doesKeyStartsWithAnyGroupType = (currentKey: string) => {
+      const currentTypesList = isInitial ? availableGroups : allAvailableGroups;
+
+      return currentTypesList.some((currentType) => {
+        const typeKeysLength = currentType.key.split('|').length;
+        const updatedCurrentType = currentType.key
+          .split('|')
+          .filter((_, index) => index !== typeKeysLength - 1)
+          .join('|');
+
+        return updatedCurrentType
+          .split('|')
+          .every((type, index) => type === currentKey.split('|')[index]);
+      });
+    };
+
+    const doesKeyStartsWithAnyResolvedComplexType = (currentKey: string) => {
+      return resolvedComplexTypes.some((currentType) => {
+        const typeKeysLength = currentType.split('|').length;
+        const updatedCurrentType = currentType
+          .split('|')
+          .filter((_, index) => index !== typeKeysLength - 1)
+          .join('|');
+
+        return updatedCurrentType
+          .split('|')
+          .every((type, index) => type === currentKey.split('|')[index]);
+      });
+    };
+
     const renderElement = (
       element: ElementType,
       parentsKey: string,
@@ -342,13 +354,15 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         leftSideLabel = getFieldLabel(element, parentsKey);
       }
 
+      const isOptionalElement = doesKeyStartsWithAnyGroupType(fieldKey);
+
       if (
         !showField(fieldKey, element.visibility, isChildOfFirstLevelComponent)
       ) {
         return null;
       }
 
-      if (payload[fieldKey] === undefined) {
+      if (payload[fieldKey] === undefined && !isOptionalElement) {
         const keysLength = fieldKey.split('|').length;
 
         const fieldPath = fieldKey
@@ -359,17 +373,20 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
         const currentFieldValue = get(currentEInvoice, fieldPath);
 
-        if (
-          (currentFieldValue as string | number) ||
-          defaultFields[fieldKey.split('|')[keysLength - 1]]
-        ) {
-          setPayload((current) => ({
-            ...current,
-            [fieldKey]:
-              (currentFieldValue as string | number) ||
-              defaultFields[fieldKey.split('|')[keysLength - 1]],
-          }));
-        }
+        const defaultValue =
+          element.base_type === 'boolean'
+            ? false
+            : element.base_type === 'decimal' || element.base_type === 'number'
+            ? 0
+            : '';
+
+        setPayload((current) => ({
+          ...current,
+          [fieldKey]:
+            (currentFieldValue as string | number) ||
+            defaultFields[fieldKey.split('|')[keysLength - 1]] ||
+            defaultValue,
+        }));
       }
 
       if (
@@ -380,14 +397,24 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="string"
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <SelectField
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
               withBlank
               //errorMessage={errors?.errors[fieldKey]}
             >
@@ -405,9 +432,18 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="number"
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <InputField
@@ -419,6 +455,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   parseFloat(value).toFixed(value.split('.')?.[1]?.length)
                 )
               }
+              disabled={payload[fieldKey] === undefined}
               //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
@@ -429,15 +466,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="date"
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <InputField
               type="date"
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
               //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
@@ -448,14 +495,24 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="boolean"
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <Toggle
               checked={Boolean(payload[fieldKey]) || false}
               onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
             />
           </Element>
         );
@@ -465,15 +522,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType="time"
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <InputField
               type="time"
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
               //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
@@ -484,14 +551,24 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return (
           <Element
             key={fieldKey}
-            required={rule?.required}
-            leftSide={leftSideLabel}
-            {...(element.help && { leftSideHelp: element.help })}
+            leftSide={
+              <EInvoiceFieldCheckbox
+                fieldKey={fieldKey}
+                fieldType={element.base_type}
+                payload={payload}
+                setPayload={setPayload}
+                label={leftSideLabel}
+                helpLabel={element.help}
+                isOptionalField={isOptionalElement}
+                requiredField={Boolean(rule?.required)}
+              />
+            }
             noExternalPadding
           >
             <InputField
               value={payload[fieldKey] || ''}
               onValueChange={(value) => handleChange(fieldKey, value)}
+              disabled={payload[fieldKey] === undefined}
               //errorMessage={errors?.errors[fieldKey]}
             />
           </Element>
