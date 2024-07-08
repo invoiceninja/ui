@@ -1103,8 +1103,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return <></>;
       }
 
-      const invoiceComponents = Object.values(components).map(
-        (component, index) => {
+      const invoiceComponents = Object.entries(components).map(
+        ([componentName, component], index) => {
           const isAlreadyRendered = Object.values(components)
             .filter((_, currentIndex) => currentIndex < index)
             .some((currentComponent) =>
@@ -1120,8 +1120,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 component,
                 index,
                 preComponentPath
-                  ? `${preComponentPath}|${getComponentKey(component.type)}`
-                  : getComponentKey(component.type) || '',
+                  ? preComponentPath
+                  : getComponentKey(componentName) || '',
                 firstLevelComponents ?? true
               )
             );
@@ -1208,7 +1208,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
               const componentPrePath = currentResolvedType
                 .split('|')
-                .filter((_, index) => index < componentTypeKeysLength - 2)
+                .filter((_, index) => index < componentTypeKeysLength - 1)
                 .join('|');
 
               return await generateEInvoiceUI(
