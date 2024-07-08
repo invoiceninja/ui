@@ -22,7 +22,7 @@ import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import duration from 'dayjs/plugin/duration';
 import dayjs from 'dayjs';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -67,6 +67,7 @@ export default function Show() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const navigate = useNavigate();
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -128,8 +129,9 @@ export default function Show() {
           navigationTopRight: (
             <ResourceActions
               resource={project}
-              label={t('more_actions')}
               actions={projectActions}
+              saveButtonLabel={t('edit')}
+              onSaveClick={() => navigate(route('/projects/:id/edit', { id }))}
               cypressRef="projectActionDropdown"
             />
           ),
