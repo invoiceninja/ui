@@ -322,6 +322,38 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return fieldElement.name;
     };
 
+    const getComplexTypeLabel = (
+      element: ElementType,
+      componentPath: string
+    ) => {
+      const pathKeysLength = componentPath.split('|').length;
+
+      const updatedComponentPath = componentPath
+        .split('|')
+        .filter((_, index) => index < pathKeysLength - 2)
+        .join('|');
+      const updatedPathKeysLength = updatedComponentPath.split('|').length;
+
+      let topParentName = '';
+      let lastParentName = '';
+
+      lastParentName =
+        updatedComponentPath.split('|')[updatedPathKeysLength - 1];
+
+      if (updatedPathKeysLength > 1) {
+        topParentName =
+          updatedComponentPath.split('|')[updatedPathKeysLength - 2];
+
+        return `${element.name} (${topParentName}, ${lastParentName})`;
+      }
+
+      if (updatedPathKeysLength > 0) {
+        return `${element.name} (${lastParentName})`;
+      }
+
+      return element.name;
+    };
+
     const renderElement = (
       element: ElementType,
       parentsKey: string,
@@ -661,7 +693,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   <>
                     {element.base_type?.endsWith('Type') ? (
                       <div className="flex justify-between px-6 py-2">
-                        <span className="text-sm">{element.name}</span>
+                        <span className="text-sm">
+                          {getComplexTypeLabel(element, componentKeyPath)}
+                        </span>
 
                         <div
                           className="cursor-pointer"
@@ -730,10 +764,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       const isIncludedInAllGroups = allAvailableGroups.some(
         (currentType) => componentKey === currentType.key
       );
-
-      if (componentKey === 'Invoice|PaymentMeans|PaymentMeansType') {
-        console.log(currentGroupsList);
-      }
 
       const shouldBeRendered =
         !currentGroupsList.some(
@@ -927,7 +957,12 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                               className="flex items-center space-x-4 mt-1"
                             >
                               <div className="flex flex-1 items-center py-2 border-b border-t justify-between">
-                                <span className="text-sm">{element.name}</span>
+                                <span className="text-sm">
+                                  {getComplexTypeLabel(
+                                    element,
+                                    componentKeyPath
+                                  )}
+                                </span>
 
                                 <div
                                   className="cursor-pointer"
