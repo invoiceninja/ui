@@ -1269,11 +1269,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     }
                     clearAfterSelection
                   >
-                    {currentAvailableGroups.map(({ key, label }, index) => (
-                      <option key={index} value={key}>
-                        {label}
-                      </option>
-                    ))}
+                    {currentAvailableGroups
+                      .sort((a, b) => a.label.localeCompare(b.label))
+                      .map(({ key, label }, index) => (
+                        <option key={index} value={key}>
+                          {label}
+                        </option>
+                      ))}
                   </SearchableSelect>
                 </Element>
               )}
