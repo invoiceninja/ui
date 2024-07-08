@@ -54,11 +54,10 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Icon } from '$app/components/icons/Icon';
-import { MdLockOutline } from 'react-icons/md';
-import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
+import { ProjectPublicNotes } from './components/ProjectPublicNotes';
 
 dayjs.extend(duration);
 
@@ -136,104 +135,94 @@ export default function Show() {
           ),
         })}
     >
-      <div className="grid grid-cols-3 gap-4">
-        <InfoCard title={project.name}>
-          {project && (
-            <div className="flex space-x-20 my-3">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <EntityStatus entity={project} />
-            </div>
-          )}
+      <div className="grid grid-cols-12 lg:space-y-0 gap-4">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoCard title={project.name}>
+            {project && (
+              <div className="flex space-x-20 my-3">
+                <span
+                  className="text-sm"
+                  style={{
+                    backgroundColor: colors.$2,
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                  }}
+                >
+                  {t('status')}
+                </span>
 
-          {project.client && (
-            <ClientActionButtons displayClientName client={project.client} />
-          )}
-
-          <div className="mt-2">
-            {project.due_date.length > 0 && (
-              <p>
-                {t('due_date')}: {date(project.due_date, dateFormat)}
-              </p>
+                <EntityStatus entity={project} />
+              </div>
             )}
 
-            <p>
-              {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
-            </p>
+            {project.client && (
+              <ClientActionButtons displayClientName client={project.client} />
+            )}
 
-            <p>
-              {t('task_rate')}:
-              {formatMoney(
-                project.task_rate,
-                project.client?.country_id,
-                project.client?.settings.currency_id
+            <div className="mt-2">
+              {project.due_date.length > 0 && (
+                <p>
+                  {t('due_date')}: {date(project.due_date, dateFormat)}
+                </p>
               )}
-            </p>
-          </div>
-        </InfoCard>
 
-        <InfoCard title={t('notes')} className="h-56" withoutTruncate>
-          <p className="break-all">{project.public_notes}</p>
+              <p>
+                {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
+              </p>
 
-          {project.private_notes && (
-            <div className="flex items-center space-x-1 mt-2 break-all">
-              <div>
-                <Icon element={MdLockOutline} size={24} />
-              </div>
-
-              <span
-                className="whitespace-normal"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHTML(project.private_notes),
-                }}
-              />
+              <p>
+                {t('task_rate')}:{' '}
+                {formatMoney(
+                  project.task_rate,
+                  project.client?.country_id,
+                  project.client?.settings.currency_id
+                )}
+              </p>
             </div>
-          )}
 
-          <div className="mt-3">
-            {project?.invoices?.map((invoice: Invoice, index: number) => (
-              <div key={index}>
-                <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-                  {t('invoice')} #{invoice.number}
-                </Link>
-              </div>
-            ))}
+            <div className="mt-2">
+              {project?.invoices?.map((invoice: Invoice, index: number) => (
+                <div key={index}>
+                  <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+                    {t('invoice')} #{invoice.number}
+                  </Link>
+                </div>
+              ))}
 
-            {project?.quotes?.map((quote: Quote, index: number) => (
-              <div key={index}>
-                <Link to={route('/quotes/:id/edit', { id: quote.id })}>
-                  {t('quote')} #{quote.number}
-                </Link>
-              </div>
-            ))}
+              {project?.quotes?.map((quote: Quote, index: number) => (
+                <div key={index}>
+                  <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+                    {t('quote')} #{quote.number}
+                  </Link>
+                </div>
+              ))}
 
-            {project?.expenses?.map((expense: Expense, index: number) => (
-              <div key={index}>
-                <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-                  {t('expense')} #{expense.number}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </InfoCard>
+              {project?.expenses?.map((expense: Expense, index: number) => (
+                <div key={index}>
+                  <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+                    {t('expense')} #{expense.number}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </InfoCard>
+        </div>
 
-        <InfoCard title={t('summary')}>
-          <p>
-            {t('tasks')}: {project.tasks?.length}
-          </p>
+        <ProjectPrivateNotes project={project} />
 
-          <p>
-            {t('total_hours')}: {formatNumber(project.current_hours)}
-          </p>
-        </InfoCard>
+        <ProjectPublicNotes project={project} />
+
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoCard title={t('summary')}>
+            <p>
+              {t('tasks')}: {project.tasks?.length}
+            </p>
+
+            <p>
+              {t('total_hours')}: {formatNumber(project.current_hours)}
+            </p>
+          </InfoCard>
+        </div>
       </div>
 
       {enabled(ModuleBitmask.Tasks) && (
