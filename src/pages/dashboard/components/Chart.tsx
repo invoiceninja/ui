@@ -219,7 +219,8 @@ export function Chart(props: Props) {
     return formatMoney(
       Number(number) || 0,
       company.settings.country_id,
-      currency
+      currency,
+      2
     ).toString();
   };
 
