@@ -13,6 +13,10 @@ import { Payload } from './EInvoiceGenerator';
 import { Checkbox } from '../forms';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
+import { cloneDeep } from 'lodash';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useDispatch } from 'react-redux';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 
 interface Props {
   fieldKey: string;
@@ -37,11 +41,15 @@ export function EInvoiceFieldCheckbox(props: Props) {
     requiredField,
   } = props;
 
+  const dispatch = useDispatch();
+
   const colors = useColorScheme();
+  const company = useCompanyChanges();
 
   const [checked, setChecked] = useState<boolean>(
-    Boolean(payload?.[fieldKey] !== undefined)
+    payload?.[fieldKey] !== undefined
   );
+  const [isInitialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     if (checked && Boolean(payload?.[fieldKey] === undefined)) {
@@ -61,9 +69,37 @@ export function EInvoiceFieldCheckbox(props: Props) {
     if (!checked && Boolean(payload?.[fieldKey] !== undefined)) {
       delete payload[fieldKey];
 
+      if (company) {
+        const keysLength = fieldKey.split('|').length;
+
+        const updatedPath = fieldKey
+          .split('|')
+          .filter((_, index) => index !== keysLength - 2)
+          .join('|');
+
+        const updatedCompanyEInvoice = cloneDeep(company);
+
+        delete updatedCompanyEInvoice[updatedPath.replaceAll('|', '.')];
+
+        dispatch(
+          updateChanges({
+            object: 'company',
+            property: `e_invoice`,
+            value: updatedCompanyEInvoice,
+          })
+        );
+      }
+
       setPayload({ ...payload });
     }
   }, [checked]);
+
+  useEffect(() => {
+    if (payload?.[fieldKey] !== undefined && !isInitialized) {
+      setChecked(true);
+      setInitialized(true);
+    }
+  }, [payload?.[fieldKey]]);
 
   return (
     <div className="flex items-center">
@@ -76,7 +112,7 @@ export function EInvoiceFieldCheckbox(props: Props) {
 
       <div
         className={classNames({
-          'opacity-75': !checked,
+          'opacity-75': !checked && isOptionalField,
           'cursor-pointer': isOptionalField,
         })}
         onClick={() => isOptionalField && setChecked((current) => !current)}

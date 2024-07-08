@@ -308,8 +308,12 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       return element.name;
     };
 
-    const doesKeyStartsWithAnyGroupType = (currentKey: string) => {
-      const currentTypesList = isInitial ? availableGroups : allAvailableGroups;
+    const doesKeyStartsWithAnyGroupType = (
+      currentKey: string,
+      currentList?: AvailableGroup[]
+    ) => {
+      const currentTypesList =
+        currentList ?? (isInitial ? availableGroups : allAvailableGroups);
 
       return currentTypesList.some((currentType) => {
         const typeKeysLength = currentType.key.split('|').length;
@@ -362,7 +366,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return null;
       }
 
-      if (payload[fieldKey] === undefined && !isOptionalElement) {
+      if (payload[fieldKey] === undefined) {
         const keysLength = fieldKey.split('|').length;
 
         const fieldPath = fieldKey
@@ -380,13 +384,19 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             ? 0
             : '';
 
-        setPayload((current) => ({
-          ...current,
-          [fieldKey]:
-            (currentFieldValue as string | number) ||
-            defaultFields[fieldKey.split('|')[keysLength - 1]] ||
-            defaultValue,
-        }));
+        if (
+          (currentFieldValue as string | number) ||
+          defaultFields[fieldKey.split('|')[keysLength - 1]] ||
+          !isOptionalElement
+        ) {
+          setPayload((current) => ({
+            ...current,
+            [fieldKey]:
+              (currentFieldValue as string | number) ||
+              defaultFields[fieldKey.split('|')[keysLength - 1]] ||
+              defaultValue,
+          }));
+        }
       }
 
       if (
@@ -783,15 +793,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       isAnyElementOfNewComponentVisible &&
                       isElementVisible
                     ) {
-                      const isAlreadyAdded = currentTypesList.some((group) => {
-                        const typeKeysLength = group.key.split('|').length;
-                        const updatedCurrentType = group.key
-                          .split('|')
-                          .filter((_, index) => index !== typeKeysLength - 1)
-                          .join('|');
-
-                        return componentKeyPath.startsWith(updatedCurrentType);
-                      });
+                      const isAlreadyAdded = doesKeyStartsWithAnyGroupType(
+                        componentKeyPath,
+                        currentTypesList
+                      );
 
                       if (!isAlreadyAdded) {
                         const label = `${getComponentKey(
@@ -808,41 +813,23 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     }
 
                     const shouldResolvingComponentBeRenderedByParent =
-                      resolvedComplexTypes.find((currentType) => {
-                        const typeKeysLength = currentType.split('|').length;
-                        const updatedCurrentType = currentType
-                          .split('|')
-                          .filter((_, index) => index !== typeKeysLength - 1)
-                          .join('|');
-
-                        return componentKeyPath.startsWith(updatedCurrentType);
-                      });
+                      doesKeyStartsWithAnyResolvedComplexType(componentKeyPath);
 
                     const isTypeFromSelectedGroup =
-                      !currentAvailableGroups.some((currentType) => {
-                        const typeKeysLength =
-                          currentType.key.split('|').length;
-                        const updatedCurrentType = currentType.key
-                          .split('|')
-                          .filter((_, index) => index !== typeKeysLength - 1)
-                          .join('|');
-
-                        return componentKeyPath.startsWith(updatedCurrentType);
-                      });
-
-                    const isTypeAddedAsGroup = allAvailableGroups.some(
-                      (currentGroup) => currentGroup.key === componentKeyPath
-                    );
-
-                    const shouldResolvingComponentBeRendered =
-                      isElementVisible &&
-                      ((isFirstLevelComponent && !isTypeAddedAsGroup) ||
-                        isTypeFromSelectedGroup ||
-                        shouldResolvingComponentBeRenderedByParent);
+                      !doesKeyStartsWithAnyGroupType(
+                        componentKeyPath,
+                        currentAvailableGroups
+                      );
 
                     const isComplexTypeGroup = currentTypesList.find(
                       (group) => group.key === componentKeyPath
                     );
+
+                    const shouldResolvingComponentBeRendered =
+                      isElementVisible &&
+                      ((isFirstLevelComponent && !isComplexTypeGroup) ||
+                        isTypeFromSelectedGroup ||
+                        shouldResolvingComponentBeRenderedByParent);
 
                     return (
                       <>
