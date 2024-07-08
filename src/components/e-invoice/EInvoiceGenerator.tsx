@@ -731,6 +731,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         (currentType) => componentKey === currentType.key
       );
 
+      if (componentKey === 'Invoice|PaymentMeans|PaymentMeansType') {
+        console.log(currentGroupsList);
+      }
+
       const shouldBeRendered =
         !currentGroupsList.some(
           (currentType) => componentKey === currentType.key
@@ -825,15 +829,15 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                     const isAnyElementOfNewComponentVisible =
                       isAnyElementOfComponentVisible(nextComponent);
 
+                    const currentTypesList = isInitial
+                      ? availableGroups
+                      : allAvailableGroups;
+
                     if (
                       element.min_occurs === 0 &&
                       isAnyElementOfNewComponentVisible &&
                       isElementVisible
                     ) {
-                      const currentTypesList = isInitial
-                        ? availableGroups
-                        : allAvailableGroups;
-
                       const isAlreadyAdded = currentTypesList.some((group) => {
                         const typeKeysLength = group.key.split('|').length;
                         const updatedCurrentType = group.key
@@ -857,20 +861,20 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                         });
                       }
 
-                      if (
-                        currentTypesList.some(
-                          (currentType) => currentType.key === componentKeyPath
-                        )
-                      ) {
-                        return renderComponent(
-                          nextComponent,
-                          nextComponentIndex,
-                          Boolean(isNewComponentDefault),
-                          `${componentPath}|${element.name}`,
-                          false,
-                          true
-                        );
-                      }
+                      // if (
+                      //   currentTypesList.some(
+                      //     (currentType) => currentType.key === componentKeyPath
+                      //   )
+                      // ) {
+                      //   return renderComponent(
+                      //     nextComponent,
+                      //     nextComponentIndex,
+                      //     Boolean(isNewComponentDefault),
+                      //     `${componentPath}|${element.name}`,
+                      //     false,
+                      //     true
+                      //   );
+                      // }
                     }
 
                     const isComplexTypeResolved = resolvedComplexTypes.find(
@@ -910,40 +914,51 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                         isTypeFromSelectedGroup ||
                         shouldResolvingComponentBeRenderedByParent);
 
+                    const isComplexTypeGroup = currentTypesList.find(
+                      (group) => group.key === componentKeyPath
+                    );
+
                     return (
                       <>
                         {shouldResolvingComponentBeRendered &&
                           isAnyElementOfNewComponentVisible && (
                             <div
                               key={componentKeyPath}
-                              className="flex flex-col border-b border-t mt-1"
+                              className="flex items-center space-x-4 mt-1"
                             >
-                              <div className="py-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-sm">
-                                    {element.name}
-                                  </span>
+                              <div className="flex flex-1 items-center py-2 border-b border-t justify-between">
+                                <span className="text-sm">{element.name}</span>
 
-                                  <div
-                                    className="cursor-pointer"
-                                    onClick={() =>
-                                      setResolvedComplexTypes((current) => [
-                                        ...current,
-                                        componentKeyPath,
-                                      ])
-                                    }
-                                  >
-                                    <Icon element={MdAdd} size={27} />
-                                  </div>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() =>
+                                    setResolvedComplexTypes((current) => [
+                                      ...current,
+                                      componentKeyPath,
+                                    ])
+                                  }
+                                >
+                                  <Icon element={MdAdd} size={27} />
                                 </div>
+                              </div>
 
-                                {isComplexTypeResolved
+                              {/* {isComplexTypeResolved
                                   ? renderComponentResolvingElements(
                                       nextComponent,
                                       componentKeyPath
                                     )
-                                  : null}
-                              </div>
+                                  : null} */}
+
+                              {isComplexTypeGroup && (
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() =>
+                                    handleDeleteComponent(componentKeyPath)
+                                  }
+                                >
+                                  <Icon element={MdDelete} size={28} />
+                                </div>
+                              )}
                             </div>
                           )}
                       </>
@@ -960,12 +975,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           </Container>
 
           {shouldBeRendered && !isDefaultComponent && (
-            <div
-              className="cursor-pointer"
-              onClick={() => handleDeleteComponent(componentKey)}
-            >
-              <Icon element={MdDelete} size={28} />
-            </div>
+            <>
+              {/* <div
+                className="cursor-pointer"
+                onClick={() => handleDeleteComponent(componentKey)}
+              >
+                <Icon element={MdDelete} size={28} />
+              </div> */}
+            </>
           )}
         </Container>
       );
