@@ -62,9 +62,10 @@ export function EInvoice() {
       docsLink="en/advanced-settings/#e_invoice"
       breadcrumbs={pages}
       onSaveClick={() => {
-        eInvoiceRef?.current?.saveEInvoice() &&
+        if (eInvoiceRef?.current?.saveEInvoice()) {
           handleChange('e_invoice', eInvoiceRef?.current?.saveEInvoice());
-        setSaveChanges(true);
+          setSaveChanges(true);
+        }
       }}
       disableSaveButton={showPlanAlert}
       withoutBackButton

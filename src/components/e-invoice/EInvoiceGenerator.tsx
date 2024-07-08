@@ -29,8 +29,8 @@ import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
 import Toggle from '../forms/Toggle';
 import { EInvoiceBreadcrumbs } from './EInvoiceBreadcrumbs';
-import { ValidationAlert } from '../ValidationAlert';
 import { EInvoiceFieldCheckbox } from './EInvoiceFieldCheckbox';
+import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
 
 export type Country = 'italy';
 
@@ -1032,9 +1032,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
       if (Object.keys(updatedErrors.errors).length) {
         setErrors(updatedErrors);
-      } else {
-        setErrors(undefined);
+
+        return updatedErrors;
       }
+
+      setErrors(undefined);
+
+      return undefined;
     };
 
     const formatPayload = () => {
@@ -1083,9 +1087,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const handleSave = () => {
       setErrors(undefined);
 
-      checkValidation();
+      const currentErrors = checkValidation();
 
-      if (errors === undefined) {
+      if (currentErrors === undefined) {
         return formatPayload();
       }
     };
@@ -1248,7 +1252,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     return (
       <div className="flex flex-col mt-5">
         <div className="flex px-6">
-          {errors && <ValidationAlert errors={errors} />}
+          {errors && <EInvoiceValidationAlert errors={errors} />}
         </div>
 
         <div>
