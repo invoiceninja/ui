@@ -17,6 +17,7 @@ import { cloneDeep } from 'lodash';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 interface Props {
   fieldKey: string;
@@ -27,6 +28,8 @@ interface Props {
   helpLabel: string;
   isOptionalField: boolean;
   requiredField: boolean;
+  invoice?: Invoice;
+  setInvoice?: Dispatch<SetStateAction<Invoice | undefined>>;
 }
 
 export function EInvoiceFieldCheckbox(props: Props) {
@@ -39,6 +42,8 @@ export function EInvoiceFieldCheckbox(props: Props) {
     helpLabel,
     isOptionalField,
     requiredField,
+    invoice,
+    setInvoice,
   } = props;
 
   const dispatch = useDispatch();
@@ -69,14 +74,14 @@ export function EInvoiceFieldCheckbox(props: Props) {
     if (!checked && Boolean(payload?.[fieldKey] !== undefined)) {
       delete payload[fieldKey];
 
-      if (company) {
-        const keysLength = fieldKey.split('|').length;
+      const keysLength = fieldKey.split('|').length;
 
-        const updatedPath = fieldKey
-          .split('|')
-          .filter((_, index) => index !== keysLength - 2)
-          .join('|');
+      const updatedPath = fieldKey
+        .split('|')
+        .filter((_, index) => index !== keysLength - 2)
+        .join('|');
 
+      if (company && !invoice) {
         const updatedCompanyEInvoice = cloneDeep(company);
 
         delete updatedCompanyEInvoice[updatedPath.replaceAll('|', '.')];
@@ -88,6 +93,16 @@ export function EInvoiceFieldCheckbox(props: Props) {
             value: updatedCompanyEInvoice,
           })
         );
+      } else {
+        if (invoice && setInvoice) {
+          const updatedEntityEInvoice = cloneDeep(invoice);
+
+          delete updatedEntityEInvoice[
+            `e_invoice.${updatedPath.replaceAll('|', '.')}` as keyof Invoice
+          ];
+
+          setInvoice(updatedEntityEInvoice);
+        }
       }
 
       setPayload({ ...payload });

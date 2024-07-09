@@ -9,7 +9,9 @@
  */
 
 import React, {
+  Dispatch,
   ReactNode,
+  SetStateAction,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -31,6 +33,8 @@ import Toggle from '../forms/Toggle';
 import { EInvoiceBreadcrumbs } from './EInvoiceBreadcrumbs';
 import { EInvoiceFieldCheckbox } from './EInvoiceFieldCheckbox';
 import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
+import { useLocation } from 'react-router-dom';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export type Country = 'italy';
 
@@ -104,6 +108,8 @@ interface Props {
   country: Country | undefined;
   entityLevel?: boolean;
   currentEInvoice: EInvoiceType;
+  invoice?: Invoice;
+  setInvoice?: Dispatch<SetStateAction<Invoice | undefined>>;
 }
 
 interface ContainerProps {
@@ -128,7 +134,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
   (props, ref) => {
     const [t] = useTranslation();
 
-    const { country, entityLevel, currentEInvoice } = props;
+    const location = useLocation();
+
+    const { country, entityLevel, currentEInvoice, invoice, setInvoice } =
+      props;
 
     const { isCompanySettingsActive, isClientSettingsActive } =
       useCurrentSettingsLevel();
@@ -417,6 +426,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -452,6 +463,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -486,6 +499,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -515,6 +530,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -542,6 +559,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -571,6 +590,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 helpLabel={element.help}
                 isOptionalField={isOptionalElement}
                 requiredField={Boolean(rule?.required)}
+                invoice={invoice}
+                setInvoice={setInvoice}
               />
             }
             noExternalPadding
@@ -589,11 +610,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     };
 
     const checkElementVisibility = (visibility: number) => {
+      const isCompanyLevel =
+        isCompanySettingsActive && location.pathname.startsWith('/settings');
+
       if (visibility === 0) {
         return false;
       }
 
-      if (visibility === 1 && !isCompanySettingsActive) {
+      if (visibility === 1 && !isCompanyLevel) {
         return false;
       }
 
@@ -605,15 +629,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         return false;
       }
 
-      if (
-        visibility === 3 &&
-        !isClientSettingsActive &&
-        !isCompanySettingsActive
-      ) {
+      if (visibility === 3 && !isClientSettingsActive && !isCompanyLevel) {
         return false;
       }
 
-      if (visibility === 5 && !entityLevel && !isCompanySettingsActive) {
+      if (visibility === 5 && !entityLevel && !isCompanyLevel) {
         return false;
       }
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,23 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
+import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -35,49 +30,42 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { useActions } from './components/Actions';
-import { useHandleSave } from './hooks/useInvoiceSave';
 import { Card } from '$app/components/cards';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
+import { Context } from './components/EInvoice';
 
 export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const context: Context = useOutletContext();
+
+  const {
+    invoice,
+    setInvoice,
+    isDefaultTerms,
+    setIsDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    errors,
+  } = context;
 
   const reactSettings = useReactSettings();
 
-  const pages: Page[] = [
-    { name: t('invoices'), href: '/invoices' },
-    {
-      name: t('edit_invoice'),
-      href: route('/invoices/:id/edit', { id }),
-    },
-  ];
-
-  const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
+  const productColumns = useProductColumns();
 
-  const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client | undefined>();
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
-  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
   const {
     handleChange,
@@ -110,9 +98,6 @@ export default function Edit() {
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
-
-  const actions = useActions();
-  const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
   const { changeTemplateVisible, setChangeTemplateVisible } =
     useChangeTemplate();
