@@ -22,10 +22,11 @@ import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
 import { useAtom } from 'jotai';
 import { invoiceAtom } from './common/atoms';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { CommonActions } from './edit/components/CommonActions';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { EInvoiceComponent } from '../settings';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -33,6 +34,8 @@ export default function Invoice() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+
+  const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -73,7 +76,15 @@ export default function Invoice() {
             <ResourceActions
               resource={invoice}
               actions={actions}
-              onSaveClick={() => invoice && save(invoice)}
+              onSaveClick={() => {
+                const currentEInvoice = eInvoiceRef?.current?.saveEInvoice();
+
+                invoice &&
+                  save({
+                    ...invoice,
+                    e_invoice: currentEInvoice ?? invoice.e_invoice,
+                  });
+              }}
               disableSaveButton={
                 invoice &&
                 (invoice.status_id === InvoiceStatus.Cancelled ||
@@ -97,6 +108,7 @@ export default function Invoice() {
             setIsDefaultTerms,
             isDefaultFooter,
             setIsDefaultFooter,
+            eInvoiceRef,
           }}
         />
       </div>

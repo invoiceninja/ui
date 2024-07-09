@@ -12,9 +12,8 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
 import { EInvoiceGenerator } from '$app/components/e-invoice/EInvoiceGenerator';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { EInvoiceComponent } from '$app/pages/settings';
-import { Dispatch, SetStateAction, useRef } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 
@@ -26,22 +25,14 @@ export interface Context {
   isDefaultFooter: boolean;
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
+  eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
 }
 export default function EInvoice() {
   const [t] = useTranslation();
 
   const context: Context = useOutletContext();
 
-  const { invoice, setInvoice } = context;
-
-  const eInvoiceRef = useRef<EInvoiceComponent>(null);
-
-  useSaveBtn(
-    {
-      onClick: () => eInvoiceRef?.current?.saveEInvoice(),
-    },
-    [invoice]
-  );
+  const { invoice, setInvoice, eInvoiceRef } = context;
 
   return (
     <Card title={t('e_invoice')}>

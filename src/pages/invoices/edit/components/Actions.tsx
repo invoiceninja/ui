@@ -82,7 +82,10 @@ export function useActions(params?: Params) {
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'invoice',
+    editPageTabs: ['e_invoice'],
+  });
 
   const bulk = useBulk();
   const navigate = useNavigate();
