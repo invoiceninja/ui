@@ -295,6 +295,8 @@ export function TemplatesAndReminders() {
   const variables =
     templateId === 'payment' ? paymentVariables : commonVariables;
 
+  console.log(templateId);
+
   return (
     <Settings
       title={t('templates_and_reminders')}
@@ -411,12 +413,15 @@ export function TemplatesAndReminders() {
         </Element>
       </Card>
 
-      {(REMINDERS.includes(templateId) || templateId === 'reminder_endless') &&
+      {(REMINDERS.includes(templateId) ||
+        templateId === 'reminder_endless' ||
+        templateId === 'quote_reminder1') &&
         !disableSettingsField(
           `email_template_${templateId}` as keyof CompanySettings
         ) && (
           <Card>
-            {REMINDERS.includes(templateId) ? (
+            {REMINDERS.includes(templateId) ||
+            templateId === 'quote_reminder1' ? (
               <>
                 <Element leftSide={t('days')}>
                   <InputField
@@ -452,14 +457,38 @@ export function TemplatesAndReminders() {
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
                     </option>
-                    <option value="after_invoice_date">
-                      {t('after_invoice_date')}
+                    <option
+                      value={
+                        templateId === 'quote_reminder1'
+                          ? 'after_quote_date'
+                          : 'after_invoice_date'
+                      }
+                    >
+                      {templateId === 'quote_reminder1'
+                        ? t('after_quote_date')
+                        : t('after_invoice_date')}
                     </option>
-                    <option value="before_due_date">
-                      {t('before_due_date')}
+                    <option
+                      value={
+                        templateId === 'quote_reminder1'
+                          ? 'before_valid_until_date'
+                          : 'before_due_date'
+                      }
+                    >
+                      {templateId === 'quote_reminder1'
+                        ? t('before_valid_until_date')
+                        : t('before_due_date')}
                     </option>
-                    <option value="after_due_date">
-                      {t('after_due_date')}
+                    <option
+                      value={
+                        templateId === 'quote_reminder1'
+                          ? 'after_valid_until_date'
+                          : 'after_due_date'
+                      }
+                    >
+                      {templateId === 'quote_reminder1'
+                        ? t('after_valid_until_date')
+                        : t('after_due_date')}
                     </option>
                   </SelectField>
                 </Element>
