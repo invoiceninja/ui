@@ -45,7 +45,6 @@ export function useEvents() {
   const EVENT_SENT_QUOTE = '61';
   const EVENT_ARCHIVE_QUOTE = '34';
   const EVENT_RESTORE_QUOTE = '42';
-  const EVENT_REMIND_QUOTE = '64';
   const EVENT_CREATE_CREDIT = '27';
   const EVENT_SENT_CREDIT = '62';
   const EVENT_UPDATE_CREDIT = '28';
@@ -102,7 +101,6 @@ export function useEvents() {
     { event: EVENT_ARCHIVE_QUOTE, label: t('archive_quote') },
     { event: EVENT_RESTORE_QUOTE, label: t('restore_quote') },
     { event: EVENT_DELETE_QUOTE, label: t('delete_quote') },
-    { event: EVENT_REMIND_QUOTE, label: t('remind_quote') },
 
     { event: EVENT_CREATE_CREDIT, label: t('create_credit') },
     { event: EVENT_SENT_CREDIT, label: t('sent_credit') },
