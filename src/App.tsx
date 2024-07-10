@@ -46,7 +46,12 @@ export function App() {
   const { i18n } = useTranslation();
 
   const facebookPixelId = import.meta.env.VITE_FACEBOOK_PIXEL_ID;
-  const shouldIncludeScripts = isHosted() && location.pathname !== '/login';
+  const shouldIncludeScripts =
+    isHosted() &&
+    location.pathname !== '/' &&
+    location.pathname !== '/login' &&
+    location.pathname !== '/logout' &&
+    location.pathname !== '/register';
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -202,6 +207,7 @@ export function App() {
           <script>
             {`
               const noscriptElement = document.createElement('noscript');
+              noscriptElement.id = 'facebook-pixel-noscript';
               const pixelBody = document.createElement('img');
               pixelBody.height = '1';
               pixelBody.width = '1';
