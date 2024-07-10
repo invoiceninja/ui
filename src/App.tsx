@@ -36,11 +36,17 @@ import { useRefetch } from './common/hooks/useRefetch';
 import { toast } from './common/helpers/toast/toast';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
+import Helmet from 'react-helmet';
+import { isHosted } from './common/helpers';
 
 export function App() {
   const [t] = useTranslation();
   const { isOwner } = useAdmin();
+  const location = useLocation();
   const { i18n } = useTranslation();
+
+  const facebookPixelId = import.meta.env.VITE_FACEBOOK_PIXEL_ID;
+  const shouldIncludeScripts = isHosted() && location.pathname !== '/login';
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -48,7 +54,6 @@ export function App() {
 
   const { id } = useParams();
   const user = useCurrentUser();
-  const location = useLocation();
   const company = useCurrentCompany();
   useAddPreventNavigationEvents();
 
@@ -192,9 +197,62 @@ export function App() {
 
   return (
     <>
+      {shouldIncludeScripts && (
+        <Helmet>
+          <script>
+            {`
+              const noscriptElement = document.createElement('noscript');
+              const pixelBody = document.createElement('img');
+              pixelBody.height = '1';
+              pixelBody.width = '1';
+              pixelBody.style.display = 'none';
+              pixelBody.src = \`https://www.facebook.com/tr?id='${facebookPixelId}'&ev=PageView&noscript=1\`;
+              noscriptElement.appendChild(pixelBody);
+
+              if (document.body) {
+                document.body.appendChild(noscriptElement);
+              } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                  document.body.appendChild(noscriptElement);
+                });
+              }
+            `}
+          </script>
+          <script>
+            {`
+              !(function (f, b, e, v, n, t, s) {
+                if (f.fbq) return;
+                n = f.fbq = function () {
+                  n.callMethod
+                    ? n.callMethod.apply(n, arguments)
+                    : n.queue.push(arguments);
+                };
+                if (!f._fbq) f._fbq = n;
+                n.push = n;
+                n.loaded = !0;
+                n.version = '2.0';
+                n.queue = [];
+                t = b.createElement(e);
+                t.async = !0;
+                t.src = v;
+                s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s);
+              })(
+                window,
+                document,
+                'script',
+                'https://connect.facebook.net/en_US/fbevents.js'
+              );
+
+              fbq('init', '${facebookPixelId}');
+              fbq('track', 'PageView');
+            `}
+          </script>
+        </Helmet>
+      )}
+
       <div className="App">
         <Toaster position="top-center" />
-
         {routes}
       </div>
 
