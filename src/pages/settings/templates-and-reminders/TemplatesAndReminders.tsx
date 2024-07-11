@@ -85,29 +85,70 @@ export function TemplatesAndReminders() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const emailSubjectKey = (
+    templateId === 'quote_reminder1'
+      ? 'email_quote_subject_reminder1'
+      : `email_subject_${templateId || 'invoice'}`
+  ) as keyof CompanySettings;
+  const emailTemplateKey = (
+    templateId === 'quote_reminder1'
+      ? 'email_quote_template_reminder1'
+      : `email_template_${templateId || 'invoice'}`
+  ) as keyof CompanySettings;
+
+  const getNumDaysReminderKey = (index: number) => {
+    return (
+      templateId === 'quote_reminder1'
+        ? 'quote_num_days_reminder1'
+        : `num_days_reminder${index}`
+    ) as keyof CompanySettings;
+  };
+
+  const getScheduleReminderKey = (index: number) => {
+    return (
+      templateId === 'quote_reminder1'
+        ? 'quote_schedule_reminder1'
+        : `schedule_reminder${index}`
+    ) as keyof CompanySettings;
+  };
+
+  const getEnableReminderKey = (index: number) => {
+    return (
+      templateId === 'quote_reminder1'
+        ? 'enable_quote_reminder1'
+        : `enable_reminder${index}`
+    ) as keyof CompanySettings;
+  };
+
+  const getLateFeeAmountKey = (index: number) => {
+    return (
+      templateId === 'quote_reminder1'
+        ? 'quote_late_fee_amount1'
+        : `late_fee_amount${index}`
+    ) as keyof CompanySettings;
+  };
+
+  const getLateFeePercentKey = (index: number) => {
+    return (
+      templateId === 'quote_reminder1'
+        ? 'quote_late_fee_percent1'
+        : `late_fee_percent${index}`
+    ) as keyof CompanySettings;
+  };
+
   const handleSetTemplateBody = () => {
     if (statics?.templates && company && templateId) {
       const existing = {
-        subject: company.settings[
-          `email_subject_${templateId}` as keyof CompanySettings
-        ] as string,
-        body: company.settings[
-          `email_template_${templateId}` as keyof CompanySettings
-        ] as string,
+        subject: company.settings[emailSubjectKey] as string,
+        body: company.settings[emailTemplateKey] as string,
       };
 
       if (existing.subject?.length > 0 || existing.body?.length > 0) {
         setTemplateBody({ ...existing });
       } else {
         const template = statics.templates[templateId as keyof Templates] || {
-          subject:
-            company.settings[
-              `email_subject_${templateId}` as keyof CompanySettings
-            ] || '',
-          body:
-            company.settings[
-              `email_template_${templateId}` as keyof CompanySettings
-            ] || '',
+          subject: company.settings[emailSubjectKey] || '',
+          body: company.settings[emailTemplateKey] || '',
         };
 
         setTemplateBody({ ...template });
@@ -121,23 +162,23 @@ export function TemplatesAndReminders() {
     if (updatedCompanySettings) {
       if (currentReminderIndex) {
         (updatedCompanySettings[
-          `num_days_reminder${currentReminderIndex}` as keyof CompanySettings
+          getNumDaysReminderKey(currentReminderIndex) as keyof CompanySettings
         ] as number) = 0;
 
         (updatedCompanySettings[
-          `schedule_reminder${currentReminderIndex}` as keyof CompanySettings
+          getScheduleReminderKey(currentReminderIndex)
         ] as string) = 'disabled';
 
         (updatedCompanySettings[
-          `enable_reminder${currentReminderIndex}` as keyof CompanySettings
+          getEnableReminderKey(currentReminderIndex)
         ] as boolean) = false;
 
         (updatedCompanySettings[
-          `late_fee_amount${currentReminderIndex}` as keyof CompanySettings
+          getLateFeeAmountKey(currentReminderIndex)
         ] as number) = 0;
 
         (updatedCompanySettings[
-          `late_fee_percent${currentReminderIndex}` as keyof CompanySettings
+          getLateFeePercentKey(currentReminderIndex)
         ] as number) = 0;
       } else {
         updatedCompanySettings.enable_reminder_endless = false;
@@ -159,23 +200,23 @@ export function TemplatesAndReminders() {
     if (updatedCompanySettings) {
       if (currentReminderIndex) {
         delete updatedCompanySettings[
-          `num_days_reminder${currentReminderIndex}` as keyof CompanySettings
+          getNumDaysReminderKey(currentReminderIndex)
         ];
 
         delete updatedCompanySettings[
-          `schedule_reminder${currentReminderIndex}` as keyof CompanySettings
+          getScheduleReminderKey(currentReminderIndex)
         ];
 
         delete updatedCompanySettings[
-          `enable_reminder${currentReminderIndex}` as keyof CompanySettings
+          getEnableReminderKey(currentReminderIndex)
         ];
 
         delete updatedCompanySettings[
-          `late_fee_amount${currentReminderIndex}` as keyof CompanySettings
+          getLateFeeAmountKey(currentReminderIndex)
         ];
 
         delete updatedCompanySettings[
-          `late_fee_percent${currentReminderIndex}` as keyof CompanySettings
+          getLateFeePercentKey(currentReminderIndex)
         ];
       } else {
         delete updatedCompanySettings.enable_reminder_endless;
@@ -196,9 +237,11 @@ export function TemplatesAndReminders() {
           reminderIndex > -1 ? `reminder${reminderIndex}` : '';
 
         delete updatedCompanySettingsChanges[
-          `email_subject_${
-            currentReminder || templateId
-          }` as keyof typeof updatedCompanySettingsChanges
+          (templateId === 'quote_reminder1'
+            ? 'email_quote_subject_reminder1'
+            : `email_subject_${
+                currentReminder || templateId
+              }`) as keyof typeof updatedCompanySettingsChanges
         ];
 
         if (
@@ -225,9 +268,7 @@ export function TemplatesAndReminders() {
       handleSetTemplateBody();
 
       if (
-        disableSettingsField(
-          `email_template_${templateId}` as keyof CompanySettings
-        ) &&
+        disableSettingsField(emailTemplateKey) &&
         REMINDERS.includes(templateId)
       ) {
         handleSetReminderDetails(REMINDERS.indexOf(templateId) + 1);
@@ -250,10 +291,7 @@ export function TemplatesAndReminders() {
         setReminderIndex(-1);
       }
 
-      const template =
-        company?.settings[
-          `email_template_${templateId}` as keyof CompanySettings
-        ];
+      const template = company?.settings[emailTemplateKey];
 
       if (
         isCompanySettingsActive ||
@@ -272,11 +310,8 @@ export function TemplatesAndReminders() {
 
   useEffect(() => {
     if (templateId && templateBody) {
-      handleChange(
-        `settings.email_subject_${templateId}`,
-        templateBody?.subject
-      );
-      handleChange(`settings.email_template_${templateId}`, templateBody?.body);
+      handleChange(`settings.${emailSubjectKey}`, templateBody?.subject);
+      handleChange(`settings.${emailTemplateKey}`, templateBody?.body);
 
       setIsLoadingPdf(true);
 
@@ -285,7 +320,7 @@ export function TemplatesAndReminders() {
         subject: templateBody?.subject,
         entity: '',
         entity_id: '',
-        template: `email_template_${templateId}`,
+        template: `${emailTemplateKey}`,
       })
         .then((response) => setPreview(response.data))
         .finally(() => setIsLoadingPdf(false));
@@ -294,8 +329,6 @@ export function TemplatesAndReminders() {
 
   const variables =
     templateId === 'payment' ? paymentVariables : commonVariables;
-
-  console.log(templateId);
 
   return (
     <Settings
@@ -314,17 +347,9 @@ export function TemplatesAndReminders() {
           leftSide={
             <PropertyCheckbox
               checked={Boolean(
-                typeof company?.settings[
-                  `email_template_${
-                    templateId || 'invoice'
-                  }` as keyof CompanySettings
-                ] !== 'undefined'
+                typeof company?.settings[emailTemplateKey] !== 'undefined'
               )}
-              propertyKey={
-                `email_template_${
-                  templateId || 'invoice'
-                }` as keyof CompanySettings
-              }
+              propertyKey={emailTemplateKey}
               labelElement={<SettingsLabel label={t('template')} />}
               defaultValue={templateId || 'invoice'}
               onCheckboxChange={(value) => handleChangingCheckbox(value)}
@@ -354,9 +379,7 @@ export function TemplatesAndReminders() {
 
         <Element
           leftSide={t('subject')}
-          disabledLabels={disableSettingsField(
-            `email_template_${templateId}` as keyof CompanySettings
-          )}
+          disabledLabels={disableSettingsField(emailSubjectKey)}
         >
           <InputField
             id="subject"
@@ -366,17 +389,13 @@ export function TemplatesAndReminders() {
                 (current) => current && { ...current, subject: value }
               )
             }
-            disabled={disableSettingsField(
-              `email_template_${templateId}` as keyof CompanySettings
-            )}
+            disabled={disableSettingsField(emailSubjectKey)}
           />
         </Element>
 
         <Element
           leftSide={t('body')}
-          disabledLabels={disableSettingsField(
-            `email_template_${templateId}` as keyof CompanySettings
-          )}
+          disabledLabels={disableSettingsField(emailTemplateKey)}
         >
           {canChangeEmailTemplate ? (
             <MarkdownEditor
@@ -386,9 +405,7 @@ export function TemplatesAndReminders() {
                   (current) => current && { ...current, body: value }
                 )
               }
-              disabled={disableSettingsField(
-                `email_template_${templateId}` as keyof CompanySettings
-              )}
+              disabled={disableSettingsField(emailTemplateKey)}
             />
           ) : (
             <div className="flex flex-col items-start">
@@ -416,9 +433,7 @@ export function TemplatesAndReminders() {
       {(REMINDERS.includes(templateId) ||
         templateId === 'reminder_endless' ||
         templateId === 'quote_reminder1') &&
-        !disableSettingsField(
-          `email_template_${templateId}` as keyof CompanySettings
-        ) && (
+        !disableSettingsField(emailTemplateKey) && (
           <Card>
             {REMINDERS.includes(templateId) ||
             templateId === 'quote_reminder1' ? (
@@ -426,13 +441,12 @@ export function TemplatesAndReminders() {
                 <Element leftSide={t('days')}>
                   <InputField
                     value={
-                      company?.settings[
-                        `num_days_reminder${reminderIndex}` as keyof CompanySettings
-                      ] || 0
+                      company?.settings[getNumDaysReminderKey(reminderIndex)] ||
+                      0
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        `settings.num_days_reminder${reminderIndex}`,
+                        `settings.${getNumDaysReminderKey(reminderIndex)}`,
                         parseFloat(value) || 0
                       )
                     }
@@ -444,12 +458,12 @@ export function TemplatesAndReminders() {
                   <SelectField
                     value={
                       company?.settings[
-                        `schedule_reminder${reminderIndex}` as keyof CompanySettings
+                        getScheduleReminderKey(reminderIndex)
                       ] || 'disabled'
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        `settings.schedule_reminder${reminderIndex}`,
+                        `settings.${getScheduleReminderKey(reminderIndex)}`,
                         value
                       )
                     }
@@ -497,14 +511,12 @@ export function TemplatesAndReminders() {
                   <Toggle
                     checked={
                       Boolean(
-                        company?.settings[
-                          `enable_reminder${reminderIndex}` as keyof CompanySettings
-                        ]
+                        company?.settings[getEnableReminderKey(reminderIndex)]
                       ) || false
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        `settings.enable_reminder${reminderIndex}`,
+                        `settings.${getEnableReminderKey(reminderIndex)}`,
                         value
                       )
                     }
@@ -515,13 +527,11 @@ export function TemplatesAndReminders() {
                   <InputField
                     type="number"
                     value={
-                      company?.settings[
-                        `late_fee_amount${reminderIndex}` as keyof CompanySettings
-                      ] || 0
+                      company?.settings[getLateFeeAmountKey(reminderIndex)] || 0
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        `settings.late_fee_amount${reminderIndex}`,
+                        `settings.${getLateFeeAmountKey(reminderIndex)}`,
                         parseFloat(value) || 0
                       )
                     }
@@ -532,13 +542,12 @@ export function TemplatesAndReminders() {
                   <InputField
                     type="number"
                     value={
-                      company?.settings[
-                        `late_fee_percent${reminderIndex}` as keyof CompanySettings
-                      ] || 0
+                      company?.settings[getLateFeePercentKey(reminderIndex)] ||
+                      0
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        `settings.late_fee_percent${reminderIndex}`,
+                        `settings.${getLateFeePercentKey(reminderIndex)}`,
                         parseFloat(value) || 0
                       )
                     }
