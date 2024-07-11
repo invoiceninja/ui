@@ -40,7 +40,6 @@ import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavig
 export function App() {
   const [t] = useTranslation();
   const { isOwner } = useAdmin();
-  const location = useLocation();
   const { i18n } = useTranslation();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
@@ -49,6 +48,7 @@ export function App() {
 
   const { id } = useParams();
   const user = useCurrentUser();
+  const location = useLocation();
   const company = useCurrentCompany();
   useAddPreventNavigationEvents();
 

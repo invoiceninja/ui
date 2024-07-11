@@ -100,7 +100,6 @@
     "@types/react-date-range": "^1.4.4",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "^18.0.9",
-    "@types/react-helmet": "^6.1.11",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
