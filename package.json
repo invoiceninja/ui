@@ -42,7 +42,6 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-feather": "^2.0.10",
-    "react-helmet": "^6.1.0",
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
