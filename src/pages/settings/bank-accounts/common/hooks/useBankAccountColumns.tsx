@@ -32,10 +32,11 @@ export const useBankAccountColumns = () => {
   const formatMoney = useFormatMoney();
   const resolveCurrency = useResolveCurrency({ resolveBy: 'code' });
 
-  const handleConnectNordigen = () => {
+  const handleConnectNordigen = (institutionId: string) => {
     request('POST', endpoint('/api/v1/one_time_token'), {
       context: 'nordigen',
       platform: 'react',
+      institution_id: institutionId,
     }).then((tokenResponse) => {
       window.open(
         endpoint('/nordigen/connect/:hash', {
@@ -66,11 +67,15 @@ export const useBankAccountColumns = () => {
                 width="auto"
                 placement="top"
               >
-                <MdWarning
-                  color="red"
-                  size={22}
-                  onClick={handleConnectNordigen}
-                />
+                <div
+                  className="cursor-pointer"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleConnectNordigen(bankAccount.nordigen_institution_id);
+                  }}
+                >
+                  <MdWarning color="red" size={22} />
+                </div>
               </Tooltip>
             )}
         </div>
