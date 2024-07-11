@@ -162,7 +162,7 @@ export function TemplatesAndReminders() {
     if (updatedCompanySettings) {
       if (currentReminderIndex) {
         (updatedCompanySettings[
-          getNumDaysReminderKey(currentReminderIndex) as keyof CompanySettings
+          getNumDaysReminderKey(currentReminderIndex)
         ] as number) = 0;
 
         (updatedCompanySettings[
@@ -320,7 +320,7 @@ export function TemplatesAndReminders() {
         subject: templateBody?.subject,
         entity: '',
         entity_id: '',
-        template: `${emailTemplateKey}`,
+        template: emailTemplateKey,
       })
         .then((response) => setPreview(response.data))
         .finally(() => setIsLoadingPdf(false));
@@ -379,7 +379,7 @@ export function TemplatesAndReminders() {
 
         <Element
           leftSide={t('subject')}
-          disabledLabels={disableSettingsField(emailSubjectKey)}
+          disabledLabels={disableSettingsField(emailTemplateKey)}
         >
           <InputField
             id="subject"
@@ -389,7 +389,7 @@ export function TemplatesAndReminders() {
                 (current) => current && { ...current, subject: value }
               )
             }
-            disabled={disableSettingsField(emailSubjectKey)}
+            disabled={disableSettingsField(emailTemplateKey)}
           />
         </Element>
 
