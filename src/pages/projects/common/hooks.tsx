@@ -27,7 +27,6 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
-  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -316,7 +315,7 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'project',
     editPageTabs: ['documents'],
   });
@@ -347,7 +346,7 @@ export function useActions() {
           request(
             'GET',
             endpoint(
-              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active&without_deleted_clients=true',
               {
                 projectId: project.id,
               }
@@ -377,18 +376,6 @@ export function useActions() {
   } = useChangeTemplate();
 
   const actions = [
-    (project: Project) =>
-      isShowPage && (
-        <DropdownElement
-          onClick={() =>
-            navigate(route('/projects/:id/edit', { id: project.id }))
-          }
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    () => isShowPage && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement

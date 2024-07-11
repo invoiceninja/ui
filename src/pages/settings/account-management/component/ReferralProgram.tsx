@@ -25,6 +25,12 @@ export function ReferralProgram() {
           text={`https://app.invoicing.co/#/register?rc=${user?.referral_code}`}
         />
       </Element>
+
+      <Element leftSide={t('free')}>{user?.referral_meta?.free || 0}</Element>
+      <Element leftSide={t('pro')}>{user?.referral_meta?.pro || 0}</Element>
+      <Element leftSide={t('enterprise')}>
+        {user?.referral_meta?.enterprise || 0}
+      </Element>
     </Card>
   );
 }
