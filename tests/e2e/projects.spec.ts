@@ -74,13 +74,6 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
   await expect(
     page
       .getByRole('definition', { exact: true })
-      .filter({ hasText: 'Notes' })
-      .first()
-  ).toBeVisible();
-
-  await expect(
-    page
-      .getByRole('definition', { exact: true })
       .filter({ hasText: 'Summary' })
       .first()
   ).toBeVisible();
@@ -89,13 +82,13 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'More Actions', exact: true })
+        .getByRole('button', { name: 'Edit', exact: true })
     ).toBeVisible();
   }
 };
@@ -221,8 +214,6 @@ test('can edit project', async ({ page }) => {
 
   await checkShowPage(page, true);
 
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
   await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
 
   await page.waitForURL('**/projects/**/edit');
@@ -315,8 +306,6 @@ test('can view and edit assigned project with create_project', async ({
     .click();
 
   await checkShowPage(page, true);
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
 
