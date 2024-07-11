@@ -249,74 +249,6 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       }
     };
 
-    const getFieldLabel = (
-      fieldElement: ElementType,
-      fieldParentKeys: string
-    ) => {
-      const parentKeysLength = fieldParentKeys.split('|').length;
-
-      let topParentType = '';
-      let lastParentType = '';
-
-      if (parentKeysLength > 3) {
-        topParentType = fieldParentKeys.split('|')[parentKeysLength - 4];
-        lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
-
-        return `${fieldElement.name} (${getComponentKey(
-          topParentType
-        )}, ${getComponentKey(lastParentType)})`;
-      }
-
-      if (parentKeysLength > 2) {
-        topParentType = fieldParentKeys.split('|')[parentKeysLength - 3];
-        lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
-
-        return `${fieldElement.name} (${getComponentKey(
-          topParentType
-        )}, ${getComponentKey(lastParentType)})`;
-      }
-
-      if (parentKeysLength > 1) {
-        lastParentType = fieldParentKeys.split('|')[parentKeysLength - 2];
-
-        return `${fieldElement.name} (${getComponentKey(lastParentType)})`;
-      }
-
-      return fieldElement.name;
-    };
-
-    const getComplexTypeLabel = (
-      element: ElementType,
-      componentPath: string
-    ) => {
-      const pathKeysLength = componentPath.split('|').length;
-
-      const updatedComponentPath = componentPath
-        .split('|')
-        .filter((_, index) => index < pathKeysLength - 2)
-        .join('|');
-      const updatedPathKeysLength = updatedComponentPath.split('|').length;
-
-      let topParentName = '';
-      let lastParentName = '';
-
-      lastParentName =
-        updatedComponentPath.split('|')[updatedPathKeysLength - 1];
-
-      if (updatedPathKeysLength > 1) {
-        topParentName =
-          updatedComponentPath.split('|')[updatedPathKeysLength - 2];
-
-        return `${element.name} (${topParentName}, ${lastParentName})`;
-      }
-
-      if (updatedPathKeysLength > 0) {
-        return `${element.name} (${lastParentName})`;
-      }
-
-      return element.name;
-    };
-
     const doesKeyStartsWithAnyGroupType = (
       currentKey: string,
       currentList?: AvailableGroup[]
@@ -364,7 +296,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       if (rule) {
         leftSideLabel = rule.label;
       } else {
-        leftSideLabel = getFieldLabel(element, parentsKey);
+        leftSideLabel = element.name;
       }
 
       const isOptionalElement = doesKeyStartsWithAnyGroupType(fieldKey);
@@ -394,9 +326,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             : '';
 
         if (
-          (currentFieldValue as string | number) ||
-          defaultFields[fieldKey.split('|')[keysLength - 1]] ||
-          !isOptionalElement
+          ((currentFieldValue as string | number) ||
+            defaultFields[fieldKey.split('|')[keysLength - 1]] ||
+            !isOptionalElement) &&
+          !isFieldChoice(fieldKey)
         ) {
           setPayload((current) => ({
             ...current,
@@ -405,6 +338,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
               defaultFields[fieldKey.split('|')[keysLength - 1]] ||
               defaultValue,
           }));
+        }
+
+        if (isFieldChoice(fieldKey)) {
+          //do..
         }
       }
 
@@ -735,7 +672,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                   noExternalPadding
                 >
                   <SelectField
-                    defaultValue={getDefaultChoiceSelectorValue(componentKey)}
+                    value={getDefaultChoiceSelectorValue(componentKey)}
                     onValueChange={(value) => {
                       setSelectedChoices((current) => {
                         const updatedCurrentList = current.filter(
@@ -860,12 +797,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                               className="flex items-center space-x-4 mt-1"
                             >
                               <div className="flex flex-1 items-center py-2 border-b border-t justify-between">
-                                <span className="text-sm">
-                                  {getComplexTypeLabel(
-                                    element,
-                                    componentKeyPath
-                                  )}
-                                </span>
+                                <span className="text-sm">{element.name}</span>
 
                                 <div
                                   className="cursor-pointer"
