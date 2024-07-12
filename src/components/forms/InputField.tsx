@@ -111,9 +111,35 @@ export function InputField(props: Props) {
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
+            if (props.element === 'textarea') {
+              const scrollHeight = event.target.scrollHeight + 2;
+
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
+              }
+            }
+
             if (props.changeOverride && props.changeOverride === true) {
               props.onValueChange && props.onValueChange(event.target.value);
               props.onChange && props.onChange(event);
+            }
+          }}
+          onClick={(event: any) => {
+            if (props.element === 'textarea') {
+              const scrollHeight = event.target.scrollHeight + 2;
+
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
+              }
+
+              if (scrollHeight > 200) {
+                event.target.style.height = 200 + 'px';
+              }
+            }
+          }}
+          onBlurCapture={(event: any) => {
+            if (props.element === 'textarea') {
+              event.target.style.removeProperty('height')
             }
           }}
           value={props.value}
