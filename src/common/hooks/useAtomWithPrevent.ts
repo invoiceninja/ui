@@ -46,27 +46,53 @@ export function useAtomWithPrevent(
             }
         );
     }
-  }, [entity, currentInitialValue]);
+  }, [entity]);
 
   useDebounce(
     () => {
       if (entity && entity.id === id && currentInitialValue) {
         setCurrentInitialValue(cloneDeep(entity));
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: false,
+            }
+        );
       }
     },
-    450,
+    900,
     [entity?.updated_at]
   );
 
   useDebounce(
     () => {
-      if (entity && (entity.id === id || !id) && !currentInitialValue) {
+      if (entity && entity.id === id && !currentInitialValue) {
         setCurrentInitialValue(cloneDeep(entity));
       }
     },
-    450,
+    900,
     [entity]
   );
+
+  useEffect(() => {
+    if (entity && !id && !currentInitialValue) {
+      setCurrentInitialValue(cloneDeep(entity));
+    }
+  }, [entity]);
+
+  useEffect(() => {
+    return () => {
+      setCurrentInitialValue(undefined);
+      setPreventLeavingPage(
+        (current) =>
+          current && {
+            ...current,
+            prevent: false,
+          }
+      );
+    };
+  }, []);
 
   return [entity, setEntity];
 }
