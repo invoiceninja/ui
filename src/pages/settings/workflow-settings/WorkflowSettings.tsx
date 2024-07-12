@@ -41,7 +41,7 @@ export function WorkflowSettings() {
       title={t('workflow_settings')}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#workflow_settings"
-      withoutBackButton
+      
     >
       <TabGroup tabs={tabs}>
         <div>

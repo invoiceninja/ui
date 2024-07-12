@@ -29,7 +29,7 @@ export default function Dashboard() {
   const enabled = useEnabled();
 
   return (
-    <Default title={t('dashboard')} withoutBackButton>
+    <Default title={t('dashboard')}>
       <Totals />
 
       <div className="grid grid-cols-12 gap-4 my-6">
