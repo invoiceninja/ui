@@ -345,6 +345,8 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          style={{ marginTop: '4px' }}
+          textareaRows={1}
         />
       );
     }
