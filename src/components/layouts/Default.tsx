@@ -72,9 +72,7 @@ interface Props extends CommonProps {
   docsLink?: string;
   navigationTopRight?: ReactNode;
   saveButtonLabel?: string | null;
-  backButtonLabel?: string;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
   aboveMainContainer?: ReactNode;
 }
@@ -436,15 +434,6 @@ export function Default(props: Props) {
               {props.onCancelClick && (
                 <Button onClick={props.onCancelClick} type="secondary">
                   {t('cancel')}
-                </Button>
-              )}
-
-              {!props.withoutBackButton && (
-                <Button
-                  onClick={() => preventNavigation({ url: 'back' })}
-                  type="secondary"
-                >
-                  {t('back')}
                 </Button>
               )}
 
