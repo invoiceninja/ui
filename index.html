@@ -16,64 +16,6 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
-
-    <script>
-      if ('%VITE_IS_HOSTED%' === 'true') {
-        const facebookPixelId = '%VITE_FACEBOOK_PIXEL_ID%';
-
-        const noscriptElement = document.createElement('noscript');
-
-        const pixelBody = document.createElement('img');
-        pixelBody.height = '1';
-        pixelBody.width = '1';
-        pixelBody.style.display = 'none';
-
-        pixelBody.src = `https://www.facebook.com/tr?id=${facebookPixelId}&ev=PageView&noscript=1`;
-
-        noscriptElement.appendChild(pixelBody);
-
-        if (document.body) {
-          document.body.appendChild(noscriptElement);
-        } else {
-          document.addEventListener('DOMContentLoaded', function () {
-            document.body.appendChild(noscriptElement);
-          });
-        }
-      }
-    </script>
-
-    <script>
-      if ('%VITE_IS_HOSTED%' === 'true') {
-        const facebookPixelId = '%VITE_FACEBOOK_PIXEL_ID%';
-
-        !(function (f, b, e, v, n, t, s) {
-          if (f.fbq) return;
-          n = f.fbq = function () {
-            n.callMethod
-              ? n.callMethod.apply(n, arguments)
-              : n.queue.push(arguments);
-          };
-          if (!f._fbq) f._fbq = n;
-          n.push = n;
-          n.loaded = !0;
-          n.version = '2.0';
-          n.queue = [];
-          t = b.createElement(e);
-          t.async = !0;
-          t.src = v;
-          s = b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t, s);
-        })(
-          window,
-          document,
-          'script',
-          'https://connect.facebook.net/en_US/fbevents.js'
-        );
-
-        fbq('init', facebookPixelId);
-        fbq('track', 'PageView');
-      }
-    </script>
   </head>
 
   <body class="h-full">
