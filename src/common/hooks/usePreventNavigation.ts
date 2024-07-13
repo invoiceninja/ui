@@ -25,7 +25,13 @@ export const isNavigationModalVisibleAtom = atom<boolean>(false);
 export const blockedNavigationActionAtom = atom<NavigationAction | undefined>(
   undefined
 );
-export function usePreventNavigation() {
+
+interface Params {
+  disablePrevention?: boolean;
+}
+export function usePreventNavigation(params?: Params) {
+  const { disablePrevention } = params || {};
+
   const navigate = useNavigate();
 
   const { nonPreventedLocations } = useAtomValue(lastHistoryLocationAtom);
@@ -37,7 +43,7 @@ export function usePreventNavigation() {
   const setBlockedNavigationAction = useSetAtom(blockedNavigationActionAtom);
 
   return ({ url, externalLink = false, fn, actionKey }: NavigationAction) => {
-    if (preventLeavingPage.prevent) {
+    if (preventLeavingPage.prevent && !disablePrevention) {
       setBlockedNavigationAction({
         url,
         externalLink,
