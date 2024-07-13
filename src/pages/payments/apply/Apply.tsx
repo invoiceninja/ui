@@ -45,7 +45,7 @@ export default function Apply() {
   
     if(payment){
       
-      const unapplied = payment?.amount - payment?.refunded - payment?.applied;
+      const unapplied = payment?.amount - payment?.applied;
 
       let invoices_total = 0;
       formik.values.invoices.map((invoice: any) => {
@@ -62,7 +62,7 @@ export default function Apply() {
   const calcApplyBalance = () => {
     if (payment) {
 
-      const unapplied = payment?.amount - payment?.refunded - payment?.applied;
+      const unapplied = payment?.amount - payment?.applied;
 
       let total = 0;
       formik.values.invoices.map((invoice: any) => {
@@ -141,7 +141,7 @@ export default function Apply() {
         <>
           <Element leftSide={t('amount')}>
             {formatMoney(
-              payment?.amount - payment?.refunded,
+              payment?.amount ,
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
@@ -157,7 +157,7 @@ export default function Apply() {
 
           <Element leftSide={t('unapplied')}>
             {formatMoney(
-              payment?.amount - payment?.refunded - payment?.applied,
+              payment?.amount - payment?.applied,
               payment.client?.country_id,
               payment.client?.settings.currency_id
             )}
