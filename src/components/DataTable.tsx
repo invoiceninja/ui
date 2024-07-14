@@ -466,109 +466,112 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   return (
     <div data-cy="dataTable">
-      {!props.withoutActions && (
-        <Actions
-          filter={filter}
-          onFilterChange={setFilter}
-          optionsMultiSelect={true}
-          options={options}
-          defaultOptions={defaultOptions}
-          defaultCustomFilterOptions={defaultCustomFilterOptions}
-          onStatusChange={setStatus}
-          customFilters={props.customFilters}
-          customFilterPlaceholder={props.customFilterPlaceholder}
-          onCustomFilterChange={setCustomFilter}
-          rightSide={
-            <>
-              {props.rightSide}
+      <>
+        {!props.withoutActions && (
+          <Actions
+            filter={filter}
+            onFilterChange={setFilter}
+            optionsMultiSelect={true}
+            options={options}
+            defaultOptions={defaultOptions}
+            defaultCustomFilterOptions={defaultCustomFilterOptions}
+            onStatusChange={setStatus}
+            customFilters={props.customFilters}
+            customFilterPlaceholder={props.customFilterPlaceholder}
+            onCustomFilterChange={setCustomFilter}
+            customFilter={customFilter}
+            rightSide={
+              <>
+                {props.rightSide}
 
-              {props.linkToCreate && (
-                <Guard
-                  type="component"
-                  guards={props.linkToCreateGuards || []}
-                  component={
-                    <Button to={props.linkToCreate}>
-                      <span>{t(`new_${props.resource}`)}</span>
-                    </Button>
-                  }
-                />
-              )}
-            </>
-          }
-          beforeFilter={props.beforeFilter}
-          withoutStatusFilter={props.withoutStatusFilter}
-        >
-          {!hideEditableOptions && (
-            <Dropdown
-              label={t('more_actions')}
-              disabled={!selected.length}
-              cypressRef="bulkActionsDropdown"
-            >
-              {props.customBulkActions &&
-                props.customBulkActions.map(
-                  (bulkAction: CustomBulkAction<T>, index: number) => (
-                    <div key={index}>
-                      {bulkAction({
-                        selectedIds: selected,
-                        selectedResources,
-                        setSelected,
-                      })}
-                    </div>
-                  )
+                {props.linkToCreate && (
+                  <Guard
+                    type="component"
+                    guards={props.linkToCreateGuards || []}
+                    component={
+                      <Button to={props.linkToCreate}>
+                        <span>{t(`new_${props.resource}`)}</span>
+                      </Button>
+                    }
+                  />
+                )}
+              </>
+            }
+            beforeFilter={props.beforeFilter}
+            withoutStatusFilter={props.withoutStatusFilter}
+          >
+            {!hideEditableOptions && (
+              <Dropdown
+                label={t('more_actions')}
+                disabled={!selected.length}
+                cypressRef="bulkActionsDropdown"
+              >
+                {props.customBulkActions &&
+                  props.customBulkActions.map(
+                    (bulkAction: CustomBulkAction<T>, index: number) => (
+                      <div key={index}>
+                        {bulkAction({
+                          selectedIds: selected,
+                          selectedResources,
+                          setSelected,
+                        })}
+                      </div>
+                    )
+                  )}
+
+                {props.customBulkActions && showCustomBulkActionDivider && (
+                  <Divider withoutPadding />
                 )}
 
-              {props.customBulkActions && showCustomBulkActionDivider && (
-                <Divider withoutPadding />
-              )}
-
-              {!props.withoutDefaultBulkActions && (
-                <>
-                  <DropdownElement
-                    onClick={() => {
-                      if (onBulkActionCall) {
-                        onBulkActionCall(selected, 'archive');
-                      } else {
-                        bulk('archive');
-                      }
-                    }}
-                    icon={<Icon element={MdArchive} />}
-                  >
-                    {t('archive')}
-                  </DropdownElement>
-
-                  <DropdownElement
-                    onClick={() => {
-                      if (onBulkActionCall) {
-                        onBulkActionCall(selected, 'delete');
-                      } else {
-                        bulk('delete');
-                      }
-                    }}
-                    icon={<Icon element={MdDelete} />}
-                  >
-                    {t('delete')}
-                  </DropdownElement>
-
-                  {showRestoreBulkAction() && (
+                {!props.withoutDefaultBulkActions && (
+                  <>
                     <DropdownElement
                       onClick={() => {
                         if (onBulkActionCall) {
-                          onBulkActionCall(selected, 'restore');
+                          onBulkActionCall(selected, 'archive');
                         } else {
-                          bulk('restore');
+                          bulk('archive');
                         }
                       }}
-                      icon={<Icon element={MdRestore} />}
+                      icon={<Icon element={MdArchive} />}
                     >
-                      {t('restore')}
+                      {t('archive')}
                     </DropdownElement>
-                  )}
-                </>
-              )}
-            </Dropdown>
-          )}
-        </Actions>
-      )}
+
+                    <DropdownElement
+                      onClick={() => {
+                        if (onBulkActionCall) {
+                          onBulkActionCall(selected, 'delete');
+                        } else {
+                          bulk('delete');
+                        }
+                      }}
+                      icon={<Icon element={MdDelete} />}
+                    >
+                      {t('delete')}
+                    </DropdownElement>
+
+                    {showRestoreBulkAction() && (
+                      <DropdownElement
+                        onClick={() => {
+                          if (onBulkActionCall) {
+                            onBulkActionCall(selected, 'restore');
+                          } else {
+                            bulk('restore');
+                          }
+                        }}
+                        icon={<Icon element={MdRestore} />}
+                      >
+                        {t('restore')}
+                      </DropdownElement>
+                    )}
+                  </>
+                )}
+              </Dropdown>
+            )}
+          </Actions>
+        )}
+      </>
 
       <Table
         className={classNames(props.className, {

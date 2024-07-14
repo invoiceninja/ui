@@ -14,6 +14,7 @@ import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import collect from 'collect.js';
 
 export interface SelectOption {
   value: string;
@@ -21,6 +22,8 @@ export interface SelectOption {
   backgroundColor: string;
   color: string;
   queryKey?: string;
+  dropdownKey?: '0' | '1';
+  placeHolder?: string;
 }
 
 interface Props extends CommonProps {
@@ -38,10 +41,21 @@ interface Props extends CommonProps {
   defaultCustomFilterOptions?: SelectOption[];
   filter: string;
   withoutStatusFilter?: boolean;
+  customFilter: string[] | undefined;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
+
+  const { customFilter } = props;
+
+  const customFilterDropdowns = props.customFilters
+    ? collect(props.customFilters)
+        .pluck('dropdownKey')
+        .unique()
+        .toArray()
+        .map((dropdownKey) => (dropdownKey as string) ?? '0')
+    : [];
 
   const onStatusChange = (
     options:
@@ -62,9 +76,10 @@ export function Actions(props: Props) {
   const onCustomFilterChange = (
     options:
       | MultiValue<{ value: string; label: string }>
-      | SingleValue<{ value: string; label: string }>
+      | SingleValue<{ value: string; label: string }>,
+    currentDropdownKey: string
   ) => {
-    if (props.onCustomFilterChange) {
+    if (props.onCustomFilterChange && customFilterDropdowns.length === 1) {
       const values: string[] = [];
 
       (options as SelectOption[]).map(
@@ -72,6 +87,30 @@ export function Actions(props: Props) {
       );
 
       return props.onCustomFilterChange(values);
+    } else if (props.onCustomFilterChange && customFilterDropdowns.length > 1) {
+      const values: string[] = [];
+
+      (options as SelectOption[]).map(
+        (option: { value: string; label: string }) => values.push(option.value)
+      );
+
+      if (!customFilter?.length) {
+        return props.onCustomFilterChange(values);
+      } else {
+        const otherDropdownsOptions =
+          props.customFilters?.filter(
+            (option) =>
+              option.dropdownKey !== currentDropdownKey &&
+              customFilter.some(
+                (currentFilter) => currentFilter === option.value
+              )
+          ) || [];
+
+        return props.onCustomFilterChange([
+          ...otherDropdownsOptions.map((option) => option.value),
+          ...values,
+        ]);
+      }
     }
   };
 
@@ -154,18 +193,31 @@ export function Actions(props: Props) {
             />
           )}
 
-        {props.customFilters &&
-          props.customFilterPlaceholder &&
-          props.defaultCustomFilterOptions && (
-            <Select
-              styles={customStyles}
-              defaultValue={props.defaultCustomFilterOptions}
-              onChange={(options) => onCustomFilterChange(options)}
-              placeholder={t(props.customFilterPlaceholder)}
-              options={props.customFilters}
-              isMulti={props.optionsMultiSelect}
-            />
-          )}
+        {customFilterDropdowns.map(
+          (dropDownKey, index) =>
+            props.customFilterPlaceholder &&
+            props.defaultCustomFilterOptions && (
+              <Select
+                key={index}
+                styles={customStyles}
+                defaultValue={props.defaultCustomFilterOptions.filter(
+                  (value) => value.dropdownKey === dropDownKey
+                )}
+                onChange={(options) =>
+                  onCustomFilterChange(options, dropDownKey)
+                }
+                placeholder={t(
+                  props.customFilters?.filter(
+                    (value) => value.dropdownKey === dropDownKey
+                  )[0]?.placeHolder ?? props.customFilterPlaceholder
+                )}
+                options={props.customFilters?.filter(
+                  (value) => value.dropdownKey === dropDownKey
+                )}
+                isMulti={props.optionsMultiSelect}
+              />
+            )
+        )}
       </div>
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.beforeFilter}
