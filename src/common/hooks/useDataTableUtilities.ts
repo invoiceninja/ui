@@ -91,8 +91,6 @@ export function useDataTableUtilities(params: Params) {
           }
 
           if (index === customFilters.length - 1) {
-            console.log(customFilter);
-
             apiEndpoint.searchParams.set(
               currentQueryKey,
               selectedFiltersByKey.join(',')

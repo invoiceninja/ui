@@ -49,7 +49,7 @@ export function useBankAccountsQuery(params?: Params) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/bank_integrations?per_page=:perPage', {
+        endpoint('/api/v1/bank_integrations?per_page=:perPage&status=active', {
           perPage: perPage ?? 20,
         })
       ).then(
