@@ -195,24 +195,25 @@ export function Actions(props: Props) {
 
         {customFilterDropdowns.map(
           (dropDownKey, index) =>
+            props.customFilters &&
             props.customFilterPlaceholder &&
             props.defaultCustomFilterOptions && (
               <Select
                 key={index}
                 styles={customStyles}
                 defaultValue={props.defaultCustomFilterOptions.filter(
-                  (value) => value.dropdownKey === dropDownKey
+                  (value) => (value.dropdownKey ?? '0') === dropDownKey
                 )}
                 onChange={(options) =>
                   onCustomFilterChange(options, dropDownKey)
                 }
                 placeholder={t(
-                  props.customFilters?.filter(
+                  props.customFilters.filter(
                     (value) => value.dropdownKey === dropDownKey
                   )[0]?.placeHolder ?? props.customFilterPlaceholder
                 )}
-                options={props.customFilters?.filter(
-                  (value) => value.dropdownKey === dropDownKey
+                options={props.customFilters.filter(
+                  (value) => (value.dropdownKey ?? '0') === dropDownKey
                 )}
                 isMulti={props.optionsMultiSelect}
               />
