@@ -16,6 +16,7 @@ import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -60,6 +61,7 @@ export function InputField(props: Props) {
   }, [props.type, isInputMasked]);
 
   const colors = useColorScheme();
+  const { preferences } = usePreferences();
 
   return (
     <section style={{ width: props.width }}>
@@ -111,7 +113,7 @@ export function InputField(props: Props) {
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
-            if (props.element === 'textarea') {
+            if (props.element === 'textarea' && preferences.auto_expand_product_table_notes) {
               const scrollHeight = event.target.scrollHeight + 2;
 
               if (scrollHeight < 200) {
@@ -125,7 +127,7 @@ export function InputField(props: Props) {
             }
           }}
           onClick={(event: any) => {
-            if (props.element === 'textarea') {
+            if (props.element === 'textarea' && preferences.auto_expand_product_table_notes) {
               const scrollHeight = event.target.scrollHeight + 2;
 
               if (scrollHeight < 200) {
