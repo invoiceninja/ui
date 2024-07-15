@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -13,10 +14,16 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
-import { Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { t } from 'i18next';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { Tooltip } from '$app/components/Tooltip';
+import { Icon } from '$app/components/icons/Icon';
+import { MdAddCircle } from 'react-icons/md';
+import { Modal } from '$app/components/Modal';
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 const Div = styled.div`
   border-color: ${(props) => props.theme.borderColor};
@@ -31,14 +38,14 @@ export function useGenerateActivityElement() {
   const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
-    if(activity.activity_type_id === 10 && activity.contact) {
+    if (activity.activity_type_id === 10 && activity.contact) {
       text = trans(`activity_10_online`, {});
     }
 
     if (activity.activity_type_id === 54 && activity.contact) {
       text = text.replace(':user', ':contact');
     }
-  
+
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
@@ -169,5 +176,66 @@ export function useGenerateActivityElement() {
         </div>
       </div>
     </Div>
+  );
+}
+
+interface Props {
+  activity: ActivityRecord;
+  iconSize?: number;
+}
+
+export function InsertActivityNotesModal(props: Props) {
+  const [t] = useTranslation();
+
+  const { activity, iconSize = 28 } = props;
+
+  const availableEntities = ['payment'];
+
+  const entity = trans(`activity_${activity.activity_type_id}`, {});
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [notes, setNotes] = useState<string>('');
+
+  const handleOnClose = () => {
+    setIsModalOpen(false);
+    setNotes('');
+  };
+
+  const handleInsertNotes = () => {};
+
+  return (
+    <>
+      <Tooltip
+        placement="top"
+        message={t('insert_notes') as string}
+        width="auto"
+      >
+        <Icon
+          element={MdAddCircle}
+          size={iconSize}
+          onClick={() => setIsModalOpen(true)}
+        />
+      </Tooltip>
+
+      <Modal
+        size="regular"
+        title={t('insert_notes')}
+        visible={isModalOpen}
+        onClose={handleOnClose}
+      >
+        <InputField
+          element="textarea"
+          value={notes}
+          onValueChange={(value) => setNotes(value)}
+        />
+
+        <div className="flex self-end">
+          <Button behavior="button" onClick={handleInsertNotes}>
+            {t('insert')}
+          </Button>
+        </div>
+      </Modal>
+    </>
   );
 }

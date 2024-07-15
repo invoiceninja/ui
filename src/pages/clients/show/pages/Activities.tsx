@@ -16,7 +16,10 @@ import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import React from 'react';
-import { useGenerateActivityElement } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import {
+  InsertActivityNotesModal,
+  useGenerateActivityElement,
+} from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 
@@ -51,9 +54,11 @@ export default function Activities() {
         <div className="flex flex-col overflow-y-auto pr-4">
           {activities &&
             activities.map((record: ActivityRecord, index: number) => (
-              <React.Fragment key={index}>
+              <div key={index} className="flex items-center justify-between">
                 {activityElement(record)}
-              </React.Fragment>
+
+                <InsertActivityNotesModal activity={record} />
+              </div>
             ))}
         </div>
       </div>
