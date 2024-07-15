@@ -43,6 +43,7 @@ export interface Preferences {
   reports: {
     columns: Record<string, ClientMapRecord[][]>;
   };
+  auto_expand_product_table_notes: boolean;
 }
 
 type ImportTemplates = Record<string, Record<string, Record<number, string>>>;
@@ -97,6 +98,7 @@ export const preferencesDefaults: Preferences = {
   reports: {
     columns: {},
   },
+  auto_expand_product_table_notes: true,
 };
 
 interface Options {
