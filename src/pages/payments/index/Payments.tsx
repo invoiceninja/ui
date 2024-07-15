@@ -38,6 +38,8 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
 
 export default function Payments() {
   useTitle('payments');
@@ -115,6 +117,11 @@ export default function Payments() {
         }}
         linkToCreateGuards={[permission('create_payment')]}
         hideEditableOptions={!hasPermission('edit_payment')}
+        showRestoreBulk={(selectedPayments) =>
+          selectedPayments.every(
+            (payment) => getEntityState(payment) === EntityState.Archived
+          )
+        }
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
