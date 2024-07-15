@@ -16,7 +16,7 @@ import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
-import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -61,7 +61,7 @@ export function InputField(props: Props) {
   }, [props.type, isInputMasked]);
 
   const colors = useColorScheme();
-  const { preferences } = usePreferences();
+  const reactSettings = useReactSettings({ overwrite: false });
 
   return (
     <section style={{ width: props.width }}>
@@ -113,7 +113,10 @@ export function InputField(props: Props) {
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
-            if (props.element === 'textarea' && preferences.auto_expand_product_table_notes) {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
               const scrollHeight = event.target.scrollHeight + 2;
 
               if (scrollHeight < 200) {
@@ -127,7 +130,10 @@ export function InputField(props: Props) {
             }
           }}
           onClick={(event: any) => {
-            if (props.element === 'textarea' && preferences.auto_expand_product_table_notes) {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
               const scrollHeight = event.target.scrollHeight + 2;
 
               if (scrollHeight < 200) {
@@ -141,7 +147,7 @@ export function InputField(props: Props) {
           }}
           onBlurCapture={(event: any) => {
             if (props.element === 'textarea') {
-              event.target.style.removeProperty('height')
+              event.target.style.removeProperty('height');
             }
           }}
           value={props.value}
