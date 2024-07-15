@@ -81,7 +81,7 @@ export function Guard({ guards, component, type = 'page' }: Props) {
 
   if (state === State.Loading) {
     return type === 'page' ? (
-      <Default>
+      <Default breadcrumbs={[]}>
         <Spinner />
       </Default>
     ) : (

@@ -22,7 +22,7 @@ export function Fallback({ children, type = 'page' }: Props) {
     <Suspense
       fallback={
         type === 'page' || type === 'component' ? (
-          <Default>
+          <Default breadcrumbs={[]}>
             <Spinner />
           </Default>
         ) : (

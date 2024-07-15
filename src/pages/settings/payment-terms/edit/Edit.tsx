@@ -83,7 +83,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container>
+        <Container breadcrumbs={[]}>
           <Card
             title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}

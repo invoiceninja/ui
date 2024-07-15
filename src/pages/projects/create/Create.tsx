@@ -126,7 +126,7 @@ export default function Create() {
       disableSaveButton={!project}
       onSaveClick={onSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           <Element leftSide={t('project_name')} required>
             <InputField

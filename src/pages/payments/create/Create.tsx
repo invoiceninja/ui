@@ -218,7 +218,7 @@ export default function Create() {
       onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
       disableSaveButton={!payment || isFormBusy}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector

@@ -105,7 +105,7 @@ export function Create() {
 
   return (
     <Settings title={t('payment_terms')} breadcrumbs={pages}>
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card
           title={documentTitle}
           withSaveButton

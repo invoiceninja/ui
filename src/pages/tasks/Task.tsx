@@ -28,6 +28,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Page } from '$app/components/Breadcrumbs';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');
@@ -74,8 +75,20 @@ export default function Task() {
     changeTemplateResources,
   } = useChangeTemplate();
 
+  const pages: Page[] = [
+    {
+      name: t('tasks'),
+      href: route('/tasks'),
+    },
+    {
+      name: t('edit_task'),
+      href: route('/tasks/:id', { id }),
+    },
+  ];
+
   return (
     <Default
+      breadcrumbs={pages}
       title={documentTitle}
       disableSaveButton={isFormBusy}
       {...((hasPermission('edit_task') || entityAssigned(task)) &&

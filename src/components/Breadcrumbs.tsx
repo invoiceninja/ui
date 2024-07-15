@@ -17,6 +17,10 @@ export type Page = { name: string; href: string };
 export function Breadcrumbs(props: { pages: Page[] }) {
   const colors = useColorScheme();
 
+  if (props.pages.length === 0) {
+    return null;
+  }
+  
   return (
     <nav
       className="flex"

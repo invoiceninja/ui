@@ -29,7 +29,7 @@ export default function Dashboard() {
   const enabled = useEnabled();
 
   return (
-    <Default title={t('dashboard')}>
+    <Default title={t('dashboard')} breadcrumbs={[]}>
       <Totals />
 
       <div className="grid grid-cols-12 gap-4 my-6">
