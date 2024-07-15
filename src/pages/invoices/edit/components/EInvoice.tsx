@@ -39,7 +39,6 @@ export default function EInvoice() {
       {invoice?.e_invoice && (
         <EInvoiceGenerator
           ref={eInvoiceRef}
-          country={'italy'}
           entityLevel
           currentEInvoice={invoice.e_invoice}
           invoice={invoice}

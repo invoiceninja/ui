@@ -35,6 +35,7 @@ import { EInvoiceFieldCheckbox } from './EInvoiceFieldCheckbox';
 import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
 import { useLocation } from 'react-router-dom';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { useColorScheme } from '$app/common/colors';
 
 export type Country = 'italy';
 
@@ -105,7 +106,7 @@ interface Component {
 }
 
 interface Props {
-  country: Country | undefined;
+  standard?: 'peppol';
   entityLevel?: boolean;
   currentEInvoice: EInvoiceType;
   invoice?: Invoice;
@@ -136,8 +137,15 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
     const location = useLocation();
 
-    const { country, entityLevel, currentEInvoice, invoice, setInvoice } =
-      props;
+    const colors = useColorScheme();
+
+    const {
+      standard = 'peppol',
+      entityLevel,
+      currentEInvoice,
+      invoice,
+      setInvoice,
+    } = props;
 
     const { isCompanySettingsActive, isClientSettingsActive } =
       useCurrentSettingsLevel();
@@ -796,7 +804,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                               key={componentKeyPath}
                               className="flex items-center space-x-4 mt-1"
                             >
-                              <div className="flex flex-1 items-center py-2 border-b border-t justify-between">
+                              <div
+                                className="flex flex-1 items-center py-2 border-b border-t justify-between"
+                                style={{ borderColor: colors.$5 }}
+                              >
                                 <span className="text-sm">{element.name}</span>
 
                                 <div
@@ -1085,10 +1096,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     };
 
     useEffect(() => {
-      if (country) {
+      if (standard) {
         fetch(
           new URL(
-            `/src/resources/e-invoice/${country}/${country}.json`,
+            `/src/resources/e-invoice/${standard}/${standard}.json`,
             import.meta.url
           ).href
         )
@@ -1117,7 +1128,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         setSelectedChoices([]);
         availableGroups = [];
       }
-    }, [country]);
+    }, [standard]);
 
     useEffect(() => {
       if (Object.keys(components).length) {
