@@ -52,6 +52,8 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { InsertActivityNotesModal } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { ActivityRecord } from '$app/common/interfaces/activity-record';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -434,7 +436,14 @@ export function InvoiceSlider() {
         <div>
           {activities2?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
+              <div className="flex items-center justify-between">
+                {activityElement(activity)}
+
+                <InsertActivityNotesModal
+                  activity={activity as unknown as ActivityRecord}
+                />
+              </div>
+
               <p className="inline-flex items-center space-x-1">
                 <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
                 <p>&middot;</p>

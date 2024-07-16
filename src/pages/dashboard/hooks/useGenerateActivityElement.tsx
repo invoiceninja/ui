@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,9 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, trans } from '$app/common/helpers';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { ActivityRecord } from '$app/common/interfaces/activity-record';
+import {
+  ActivityRecord,
+  ActivityRecordBase,
+} from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Button, InputField, Link } from '$app/components/forms';
@@ -24,6 +26,8 @@ import { MdAddCircle } from 'react-icons/md';
 import { Modal } from '$app/components/Modal';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
 
 const Div = styled.div`
   border-color: ${(props) => props.theme.borderColor};
@@ -189,38 +193,99 @@ export function InsertActivityNotesModal(props: Props) {
 
   const { activity, iconSize = 28 } = props;
 
-  const availableEntities = ['payment'];
+  const entities = [
+    'invoice',
+    'quote',
+    'recurring_invoice',
+    'vendor',
+    'credit',
+    'payment',
+    'project',
+    'task',
+    'expense',
+    'recurring_expense',
+    'bank_transaction',
+    'purchase_order',
+  ];
 
-  const entity = trans(`activity_${activity.activity_type_id}`, {});
+  const getCurrentEntity = () => {
+    if (activity?.contact?.contact_entity) {
+      return activity?.contact?.contact_entity;
+    }
 
+    const activityEntity = Object.keys(activity || {}).find((key) =>
+      entities.includes(key)
+    );
+
+    if (!activityEntity && activity?.client) {
+      return 'client';
+    }
+
+    if (activityEntity) {
+      return activityEntity;
+    }
+
+    return '';
+  };
+
+  const activityEntity = getCurrentEntity();
+
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const [notes, setNotes] = useState<string>('');
 
   const handleOnClose = () => {
+    setIsFormBusy(false);
     setIsModalOpen(false);
     setNotes('');
   };
 
-  const handleInsertNotes = () => {};
+  const handleInsertNotes = () => {
+    if (!isFormBusy) {
+      setIsFormBusy(true);
+
+      toast.processing();
+
+      request('POST', endpoint('/api/v1/activities/notes'), {
+        entity: `${activityEntity}s`,
+        entity_id: (
+          activity[
+            activityEntity as keyof typeof activity
+          ] as ActivityRecordBase
+        ).hashed_id,
+        notes,
+      })
+        .then(() => toast.success('inserted_notes'))
+        .finally(() => handleOnClose());
+    }
+  };
 
   return (
     <>
-      <Tooltip
-        placement="top"
-        message={t('insert_notes') as string}
-        width="auto"
-      >
-        <Icon
-          element={MdAddCircle}
-          size={iconSize}
-          onClick={() => setIsModalOpen(true)}
-        />
-      </Tooltip>
+      {activityEntity && (
+        <Tooltip
+          placement="top"
+          message={t('insert_notes') as string}
+          width="auto"
+        >
+          <Icon
+            element={MdAddCircle}
+            size={iconSize}
+            onClick={() => setIsModalOpen(true)}
+          />
+        </Tooltip>
+      )}
 
       <Modal
         size="regular"
-        title={t('insert_notes')}
+        title={`${t('notes')} | ${t(activityEntity)} | ${
+          (
+            activity[
+              activityEntity as keyof typeof activity
+            ] as ActivityRecordBase
+          ).label
+        }`}
         visible={isModalOpen}
         onClose={handleOnClose}
       >
@@ -228,10 +293,16 @@ export function InsertActivityNotesModal(props: Props) {
           element="textarea"
           value={notes}
           onValueChange={(value) => setNotes(value)}
+          changeOverride
         />
 
         <div className="flex self-end">
-          <Button behavior="button" onClick={handleInsertNotes}>
+          <Button
+            behavior="button"
+            onClick={handleInsertNotes}
+            disabled={isFormBusy || !notes}
+            disableWithoutIcon
+          >
             {t('insert')}
           </Button>
         </div>
