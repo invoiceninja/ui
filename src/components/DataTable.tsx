@@ -478,6 +478,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
+          customFilter={customFilter}
           rightSide={
             <>
               {props.rightSide}
