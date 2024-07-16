@@ -109,6 +109,9 @@ export function useGenerateActivityElement() {
 
       notes: activity?.notes,
     };
+
+    console.log('ok');
+
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
