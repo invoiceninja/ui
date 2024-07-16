@@ -53,7 +53,6 @@ export function CustomFields() {
       docsLink="en/advanced-settings/#custom_fields"
       onSaveClick={save}
       onCancelClick={cancel}
-      withoutBackButton
     >
       {location.pathname.endsWith('custom_fields') && (
         <Navigate to="/settings/custom_fields/company" />

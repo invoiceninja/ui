@@ -58,7 +58,7 @@ export default function PurchaseOrders() {
   } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="purchase_order"
         endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"

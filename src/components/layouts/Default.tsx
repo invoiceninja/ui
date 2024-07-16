@@ -67,14 +67,12 @@ interface Props extends CommonProps {
   title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: Page[];
+  breadcrumbs: Page[];
   topRight?: ReactNode;
   docsLink?: string;
   navigationTopRight?: ReactNode;
   saveButtonLabel?: string | null;
-  backButtonLabel?: string;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
   aboveMainContainer?: ReactNode;
 }
@@ -439,15 +437,6 @@ export function Default(props: Props) {
                 </Button>
               )}
 
-              {!props.withoutBackButton && (
-                <Button
-                  onClick={() => preventNavigation({ url: 'back' })}
-                  type="secondary"
-                >
-                  {t('back')}
-                </Button>
-              )}
-
               {(Boolean(props.onSaveClick) || saveBtn) && (
                 <div>
                   {!props.additionalSaveOptions && (
@@ -511,15 +500,18 @@ export function Default(props: Props) {
         {props.aboveMainContainer}
 
         <main className="flex-1">
-          {(props.breadcrumbs || props.topRight) && (
-            <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-              <div className="">
-                {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
-              </div>
+          {(props.breadcrumbs || props.topRight) &&
+            props.breadcrumbs.length > 0 && (
+              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                <div className="">
+                  {props.breadcrumbs && (
+                    <Breadcrumbs pages={props.breadcrumbs} />
+                  )}
+                </div>
 
-              {props.topRight && <div>{props.topRight}</div>}
-            </div>
-          )}
+                {props.topRight && <div>{props.topRight}</div>}
+              </div>
+            )}
 
           <div
             style={{ color: colors.$3, backgroundColor: colors.$2 }}

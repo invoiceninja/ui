@@ -20,7 +20,6 @@ import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskStatusQuery } from '$app/common/queries/task-statuses';
 import { Badge } from '$app/components/Badge';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Settings } from '$app/components/layouts/Settings';
@@ -118,6 +117,7 @@ export function Edit() {
           />
         )
       }
+      breadcrumbs={[]}
     >
       {!taskStatus && (
         <div className="flex justify-center">
@@ -126,8 +126,7 @@ export function Edit() {
       )}
 
       {taskStatus && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
+        <Container className="space-y-6" breadcrumbs={pages}>
 
           <Card
             title={documentTitle}

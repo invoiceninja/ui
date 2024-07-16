@@ -165,7 +165,7 @@ export default function Create() {
   };
 
   return (
-    <Container>
+    <Container breadcrumbs={[]}>
       <CustomDesignsPlanAlert />
 
       <Card title={t('new_design')}>

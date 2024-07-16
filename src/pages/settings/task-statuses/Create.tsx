@@ -20,7 +20,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Icon } from '$app/components/icons/Icon';
@@ -115,10 +114,8 @@ export function Create() {
   ];
 
   return (
-    <Settings title={t('task_statuses')}>
-      <Container className="space-y-6">
-        <Breadcrumbs pages={pages} />
-
+    <Settings title={t('task_statuses')} breadcrumbs={[]}>
+      <Container className="space-y-6" breadcrumbs={pages}>
         <Card
           title={documentTitle}
           withSaveButton

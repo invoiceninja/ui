@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
+import { Page } from '$app/components/Breadcrumbs';
 
 export default function Pdf() {
   const [t] = useTranslation();
@@ -36,9 +37,22 @@ export default function Pdf() {
   const url = useGeneratePdfUrl({ resourceType: 'credit' });
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
 
+  const pages: Page[] = [
+    { name: t('credits'), href: '/credits' },
+    {
+      name: t('edit_credit'),
+      href: route('/credits/:id/edit', { id }),
+    },
+    {
+      name: t('pdf'),
+      href: route('/credits/:id/pdf', { id }),
+    }
+  ];
+
   return (
     <Default
       title={documentTitle}
+      breadcrumbs={pages}
       navigationTopRight={
         credit && (
           <div className="flex space-x-3">

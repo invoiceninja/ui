@@ -331,7 +331,7 @@ export default function Kanban() {
           </Inline>
         </Link>
       }
-      withoutBackButton
+      
     >
       <Slider
         title={

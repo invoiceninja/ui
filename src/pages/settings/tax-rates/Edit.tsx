@@ -96,6 +96,7 @@ export function Edit() {
           />
         )
       }
+      breadcrumbs={[]}
     >
       {!data && (
         <div className="flex justify-center">
@@ -104,9 +105,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
+        <Container className="space-y-6" breadcrumbs={pages}>
           <Card
             withSaveButton
             onFormSubmit={formik.handleSubmit}

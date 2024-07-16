@@ -19,7 +19,7 @@ export default function Activity() {
   const { t } = useTranslation();
 
   return (
-    <Default title={t('activity')}>
+    <Default title={t('activity')} breadcrumbs={[]}>
       <InvoiceViewer
         link={endpoint(`/api/v1/activities/download_entity/${id}`)}
         method="GET"

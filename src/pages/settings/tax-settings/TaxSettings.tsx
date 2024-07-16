@@ -87,7 +87,6 @@ export function TaxSettings() {
       title={t('tax_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#tax_settings"
-      withoutBackButton
     >
       {isCompanySettingsActive && (
         <>
