@@ -42,7 +42,7 @@ export default function Vendors() {
   const customBulkActions = useCustomBulkActions();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="vendor"
         columns={columns}

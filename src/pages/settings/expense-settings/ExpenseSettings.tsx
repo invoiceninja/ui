@@ -57,7 +57,6 @@ export function ExpenseSettings() {
       title={t('expense_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#expense_settings"
-      withoutBackButton
     >
       <Card title={t('settings')}>
         <Element

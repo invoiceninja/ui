@@ -16,6 +16,8 @@ import { usePaymentColumns } from '$app/pages/payments/common/hooks/usePaymentCo
 import { useActions } from '$app/pages/payments/common/hooks/useActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
+import { getEntityState } from '$app/common/helpers';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export default function Payments() {
   const { id } = useParams();
@@ -43,6 +45,11 @@ export default function Payments() {
       showRestore={(resource: Payment) => !resource.is_deleted}
       linkToCreateGuards={[permission('create_payment')]}
       hideEditableOptions={!hasPermission('edit_payment')}
+      showRestoreBulk={(selectedPayments) =>
+        selectedPayments.every(
+          (payment) => getEntityState(payment) === EntityState.Archived
+        )
+      }
     />
   );
 }

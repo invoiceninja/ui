@@ -89,7 +89,7 @@ export function OnlinePayments() {
       docsLink="en/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      withoutBackButton
+      
     >
       <Gateways />
 

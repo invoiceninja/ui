@@ -139,7 +139,7 @@ export default function Edit() {
           ),
         })}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm

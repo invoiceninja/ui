@@ -349,7 +349,6 @@ export default function Reports() {
           </DropdownElement>
         </Dropdown>
       }
-      withoutBackButton
     >
       <ReportsPlanAlert />
 
