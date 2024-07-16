@@ -149,6 +149,7 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       adjustment: activity?.adjustment?.label,
+      notes: activity?.notes,
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -236,7 +237,6 @@ export function InsertActivityNotesModal(props: Props) {
   const [notes, setNotes] = useState<string>('');
 
   const handleOnClose = () => {
-    setIsFormBusy(false);
     setIsModalOpen(false);
     setNotes('');
   };
@@ -257,7 +257,10 @@ export function InsertActivityNotesModal(props: Props) {
         notes,
       })
         .then(() => toast.success('inserted_notes'))
-        .finally(() => handleOnClose());
+        .finally(() => {
+          setIsFormBusy(false);
+          handleOnClose();
+        });
     }
   };
 

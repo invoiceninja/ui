@@ -106,6 +106,8 @@ export function useGenerateActivityElement() {
             {activity?.contact?.label}
           </Link>
         ) ?? '',
+
+      notes: activity?.notes,
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -436,19 +438,24 @@ export function InvoiceSlider() {
         <div>
           {activities2?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <div className="flex items-center justify-between">
-                {activityElement(activity)}
+              <div className="flex justify-between items-center space-x-3">
+                <div>
+                  <p>{activityElement(activity)}</p>
+
+                  <p className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </p>
+                </div>
 
                 <InsertActivityNotesModal
                   activity={activity as unknown as ActivityRecord}
+                  iconSize={25}
                 />
               </div>
-
-              <p className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </p>
             </NonClickableElement>
           ))}
         </div>
