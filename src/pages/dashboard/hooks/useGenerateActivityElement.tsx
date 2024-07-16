@@ -192,7 +192,7 @@ interface Props {
 export function InsertActivityNotesModal(props: Props) {
   const [t] = useTranslation();
 
-  const { activity, iconSize = 28 } = props;
+  const { activity, iconSize = 25 } = props;
 
   const entities = [
     'invoice',

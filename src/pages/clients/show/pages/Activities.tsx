@@ -57,7 +57,7 @@ export default function Activities() {
               <div key={index} className="flex items-center justify-between">
                 {activityElement(record)}
 
-                <InsertActivityNotesModal activity={record} />
+                <InsertActivityNotesModal activity={record} iconSize={28} />
               </div>
             ))}
         </div>

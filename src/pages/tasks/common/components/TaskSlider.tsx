@@ -225,7 +225,6 @@ export function TaskSlider() {
 
                 <InsertActivityNotesModal
                   activity={activity as unknown as ActivityRecord}
-                  iconSize={25}
                 />
               </div>
             </NonClickableElement>
