@@ -88,7 +88,7 @@ export default function Payment() {
           disableSaveButton: !paymentValue,
         })}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} disableBackupNavigation />
 
         <Outlet

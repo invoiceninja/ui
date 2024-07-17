@@ -126,6 +126,21 @@ export function Preferences() {
           />
         </Element>
 
+        <Element
+          leftSide={t('auto_expand_product_table_notes')}
+          leftSideHelp={t('auto_expand_product_table_notes_help')}
+        >
+          <Toggle
+            checked={Boolean(reactSettings.preferences.auto_expand_product_table_notes)}
+            onValueChange={(value) =>
+              handleChange(
+                'company_user.react_settings.preferences.auto_expand_product_table_notes',
+                value
+              )
+            }
+          />
+        </Element>
+
         <StatusColorTheme />
       </Card>
 

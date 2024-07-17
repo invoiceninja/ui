@@ -127,7 +127,7 @@ export default function Project() {
         )
       }
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />
 
         <Outlet

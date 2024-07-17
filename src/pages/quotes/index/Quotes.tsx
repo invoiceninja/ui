@@ -89,7 +89,7 @@ export default function Quotes() {
   } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="quote"
         columns={columns}

@@ -86,7 +86,6 @@ export function TaskSettings() {
       title={t('task_settings')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#task_settings"
-      withoutBackButton
     >
       <Card title={t('settings')}>
         <Element

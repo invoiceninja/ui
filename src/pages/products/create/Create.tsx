@@ -108,7 +108,7 @@ export default function Create() {
       disableSaveButton={!product || isFormBusy}
       onSaveClick={handleSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         {product ? (
           <CreateProduct errors={errors} setErrors={setErrors} />
         ) : (

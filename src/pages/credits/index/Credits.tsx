@@ -56,7 +56,6 @@ export default function Credits() {
       title={t('credits')}
       breadcrumbs={pages}
       docsLink="en/credits/"
-      withoutBackButton
     >
       <DataTable
         resource="credit"

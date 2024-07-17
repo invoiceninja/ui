@@ -155,7 +155,6 @@ export function UserDetails() {
         title={t('user_details')}
         breadcrumbs={pages}
         docsLink="en/basic-settings/#user_details"
-        withoutBackButton
       >
         <PasswordConfirmation
           show={isPasswordConfirmModalOpen}
