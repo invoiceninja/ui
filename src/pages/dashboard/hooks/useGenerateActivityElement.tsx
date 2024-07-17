@@ -284,7 +284,7 @@ export function InsertActivityNotesModal(props: Props) {
         size="regular"
         title={`${t('notes')} | ${t(activityEntity)} | ${
           (
-            activity[
+            activity?.[
               activityEntity as keyof typeof activity
             ] as ActivityRecordBase
           ).label
