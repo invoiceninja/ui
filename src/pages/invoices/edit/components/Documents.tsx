@@ -16,8 +16,12 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { Context } from '../Edit';
+import { Card } from '$app/components/cards';
+import { useTranslation } from 'react-i18next';
 
 export default function Documents() {
+  const [t] = useTranslation();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
@@ -28,23 +32,31 @@ export default function Documents() {
   const { invoice } = context;
 
   return (
-    <div className="w-2/3">
-      <Upload
-        widgetOnly
-        endpoint={endpoint('/api/v1/invoices/:id/upload', {
-          id,
-        })}
-        onSuccess={() => $refetch(['invoices'])}
-        disableUpload={
-          !hasPermission('edit_invoice') && !entityAssigned(invoice)
-        }
-      />
+    <Card title={t('documents')}>
+      {location.pathname.includes('/create') ? (
+        <div className="text-sm mt-4 px-6">
+          {t('save_to_upload_documents')}.
+        </div>
+      ) : (
+        <div className="w-2/3 px-6">
+          <Upload
+            widgetOnly
+            endpoint={endpoint('/api/v1/invoices/:id/upload', {
+              id,
+            })}
+            onSuccess={() => $refetch(['invoices'])}
+            disableUpload={
+              !hasPermission('edit_invoice') && !entityAssigned(invoice)
+            }
+          />
 
-      <DocumentsTable
-        documents={invoice?.documents || []}
-        onDocumentDelete={() => $refetch(['invoices'])}
-        disableEditableOptions={!entityAssigned(invoice, true)}
-      />
-    </div>
+          <DocumentsTable
+            documents={invoice?.documents || []}
+            onDocumentDelete={() => $refetch(['invoices'])}
+            disableEditableOptions={!entityAssigned(invoice, true)}
+          />
+        </div>
+      )}
+    </Card>
   );
 }

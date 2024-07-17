@@ -39,6 +39,9 @@ const History = lazy(
 const EmailHistory = lazy(
   () => import('$app/pages/invoices/edit/components/EmailHistory')
 );
+const CreatePage = lazy(
+  () => import('$app/pages/invoices/create/components/CreatePage')
+);
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -70,6 +73,7 @@ export const invoiceRoutes = (
         />
       }
     />
+
     <Route
       path="create"
       element={
@@ -81,7 +85,12 @@ export const invoiceRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
+
     <Route
       path=":id"
       element={
