@@ -58,7 +58,6 @@ export function Users() {
         title={t('user_details')}
         breadcrumbs={pages}
         docsLink="/docs/advanced-settings/#user_management"
-        withoutBackButton
       >
         <DataTable
           resource="user"

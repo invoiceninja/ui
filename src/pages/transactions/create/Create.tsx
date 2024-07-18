@@ -120,7 +120,7 @@ export default function Create() {
       disableSaveButton={!transaction || isFormBusy}
       onSaveClick={onSave}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={documentTitle}>
           {currencySeparators && transaction && (
             <TransactionForm

@@ -44,6 +44,7 @@ import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useLocation } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 const numberInputs = [
   'discount',
@@ -231,6 +232,7 @@ export function useResolveInputField(props: Props) {
   }, [resource?.line_items, isDeleteActionTriggered]);
 
   const taxCategories = useTaxCategories();
+  const { preferences } = usePreferences();
 
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
@@ -345,6 +347,8 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          style={{ marginTop: '4px' }}
+          textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
     }

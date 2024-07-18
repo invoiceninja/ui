@@ -55,6 +55,12 @@ export default function InvoiceDesign() {
     : true;
 
   const pages: Page[] = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('invoice_design'), href: '/settings/invoice_design' },
+  ];
+
+  const pages2: Page[] = [
+    { name: t('settings'), href: '/settings' },
     { name: t('invoice_design'), href: '/settings/invoice_design' },
     {
       name: t('custom_designs'),
@@ -112,10 +118,7 @@ export default function InvoiceDesign() {
   );
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={showsMainTabs ? undefined : pages}
-    >
+    <Default title={documentTitle} breadcrumbs={showsMainTabs ? pages : pages2}>
       <Tabs
         tabBarClassName="space-x-5"
         tabs={tabs}

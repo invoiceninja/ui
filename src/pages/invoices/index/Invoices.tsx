@@ -90,12 +90,7 @@ export default function Invoices() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      docsLink="en/invoices"
-      withoutBackButton
-    >
+    <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
       <DataTable
         resource="invoice"
         endpoint="/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&sort=id|desc"
@@ -126,14 +121,10 @@ export default function Invoices() {
             })}
           >
             {Boolean(reactSettings.show_table_footer) && (
-              <>
-                <DataTableFooterColumnsPicker
-                  table="invoice"
-                  columns={allFooterColumns}
-                />
-
-                <span>|</span>
-              </>
+              <DataTableFooterColumnsPicker
+                table="invoice"
+                columns={allFooterColumns}
+              />
             )}
 
             <DataTableColumnsPicker

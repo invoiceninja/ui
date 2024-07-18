@@ -91,7 +91,6 @@ export default function Tasks() {
       title={documentTitle}
       breadcrumbs={pages}
       aboveMainContainer={<ExtensionBanner />}
-      withoutBackButton
     >
       <DataTable
         resource="task"

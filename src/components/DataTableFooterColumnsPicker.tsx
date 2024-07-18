@@ -101,12 +101,13 @@ export function DataTableFooterColumnsPicker(props: Props) {
 
   return (
     <>
-      <div
-        className="text-sm cursor-pointer"
+      <Button
+        className="mr-1"
+        type="secondary"
         onClick={() => setIsModalOpen(true)}
       >
-        {t('footer')}
-      </div>
+        {t('footer')} {t('columns')}
+      </Button>
 
       <Modal
         title={t('footer')}

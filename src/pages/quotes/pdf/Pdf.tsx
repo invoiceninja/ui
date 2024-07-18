@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
+import { Page } from '$app/components/Breadcrumbs';
 
 export default function Pdf() {
   const [t] = useTranslation();
@@ -35,9 +36,22 @@ export default function Pdf() {
   const url = useGeneratePdfUrl({ resourceType: 'quote' });
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
 
+  const pages: Page[] = [
+    { name: t('quotes'), href: '/quotes' },
+    {
+      name: t('edit_quote'),
+      href: route('/quotes/:id/edit', { id }),
+    },
+    {
+      name: t('pdf'),
+      href: route('/quotes/:id/pdf', { id }),
+    },
+  ];
+
   return (
     <Default
       title={documentTitle}
+      breadcrumbs={pages}
       navigationTopRight={
         quote && (
           <div className="flex space-x-3">

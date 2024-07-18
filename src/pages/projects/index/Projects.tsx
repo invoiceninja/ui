@@ -55,7 +55,6 @@ export default function Projects() {
       title={t('projects')}
       breadcrumbs={pages}
       docsLink="en/projects/"
-      withoutBackButton
     >
       <DataTable
         resource="project"

@@ -151,6 +151,7 @@ interface Props<T> extends CommonProps {
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
   withoutSortQueryParameter?: boolean;
+  showRestoreBulk?: (selectedResources: T[]) => boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -191,6 +192,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     bottomActionsKeys = [],
     withoutPerPageAsPreference = false,
     withoutSortQueryParameter = false,
+    showRestoreBulk,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -478,6 +480,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
+          customFilter={customFilter}
           rightSide={
             <>
               {props.rightSide}
@@ -549,7 +552,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                     {t('delete')}
                   </DropdownElement>
 
-                  {showRestoreBulkAction() && (
+                  {(showRestoreBulk
+                    ? showRestoreBulk(selectedResources)
+                    : showRestoreBulkAction()) && (
                     <DropdownElement
                       onClick={() => {
                         if (onBulkActionCall) {
