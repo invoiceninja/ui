@@ -240,6 +240,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
             <CurrencySelector
               value={expense.invoice_currency_id}
               onChange={(id) => handleChange('invoice_currency_id', id)}
+              dismissable
               errorMessage={errors?.errors.invoice_currency_id}
             />
           </Element>
