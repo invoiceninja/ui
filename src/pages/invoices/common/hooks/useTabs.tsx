@@ -31,8 +31,8 @@ export function useTabs(params: Params) {
   const { invoice } = params;
 
   const canEditAndView =
-    hasPermission('view_product') ||
-    hasPermission('edit_product') ||
+    hasPermission('view_invoice') ||
+    hasPermission('edit_invoice') ||
     entityAssigned(invoice);
 
   const tabs: Tab[] = [

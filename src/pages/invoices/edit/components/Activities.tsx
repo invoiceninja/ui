@@ -113,7 +113,7 @@ export default function Activities() {
       )}
 
       {activities && !activities.length && (
-        <NonClickableElement>{t('nothing_to_see_here')}</NonClickableElement>
+        <NonClickableElement>{t('api_404')}</NonClickableElement>
       )}
 
       {activities?.map((activity) => (

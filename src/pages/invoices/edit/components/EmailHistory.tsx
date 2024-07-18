@@ -43,7 +43,7 @@ export default function EmailHistory() {
       )}
 
       {emailRecords && !(emailRecords as EmailRecordType[]).length && (
-        <span className="px-6">{t('nothing_to_see_here')}</span>
+        <span className="px-6">{t('api_404')}</span>
       )}
 
       {(emailRecords as EmailRecordType[] | undefined)?.map(

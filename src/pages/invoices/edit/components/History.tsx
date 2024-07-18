@@ -65,7 +65,7 @@ export default function History() {
       )}
 
       {resource?.activities && !resource.activities.length && (
-        <NonClickableElement>{t('nothing_to_see_here')}</NonClickableElement>
+        <NonClickableElement>{t('api_404')}</NonClickableElement>
       )}
 
       {resource?.activities &&

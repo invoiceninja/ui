@@ -75,8 +75,8 @@ export default function CreatePage() {
   };
 
   return (
-    <Card title={t('create')}>
-      <div className="grid grid-cols-12 gap-4 px-6">
+    <>
+      <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           <ClientSelector
             resource={invoice}
@@ -196,6 +196,6 @@ export default function CreatePage() {
           )}
         </div>
       )}
-    </Card>
+    </>
   );
 }
