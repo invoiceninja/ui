@@ -808,7 +808,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                                 className="flex flex-1 items-center py-2 border-b border-t justify-between"
                                 style={{ borderColor: colors.$5 }}
                               >
-                                <span className="text-sm">{element.name}</span>
+                                <div className="flex flex-col space-y-1">
+                                  <span className="text-sm">
+                                    {element.name}
+                                  </span>
+
+                                  {element.help && (
+                                    <span className="text-xs">
+                                      {element.help}
+                                    </span>
+                                  )}
+                                </div>
 
                                 <div
                                   className="cursor-pointer"
