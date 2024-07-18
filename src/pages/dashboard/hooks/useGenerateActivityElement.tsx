@@ -284,10 +284,10 @@ export function InsertActivityNotesModal(props: Props) {
         size="regular"
         title={`${t('notes')} | ${t(activityEntity)} | ${
           (
-            activity?.[
-              activityEntity as keyof typeof activity
-            ] as ActivityRecordBase
-          ).label
+            activity?.[activityEntity as keyof typeof activity] as
+              | ActivityRecordBase
+              | undefined
+          )?.label ?? ''
         }`}
         visible={isModalOpen}
         onClose={handleOnClose}
