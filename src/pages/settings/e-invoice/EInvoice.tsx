@@ -158,7 +158,6 @@ export function EInvoice() {
         setSaveChanges(true);
       }}
       disableSaveButton={showPlanAlert}
-      withoutBackButton
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
