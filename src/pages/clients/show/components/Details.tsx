@@ -41,9 +41,23 @@ export function Details(props: Props) {
             title={t('details')}
             value={
               <>
-                <Element leftSide={t('status')} noExternalPadding>
-                  <EntityStatus entity={client} />
-                </Element>
+                <div className="space-y-2 mb-4">
+                  <Element
+                    leftSide={t('status')}
+                    noExternalPadding
+                    noVerticalPadding
+                  >
+                    <EntityStatus entity={client} />
+                  </Element>
+
+                  <Element
+                    leftSide={t('number')}
+                    noExternalPadding
+                    noVerticalPadding
+                  >
+                    {client.number}
+                  </Element>
+                </div>
 
                 {client.group_settings_id && (
                   <Element leftSide={t('group')} noExternalPadding>
