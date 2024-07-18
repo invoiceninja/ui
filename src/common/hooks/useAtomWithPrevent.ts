@@ -31,8 +31,11 @@ export function useAtomWithPrevent(
 
   const [currentInitialValue, setCurrentInitialValue] = useState<Entity>();
 
+  const isFunctionalityDisabled =
+    import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
+
   useEffect(() => {
-    if (entity && currentInitialValue) {
+    if (entity && currentInitialValue && !isFunctionalityDisabled) {
       const currentPreventValue = isEqual(entity, currentInitialValue);
 
       const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
