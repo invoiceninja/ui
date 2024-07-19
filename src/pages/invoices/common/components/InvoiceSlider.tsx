@@ -38,7 +38,12 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
-import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
+import {
+  MdAddCircle,
+  MdCloudCircle,
+  MdInfo,
+  MdOutlineContentCopy,
+} from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
@@ -52,8 +57,8 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { InsertActivityNotesModal } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { ActivityRecord } from '$app/common/interfaces/activity-record';
+import { ActivityRecordBase } from '$app/common/interfaces/activity-record';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -65,6 +70,46 @@ export function useGenerateActivityElement() {
 
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
+
+    const entities = [
+      'invoice',
+      'quote',
+      'recurring_invoice',
+      'vendor',
+      'credit',
+      'payment',
+      'project',
+      'task',
+      'expense',
+      'recurring_expense',
+      'bank_transaction',
+      'purchase_order',
+    ];
+
+    const getCurrentEntity = () => {
+      if (
+        (activity?.contact as ActivityRecordBase | undefined)?.contact_entity
+      ) {
+        return (activity?.contact as ActivityRecordBase | undefined)
+          ?.contact_entity;
+      }
+
+      const activityEntity = Object.keys(activity || {}).find((key) =>
+        entities.includes(key)
+      );
+
+      if (!activityEntity && activity?.client) {
+        return 'client';
+      }
+
+      if (activityEntity) {
+        return activityEntity;
+      }
+
+      return '';
+    };
+
+    const activityEntity = getCurrentEntity();
 
     const replacements = {
       client: (
@@ -107,7 +152,21 @@ export function useGenerateActivityElement() {
           </Link>
         ) ?? '',
 
-      notes: activity?.notes,
+      notes: activityEntity && (
+        <Link
+          to={route(
+            `/${activityEntity}s/${
+              (
+                activity[
+                  activityEntity as keyof typeof activity
+                ] as ActivityRecordBase
+              ).hashed_id
+            }/edit`
+          )}
+        >
+          {activity?.notes}
+        </Link>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -437,27 +496,28 @@ export function InvoiceSlider() {
         </div>
 
         <div>
-          {activities2?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <div className="flex justify-between items-center space-x-3">
-                <div>
-                  <p>{activityElement(activity)}</p>
+          <div className="flex flex-col pb-14 overflow-y-auto">
+            {activities2?.map((activity) => (
+              <NonClickableElement key={activity.id} className="flex flex-col">
+                <p>{activityElement(activity)}</p>
 
-                  <p className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
-                  </p>
-                </div>
+                <p className="inline-flex items-center space-x-1">
+                  <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                  <p>&middot;</p>
+                  <p>{activity.ip}</p>
+                </p>
+              </NonClickableElement>
+            ))}
+          </div>
 
-                <InsertActivityNotesModal
-                  activity={activity as unknown as ActivityRecord}
-                />
-              </div>
-            </NonClickableElement>
-          ))}
+          <div className="absolute bottom-6 right-6">
+            <AddActivityComment
+              entity="invoice"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+              labelElement={<Icon element={MdAddCircle} size={40} />}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col">

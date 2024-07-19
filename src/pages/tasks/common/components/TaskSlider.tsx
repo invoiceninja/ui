@@ -46,8 +46,6 @@ import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceP
 import { date as formatDate } from '$app/common/helpers';
 import { useFormatTimeLog } from '../../kanban/common/hooks';
 import { TaskClock } from '../../kanban/components/TaskClock';
-import { InsertActivityNotesModal } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { ActivityRecord } from '$app/common/interfaces/activity-record';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -210,22 +208,12 @@ export function TaskSlider() {
         <div>
           {activities?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <div className="flex items-center justify-between space-x-3">
-                <div>
-                  <p>{activityElement(activity)}</p>
+              <p>{activityElement(activity)}</p>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
-                  </div>
-                </div>
-
-                <InsertActivityNotesModal
-                  activity={activity as unknown as ActivityRecord}
-                />
+              <div className="inline-flex items-center space-x-1">
+                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>&middot;</p>
+                <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
           ))}

@@ -53,8 +53,6 @@ import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { InsertActivityNotesModal } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { ActivityRecord } from '$app/common/interfaces/activity-record';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -396,22 +394,12 @@ export function QuoteSlider() {
         <div>
           {activities?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <div className="flex items-center justify-between space-x-3">
-                <div>
-                  <p>{activityElement(activity)}</p>
+              <p>{activityElement(activity)}</p>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
-                  </div>
-                </div>
-
-                <InsertActivityNotesModal
-                  activity={activity as unknown as ActivityRecord}
-                />
+              <div className="inline-flex items-center space-x-1">
+                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>&middot;</p>
+                <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
           ))}

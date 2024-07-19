@@ -20,12 +20,9 @@ import { Button, InputField, Link } from '$app/components/forms';
 import { t } from 'i18next';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { Tooltip } from '$app/components/Tooltip';
-import { Icon } from '$app/components/icons/Icon';
-import { MdAddCircle } from 'react-icons/md';
 import { Modal } from '$app/components/Modal';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 
@@ -49,6 +46,43 @@ export function useGenerateActivityElement() {
     if (activity.activity_type_id === 54 && activity.contact) {
       text = text.replace(':user', ':contact');
     }
+
+    const entities = [
+      'invoice',
+      'quote',
+      'recurring_invoice',
+      'vendor',
+      'credit',
+      'payment',
+      'project',
+      'task',
+      'expense',
+      'recurring_expense',
+      'bank_transaction',
+      'purchase_order',
+    ];
+
+    const getCurrentEntity = () => {
+      if (activity?.contact?.contact_entity) {
+        return activity?.contact?.contact_entity;
+      }
+
+      const activityEntity = Object.keys(activity || {}).find((key) =>
+        entities.includes(key)
+      );
+
+      if (!activityEntity && activity?.client) {
+        return 'client';
+      }
+
+      if (activityEntity) {
+        return activityEntity;
+      }
+
+      return '';
+    };
+
+    const activityEntity = getCurrentEntity();
 
     const replacements = {
       client: (
@@ -149,7 +183,21 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       adjustment: activity?.adjustment?.label,
-      notes: activity?.notes,
+      notes: activityEntity && (
+        <Link
+          to={route(
+            `/${activityEntity}s/${
+              (
+                activity[
+                  activityEntity as keyof typeof activity
+                ] as ActivityRecordBase
+              ).hashed_id
+            }/edit`
+          )}
+        >
+          {activity?.notes}
+        </Link>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -185,51 +233,16 @@ export function useGenerateActivityElement() {
 }
 
 interface Props {
-  activity: ActivityRecord;
-  iconSize?: number;
+  entity: 'client' | 'invoice';
+  entityId: string | undefined;
+  label: string;
+  labelElement?: ReactNode;
 }
 
-export function InsertActivityNotesModal(props: Props) {
+export function AddActivityComment(props: Props) {
   const [t] = useTranslation();
 
-  const { activity, iconSize = 25 } = props;
-
-  const entities = [
-    'invoice',
-    'quote',
-    'recurring_invoice',
-    'vendor',
-    'credit',
-    'payment',
-    'project',
-    'task',
-    'expense',
-    'recurring_expense',
-    'bank_transaction',
-    'purchase_order',
-  ];
-
-  const getCurrentEntity = () => {
-    if (activity?.contact?.contact_entity) {
-      return activity?.contact?.contact_entity;
-    }
-
-    const activityEntity = Object.keys(activity || {}).find((key) =>
-      entities.includes(key)
-    );
-
-    if (!activityEntity && activity?.client) {
-      return 'client';
-    }
-
-    if (activityEntity) {
-      return activityEntity;
-    }
-
-    return '';
-  };
-
-  const activityEntity = getCurrentEntity();
+  const { entity, entityId, label, labelElement } = props;
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -241,22 +254,18 @@ export function InsertActivityNotesModal(props: Props) {
     setNotes('');
   };
 
-  const handleInsertNotes = () => {
+  const handleAddComment = () => {
     if (!isFormBusy) {
       setIsFormBusy(true);
 
       toast.processing();
 
       request('POST', endpoint('/api/v1/activities/notes'), {
-        entity: `${activityEntity}s`,
-        entity_id: (
-          activity[
-            activityEntity as keyof typeof activity
-          ] as ActivityRecordBase
-        ).hashed_id,
+        entity: `${entity}s`,
+        entity_id: entityId,
         notes,
       })
-        .then(() => toast.success('inserted_notes'))
+        .then(() => toast.success('saved_comment'))
         .finally(() => {
           setIsFormBusy(false);
           handleOnClose();
@@ -266,7 +275,7 @@ export function InsertActivityNotesModal(props: Props) {
 
   return (
     <>
-      {activityEntity && (
+      {/* {activityEntity && (
         <Tooltip
           placement="top"
           message={t('insert_notes') as string}
@@ -278,17 +287,21 @@ export function InsertActivityNotesModal(props: Props) {
             onClick={() => setIsModalOpen(true)}
           />
         </Tooltip>
+      )} */}
+
+      {entityId && (
+        <div className="cursor-pointer" onClick={() => setIsModalOpen(true)}>
+          {labelElement || (
+            <Button behavior="button" onClick={() => {}}>
+              {t('add_comment')}
+            </Button>
+          )}
+        </div>
       )}
 
       <Modal
         size="regular"
-        title={`${t('notes')} | ${t(activityEntity)} | ${
-          (
-            activity?.[activityEntity as keyof typeof activity] as
-              | ActivityRecordBase
-              | undefined
-          )?.label ?? ''
-        }`}
+        title={`${t('comment')} | ${t(entity)} | ${label}`}
         visible={isModalOpen}
         onClose={handleOnClose}
       >
@@ -302,11 +315,11 @@ export function InsertActivityNotesModal(props: Props) {
         <div className="flex self-end">
           <Button
             behavior="button"
-            onClick={handleInsertNotes}
+            onClick={handleAddComment}
             disabled={isFormBusy || !notes}
             disableWithoutIcon
           >
-            {t('insert')}
+            {t('add')}
           </Button>
         </div>
       </Modal>

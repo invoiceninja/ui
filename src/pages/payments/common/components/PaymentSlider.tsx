@@ -38,8 +38,6 @@ import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStat
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
 import paymentType from '$app/common/constants/payment-type';
-import { InsertActivityNotesModal } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { ActivityRecord } from '$app/common/interfaces/activity-record';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -275,22 +273,12 @@ export function PaymentSlider() {
         <div>
           {activities?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
-              <div className="flex items-center justify-between space-x-3">
-                <div>
-                  <p>{activityElement(activity, payment)}</p>
+              <p>{activityElement(activity, payment)}</p>
 
-                  <div className="inline-flex items-center space-x-1">
-                    <p>
-                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
-                    </p>
-                    <p>&middot;</p>
-                    <p>{activity.ip}</p>
-                  </div>
-                </div>
-
-                <InsertActivityNotesModal
-                  activity={activity as unknown as ActivityRecord}
-                />
+              <div className="inline-flex items-center space-x-1">
+                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                <p>&middot;</p>
+                <p>{activity.ip}</p>
               </div>
             </NonClickableElement>
           ))}

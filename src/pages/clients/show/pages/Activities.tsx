@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useParams } from 'react-router-dom';
+import { useOutletContext, useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
@@ -17,16 +17,21 @@ import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import React from 'react';
 import {
-  InsertActivityNotesModal,
+  AddActivityComment,
   useGenerateActivityElement,
 } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Context } from './Documents';
 
 export default function Activities() {
   const { id } = useParams();
 
   const [t] = useTranslation();
+
+  const context: Context = useOutletContext();
+
+  const { displayName } = context;
 
   const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', id],
@@ -48,17 +53,18 @@ export default function Activities() {
     <Card
       title={t('recent_activity')}
       className="h-full relative"
+      topRight={
+        <AddActivityComment entity="client" entityId={id} label={displayName} />
+      }
       withoutBodyPadding
     >
       <div className="pl-6 pr-4 ">
         <div className="flex flex-col overflow-y-auto pr-4">
           {activities &&
             activities.map((record: ActivityRecord, index: number) => (
-              <div key={index} className="flex items-center justify-between">
+              <React.Fragment key={index}>
                 {activityElement(record)}
-
-                <InsertActivityNotesModal activity={record} iconSize={28} />
-              </div>
+              </React.Fragment>
             ))}
         </div>
       </div>
