@@ -29,9 +29,10 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
   const { recurringExpense, handleChange, errors } = props;
 
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+
   const resolveCurrency = useResolveCurrency();
   const resolveCurrencySeparator = useResolveCurrencySeparator();
-  const reactSettings = useReactSettings();
 
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>({
@@ -78,8 +79,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
     if (
       recurringExpense &&
       recurringExpense.exchange_rate &&
-      recurringExpense.invoice_currency_id &&
-      recurringExpense.currency_id
+      recurringExpense.invoice_currency_id
     ) {
       handleChange(
         'foreign_amount',
@@ -92,37 +92,20 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
 
   useEffect(() => {
     if (recurringExpense) {
-      if (recurringExpense.currency_id) {
-        handleChange('currency_id', recurringExpense.currency_id);
-      } else {
-        handleChange(
-          'invoice_currency_id',
-          recurringExpense.invoice_currency_id
-        );
-      }
+      handleChange('invoice_currency_id', recurringExpense.invoice_currency_id);
 
-      if (
-        recurringExpense.currency_id &&
-        recurringExpense.invoice_currency_id
-      ) {
-        const resolveExpenseCurrency = resolveCurrency(
-          recurringExpense.currency_id
-        );
+      if (recurringExpense.invoice_currency_id) {
         const resolveConvertCurrency = resolveCurrency(
           recurringExpense.invoice_currency_id
         );
 
-        if (resolveExpenseCurrency && resolveConvertCurrency) {
-          handleChange(
-            'exchange_rate',
-            (1 / resolveExpenseCurrency?.exchange_rate) *
-              resolveConvertCurrency?.exchange_rate
-          );
+        if (resolveConvertCurrency) {
+          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
 
           if (recurringExpense.amount) {
             handleChange(
               'foreign_amount',
-              recurringExpense.amount * recurringExpense.exchange_rate
+              recurringExpense.amount * resolveConvertCurrency.exchange_rate
             );
           }
         }
@@ -134,7 +117,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
       handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
-  }, [recurringExpense?.currency_id, recurringExpense?.invoice_currency_id]);
+  }, [recurringExpense?.invoice_currency_id]);
 
   useEffect(() => {
     if (recurringExpense?.invoice_currency_id) {
@@ -152,11 +135,7 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
     if (recurringExpense && recurringExpense.exchange_rate) {
       handleChange('exchange_rate', recurringExpense.exchange_rate);
 
-      if (
-        recurringExpense.amount &&
-        recurringExpense.invoice_currency_id &&
-        recurringExpense.currency_id
-      ) {
+      if (recurringExpense.amount && recurringExpense.invoice_currency_id) {
         handleChange(
           'foreign_amount',
           recurringExpense.amount * recurringExpense.exchange_rate
