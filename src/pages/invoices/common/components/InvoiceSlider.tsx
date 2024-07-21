@@ -38,12 +38,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Inline } from '$app/components/Inline';
 import { Icon } from '$app/components/icons/Icon';
-import {
-  MdAddCircle,
-  MdCloudCircle,
-  MdInfo,
-  MdOutlineContentCopy,
-} from 'react-icons/md';
+import { MdCloudCircle, MdInfo, MdOutlineContentCopy } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
@@ -59,6 +54,8 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { ActivityRecordBase } from '$app/common/interfaces/activity-record';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -184,10 +181,14 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const activityElement = useGenerateActivityElement();
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const queryClient = useQueryClient();
@@ -231,33 +232,19 @@ export function InvoiceSlider() {
     setEmailRecords(response);
   };
 
-  useEffect(() => {
-    if (invoice) {
-      fetchEmailHistory();
-    }
-  }, [invoice]);
-
-  //duplicate not needed
-  // const { data: activities } = useQuery({
-  //   queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
-  //   queryFn: () =>
-  //     request(
-  //       'GET',
-  //       endpoint(`/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`)
-  //     ).then(
-  //       (response: GenericSingleResourceResponse<Invoice>) =>
-  //         response.data.data.activities
-  //     ),
-  //   enabled: invoice !== null && isVisible,
-  // });
-
-  const { data: activities2 } = useQuery({
-    queryKey: ['/api/v1/activities/entity', invoice?.id],
+  const { data: activities } = useQuery({
+    queryKey: ['/api/v1/activities/entity', invoice?.id, commentsOnly],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'invoice',
-        entity_id: invoice?.id,
-      }).then(
+      request(
+        'POST',
+        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
+          commentsOnly,
+        }),
+        {
+          entity: 'invoice',
+          entity_id: invoice?.id,
+        }
+      ).then(
         (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
           response.data.data
       ),
@@ -265,7 +252,11 @@ export function InvoiceSlider() {
     staleTime: Infinity,
   });
 
-  const activityElement = useGenerateActivityElement();
+  useEffect(() => {
+    if (invoice) {
+      fetchEmailHistory();
+    }
+  }, [invoice]);
 
   return (
     <Slider
@@ -496,8 +487,25 @@ export function InvoiceSlider() {
         </div>
 
         <div>
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
+
+            <AddActivityComment
+              entity="invoice"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
           <div className="flex flex-col pb-14 overflow-y-auto">
-            {activities2?.map((activity) => (
+            {activities?.map((activity) => (
               <NonClickableElement key={activity.id} className="flex flex-col">
                 <p>{activityElement(activity)}</p>
 
@@ -508,15 +516,6 @@ export function InvoiceSlider() {
                 </p>
               </NonClickableElement>
             ))}
-          </div>
-
-          <div className="absolute bottom-6 right-6">
-            <AddActivityComment
-              entity="invoice"
-              entityId={resource?.id}
-              label={`#${resource?.number}`}
-              labelElement={<Icon element={MdAddCircle} size={40} />}
-            />
           </div>
         </div>
 

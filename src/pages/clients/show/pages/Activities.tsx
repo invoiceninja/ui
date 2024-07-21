@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AddActivityComment,
   useGenerateActivityElement,
@@ -23,23 +23,32 @@ import {
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Context } from './Documents';
+import Toggle from '$app/components/forms/Toggle';
 
 export default function Activities() {
   const { id } = useParams();
 
   const [t] = useTranslation();
+  const activityElement = useGenerateActivityElement();
 
   const context: Context = useOutletContext();
-
   const { displayName } = context;
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
+
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities/entity', id],
+    queryKey: ['/api/v1/activities/entity', id, commentsOnly],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'client',
-        entity_id: id,
-      }).then(
+      request(
+        'POST',
+        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
+          commentsOnly,
+        }),
+        {
+          entity: 'client',
+          entity_id: id,
+        }
+      ).then(
         (response: AxiosResponse<GenericManyResponse<ActivityRecord>>) =>
           response.data.data
       ),
@@ -47,14 +56,24 @@ export default function Activities() {
     staleTime: Infinity,
   });
 
-  const activityElement = useGenerateActivityElement();
-
   return (
     <Card
       title={t('recent_activity')}
       className="h-full relative"
       topRight={
-        <AddActivityComment entity="client" entityId={id} label={displayName} />
+        <div className="flex items-center space-x-10">
+          <Toggle
+            label={t('comments_only')}
+            checked={commentsOnly}
+            onValueChange={(value) => setCommentsOnly(value)}
+          />
+
+          <AddActivityComment
+            entity="client"
+            entityId={id}
+            label={displayName}
+          />
+        </div>
       }
       withoutBodyPadding
     >

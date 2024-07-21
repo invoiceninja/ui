@@ -275,20 +275,6 @@ export function AddActivityComment(props: Props) {
 
   return (
     <>
-      {/* {activityEntity && (
-        <Tooltip
-          placement="top"
-          message={t('insert_notes') as string}
-          width="auto"
-        >
-          <Icon
-            element={MdAddCircle}
-            size={iconSize}
-            onClick={() => setIsModalOpen(true)}
-          />
-        </Tooltip>
-      )} */}
-
       {entityId && (
         <div className="cursor-pointer" onClick={() => setIsModalOpen(true)}>
           {labelElement || (
