@@ -94,7 +94,6 @@ function useGenerateActivityElement() {
             {activity?.contact?.label}
           </Link>
         ) ?? '',
-      notes: activity?.notes,
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -274,7 +273,6 @@ export function PaymentSlider() {
           {activities?.map((activity) => (
             <NonClickableElement key={activity.id} className="flex flex-col">
               <p>{activityElement(activity, payment)}</p>
-
               <div className="inline-flex items-center space-x-1">
                 <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
                 <p>&middot;</p>
