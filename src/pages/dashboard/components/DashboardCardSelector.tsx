@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,14 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   Calculate,
+  CompanyUser,
   DashboardField,
   Field,
   Period,
 } from '$app/common/interfaces/company-user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { User } from '$app/common/interfaces/user';
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
@@ -27,10 +32,13 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { useState } from 'react';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgOptions } from 'react-icons/cg';
 import { MdClose, MdDragHandle } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '$app/common/stores/slices/user';
 
 const FIELDS = [
   'active_invoices',
@@ -50,13 +58,11 @@ const FIELDS = [
 
 export function DashboardCardSelector() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
 
   const currentUser = useCurrentUser();
 
-  const userChanges = useInjectUserChanges();
-
   const [currentFields, setCurrentFields] = useState<DashboardField[]>([]);
-
   const [currentField, setCurrentField] = useState<DashboardField>({
     field: '' as Field,
     period: 'current',
@@ -64,6 +70,7 @@ export function DashboardCardSelector() {
     format: 'time',
   });
 
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isCardsModalOpen, setIsCardsModalOpen] = useState<boolean>(false);
   const [isFieldsModalOpen, setIsFieldsModalOpen] = useState<boolean>(false);
 
@@ -100,6 +107,43 @@ export function DashboardCardSelector() {
     setCurrentFields(updatedCurrentColumns);
   };
 
+  const handleSaveCards = () => {
+    const updatedUser = cloneDeep(currentUser) as User;
+
+    if (updatedUser && !isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+
+      set(updatedUser, 'company_user.settings.dashboard_fields', currentFields);
+
+      request(
+        'PUT',
+        endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+        updatedUser
+      )
+        .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+          toast.success('updated_settings');
+
+          set(updatedUser, 'company_user', response.data.data);
+
+          $refetch(['company_users']);
+
+          dispatch(updateUser(updatedUser));
+
+          handleCardsModalClose();
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser && Object.keys(currentUser).length && isCardsModalOpen) {
+      setCurrentFields(
+        currentUser.company_user?.settings.dashboard_fields ?? []
+      );
+    }
+  }, [currentUser, isCardsModalOpen]);
+
   return (
     <>
       <div
@@ -129,12 +173,12 @@ export function DashboardCardSelector() {
                     className="flex items-center justify-between py-2 text-sm"
                   >
                     <div className="flex space-x-2 items-center">
-                      <Icon element={MdClose} size={20} />
+                      <Icon element={MdClose} size={24} />
 
                       <div className="flex flex-col">
                         <p>{t(dashboardField.field)}</p>
 
-                        <div>
+                        <div className="flex text-xs space-x-1">
                           <span>{t(dashboardField.period)}</span>
                           <span>&middot;</span>
                           <span>{t(dashboardField.calculate)}</span>
@@ -143,7 +187,7 @@ export function DashboardCardSelector() {
                     </div>
 
                     <div {...provided.dragHandleProps}>
-                      <Icon element={MdDragHandle} size={23} />
+                      <Icon element={MdDragHandle} size={27} />
                     </div>
                   </div>
                 );
@@ -167,14 +211,14 @@ export function DashboardCardSelector() {
                             <Icon
                               className="cursor-pointer"
                               element={MdClose}
-                              size={20}
+                              size={24}
                               onClick={() => handleDelete(field.field)}
                             />
 
                             <div className="flex flex-col">
                               <p>{t(field.field)}</p>
 
-                              <div>
+                              <div className="flex text-xs space-x-1">
                                 <span>{t(field.period)}</span>
                                 <span>&middot;</span>
                                 <span>{t(field.calculate)}</span>
@@ -183,7 +227,7 @@ export function DashboardCardSelector() {
                           </div>
 
                           <div {...provided.dragHandleProps}>
-                            <Icon element={MdDragHandle} size={23} />
+                            <Icon element={MdDragHandle} size={27} />
                           </div>
                         </div>
                       )}
@@ -204,7 +248,7 @@ export function DashboardCardSelector() {
             {t('add_field')}
           </Button>
 
-          <SelectField>
+          {/* <SelectField>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -213,9 +257,16 @@ export function DashboardCardSelector() {
             <option value="6">6</option>
             <option value="7">7</option>
             <option value="8">8</option>
-          </SelectField>
+          </SelectField> */}
 
-          <Button behavior="button">{t('save')}</Button>
+          <Button
+            behavior="button"
+            onClick={handleSaveCards}
+            disableWithoutIcon
+            disabled={isFormBusy}
+          >
+            {t('save')}
+          </Button>
         </div>
       </Modal>
 
