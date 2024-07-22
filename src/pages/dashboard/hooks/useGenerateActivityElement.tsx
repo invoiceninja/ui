@@ -285,7 +285,7 @@ export function AddActivityComment(props: Props) {
       {entityId && (
         <div className="cursor-pointer" onClick={() => setIsModalOpen(true)}>
           {labelElement || (
-            <Button behavior="button" onClick={() => {}}>
+            <Button behavior="button" type="secondary" onClick={() => {}}>
               {t('add_comment')}
             </Button>
           )}
