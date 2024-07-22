@@ -52,7 +52,6 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { ActivityRecordBase } from '$app/common/interfaces/activity-record';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
@@ -67,46 +66,6 @@ export function useGenerateActivityElement() {
 
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const entities = [
-      'invoice',
-      'quote',
-      'recurring_invoice',
-      'vendor',
-      'credit',
-      'payment',
-      'project',
-      'task',
-      'expense',
-      'recurring_expense',
-      'bank_transaction',
-      'purchase_order',
-    ];
-
-    const getCurrentEntity = () => {
-      if (
-        (activity?.contact as ActivityRecordBase | undefined)?.contact_entity
-      ) {
-        return (activity?.contact as ActivityRecordBase | undefined)
-          ?.contact_entity;
-      }
-
-      const activityEntity = Object.keys(activity || {}).find((key) =>
-        entities.includes(key)
-      );
-
-      if (!activityEntity && activity?.client) {
-        return 'client';
-      }
-
-      if (activityEntity) {
-        return activityEntity;
-      }
-
-      return '';
-    };
-
-    const activityEntity = getCurrentEntity();
 
     const replacements = {
       client: (
@@ -149,21 +108,7 @@ export function useGenerateActivityElement() {
           </Link>
         ) ?? '',
 
-      notes: activityEntity && (
-        <Link
-          to={route(
-            `/${activityEntity}s/${
-              (
-                activity[
-                  activityEntity as keyof typeof activity
-                ] as ActivityRecordBase
-              ).hashed_id
-            }/edit`
-          )}
-        >
-          {activity?.notes}
-        </Link>
-      ),
+      notes: activity?.notes,
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -504,7 +449,7 @@ export function InvoiceSlider() {
             />
           </div>
 
-          <div className="flex flex-col pb-14 overflow-y-auto">
+          <div className="flex flex-col">
             {activities?.map((activity) => (
               <NonClickableElement key={activity.id} className="flex flex-col">
                 <p>{activityElement(activity)}</p>

@@ -233,7 +233,14 @@ export function useGenerateActivityElement() {
 }
 
 interface Props {
-  entity: 'client' | 'invoice';
+  entity:
+    | 'client'
+    | 'invoice'
+    | 'recurring_invoice'
+    | 'quote'
+    | 'credit'
+    | 'vendor'
+    | 'purchase_order';
   entityId: string | undefined;
   label: string;
   labelElement?: ReactNode;

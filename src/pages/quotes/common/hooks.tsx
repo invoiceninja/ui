@@ -51,6 +51,7 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
@@ -100,6 +101,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -436,6 +438,18 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </DropdownElement>
       ),
+    (quote) => (
+      <AddActivityComment
+        entity="quote"
+        entityId={quote.id}
+        label={`#${quote.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/email', { id: quote.id })}

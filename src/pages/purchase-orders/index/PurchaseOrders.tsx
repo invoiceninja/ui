@@ -41,15 +41,11 @@ export default function PurchaseOrders() {
     { name: t('purchase_orders'), href: '/purchase_orders' },
   ];
 
-  const columns = usePurchaseOrderColumns();
-
-  const filters = usePurchaseOrderFilters();
-
   const actions = useActions();
-
-  const purchaseOrderColumns = useAllPurchaseOrderColumns();
-
+  const filters = usePurchaseOrderFilters();
+  const columns = usePurchaseOrderColumns();
   const customBulkActions = useCustomBulkActions();
+  const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
   const {
     changeTemplateVisible,

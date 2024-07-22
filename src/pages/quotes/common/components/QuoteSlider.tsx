@@ -53,6 +53,9 @@ import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import Toggle from '$app/components/forms/Toggle';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useColorScheme } from '$app/common/colors';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -108,6 +111,8 @@ export function QuoteSlider() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
 
+  const colors = useColorScheme();
+
   const actions = useActions({
     showCommonBulkAction: true,
     showEditAction: true,
@@ -123,6 +128,7 @@ export function QuoteSlider() {
   const [quote, setQuote] = useAtom(quoteSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(quoteSliderVisibilityAtom);
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
@@ -143,12 +149,18 @@ export function QuoteSlider() {
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', quote?.id, 'quote'],
+    queryKey: ['/api/v1/activities', quote?.id, 'quote', commentsOnly],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'quote',
-        entity_id: quote?.id,
-      }).then(
+      request(
+        'POST',
+        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
+          commentsOnly,
+        }),
+        {
+          entity: 'quote',
+          entity_id: quote?.id,
+        }
+      ).then(
         (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
           response.data.data
       ),
@@ -392,17 +404,36 @@ export function QuoteSlider() {
         </div>
 
         <div>
-          {activities?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
 
-              <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </div>
-            </NonClickableElement>
-          ))}
+            <AddActivityComment
+              entity="quote"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {activities?.map((activity) => (
+              <NonClickableElement key={activity.id} className="flex flex-col">
+                <p>{activityElement(activity)}</p>
+
+                <div className="inline-flex items-center space-x-1">
+                  <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
+                  <p>&middot;</p>
+                  <p>{activity.ip}</p>
+                </div>
+              </NonClickableElement>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col">

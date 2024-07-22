@@ -12,6 +12,7 @@ export interface RecurringInvoiceActivity {
   user: Client;
   recurring_invoice: Client;
   client: Client;
+  contact: Client;
   activity_type_id: number;
   id: string;
   invoice: Client;
