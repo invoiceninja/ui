@@ -88,7 +88,7 @@ export function PastDueInvoices() {
           resource="invoice"
           columns={columns}
           className="pr-4"
-          endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&filter_deleted_clients=true&per_page=50&page=1&sort=due_date|asc"
+          endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=due_date|asc"
           withoutActions
           withoutPagination
           withoutPadding

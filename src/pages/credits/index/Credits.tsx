@@ -52,14 +52,10 @@ export default function Credits() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      title={t('credits')}
-      breadcrumbs={pages}
-      docsLink="en/credits/"
-    >
+    <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client&filter_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"
