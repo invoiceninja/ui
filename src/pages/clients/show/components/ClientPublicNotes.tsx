@@ -24,7 +24,7 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
-  const reactSettings = useReactSettings({ overwrite: false });
+  const reactSettings = useReactSettings();
 
   return (
     <>
