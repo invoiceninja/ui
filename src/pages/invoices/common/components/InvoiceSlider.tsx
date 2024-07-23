@@ -52,7 +52,8 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -121,7 +122,7 @@ export function InvoiceSlider() {
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -307,14 +308,13 @@ export function InvoiceSlider() {
                 width="auto"
                 tooltipElement={
                   <article
-                    className="prose prose-sm"
+                    className={classNames('prose prose-sm', {
+                      'prose-invert': reactSettings.dark_mode,
+                    })}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
-                    }}
-                    style={{
-                      color: colors.$3,
                     }}
                   />
                 }

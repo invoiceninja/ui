@@ -79,7 +79,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -525,8 +525,6 @@ export function useRecurringInvoiceColumns() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
-  const colors = useColorScheme();
-
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -713,12 +711,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>
@@ -740,12 +737,11 @@ export function useRecurringInvoiceColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>

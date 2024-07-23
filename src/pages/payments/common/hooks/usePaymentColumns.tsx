@@ -31,7 +31,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -91,8 +91,6 @@ export function usePaymentColumns() {
 
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
-
-  const colors = useColorScheme();
 
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
@@ -303,12 +301,11 @@ export function usePaymentColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>

@@ -100,7 +100,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -616,7 +616,6 @@ export function useQuoteColumns() {
   const quoteColumns = useAllQuoteColumns();
   type QuoteColumns = (typeof quoteColumns)[number];
 
-  const colors = useColorScheme();
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
@@ -898,12 +897,11 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>
@@ -925,12 +923,11 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>

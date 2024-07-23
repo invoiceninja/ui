@@ -57,7 +57,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -114,7 +114,6 @@ export function useProjectColumns() {
 
   const formatMoney = useFormatMoney();
 
-  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const projectColumns = useAllProjectColumns();
@@ -180,12 +179,11 @@ export function useProjectColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>
@@ -207,12 +205,11 @@ export function useProjectColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>

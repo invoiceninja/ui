@@ -59,7 +59,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -231,8 +231,6 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const colors = useColorScheme();
-
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
@@ -365,12 +363,11 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>
@@ -477,12 +474,11 @@ export function useExpenseColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
-                }}
-                style={{
-                  color: colors.$3,
                 }}
               />
             </div>
