@@ -29,6 +29,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'number',
@@ -84,7 +85,9 @@ export function useVendorColumns() {
 
   const disableNavigation = useDisableNavigation();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
+
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -259,6 +262,9 @@ export function useVendorColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

@@ -59,6 +59,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useColorScheme } from '$app/common/colors';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -230,6 +231,8 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
@@ -366,6 +369,9 @@ export function useExpenseColumns() {
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{
+                  color: colors.$3,
+                }}
               />
             </div>
           }
@@ -474,6 +480,9 @@ export function useExpenseColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

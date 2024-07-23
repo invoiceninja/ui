@@ -100,6 +100,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useColorScheme } from '$app/common/colors';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -615,6 +616,7 @@ export function useQuoteColumns() {
   const quoteColumns = useAllQuoteColumns();
   type QuoteColumns = (typeof quoteColumns)[number];
 
+  const colors = useColorScheme();
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
@@ -900,6 +902,9 @@ export function useQuoteColumns() {
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{
+                  color: colors.$3,
+                }}
               />
             </div>
           }
@@ -923,6 +928,9 @@ export function useQuoteColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

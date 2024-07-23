@@ -35,6 +35,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'name',
@@ -102,6 +103,7 @@ export function useClientColumns() {
 
   const disableNavigation = useDisableNavigation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -328,6 +330,9 @@ export function useClientColumns() {
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{
+                  color: colors.$3,
+                }}
               />
             </div>
           }
@@ -351,6 +356,9 @@ export function useClientColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

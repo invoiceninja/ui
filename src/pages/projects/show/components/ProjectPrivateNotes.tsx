@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { Project } from '$app/common/interfaces/project';
 import { InfoCard } from '$app/components/InfoCard';
@@ -22,6 +23,8 @@ export function ProjectPrivateNotes(props: Props) {
 
   const { project } = props;
 
+  const colors = useColorScheme();
+
   return (
     <>
       {Boolean(project && project.private_notes) && (
@@ -34,6 +37,9 @@ export function ProjectPrivateNotes(props: Props) {
                   className="prose prose-sm"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(project.private_notes),
+                  }}
+                  style={{
+                    color: colors.$3,
                   }}
                 />
               </div>

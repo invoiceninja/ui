@@ -53,6 +53,7 @@ import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { useColorScheme } from '$app/common/colors';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -112,6 +113,8 @@ export function QuoteSlider() {
     showEditAction: true,
   });
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const colors = useColorScheme();
 
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
@@ -283,6 +286,9 @@ export function QuoteSlider() {
                       __html: sanitizeHTML(
                         (resource?.reminder_schedule as string) ?? ''
                       ),
+                    }}
+                    style={{
+                      color: colors.$3,
                     }}
                   />
                 }

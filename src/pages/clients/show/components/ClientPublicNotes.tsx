@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
@@ -22,6 +23,8 @@ export function ClientPublicNotes(props: Props) {
 
   const { client } = props;
 
+  const colors = useColorScheme();
+
   return (
     <>
       {Boolean(client && client.public_notes) && (
@@ -34,6 +37,9 @@ export function ClientPublicNotes(props: Props) {
                   className="prose prose-sm"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(client.public_notes),
+                  }}
+                  style={{
+                    color: colors.$3,
                   }}
                 />
               </div>

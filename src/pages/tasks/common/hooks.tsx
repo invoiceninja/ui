@@ -77,6 +77,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'status',
@@ -135,10 +136,12 @@ export function useTaskColumns() {
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -247,6 +250,9 @@ export function useTaskColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

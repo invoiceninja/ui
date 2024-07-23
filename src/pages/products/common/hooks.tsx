@@ -50,6 +50,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -102,6 +103,8 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const colors = useColorScheme();
+
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
@@ -144,6 +147,9 @@ export function useProductColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

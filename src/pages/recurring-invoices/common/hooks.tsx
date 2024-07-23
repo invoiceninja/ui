@@ -79,6 +79,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useColorScheme } from '$app/common/colors';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -524,6 +525,8 @@ export function useRecurringInvoiceColumns() {
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
+  const colors = useColorScheme();
+
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -714,6 +717,9 @@ export function useRecurringInvoiceColumns() {
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{
+                  color: colors.$3,
+                }}
               />
             </div>
           }
@@ -737,6 +743,9 @@ export function useRecurringInvoiceColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

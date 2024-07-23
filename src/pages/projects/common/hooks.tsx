@@ -57,6 +57,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useColorScheme } from '$app/common/colors';
 
 export const defaultColumns: string[] = [
   'name',
@@ -113,6 +114,7 @@ export function useProjectColumns() {
 
   const formatMoney = useFormatMoney();
 
+  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
   const projectColumns = useAllProjectColumns();
@@ -182,6 +184,9 @@ export function useProjectColumns() {
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
+                style={{
+                  color: colors.$3,
+                }}
               />
             </div>
           }
@@ -205,6 +210,9 @@ export function useProjectColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>

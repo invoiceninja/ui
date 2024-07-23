@@ -29,10 +29,12 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { useColorScheme } from '$app/common/colors';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -108,6 +110,9 @@ export function useTransactionColumns() {
                 className="prose prose-sm"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(cleanDescriptionText(value as string)),
+                }}
+                style={{
+                  color: colors.$3,
                 }}
               />
             </div>
