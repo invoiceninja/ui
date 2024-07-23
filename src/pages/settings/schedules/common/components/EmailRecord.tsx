@@ -67,7 +67,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('invoice')}>
           <ComboboxAsync<Invoice>
             endpoint={endpoint(
-              '/api/v1/invoices?include=client.group_settings&without_deleted_clients=true&status=active'
+              '/api/v1/invoices?include=client.group_settings&filter_deleted_clients=true&status=active'
             )}
             onChange={(invoice: Entry<Invoice>) =>
               invoice.resource &&
@@ -99,7 +99,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('quote')}>
           <ComboboxAsync<Quote>
             endpoint={endpoint(
-              '/api/v1/quotes?include=client&without_deleted_clients=true&status=active'
+              '/api/v1/quotes?include=client&filter_deleted_clients=true&status=active'
             )}
             onChange={(quote: Entry<Quote>) =>
               quote.resource &&
@@ -130,7 +130,7 @@ export function EmailRecord(props: Props) {
         <Element leftSide={t('credit')}>
           <ComboboxAsync<Credit>
             endpoint={endpoint(
-              '/api/v1/credits?include=client&without_deleted_clients=true&status=active'
+              '/api/v1/credits?include=client&filter_deleted_clients=true&status=active'
             )}
             onChange={(credit: Entry<Credit>) =>
               credit.resource &&
