@@ -39,7 +39,13 @@ export function Plan() {
             </span>
           </>
         ) : (
-          <span>{t('plan_free_self_hosted')}</span>
+          <span>
+            {t(
+              account?.plan_expires !== ''
+                ? 'licensed'
+                : 'plan_free_self_hosted'
+            )}
+          </span>
         )}
       </Element>
 
