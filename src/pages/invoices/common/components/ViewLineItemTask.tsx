@@ -38,7 +38,7 @@ export function ViewLineItemTask(props: Props) {
           )}
 
           <span className="text-sm">
-            {t('linked_task')} {'=>'}
+            {t('task')} {'=>'}
           </span>
 
           <Link to={route('/tasks/:id/edit', { id: taskId })}>

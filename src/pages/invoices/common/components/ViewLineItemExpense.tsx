@@ -36,7 +36,7 @@ export function ViewLineItemExpense(props: Props) {
           </span>
 
           <span className="text-sm">
-            {t('linked_expense')} {'=>'}
+            {t('expense')} {'=>'}
           </span>
 
           <Link to={route('/expenses/:id/edit', { id: expenseId })}>
