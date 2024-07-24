@@ -63,10 +63,6 @@ export function useGenerateActivityElement() {
     ];
 
     const getCurrentEntity = () => {
-      if (activity?.contact?.contact_entity) {
-        return activity?.contact?.contact_entity;
-      }
-
       const activityEntity = Object.keys(activity || {}).find((key) =>
         entities.includes(key)
       );
@@ -183,7 +179,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       adjustment: activity?.adjustment?.label,
-      notes: activityEntity && (
+      notes: Boolean(
+        activityEntity && activity[activityEntity as keyof typeof activity]
+      ) && (
         <Link
           to={route(
             `/${activityEntity}s/${
