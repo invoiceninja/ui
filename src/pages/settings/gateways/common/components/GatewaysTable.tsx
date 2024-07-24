@@ -281,7 +281,7 @@ export function GatewaysTable(params: Params) {
           <Th disableUppercase>
             <Tooltip
               placement="top"
-              message={t('sort_gateways') as string}
+              message={t('priority') as string}
               width="auto"
             >
               <Icon element={BsQuestionCircle} color="white" size={20} />
