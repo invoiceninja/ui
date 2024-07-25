@@ -41,7 +41,8 @@ export function Plan() {
         ) : (
           <span>
             {t(
-              account?.plan_expires !== ''
+              account?.plan_expires !== '' &&
+                !dayjs(account.plan_expires).isBefore(dayjs())
                 ? 'licensed'
                 : 'plan_free_self_hosted'
             )}
