@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 const Div = styled.div`
   border-color: ${(props) => props.theme.borderColor};
@@ -270,7 +271,10 @@ export function AddActivityComment(props: Props) {
         entity_id: entityId,
         notes,
       })
-        .then(() => toast.success('saved_comment'))
+        .then(() => {
+          toast.success('saved_comment');
+          $refetch(['activities']);
+        })
         .finally(() => {
           setIsFormBusy(false);
           handleOnClose();
