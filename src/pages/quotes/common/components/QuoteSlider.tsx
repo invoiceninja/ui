@@ -418,7 +418,9 @@ export function QuoteSlider() {
           <div className="flex flex-col">
             {activities
               ?.filter(
-                (activity) => commentsOnly && activity.activity_type_id === 141
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
               )
               .map((activity) => (
                 <NonClickableElement

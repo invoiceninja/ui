@@ -71,11 +71,13 @@ export default function Activities() {
       }
       withoutBodyPadding
     >
-      <div className="pl-6 pr-4 ">
+      <div className="pl-6 pr-4">
         <div className="flex flex-col overflow-y-auto pr-4">
           {activities
             ?.filter(
-              (activity) => commentsOnly && activity.activity_type_id === 141
+              (activity) =>
+                (commentsOnly && activity.activity_type_id === 141) ||
+                !commentsOnly
             )
             .map((record: ActivityRecord, index: number) => (
               <React.Fragment key={index}>
