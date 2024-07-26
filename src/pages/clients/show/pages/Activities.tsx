@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AddActivityComment,
   useGenerateActivityElement,
@@ -35,26 +35,35 @@ export default function Activities() {
   const { displayName } = context;
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
+  const [currentActivities, setCurrentActivities] = useState<ActivityRecord[]>(
+    []
+  );
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities/entity', id, commentsOnly],
+    queryKey: ['/api/v1/activities/entity', id],
     queryFn: () =>
-      request(
-        'POST',
-        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
-          commentsOnly,
-        }),
-        {
-          entity: 'client',
-          entity_id: id,
-        }
-      ).then(
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'client',
+        entity_id: id,
+      }).then(
         (response: AxiosResponse<GenericManyResponse<ActivityRecord>>) =>
           response.data.data
       ),
     enabled: id !== null,
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    if (activities) {
+      if (commentsOnly) {
+        setCurrentActivities(
+          activities.filter((activity) => activity.activity_type_id === 141)
+        );
+      } else {
+        setCurrentActivities(activities);
+      }
+    }
+  }, [activities, commentsOnly]);
 
   return (
     <Card
@@ -79,12 +88,11 @@ export default function Activities() {
     >
       <div className="pl-6 pr-4 ">
         <div className="flex flex-col overflow-y-auto pr-4">
-          {activities &&
-            activities.map((record: ActivityRecord, index: number) => (
-              <React.Fragment key={index}>
-                {activityElement(record)}
-              </React.Fragment>
-            ))}
+          {currentActivities.map((record: ActivityRecord, index: number) => (
+            <React.Fragment key={index}>
+              {activityElement(record)}
+            </React.Fragment>
+          ))}
         </div>
       </div>
     </Card>

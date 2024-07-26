@@ -130,6 +130,9 @@ export function QuoteSlider() {
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
+  const [currentActivities, setCurrentActivities] = useState<QuoteActivity[]>(
+    []
+  );
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
 
@@ -149,18 +152,12 @@ export function QuoteSlider() {
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', quote?.id, 'quote', commentsOnly],
+    queryKey: ['/api/v1/activities', quote?.id, 'quote'],
     queryFn: () =>
-      request(
-        'POST',
-        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
-          commentsOnly,
-        }),
-        {
-          entity: 'quote',
-          entity_id: quote?.id,
-        }
-      ).then(
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'quote',
+        entity_id: quote?.id,
+      }).then(
         (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
           response.data.data
       ),
@@ -189,6 +186,18 @@ export function QuoteSlider() {
       fetchEmailHistory();
     }
   }, [quote]);
+
+  useEffect(() => {
+    if (activities) {
+      if (commentsOnly) {
+        setCurrentActivities(
+          activities.filter((activity) => activity.activity_type_id === 141)
+        );
+      } else {
+        setCurrentActivities(activities);
+      }
+    }
+  }, [activities, commentsOnly]);
 
   return (
     <Slider
@@ -422,7 +431,7 @@ export function QuoteSlider() {
           </div>
 
           <div className="flex flex-col">
-            {activities?.map((activity) => (
+            {currentActivities.map((activity) => (
               <NonClickableElement key={activity.id} className="flex flex-col">
                 <p>{activityElement(activity)}</p>
 

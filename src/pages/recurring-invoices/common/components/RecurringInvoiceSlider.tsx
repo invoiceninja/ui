@@ -49,7 +49,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useColorScheme } from '$app/common/colors';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
@@ -114,6 +114,7 @@ export const RecurringInvoiceSlider = () => {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const activityElement = useGenerateActivityElement();
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -124,6 +125,9 @@ export const RecurringInvoiceSlider = () => {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
+  const [currentActivities, setCurrentActivities] = useState<
+    RecurringInvoiceActivity[]
+  >([]);
 
   const { data: resource } = useQuery({
     queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id, 'slider'],
@@ -143,18 +147,12 @@ export const RecurringInvoiceSlider = () => {
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities/entity', recurringInvoice?.id, commentsOnly],
+    queryKey: ['/api/v1/activities/entity', recurringInvoice?.id],
     queryFn: () =>
-      request(
-        'POST',
-        endpoint('/api/v1/activities/entity?comments_only=:commentsOnly', {
-          commentsOnly,
-        }),
-        {
-          entity: 'recurring_invoice',
-          entity_id: recurringInvoice?.id,
-        }
-      ).then(
+      request('POST', endpoint('/api/v1/activities/entity'), {
+        entity: 'recurring_invoice',
+        entity_id: recurringInvoice?.id,
+      }).then(
         (
           response: AxiosResponse<GenericManyResponse<RecurringInvoiceActivity>>
         ) => response.data.data
@@ -163,7 +161,17 @@ export const RecurringInvoiceSlider = () => {
     staleTime: Infinity,
   });
 
-  const activityElement = useGenerateActivityElement();
+  useEffect(() => {
+    if (activities) {
+      if (commentsOnly) {
+        setCurrentActivities(
+          activities.filter((activity) => activity.activity_type_id === 141)
+        );
+      } else {
+        setCurrentActivities(activities);
+      }
+    }
+  }, [activities, commentsOnly]);
 
   return (
     <Slider
@@ -365,7 +373,7 @@ export const RecurringInvoiceSlider = () => {
           </div>
 
           <div className="flex flex-col">
-            {activities?.map((activity) => (
+            {currentActivities.map((activity) => (
               <NonClickableElement key={activity.id} className="flex flex-col">
                 <p>{activityElement(activity)}</p>
 
