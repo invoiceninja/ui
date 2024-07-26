@@ -247,7 +247,9 @@ export function EmailSettings() {
               leftSide={
                 <PropertyCheckbox
                   propertyKey="merge_e_invoice_to_pdf"
-                  labelElement={<SettingsLabel label={t('merge_e_invoice_to_pdf')} />}
+                  labelElement={
+                    <SettingsLabel label={t('merge_e_invoice_to_pdf')} />
+                  }
                 />
               }
             >
@@ -425,6 +427,7 @@ export function EmailSettings() {
                   handleChange('settings.gmail_sending_user_id', '0')
                 }
                 readonly={disableSettingsField('gmail_sending_user_id')}
+                withoutAction
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
               />
             </Element>
