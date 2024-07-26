@@ -135,9 +135,6 @@ export function InvoiceSlider() {
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
-  const [currentActivities, setCurrentActivities] = useState<InvoiceActivity[]>(
-    []
-  );
 
   const queryClient = useQueryClient();
 
@@ -199,18 +196,6 @@ export function InvoiceSlider() {
       fetchEmailHistory();
     }
   }, [invoice]);
-
-  useEffect(() => {
-    if (activities) {
-      if (commentsOnly) {
-        setCurrentActivities(
-          activities.filter((activity) => activity.activity_type_id === 141)
-        );
-      } else {
-        setCurrentActivities(activities);
-      }
-    }
-  }, [activities, commentsOnly]);
 
   return (
     <Slider
@@ -459,17 +444,26 @@ export function InvoiceSlider() {
           </div>
 
           <div className="flex flex-col">
-            {currentActivities.map((activity) => (
-              <NonClickableElement key={activity.id} className="flex flex-col">
-                <p>{activityElement(activity)}</p>
+            {activities
+              ?.filter(
+                (activity) => commentsOnly && activity.activity_type_id === 141
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col"
+                >
+                  <p>{activityElement(activity)}</p>
 
-                <p className="inline-flex items-center space-x-1">
-                  <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                  <p>&middot;</p>
-                  <p>{activity.ip}</p>
-                </p>
-              </NonClickableElement>
-            ))}
+                  <p className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </p>
+                </NonClickableElement>
+              ))}
           </div>
         </div>
 

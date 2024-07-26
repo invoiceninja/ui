@@ -130,9 +130,6 @@ export function QuoteSlider() {
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
-  const [currentActivities, setCurrentActivities] = useState<QuoteActivity[]>(
-    []
-  );
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
 
@@ -186,18 +183,6 @@ export function QuoteSlider() {
       fetchEmailHistory();
     }
   }, [quote]);
-
-  useEffect(() => {
-    if (activities) {
-      if (commentsOnly) {
-        setCurrentActivities(
-          activities.filter((activity) => activity.activity_type_id === 141)
-        );
-      } else {
-        setCurrentActivities(activities);
-      }
-    }
-  }, [activities, commentsOnly]);
 
   return (
     <Slider
@@ -431,17 +416,26 @@ export function QuoteSlider() {
           </div>
 
           <div className="flex flex-col">
-            {currentActivities.map((activity) => (
-              <NonClickableElement key={activity.id} className="flex flex-col">
-                <p>{activityElement(activity)}</p>
+            {activities
+              ?.filter(
+                (activity) => commentsOnly && activity.activity_type_id === 141
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col"
+                >
+                  <p>{activityElement(activity)}</p>
 
-                <div className="inline-flex items-center space-x-1">
-                  <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                  <p>&middot;</p>
-                  <p>{activity.ip}</p>
-                </div>
-              </NonClickableElement>
-            ))}
+                  <div className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </div>
+                </NonClickableElement>
+              ))}
           </div>
         </div>
 

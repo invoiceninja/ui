@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   AddActivityComment,
   useGenerateActivityElement,
@@ -35,9 +35,6 @@ export default function Activities() {
   const { displayName } = context;
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
-  const [currentActivities, setCurrentActivities] = useState<ActivityRecord[]>(
-    []
-  );
 
   const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', id],
@@ -52,18 +49,6 @@ export default function Activities() {
     enabled: id !== null,
     staleTime: Infinity,
   });
-
-  useEffect(() => {
-    if (activities) {
-      if (commentsOnly) {
-        setCurrentActivities(
-          activities.filter((activity) => activity.activity_type_id === 141)
-        );
-      } else {
-        setCurrentActivities(activities);
-      }
-    }
-  }, [activities, commentsOnly]);
 
   return (
     <Card
@@ -88,11 +73,15 @@ export default function Activities() {
     >
       <div className="pl-6 pr-4 ">
         <div className="flex flex-col overflow-y-auto pr-4">
-          {currentActivities.map((record: ActivityRecord, index: number) => (
-            <React.Fragment key={index}>
-              {activityElement(record)}
-            </React.Fragment>
-          ))}
+          {activities
+            ?.filter(
+              (activity) => commentsOnly && activity.activity_type_id === 141
+            )
+            .map((record: ActivityRecord, index: number) => (
+              <React.Fragment key={index}>
+                {activityElement(record)}
+              </React.Fragment>
+            ))}
         </div>
       </div>
     </Card>
