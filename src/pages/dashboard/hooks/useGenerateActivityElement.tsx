@@ -184,6 +184,7 @@ export function useGenerateActivityElement() {
         activityEntity && activity[activityEntity as keyof typeof activity]
       ) && (
         <Link
+          className="whitespace-pre-line"
           to={route(
             `/${activityEntity}s/${
               (
@@ -216,7 +217,9 @@ export function useGenerateActivityElement() {
       className="flex flex-col py-2 border border-t-0 border-x-0 last:border-b-0"
     >
       <div className="flex flex-col">
-        <span className="text-sm">{generate(activity)}</span>
+        <div className="flex items-center text-sm gap-1">
+          {generate(activity)}
+        </div>
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">
@@ -224,7 +227,6 @@ export function useGenerateActivityElement() {
           </span>
 
           <span className="text-gray-500 text-sm">{activity.ip}</span>
-          <span className="text-gray-500 text-sm">{activity.notes}</span>
         </div>
       </div>
     </Div>

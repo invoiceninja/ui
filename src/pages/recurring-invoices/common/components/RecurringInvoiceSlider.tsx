@@ -86,7 +86,9 @@ export const useGenerateActivityElement = () => {
           {activity?.recurring_invoice?.label}
         </Link>
       ),
-      notes: activity?.notes,
+      notes: activity?.notes && (
+        <span className="whitespace-pre-line">{activity?.notes}</span>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -369,7 +371,9 @@ export const RecurringInvoiceSlider = () => {
                   key={activity.id}
                   className="flex flex-col"
                 >
-                  <p>{activityElement(activity)}</p>
+                  <div className="flex items-center text-sm gap-1">
+                    {activityElement(activity)}
+                  </div>
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
