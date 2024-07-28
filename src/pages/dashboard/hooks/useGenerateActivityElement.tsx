@@ -183,20 +183,23 @@ export function useGenerateActivityElement() {
       notes: Boolean(
         activityEntity && activity[activityEntity as keyof typeof activity]
       ) && (
-        <Link
-          className="whitespace-pre-line"
-          to={route(
-            `/${activityEntity}s/${
-              (
-                activity[
-                  activityEntity as keyof typeof activity
-                ] as ActivityRecordBase
-              ).hashed_id
-            }/edit`
-          )}
-        >
-          {activity?.notes}
-        </Link>
+        <>
+          <br />
+
+          <Link
+            to={route(
+              `/${activityEntity}s/${
+                (
+                  activity[
+                    activityEntity as keyof typeof activity
+                  ] as ActivityRecordBase
+                ).hashed_id
+              }/edit`
+            )}
+          >
+            {activity?.notes}
+          </Link>
+        </>
       ),
     };
 
@@ -216,10 +219,8 @@ export function useGenerateActivityElement() {
       theme={{ borderColor: colors.$4, hoverColor: colors.$2 }}
       className="flex flex-col py-2 border border-t-0 border-x-0 last:border-b-0"
     >
-      <div className="flex flex-col">
-        <div className="flex items-center text-sm gap-1">
-          {generate(activity)}
-        </div>
+      <div className="flex flex-col space-y-2">
+        <span className="text-sm">{generate(activity)}</span>
 
         <div className="flex space-x-3">
           <span className="dark:text-white text-sm">

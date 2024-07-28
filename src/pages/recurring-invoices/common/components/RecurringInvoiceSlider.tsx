@@ -87,7 +87,11 @@ export const useGenerateActivityElement = () => {
         </Link>
       ),
       notes: activity?.notes && (
-        <span className="whitespace-pre-line">{activity?.notes}</span>
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
       ),
     };
 
@@ -369,11 +373,9 @@ export const RecurringInvoiceSlider = () => {
               .map((activity) => (
                 <NonClickableElement
                   key={activity.id}
-                  className="flex flex-col"
+                  className="flex flex-col space-y-2"
                 >
-                  <div className="flex items-center text-sm gap-1">
-                    {activityElement(activity)}
-                  </div>
+                  <p>{activityElement(activity)}</p>
 
                   <div className="inline-flex items-center space-x-1">
                     <p>

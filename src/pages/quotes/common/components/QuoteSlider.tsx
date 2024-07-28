@@ -96,7 +96,11 @@ function useGenerateActivityElement() {
           </Link>
         ) ?? '',
       notes: activity?.notes && (
-        <span className="whitespace-pre-line">{activity?.notes}</span>
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
       ),
     };
     for (const [variable, value] of Object.entries(replacements)) {
@@ -427,11 +431,9 @@ export function QuoteSlider() {
               .map((activity) => (
                 <NonClickableElement
                   key={activity.id}
-                  className="flex flex-col"
+                  className="flex flex-col space-y-2"
                 >
-                  <div className="flex items-center text-sm gap-1">
-                    {activityElement(activity)}
-                  </div>
+                  <p>{activityElement(activity)}</p>
 
                   <div className="inline-flex items-center space-x-1">
                     <p>
