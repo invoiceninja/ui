@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -31,6 +30,11 @@ interface CardProps extends DashboardCardsProps {
   field: DashboardField;
 }
 
+export const PERIOD_LABELS = {
+  current: 'current_period',
+  previous: 'previous_period',
+};
+
 function Card(props: CardProps) {
   const [t] = useTranslation();
 
@@ -40,11 +44,12 @@ function Card(props: CardProps) {
   const formatMoney = useFormatMoney();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [responseData, setResponseData] = useState<number>(0);
 
   useEffect(() => {
     setIsFormBusy(true);
 
-    queryClient.fetchQuery([`/api/v1/charts/calculated_fields`], () =>
+    queryClient.fetchQuery(['/api/v1/charts/calculated_fields'], () =>
       request('POST', endpoint('/api/v1/charts/calculated_fields'), {
         date_range: dateRange,
         start_date: startDate,
@@ -54,9 +59,7 @@ function Card(props: CardProps) {
         period: field.period,
         format: field.format,
       })
-        .then((response) => {
-          console.log(response);
-        })
+        .then((response) => setResponseData(response.data))
         .finally(() => setIsFormBusy(false))
     );
   }, [field]);
@@ -70,12 +73,19 @@ function Card(props: CardProps) {
       )}
 
       {!isFormBusy && (
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-1">
           <span className="font-medium">{t(FIELDS_LABELS[field.field])}</span>
 
-          {/* {field.format === 'money' && (
-          <span className="text-sm">{formatMoney(field.value)}</span>
-        )} */}
+          {field.format === 'money' && (
+            <span>{formatMoney(responseData, '', '')}</span>
+          )}
+
+          <span>
+            {t(
+              PERIOD_LABELS[field.period as keyof typeof PERIOD_LABELS] ??
+                field.period
+            )}
+          </span>
         </div>
       )}
     </CardElement>

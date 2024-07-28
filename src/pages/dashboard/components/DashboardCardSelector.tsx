@@ -39,6 +39,7 @@ import { CgOptions } from 'react-icons/cg';
 import { MdClose, MdDragHandle } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '$app/common/stores/slices/user';
+import { PERIOD_LABELS } from './DashboardCards';
 
 const FIELDS = [
   'active_invoices',
@@ -201,9 +202,21 @@ export function DashboardCardSelector() {
                         <p>{t(FIELDS_LABELS[dashboardField.field])}</p>
 
                         <div className="flex text-xs space-x-1">
-                          <span>{t(dashboardField.period)}</span>
+                          <span>
+                            {t(
+                              PERIOD_LABELS[
+                                dashboardField.period as keyof typeof PERIOD_LABELS
+                              ] ?? dashboardField.period
+                            )}
+                          </span>
                           <span>&middot;</span>
-                          <span>{t(dashboardField.calculate)}</span>
+                          <span>
+                            {t(
+                              dashboardField.calculate === 'avg'
+                                ? 'average'
+                                : dashboardField.calculate
+                            )}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -241,9 +254,21 @@ export function DashboardCardSelector() {
                               <p>{t(FIELDS_LABELS[field.field])}</p>
 
                               <div className="flex text-xs space-x-1">
-                                <span>{t(field.period)}</span>
+                                <span>
+                                  {t(
+                                    PERIOD_LABELS[
+                                      field.period as keyof typeof PERIOD_LABELS
+                                    ] ?? field.period
+                                  )}
+                                </span>
                                 <span>&middot;</span>
-                                <span>{t(field.calculate)}</span>
+                                <span>
+                                  {t(
+                                    field.calculate === 'avg'
+                                      ? 'average'
+                                      : field.calculate
+                                  )}
+                                </span>
                               </div>
                             </div>
                           </div>
