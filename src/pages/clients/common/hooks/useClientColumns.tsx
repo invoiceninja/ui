@@ -133,7 +133,7 @@ export function useClientColumns() {
     {
       column: 'number',
       id: 'number',
-      label: t('id_number'),
+      label: t('number'),
     },
     {
       column: 'name',
