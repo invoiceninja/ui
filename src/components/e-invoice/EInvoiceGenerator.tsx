@@ -764,11 +764,14 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       );
 
                       if (!isAlreadyAdded) {
-                        const label = `${getComponentKey(
-                          nextComponent.type
-                        )} (${element.name}, ${getComponentKey(
-                          component.type
-                        )})`;
+                        const keysLength = componentKeyPath.split('|').length;
+
+                        const lastParentName =
+                          componentKeyPath.split('|')[keysLength - 3];
+
+                        const label = lastParentName
+                          ? `${element.name} (${lastParentName})`
+                          : element.name;
 
                         availableGroups.push({
                           key: componentKeyPath,
