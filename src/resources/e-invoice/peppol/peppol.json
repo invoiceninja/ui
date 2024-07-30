@@ -2128,7 +2128,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "AdditionalAccountID": {
             "name": "AdditionalAccountID",
