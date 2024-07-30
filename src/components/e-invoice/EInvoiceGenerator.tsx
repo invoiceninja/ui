@@ -291,20 +291,24 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       });
     };
 
+    const getElementName = (name: string): string => {
+      return name.replace(/([a-z])([A-Z])/g, '$1 $2').trim();
+    };
+
     const renderElement = (
       element: ElementType,
       parentsKey: string,
       isChildOfFirstLevelComponent: boolean
     ) => {
       let leftSideLabel = '';
-      const fieldKey = `${parentsKey}|${element.name || ''}`;
+      const fieldKey = `${parentsKey}|${element.name}`;
 
       const rule = rules.find((rule) => rule.key === element.name);
 
       if (rule) {
         leftSideLabel = rule.label;
       } else {
-        leftSideLabel = element.name;
+        leftSideLabel = getElementName(element.name);
       }
 
       const isOptionalElement = doesKeyStartsWithAnyGroupType(fieldKey);
@@ -770,8 +774,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                           componentKeyPath.split('|')[keysLength - 3];
 
                         const label = lastParentName
-                          ? `${element.name} (${lastParentName})`
-                          : element.name;
+                          ? `${getElementName(element.name)} (${getElementName(
+                              lastParentName
+                            )})`
+                          : getElementName(element.name);
 
                         availableGroups.push({
                           key: componentKeyPath,
@@ -813,7 +819,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                               >
                                 <div className="flex flex-col space-y-1">
                                   <span className="text-sm">
-                                    {element.name}
+                                    {getElementName(element.name)}
                                   </span>
 
                                   {element.help && (
