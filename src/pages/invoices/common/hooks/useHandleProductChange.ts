@@ -51,9 +51,13 @@ export function useHandleProductChange(props: Props) {
         : product?.price || 0;
 
     if (company.fill_products) {
-      lineItem.quantity = company?.default_quantity
-        ? 1
-        : product?.quantity ?? 0;
+      if (!company?.enable_product_quantity) {
+        lineItem.quantity = 1;
+      } else {
+        lineItem.quantity = company?.default_quantity
+          ? 1
+          : product?.quantity ?? 1;
+      }
 
       if (resource.client_id) {
         resolveClient.find(resource.client_id).then((client) => {
