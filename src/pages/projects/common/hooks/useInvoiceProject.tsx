@@ -27,7 +27,7 @@ import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { toast } from '$app/common/helpers/toast/toast';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export const calculateTaskHours = (timeLog: string) => {
   const parsedTimeLogs = parseTimeLog(timeLog);
@@ -51,6 +51,7 @@ export const calculateTaskHours = (timeLog: string) => {
 };
 
 export function useInvoiceProject() {
+  const [t] = useTranslation();
   const navigate = useNavigate();
   const company = useCurrentCompany();
 
