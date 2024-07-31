@@ -2167,7 +2167,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           },
           "DespatchContact": {
             "name": "DespatchContact",
@@ -2193,7 +2193,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           },
           "SellerContact": {
             "name": "SellerContact",
@@ -2206,7 +2206,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           }
         },
         "visibility": 0
@@ -2417,7 +2417,7 @@
             "max_occurs": -1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           },
           "Language": {
             "name": "Language",
@@ -2443,7 +2443,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           },
           "PhysicalLocation": {
             "name": "PhysicalLocation",
@@ -2495,7 +2495,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cac",
-            "visibility": 0
+            "visibility": 7
           },
           "Person": {
             "name": "Person",
@@ -4763,7 +4763,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "Telephone": {
             "name": "Telephone",
@@ -4776,7 +4776,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "Telefax": {
             "name": "Telefax",
@@ -4789,7 +4789,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "ElectronicMail": {
             "name": "ElectronicMail",
@@ -4802,7 +4802,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "Note": {
             "name": "Note",
