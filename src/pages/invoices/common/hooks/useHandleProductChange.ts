@@ -33,7 +33,11 @@ export function useHandleProductChange(props: Props) {
 
   const resource = props.resource;
 
-  return (index: number, product_key: string, product: Product | null) => {
+  return async (
+    index: number,
+    product_key: string,
+    product: Product | null
+  ) => {
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
@@ -60,7 +64,7 @@ export function useHandleProductChange(props: Props) {
       }
 
       if (resource.client_id) {
-        resolveClient.find(resource.client_id).then((client) => {
+        await resolveClient.find(resource.client_id).then((client) => {
           const clientCurrencyId = client.settings.currency_id;
 
           if (
