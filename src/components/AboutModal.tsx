@@ -48,6 +48,7 @@ interface SystemInfo {
     is_okay: boolean;
     memory_limit: string;
   };
+  is_docker: boolean;
   env_writable: boolean;
   simple_db_check: boolean;
   cache_enabled: boolean;
@@ -352,38 +353,39 @@ export function AboutModal(props: Props) {
           </div>
 
           {(Boolean(!systemInfo?.env_writable) ||
-            Boolean(systemInfo?.file_permissions !== 'Ok')) && (
-            <Div
-              className="flex justify-between items-center cursor-pointer py-1 px-3"
-              theme={{
-                hoverColor: colors.$5,
-              }}
-              onClick={() =>
-                window
-                  .open(
-                    'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
-                    '_blank'
-                  )
-                  ?.focus()
-              }
-            >
-              <div className="flex flex-col">
-                <span className="font-medium text-base mb-1">
-                  {t('permissions')}
-                </span>
+            Boolean(systemInfo?.file_permissions !== 'Ok')) &&
+            Boolean(!systemInfo?.is_docker) && (
+              <Div
+                className="flex justify-between items-center cursor-pointer py-1 px-3"
+                theme={{
+                  hoverColor: colors.$5,
+                }}
+                onClick={() =>
+                  window
+                    .open(
+                      'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
+                      '_blank'
+                    )
+                    ?.focus()
+                }
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium text-base mb-1">
+                    {t('permissions')}
+                  </span>
 
-                <span>
-                  {!systemInfo?.env_writable
-                    ? t('env_not_writable')
-                    : systemInfo?.file_permissions}
-                </span>
-              </div>
+                  <span>
+                    {!systemInfo?.env_writable
+                      ? t('env_not_writable')
+                      : systemInfo?.file_permissions}
+                  </span>
+                </div>
 
-              <div>
-                <Icon element={MdWarning} color="red" size={25} />
-              </div>
-            </Div>
-          )}
+                <div>
+                  <Icon element={MdWarning} color="red" size={25} />
+                </div>
+              </Div>
+            )}
 
           {systemInfo?.pdf_engine !== 'SnapPDF PDF Generator' && (
             <Div
