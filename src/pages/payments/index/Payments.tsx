@@ -85,15 +85,11 @@ export default function Payments() {
   } = useChangeTemplate();
 
   return (
-    <Default
-      title={t('payments')}
-      breadcrumbs={pages}
-      docsLink="en/payments/"
-    >
+    <Default title={t('payments')} breadcrumbs={pages} docsLink="en/payments/">
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&filter_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/payments?include=client,invoices&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
