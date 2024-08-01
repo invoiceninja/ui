@@ -46,6 +46,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdEdit,
@@ -80,6 +81,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -364,6 +366,18 @@ export function useActions(params?: Params) {
       !recurringInvoice.is_deleted && (
         <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
       ),
+    (recurringInvoice) => (
+      <AddActivityComment
+        entity="recurring_invoice"
+        entityId={recurringInvoice.id}
+        label={`#${recurringInvoice.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     () => <Divider withoutPadding />,
     (recurringInvoice) =>
       hasPermission('create_recurring_invoice') && (
