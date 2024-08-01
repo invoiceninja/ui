@@ -257,12 +257,12 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         const updatedComponentKey = componentKey
           .split('|')
           .filter((_, index) => index !== componentKey.split('|').length - 1)
-          .join('.');
+          .join('|');
 
         const updatedPayload = cloneDeep(payload);
 
         Object.keys(updatedPayload).forEach((key) => {
-          if (!key.startsWith(updatedComponentKey)) {
+          if (key.startsWith(updatedComponentKey)) {
             delete updatedPayload[key];
           }
         });
