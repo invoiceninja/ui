@@ -27,4 +27,5 @@ export const taskMap: Record[] = [
   { trans: 'status', value: 'task.status_id', map: 'task' },
   { trans: 'project', value: 'task.project_id', map: 'task' },
   { trans: 'billable', value: 'task.billable', map: 'task' },
+  { trans: 'item_notes', value: 'task.item_notes', map: 'task' },
 ];
