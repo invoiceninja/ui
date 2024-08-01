@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
-import { useAtom } from 'jotai';
 import { invoiceAtom } from './common/atoms';
 import { useEffect, useState } from 'react';
 import { CommonActions } from './edit/components/CommonActions';
@@ -33,6 +32,7 @@ import { v4 } from 'uuid';
 import { Client } from '$app/common/interfaces/client';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -54,7 +54,7 @@ export default function Invoice() {
 
   const { calculateInvoiceSum } = useInvoiceUtilities({ client });
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
