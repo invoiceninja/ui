@@ -17,9 +17,9 @@ import {
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Button, InputField, Link } from '$app/components/forms';
-import { t } from 'i18next';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
@@ -35,6 +35,7 @@ const Div = styled.div`
 `;
 
 export function useGenerateActivityElement() {
+  const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const generate = (activity: ActivityRecord) => {

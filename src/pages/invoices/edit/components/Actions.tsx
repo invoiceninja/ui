@@ -170,6 +170,7 @@ export function useActions(params?: Params) {
           tooltipText={t('print_pdf')}
           onClick={() => printPdf([invoice.id])}
           icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
         </EntityActionElement>
@@ -217,6 +218,7 @@ export function useActions(params?: Params) {
         tooltipText={t('download')}
         onClick={() => downloadPdf(invoice)}
         icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download')}
       </EntityActionElement>
@@ -233,6 +235,7 @@ export function useActions(params?: Params) {
           tooltipText={t('download_e_invoice')}
           onClick={() => downloadEInvoice(invoice)}
           icon={MdDownload}
+          disablePreventNavigation
         >
           {t('download_e_invoice')}
         </EntityActionElement>
@@ -271,6 +274,7 @@ export function useActions(params?: Params) {
           tooltipText={t('mark_sent')}
           onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={MdMarkEmailRead}
+          disablePreventNavigation
         >
           {t('mark_sent')}
         </EntityActionElement>
@@ -288,6 +292,7 @@ export function useActions(params?: Params) {
           tooltipText={t('mark_paid')}
           onClick={() => bulk([invoice.id], 'mark_paid')}
           icon={MdPaid}
+          disablePreventNavigation
         >
           {t('mark_paid')}
         </EntityActionElement>
@@ -304,6 +309,7 @@ export function useActions(params?: Params) {
           tooltipText={t('auto_bill')}
           onClick={() => bulk([invoice.id], 'auto_bill')}
           icon={BiMoney}
+          disablePreventNavigation
         >
           {t('auto_bill')}
         </EntityActionElement>
@@ -339,6 +345,7 @@ export function useActions(params?: Params) {
         tooltipText={t('client_portal')}
         onClick={() => invoice && openClientPortal(invoice)}
         icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('client_portal')}
       </EntityActionElement>
@@ -422,6 +429,7 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'archive')}
           icon={MdArchive}
           excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
         </EntityActionElement>
@@ -441,6 +449,7 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'restore')}
           icon={MdRestore}
           excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
         </EntityActionElement>
@@ -459,6 +468,7 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'delete')}
           icon={MdDelete}
           excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
         </EntityActionElement>
@@ -474,6 +484,7 @@ export function useActions(params?: Params) {
           tooltipText={t('cancel_invoice')}
           onClick={() => bulk([invoice.id], 'cancel')}
           icon={MdCancel}
+          disablePreventNavigation
         >
           {t('cancel_invoice')}
         </EntityActionElement>
