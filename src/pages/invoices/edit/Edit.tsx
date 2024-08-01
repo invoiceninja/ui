@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceSumAtom } from '../common/atoms';
+import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -48,8 +48,6 @@ export default function Edit() {
   const context: Context = useOutletContext();
 
   const {
-    invoice,
-    setInvoice,
     isDefaultTerms,
     setIsDefaultTerms,
     isDefaultFooter,
