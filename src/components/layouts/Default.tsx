@@ -396,7 +396,7 @@ export function Default(props: Props) {
             <MenuIcon className="dark:text-gray-100" />
           </button>
           <div
-            className="flex-1 px-4 md:px-8 flex items-center"
+            className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
           >
             <div className="flex flex-1 items-center space-x-4">
@@ -414,7 +414,7 @@ export function Default(props: Props) {
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
               {shouldShowUnlockButton && (
                 <button
-                  className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                   onClick={() =>
                     preventNavigation({
                       url: (isSelfHosted()
@@ -488,7 +488,7 @@ export function Default(props: Props) {
               )}
 
               {(navigationTopRightElement || props.navigationTopRight) && (
-                <div className="space-x-3 items-center hidden lg:flex">
+                <div className="flex space-x-3 items-center">
                   {navigationTopRightElement?.element ||
                     props.navigationTopRight}
                 </div>

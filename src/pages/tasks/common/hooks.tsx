@@ -77,6 +77,7 @@ import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -136,9 +137,10 @@ export function useTaskColumns() {
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -244,7 +246,9 @@ export function useTaskColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}

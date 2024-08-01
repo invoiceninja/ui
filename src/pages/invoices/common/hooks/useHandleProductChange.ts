@@ -33,7 +33,11 @@ export function useHandleProductChange(props: Props) {
 
   const resource = props.resource;
 
-  return (index: number, product_key: string, product: Product | null) => {
+  return async (
+    index: number,
+    product_key: string,
+    product: Product | null
+  ) => {
     const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
@@ -51,12 +55,16 @@ export function useHandleProductChange(props: Props) {
         : product?.price || 0;
 
     if (company.fill_products) {
-      lineItem.quantity = company?.default_quantity
-        ? 1
-        : product?.quantity ?? 0;
+      if (!company?.enable_product_quantity) {
+        lineItem.quantity = 1;
+      } else {
+        lineItem.quantity = company?.default_quantity
+          ? 1
+          : product?.quantity ?? 1;
+      }
 
       if (resource.client_id) {
-        resolveClient.find(resource.client_id).then((client) => {
+        await resolveClient.find(resource.client_id).then((client) => {
           const clientCurrencyId = client.settings.currency_id;
 
           if (
