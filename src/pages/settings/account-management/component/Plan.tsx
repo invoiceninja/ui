@@ -39,7 +39,14 @@ export function Plan() {
             </span>
           </>
         ) : (
-          <span>{t('plan_free_self_hosted')}</span>
+          <span>
+            {t(
+              account?.plan_expires !== '' &&
+                !dayjs(account.plan_expires).isBefore(dayjs())
+                ? 'licensed'
+                : 'plan_free_self_hosted'
+            )}
+          </span>
         )}
       </Element>
 
