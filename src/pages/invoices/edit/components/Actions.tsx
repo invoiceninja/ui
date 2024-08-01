@@ -24,6 +24,7 @@ import {
   MdArchive,
   MdCancel,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
@@ -56,6 +57,7 @@ import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -82,7 +84,16 @@ export function useActions(params?: Params) {
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'invoice',
+    editPageTabs: [
+      'documents',
+      'settings',
+      'activity',
+      'history',
+      'email_history',
+    ],
+  });
 
   const bulk = useBulk();
   const navigate = useNavigate();
@@ -238,6 +249,27 @@ export function useActions(params?: Params) {
           {t('download_e_invoice')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) => (
+      <AddActivityComment
+        {...(!dropdown && {
+          key: 'add_comment',
+        })}
+        entity="invoice"
+        entityId={invoice.id}
+        label={`#${invoice.number}`}
+        labelElement={
+          <EntityActionElement
+            entity="invoice"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
+            {t('add_comment')}
+          </EntityActionElement>
+        }
+      />
+    ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (

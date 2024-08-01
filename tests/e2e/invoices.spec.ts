@@ -145,7 +145,11 @@ const createInvoice = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Settings', exact: true })
+      .first()
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
@@ -227,7 +231,7 @@ test('can edit invoice', async ({ page }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
+  const tableRow = page.locator('tbody').first().getByRole('row').nth(3);
 
   await tableRow.getByRole('link').first().click();
 
@@ -475,7 +479,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   }
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
     .click();
@@ -524,7 +528,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   }
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
     .click();
