@@ -25,7 +25,7 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
-import { get, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
@@ -253,6 +253,22 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             (choiceKey) => !choiceKey.startsWith(componentKey)
           )
         );
+
+        const updatedComponentKey = componentKey
+          .split('|')
+          .filter((_, index) => index !== componentKey.split('|').length - 1)
+          .join('.');
+
+        const updatedPayload = cloneDeep(payload);
+
+        Object.keys(updatedPayload).forEach((key) => {
+          if (!key.startsWith(updatedComponentKey)) {
+            delete updatedPayload[key];
+          }
+        });
+
+        setPayload(updatedPayload);
+
         setCurrentAvailableGroups((current) => [...current, deletedComponent]);
       }
     };
