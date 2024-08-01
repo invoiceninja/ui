@@ -159,6 +159,7 @@ export const keys = {
       '/api/v1/projects',
       '/api/v1/payments',
       '/api/v1/expenses',
+      '/api/v1/recurring_expenses',
       '/api/v1/tasks',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
