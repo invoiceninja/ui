@@ -282,9 +282,7 @@ export const RecurringInvoiceSlider = () => {
 
         <div>
           {resource?.activities && resource.activities.length === 0 && (
-            <NonClickableElement>
-              {t('nothing_to_see_here')}
-            </NonClickableElement>
+            <NonClickableElement>{t('api_404')}</NonClickableElement>
           )}
 
           {resource?.activities &&
