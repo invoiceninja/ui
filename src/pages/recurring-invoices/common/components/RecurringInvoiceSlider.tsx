@@ -47,6 +47,10 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import Toggle from '$app/components/forms/Toggle';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -82,6 +86,13 @@ export const useGenerateActivityElement = () => {
           {activity?.recurring_invoice?.label}
         </Link>
       ),
+      notes: activity?.notes && (
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -103,10 +114,13 @@ export const RecurringInvoiceSlider = () => {
   );
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const dateTime = useDateTime();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const activityElement = useGenerateActivityElement();
 
   const formatMoney = useFormatMoney();
   const actions = useActions({
@@ -115,6 +129,8 @@ export const RecurringInvoiceSlider = () => {
   });
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
 
   const { data: resource } = useQuery({
     queryKey: ['/api/v1/recurring_invoices', recurringInvoice?.id, 'slider'],
@@ -147,8 +163,6 @@ export const RecurringInvoiceSlider = () => {
     enabled: recurringInvoice !== null && isVisible,
     staleTime: Infinity,
   });
-
-  const activityElement = useGenerateActivityElement();
 
   return (
     <Slider
@@ -332,16 +346,47 @@ export const RecurringInvoiceSlider = () => {
         </div>
 
         <div>
-          {activities?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
-              <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </div>
-            </NonClickableElement>
-          ))}
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
+
+            <AddActivityComment
+              entity="recurring_invoice"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {activities
+              ?.filter(
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col space-y-2"
+                >
+                  <p>{activityElement(activity)}</p>
+
+                  <div className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </div>
+                </NonClickableElement>
+              ))}
+          </div>
         </div>
       </TabGroup>
     </Slider>

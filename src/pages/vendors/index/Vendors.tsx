@@ -25,6 +25,7 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { or } from '$app/common/guards/guards/or';
 import { Guard } from '$app/common/guards/Guard';
+import { useActions } from '../common/hooks/useActions';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -35,10 +36,9 @@ export default function Vendors() {
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
+  const actions = useActions();
   const columns = useVendorColumns();
-
   const vendorColumns = useAllVendorColumns();
-
   const customBulkActions = useCustomBulkActions();
 
   return (
@@ -51,6 +51,7 @@ export default function Vendors() {
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions
+        customActions={actions}
         customBulkActions={customBulkActions}
         rightSide={
           <Guard

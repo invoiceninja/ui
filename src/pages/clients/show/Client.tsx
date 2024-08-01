@@ -123,6 +123,7 @@ export default function Client() {
             <Outlet
               context={{
                 isPurgeOrMergeActionCalled,
+                displayName: client.display_name,
               }}
             />
           </div>

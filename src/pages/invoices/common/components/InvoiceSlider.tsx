@@ -54,6 +54,9 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -106,7 +109,16 @@ export function useGenerateActivityElement() {
             {activity?.contact?.label}
           </Link>
         ) ?? '',
+
+      notes: activity?.notes && (
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
+      ),
     };
+
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -124,10 +136,14 @@ export function InvoiceSlider() {
 
   const reactSettings = useReactSettings();
 
+  const colors = useColorScheme();
+
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const activityElement = useGenerateActivityElement();
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const queryClient = useQueryClient();
@@ -171,27 +187,7 @@ export function InvoiceSlider() {
     setEmailRecords(response);
   };
 
-  useEffect(() => {
-    if (invoice) {
-      fetchEmailHistory();
-    }
-  }, [invoice]);
-
-  //duplicate not needed
-  // const { data: activities } = useQuery({
-  //   queryKey: [`/api/v1/invoices`, invoice?.id, 'activities'],
-  //   queryFn: () =>
-  //     request(
-  //       'GET',
-  //       endpoint(`/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true`)
-  //     ).then(
-  //       (response: GenericSingleResourceResponse<Invoice>) =>
-  //         response.data.data.activities
-  //     ),
-  //   enabled: invoice !== null && isVisible,
-  // });
-
-  const { data: activities2 } = useQuery({
+  const { data: activities } = useQuery({
     queryKey: ['/api/v1/activities/entity', invoice?.id],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
@@ -205,7 +201,11 @@ export function InvoiceSlider() {
     staleTime: Infinity,
   });
 
-  const activityElement = useGenerateActivityElement();
+  useEffect(() => {
+    if (invoice) {
+      fetchEmailHistory();
+    }
+  }, [invoice]);
 
   return (
     <Slider
@@ -438,16 +438,47 @@ export function InvoiceSlider() {
         </div>
 
         <div>
-          {activities2?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
-              <p className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </p>
-            </NonClickableElement>
-          ))}
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
+
+            <AddActivityComment
+              entity="invoice"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {activities
+              ?.filter(
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col space-y-2"
+                >
+                  <p>{activityElement(activity)}</p>
+
+                  <p className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </p>
+                </NonClickableElement>
+              ))}
+          </div>
         </div>
 
         <div className="flex flex-col">
