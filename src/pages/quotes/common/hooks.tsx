@@ -100,6 +100,7 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -172,7 +173,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -896,7 +897,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -920,7 +923,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}

@@ -25,14 +25,15 @@ import {
 import { route } from '$app/common/helpers/route';
 import { Task } from '$app/common/interfaces/task';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { t } from 'i18next';
 import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 interface Params {
   tasks: Task[];
 }
 
 export function useAddTasksOnInvoice(params: Params) {
+  const [t] = useTranslation();
   const navigate = useNavigate();
 
   const { tasks } = params;

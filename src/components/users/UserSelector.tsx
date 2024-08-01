@@ -21,6 +21,7 @@ import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 interface UserSelectorProps extends GenericSelectorProps<User> {
   endpoint?: string;
   staleTime?: number;
+  withoutAction?: boolean;
 }
 
 export function UserSelector(props: UserSelectorProps) {
@@ -55,7 +56,7 @@ export function UserSelector(props: UserSelectorProps) {
           preventNavigation({
             fn: () => navigate('/settings/users'),
           }),
-        visible: isAdmin || isOwner,
+        visible: (isAdmin || isOwner) && !props.withoutAction,
       }}
       onChange={(entry) =>
         entry.resource ? props.onChange(entry.resource) : null
