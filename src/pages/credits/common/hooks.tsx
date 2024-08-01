@@ -167,7 +167,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            {
+              ...blankLineItem(),
+              type_id: InvoiceItemType.Product,
+              quantity: 1,
+            },
           ],
         }
     );

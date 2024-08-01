@@ -109,7 +109,7 @@ export function useInvoiceUtilities(props: Props) {
           ...invoice,
           line_items: [
             ...invoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
