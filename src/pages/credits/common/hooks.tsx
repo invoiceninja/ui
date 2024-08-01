@@ -51,6 +51,7 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
@@ -96,6 +97,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -424,6 +426,18 @@ export function useActions() {
           {t('schedule')}
         </DropdownElement>
       ),
+    (credit) => (
+      <AddActivityComment
+        entity="credit"
+        entityId={credit.id}
+        label={`#${credit.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (credit) => (
       <DropdownElement
         to={route('/credits/:id/email', { id: credit.id })}
