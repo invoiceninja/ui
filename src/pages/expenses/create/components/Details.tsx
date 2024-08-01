@@ -361,6 +361,7 @@ export function Details(props: Props) {
               value={expense.currency_id}
               onChange={(currency) => handleChange('currency_id', currency)}
               errorMessage={errors?.errors.currency_id}
+              dismissable
             />
           </Element>
         )}
