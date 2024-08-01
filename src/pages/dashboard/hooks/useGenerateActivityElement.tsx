@@ -14,9 +14,9 @@ import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
-import { t } from 'i18next';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useTranslation } from 'react-i18next';
 
 const Div = styled.div`
   border-color: ${(props) => props.theme.borderColor};
@@ -26,19 +26,20 @@ const Div = styled.div`
 `;
 
 export function useGenerateActivityElement() {
+  const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
-    if(activity.activity_type_id === 10 && activity.contact) {
+    if (activity.activity_type_id === 10 && activity.contact) {
       text = trans(`activity_10_online`, {});
     }
 
     if (activity.activity_type_id === 54 && activity.contact) {
       text = text.replace(':user', ':contact');
     }
-  
+
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>

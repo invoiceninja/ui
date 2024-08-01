@@ -33,6 +33,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Client } from '$app/common/interfaces/client';
 
@@ -68,6 +69,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
 
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const {
