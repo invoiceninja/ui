@@ -54,7 +54,7 @@ export default function EmailHistory() {
   }, [id]);
 
   return (
-    <Card title={t('email_history')}>
+    <Card title={t('email_history')} className="w-full xl:w-2/3">
       {isLoading && (
         <div className="flex justify-center">
           <Spinner />

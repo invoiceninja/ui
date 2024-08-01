@@ -32,13 +32,13 @@ export default function Documents() {
   const { invoice } = context;
 
   return (
-    <Card title={t('documents')}>
+    <Card title={t('documents')} className="w-full xl:w-2/3">
       {location.pathname.includes('/create') ? (
         <div className="text-sm mt-4 px-6">
           {t('save_to_upload_documents')}.
         </div>
       ) : (
-        <div className="w-2/3 px-6">
+        <div className="px-6">
           <Upload
             widgetOnly
             endpoint={endpoint('/api/v1/invoices/:id/upload', {

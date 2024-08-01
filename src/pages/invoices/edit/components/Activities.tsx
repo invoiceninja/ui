@@ -105,7 +105,7 @@ export default function Activities() {
   });
 
   return (
-    <Card title={t('activity')}>
+    <Card title={t('activity')} className="w-full xl:w-2/3">
       {isLoading && (
         <div className="flex justify-center">
           <Spinner />

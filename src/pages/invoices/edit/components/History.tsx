@@ -57,7 +57,7 @@ export default function History() {
   });
 
   return (
-    <Card title={t('history')}>
+    <Card title={t('history')} className="w-full xl:w-2/3">
       {isLoading && (
         <div className="flex justify-center">
           <Spinner />

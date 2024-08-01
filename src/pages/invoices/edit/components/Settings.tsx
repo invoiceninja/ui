@@ -41,7 +41,7 @@ export default function Settings() {
   };
 
   return (
-    <Card title={t('settings')}>
+    <Card title={t('settings')} className="w-full xl:w-2/3">
       <div className="grid grid-cols-12 gap-4 px-6">
         <div className="col-span-12 lg:col-span-6 space-y-6">
           <div className="space-y-2">
