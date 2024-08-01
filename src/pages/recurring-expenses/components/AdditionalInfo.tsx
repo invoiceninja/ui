@@ -10,20 +10,36 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import Toggle from '$app/components/forms/Toggle';
 import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
+import { useResolveCurrencySeparator } from '$app/pages/transactions/common/hooks/useResolveCurrencySeparator';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { RecurringExpenseCardProps } from './Details';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function AdditionalInfo(props: RecurringExpenseCardProps) {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
-
   const { recurringExpense, handleChange, errors } = props;
+
+  const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+
+  const resolveCurrency = useResolveCurrency();
+  const resolveCurrencySeparator = useResolveCurrencySeparator();
+
+  const [currencySeparators, setCurrencySeparators] =
+    useState<DecimalInputSeparators>({
+      decimalSeparator: ',',
+      precision: 2,
+      thousandSeparator: '.',
+    });
 
   const [convertCurrency, setConvertCurrency] = useState<boolean>();
 
@@ -47,46 +63,89 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
     handleChange('payment_date', dayjs().format('YYYY-MM-DD'));
   };
 
-  const onConvertCurrency = (checked: boolean) => {
-    if (!checked) {
-      handleChange('invoice_currency_id', '');
-      handleChange('exchange_rate', 0);
+  const onConvertedAmountChange = (value: number) => {
+    if (recurringExpense && value) {
+      handleChange('foreign_amount', value);
+
+      if (recurringExpense.amount) {
+        handleChange('exchange_rate', value / recurringExpense.amount);
+      }
+    } else {
       handleChange('foreign_amount', 0);
-
-      return;
     }
-
-    handleChange('exchange_rate', 1);
-    handleChange('foreign_amount', recurringExpense!.amount);
   };
 
   useEffect(() => {
-    if (convertCurrency) {
+    if (
+      recurringExpense &&
+      recurringExpense.exchange_rate &&
+      recurringExpense.invoice_currency_id
+    ) {
       handleChange(
         'foreign_amount',
-        recurringExpense!.amount * recurringExpense!.exchange_rate
+        recurringExpense.amount * recurringExpense.exchange_rate
       );
+    } else {
+      handleChange('foreign_amount', 0);
     }
   }, [recurringExpense?.amount]);
 
-  const onExchangeRateChange = (rate: string) => {
-    handleChange('exchange_rate', parseFloat(rate) || 1);
-    handleChange(
-      'foreign_amount',
-      recurringExpense!.amount * parseFloat(rate) || 1
-    );
-  };
+  useEffect(() => {
+    if (recurringExpense) {
+      handleChange('invoice_currency_id', recurringExpense.invoice_currency_id);
 
-  const onConvertedAmountChange = (amount: string) => {
-    handleChange(
-      'foreign_amount',
-      parseFloat(amount) || recurringExpense!.amount
-    );
-    handleChange(
-      'exchange_rate',
-      parseFloat(amount) / recurringExpense!.amount
-    );
-  };
+      if (recurringExpense.invoice_currency_id) {
+        const resolveConvertCurrency = resolveCurrency(
+          recurringExpense.invoice_currency_id
+        );
+
+        if (resolveConvertCurrency) {
+          handleChange('exchange_rate', resolveConvertCurrency.exchange_rate);
+
+          if (recurringExpense.amount) {
+            handleChange(
+              'foreign_amount',
+              recurringExpense.amount * resolveConvertCurrency.exchange_rate
+            );
+          }
+        }
+      } else {
+        handleChange('foreign_amount', 0);
+        handleChange('exchange_rate', 1);
+      }
+    } else {
+      handleChange('foreign_amount', 0);
+      handleChange('exchange_rate', 1);
+    }
+  }, [recurringExpense?.invoice_currency_id]);
+
+  useEffect(() => {
+    if (recurringExpense?.invoice_currency_id) {
+      const resolvedCurrencySeparators = resolveCurrencySeparator(
+        recurringExpense.invoice_currency_id
+      );
+
+      if (resolvedCurrencySeparators) {
+        setCurrencySeparators(resolvedCurrencySeparators);
+      }
+    }
+  }, [recurringExpense?.invoice_currency_id]);
+
+  useEffect(() => {
+    if (recurringExpense && recurringExpense.exchange_rate) {
+      handleChange('exchange_rate', recurringExpense.exchange_rate);
+
+      if (recurringExpense.amount && recurringExpense.invoice_currency_id) {
+        handleChange(
+          'foreign_amount',
+          recurringExpense.amount * recurringExpense.exchange_rate
+        );
+      }
+    } else {
+      handleChange('exchange_rate', 1);
+      handleChange('foreign_amount', 0);
+    }
+  }, [recurringExpense?.exchange_rate]);
 
   useEffect(() => {
     if (recurringExpense && typeof convertCurrency === 'undefined') {
@@ -158,11 +217,11 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
       {recurringExpense && (
         <Element
           leftSide={t('convert_currency')}
-          leftSideHelp={t('convert_currency_help')}
+          leftSideHelp={t('convert_expense_currency_help')}
         >
           <Toggle
             checked={convertCurrency || false}
-            onChange={onConvertCurrency}
+            onChange={(value: boolean) => setConvertCurrency(value)}
             cypressRef="convertCurrencyToggle"
           />
         </Element>
@@ -174,22 +233,37 @@ export function AdditionalInfo(props: RecurringExpenseCardProps) {
             <CurrencySelector
               value={recurringExpense.invoice_currency_id}
               onChange={(id) => handleChange('invoice_currency_id', id)}
+              dismissable
               errorMessage={errors?.errors.invoice_currency_id}
             />
           </Element>
 
           <Element leftSide={t('exchange_rate')}>
             <InputField
-              value={recurringExpense.exchange_rate}
-              onValueChange={onExchangeRateChange}
+              value={recurringExpense.exchange_rate.toFixed(5)}
+              onValueChange={(value) =>
+                handleChange('exchange_rate', parseFloat(value))
+              }
               errorMessage={errors?.errors.exchange_rate}
             />
           </Element>
 
           <Element leftSide={t('converted_amount')}>
-            <InputField
-              value={recurringExpense.foreign_amount}
-              onValueChange={onConvertedAmountChange}
+            <DecimalNumberInput
+              border
+              precision={
+                reactSettings?.number_precision &&
+                reactSettings?.number_precision > 0 &&
+                reactSettings?.number_precision <= 100
+                  ? reactSettings.number_precision
+                  : currencySeparators?.precision || 2
+              }
+              currency={currencySeparators}
+              className="auto"
+              initialValue={(recurringExpense.foreign_amount || 0).toString()}
+              onChange={(value: string) =>
+                onConvertedAmountChange(parseFloat(value))
+              }
               errorMessage={errors?.errors.foreign_amount}
             />
           </Element>

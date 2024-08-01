@@ -93,13 +93,12 @@ export default function RecurringInvoices() {
       title={t('recurring_invoices')}
       breadcrumbs={pages}
       docsLink="en/recurring-invoices/"
-      
     >
       <DataTable
         resource="recurring_invoice"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/recurring_invoices?include=client&filter_deleted_clients=true&sort=id|desc"
+        endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"

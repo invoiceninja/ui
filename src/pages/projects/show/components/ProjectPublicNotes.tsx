@@ -9,8 +9,10 @@
  */
 
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Project } from '$app/common/interfaces/project';
 import { InfoCard } from '$app/components/InfoCard';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -22,6 +24,8 @@ export function ProjectPublicNotes(props: Props) {
 
   const { project } = props;
 
+  const reactSettings = useReactSettings();
+
   return (
     <>
       {Boolean(project && project.public_notes) && (
@@ -31,7 +35,9 @@ export function ProjectPublicNotes(props: Props) {
             value={
               <div className="whitespace-normal max-h-56 overflow-y-auto">
                 <article
-                  className="prose prose-sm"
+                  className={classNames('prose prose-sm', {
+                    'prose-invert': reactSettings.dark_mode,
+                  })}
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHTML(project.public_notes),
                   }}
