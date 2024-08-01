@@ -37,6 +37,7 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Invoice as IInvoice } from '$app/common/interfaces/invoice';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { Context } from './components/EInvoice';
 
 export default function Edit() {
@@ -63,6 +64,7 @@ export default function Edit() {
 
   const { data } = useInvoiceQuery({ id });
 
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client | undefined>();

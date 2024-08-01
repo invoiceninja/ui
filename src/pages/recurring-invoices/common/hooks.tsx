@@ -162,7 +162,7 @@ export function useRecurringInvoiceUtilities(
           ...recurringInvoice,
           line_items: [
             ...recurringInvoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );

@@ -10,7 +10,6 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
 import { Payment } from '$app/common/interfaces/payment';
 import { Card } from '$app/components/cards';
@@ -20,8 +19,10 @@ import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
+import { useTranslation } from 'react-i18next';
 
 export function RecentPayments() {
+  const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
