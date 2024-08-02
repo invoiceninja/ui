@@ -51,6 +51,7 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
@@ -95,6 +96,8 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -167,7 +170,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            {
+              ...blankLineItem(),
+              type_id: InvoiceItemType.Product,
+              quantity: 1,
+            },
           ],
         }
     );
@@ -419,6 +426,18 @@ export function useActions() {
           {t('schedule')}
         </DropdownElement>
       ),
+    (credit) => (
+      <AddActivityComment
+        entity="credit"
+        entityId={credit.id}
+        label={`#${credit.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (credit) => (
       <DropdownElement
         to={route('/credits/:id/email', { id: credit.id })}
@@ -844,7 +863,9 @@ export function useCreditColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -868,7 +889,9 @@ export function useCreditColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}

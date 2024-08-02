@@ -47,6 +47,7 @@ import { Settings } from '$app/common/interfaces/company.interface';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useSelectorCustomStyles } from '$app/pages/reports/common/hooks/useSelectorCustomStyles';
+import { BsQuestionCircle } from 'react-icons/bs';
 
 interface Params {
   includeRemoveAction: boolean;
@@ -277,7 +278,15 @@ export function GatewaysTable(params: Params) {
           <Th>{t('status')}</Th>
           <Th>{t('label')}</Th>
           <Th>{t('test_mode')}</Th>
-          <Th></Th>
+          <Th disableUppercase>
+            <Tooltip
+              placement="top"
+              message={t('priority') as string}
+              width="auto"
+            >
+              <Icon element={BsQuestionCircle} color="white" size={20} />
+            </Tooltip>
+          </Th>
         </Thead>
 
         <DragDropContext onDragEnd={onDragEnd}>

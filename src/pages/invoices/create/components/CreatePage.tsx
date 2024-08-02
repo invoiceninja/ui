@@ -9,66 +9,49 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { invoiceSumAtom } from '../common/atoms';
-import { ClientSelector } from '../common/components/ClientSelector';
-import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { InvoicePreview } from '../common/components/InvoicePreview';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { ProductsTable } from '../common/components/ProductsTable';
-import { useProductColumns } from '../common/hooks/useProductColumns';
-import { useTaskColumns } from '../common/hooks/useTaskColumns';
-import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { Card } from '$app/components/cards';
-import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Client } from '$app/common/interfaces/client';
+import { ClientSelector } from '../../common/components/ClientSelector';
+import { InvoiceDetails } from '../../common/components/InvoiceDetails';
+import { ProductsTable } from '../../common/components/ProductsTable';
+import { useProductColumns } from '../../common/hooks/useProductColumns';
+import { useTaskColumns } from '../../common/hooks/useTaskColumns';
+import { useInvoiceUtilities } from '../hooks/useInvoiceUtilities';
+import { InvoiceFooter } from '../../common/components/InvoiceFooter';
+import { InvoiceTotals } from '../../common/components/InvoiceTotals';
+import { InvoicePreview } from '../../common/components/InvoicePreview';
+import { CreateInvoiceContext } from '../Create';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
-export interface Context {
-  invoice: Invoice | undefined;
-  setInvoice: Dispatch<SetStateAction<Invoice | undefined>>;
-  isDefaultTerms: boolean;
-  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
-  isDefaultFooter: boolean;
-  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
-  errors: ValidationBag | undefined;
-  client: Client | undefined;
-}
+export type ChangeHandler = <T extends keyof Invoice>(
+  property: T,
+  value: Invoice[typeof property]
+) => void;
 
-export default function Edit() {
+export default function CreatePage() {
   const [t] = useTranslation();
 
   const [searchParams] = useSearchParams();
 
-  const context: Context = useOutletContext();
+  const context: CreateInvoiceContext = useOutletContext();
   const {
     invoice,
-    isDefaultTerms,
-    setIsDefaultTerms,
-    isDefaultFooter,
-    setIsDefaultFooter,
     errors,
     client,
+    invoiceSum,
+    isDefaultFooter,
+    isDefaultTerms,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
   } = context;
 
-  const reactSettings = useReactSettings();
-
   const taskColumns = useTaskColumns();
+  const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
-
-  const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const {
     handleChange,
@@ -79,28 +62,30 @@ export default function Edit() {
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
 
-  const { changeTemplateVisible, setChangeTemplateVisible } =
-    useChangeTemplate();
+  const resetInvoiceForm = () => {
+    handleChange('client_id', '');
+    handleChange('tax_name1', '');
+    handleChange('tax_rate1', 0);
+    handleChange('tax_name2', '');
+    handleChange('tax_rate2', 0);
+    handleChange('tax_name3', '');
+    handleChange('tax_rate3', 0);
+
+    return true;
+  };
 
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {invoice && (
-            <div className="flex space-x-20">
-              <span className="text-sm">{t('status')}</span>
-              <InvoiceStatusBadge entity={invoice} />
-            </div>
-          )}
-
           <ClientSelector
             resource={invoice}
             onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
+            onClearButtonClick={resetInvoiceForm}
             onContactCheckboxChange={handleInvitationChange}
+            readonly={searchParams.get('project') === 'true'}
             errorMessage={errors?.errors.client_id}
-            textOnly
-            readonly
+            disableWithSpinner={searchParams.get('action') === 'create'}
           />
         </Card>
 
@@ -116,7 +101,7 @@ export default function Edit() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="product"
                   resource={invoice}
@@ -147,7 +132,7 @@ export default function Edit() {
             </div>
 
             <div>
-              {invoice && client ? (
+              {invoice ? (
                 <ProductsTable
                   type="task"
                   resource={invoice}
@@ -200,29 +185,17 @@ export default function Edit() {
         <div className="my-4">
           {invoice && (
             <InvoicePreview
-              for="invoice"
+              for="create"
               resource={invoice}
               entity="invoice"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
               observable={true}
               initiallyVisible={false}
-              withRemoveLogoCTA
             />
           )}
         </div>
       )}
-
-      {invoice ? (
-        <ChangeTemplateModal<IInvoice>
-          entity="invoice"
-          entities={[invoice]}
-          visible={changeTemplateVisible}
-          setVisible={setChangeTemplateVisible}
-          labelFn={(invoice) => `${t('number')}: ${invoice.number}`}
-          bulkUrl="/api/v1/invoices/bulk"
-        />
-      ) : null}
     </>
   );
 }

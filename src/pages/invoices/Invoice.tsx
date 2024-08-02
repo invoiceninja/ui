@@ -15,18 +15,24 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { useActions } from './edit/components/Actions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
-import { useAtom } from 'jotai';
 import { invoiceAtom } from './common/atoms';
-import { useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CommonActions } from './edit/components/CommonActions';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { EInvoiceComponent } from '../settings';
+import { useTabs } from './common/hooks/useTabs';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { cloneDeep } from 'lodash';
+import { v4 } from 'uuid';
+import { Client } from '$app/common/interfaces/client';
+import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
+import { Spinner } from '$app/components/Spinner';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 
 export default function Invoice() {
   const { documentTitle } = useTitle('edit_invoice');
@@ -35,14 +41,20 @@ export default function Invoice() {
 
   const { id } = useParams();
 
-  const eInvoiceRef = useRef<EInvoiceComponent>(null);
+  const [searchParams] = useSearchParams();
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
   const actions = useActions();
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const { data } = useInvoiceQuery({ id });
+
+  const [client, setClient] = useState<Client | undefined>();
+
+  const { calculateInvoiceSum } = useInvoiceUtilities({ client });
+
+  const [invoice, setInvoice] = useAtomWithPrevent(invoiceAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
@@ -50,21 +62,34 @@ export default function Invoice() {
 
   const save = useHandleSave({ setErrors, isDefaultTerms, isDefaultFooter });
 
+  const tabs = useTabs({ invoice });
+
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
   ];
 
-  const tabs: Tab[] = [
-    {
-      name: t('edit'),
-      href: route('/invoices/:id/edit', { id }),
-    },
-    {
-      name: t('e_invoice'),
-      href: route('/invoices/:id/e_invoice', { id }),
-    },
-  ];
+  useEffect(() => {
+    const isAnyAction = searchParams.get('action');
+
+    const currentInvoice = isAnyAction && invoice ? invoice : data;
+
+    if (currentInvoice) {
+      const _invoice = cloneDeep(currentInvoice);
+
+      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
+
+      setInvoice(_invoice);
+
+      if (_invoice?.client) {
+        setClient(_invoice.client);
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    invoice && calculateInvoiceSum(invoice);
+  }, [invoice]);
 
   return (
     <Default
@@ -76,15 +101,7 @@ export default function Invoice() {
             <ResourceActions
               resource={invoice}
               actions={actions}
-              onSaveClick={() => {
-                const currentEInvoice = eInvoiceRef?.current?.saveEInvoice();
-
-                invoice &&
-                  save({
-                    ...invoice,
-                    e_invoice: currentEInvoice ?? invoice.e_invoice,
-                  });
-              }}
+              onSaveClick={() => save(invoice)}
               disableSaveButton={
                 invoice &&
                 (invoice.status_id === InvoiceStatus.Cancelled ||
@@ -96,22 +113,28 @@ export default function Invoice() {
           topRight: <CommonActions invoice={invoice} />,
         })}
     >
-      <div className="space-y-4">
-        <Tabs tabs={tabs} />
+      {invoice?.id === id ? (
+        <div className="space-y-4">
+          <Tabs tabs={tabs} />
 
-        <Outlet
-          context={{
-            invoice,
-            setInvoice,
-            errors,
-            isDefaultTerms,
-            setIsDefaultTerms,
-            isDefaultFooter,
-            setIsDefaultFooter,
-            eInvoiceRef,
-          }}
-        />
-      </div>
+          <Outlet
+            context={{
+              invoice,
+              setInvoice,
+              errors,
+              isDefaultTerms,
+              setIsDefaultTerms,
+              isDefaultFooter,
+              setIsDefaultFooter,
+              client,
+            }}
+          />
+        </div>
+      ) : (
+        <div className="flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
     </Default>
   );
 }

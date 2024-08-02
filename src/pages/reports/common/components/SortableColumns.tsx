@@ -18,7 +18,6 @@ import {
 import { cloneDeep } from 'lodash';
 import { Record, clientMap } from '$app/common/constants/exports/client-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
-import { t } from 'i18next';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import { useTranslation } from 'react-i18next';
@@ -265,6 +264,7 @@ export function useColumns({ report, columns }: Props) {
 }
 
 export function SortableColumns({ report, columns }: Props) {
+  const [t] = useTranslation();
   const { update } = usePreferences();
   const { data, defaultColumns } = useColumns({ report, columns });
 

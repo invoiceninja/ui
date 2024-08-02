@@ -198,6 +198,7 @@ export function EmailSettings() {
                   handleChange('settings.gmail_sending_user_id', '0')
                 }
                 readonly={disableSettingsField('gmail_sending_user_id')}
+                withoutAction
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
               />
             </Element>

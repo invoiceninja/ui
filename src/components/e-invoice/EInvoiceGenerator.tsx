@@ -25,7 +25,7 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
-import { get, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
@@ -253,6 +253,22 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             (choiceKey) => !choiceKey.startsWith(componentKey)
           )
         );
+
+        const updatedComponentKey = componentKey
+          .split('|')
+          .filter((_, index) => index !== componentKey.split('|').length - 1)
+          .join('|');
+
+        const updatedPayload = cloneDeep(payload);
+
+        Object.keys(updatedPayload).forEach((key) => {
+          if (key.startsWith(updatedComponentKey)) {
+            delete updatedPayload[key];
+          }
+        });
+
+        setPayload(updatedPayload);
+
         setCurrentAvailableGroups((current) => [...current, deletedComponent]);
       }
     };
@@ -328,7 +344,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           .join('|')
           .replaceAll('|', '.');
 
-        const currentFieldValue = get(currentEInvoice, fieldPath);
+        const updatedCurrentEInvoice = cloneDeep(currentEInvoice);
+
+        allAvailableGroups.forEach((currentGroup) => {
+          const updatedGroupKey = currentGroup.key
+            .split('|')
+            .filter(
+              (_, index) => index !== currentGroup.key.split('|').length - 1
+            )
+            .join('|')
+            .replaceAll('|', '.');
+
+          const groupValue = get(updatedCurrentEInvoice, updatedGroupKey);
+
+          if (element && groupValue && Array.isArray(groupValue)) {
+            set(updatedCurrentEInvoice, updatedGroupKey, { ...groupValue[0] });
+          }
+        });
+
+        const currentFieldValue = get(updatedCurrentEInvoice, fieldPath);
 
         const defaultValue =
           element.base_type === 'boolean'
@@ -1052,6 +1086,35 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
             .join('|');
 
           set(formattedPayload, updatedPath.replaceAll('|', '.'), value);
+        }
+      });
+
+      allAvailableGroups.forEach((currentGroup) => {
+        const updatedGroupKey = currentGroup.key
+          .split('|')
+          .filter(
+            (_, index) => index !== currentGroup.key.split('|').length - 1
+          )
+          .join('|')
+          .replaceAll('|', '.');
+
+        const groupValue = get(formattedPayload, updatedGroupKey);
+
+        let element: ElementType | undefined;
+
+        Object.values(components).forEach((component) => {
+          const groupKeysLength = currentGroup.key.split('|').length;
+          const elementName = currentGroup.key.split('|')[groupKeysLength - 2];
+
+          if (component && !element) {
+            element = Object.values(component?.elements || {}).find(
+              ({ name }) => name === elementName
+            );
+          }
+        });
+
+        if (element && groupValue && element.max_occurs === -1) {
+          set(formattedPayload, updatedGroupKey, [{ ...groupValue }]);
         }
       });
 

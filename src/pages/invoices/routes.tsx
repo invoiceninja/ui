@@ -24,8 +24,23 @@ const Create = lazy(() => import('$app/pages/invoices/create/Create'));
 const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/invoices/email/Email'));
-const EInvoice = lazy(
-  () => import('$app/pages/invoices/edit/components/EInvoice')
+const Documents = lazy(
+  () => import('$app/pages/invoices/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/invoices/edit/components/Settings')
+);
+const Activities = lazy(
+  () => import('$app/pages/invoices/edit/components/Activities')
+);
+const History = lazy(
+  () => import('$app/pages/invoices/edit/components/History')
+);
+const EmailHistory = lazy(
+  () => import('$app/pages/invoices/edit/components/EmailHistory')
+);
+const CreatePage = lazy(
+  () => import('$app/pages/invoices/create/components/CreatePage')
 );
 
 export const invoiceRoutes = (
@@ -58,6 +73,7 @@ export const invoiceRoutes = (
         />
       }
     />
+
     <Route
       path="create"
       element={
@@ -69,7 +85,12 @@ export const invoiceRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
+
     <Route
       path=":id"
       element={
@@ -87,8 +108,13 @@ export const invoiceRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
-      <Route path="e_invoice" element={<EInvoice />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+      <Route path="email_history" element={<EmailHistory />} />
     </Route>
+
     <Route
       path=":id/pdf"
       element={

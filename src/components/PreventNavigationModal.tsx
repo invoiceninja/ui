@@ -72,14 +72,10 @@ export function PreventNavigationModal() {
 
     if (blockedNavigationAction) {
       if (url) {
-        if (url === 'back') {
-          lastNonPreventedLocation && navigate(lastNonPreventedLocation);
+        if (externalLink) {
+          window.open(url, '_blank');
         } else {
-          if (externalLink) {
-            window.open(url, '_blank');
-          } else {
-            navigate(url);
-          }
+          navigate(url);
         }
       }
 

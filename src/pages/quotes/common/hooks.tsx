@@ -51,6 +51,7 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
@@ -100,6 +101,8 @@ import {
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -172,7 +175,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -436,6 +439,18 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </DropdownElement>
       ),
+    (quote) => (
+      <AddActivityComment
+        entity="quote"
+        entityId={quote.id}
+        label={`#${quote.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/email', { id: quote.id })}
@@ -896,7 +911,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
@@ -920,7 +937,9 @@ export function useQuoteColumns() {
           tooltipElement={
             <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
               <article
-                className="prose prose-sm"
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHTML(value as string),
                 }}
