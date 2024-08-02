@@ -44,7 +44,7 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Tooltip } from '$app/components/Tooltip';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { EmailRecord } from '$app/components/EmailRecord';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -57,6 +57,8 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
+import { ViewLineItemExpense } from './ViewLineItemExpense';
+import { ViewLineItemTask } from './ViewLineItemTask';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -391,6 +393,25 @@ export function InvoiceSlider() {
                   ))
               )}
           </div>
+
+          {invoice && (
+            <div className="flex flex-col px-6 py-2">
+              {invoice.line_items.map(
+                (lineItem, index) =>
+                  (lineItem.expense_id || lineItem.task_id) && (
+                    <React.Fragment key={index}>
+                      {lineItem.expense_id && (
+                        <ViewLineItemExpense expenseId={lineItem.expense_id} />
+                      )}
+
+                      {lineItem.task_id && (
+                        <ViewLineItemTask taskId={lineItem.task_id} />
+                      )}
+                    </React.Fragment>
+                  )
+              )}
+            </div>
+          )}
         </div>
 
         <div>
