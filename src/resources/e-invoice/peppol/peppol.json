@@ -494,7 +494,7 @@
             "max_occurs": 1,
             "help": "The date of the Invoice, used to indicate the point at which tax becomes applicable.",
             "namespace": "cbc",
-            "visibility": 7
+            "visibility": 0
           },
           "DocumentCurrencyCode": {
             "name": "DocumentCurrencyCode",
@@ -1183,7 +1183,7 @@
             "pattern": null,
             "min_occurs": 0,
             "max_occurs": 1,
-            "visibility": 0
+            "visibility": 7
           },
           "listID": {
             "name": "listID",
@@ -1249,7 +1249,7 @@
             "pattern": null,
             "min_occurs": 0,
             "max_occurs": 1,
-            "visibility": 0
+            "visibility": 7
           },
           "languageID": {
             "name": "languageID",
@@ -6203,7 +6203,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "AccountFormatCode": {
             "name": "AccountFormatCode",
@@ -6216,7 +6216,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "CurrencyCode": {
             "name": "CurrencyCode",
@@ -6229,7 +6229,7 @@
             "max_occurs": 1,
             "min_occurs": 0,
             "namespace": "cbc",
-            "visibility": 0
+            "visibility": 7
           },
           "PaymentNote": {
             "name": "PaymentNote",
