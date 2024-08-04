@@ -31,7 +31,7 @@ export enum ModuleBitmask {
   Expenses = 16,
   RecurringExpenses = 512,
   PurchaseOrders = 16384,
-  Transactions = 32768,
+  Transactions = 256, // old: 32768 
 }
 
 export const modules: Module[] = [
