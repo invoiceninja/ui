@@ -333,7 +333,6 @@ export function useResolveInputField(props: Props) {
           clearButton
           onClearButtonClick={() => handleProductChange(index, '', null)}
           displayStockQuantity={location.pathname.startsWith('/invoices')}
-          onInputValueChange={(value) => onChange(property, value, index)}
         />
       );
     }
