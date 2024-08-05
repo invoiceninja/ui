@@ -29,7 +29,6 @@ interface Props {
   onInputFocus?: () => unknown;
   errorMessage?: string | string[];
   displayStockQuantity?: boolean;
-  onInputValueChange?: (inputValue: string) => void;
 }
 
 export function ProductSelector(props: Props) {
@@ -90,7 +89,6 @@ export function ProductSelector(props: Props) {
           visible: hasPermission('create_product'),
         }}
         onDismiss={props.onClearButtonClick}
-        onInputValueChange={props.onInputValueChange}
         sortBy="product_key|asc"
         nullable
         key="product_selector"
