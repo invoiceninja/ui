@@ -132,7 +132,9 @@ export function Registration() {
       <Element
         leftSide={t('registration_url')}
       >
+        
         <CopyToClipboard text={`${company?.portal_domain}/client/register?company_key=${company?.company_key}`} />
+
       </Element>
       )}
 
