@@ -64,7 +64,6 @@ export interface ComboboxStaticProps<T = any> {
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
   isDataLoading?: boolean;
-  onInputValueChange?: (value: string) => void;
 }
 
 export type Nullable<T> = T | null;
@@ -105,7 +104,6 @@ export function Combobox<T = any>({
   clearInputAfterSelection,
   onEmptyValues,
   onFocus,
-  onInputValueChange,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -331,7 +329,6 @@ export function Combobox<T = any>({
                 onFocus();
               }
             }}
-            onBlur={() => onInputValueChange?.(inputValue ?? '')}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
             defaultValue={
@@ -786,7 +783,6 @@ export interface ComboboxAsyncProps<T> {
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
-  onInputValueChange?: (value: string) => void;
 }
 
 export function ComboboxAsync<T = any>({
@@ -807,7 +803,6 @@ export function ComboboxAsync<T = any>({
   disableWithQueryParameter,
   errorMessage,
   clearInputAfterSelection,
-  onInputValueChange,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -973,7 +968,6 @@ export function ComboboxAsync<T = any>({
         clearInputAfterSelection={clearInputAfterSelection}
         isDataLoading={isLoading}
         onFocus={() => setEnableQuery(true)}
-        onInputValueChange={onInputValueChange}
       />
     );
   }
@@ -996,7 +990,6 @@ export function ComboboxAsync<T = any>({
       errorMessage={errorMessage}
       clearInputAfterSelection={clearInputAfterSelection}
       isDataLoading={isLoading}
-      onInputValueChange={onInputValueChange}
     />
   );
 }
