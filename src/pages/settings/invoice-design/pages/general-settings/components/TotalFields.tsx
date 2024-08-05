@@ -26,7 +26,7 @@ export default function TotalFields() {
     { value: '$custom_surcharge4', label: t('custom_surcharge4') },
     { value: '$paid_to_date', label: t('paid_to_date') },
     { value: '$total', label: t('total') },
-    { value: '$outstanding', label: t('outstanding') },
+    { value: '$outstanding', label: t('balance_due') },
   ];
 
   return (
