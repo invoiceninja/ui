@@ -327,9 +327,7 @@ export function Combobox<T = any>({
         >
           <input
             type="text"
-            onChange={(e) => {
-              handleInputChange(e.target.value);
-            }}
+            onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => {
               setIsOpen(true);
@@ -350,6 +348,7 @@ export function Combobox<T = any>({
               borderColor: colors.$5,
               color: colors.$3,
             }}
+            data-cy="comboboxInput"
             tabIndex={-1}
           />
 
