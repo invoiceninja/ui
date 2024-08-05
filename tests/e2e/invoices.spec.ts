@@ -770,8 +770,6 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
 test('Second and Third Custom email sending template is displayed', async ({
   page,
 }) => {
-  await page.waitForTimeout(15000);
-
   await login(page);
 
   await page
