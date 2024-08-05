@@ -29,6 +29,7 @@ interface Props {
   onInputFocus?: () => unknown;
   errorMessage?: string | string[];
   displayStockQuantity?: boolean;
+  onInputValueChange?: (value: string) => void;
 }
 
 export function ProductSelector(props: Props) {
@@ -83,6 +84,7 @@ export function ProductSelector(props: Props) {
           ),
         }}
         onChange={(product) => props.onChange && props.onChange(product)}
+        onInputValueChange={props.onInputValueChange}
         action={{
           label: t('new_product'),
           onClick: () => setIsModalOpen(true),

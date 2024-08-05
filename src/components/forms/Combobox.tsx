@@ -64,6 +64,7 @@ export interface ComboboxStaticProps<T = any> {
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
   isDataLoading?: boolean;
+  onInputValueChange?: (value: string) => void;
 }
 
 export type Nullable<T> = T | null;
@@ -104,6 +105,7 @@ export function Combobox<T = any>({
   clearInputAfterSelection,
   onEmptyValues,
   onFocus,
+  onInputValueChange,
 }: ComboboxStaticProps<T>) {
   const [inputValue, setInputValue] = useState(
     String(inputOptions.value ?? '')
@@ -113,6 +115,7 @@ export function Combobox<T = any>({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const selectorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   let filteredOptions =
@@ -277,6 +280,10 @@ export function Combobox<T = any>({
     onChange(option);
   });
 
+  useClickAway(selectorRef, () => {
+    onInputValueChange?.(inputValue);
+  });
+
   useDebounce(
     () => {
       if (inputValue === '' && filteredOptions.length > 0) {
@@ -320,7 +327,9 @@ export function Combobox<T = any>({
         >
           <input
             type="text"
-            onChange={(e) => handleInputChange(e.target.value)}
+            onChange={(e) => {
+              handleInputChange(e.target.value);
+            }}
             onKeyDown={handleKeyDown}
             onFocus={() => {
               setIsOpen(true);
@@ -783,6 +792,7 @@ export interface ComboboxAsyncProps<T> {
   disableWithQueryParameter?: boolean;
   errorMessage?: string | string[];
   clearInputAfterSelection?: boolean;
+  onInputValueChange?: (value: string) => void;
 }
 
 export function ComboboxAsync<T = any>({
@@ -803,6 +813,7 @@ export function ComboboxAsync<T = any>({
   disableWithQueryParameter,
   errorMessage,
   clearInputAfterSelection,
+  onInputValueChange,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
@@ -968,6 +979,7 @@ export function ComboboxAsync<T = any>({
         clearInputAfterSelection={clearInputAfterSelection}
         isDataLoading={isLoading}
         onFocus={() => setEnableQuery(true)}
+        onInputValueChange={onInputValueChange}
       />
     );
   }
@@ -990,6 +1002,7 @@ export function ComboboxAsync<T = any>({
       errorMessage={errorMessage}
       clearInputAfterSelection={clearInputAfterSelection}
       isDataLoading={isLoading}
+      onInputValueChange={onInputValueChange}
     />
   );
 }
