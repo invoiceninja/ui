@@ -20,7 +20,6 @@ import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskStatusQuery } from '$app/common/queries/task-statuses';
 import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
@@ -117,7 +116,7 @@ export function Edit() {
           />
         )
       }
-      breadcrumbs={[]}
+      breadcrumbs={pages}
     >
       {!taskStatus && (
         <div className="flex justify-center">
@@ -126,8 +125,7 @@ export function Edit() {
       )}
 
       {taskStatus && (
-        <Container className="space-y-6" breadcrumbs={pages}>
-
+        <div className="max-w-3xl">
           <Card
             title={documentTitle}
             withSaveButton
@@ -165,7 +163,7 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-        </Container>
+        </div>
       )}
     </Settings>
   );
