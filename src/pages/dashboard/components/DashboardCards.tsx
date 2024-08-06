@@ -24,6 +24,7 @@ interface DashboardCardsProps {
   dateRange: string;
   startDate: string;
   endDate: string;
+  currencyId: string;
 }
 
 interface CardProps extends DashboardCardsProps {
@@ -38,7 +39,7 @@ export const PERIOD_LABELS = {
 function Card(props: CardProps) {
   const [t] = useTranslation();
 
-  const { dateRange, startDate, endDate, field } = props;
+  const { dateRange, startDate, endDate, field, currencyId } = props;
 
   const queryClient = useQueryClient();
   const formatMoney = useFormatMoney();
@@ -58,6 +59,7 @@ function Card(props: CardProps) {
         calculation: field.calculate,
         period: field.period,
         format: field.format,
+        currency_id: currencyId,
       })
         .then((response) => setResponseData(response.data))
         .finally(() => setIsFormBusy(false))
@@ -93,7 +95,7 @@ function Card(props: CardProps) {
 }
 
 export function DashboardCards(props: DashboardCardsProps) {
-  const { dateRange, startDate, endDate } = props;
+  const { dateRange, startDate, endDate, currencyId } = props;
 
   const currentUser = useCurrentUser();
 
@@ -116,6 +118,7 @@ export function DashboardCards(props: DashboardCardsProps) {
           dateRange={dateRange}
           startDate={startDate}
           endDate={endDate}
+          currencyId={currencyId}
         />
       ))}
     </div>

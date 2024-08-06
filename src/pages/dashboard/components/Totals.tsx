@@ -315,6 +315,7 @@ export function Totals() {
         dateRange={dateRange}
         startDate={dates.start_date}
         endDate={dates.end_date}
+        currencyId={currency.toString()}
       />
 
       <div className="grid grid-cols-12 mt-4 gap-4">
