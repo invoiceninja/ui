@@ -107,14 +107,14 @@ export function LimitsAndFees(props: Props) {
                 type="number"
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit
+                    ?.min_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
                 }
                 disabled={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit === -1
+                    ?.min_limit === -1
                 }
                 errorMessage={props.errors?.errors.min_limit}
               />
@@ -122,7 +122,7 @@ export function LimitsAndFees(props: Props) {
               <Toggle
                 checked={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .min_limit >= 0
+                    ?.min_limit >= 0
                 }
                 label={t('enable_min')}
                 onValueChange={(value) =>
@@ -138,14 +138,14 @@ export function LimitsAndFees(props: Props) {
                 type="number"
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit
+                    ?.max_limit
                 }
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
                 }
                 disabled={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit === -1
+                    ?.max_limit === -1
                 }
                 errorMessage={props.errors?.errors.max_limit}
               />
@@ -153,7 +153,7 @@ export function LimitsAndFees(props: Props) {
               <Toggle
                 checked={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                    .max_limit >= 0
+                    ?.max_limit >= 0
                 }
                 label={t('enable_max')}
                 onValueChange={(value) =>
@@ -170,7 +170,7 @@ export function LimitsAndFees(props: Props) {
               type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_percent
+                  ?.fee_percent
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
@@ -184,7 +184,7 @@ export function LimitsAndFees(props: Props) {
               type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_amount
+                  ?.fee_amount
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
@@ -276,7 +276,7 @@ export function LimitsAndFees(props: Props) {
               type="number"
               value={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .fee_cap
+                  ?.fee_cap
               }
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))
@@ -289,7 +289,7 @@ export function LimitsAndFees(props: Props) {
             <Toggle
               checked={
                 props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
-                  .adjust_fee_percent
+                  ?.adjust_fee_percent
               }
               label={t('adjust_fee_percent_help')}
               onValueChange={(value) =>
