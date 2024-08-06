@@ -138,9 +138,20 @@ export function Settings() {
           }
         >
           <div className="flex flex-col space-y-1">
-            <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+            
+            {isSelfHosted() && (
+              <CopyToClipboard text={`${company?.portal_domain}/client/login?company_key=${company?.company_key}`} />
+            )}
 
-            {isHosted() && company.portal_mode === 'domain' && (
+            {(isHosted() && company.portal_mode === 'domain') && (
+            <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+            )}
+
+            {(isHosted() && company.portal_mode === 'subdomain') && (
+              <CopyToClipboard text={`${company?.subdomain}.invoicing.co/client/login`} />
+            )}
+
+            {(isHosted() && company.portal_mode === 'domain') && (
               <div>
                 <span>{t('app_help_link')}</span>
                 <Link

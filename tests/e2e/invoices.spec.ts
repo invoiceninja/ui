@@ -1039,3 +1039,98 @@ test('Prevent back button', async ({ page }) => {
 
   await logout(page);
 });
+
+test('Products combobox various selections', async ({ page }) => {
+  await login(page);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Invoice' })
+    .click();
+
+  await page.waitForTimeout(1000);
+
+  await page.getByRole('option').first().click();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').first().click();
+
+  await page.waitForTimeout(500);
+
+  await page.locator('[data-combobox-element-id="0"]').first().click();
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').first().inputValue()) ===
+      'Et aliquid soluta.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(1).click();
+
+  await page.waitForTimeout(500);
+
+  await page.locator('[data-cy="comboboxInput"]').nth(1).fill('Qui');
+
+  await page.waitForTimeout(200);
+
+  await page.locator('[data-combobox-element-id="0"]').first().click();
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').nth(1).inputValue()) ===
+      'Et aliquid soluta.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(2).click();
+
+  await page.waitForTimeout(500);
+
+  await page.keyboard.press('ArrowDown');
+
+  await page.waitForTimeout(50);
+
+  await page.keyboard.press('ArrowDown');
+
+  await page.keyboard.press('Enter');
+
+  await page.waitForTimeout(100);
+
+  expect(
+    (await page.locator('[id="notes"]').nth(2).inputValue()) ===
+      'Atque non quibusdam.'
+  ).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Add Item' }).first().click();
+
+  await page.locator('[data-cy="comboboxInput"]').nth(3).click();
+
+  await page.waitForTimeout(500);
+
+  await page
+    .locator('[data-cy="comboboxInput"]')
+    .nth(3)
+    .fill('test product name');
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+
+  expect(
+    (await page.locator('[data-cy="comboboxInput"]').nth(3).inputValue()) ===
+      'test product name'
+  ).toBeTruthy();
+
+  await logout(page);
+});

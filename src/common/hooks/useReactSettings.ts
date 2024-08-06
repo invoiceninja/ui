@@ -98,7 +98,7 @@ export const preferencesDefaults: Preferences = {
   reports: {
     columns: {},
   },
-  auto_expand_product_table_notes: true,
+  auto_expand_product_table_notes: false,
 };
 
 interface Options {

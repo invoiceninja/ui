@@ -19,7 +19,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaxRateQuery } from '$app/common/queries/tax-rates';
-import { Container } from '$app/components/Container';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
@@ -103,8 +102,8 @@ export function Create() {
   }, [blankTaxRate]);
 
   return (
-    <Settings title={t('tax_rates')} breadcrumbs={[]}>
-      <Container className="space-y-6" breadcrumbs={pages}>
+    <Settings title={t('tax_rates')} breadcrumbs={pages}>
+      <div className="max-w-3xl">
         <Card
           title={documentTitle}
           withSaveButton
@@ -133,7 +132,7 @@ export function Create() {
             />
           </CardContainer>
         </Card>
-      </Container>
+      </div>
     </Settings>
   );
 }
