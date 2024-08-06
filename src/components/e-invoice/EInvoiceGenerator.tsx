@@ -25,7 +25,7 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 import { SearchableSelect } from '../SearchableSelect';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import RandExp from 'randexp';
-import { cloneDeep, get, set } from 'lodash';
+import { cloneDeep, flatMapDeep, get, isObject, keys, set } from 'lodash';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
 import { Spinner } from '../Spinner';
@@ -44,6 +44,7 @@ export type Payload = Record<string, string | number | boolean>;
 interface AvailableGroup {
   key: string;
   label: string;
+  multiSelection: boolean;
 }
 
 interface Resource {
@@ -169,6 +170,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const [currentAvailableGroups, setCurrentAvailableGroups] = useState<
       AvailableGroup[]
     >([]);
+    const [selectedMultiSelectionGroups, setSelectedMultiSelectionGroups] =
+      useState<AvailableGroup[]>([]);
+    const [deletedMultiSelectionGroups, setDeletedMultiSelectionGroups] =
+      useState<AvailableGroup[]>([]);
     const [allAvailableGroups, setAllAvailableGroups] = useState<
       AvailableGroup[]
     >([]);
@@ -193,7 +198,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const isFieldChoice = (fieldKey: string) => {
       const keysLength = fieldKey.split('|').length;
       if (keysLength > 1) {
-        const parentComponentType = fieldKey.split('|')[keysLength - 2];
+        const isFromMultiSelectionGroup = doesKeyContainsNumber(fieldKey);
+
+        const parentComponentType =
+          fieldKey.split('|')[keysLength - (isFromMultiSelectionGroup ? 4 : 2)];
 
         const fieldName = fieldKey.split('|')[keysLength - 1];
 
@@ -238,25 +246,40 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         doesKeyStartsWithAnyResolvedComplexType(key);
 
       const isFieldFromSelectedGroup = !doesKeyStartsWithAnyGroupType(key);
+      const isFieldFromSelectedMultiSelectionGroup =
+        doesKeyStartsWithAnyMultiSelectionGroupType(key);
 
-      return isFieldFromResolvedComplexType || isFieldFromSelectedGroup;
+      return (
+        isFieldFromResolvedComplexType ||
+        isFieldFromSelectedGroup ||
+        isFieldFromSelectedMultiSelectionGroup
+      );
     };
 
-    const handleDeleteComponent = (componentKey: string) => {
+    const handleDeleteComponent = (
+      componentKey: string,
+      isMultiSelection: boolean
+    ) => {
       const deletedComponent = allAvailableGroups.find(
         ({ key }) => key === componentKey
       );
 
-      if (deletedComponent) {
+      if (deletedComponent || isMultiSelection) {
         setSelectedChoices((currentChoices) =>
           currentChoices.filter(
             (choiceKey) => !choiceKey.startsWith(componentKey)
           )
         );
 
+        const isMultiSelectionKey = doesKeyContainsNumber(componentKey);
+
         const updatedComponentKey = componentKey
           .split('|')
-          .filter((_, index) => index !== componentKey.split('|').length - 1)
+          .filter(
+            (_, index) =>
+              index !==
+              componentKey.split('|').length - (isMultiSelectionKey ? 2 : 1)
+          )
           .join('|');
 
         const updatedPayload = cloneDeep(payload);
@@ -269,7 +292,26 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
 
         setPayload(updatedPayload);
 
-        setCurrentAvailableGroups((current) => [...current, deletedComponent]);
+        if (isMultiSelection) {
+          const currentDeletedMultiSelectionGroup =
+            selectedMultiSelectionGroups.find(
+              (group) => group.key === componentKey
+            );
+
+          if (currentDeletedMultiSelectionGroup) {
+            setDeletedMultiSelectionGroups((current) => [
+              ...current,
+              currentDeletedMultiSelectionGroup,
+            ]);
+          }
+        } else {
+          if (deletedComponent) {
+            setCurrentAvailableGroups((current) => [
+              ...current,
+              deletedComponent,
+            ]);
+          }
+        }
       }
     };
 
@@ -285,6 +327,25 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         const updatedCurrentType = currentType.key
           .split('|')
           .filter((_, index) => index !== typeKeysLength - 1)
+          .join('|');
+
+        return updatedCurrentType
+          .split('|')
+          .every((type, index) => type === currentKey.split('|')[index]);
+      });
+    };
+
+    const doesKeyStartsWithAnyMultiSelectionGroupType = (
+      currentKey: string
+    ) => {
+      return selectedMultiSelectionGroups.some((currentType) => {
+        const typeKeysLength = currentType.key.split('|').length;
+        const updatedCurrentType = currentType.key
+          .split('|')
+          .filter(
+            (_, index) =>
+              index !== typeKeysLength - 1 && index !== typeKeysLength - 2
+          )
           .join('|');
 
         return updatedCurrentType
@@ -344,25 +405,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           .join('|')
           .replaceAll('|', '.');
 
-        const updatedCurrentEInvoice = cloneDeep(currentEInvoice);
-
-        allAvailableGroups.forEach((currentGroup) => {
-          const updatedGroupKey = currentGroup.key
-            .split('|')
-            .filter(
-              (_, index) => index !== currentGroup.key.split('|').length - 1
-            )
-            .join('|')
-            .replaceAll('|', '.');
-
-          const groupValue = get(updatedCurrentEInvoice, updatedGroupKey);
-
-          if (element && groupValue && Array.isArray(groupValue)) {
-            set(updatedCurrentEInvoice, updatedGroupKey, { ...groupValue[0] });
-          }
-        });
-
-        const currentFieldValue = get(updatedCurrentEInvoice, fieldPath);
+        const currentFieldValue = get(currentEInvoice, fieldPath);
 
         const defaultValue =
           element.base_type === 'boolean'
@@ -683,7 +726,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       component: Component,
       componentIndex: number,
       componentPath: string,
-      isFirstLevelComponent: boolean
+      isFirstLevelComponent: boolean,
+      isResolvingComplexType: boolean,
+      isComponentMultiSelectionComplexType: boolean
     ) => {
       const componentKey = `${componentPath}|${component.type}`;
 
@@ -695,10 +740,16 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         (currentType) => componentKey === currentType.key
       );
 
+      const isSelectedAsMultiSelectionGroup = selectedMultiSelectionGroups.some(
+        (currentType) => componentKey === currentType.key
+      );
+
       const shouldBeRendered =
-        !currentGroupsList.some(
+        (!currentGroupsList.some(
           (currentType) => componentKey === currentType.key
-        ) && isIncludedInAllGroups;
+        ) &&
+          isIncludedInAllGroups) ||
+        isSelectedAsMultiSelectionGroup;
 
       return (
         <Container
@@ -816,6 +867,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                         availableGroups.push({
                           key: componentKeyPath,
                           label,
+                          multiSelection: Boolean(element.max_occurs === -1),
                         });
                       }
                     }
@@ -829,6 +881,11 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                         currentAvailableGroups
                       );
 
+                    const isTypeFromMultiSelectionGroup =
+                      doesKeyStartsWithAnyMultiSelectionGroupType(
+                        componentKeyPath
+                      );
+
                     const isComplexTypeGroup = currentTypesList.find(
                       (group) => group.key === componentKeyPath
                     );
@@ -837,56 +894,104 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                       isElementVisible &&
                       ((isFirstLevelComponent && !isComplexTypeGroup) ||
                         isTypeFromSelectedGroup ||
+                        isTypeFromMultiSelectionGroup ||
                         shouldResolvingComponentBeRenderedByParent);
+
+                    const isMultiSelectionComplexType =
+                      element.max_occurs === -1 &&
+                      !isComponentMultiSelectionComplexType;
+
+                    const complexTypesList = isMultiSelectionComplexType
+                      ? selectedMultiSelectionGroups
+                          .filter((group) => {
+                            const groupKeysLength = group.key.split('|').length;
+                            const updatedCurrentGroupKey = group.key
+                              .split('|')
+                              .filter(
+                                (_, index) => index !== groupKeysLength - 1
+                              )
+                              .join('|');
+
+                            return updatedCurrentGroupKey === componentKeyPath;
+                          })
+                          .map(() => element)
+                      : [element];
 
                     return (
                       <>
                         {shouldResolvingComponentBeRendered &&
                           isAnyElementOfNewComponentVisible && (
-                            <div
-                              key={componentKeyPath}
-                              className="flex items-center space-x-4 mt-1"
-                            >
-                              <div
-                                className="flex flex-1 items-center py-2 border-b border-t justify-between"
-                                style={{ borderColor: colors.$5 }}
-                              >
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm">
-                                    {getElementName(element.name)}
-                                  </span>
+                            <>
+                              {complexTypesList.map(
+                                (currentElement, index) =>
+                                  (!deletedMultiSelectionGroups.some(
+                                    (currentGroup) =>
+                                      currentGroup.key ===
+                                      `${componentKeyPath}|${index}`
+                                  ) ||
+                                    !isMultiSelectionComplexType) && (
+                                    <div
+                                      key={`${componentKeyPath}${index}`}
+                                      className="flex items-center space-x-4 mt-1"
+                                    >
+                                      <div
+                                        className="flex flex-1 items-center py-2 border-b border-t justify-between"
+                                        style={{ borderColor: colors.$5 }}
+                                      >
+                                        <div className="flex flex-col space-y-1">
+                                          <span className="text-sm">
+                                            {complexTypesList.length === 1
+                                              ? getElementName(
+                                                  currentElement.name
+                                                )
+                                              : `${getElementName(
+                                                  currentElement.name
+                                                )} (${index + 1})`}
+                                          </span>
 
-                                  {element.help && (
-                                    <span className="text-xs">
-                                      {element.help}
-                                    </span>
-                                  )}
-                                </div>
+                                          {currentElement.help && (
+                                            <span className="text-xs">
+                                              {currentElement.help}
+                                            </span>
+                                          )}
+                                        </div>
 
-                                <div
-                                  className="cursor-pointer"
-                                  onClick={() =>
-                                    setResolvedComplexTypes((current) => [
-                                      ...current,
-                                      componentKeyPath,
-                                    ])
-                                  }
-                                >
-                                  <Icon element={MdAdd} size={27} />
-                                </div>
-                              </div>
+                                        <div
+                                          className="cursor-pointer"
+                                          onClick={() =>
+                                            setResolvedComplexTypes(
+                                              (current) => [
+                                                ...current,
+                                                isMultiSelectionComplexType
+                                                  ? `${componentKeyPath}|${index}`
+                                                  : componentKeyPath,
+                                              ]
+                                            )
+                                          }
+                                        >
+                                          <Icon element={MdAdd} size={27} />
+                                        </div>
+                                      </div>
 
-                              {isComplexTypeGroup && (
-                                <div
-                                  className="cursor-pointer"
-                                  onClick={() =>
-                                    handleDeleteComponent(componentKeyPath)
-                                  }
-                                >
-                                  <Icon element={MdDelete} size={28} />
-                                </div>
+                                      {isComplexTypeGroup && (
+                                        <div
+                                          className="cursor-pointer"
+                                          onClick={() =>
+                                            handleDeleteComponent(
+                                              isMultiSelectionComplexType
+                                                ? `${componentKeyPath}|${index}`
+                                                : componentKeyPath,
+                                              isMultiSelectionComplexType
+                                            )
+                                          }
+                                        >
+                                          <Icon element={MdDelete} size={28} />
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
                               )}
-                            </div>
+                            </>
                           )}
                       </>
                     );
@@ -921,13 +1026,35 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       };
     };
 
+    const doesKeyContainsNumber = (key: string) => {
+      return /\d/.test(key);
+    };
+
+    const buildPaths = (currentEInvoice: EInvoiceType, path = ''): string[] => {
+      return flatMapDeep(keys(currentEInvoice), (key) => {
+        const value = currentEInvoice[key];
+        const newPath = path ? `${path}.${key}` : key;
+        if (isObject(value)) {
+          return buildPaths(value, newPath);
+        }
+        return newPath;
+      });
+    };
+
+    const generatePaths = (currentEInvoice: EInvoiceType, currentPath = '') => {
+      return buildPaths(currentEInvoice, currentPath);
+    };
+
     const checkValidation = () => {
       let updatedErrors: ValidationBag = { errors: {}, message: '' };
 
       Object.entries(payload).forEach(([key, value]) => {
+        const isFromMultiSelectionGroup = doesKeyContainsNumber(key);
+
         const keysLength = key.split('|').length;
         const fieldKey = key.split('|')[keysLength - 1];
-        const firstParentComponentType = key.split('|')[keysLength - 2];
+        const firstParentComponentType =
+          key.split('|')[keysLength - (isFromMultiSelectionGroup ? 4 : 2)];
 
         let field: ElementType | undefined;
 
@@ -1082,39 +1209,10 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         if (payload[key] !== undefined) {
           const updatedPath = key
             .split('|')
-            .filter((_, index) => index !== keysLength - 2)
+            .filter((currentKey) => !currentKey.endsWith('Type'))
             .join('|');
 
           set(formattedPayload, updatedPath.replaceAll('|', '.'), value);
-        }
-      });
-
-      allAvailableGroups.forEach((currentGroup) => {
-        const updatedGroupKey = currentGroup.key
-          .split('|')
-          .filter(
-            (_, index) => index !== currentGroup.key.split('|').length - 1
-          )
-          .join('|')
-          .replaceAll('|', '.');
-
-        const groupValue = get(formattedPayload, updatedGroupKey);
-
-        let element: ElementType | undefined;
-
-        Object.values(components).forEach((component) => {
-          const groupKeysLength = currentGroup.key.split('|').length;
-          const elementName = currentGroup.key.split('|')[groupKeysLength - 2];
-
-          if (component && !element) {
-            element = Object.values(component?.elements || {}).find(
-              ({ name }) => name === elementName
-            );
-          }
-        });
-
-        if (element && groupValue && element.max_occurs === -1) {
-          set(formattedPayload, updatedGroupKey, [{ ...groupValue }]);
         }
       });
 
@@ -1124,8 +1222,17 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const getBreadcrumbsLabels = () => {
       return resolvedComplexTypes.map((currentComplexType) => {
         const componentTypeKeysLength = currentComplexType.split('|').length;
+        const lastChar = currentComplexType.slice(-1);
+        const isMultiSelectionComplexType = /\d/.test(lastChar);
 
-        return currentComplexType.split('|')[componentTypeKeysLength - 2];
+        const currentLabel =
+          currentComplexType.split('|')[
+            componentTypeKeysLength - (isMultiSelectionComplexType ? 3 : 2)
+          ];
+
+        return isMultiSelectionComplexType
+          ? `${currentLabel} (${Number(lastChar) + 1})`
+          : currentLabel;
       });
     };
 
@@ -1142,7 +1249,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
     const generateEInvoiceUI = async (
       components: Record<string, Component | undefined>,
       firstLevelComponents?: boolean,
-      preComponentPath?: string
+      preComponentPath?: string,
+      isMultiSelectionComplexType?: boolean
     ) => {
       if (!Object.keys(components).length) {
         return <></>;
@@ -1167,7 +1275,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 preComponentPath
                   ? preComponentPath
                   : getComponentKey(componentName) || '',
-                firstLevelComponents ?? true
+                firstLevelComponents ?? true,
+                Boolean(preComponentPath),
+                Boolean(isMultiSelectionComplexType)
               )
             );
           }
@@ -1238,6 +1348,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       payload,
       selectedChoices,
       resolvedComplexTypes,
+      selectedMultiSelectionGroups,
+      deletedMultiSelectionGroups,
     ]);
 
     useEffect(() => {
@@ -1245,23 +1357,44 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
         (async () => {
           const eInvoiceResolvedTypeUI = (await Promise.all(
             resolvedComplexTypes.map(async (currentResolvedType) => {
+              const lastChar = currentResolvedType.slice(-1);
+              const isLastCharNumber = /\d/.test(lastChar);
+
+              const isMultiSelectionComplexType =
+                doesKeyContainsNumber(currentResolvedType);
+
               const componentTypeKeysLength =
                 currentResolvedType.split('|').length;
               const componentType =
-                currentResolvedType.split('|')[componentTypeKeysLength - 1];
+                currentResolvedType.split('|')[
+                  componentTypeKeysLength - (isLastCharNumber ? 2 : 1)
+                ];
               const componentForResolving = components[componentType];
 
-              const componentPrePath = currentResolvedType
+              let componentPrePath = currentResolvedType
                 .split('|')
-                .filter((_, index) => index < componentTypeKeysLength - 1)
+                .filter(
+                  (_, index) =>
+                    index <
+                    componentTypeKeysLength -
+                      (isMultiSelectionComplexType ? 0 : 1)
+                )
                 .join('|');
+
+              if (isMultiSelectionComplexType) {
+                componentPrePath = componentPrePath
+                  .split('|')
+                  .filter((currentKey) => !currentKey.endsWith('Type'))
+                  .join('|');
+              }
 
               return await generateEInvoiceUI(
                 {
                   [componentType]: componentForResolving,
                 },
                 false,
-                componentPrePath
+                componentPrePath,
+                isMultiSelectionComplexType
               );
             })
           )) as EInvoiceUIComponents | undefined;
@@ -1280,7 +1413,109 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       currentAvailableGroups,
       resolvedComplexTypes,
       selectedChoices,
+      selectedMultiSelectionGroups,
     ]);
+
+    useEffect(() => {
+      if (currentEInvoice && currentAvailableGroups.length) {
+        allAvailableGroups.forEach((currentGroup) => {
+          const updatedGroupKey = currentGroup.key
+            .split('|')
+            .filter((currentKey) => !currentKey.endsWith('Type'))
+            .join('|');
+
+          const groupValue = get(
+            currentEInvoice,
+            updatedGroupKey.replaceAll('|', '.')
+          );
+
+          if (groupValue) {
+            const currentEInvoicePaths = generatePaths(currentEInvoice);
+
+            currentEInvoicePaths.forEach((currentPath: string) => {
+              let updatedCurrentPath = currentPath.split('.').join('|');
+              const keysLength = updatedCurrentPath.split('|').length;
+              const preLastFieldKey =
+                updatedCurrentPath.split('|')[keysLength - 2];
+              const fieldParentName =
+                updatedCurrentPath.split('|')[
+                  keysLength - (/\d/.test(preLastFieldKey) ? 3 : 2)
+                ];
+
+              let firstFieldParentType = '';
+
+              Object.values(components).forEach((component) => {
+                if (component && !firstFieldParentType) {
+                  const fieldParentElement = Object.values(
+                    component.elements
+                  ).find((element) => element.name === fieldParentName);
+
+                  if (fieldParentElement) {
+                    firstFieldParentType =
+                      fieldParentElement.base_type as string;
+                  }
+                }
+              });
+
+              if (firstFieldParentType) {
+                const currentKeys = updatedCurrentPath.split('|');
+
+                updatedCurrentPath = [
+                  ...currentKeys.slice(0, keysLength - 1),
+                  firstFieldParentType,
+                  ...currentKeys.slice(keysLength - 1),
+                ].join('|');
+
+                const propertyValue = get(currentEInvoice, currentPath);
+
+                setPayload((currentPayload) => ({
+                  ...currentPayload,
+                  [updatedCurrentPath]: propertyValue as string | number,
+                }));
+              }
+            });
+          }
+
+          if (groupValue) {
+            if (!currentGroup.multiSelection) {
+              setCurrentAvailableGroups((current) =>
+                current.filter((group) => group.key !== currentGroup.key)
+              );
+            } else {
+              if (Array.isArray(groupValue)) {
+                groupValue.forEach((currentGroupValue, index) => {
+                  const isAlreadyAddedInSelectedGroups =
+                    selectedMultiSelectionGroups.some(
+                      (currentType) =>
+                        currentType.key === `${currentGroup.key}|${index}`
+                    );
+
+                  const isAlreadyAddedInDeletedGroups =
+                    deletedMultiSelectionGroups.some(
+                      (currentType) =>
+                        currentType.key === `${currentGroup.key}|${index}`
+                    );
+
+                  if (!isAlreadyAddedInSelectedGroups) {
+                    setSelectedMultiSelectionGroups((current) => [
+                      ...current,
+                      { ...currentGroup, key: `${currentGroup.key}|${index}` },
+                    ]);
+                  }
+
+                  if (!isAlreadyAddedInDeletedGroups && !currentGroupValue) {
+                    setDeletedMultiSelectionGroups((current) => [
+                      ...current,
+                      { ...currentGroup, key: `${currentGroup.key}|${index}` },
+                    ]);
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }, [currentEInvoice, allAvailableGroups]);
 
     useImperativeHandle(
       ref,
@@ -1307,11 +1542,53 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                 <Element leftSide={t('fields')}>
                   <SearchableSelect
                     value=""
-                    onValueChange={(value) =>
-                      setCurrentAvailableGroups((current) =>
-                        current.filter((type) => type.key !== value)
-                      )
-                    }
+                    onValueChange={(value) => {
+                      const currentGroup = allAvailableGroups.find(
+                        (group) => group.key === value
+                      );
+
+                      if (currentGroup && currentGroup.multiSelection) {
+                        const numberOfAlreadyAddedGroups =
+                          selectedMultiSelectionGroups.filter((group) => {
+                            const groupKeysLength = group.key.split('|').length;
+                            const updatedCurrentGroupKey = group.key
+                              .split('|')
+                              .filter(
+                                (_, index) => index !== groupKeysLength - 1
+                              )
+                              .join('|');
+
+                            return updatedCurrentGroupKey === value;
+                          }).length;
+
+                        const groupWithSameKeyAlreadyDeleted =
+                          deletedMultiSelectionGroups.find((currentGroup) =>
+                            currentGroup.key.startsWith(value)
+                          );
+
+                        if (!groupWithSameKeyAlreadyDeleted) {
+                          setSelectedMultiSelectionGroups((current) => [
+                            ...current,
+                            {
+                              ...currentGroup,
+                              key: `${currentGroup.key}|${numberOfAlreadyAddedGroups}`,
+                            },
+                          ]);
+                        } else {
+                          setDeletedMultiSelectionGroups((current) =>
+                            current.filter(
+                              (currentDeletedGroup) =>
+                                currentDeletedGroup.key !==
+                                groupWithSameKeyAlreadyDeleted.key
+                            )
+                          );
+                        }
+                      } else {
+                        setCurrentAvailableGroups((current) =>
+                          current.filter((type) => type.key !== value)
+                        );
+                      }
+                    }}
                     clearAfterSelection
                   >
                     {currentAvailableGroups
