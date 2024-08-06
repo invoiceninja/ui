@@ -51,6 +51,7 @@ export function Credentials(props: Props) {
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
   const [isTestingSuccessful, setIsTestingSuccessful] = useState<boolean>();
+  const [testingMessage, setTestingMessage] = useState<string>('');
 
   const handleTestCredentials = () => {
     if (!isTestingBusy) {
@@ -64,7 +65,10 @@ export function Credentials(props: Props) {
         })
       )
         .then(() => setIsTestingSuccessful(true))
-        .catch(() => setIsTestingSuccessful(false))
+        .catch((error) => {
+          setTestingMessage(error.response?.data?.message);
+          setIsTestingSuccessful(false);
+        })
         .finally(() => {
           toast.dismiss();
           setIsTestingBusy(false);
@@ -131,7 +135,11 @@ export function Credentials(props: Props) {
       >
         {typeof isTestingSuccessful !== 'undefined' && (
           <span className="text-center font-medium text-base pb-3">
-            {t(isTestingSuccessful ? 'success' : 'status_failed')}
+            {t(
+              isTestingSuccessful
+                ? 'success'
+                : testingMessage || 'status_failed'
+            )}
           </span>
         )}
       </Modal>
