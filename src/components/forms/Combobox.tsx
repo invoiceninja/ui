@@ -115,6 +115,7 @@ export function Combobox<T = any>({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const selectorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   let filteredOptions =
@@ -279,6 +280,10 @@ export function Combobox<T = any>({
     onChange(option);
   });
 
+  useClickAway(selectorRef, () => {
+    onInputValueChange?.(inputValue);
+  });
+
   useDebounce(
     () => {
       if (inputValue === '' && filteredOptions.length > 0) {
@@ -331,7 +336,6 @@ export function Combobox<T = any>({
                 onFocus();
               }
             }}
-            onBlur={() => onInputValueChange?.(inputValue ?? '')}
             placeholder={inputOptions.placeholder}
             disabled={readonly}
             defaultValue={
@@ -344,6 +348,7 @@ export function Combobox<T = any>({
               borderColor: colors.$5,
               color: colors.$3,
             }}
+            data-cy="comboboxInput"
             tabIndex={-1}
           />
 
