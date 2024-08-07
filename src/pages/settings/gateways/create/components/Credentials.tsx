@@ -25,6 +25,7 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
+import { useLocation } from 'react-router-dom';
 
 interface Props {
   gateway: Gateway;
@@ -33,10 +34,13 @@ interface Props {
     React.SetStateAction<CompanyGateway | undefined>
   >;
   errors: ValidationBag | undefined;
+  isGatewaySaved?: boolean;
 }
 
 export function Credentials(props: Props) {
   const [t] = useTranslation();
+
+  const location = useLocation();
 
   const resolveInputField = useResolveInputField(
     props.companyGateway,
@@ -114,18 +118,22 @@ export function Credentials(props: Props) {
             </Element>
           ))}
 
-        <Divider />
+        {!location.pathname.includes('/create') && (
+          <>
+            <Divider />
 
-        <div className="flex justify-end pr-6">
-          <Button
-            behavior="button"
-            onClick={handleTestCredentials}
-            disableWithoutIcon
-            disabled={isTestingBusy}
-          >
-            {t('health_check')}
-          </Button>
-        </div>
+            <div className="flex justify-end pr-6">
+              <Button
+                behavior="button"
+                onClick={handleTestCredentials}
+                disableWithoutIcon
+                disabled={isTestingBusy || !props.isGatewaySaved}
+              >
+                {t('health_check')}
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
       <Modal
