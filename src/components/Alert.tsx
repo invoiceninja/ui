@@ -57,7 +57,7 @@ export function Alert(props: Props) {
             style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
           >
             <div
-              className="w-full whitespace-pre"
+              className="w-full break-all"
               style={{ backgroundColor: colors.$1, borderColor: colors.$4 }}
             >
               {props.children}
