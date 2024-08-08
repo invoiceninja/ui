@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { isHosted, trans } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
@@ -35,6 +35,7 @@ import { useEmailProviders } from './common/hooks/useEmailProviders';
 import { SMTPMailDriver } from './common/components/SMTPMailDriver';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import reactStringReplace from 'react-string-replace';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -128,7 +129,18 @@ export function EmailSettings() {
           leftSide={
             <PropertyCheckbox
               propertyKey="ubl_email_attachment"
-              labelElement={<SettingsLabel label={t('attach_ubl')} />}
+              labelElement={
+                <SettingsLabel
+                  label={t('attach_ubl')}
+                  helpLabel={reactStringReplace(
+                    `${t('ubl_email_attachment_help')}.`,
+                    ':here',
+                    () => (
+                      <Link to="/settings/e_invoice">{t('here')}</Link>
+                    )
+                  )}
+                />
+              }
             />
           }
         >
