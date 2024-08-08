@@ -63,7 +63,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
-      name: t('edit_gateway'),
+      name: companyGateway?.label ?? '',
       href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
