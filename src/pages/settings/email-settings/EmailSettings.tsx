@@ -136,7 +136,9 @@ export function EmailSettings() {
                     `${t('ubl_email_attachment_help')}.`,
                     ':here',
                     () => (
-                      <Link to="/settings/e_invoice">{t('here')}</Link>
+                      <Link className="text-xs" to="/settings/e_invoice">
+                        {t('here')}
+                      </Link>
                     )
                   )}
                 />
