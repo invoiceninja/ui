@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ActivityRecordBase } from './activity-record';
+
 export interface InvoiceActivity {
   user: Client;
   invoice: Client;
@@ -20,6 +22,8 @@ export interface InvoiceActivity {
   created_at: number;
   ip: string;
   recurring_invoice?: Client;
+  payment?: Client;
+  payment_amount?: ActivityRecordBase;
 }
 
 export interface Client {
