@@ -73,9 +73,10 @@ export function UpcomingQuotes() {
   return (
     <Card
       title={t('upcoming_quotes')}
-      className="h-96 relative"
+      className="relative"
       withoutBodyPadding
       withoutHeaderBorder
+      height="full"
     >
       <div className="pl-6 pr-4">
         <DataTable

@@ -80,7 +80,7 @@ export function PastDueInvoices() {
   return (
     <Card
       title={t('past_due_invoices')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
       withoutHeaderBorder
     >

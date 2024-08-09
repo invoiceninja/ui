@@ -20,6 +20,9 @@ import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+
 interface DashboardCardsProps {
   dateRange: string;
   startDate: string;
@@ -110,17 +113,19 @@ export function DashboardCards(props: DashboardCardsProps) {
   }, [currentUser]);
 
   return (
-    <div className="grid grid-cols-7 mt-4 gap-4">
-      {currentFields.map((field, index) => (
-        <Card
-          key={index}
-          field={field}
-          dateRange={dateRange}
-          startDate={startDate}
-          endDate={endDate}
-          currencyId={currencyId}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-7 mt-4 gap-4">
+        {currentFields.map((field, index) => (
+          <Card
+            key={index}
+            field={field}
+            dateRange={dateRange}
+            startDate={startDate}
+            endDate={endDate}
+            currencyId={currencyId}
+          />
+        ))}
+      </div>
+    </>
   );
 }

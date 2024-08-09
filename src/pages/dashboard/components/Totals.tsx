@@ -31,7 +31,6 @@ import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import { DashboardCardSelector } from './DashboardCardSelector';
-import { DashboardCards } from './DashboardCards';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -311,12 +310,12 @@ export function Totals() {
         </div>
       </div>
 
-      <DashboardCards
+      {/* <DashboardCards
         dateRange={dateRange}
         startDate={dates.start_date}
         endDate={dates.end_date}
         currencyId={currency.toString()}
-      />
+      /> */}
 
       <div className="grid grid-cols-12 mt-4 gap-4">
         {company && (

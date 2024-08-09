@@ -19,7 +19,11 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useTranslation } from 'react-i18next';
 
-export function UpcomingRecurringInvoices() {
+interface Props {
+  className?: string;
+}
+
+export function UpcomingRecurringInvoices(props: Props) {
   const [t] = useTranslation();
   const dateTime = useDateTime();
   const formatMoney = useFormatMoney();
@@ -80,9 +84,10 @@ export function UpcomingRecurringInvoices() {
   return (
     <Card
       title={t('upcoming_recurring_invoices')}
-      className="h-96 relative"
+      className={`relative ${props.className}`}
       withoutBodyPadding
       withoutHeaderBorder
+      height="full"
     >
       <div className="pl-6 pr-4">
         <DataTable
