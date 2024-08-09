@@ -33,7 +33,8 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96 relative"
+      className="relative"
+      height="full"
       withoutBodyPadding
     >
       {isLoading && (
@@ -46,10 +47,10 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="pl-6 pr-4">
+      <div className="h-full pl-6 pr-4">
         <div
           className="flex flex-col overflow-y-auto pr-4"
-          style={{ height: '19.9rem' }}
+          style={{ height: '78%' }}
         >
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (

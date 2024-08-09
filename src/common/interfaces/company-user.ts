@@ -32,10 +32,38 @@ export interface CompanyUser {
   react_settings: ReactSettings;
 }
 
+type Format = 'time' | 'money';
+export type Period = 'current' | 'previous' | 'total';
+export type Calculate = 'sum' | 'avg' | 'count';
+export type Field =
+  | 'active_invoices'
+  | 'outstanding_invoices'
+  | 'completed_payments'
+  | 'refunded_payments'
+  | 'active_quotes'
+  | 'unapproved_quotes'
+  | 'logged_tasks'
+  | 'invoiced_tasks'
+  | 'paid_tasks'
+  | 'logged_expenses'
+  | 'pending_expenses'
+  | 'invoiced_expenses'
+  | 'invoice_paid_expenses';
+
+export interface DashboardField {
+  calculate: Calculate;
+  field: Field;
+  format: Format;
+  period: Period;
+}
+
 export interface Settings {
   accent_color: string;
   table_columns?: Record<ReactTableColumns, string[]>;
   react_table_columns?: Record<ReactTableColumns, string[]>;
+  dashboard_fields?: DashboardField[];
+  dashboard_fields_per_row_desktop?: number;
+  dashboard_fields_per_row_mobile?: number;
 }
 
 export interface Notifications {

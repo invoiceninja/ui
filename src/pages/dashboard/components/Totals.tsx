@@ -30,6 +30,7 @@ import collect from 'collect.js';
 import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
+import { DashboardCardSelector } from './DashboardCardSelector';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -252,17 +253,17 @@ export function Totals() {
             </Button>
           </div>
 
-          <div className="flex flex-auto justify-center sm:col-start-3 ">
-            <DropdownDateRangePicker
-              handleDateChange={handleDateChange}
-              startDate={dates.start_date}
-              endDate={dates.end_date}
-              handleDateRangeChange={(value) =>
-                update('preferences.dashboard_charts.range', value)
-              }
-              value={body.date_range}
-            />
-          </div>
+          <DropdownDateRangePicker
+            handleDateChange={handleDateChange}
+            startDate={dates.start_date}
+            endDate={dates.end_date}
+            handleDateRangeChange={(value) =>
+              update('preferences.dashboard_charts.range', value)
+            }
+            value={body.date_range}
+          />
+
+          <DashboardCardSelector />
 
           <Preferences>
             <CurrencySelector
@@ -308,6 +309,13 @@ export function Totals() {
           </Preferences>
         </div>
       </div>
+
+      {/* <DashboardCards
+        dateRange={dateRange}
+        startDate={dates.start_date}
+        endDate={dates.end_date}
+        currencyId={currency.toString()}
+      /> */}
 
       <div className="grid grid-cols-12 mt-4 gap-4">
         {company && (

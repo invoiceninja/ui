@@ -94,7 +94,7 @@ export function RecentPayments() {
   return (
     <Card
       title={t('recent_payments')}
-      className="h-96 relative"
+      className="h-full relative"
       withoutBodyPadding
     >
       <div className="pl-6 pr-4">

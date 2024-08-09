@@ -142,11 +142,12 @@ export const keys = {
       '/api/v1/payments',
       '/api/v1/expenses',
       '/api/v1/tasks',
+      '/api/v1/charts/calculated_fields',
     ],
   },
   company_users: {
     path: '/api/v1/company_users',
-    dependencies: [],
+    dependencies: ['/api/v1/charts/calculated_fields'],
   },
   clients: {
     path: '/api/v1/clients',
