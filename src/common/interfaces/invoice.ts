@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
@@ -81,6 +82,7 @@ export interface Invoice {
   activities?: Activity[];
   payments?: Payment[];
   reminder_schedule?: string;
+  e_invoice?: EInvoiceType;
 }
 
 export interface Activity {
