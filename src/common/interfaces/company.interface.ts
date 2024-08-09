@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { BankAccount } from './bank-accounts';
 import { Document } from './document.interface';
 
@@ -76,6 +77,7 @@ export interface Company {
   smtp_password: string;
   smtp_local_domain: string;
   smtp_verify_peer: boolean;
+  e_invoice?: EInvoiceType;
 }
 
 export interface Settings {
