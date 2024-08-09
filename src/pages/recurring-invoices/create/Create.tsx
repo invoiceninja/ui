@@ -13,7 +13,6 @@ import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
-import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
@@ -21,33 +20,43 @@ import { Default, SaveOption } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
-import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { Outlet, useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
-import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
 import { Icon } from '$app/components/icons/Icon';
 import { MdNotStarted, MdSend } from 'react-icons/md';
 import dayjs from 'dayjs';
-import { Card } from '$app/components/cards';
-import { TabGroup } from '$app/components/TabGroup';
-import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '../common/components/ConfirmActionModal';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Tab, Tabs } from '$app/components/Tabs';
+
+export interface RecurringInvoiceContext {
+  recurringInvoice: RecurringInvoice | undefined;
+  setRecurringInvoice: Dispatch<SetStateAction<RecurringInvoice | undefined>>;
+  errors: ValidationBag | undefined;
+  client: Client | undefined;
+  invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
+}
 
 export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
+  const [searchParams] = useSearchParams();
+
+  const [invoiceSum] = useAtom(invoiceSumAtom);
+  const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+
+  const { data, isLoading } = useBlankRecurringInvoiceQuery({
+    enabled: typeof recurringInvoice === 'undefined',
+  });
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -57,31 +66,30 @@ export default function Create() {
     },
   ];
 
-  const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
+  const tabs: Tab[] = [
+    {
+      name: t('create'),
+      href: '/recurring_invoices/create',
+    },
+    {
+      name: t('documents'),
+      href: '/recurring_invoices/create/documents',
+    },
+    {
+      name: t('settings'),
+      href: '/recurring_invoices/create/settings',
+    },
+  ];
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
-  const [searchParams] = useSearchParams();
 
-  const clientResolver = useClientResolver();
   const company = useCurrentCompany();
-  const productColumns = useProductColumns();
+  const save = useCreate({ setErrors });
+  const clientResolver = useClientResolver();
 
-  const {
-    handleChange,
-    calculateInvoiceSum,
-    handleInvitationChange,
-    handleLineItemChange,
-    handleLineItemPropertyChange,
-    handleCreateLineItem,
-    handleDeleteLineItem,
-  } = useRecurringInvoiceUtilities({
+  const { handleChange, calculateInvoiceSum } = useRecurringInvoiceUtilities({
     client,
-  });
-
-  const { data } = useBlankRecurringInvoiceQuery({
-    enabled: typeof recurringInvoice === 'undefined',
   });
 
   useEffect(() => {
@@ -167,8 +175,6 @@ export default function Create() {
       });
   }, [recurringInvoice?.client_id]);
 
-  const save = useCreate({ setErrors });
-
   const [, setIsConfirmationVisible] = useAtom(confirmActionModalAtom);
 
   const saveOptions: SaveOption[] = [
@@ -184,8 +190,6 @@ export default function Create() {
     },
   ];
 
-  const taskColumns = useTaskColumns();
-
   return (
     <Default
       title={documentTitle}
@@ -194,102 +198,25 @@ export default function Create() {
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
       additionalSaveOptions={saveOptions}
     >
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <ClientSelector
-            resource={recurringInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={handleInvitationChange}
-            errorMessage={errors?.errors.client_id}
-            disableWithSpinner={searchParams.get('action') === 'create'}
+      {!isLoading ? (
+        <div className="space-y-4">
+          <Tabs tabs={tabs} />
+
+          <Outlet
+            context={{
+              recurringInvoice,
+              setRecurringInvoice,
+              errors,
+              client,
+              invoiceSum,
+            }}
           />
-        </Card>
-
-        <InvoiceDetails handleChange={handleChange} errors={errors} />
-
-        <div className="col-span-12">
-          <TabGroup
-            tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
-          >
-            <div>
-              {recurringInvoice ? (
-                <ProductsTable
-                  type="product"
-                  resource={recurringInvoice}
-                  items={recurringInvoice.line_items.filter((item) =>
-                    [
-                      InvoiceItemType.Product,
-                      InvoiceItemType.UnpaidFee,
-                      InvoiceItemType.PaidFee,
-                      InvoiceItemType.LateFee,
-                    ].includes(item.type_id)
-                  )}
-                  columns={productColumns}
-                  relationType="client_id"
-                  onLineItemChange={handleLineItemChange}
-                  onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onLineItemPropertyChange={handleLineItemPropertyChange}
-                  onCreateItemClick={() =>
-                    handleCreateLineItem(InvoiceItemType.Product)
-                  }
-                  onDeleteRowClick={handleDeleteLineItem}
-                />
-              ) : (
-                <Spinner />
-              )}
-            </div>
-
-            <div>
-              {recurringInvoice ? (
-                <ProductsTable
-                  type="task"
-                  resource={recurringInvoice}
-                  items={recurringInvoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Task
-                  )}
-                  columns={taskColumns}
-                  relationType="client_id"
-                  onLineItemChange={handleLineItemChange}
-                  onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onLineItemPropertyChange={handleLineItemPropertyChange}
-                  onCreateItemClick={() =>
-                    handleCreateLineItem(InvoiceItemType.Task)
-                  }
-                  onDeleteRowClick={handleDeleteLineItem}
-                />
-              ) : (
-                <Spinner />
-              )}
-            </div>
-          </TabGroup>
         </div>
-        <InvoiceFooter handleChange={handleChange} errors={errors} />
-
-        {recurringInvoice && (
-          <InvoiceTotals
-            relationType="client_id"
-            resource={recurringInvoice}
-            invoiceSum={invoiceSum}
-            onChange={(property, value) =>
-              handleChange(property, value as string)
-            }
-          />
-        )}
-      </div>
-
-      <div className="my-4">
-        {recurringInvoice && (
-          <InvoicePreview
-            for="create"
-            resource={recurringInvoice}
-            entity="recurring_invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      ) : (
+        <div className="flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
 
       <ConfirmActionModal
         onClick={() => save(recurringInvoice as RecurringInvoice, 'send_now')}
