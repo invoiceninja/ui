@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { Expense } from './expense';
 import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
@@ -77,6 +78,7 @@ export interface PurchaseOrder {
   documents: any[];
   vendor?: Vendor;
   expense?: Expense;
+  e_invoice?: EInvoiceType;
 }
 
 export interface Invitation {
