@@ -47,9 +47,6 @@ export interface EInvoiceComponent {
 export function EInvoice() {
   const [t] = useTranslation();
 
-  const isPeppolStandardEnabled =
-    import.meta.env.VITE_ENABLE_PEPPOL_STANDARD === 'true';
-
   const eInvoiceRef = useRef<EInvoiceComponent>(null);
 
   const pages = [
@@ -181,7 +178,7 @@ export function EInvoice() {
             }
             disabled={disableSettingsField('e_invoice_type')}
           >
-            {isPeppolStandardEnabled && <option value="PEPPOL">PEPPOL</option>}
+            <option value="PEPPOL">PEPPOL</option>
             <option value="FACT1">FACT1</option>
             <option value="EN16931">EN16931</option>
             <option value="XInvoice_3_0">XInvoice_3.0</option>
@@ -200,8 +197,7 @@ export function EInvoice() {
           </SelectField>
         </Element>
 
-        {company?.settings.e_invoice_type === 'PEPPOL' &&
-        isPeppolStandardEnabled ? (
+        {company?.settings.e_invoice_type === 'PEPPOL' ? (
           <EInvoiceGenerator
             ref={eInvoiceRef}
             currentEInvoice={company?.e_invoice || {}}
