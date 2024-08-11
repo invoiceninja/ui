@@ -1206,7 +1206,7 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           }
         });
 
-        if (payload[key] !== undefined) {
+        if (payload[key] !== undefined && payload[key] !== null) {
           const updatedPath = key
             .split('|')
             .filter((currentKey) => !currentKey.endsWith('Type'))
