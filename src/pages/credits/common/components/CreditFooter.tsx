@@ -17,22 +17,15 @@ import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { creditAtom } from '../atoms';
-import { useLocation, useParams } from 'react-router-dom';
-import { Upload } from '$app/pages/settings/company/documents/components';
-import { endpoint } from '$app/common/helpers';
-import { DocumentsTable } from '$app/components/DocumentsTable';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
@@ -45,8 +38,8 @@ interface Props {
 }
 
 export function CreditFooter(props: Props) {
-  const { t } = useTranslation();
-  const { id } = useParams();
+  const [t] = useTranslation();
+
   const {
     handleChange,
     errors,
@@ -57,41 +50,23 @@ export function CreditFooter(props: Props) {
   } = props;
 
   const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const location = useLocation();
-
   const [credit] = useAtom(creditAtom);
-
-  const onSuccess = () => {
-    $refetch(['credits']);
-  };
 
   const tabs = [
     t('terms'),
     t('footer'),
     t('public_notes'),
     t('private_notes'),
-    t('documents'),
     t('settings'),
     ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup
-        tabs={tabs}
-        formatTabLabel={(tabIndex) => {
-          if (tabIndex === 4) {
-            return (
-              <DocumentsTabLabel numberOfDocuments={credit?.documents.length} />
-            );
-          }
-        }}
-        withoutVerticalMargin
-      >
+      <TabGroup tabs={tabs} withoutVerticalMargin>
         <div>
           <MarkdownEditor
             value={credit?.terms || ''}
@@ -147,29 +122,6 @@ export function CreditFooter(props: Props) {
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
-
-        {location.pathname.endsWith('/create') ? (
-          <div className="text-sm mt-4">{t('save_to_upload_documents')}.</div>
-        ) : (
-          <div className="my-4">
-            <Upload
-              widgetOnly
-              endpoint={endpoint('/api/v1/credits/:id/upload', {
-                id,
-              })}
-              onSuccess={onSuccess}
-              disableUpload={
-                !hasPermission('edit_credit') && !entityAssigned(credit)
-              }
-            />
-
-            <DocumentsTable
-              documents={credit?.documents || []}
-              onDocumentDelete={onSuccess}
-              disableEditableOptions={!entityAssigned(credit, true)}
-            />
-          </div>
-        )}
 
         <div className="my-4">
           <div className="grid grid-cols-12 gap-4">
