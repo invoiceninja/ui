@@ -219,41 +219,39 @@ export function TaskTable(props: Props) {
 
                   {company?.show_task_end_date && (
                     <Td>
-                      {stop !== 0 ? (
-                        <InputField
-                          style={{ color: colors.$3, colorScheme: colors.$0 }}
-                          type="date"
-                          value={parseTimeToDate(stop)}
-                          onValueChange={(value) =>
-                            handleDateChange(
-                              stop,
-                              value || parseTimeToDate(start) || '',
-                              index,
-                              LogPosition.End
-                            )
-                          }
-                        />
-                      ) : null}
+                      <InputField
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
+                        type="date"
+                        value={parseTimeToDate(stop)}
+                        onValueChange={(value) =>
+                          handleDateChange(
+                            stop,
+                            value || parseTimeToDate(start) || '',
+                            index,
+                            LogPosition.End
+                          )
+                        }
+                        disabled={stop === 0}
+                      />
                     </Td>
                   )}
 
                   <Td>
-                    {stop !== 0 ? (
-                      <InputField
-                        style={{ color: colors.$3, colorScheme: colors.$0 }}
-                        type="time"
-                        step="1"
-                        value={parseTime(stop)}
-                        onValueChange={(value) =>
-                          handleTimeChange(
-                            stop,
-                            value || parseTime(start) || '',
-                            LogPosition.End,
-                            index
-                          )
-                        }
-                      />
-                    ) : null}
+                    <InputField
+                      style={{ color: colors.$3, colorScheme: colors.$0 }}
+                      type="time"
+                      step="1"
+                      value={parseTime(stop)}
+                      onValueChange={(value) =>
+                        handleTimeChange(
+                          stop,
+                          value || parseTime(start) || '',
+                          LogPosition.End,
+                          index
+                        )
+                      }
+                      disabled={stop === 0}
+                    />
                   </Td>
 
                   <Td>
@@ -270,16 +268,11 @@ export function TaskTable(props: Props) {
                         }
                       />
                     ) : (
-                      <div className="flex items-center space-x-2">
-                        {/* <TaskStatus entity={task} /> */}
-
-                        <p>
-                          <DurationClock
-                            start={start}
-                            key={`duration-clock-${index}`}
-                          />
-                        </p>
-                      </div>
+                      <DurationClock
+                        start={start}
+                        key={`duration-clock-${index}`}
+                        task={task}
+                      />
                     )}
                   </Td>
 
