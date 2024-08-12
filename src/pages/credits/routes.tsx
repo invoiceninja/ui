@@ -38,9 +38,6 @@ const Activities = lazy(
 const History = lazy(
   () => import('$app/pages/credits/edit/components/History')
 );
-const EmailHistory = lazy(
-  () => import('$app/pages/credits/edit/components/EmailHistory')
-);
 
 export const creditRoutes = (
   <Route path="/credits">
@@ -95,7 +92,6 @@ export const creditRoutes = (
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />
       <Route path="history" element={<History />} />
-      <Route path="email_history" element={<EmailHistory />} />
     </Route>
 
     <Route

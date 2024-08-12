@@ -60,10 +60,6 @@ export function useTabs(params: Params) {
       name: t('history'),
       href: route('/credits/:id/history', { id }),
     },
-    {
-      name: t('email_history'),
-      href: route('/credits/:id/email_history', { id }),
-    },
   ];
 
   return tabs;
