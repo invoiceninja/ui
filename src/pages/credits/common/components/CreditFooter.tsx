@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, Link } from '$app/components/forms';
+import { Link } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTranslation } from 'react-i18next';
@@ -17,15 +17,8 @@ import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { creditAtom } from '../atoms';
-import { UserSelector } from '$app/components/users/UserSelector';
-import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { DesignSelector } from '$app/common/generic/DesignSelector';
-import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
@@ -42,14 +35,11 @@ export function CreditFooter(props: Props) {
 
   const {
     handleChange,
-    errors,
     isDefaultTerms,
     isDefaultFooter,
     setIsDefaultFooter,
     setIsDefaultTerms,
   } = props;
-
-  const hasPermission = useHasPermission();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -60,7 +50,6 @@ export function CreditFooter(props: Props) {
     t('footer'),
     t('public_notes'),
     t('private_notes'),
-    t('settings'),
     ...(isAdmin || isOwner ? [t('custom_fields')] : []),
   ];
 
@@ -121,76 +110,6 @@ export function CreditFooter(props: Props) {
             value={credit?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
-        </div>
-
-        <div className="my-4">
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-6 space-y-6">
-              <div className="space-y-2">
-                <UserSelector
-                  inputLabel={t('user')}
-                  value={credit?.assigned_user_id}
-                  onChange={(user) => handleChange('assigned_user_id', user.id)}
-                  errorMessage={errors?.errors.assigned_user_id}
-                  readonly={!hasPermission('edit_credit')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <VendorSelector
-                  inputLabel={t('vendor')}
-                  value={credit?.vendor_id}
-                  onChange={(vendor) => handleChange('vendor_id', vendor.id)}
-                  onClearButtonClick={() => handleChange('vendor_id', '')}
-                  errorMessage={errors?.errors.vendor_id}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <DesignSelector
-                  inputLabel={t('design')}
-                  value={credit?.design_id}
-                  onChange={(design) => handleChange('design_id', design.id)}
-                  onClearButtonClick={() => handleChange('design_id', '')}
-                  disableWithQueryParameter
-                  errorMessage={errors?.errors.design_id}
-                />
-              </div>
-            </div>
-
-            <div className="col-span-12 lg:col-span-6 space-y-6">
-              <div className="space-y-2">
-                <ProjectSelector
-                  inputLabel={t('project')}
-                  value={credit?.project_id}
-                  onChange={(project) => handleChange('project_id', project.id)}
-                  errorMessage={errors?.errors.project_id}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <InputField
-                  label={t('exchange_rate')}
-                  type="number"
-                  value={credit?.exchange_rate || 1.0}
-                  onValueChange={(value) =>
-                    handleChange('exchange_rate', parseFloat(value))
-                  }
-                  errorMessage={errors?.errors.exchange_rate}
-                />
-              </div>
-
-              <div className="pt-9">
-                <Toggle
-                  label={t('inclusive_taxes')}
-                  checked={credit?.uses_inclusive_taxes || false}
-                  onChange={(value) =>
-                    handleChange('uses_inclusive_taxes', value)
-                  }
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="my-4">
