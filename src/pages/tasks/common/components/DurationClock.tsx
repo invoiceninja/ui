@@ -40,5 +40,5 @@ export function DurationClock({ start }: Props) {
     return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
   };
 
-  return formatTime(elapsedTime);
+  return <span>{formatTime(elapsedTime)}</span>;
 }
