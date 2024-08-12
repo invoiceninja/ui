@@ -31,23 +31,26 @@ import { WebhookConfiguration } from './components/WebhookConfiguration';
 import collect from 'collect.js';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
+import { isEqual } from 'lodash';
 
 export function Edit() {
+  const { documentTitle } = useTitle('edit_gateway');
+
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
   const { id } = useParams();
   const actions = useActions();
+  const gateways = useGateways();
 
   const { data } = useCompanyGatewayQuery({ id });
 
-  const { documentTitle } = useTitle('edit_gateway');
-
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
-
   const defaultTab = [t('payment_provider')];
+
+  const [gateway, setGateway] = useState<Gateway>();
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [tabs, setTabs] = useState<string[]>(defaultTab);
+  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
   const additionalTabs = [
     t('credentials'),
@@ -60,16 +63,10 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
-      name: t('edit_gateway'),
+      name: companyGateway?.label ?? '',
       href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
-
-  const [gateway, setGateway] = useState<Gateway>();
-
-  const [tabs, setTabs] = useState<string[]>(defaultTab);
-
-  const gateways = useGateways();
 
   const onSave = useHandleUpdate(companyGateway, setErrors);
 
@@ -154,6 +151,9 @@ export function Edit() {
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
               errors={errors}
+              isGatewaySaved={Boolean(
+                data && isEqual(companyGateway, data.data.data)
+              )}
             />
           )}
         </div>
