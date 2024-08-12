@@ -340,6 +340,13 @@ export function useActions() {
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'credit',
+    editPageTabs: [
+      'documents',
+      'settings',
+      'activity',
+      'history',
+      'email_history',
+    ],
   });
 
   const setCredit = useSetAtom(creditAtom);
