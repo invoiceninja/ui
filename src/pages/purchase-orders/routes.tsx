@@ -22,6 +22,15 @@ const Edit = lazy(() => import('./edit/Edit'));
 const Email = lazy(() => import('./email/Email'));
 const Pdf = lazy(() => import('./pdf/Pdf'));
 const Create = lazy(() => import('./create/Create'));
+const CreatePage = lazy(
+  () => import('$app/pages/purchase-orders/create/components/CreatePage')
+);
+const Documents = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/purchase-orders/edit/components/Settings')
+);
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
@@ -78,6 +87,7 @@ export const purchaseOrderRoutes = (
       <Route path="email" element={<Email />} />
       <Route path="pdf" element={<Pdf />} />
     </Route>
+
     <Route
       path="create"
       element={
@@ -89,6 +99,10 @@ export const purchaseOrderRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
   </Route>
 );
