@@ -70,7 +70,11 @@ export default function History() {
 
       {resource?.activities &&
         resource.activities.map((activity) => (
-          <ClickableElement key={activity.id} to={`/activities/${activity.id}`}>
+          <ClickableElement
+            key={activity.id}
+            to={`/activities/${activity.id}`}
+            disableNavigation={Boolean(!activity.history.id)}
+          >
             <div className="flex flex-col">
               <div className="flex space-x-1">
                 <span>
