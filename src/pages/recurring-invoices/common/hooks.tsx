@@ -303,6 +303,7 @@ export function useActions(params?: Params) {
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'recurring_invoice',
+    editPageTabs: ['documents', 'settings', 'activity', 'history', 'schedule'],
   });
 
   const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
