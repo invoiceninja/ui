@@ -19,6 +19,7 @@ import { lazy } from 'react';
 
 const Quotes = lazy(() => import('$app/pages/quotes/index/Quotes'));
 const Import = lazy(() => import('$app/pages/quotes/import/Import'));
+const Quote = lazy(() => import('$app/pages/quotes/Quote'));
 const Edit = lazy(() => import('$app/pages/quotes/edit/Edit'));
 const Create = lazy(() => import('$app/pages/quotes/create/Create'));
 const CreatePage = lazy(
@@ -32,6 +33,13 @@ const Settings = lazy(
 );
 const Pdf = lazy(() => import('$app/pages/quotes/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/quotes/email/Email'));
+const Activities = lazy(
+  () => import('$app/pages/quotes/edit/components/Activities')
+);
+const History = lazy(() => import('$app/pages/quotes/edit/components/History'));
+const EmailHistory = lazy(
+  () => import('$app/pages/quotes/edit/components/EmailHistory')
+);
 
 export const quoteRoutes = (
   <Route path="/quotes">
@@ -63,8 +71,9 @@ export const quoteRoutes = (
         />
       }
     />
+
     <Route
-      path=":id/edit"
+      path=":id"
       element={
         <Guard
           guards={[
@@ -75,10 +84,17 @@ export const quoteRoutes = (
               assigned('/api/v1/quotes/:id')
             ),
           ]}
-          component={<Edit />}
+          component={<Quote />}
         />
       }
-    />
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+      <Route path="email_history" element={<EmailHistory />} />
+    </Route>
 
     <Route
       path="create"

@@ -8,73 +8,47 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { v4 } from 'uuid';
-import { invoiceSumAtom, quoteAtom } from '../common/atoms';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
-import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
-import { useQuoteQuery } from '../common/queries';
+import { useQuoteUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Quote as IQuote } from '$app/common/interfaces/quote';
+import { QuoteContext } from '../create/Create';
 
 export default function Edit() {
-  const { documentTitle } = useTitle('edit_quote');
-  const { t } = useTranslation();
-  const { id } = useParams();
+  const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const entityAssigned = useEntityAssigned();
+  const [searchParams] = useSearchParams();
 
   const reactSettings = useReactSettings();
 
-  const pages: Page[] = [
-    { name: t('quotes'), href: '/quotes' },
-    {
-      name: t('edit_quote'),
-      href: route('/quotes/:id/edit', { id }),
-    },
-  ];
+  const context: QuoteContext = useOutletContext();
+  const {
+    quote,
+    errors,
+    isDefaultTerms,
+    isDefaultFooter,
+    client,
+    setIsDefaultFooter,
+    setIsDefaultTerms,
+    invoiceSum,
+  } = context;
 
-  const { data } = useQuoteQuery({ id: id! });
-
-  const [quote, setQuote] = useAtom(quoteAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
-
-  const [client, setClient] = useState<Client>();
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
-  const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
-
+  const colors = useColorScheme();
+  const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
 
   const {
@@ -84,56 +58,10 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-    calculateInvoiceSum,
   } = useQuoteUtilities({ client });
 
-  useEffect(() => {
-    if (data) {
-      const _quote = cloneDeep(data);
-
-      _quote.line_items.map((item) => (item._id = v4()));
-
-      setQuote(_quote);
-
-      if (_quote && _quote.client) {
-        setClient(_quote.client);
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
-    quote && calculateInvoiceSum(quote);
-  }, [quote]);
-
-  const actions = useActions();
-  const save = useSave({ setErrors, isDefaultFooter, isDefaultTerms });
-
-  const [searchParams] = useSearchParams();
-  const taskColumns = useTaskColumns();
-  const colors = useColorScheme();
-
-  const {
-    changeTemplateVisible,
-    setChangeTemplateVisible,
-    changeTemplateResources,
-  } = useChangeTemplate();
-
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      {...((hasPermission('edit_quote') || entityAssigned(quote)) &&
-        quote && {
-          navigationTopRight: (
-            <ResourceActions
-              resource={quote}
-              actions={actions}
-              onSaveClick={() => quote && save(quote)}
-              cypressRef="quoteActionDropdown"
-            />
-          ),
-        })}
-    >
+    <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           {quote && (
@@ -253,15 +181,6 @@ export default function Edit() {
           )}
         </div>
       )}
-
-      <ChangeTemplateModal<IQuote>
-        entity="quote"
-        entities={changeTemplateResources as IQuote[]}
-        visible={changeTemplateVisible}
-        setVisible={setChangeTemplateVisible}
-        labelFn={(quote) => `${t('number')}: ${quote.number}`}
-        bulkUrl="/api/v1/quotes/bulk"
-      />
-    </Default>
+    </>
   );
 }
