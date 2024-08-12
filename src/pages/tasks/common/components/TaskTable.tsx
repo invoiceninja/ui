@@ -26,6 +26,7 @@ import {
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
 import { useColorScheme } from '$app/common/colors';
+import { DurationClock } from './DurationClock';
 
 interface Props {
   task: Task;
@@ -218,47 +219,68 @@ export function TaskTable(props: Props) {
 
                   {company?.show_task_end_date && (
                     <Td>
-                      <InputField
-                        style={{ color: colors.$3, colorScheme: colors.$0 }}
-                        type="date"
-                        value={parseTimeToDate(stop)}
-                        onValueChange={(value) =>
-                          handleDateChange(
-                            stop,
-                            value || parseTimeToDate(start) || '',
-                            index,
-                            LogPosition.End
-                          )
-                        }
-                      />
+                      {stop !== 0 ? (
+                        <InputField
+                          style={{ color: colors.$3, colorScheme: colors.$0 }}
+                          type="date"
+                          value={parseTimeToDate(stop)}
+                          onValueChange={(value) =>
+                            handleDateChange(
+                              stop,
+                              value || parseTimeToDate(start) || '',
+                              index,
+                              LogPosition.End
+                            )
+                          }
+                        />
+                      ) : null}
                     </Td>
                   )}
 
                   <Td>
-                    <InputField
-                      style={{ color: colors.$3, colorScheme: colors.$0 }}
-                      type="time"
-                      step="1"
-                      value={parseTime(stop)}
-                      onValueChange={(value) =>
-                        handleTimeChange(
-                          stop,
-                          value || parseTime(start) || '',
-                          LogPosition.End,
-                          index
-                        )
-                      }
-                    />
+                    {stop !== 0 ? (
+                      <InputField
+                        style={{ color: colors.$3, colorScheme: colors.$0 }}
+                        type="time"
+                        step="1"
+                        value={parseTime(stop)}
+                        onValueChange={(value) =>
+                          handleTimeChange(
+                            stop,
+                            value || parseTime(start) || '',
+                            LogPosition.End,
+                            index
+                          )
+                        }
+                      />
+                    ) : null}
                   </Td>
 
                   <Td>
-                    <InputField
-                      debounceTimeout={1000}
-                      value={duration(start, stop, company?.show_task_end_date)}
-                      onValueChange={(value) =>
-                        handleDurationChange(value, start, index)
-                      }
-                    />
+                    {stop !== 0 ? (
+                      <InputField
+                        debounceTimeout={1000}
+                        value={duration(
+                          start,
+                          stop,
+                          company?.show_task_end_date
+                        )}
+                        onValueChange={(value) =>
+                          handleDurationChange(value, start, index)
+                        }
+                      />
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        {/* <TaskStatus entity={task} /> */}
+
+                        <p>
+                          <DurationClock
+                            start={start}
+                            key={`duration-clock-${index}`}
+                          />
+                        </p>
+                      </div>
+                    )}
                   </Td>
 
                   {company?.settings.allow_billable_task_items && (
