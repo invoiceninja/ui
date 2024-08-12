@@ -85,6 +85,30 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
         .getByRole('button', { name: 'More Actions', exact: true })
     ).not.toBeVisible();
   }
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Settings', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Activity', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'History', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Schedule', exact: true })
+  ).toBeVisible();
 };
 
 interface CreateParams {
@@ -114,7 +138,11 @@ const createRecurringInvoice = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .getByRole('link', { name: 'Settings', exact: true })
+      .first()
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
@@ -164,7 +192,7 @@ test('can view recurring invoice', async ({ page }) => {
 
   await checkTableEditability(page, false);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
+  const tableRow = page.locator('tbody').first().getByRole('row').nth(1);
 
   await tableRow.getByRole('link').first().click();
 
@@ -198,7 +226,7 @@ test('can edit recurring invoice', async ({ page }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').first();
+  const tableRow = page.locator('tbody').first().getByRole('row').nth(1);
 
   await tableRow.getByRole('link').first().click();
 
@@ -504,9 +532,9 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   await page.waitForURL('**/recurring_invoices/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .getByRole('link', { name: 'Documents' })
+    .first()
     .click();
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
@@ -560,9 +588,9 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   await page.waitForURL('**/recurring_invoices/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .getByRole('link', { name: 'Documents' })
+    .first()
     .click();
 
   await page
