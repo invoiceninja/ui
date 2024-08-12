@@ -434,6 +434,7 @@ export function InvoiceSlider() {
               <ClickableElement
                 key={activity.id}
                 to={`/activities/${activity.id}`}
+                disableNavigation={Boolean(!activity.history.id)}
               >
                 <div className="flex flex-col">
                   <div className="flex space-x-1">
