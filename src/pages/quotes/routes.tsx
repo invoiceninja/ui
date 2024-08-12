@@ -21,6 +21,15 @@ const Quotes = lazy(() => import('$app/pages/quotes/index/Quotes'));
 const Import = lazy(() => import('$app/pages/quotes/import/Import'));
 const Edit = lazy(() => import('$app/pages/quotes/edit/Edit'));
 const Create = lazy(() => import('$app/pages/quotes/create/Create'));
+const CreatePage = lazy(
+  () => import('$app/pages/quotes/create/components/CreatePage')
+);
+const Documents = lazy(
+  () => import('$app/pages/quotes/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/quotes/edit/components/Settings')
+);
 const Pdf = lazy(() => import('$app/pages/quotes/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/quotes/email/Email'));
 
@@ -70,6 +79,7 @@ export const quoteRoutes = (
         />
       }
     />
+
     <Route
       path="create"
       element={
@@ -78,7 +88,12 @@ export const quoteRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
+
     <Route
       path=":id"
       element={
