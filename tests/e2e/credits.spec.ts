@@ -88,15 +88,45 @@ const checkEditPage = async (
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).toBeVisible();
   }
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Documents' })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Settings', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Activity', exact: true })
+  ).toBeVisible();
+
+  await expect(
+    page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'History', exact: true })
+  ).toBeVisible();
 };
 
 interface CreateParams {
@@ -127,7 +157,12 @@ const createCredit = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Settings', exact: true })
+      .first()
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }
@@ -455,9 +490,10 @@ test('credit documents preview with edit_credit', async ({ page }) => {
   await page.waitForURL('**/credits/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Documents' })
+    .first()
     .click();
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
@@ -502,9 +538,10 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
   await page.waitForURL('**/credits/**/edit');
 
   await page
-    .getByRole('button', {
-      name: 'Documents',
-    })
+    .locator('[data-cy="tabs"]')
+    .first()
+    .getByRole('link', { name: 'Documents' })
+    .first()
     .click();
 
   await page
