@@ -45,7 +45,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Quote as IQuote } from '$app/common/interfaces/quote';
+import { Quote as IQuote, Quote } from '$app/common/interfaces/quote';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -233,7 +233,7 @@ export default function Edit() {
             resource={quote}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property, value as string)
+              handleChange(property as keyof Quote, value as string)
             }
           />
         )}

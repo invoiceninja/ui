@@ -42,7 +42,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Credit as ICredit } from '$app/common/interfaces/credit';
+import { Credit, Credit as ICredit } from '$app/common/interfaces/credit';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -190,7 +190,7 @@ export default function Edit() {
             resource={credit}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property, value as string)
+              handleChange(property as keyof Credit, value as string)
             }
           />
         )}

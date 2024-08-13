@@ -38,6 +38,7 @@ import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
 import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { Quote } from '$app/common/interfaces/quote';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_quote');
@@ -262,7 +263,7 @@ export default function Create() {
             resource={quote}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property, value as string)
+              handleChange(property as keyof Quote, value as string)
             }
           />
         )}

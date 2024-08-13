@@ -35,6 +35,7 @@ import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
+import { Credit } from '$app/common/interfaces/credit';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');
@@ -227,7 +228,7 @@ export default function Create() {
             resource={credit}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property, value as string)
+              handleChange(property as keyof Credit, value as string)
             }
           />
         )}
