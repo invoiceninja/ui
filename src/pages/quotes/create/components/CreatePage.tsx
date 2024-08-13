@@ -18,36 +18,33 @@ import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTab
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { QuoteDetails } from '../common/components/QuoteDetails';
-import { QuoteFooter } from '../common/components/QuoteFooter';
-import { useQuoteUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
-import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
-import { useColorScheme } from '$app/common/colors';
-import { QuoteContext } from '../create/Create';
+import { QuoteContext } from '../Create';
+import { useQuoteUtilities } from '../../common/hooks';
+import { QuoteDetails } from '../../common/components/QuoteDetails';
+import { QuoteFooter } from '../../common/components/QuoteFooter';
 
-export default function Edit() {
+export default function CreatePage() {
   const [t] = useTranslation();
-
-  const [searchParams] = useSearchParams();
-
-  const reactSettings = useReactSettings();
 
   const context: QuoteContext = useOutletContext();
   const {
     quote,
-    errors,
     isDefaultTerms,
-    isDefaultFooter,
-    client,
-    setIsDefaultFooter,
     setIsDefaultTerms,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    errors,
     invoiceSum,
+    client,
   } = context;
 
-  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+
+  const [searchParams] = useSearchParams();
+
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
 
@@ -64,30 +61,13 @@ export default function Edit() {
     <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {quote && (
-            <div className="flex space-x-20">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <QuoteStatusBadge entity={quote} />
-            </div>
-          )}
-
           <ClientSelector
             resource={quote}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
-            textOnly
-            readonly
+            disableWithSpinner={searchParams.get('action') === 'create'}
           />
         </Card>
 
@@ -99,7 +79,7 @@ export default function Edit() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="product"
                   resource={quote}
@@ -122,7 +102,7 @@ export default function Edit() {
             </div>
 
             <div>
-              {quote && client ? (
+              {quote ? (
                 <ProductsTable
                   type="task"
                   resource={quote}
@@ -171,12 +151,11 @@ export default function Edit() {
         <div className="my-4">
           {quote && (
             <InvoicePreview
-              for="invoice"
+              for="create"
               resource={quote}
               entity="quote"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
-              withRemoveLogoCTA
             />
           )}
         </div>

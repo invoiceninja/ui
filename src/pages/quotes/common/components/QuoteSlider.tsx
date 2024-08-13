@@ -64,7 +64,7 @@ export const quoteSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
 
-function useGenerateActivityElement() {
+export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
   return (activity: QuoteActivity) => {
