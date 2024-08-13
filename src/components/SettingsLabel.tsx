@@ -9,10 +9,11 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { ReactNode } from 'react';
 
 interface Props {
   label: string;
-  helpLabel?: string | null;
+  helpLabel?: string | ReactNode | null;
   required?: boolean;
 }
 
@@ -27,12 +28,21 @@ export function SettingsLabel(props: Props) {
         {label}
         {required && <span className="ml-1 text-red-600">*</span>}
       </span>
+
       {helpLabel && (
-        <span
-          className="text-xs"
-          dangerouslySetInnerHTML={{ __html: helpLabel }}
-          style={{ color: colors.$3, opacity: 0.8 }}
-        ></span>
+        <>
+          {typeof helpLabel === 'string' ? (
+            <span
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: helpLabel }}
+              style={{ color: colors.$3, opacity: 0.8 }}
+            />
+          ) : (
+            <div className="text-xs" style={{ color: colors.$3, opacity: 0.8 }}>
+              {helpLabel}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

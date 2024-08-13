@@ -119,6 +119,16 @@ export function useGenerateActivityElement() {
           {activity?.notes}
         </>
       ),
+
+      payment_amount: activity?.payment_amount?.label,
+
+      payment: (
+        <Link
+          to={route('/payments/:id/edit', { id: activity?.payment?.hashed_id })}
+        >
+          {activity?.payment?.label}
+        </Link>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
@@ -424,6 +434,7 @@ export function InvoiceSlider() {
               <ClickableElement
                 key={activity.id}
                 to={`/activities/${activity.id}`}
+                disableNavigation={Boolean(!activity.history.id)}
               >
                 <div className="flex flex-col">
                   <div className="flex space-x-1">
