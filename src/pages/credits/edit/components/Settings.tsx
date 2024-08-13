@@ -37,17 +37,15 @@ export default function Settings() {
     <Card title={t('settings')} className="w-full xl:w-2/3">
       <div className="grid grid-cols-12 gap-4 px-6">
         <div className="col-span-12 lg:col-span-6 space-y-6">
-          <div className="space-y-2">
-            <UserSelector
-              inputLabel={t('user')}
-              value={credit?.assigned_user_id}
-              onChange={(user) => handleChange('assigned_user_id', user.id)}
-              errorMessage={errors?.errors.assigned_user_id}
-              readonly={!hasPermission('edit_credit')}
-            />
-          </div>
+          <UserSelector
+            inputLabel={t('user')}
+            value={credit?.assigned_user_id}
+            onChange={(user) => handleChange('assigned_user_id', user.id)}
+            errorMessage={errors?.errors.assigned_user_id}
+            readonly={!hasPermission('edit_credit')}
+          />
 
-          <div className="space-y-2">
+          <div className="lg:pt-1">
             <VendorSelector
               inputLabel={t('vendor')}
               value={credit?.vendor_id}
@@ -57,41 +55,35 @@ export default function Settings() {
             />
           </div>
 
-          <div className="space-y-2">
-            <DesignSelector
-              inputLabel={t('design')}
-              value={credit?.design_id}
-              onChange={(design) => handleChange('design_id', design.id)}
-              onClearButtonClick={() => handleChange('design_id', '')}
-              disableWithQueryParameter
-              errorMessage={errors?.errors.design_id}
-            />
-          </div>
+          <DesignSelector
+            inputLabel={t('design')}
+            value={credit?.design_id}
+            onChange={(design) => handleChange('design_id', design.id)}
+            onClearButtonClick={() => handleChange('design_id', '')}
+            disableWithQueryParameter
+            errorMessage={errors?.errors.design_id}
+          />
         </div>
 
         <div className="col-span-12 lg:col-span-6 space-y-6">
-          <div className="space-y-2">
-            <ProjectSelector
-              inputLabel={t('project')}
-              value={credit?.project_id}
-              onChange={(project) => handleChange('project_id', project.id)}
-              errorMessage={errors?.errors.project_id}
-            />
-          </div>
+          <ProjectSelector
+            inputLabel={t('project')}
+            value={credit?.project_id}
+            onChange={(project) => handleChange('project_id', project.id)}
+            errorMessage={errors?.errors.project_id}
+          />
 
-          <div className="space-y-2">
-            <InputField
-              label={t('exchange_rate')}
-              type="number"
-              value={credit?.exchange_rate || 1.0}
-              onValueChange={(value) =>
-                handleChange('exchange_rate', parseFloat(value))
-              }
-              errorMessage={errors?.errors.exchange_rate}
-            />
-          </div>
+          <InputField
+            label={t('exchange_rate')}
+            type="number"
+            value={credit?.exchange_rate || 1.0}
+            onValueChange={(value) =>
+              handleChange('exchange_rate', parseFloat(value))
+            }
+            errorMessage={errors?.errors.exchange_rate}
+          />
 
-          <div className="pt-9">
+          <div className="lg:pt-7">
             <Toggle
               label={t('inclusive_taxes')}
               checked={credit?.uses_inclusive_taxes || false}
