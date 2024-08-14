@@ -53,7 +53,9 @@ export default function Documents() {
           <DocumentsTable
             documents={invoice?.documents || []}
             onDocumentDelete={() => $refetch(['invoices'])}
-            disableEditableOptions={!entityAssigned(invoice, true)}
+            disableEditableOptions={
+              !entityAssigned(invoice, true) && !hasPermission('edit_invoice')
+            }
           />
         </div>
       )}
