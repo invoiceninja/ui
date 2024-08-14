@@ -166,7 +166,9 @@ export function CreditFooter(props: Props) {
             <DocumentsTable
               documents={credit?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={!entityAssigned(credit, true)}
+              disableEditableOptions={
+                !entityAssigned(credit, true) && !hasPermission('edit_credit')
+              }
             />
           </div>
         )}
