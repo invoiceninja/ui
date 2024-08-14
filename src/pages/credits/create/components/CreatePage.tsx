@@ -8,37 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
-import { CreditDetails } from '../common/components/CreditDetails';
-import { CreditFooter } from '../common/components/CreditFooter';
-import { useCreditUtilities } from '../common/hooks';
 import { Card } from '$app/components/cards';
-import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { CreditsContext } from '../create/Create';
+import { useCreditUtilities } from '../../common/hooks';
+import { CreditsContext } from '../Create';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { CreditDetails } from '../../common/components/CreditDetails';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
+import { CreditFooter } from '../../common/components/CreditFooter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
-export default function Edit() {
-  const [t] = useTranslation();
-
+export default function CreatePage() {
   const context: CreditsContext = useOutletContext();
+
   const {
     credit,
+    isDefaultFooter,
+    isDefaultTerms,
     errors,
     client,
     invoiceSum,
-    isDefaultTerms,
-    setIsDefaultTerms,
-    isDefaultFooter,
     setIsDefaultFooter,
+    setIsDefaultTerms,
   } = context;
+
+  const [searchParams] = useSearchParams();
 
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
@@ -50,27 +49,21 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-  } = useCreditUtilities({ client });
+  } = useCreditUtilities({
+    client,
+  });
 
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {credit && (
-            <div className="flex space-x-20">
-              <span className="text-sm text-gray-900">{t('status')}</span>
-              <CreditStatusBadge entity={credit} />
-            </div>
-          )}
-
           <ClientSelector
             resource={credit}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             onContactCheckboxChange={handleInvitationChange}
             errorMessage={errors?.errors.client_id}
-            readonly
-            textOnly
+            disableWithSpinner={searchParams.get('action') === 'create'}
           />
         </Card>
 
@@ -127,12 +120,11 @@ export default function Edit() {
         <div className="my-4">
           {credit && (
             <InvoicePreview
-              for="invoice"
+              for="create"
               resource={credit}
               entity="credit"
               relationType="client_id"
               endpoint="/api/v1/live_preview?entity=:entity"
-              withRemoveLogoCTA
             />
           )}
         </div>

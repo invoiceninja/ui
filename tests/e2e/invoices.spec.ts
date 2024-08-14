@@ -107,12 +107,14 @@ const checkEditPage = async (
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
+        .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
     ).toBeVisible();
   }
@@ -147,6 +149,7 @@ const createInvoice = async (params: CreateParams) => {
   if (assignTo) {
     await page
       .locator('[data-cy="tabs"]')
+      .first()
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();

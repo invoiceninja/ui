@@ -129,6 +129,14 @@ export function useGenerateActivityElement() {
           {activity?.payment?.label}
         </Link>
       ),
+
+      credit: (
+        <Link
+          to={route('/credits/:id/edit', { id: activity?.credit?.hashed_id })}
+        >
+          {activity?.credit?.label}
+        </Link>
+      ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {

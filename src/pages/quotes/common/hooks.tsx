@@ -342,7 +342,16 @@ export function useActions(params?: Params) {
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'quote',
+    editPageTabs: [
+      'documents',
+      'settings',
+      'activity',
+      'history',
+      'email_history',
+    ],
+  });
 
   const approve = useApprove();
   const bulk = useBulkAction();

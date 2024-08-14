@@ -23,6 +23,7 @@ export interface InvoiceActivity {
   ip: string;
   recurring_invoice?: Client;
   payment?: Client;
+  credit?: Client;
   payment_amount?: ActivityRecordBase;
 }
 
