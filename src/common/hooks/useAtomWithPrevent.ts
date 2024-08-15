@@ -37,7 +37,9 @@ export function useAtomWithPrevent(
   useEffect(() => {
     if (entity && currentInitialValue && !isFunctionalityDisabled) {
       const currentPreventValue = isEqual(entity, currentInitialValue);
+
       const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
+
       isDifferent &&
         setPreventLeavingPage(
           (current) =>
