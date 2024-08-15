@@ -42,7 +42,9 @@ export default function Documents() {
       <DocumentsTable
         documents={project?.documents || []}
         onDocumentDelete={onSuccess}
-        disableEditableOptions={!entityAssigned(project, true)}
+        disableEditableOptions={
+          !entityAssigned(project, true) && !hasPermission('edit_project')
+        }
       />
     </>
   );
