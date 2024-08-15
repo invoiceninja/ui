@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -12,7 +11,7 @@
 import { PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { Invoice } from '../interfaces/invoice';
 import { useEffect, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useDebounce } from 'react-use';
 import { useParams } from 'react-router-dom';
@@ -36,18 +35,18 @@ export function useAtomWithPrevent(
     import.meta.env.VITE_DISABLE_PREVENT_NAVIGATION_FEATURE === 'true';
 
   useEffect(() => {
-    // if (entity && currentInitialValue && !isFunctionalityDisabled) {
-    //   const currentPreventValue = isEqual(entity, currentInitialValue);
-    //   const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
-    //   isDifferent &&
-    //     setPreventLeavingPage(
-    //       (current) =>
-    //         current && {
-    //           ...current,
-    //           prevent: !currentPreventValue,
-    //         }
-    //     );
-    // }
+    if (entity && currentInitialValue && !isFunctionalityDisabled) {
+      const currentPreventValue = isEqual(entity, currentInitialValue);
+      const isDifferent = preventLeavingPage.prevent !== !currentPreventValue;
+      isDifferent &&
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: !currentPreventValue,
+            }
+        );
+    }
   }, [entity]);
 
   useDebounce(
