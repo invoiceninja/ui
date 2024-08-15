@@ -19,9 +19,25 @@ import { Route } from 'react-router-dom';
 
 const Credits = lazy(() => import('$app/pages/credits/index/Credits'));
 const Create = lazy(() => import('$app/pages/credits/create/Create'));
+const CreatePage = lazy(
+  () => import('$app/pages/credits/create/components/CreatePage')
+);
+const Credit = lazy(() => import('$app/pages/credits/Credit'));
 const Edit = lazy(() => import('$app/pages/credits/edit/Edit'));
 const Pdf = lazy(() => import('$app/pages/credits/pdf/Pdf'));
 const Email = lazy(() => import('$app/pages/credits/email/Email'));
+const Documents = lazy(
+  () => import('$app/pages/credits/edit/components/Documents')
+);
+const Settings = lazy(
+  () => import('$app/pages/credits/edit/components/Settings')
+);
+const Activities = lazy(
+  () => import('$app/pages/credits/edit/components/Activities')
+);
+const History = lazy(
+  () => import('$app/pages/credits/edit/components/History')
+);
 
 export const creditRoutes = (
   <Route path="/credits">
@@ -49,9 +65,14 @@ export const creditRoutes = (
           component={<Create />}
         />
       }
-    />
+    >
+      <Route path="" element={<CreatePage />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+    </Route>
+
     <Route
-      path=":id/edit"
+      path=":id"
       element={
         <Guard
           guards={[
@@ -62,10 +83,17 @@ export const creditRoutes = (
               assigned('/api/v1/credits/:id')
             ),
           ]}
-          component={<Edit />}
+          component={<Credit />}
         />
       }
-    />
+    >
+      <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="activity" element={<Activities />} />
+      <Route path="history" element={<History />} />
+    </Route>
+
     <Route
       path=":id/pdf"
       element={
@@ -78,6 +106,7 @@ export const creditRoutes = (
         />
       }
     />
+
     <Route
       path=":id/email"
       element={
