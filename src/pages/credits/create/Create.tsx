@@ -41,7 +41,6 @@ export interface CreditsContext {
   client: Client | undefined;
   invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
 }
-import { Credit } from '$app/common/interfaces/credit';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');

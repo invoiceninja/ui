@@ -161,7 +161,7 @@ export default function Edit() {
             resource={quote}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof Quote, value as string)
+              handleChange(property, value as string)
             }
           />
         )}

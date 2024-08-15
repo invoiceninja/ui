@@ -117,7 +117,7 @@ export default function Edit() {
             resource={credit}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof Credit, value as string)
+              handleChange(property, value as string)
             }
           />
         )}
