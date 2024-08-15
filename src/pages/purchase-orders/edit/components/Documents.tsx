@@ -54,7 +54,10 @@ export default function Documents() {
           <DocumentsTable
             documents={purchaseOrder?.documents || []}
             onDocumentDelete={() => $refetch(['purchase_orders'])}
-            disableEditableOptions={!entityAssigned(purchaseOrder, true)}
+            disableEditableOptions={
+              !entityAssigned(purchaseOrder, true) &&
+              !hasPermission('edit_purchase_order')
+            }
           />
         </div>
       )}
