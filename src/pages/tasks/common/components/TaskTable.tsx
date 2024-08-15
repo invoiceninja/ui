@@ -27,6 +27,7 @@ import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
 import { useColorScheme } from '$app/common/colors';
 import { DurationClock } from './DurationClock';
+import { isTaskRunning } from '../helpers/calculate-entity-state';
 
 interface Props {
   task: Task;
@@ -333,12 +334,18 @@ export function TaskTable(props: Props) {
           <Td colSpan={100}>
             <button
               onClick={createTableRow}
-              className="w-full py-2 inline-flex justify-center items-center space-x-2"
+              className="w-full py-2 inline-flex justify-center items-center space-x-2 disabled:cursor-not-allowed"
+              disabled={isTaskRunning(task)}
             >
-              <Plus size={18} />
-              <span>{t('add_item')}</span>
+              {isTaskRunning(task) ? (
+                <span>{t('stop_task_to_add_task_entry')}</span>
+              ) : (
+                <>
+                  <Plus size={18} /> <span>{t('add_item')}</span>
+                </>
+              )}
             </button>
-          </Td>
+          </Td> 
         </Tr>
       </Tbody>
     </Table>
