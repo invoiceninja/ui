@@ -19,7 +19,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { ChangeEvent, useEffect } from 'react';
-import { ChangeEvent, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
@@ -37,8 +36,6 @@ interface Props {
   >;
   errors: ValidationBag | undefined;
 }
-
-const currentGatewayTypeAtom = atom<string | undefined>(undefined);
 
 const currentGatewayTypeAtom = atom<string | undefined>(undefined);
 

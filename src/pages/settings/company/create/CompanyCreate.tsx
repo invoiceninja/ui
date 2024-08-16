@@ -37,7 +37,6 @@ export function CompanyCreate(props: Props) {
 
   const { id } = useParams();
   const location = useLocation();
-  const colors = useColorScheme();
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
