@@ -140,7 +140,7 @@ export default function Create() {
     });
 
     return () => {
-      setInvoice(undefined);
+      // setInvoice(undefined);
     };
   }, [data]);
 
