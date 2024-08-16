@@ -15,43 +15,34 @@ import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePre
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-import { Details } from './components/Details';
-import { Footer } from './components/Footer';
-import { VendorSelector } from './components/VendorSelector';
-import { useHandleCreateLineItem } from './hooks/useHandleCreateLineItem';
-import { useHandleDeleteLineItem } from './hooks/useHandleDeleteLineItem';
-import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
-import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
-import { useHandleProductChange } from './hooks/useHandleProductChange';
+import { Details } from '../../edit/components/Details';
+import { Footer } from '../../edit/components/Footer';
+import { VendorSelector } from '../../edit/components/VendorSelector';
+import { useHandleCreateLineItem } from '../../edit/hooks/useHandleCreateLineItem';
+import { useHandleDeleteLineItem } from '../../edit/hooks/useHandleDeleteLineItem';
+import { useHandleInvitationChange } from '../../edit/hooks/useHandleInvitationChange';
+import { useHandleLineItemPropertyChange } from '../../edit/hooks/useHandleLineItemPropertyChange';
+import { useHandleProductChange } from '../../edit/hooks/useHandleProductChange';
 import { Card } from '$app/components/cards';
-import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
-import { useColorScheme } from '$app/common/colors';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { PurchaseOrderContext } from '../create/Create';
+import { PurchaseOrderContext } from '../Create';
 
-export default function Edit() {
-  const [t] = useTranslation();
+export default function Create() {
+  const reactSettings = useReactSettings();
 
   const context: PurchaseOrderContext = useOutletContext();
   const {
     purchaseOrder,
     setPurchaseOrder,
     errors,
-    isDefaultFooter,
-    isDefaultTerms,
-    setIsDefaultFooter,
-    setIsDefaultTerms,
     invoiceSum,
     setInvoiceSum,
+    isDefaultFooter,
+    setIsDefaultFooter,
+    isDefaultTerms,
+    setIsDefaultTerms,
   } = context;
 
-  const colors = useColorScheme();
-  const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
   const handleChange = <T extends keyof PurchaseOrder>(
@@ -75,34 +66,11 @@ export default function Edit() {
     setInvoiceSum
   );
 
-  const {
-    changeTemplateVisible,
-    setChangeTemplateVisible,
-    changeTemplateResources,
-  } = useChangeTemplate();
-
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          {purchaseOrder && (
-            <div className="flex space-x-20">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <PurchaseOrderStatus entity={purchaseOrder} />
-            </div>
-          )}
-
           <VendorSelector
-            readonly
             resource={purchaseOrder}
             onChange={(id) => handleChange('vendor_id', id)}
             onClearButtonClick={() => handleChange('vendor_id', '')}
@@ -110,6 +78,7 @@ export default function Edit() {
               purchaseOrder &&
               handleInvitationChange(purchaseOrder, id, checked)
             }
+            initiallyVisible
             errorMessage={errors?.errors.vendor_id}
           />
         </Card>
@@ -175,25 +144,15 @@ export default function Edit() {
         <div className="my-4">
           {purchaseOrder && (
             <InvoicePreview
-              for="invoice"
+              for="create"
               resource={purchaseOrder}
               entity="purchase_order"
               relationType="vendor_id"
               endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-              withRemoveLogoCTA
             />
           )}
         </div>
       )}
-
-      <ChangeTemplateModal<PurchaseOrder>
-        entity="purchase_order"
-        entities={changeTemplateResources as PurchaseOrder[]}
-        visible={changeTemplateVisible}
-        setVisible={setChangeTemplateVisible}
-        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
-        bulkUrl="/api/v1/purchase_orders/bulk"
-      />
     </>
   );
 }
