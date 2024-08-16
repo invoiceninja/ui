@@ -12,7 +12,6 @@ import { Checkbox, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +27,7 @@ import { parseTime } from '../helpers';
 import { useColorScheme } from '$app/common/colors';
 import { DurationClock } from './DurationClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { useStart } from '../hooks/useStart';
 
 interface Props {
   task: Task;
@@ -47,28 +47,13 @@ export function TaskTable(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
-
+  const start = useStart();
   const company = useCurrentCompany();
 
   const handleTaskTimeChange = useHandleTaskTimeChange();
   const handleTaskDateChange = useHandleTaskDateChange();
 
   const [lastChangedIndex, setLastChangedIndex] = useState<number>();
-
-  const createTableRow = () => {
-    const logs = parseTimeLog(task.time_log);
-    const last = logs.at(-1);
-
-    let startTime = dayjs().unix();
-
-    if (last && last[1] !== 0) {
-      startTime = last[1] + 1;
-    }
-
-    logs.push([startTime, 0, '', true]);
-
-    handleChange('time_log', JSON.stringify(logs));
-  };
 
   const deleteTableRow = (index: number) => {
     const logs: TimeLogsType = parseTimeLog(task.time_log);
@@ -331,7 +316,7 @@ export function TaskTable(props: Props) {
         <Tr className="bg-slate-100 hover:bg-slate-200">
           <Td colSpan={100}>
             <button
-              onClick={createTableRow}
+              onClick={() => start(task)}
               className="w-full py-2 inline-flex justify-center items-center space-x-2 disabled:cursor-not-allowed"
               disabled={isTaskRunning(task)}
             >
@@ -343,7 +328,7 @@ export function TaskTable(props: Props) {
                 </>
               )}
             </button>
-          </Td> 
+          </Td>
         </Tr>
       </Tbody>
     </Table>
