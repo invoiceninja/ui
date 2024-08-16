@@ -232,7 +232,6 @@ export function TaskTable(props: Props) {
                             LogPosition.End
                           )
                         }
-                        disabled={stop === 0}
                       />
                     </Td>
                   )}
@@ -251,7 +250,6 @@ export function TaskTable(props: Props) {
                           index
                         )
                       }
-                      disabled={stop === 0}
                     />
                   </Td>
 
