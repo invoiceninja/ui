@@ -420,7 +420,7 @@ export function Combobox<T = any>({
             >
               {option.resource &&
               typeof entryOptions.dropdownLabelFn !== 'undefined'
-                ? entryOptions.dropdownLabelFn(option.resource, inputValue)
+                ? entryOptions.dropdownLabelFn(option.resource)
                 : option.label}
             </LiStyled>
           ))}
@@ -725,7 +725,7 @@ export function ComboboxStatic<T = any>({
                       >
                         {entry.resource &&
                         typeof entryOptions.dropdownLabelFn !== 'undefined'
-                          ? entryOptions.dropdownLabelFn(entry.resource, query)
+                          ? entryOptions.dropdownLabelFn(entry.resource)
                           : entry.label}
                       </span>
 
@@ -759,7 +759,7 @@ interface EntryOptions<T = any> {
   label: string;
   value: string;
   searchable?: string;
-  dropdownLabelFn?: (resource: T, searchTerm: string) => string | JSX.Element;
+  dropdownLabelFn?: (resource: T) => string | JSX.Element;
   inputLabelFn?: (resource?: T) => string;
   customSearchableValue?: (resource: T) => string;
 }
