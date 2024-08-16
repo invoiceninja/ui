@@ -115,10 +115,7 @@ export function Chart(props: Props) {
 
       if (nextEntry) {
         const dateToCheck = parseDayjs(date);
-        const dateToCheck = parseDayjs(date);
 
-        const startDate = parseDayjs(entry.date);
-        const endDate = parseDayjs(nextEntry.date);
         const startDate = parseDayjs(entry.date);
         const endDate = parseDayjs(nextEntry.date);
 
@@ -126,10 +123,6 @@ export function Chart(props: Props) {
           dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
 
         isEntryDateMatch = entry.date === date;
-
-        isMatchingWithLastPointDay =
-          startDate.isSame(dateToCheck) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
 
         return isDateInRange || isEntryDateMatch;
       }
