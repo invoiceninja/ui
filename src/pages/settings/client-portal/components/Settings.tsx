@@ -22,12 +22,13 @@ import { companySettingsErrorsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
 import { useState } from 'react';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import classNames from 'classnames';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -68,20 +69,28 @@ export function Settings() {
             leftSide={t('portal_mode')}
             leftSideHelp={t('subdomain_guide')}
           >
-            <SelectField
-              disabled={freePlan()}
-              id="portal_mode"
-              value={company?.portal_mode || 'subdomain'}
-              onValueChange={(value) => handleChange('portal_mode', value)}
-              errorMessage={errors?.errors.portal_mode}
-            >
-              <option value="subdomain" key="subdomain">
-                {t('subdomain')}
-              </option>
-              <option value="domain" key="domain">
-                {t('domain')}
-              </option>
-            </SelectField>
+            <div className="flex flex-col space-y-2">
+              <SelectField
+                disabled={!enterprisePlan()}
+                id="portal_mode"
+                value={company?.portal_mode || 'subdomain'}
+                onValueChange={(value) => handleChange('portal_mode', value)}
+                errorMessage={errors?.errors.portal_mode}
+              >
+                <option value="subdomain" key="subdomain">
+                  {t('subdomain')}
+                </option>
+                <option value="domain" key="domain">
+                  {t('domain')}
+                </option>
+              </SelectField>
+
+              {!enterprisePlan() && (
+                <span className="text-xs font-medium">
+                  * {t('requires_an_enterprise_plan')}
+                </span>
+              )}
+            </div>
           </Element>
 
           {company?.portal_mode === 'subdomain' && (
@@ -259,6 +268,18 @@ export function Settings() {
             handleChange('settings.show_pdfhtml_on_mobile', value)
           }
           disabled={disableSettingsField('show_pdfhtml_on_mobile')}
+        />
+      </Element>
+
+      <Element
+        leftSide={t('enable_client_portal_dashboard')}
+        leftSideHelp={t('enable_client_portal_dashboard_help')}
+      >
+        <Toggle
+          checked={Boolean(company?.settings?.enable_client_portal_dashboard)}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_portal_dashboard', value)
+          }
         />
       </Element>
 

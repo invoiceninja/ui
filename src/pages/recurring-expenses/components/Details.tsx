@@ -23,11 +23,15 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCalculateExpenseAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { Icon } from '$app/components/icons/Icon';
+import { MdLaunch } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -89,7 +93,24 @@ export function Details(props: Props) {
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('vendor')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('vendor')}</span>
+
+                {recurringExpense.vendor_id && (
+                  <Link
+                    to={route('/vendors/:id', {
+                      id: recurringExpense.vendor_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
+                )}
+              </div>
+            }
+          >
             <VendorSelector
               value={recurringExpense.vendor_id}
               onChange={(vendor) => handleChange('vendor_id', vendor.id)}
@@ -101,19 +122,42 @@ export function Details(props: Props) {
 
         {recurringExpense && (
           <Element leftSide={t('client')}>
-            <ClientSelector
-              value={recurringExpense.client_id}
-              clearButton={Boolean(recurringExpense.client_id)}
-              onClearButtonClick={() => handleChange('client_id', '')}
-              onChange={(client) => handleChange('client_id', client.id)}
-              errorMessage={errors?.errors.client_id}
-              disableWithSpinner={searchParams.get('action') === 'create'}
-            />
+            <div className="flex flex-col space-y-2">
+              <ClientSelector
+                value={recurringExpense.client_id}
+                clearButton={Boolean(recurringExpense.client_id)}
+                onClearButtonClick={() => handleChange('client_id', '')}
+                onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
+                disableWithSpinner={searchParams.get('action') === 'create'}
+              />
+
+              {recurringExpense.client_id && (
+                <ClientActionButtons clientId={recurringExpense.client_id} />
+              )}
+            </div>
           </Element>
         )}
 
         {recurringExpense && (
-          <Element leftSide={t('project')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('project')}</span>
+
+                {recurringExpense.project_id && (
+                  <Link
+                    to={route('/projects/:id', {
+                      id: recurringExpense.project_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
+                )}
+              </div>
+            }
+          >
             <ProjectSelector
               value={recurringExpense.project_id}
               clearButton={Boolean(recurringExpense.project_id)}
@@ -323,6 +367,7 @@ export function Details(props: Props) {
               value={recurringExpense.currency_id}
               onChange={(currency) => handleChange('currency_id', currency)}
               errorMessage={errors?.errors.currency_id}
+              dismissable
             />
           </Element>
         )}

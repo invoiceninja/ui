@@ -57,6 +57,10 @@ import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
 import { DateRangePicker } from './datatables/DateRangePicker';
+import { emitter } from '$app';
+import { TFooter } from './tables/TFooter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface DateRangeColumn {
   column: string;
@@ -67,6 +71,15 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+}[];
+
+export type FooterColumns<T = any> = {
+  id: string;
+  label: string;
+  format: (
+    field: (string | number)[],
+    resource: T[]
+  ) => ReactNode | string | number;
 }[];
 
 type CustomBulkActionContext<T> = {
@@ -101,6 +114,7 @@ interface Props<T> extends CommonProps {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
+  bottomActionsKeys?: string[];
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
@@ -134,6 +148,10 @@ interface Props<T> extends CommonProps {
   withoutStatusFilter?: boolean;
   queryIdentificator?: string;
   disableQuery?: boolean;
+  footerColumns?: FooterColumns;
+  withoutPerPageAsPreference?: boolean;
+  withoutSortQueryParameter?: boolean;
+  showRestoreBulk?: (selectedResources: T[]) => boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -144,6 +162,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
   const location = useLocation();
   const options = useDataTableOptions();
+
+  const reactSettings = useReactSettings();
+
+  const themeColors = useThemeColorScheme();
 
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
@@ -166,6 +188,11 @@ export function DataTable<T extends object>(props: Props<T>) {
     methodType = 'GET',
     queryIdentificator,
     disableQuery,
+    footerColumns = [],
+    bottomActionsKeys = [],
+    withoutPerPageAsPreference = false,
+    withoutSortQueryParameter = false,
+    showRestoreBulk,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -176,7 +203,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<PerPage>(
-    (apiEndpoint.searchParams.get('perPage') as PerPage) || '10'
+    (apiEndpoint.searchParams.get('per_page') as PerPage) || '10'
   );
   const [sort, setSort] = useState<string>(
     apiEndpoint.searchParams.get('sort') || 'id|asc'
@@ -207,6 +234,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setStatus,
     tableKey,
     customFilters,
+    withoutStoringPerPage: withoutPerPageAsPreference,
   });
 
   const {
@@ -247,7 +275,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     handleChangingCustomFilters();
 
-    apiEndpoint.searchParams.set('sort', sort);
+    if (
+      !withoutSortQueryParameter ||
+      (withoutSortQueryParameter && sort !== 'id|asc')
+    ) {
+      apiEndpoint.searchParams.set('sort', sort);
+    }
+
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     if (dateRangeColumns.length && dateRangeQueryParameter) {
@@ -371,6 +405,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       setDateRangeQueryParameter(queryParameterOfCurrentColumn);
   };
 
+  const getFooterColumn = (columnId: string) => {
+    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  };
+
+  const getColumnValues = (columnId: string) => {
+    return data?.data.data.map(
+      (resource: T) => resource[columnId as keyof typeof resource]
+    );
+  };
+
   useEffect(() => {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
@@ -382,6 +426,16 @@ export function DataTable<T extends object>(props: Props<T>) {
       );
 
       setSelectedResources(filteredSelectedResources);
+
+      const shouldDeselectMainCheckbox = data.data.data.some(
+        (resource: any) => !selected.includes(resource.id)
+      );
+
+      if (shouldDeselectMainCheckbox && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      } else if (mainCheckbox.current) {
+        mainCheckbox.current.checked = true;
+      }
     }
   }, [selected]);
 
@@ -390,6 +444,27 @@ export function DataTable<T extends object>(props: Props<T>) {
       setCurrentPage(1);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      if (
+        Number(perPage) < selected.length ||
+        Number(perPage) === selected.length
+      ) {
+        setSelected(
+          data.data.data
+            .map((resource: any) => resource.id)
+            .filter((resourceId: string) => selected.includes(resourceId))
+        );
+      } else if (Number(perPage) > selected.length && mainCheckbox.current) {
+        mainCheckbox.current.checked = false;
+      }
+    }
+  }, [perPage]);
+
+  useEffect(() => {
+    emitter.on('bulk.completed', () => setSelected([]));
+  }, []);
 
   return (
     <div data-cy="dataTable">
@@ -405,6 +480,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
+          customFilter={customFilter}
           rightSide={
             <>
               {props.rightSide}
@@ -476,7 +552,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                     {t('delete')}
                   </DropdownElement>
 
-                  {showRestoreBulkAction() && (
+                  {(showRestoreBulk
+                    ? showRestoreBulk(selectedResources)
+                    : showRestoreBulkAction()) && (
                     <DropdownElement
                       onClick={() => {
                         if (onBulkActionCall) {
@@ -523,11 +601,17 @@ export function DataTable<T extends object>(props: Props<T>) {
                   ).forEach((checkbox: HTMLInputElement | any) => {
                     checkbox.checked = event.target.checked;
 
-                    event.target.checked
-                      ? setSelected((current) => [...current, checkbox.id])
-                      : setSelected((current) =>
-                          current.filter((value) => value !== checkbox.id)
-                        );
+                    if (event.target.checked) {
+                      const isAlreadyAdded = selected.find(
+                        (resourceId) => resourceId === checkbox.id
+                      );
+
+                      if (!isAlreadyAdded) {
+                        setSelected((current) => [...current, checkbox.id]);
+                      }
+                    } else {
+                      setSelected([]);
+                    }
                   });
                 }}
                 cypressRef="dataTableCheckbox"
@@ -615,6 +699,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                   'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
+                backgroundColor={index % 2 === 0 ? themeColors.$7 : ''}
               >
                 {!props.withoutActions && !hideEditableOptions && (
                   <Td
@@ -692,9 +777,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource)?.key !== 'purge' && (
-                              <div key={index}>{action(resource)}</div>
-                            )
+                            !bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
 
                       {props.customActions &&
@@ -739,9 +824,9 @@ export function DataTable<T extends object>(props: Props<T>) {
                             action: ResourceAction<typeof resource>,
                             index: number
                           ) =>
-                            action(resource)?.key === 'purge' && (
-                              <div key={index}>{action(resource)}</div>
-                            )
+                            bottomActionsKeys.includes(
+                              action(resource)?.key || ''
+                            ) && <div key={index}>{action(resource)}</div>
                         )}
                     </Dropdown>
                   </Td>
@@ -749,6 +834,36 @@ export function DataTable<T extends object>(props: Props<T>) {
               </Tr>
             ))}
         </Tbody>
+
+        {Boolean(footerColumns.length) &&
+          Boolean(data?.data.data.length) &&
+          Boolean(reactSettings.show_table_footer) && (
+            <TFooter>
+              {!props.withoutActions && !hideEditableOptions && <Th></Th>}
+
+              {props.columns.map(
+                (column, index) =>
+                  Boolean(!excludeColumns.includes(column.id)) && (
+                    <Td key={index} customizeTextColor>
+                      {getFooterColumn(column.id) ? (
+                        <div className="flex items-center space-x-3">
+                          {getFooterColumn(column.id)?.format(
+                            getColumnValues(column.id) || [],
+                            data?.data.data || []
+                          ) ?? '-/-'}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </Td>
+                  )
+              )}
+
+              {props.withResourcefulActions && !hideEditableOptions && (
+                <Th></Th>
+              )}
+            </TFooter>
+          )}
       </Table>
 
       {data && !props.withoutPagination && (

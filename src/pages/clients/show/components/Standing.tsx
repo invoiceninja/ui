@@ -12,9 +12,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { InfoCard } from '$app/components/InfoCard';
 import { Element } from '$app/components/cards';
-import { Icon } from '$app/components/icons/Icon';
 import { useTranslation } from 'react-i18next';
-import { MdLockOutline } from 'react-icons/md';
 
 interface Props {
   client: Client;
@@ -23,14 +21,14 @@ interface Props {
 export function Standing(props: Props) {
   const [t] = useTranslation();
 
-  const formatMoney = useFormatMoney();
-
   const { client } = props;
+
+  const formatMoney = useFormatMoney();
 
   return (
     <>
       {client && (
-        <div className="col-span-12 lg:col-span-3">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
           <InfoCard
             title={t('standing')}
             value={
@@ -95,19 +93,6 @@ export function Standing(props: Props) {
                       client.settings.currency_id
                     )}
                   </Element>
-                )}
-
-                {client.private_notes && (
-                  <div className="flex items-center space-x-1">
-                    <div>
-                      <Icon element={MdLockOutline} size={24} />
-                    </div>
-
-                    <span
-                      className="whitespace-normal"
-                      dangerouslySetInnerHTML={{ __html: client.private_notes }}
-                    />
-                  </div>
                 )}
               </div>
             }

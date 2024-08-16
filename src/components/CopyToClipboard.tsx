@@ -30,7 +30,7 @@ export function CopyToClipboard(props: Props) {
     <div className={`inline-flex space-x-2 ${props.className}`}>
       <span>{props.secure ? props.text.split('').map(() => '*') : value}</span>
 
-      {value.length > 0 && (
+      {value.length > 0 && navigator.clipboard && window.isSecureContext && (
         <button type="button" onClick={handleClick}>
           <MdOutlineContentCopy size={18} />
         </button>

@@ -45,6 +45,12 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -98,6 +104,7 @@ export function useProductColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -129,18 +136,27 @@ export function useProductColumns() {
       column: 'description',
       id: 'notes',
       label: t('notes'),
-      format: (value) => {
-        return (
-          <Tooltip
-            size="regular"
-            truncate
-            containsUnsafeHTMLTags
-            message={value as string}
-          >
-            <span dangerouslySetInnerHTML={{ __html: value as string }} />
-          </Tooltip>
-        );
-      },
+      format: (value) => (
+        <Tooltip
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
+        >
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       column: 'price',
@@ -157,6 +173,7 @@ export function useProductColumns() {
       column: 'quantity',
       id: 'quantity',
       label: t('default_quantity'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'archived_at',
@@ -236,6 +253,24 @@ export function useProductColumns() {
       column: 'tax_name3',
       id: 'tax_name3',
       label: t('tax_name3'),
+    },
+    {
+      column: 'tax_rate1',
+      id: 'tax_rate1',
+      label: t('tax_rate1'),
+      format: (value) => formatNumber(value),
+    },
+    {
+      column: 'tax_rate2',
+      id: 'tax_rate2',
+      label: t('tax_rate2'),
+      format: (value) => formatNumber(value),
+    },
+    {
+      column: 'tax_rate3',
+      id: 'tax_rate3',
+      label: t('tax_rate3'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'updated_at',

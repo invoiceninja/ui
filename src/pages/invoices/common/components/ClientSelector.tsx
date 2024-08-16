@@ -16,11 +16,11 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { useColorScheme } from '$app/common/colors';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
+import { ClientActionButtons } from './ClientActionButtons';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   readonly?: boolean;
@@ -36,8 +36,6 @@ interface Props {
 export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const [client, setClient] = useState<Client>();
-
-  const hasPermission = useHasPermission();
 
   const { resource } = props;
 
@@ -82,23 +80,7 @@ export function ClientSelector(props: Props) {
           />
         )}
 
-        {client && (
-          <div className="space-x-2">
-            {hasPermission('edit_client') && (
-              <Link to={route('/clients/:id/edit', { id: client.id })}>
-                {t('edit_client')}
-              </Link>
-            )}
-
-            {hasPermission('edit_client') && <span className="text-sm">/</span>}
-
-            {(hasPermission('view_client') || hasPermission('edit_client')) && (
-              <Link to={route('/clients/:id', { id: client.id })}>
-                {t('view_client')}
-              </Link>
-            )}
-          </div>
-        )}
+        {client && <ClientActionButtons client={client} />}
       </div>
 
       {resource?.client_id &&
@@ -123,7 +105,7 @@ export function ClientSelector(props: Props) {
                 }
               />
 
-              <div>
+              <div className="relative">
                 {contact.first_name && (
                   <p className="text-sm" style={{ color: colors.$3 }}>
                     {contact.email}
@@ -131,17 +113,25 @@ export function ClientSelector(props: Props) {
                 )}
 
                 {resource.invitations.length >= 1 && (
-                  <>
+                  <div className="flex space-x-2 mt-1">
                     <Link
                       to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`}
                       external
                     >
                       {t('view_in_portal')}
                     </Link>
-                    <CopyToClipboardIconOnly
-                      text={resource.invitations[0].link}
-                    />
-                  </>
+
+                    <Tooltip
+                      width="auto"
+                      placement="bottom"
+                      message={t('copy_link') as string}
+                      withoutArrow
+                    >
+                      <CopyToClipboardIconOnly
+                        text={resource.invitations[0].link}
+                      />
+                    </Tooltip>
+                  </div>
                 )}
               </div>
             </div>

@@ -17,15 +17,16 @@ import {
 } from '$app/pages/recurring-invoices/common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFooterColumns } from '$app/pages/recurring-invoices/common/hooks/useFooterColumns';
 
 export default function RecurringInvoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
 
-  const columns = useRecurringInvoiceColumns();
-
   const actions = useActions();
+  const columns = useRecurringInvoiceColumns();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -37,6 +38,7 @@ export default function RecurringInvoices() {
         }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"

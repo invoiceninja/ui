@@ -16,6 +16,7 @@ import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -60,6 +61,7 @@ export function InputField(props: Props) {
   }, [props.type, isInputMasked]);
 
   const colors = useColorScheme();
+  const reactSettings = useReactSettings({ overwrite: false });
 
   return (
     <section style={{ width: props.width }}>
@@ -84,6 +86,7 @@ export function InputField(props: Props) {
             ...props.style,
           }}
           min={props.min}
+          max={props.type === 'date' ? '9999-12-31' : undefined}
           maxLength={props.maxLength}
           autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
@@ -101,13 +104,50 @@ export function InputField(props: Props) {
           )}
           placeholder={props.placeholder || ''}
           onBlur={(event) => {
+            event.target.value =
+              event.target.value === '' && props.type === 'number'
+                ? '0'
+                : event.target.value;
+
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);
           }}
           onChange={(event) => {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
+              const scrollHeight = event.target.scrollHeight + 2;
+
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
+              }
+            }
+
             if (props.changeOverride && props.changeOverride === true) {
               props.onValueChange && props.onValueChange(event.target.value);
               props.onChange && props.onChange(event);
+            }
+          }}
+          onClick={(event: any) => {
+            if (
+              props.element === 'textarea' &&
+              reactSettings.preferences.auto_expand_product_table_notes
+            ) {
+              const scrollHeight = event.target.scrollHeight + 2;
+
+              if (scrollHeight < 200) {
+                event.target.style.height = scrollHeight + 'px';
+              }
+
+              if (scrollHeight > 200) {
+                event.target.style.height = 200 + 'px';
+              }
+            }
+          }}
+          onBlurCapture={(event: any) => {
+            if (props.element === 'textarea') {
+              event.target.style.removeProperty('height');
             }
           }}
           value={props.value}

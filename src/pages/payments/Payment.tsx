@@ -25,6 +25,10 @@ import { useSave } from './edit/hooks/useSave';
 import { useTabs } from './edit/hooks/useTabs';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -60,6 +64,12 @@ export default function Payment() {
     }
   }, [data]);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={t('payment')}
@@ -78,7 +88,7 @@ export default function Payment() {
           disableSaveButton: !paymentValue,
         })}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} disableBackupNavigation />
 
         <Outlet
@@ -89,6 +99,15 @@ export default function Payment() {
           }}
         />
       </Container>
+
+      <ChangeTemplateModal<PaymentEntity>
+        entity="payment"
+        entities={changeTemplateResources as PaymentEntity[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(payment) => `${t('number')}: ${payment.number}`}
+        bulkUrl="/api/v1/payments/bulk"
+      />
     </Default>
   );
 }

@@ -9,18 +9,15 @@
  */
 
 import { SelectOption } from '$app/components/datatables/Actions';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { useTranslation } from 'react-i18next';
 
 export function useCreditsFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('draft'),
       value: 'draft',
@@ -31,19 +28,19 @@ export function useCreditsFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
     {
       label: t('partial'),
       value: 'partial',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$2 || '#1D4ED8',
     },
     {
       label: t('applied'),
       value: 'applied',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
   ];
 

@@ -25,6 +25,11 @@ import { ExpenseStatus } from '../../common/components/ExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useCalculateExpenseAmount } from '../../common/hooks/useCalculateExpenseAmount';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { Icon } from '$app/components/icons/Icon';
+import { MdLaunch } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
+import { Link } from 'react-router-dom';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -83,7 +88,24 @@ export function Details(props: Props) {
         )}
 
         {expense && (
-          <Element leftSide={t('vendor')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('vendor')}</span>
+
+                {expense.vendor_id && (
+                  <Link
+                    to={route('/vendors/:id', {
+                      id: expense.vendor_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
+                )}
+              </div>
+            }
+          >
             <VendorSelector
               value={expense.vendor_id}
               onChange={(vendor) => handleChange('vendor_id', vendor.id)}
@@ -95,18 +117,41 @@ export function Details(props: Props) {
 
         {expense && (
           <Element leftSide={t('client')}>
-            <ClientSelector
-              value={expense.client_id}
-              clearButton={Boolean(expense.client_id)}
-              onClearButtonClick={() => handleChange('client_id', '')}
-              onChange={(client) => handleChange('client_id', client.id)}
-              errorMessage={errors?.errors.client_id}
-            />
+            <div className="flex flex-col space-y-2">
+              <ClientSelector
+                value={expense.client_id}
+                clearButton={Boolean(expense.client_id)}
+                onClearButtonClick={() => handleChange('client_id', '')}
+                onChange={(client) => handleChange('client_id', client.id)}
+                errorMessage={errors?.errors.client_id}
+              />
+
+              {expense.client_id && (
+                <ClientActionButtons clientId={expense.client_id} />
+              )}
+            </div>
           </Element>
         )}
 
         {expense && (
-          <Element leftSide={t('project')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-2">
+                <span>{t('project')}</span>
+
+                {expense.project_id && (
+                  <Link
+                    to={route('/projects/:id', {
+                      id: expense.project_id,
+                    })}
+                    target="_blank"
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
+                )}
+              </div>
+            }
+          >
             <ProjectSelector
               value={expense.project_id}
               clearButton={Boolean(expense.project_id)}
@@ -316,6 +361,7 @@ export function Details(props: Props) {
               value={expense.currency_id}
               onChange={(currency) => handleChange('currency_id', currency)}
               errorMessage={errors?.errors.currency_id}
+              dismissable
             />
           </Element>
         )}

@@ -108,23 +108,24 @@ export function Chart(props: Props) {
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
     if (!data || !date) return -1;
 
-    let isMatchingWithLastPointDay = false;
+    let isEntryDateMatch = false;
 
     const recordIndex = data.findIndex((entry, index) => {
       const nextEntry = data[index + 1];
 
       if (nextEntry) {
         const dateToCheck = parseDayjs(date);
+        const dateToCheck = parseDayjs(date);
 
+        const startDate = parseDayjs(entry.date);
+        const endDate = parseDayjs(nextEntry.date);
         const startDate = parseDayjs(entry.date);
         const endDate = parseDayjs(nextEntry.date);
 
         const isDateInRange =
-          dateToCheck.isAfter(startDate) &&
-          dateToCheck.isBefore(endDate) &&
-          !dateToCheck.isSame(parseDayjs(data[0].date));
+          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
 
-        const isEntryDateMatch = entry.date === date;
+        isEntryDateMatch = entry.date === date;
 
         isMatchingWithLastPointDay =
           startDate.isSame(dateToCheck) &&
@@ -133,12 +134,16 @@ export function Chart(props: Props) {
         return isDateInRange || isEntryDateMatch;
       }
 
+      if (!nextEntry && entry) {
+        isEntryDateMatch = entry.date === date;
+
+        return isEntryDateMatch;
+      }
+
       return false;
     });
 
-    return chartSensitivity !== 'day' &&
-      recordIndex > -1 &&
-      !isMatchingWithLastPointDay
+    return chartSensitivity !== 'day' && recordIndex > -1 && !isEntryDateMatch
       ? recordIndex + 1
       : recordIndex;
   };
@@ -221,7 +226,8 @@ export function Chart(props: Props) {
     return formatMoney(
       Number(number) || 0,
       company.settings.country_id,
-      currency
+      currency,
+      2
     ).toString();
   };
 

@@ -69,8 +69,8 @@ export function useInvoiceUtilities(props: Props) {
 
     if (currency && invoice) {
       const invoiceSum = invoice.uses_inclusive_taxes
-        ? new InvoiceSumInclusive(invoice, currency).build()
-        : new InvoiceSum(invoice, currency).build();
+        ? new InvoiceSumInclusive({ ...invoice }, currency).build()
+        : new InvoiceSum({ ...invoice }, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
@@ -109,7 +109,7 @@ export function useInvoiceUtilities(props: Props) {
           ...invoice,
           line_items: [
             ...invoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );

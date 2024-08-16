@@ -28,6 +28,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdNotStarted,
@@ -69,6 +70,14 @@ import { Assigned } from '$app/components/Assigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { User } from '$app/common/interfaces/user';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -111,6 +120,8 @@ export function useAllTaskColumns() {
     'is_running',
     'rate',
     'updated_at',
+    'user',
+    'assigned_user',
   ] as const;
 
   return taskColumns;
@@ -126,12 +137,23 @@ export function useTaskColumns() {
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
+
+  const formatUserName = (user: User) => {
+    const firstName = user?.first_name ?? '';
+    const lastName = user?.last_name ?? '';
+
+    if (firstName.length === 0 && lastName.length === 0)
+      return user?.email ?? 'Unknown User';
+
+    return `${firstName} ${lastName}`;
+  };
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -168,14 +190,21 @@ export function useTaskColumns() {
           <TaskStatus entity={task} />
 
           {task.invoice_id && (
-            <MdTextSnippet
-              className="cursor-pointer"
-              fontSize={19}
-              color={accentColor}
-              onClick={() =>
-                navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
-              }
-            />
+            <Tooltip
+              width="auto"
+              message={t('view_invoice') as string}
+              withoutArrow
+              placement="bottom"
+            >
+              <MdTextSnippet
+                className="cursor-pointer"
+                fontSize={19}
+                color={accentColor}
+                onClick={() =>
+                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                }
+              />
+            </Tooltip>
           )}
         </div>
       ),
@@ -213,12 +242,23 @@ export function useTaskColumns() {
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -328,6 +368,19 @@ export function useTaskColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, task) => formatUserName(task?.user),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, task) =>
+        task?.assigned_user ? formatUserName(task?.assigned_user) : '',
+    },
   ];
 
   const list: string[] =
@@ -354,6 +407,7 @@ export function useTaskFilters() {
   const [t] = useTranslation();
 
   const adjustColorDarkness = useAdjustColorDarkness();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const { data: taskStatuses } = useTaskStatusesQuery({
     status: 'active',
@@ -361,22 +415,16 @@ export function useTaskFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
-    {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('uninvoiced'),
       value: 'uninvoiced',
       color: 'white',
-      backgroundColor: '#F87171',
+      backgroundColor: statusThemeColors.$4 || '#F87171',
     },
   ];
 
@@ -431,6 +479,12 @@ export function useActions(params?: Params) {
     navigate('/tasks/create?action=clone');
   };
 
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const actions = [
     (task: Task) =>
       Boolean(showEditAction) && (
@@ -483,6 +537,21 @@ export function useActions(params?: Params) {
           {t('clone')}
         </DropdownElement>
       ),
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([task]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () =>
       (isEditPage || Boolean(showCommonBulkAction)) && (
         <Divider withoutPadding />
@@ -576,6 +645,12 @@ export const useCustomBulkActions = () => {
     setSelected?.([]);
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Task>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
@@ -636,6 +711,21 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/tasks/bulk',
+            entity: 'task',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

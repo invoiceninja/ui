@@ -33,6 +33,10 @@ import { Details } from './components/Details';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -123,6 +127,12 @@ export default function Edit() {
       });
   };
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -173,6 +183,15 @@ export default function Edit() {
               errors={errors}
             />
           </div>
+
+          <ChangeTemplateModal<Client>
+            entity="client"
+            entities={changeTemplateResources as Client[]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(client) => `${t('number')}: ${client.number}`}
+            bulkUrl="/api/v1/clients/bulk"
+          />
         </div>
       )}
     </Default>

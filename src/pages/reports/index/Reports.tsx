@@ -49,6 +49,9 @@ import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseC
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
 import { useShowReportField } from '../common/hooks/useShowReportField';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
 interface Range {
   identifier: string;
   label: string;
@@ -323,9 +326,12 @@ export default function Reports() {
       breadcrumbs={pages}
       onSaveClick={handleExport}
       saveButtonLabel={t('export')}
-      disableSaveButton={isPendingExport}
+      disableSaveButton={isPendingExport || (!proPlan() && !enterprisePlan())}
       navigationTopRight={
-        <Dropdown label={t('more_actions')}>
+        <Dropdown
+          label={t('more_actions')}
+          disabled={!proPlan() && !enterprisePlan()}
+        >
           {report.supports_previews && (
             <DropdownElement
               icon={<Icon element={MdOutlinePreview} />}
@@ -343,8 +349,9 @@ export default function Reports() {
           </DropdownElement>
         </Dropdown>
       }
-      withoutBackButton
     >
+      <ReportsPlanAlert />
+
       <div
         className="grid grid-cols-12 gap-4"
         style={{
@@ -588,7 +595,7 @@ export default function Reports() {
             </Element>
           )}
 
-          {report.identifier === 'product_sales' && (
+          {showReportField('client') && (
             <Element leftSide={t('client')}>
               <ClientSelector
                 value={report.payload.client_id}

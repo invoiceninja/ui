@@ -25,8 +25,8 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
-  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -51,6 +51,13 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -101,6 +108,7 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
@@ -167,12 +175,23 @@ export function useProjectColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -182,12 +201,23 @@ export function useProjectColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -195,13 +225,13 @@ export function useProjectColumns() {
       column: 'budgeted_hours',
       id: 'budgeted_hours',
       label: t('budgeted_hours'),
-      format: (value) => value,
+      format: (value) => formatNumber(value),
     },
     {
       column: 'total_hours',
       id: 'current_hours',
       label: t('total_hours'),
-      format: (value) => value,
+      format: (value) => formatNumber(value),
     },
     {
       column: 'entity_state',
@@ -290,7 +320,7 @@ export function useActions() {
 
   const invoiceProject = useInvoiceProject();
 
-  const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
+  const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'project',
     editPageTabs: ['documents'],
   });
@@ -321,7 +351,7 @@ export function useActions() {
           request(
             'GET',
             endpoint(
-              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active',
+              '/api/v1/tasks?project_tasks=:projectId&per_page=100&status=active&without_deleted_clients=true',
               {
                 projectId: project.id,
               }
@@ -344,19 +374,13 @@ export function useActions() {
       });
   };
 
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const actions = [
-    (project: Project) =>
-      isShowPage && (
-        <DropdownElement
-          onClick={() =>
-            navigate(route('/projects/:id/edit', { id: project.id }))
-          }
-          icon={<Icon element={MdEdit} />}
-        >
-          {t('edit')}
-        </DropdownElement>
-      ),
-    () => isShowPage && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
@@ -375,6 +399,21 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([project]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/projects/bulk',
+            entity: 'project',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -452,6 +491,12 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
+
   const customBulkActions: CustomBulkAction<Project>[] = [
     ({ selectedIds, selectedResources, setSelected }) =>
       hasPermission('create_invoice') && (
@@ -478,6 +523,21 @@ export const useCustomBulkActions = () => {
         icon={<Icon element={MdDownload} />}
       >
         {t('documents')}
+      </DropdownElement>
+    ),
+    ({ selectedResources }) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources(selectedResources);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/projects/bulk',
+            entity: 'project',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
       </DropdownElement>
     ),
   ];

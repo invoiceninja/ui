@@ -22,6 +22,7 @@ import { request } from '../helpers/request';
 import { useUserChanges } from './useInjectUserChanges';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../stores/slices/user';
+import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
   apiEndpoint: URL;
@@ -36,6 +37,7 @@ interface Params {
   setSortedBy: Dispatch<SetStateAction<string | undefined>>;
   setStatus: Dispatch<SetStateAction<string[]>>;
   setPerPage: Dispatch<SetStateAction<PerPage>>;
+  withoutStoringPerPage: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -55,9 +57,11 @@ export function useDataTablePreferences(params: Params) {
     setSortedBy,
     setStatus,
     setPerPage,
+    withoutStoringPerPage,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
+  const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
 
   const handleUpdateUserPreferences = (updatedUser: User) => {
     request(
@@ -89,22 +93,25 @@ export function useDataTablePreferences(params: Params) {
       user?.company_user?.react_settings.table_filters?.[tableKey];
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: ['all'] }),
+      ...(customFilters && { customFilter: [] }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
-      currentPage: 1,
       status: ['active'],
-      perPage: '10',
+      ...(!withoutStoringPerPage && { perPage: '10' }),
     };
 
     const cleanedUpFilters = {
-      ...(filter && { filter }),
       ...(sortedBy && { sortedBy }),
       ...(customFilters && { customFilter }),
       sort,
-      currentPage,
       status,
-      perPage,
+      ...(!withoutStoringPerPage && { perPage }),
     };
+
+    if (currentTableFilters && withoutStoringPerPage) {
+      delete currentTableFilters.perPage;
+    }
+
+    storeSessionTableFilters(filter, currentPage);
 
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
       return;
@@ -134,12 +141,13 @@ export function useDataTablePreferences(params: Params) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);
         } else {
-          setCustomFilter(['all']);
+          setCustomFilter([]);
         }
       } else {
         setCustomFilter([]);
       }
-      setPerPage((getPreference('perPage') as PerPage) || '10');
+      !withoutStoringPerPage &&
+        setPerPage((getPreference('perPage') as PerPage) || '10');
       setCurrentPage((getPreference('currentPage') as number) || 1);
       setSort((getPreference('sort') as string) || 'id|asc');
       setSortedBy((getPreference('sortedBy') as string) || undefined);

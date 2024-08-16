@@ -30,6 +30,10 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
@@ -101,6 +105,12 @@ export default function Project() {
       });
   };
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -117,7 +127,7 @@ export default function Project() {
         )
       }
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />
 
         <Outlet
@@ -129,6 +139,15 @@ export default function Project() {
           }}
         />
       </Container>
+
+      <ChangeTemplateModal<ProjectEntity>
+        entity="project"
+        entities={changeTemplateResources as ProjectEntity[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
+      />
     </Default>
   );
 }

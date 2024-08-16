@@ -22,6 +22,11 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Project } from '$app/common/interfaces/project';
 
 export default function Projects() {
   useTitle('projects');
@@ -39,13 +44,14 @@ export default function Projects() {
 
   const customBulkActions = useCustomBulkActions();
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   return (
-    <Default
-      title={t('projects')}
-      breadcrumbs={pages}
-      docsLink="en/projects/"
-      withoutBackButton
-    >
+    <Default title={t('projects')} breadcrumbs={pages} docsLink="en/projects/">
       <DataTable
         resource="project"
         endpoint="/api/v1/projects?status=active&include=client&without_deleted_clients=true&sort=id|desc"
@@ -65,6 +71,15 @@ export default function Projects() {
         }
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
+      />
+
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
       />
     </Default>
   );

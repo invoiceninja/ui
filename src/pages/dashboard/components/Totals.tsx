@@ -210,6 +210,8 @@ export function Totals() {
                 update('preferences.dashboard_charts.currency', parseInt(value))
               }
             >
+              <option value="999">{t('all')}</option>
+
               {currencies.map((currency, index) => (
                 <option key={index} value={currency.value}>
                   {currency.label}
@@ -330,9 +332,10 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Blue }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.invoices.invoiced_amount || 0,
+                        totalsData[currency]?.invoices?.invoiced_amount || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString(),
+                        2
                       )}
                     </span>
                   </Badge>
@@ -346,9 +349,10 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Green }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.revenue.paid_to_date || 0,
+                        totalsData[currency]?.revenue?.paid_to_date || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString(),
+                        2
                       )}
                     </span>
                   </Badge>
@@ -362,9 +366,10 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Gray }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.expenses.amount || 0,
+                        totalsData[currency]?.expenses?.amount || 0,
                         company.settings.country_id,
-                        currency.toString() ?? company.settings.currency_id
+                        currency.toString(),
+                        2
                       )}
                     </span>
                   </Badge>
@@ -378,9 +383,10 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Red }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.outstanding.amount || 0,
+                        totalsData[currency]?.outstanding?.amount || 0,
                         company.settings.country_id,
-                        currency.toString()
+                        currency.toString(),
+                        2
                       )}
                     </span>
                   </Badge>
@@ -394,7 +400,8 @@ export function Totals() {
 
                   <Badge variant="white">
                     <span className="mx-2 text-base">
-                      {totalsData[currency]?.outstanding.outstanding_count || 0}
+                      {totalsData[currency]?.outstanding?.outstanding_count ||
+                        0}
                     </span>
                   </Badge>
                 </div>

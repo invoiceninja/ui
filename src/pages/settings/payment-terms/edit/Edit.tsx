@@ -17,7 +17,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
 import { Badge } from '$app/components/Badge';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
@@ -36,7 +35,7 @@ export function Edit() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     {
       name: t('edit_payment_term'),
@@ -72,7 +71,11 @@ export function Edit() {
   });
 
   return (
-    <Settings title={t('payment_terms')}>
+    <Settings
+      title={t('payment_terms')}
+      breadcrumbs={pages}
+      navigationTopRight={data && <Actions paymentTerm={data.data.data} />}
+    >
       {!data && (
         <div className="flex justify-center">
           <Spinner />
@@ -80,14 +83,11 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
+        <Container breadcrumbs={[]}>
           <Card
             title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
             onFormSubmit={formik.handleSubmit}
-            additionalAction={<Actions paymentTerm={data.data.data} />}
             withSaveButton
           >
             <Element leftSide="Status">

@@ -23,11 +23,21 @@ import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
+import { date } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
@@ -84,22 +94,35 @@ export function useTransactionColumns() {
         }
       },
     },
-    { id: 'date', label: t('date') },
+    {
+      id: 'date',
+      label: t('date'),
+      format: (value) => date(value, dateFormat),
+    },
     {
       id: 'description',
       label: t('description'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={cleanDescriptionText(value as string)}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(cleanDescriptionText(value as string)),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{
-              __html: cleanDescriptionText(value as string),
-            }}
-          />
+          <span>
+            {extractTextFromHTML(
+              sanitizeHTML(cleanDescriptionText(value as string))
+            ).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

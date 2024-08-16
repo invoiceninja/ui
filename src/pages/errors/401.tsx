@@ -29,7 +29,7 @@ export function Unauthorized() {
   }, []);
 
   return (
-    <Default>
+    <Default breadcrumbs={[]}>
       <div className="flex flex-col items-center mt-14 space-y-4">
         {isLoading ? (
           <Spinner />

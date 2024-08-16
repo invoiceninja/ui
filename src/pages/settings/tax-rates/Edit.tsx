@@ -14,14 +14,12 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useTaxRateQuery } from '$app/common/queries/tax-rates';
 import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -96,6 +94,7 @@ export function Edit() {
           />
         )
       }
+      breadcrumbs={pages}
     >
       {!data && (
         <div className="flex justify-center">
@@ -104,9 +103,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
+        <div className="max-w-3xl">
           <Card
             withSaveButton
             onFormSubmit={formik.handleSubmit}
@@ -147,7 +144,7 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-        </Container>
+        </div>
       )}
     </Settings>
   );

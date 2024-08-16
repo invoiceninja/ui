@@ -33,8 +33,10 @@ import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdInventory,
   MdMarkEmailRead,
@@ -69,6 +71,14 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -117,8 +127,15 @@ export function useCreate(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -174,7 +191,9 @@ export function usePurchaseOrderColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
@@ -206,13 +225,19 @@ export function usePurchaseOrderColumns() {
         id: 'number',
         label: t('number'),
         format: (field, purchaseOrder) => (
-          <Link
-            to={route('/purchase_orders/:id/edit', {
-              id: purchaseOrder.id,
-            })}
-          >
-            {field}
-          </Link>
+          <div className="flex space-x-2">
+            <DynamicLink
+              to={route('/purchase_orders/:id/edit', { id: purchaseOrder.id })}
+              renderSpan={disableNavigation('purchase_order', purchaseOrder)}
+            >
+              {field}
+            </DynamicLink>
+
+            <CopyToClipboardIconOnly
+              text={purchaseOrder.number}
+              stopPropagation
+            />
+          </div>
         ),
       },
       {
@@ -325,11 +350,13 @@ export function usePurchaseOrderColumns() {
         id: 'discount',
         label: t('discount'),
         format: (value, purchaseOrder) =>
-          formatMoney(
-            value,
-            purchaseOrder.vendor?.country_id,
-            purchaseOrder.vendor?.currency_id
-          ),
+          purchaseOrder.is_amount_discount
+            ? formatMoney(
+                value,
+                purchaseOrder.vendor?.country_id,
+                purchaseOrder.vendor?.currency_id
+              )
+            : `${formatNumber(value)} %`,
       },
       {
         column: 'documents',
@@ -349,6 +376,7 @@ export function usePurchaseOrderColumns() {
         column: 'exchange_rate',
         id: 'exchange_rate',
         label: t('exchange_rate'),
+        format: (value) => formatNumber(value),
       },
     ];
 
@@ -363,13 +391,9 @@ export function usePurchaseOrderColumns() {
 export function usePurchaseOrderFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('draft'),
       value: 'draft',
@@ -380,19 +404,19 @@ export function usePurchaseOrderFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
     {
       label: t('accepted'),
       value: 'accepted',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$2 || '#1D4ED8',
     },
     {
       label: t('cancelled'),
       value: 'cancelled',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColors.$5 || '#e6b05c',
     },
   ];
 
@@ -401,28 +425,34 @@ export function usePurchaseOrderFilters() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
-  const bulk = useBulk();
-  const markSent = useMarkSent();
-  const hasPermission = useHasPermission();
-
-  const disableNavigation = useDisableNavigation();
-
+  const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-
-  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
-
-  const scheduleEmailRecord = useScheduleEmailRecord({
-    entity: 'purchase_order',
-  });
-  const printPdf = usePrintPdf({ entity: 'purchase_order' });
-
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'purchase_order',
   });
 
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const bulk = useBulk();
+  const navigate = useNavigate();
+  const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+  const printPdf = usePrintPdf({ entity: 'purchase_order' });
+  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+  const scheduleEmailRecord = useScheduleEmailRecord({
+    entity: 'purchase_order',
+  });
+  const downloadEPurchaseOrder = useDownloadEInvoice({
+    resource: 'purchase_order',
+    downloadType: 'download_e_purchase_order',
+  });
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({
@@ -488,6 +518,18 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) => (
+      <AddActivityComment
+        entity="purchase_order"
+        entityId={purchaseOrder.id}
+        label={`#${purchaseOrder.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
+    (purchaseOrder) => (
       <DropdownElement
         onClick={() => downloadPdf(purchaseOrder)}
         icon={<Icon element={MdDownload} />}
@@ -495,6 +537,15 @@ export function useActions() {
         {t('download')}
       </DropdownElement>
     ),
+    (purchaseOrder) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadEPurchaseOrder(purchaseOrder)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_purchase_order')}
+        </DropdownElement>
+      ),
     (purchaseOrder) =>
       purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
         <DropdownElement
@@ -555,6 +606,21 @@ export function useActions() {
         </DropdownElement>
       ),
     (purchaseOrder) => <CloneOptionsModal purchaseOrder={purchaseOrder} />,
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([purchaseOrder]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/purchase_orders/bulk',
+            entity: 'purchase_order',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

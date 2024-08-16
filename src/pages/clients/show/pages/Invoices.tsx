@@ -16,6 +16,7 @@ import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
+import { useFooterColumns } from '$app/pages/invoices/common/hooks/useFooterColumns';
 
 export default function Invoices() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function Invoices() {
   const actions = useActions();
   const columns = useInvoiceColumns();
   const customBulkActions = useCustomBulkActions();
+  const { footerColumns } = useFooterColumns();
 
   return (
     <DataTable
@@ -34,6 +36,7 @@ export default function Invoices() {
         { id }
       )}
       columns={columns}
+      footerColumns={footerColumns}
       customActions={actions}
       customBulkActions={customBulkActions}
       withResourcefulActions

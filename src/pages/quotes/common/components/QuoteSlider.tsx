@@ -52,6 +52,12 @@ import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-his
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import Toggle from '$app/components/forms/Toggle';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useColorScheme } from '$app/common/colors';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -91,6 +97,13 @@ function useGenerateActivityElement() {
             {activity?.contact?.label}
           </Link>
         ) ?? '',
+      notes: activity?.notes && (
+        <>
+          <br />
+
+          {activity?.notes}
+        </>
+      ),
     };
     for (const [variable, value] of Object.entries(replacements)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -106,11 +119,15 @@ export function QuoteSlider() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
 
+  const colors = useColorScheme();
+
   const actions = useActions({
     showCommonBulkAction: true,
     showEditAction: true,
   });
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const reactSettings = useReactSettings();
 
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
@@ -121,6 +138,7 @@ export function QuoteSlider() {
   const [quote, setQuote] = useAtom(quoteSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(quoteSliderVisibilityAtom);
 
+  const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
   const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
@@ -275,8 +293,18 @@ export function QuoteSlider() {
               <Tooltip
                 size="regular"
                 width="auto"
-                containsUnsafeHTMLTags
-                message={(resource?.reminder_schedule as string) ?? ''}
+                tooltipElement={
+                  <article
+                    className={classNames('prose prose-sm', {
+                      'prose-invert': reactSettings.dark_mode,
+                    })}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(
+                        (resource?.reminder_schedule as string) ?? ''
+                      ),
+                    }}
+                  />
+                }
               >
                 <h3 className="flex ml-3 mt-2 italic">
                   {t('reminders')} <MdInfo className="mt-1 ml-1" />
@@ -349,6 +377,7 @@ export function QuoteSlider() {
               <ClickableElement
                 key={activity.id}
                 to={`/activities/${activity.id}`}
+                disableNavigation={Boolean(!activity.history.id)}
               >
                 <div className="flex flex-col">
                   <div className="flex space-x-1">
@@ -382,16 +411,47 @@ export function QuoteSlider() {
         </div>
 
         <div>
-          {activities?.map((activity) => (
-            <NonClickableElement key={activity.id} className="flex flex-col">
-              <p>{activityElement(activity)}</p>
-              <div className="inline-flex items-center space-x-1">
-                <p>{date(activity.created_at, `${dateFormat} h:mm:ss A`)}</p>
-                <p>&middot;</p>
-                <p>{activity.ip}</p>
-              </div>
-            </NonClickableElement>
-          ))}
+          <div
+            className="flex items-center border-b px-6 pb-4 justify-between"
+            style={{ borderColor: colors.$4 }}
+          >
+            <Toggle
+              label={t('comments_only')}
+              checked={commentsOnly}
+              onValueChange={(value) => setCommentsOnly(value)}
+            />
+
+            <AddActivityComment
+              entity="quote"
+              entityId={resource?.id}
+              label={`#${resource?.number}`}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {activities
+              ?.filter(
+                (activity) =>
+                  (commentsOnly && activity.activity_type_id === 141) ||
+                  !commentsOnly
+              )
+              .map((activity) => (
+                <NonClickableElement
+                  key={activity.id}
+                  className="flex flex-col space-y-2"
+                >
+                  <p>{activityElement(activity)}</p>
+
+                  <div className="inline-flex items-center space-x-1">
+                    <p>
+                      {date(activity.created_at, `${dateFormat} h:mm:ss A`)}
+                    </p>
+                    <p>&middot;</p>
+                    <p>{activity.ip}</p>
+                  </div>
+                </NonClickableElement>
+              ))}
+          </div>
         </div>
 
         <div className="flex flex-col">

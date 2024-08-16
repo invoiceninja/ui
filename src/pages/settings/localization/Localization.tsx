@@ -40,7 +40,6 @@ export function Localization() {
       title={t('localization')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#localization"
-      withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />
       <div className="my-4">

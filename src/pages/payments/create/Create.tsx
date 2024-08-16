@@ -11,7 +11,6 @@
 import { Card, Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
-import paymentType from '$app/common/constants/payment-type';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -29,7 +28,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -43,6 +42,7 @@ import { ComboboxAsync } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -74,12 +74,15 @@ export default function Create() {
   ];
 
   const company = useCurrentCompany();
-  const invoiceResolver = useInvoiceResolver();
   const creditResolver = useCreditResolver();
+  const invoiceResolver = useInvoiceResolver();
+
   const formatMoney = useFormatMoney();
+  const paymentTypes = usePaymentTypes();
 
   const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
   );
@@ -206,19 +209,16 @@ export default function Create() {
     setPayment((current) => current && { ...current, [field]: value });
   };
 
-  const onSubmit = useSave(setErrors);
+  const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        onSubmit(payment as unknown as Payment, sendEmail);
-      }}
-      disableSaveButton={!payment}
+      onSaveClick={() => onSubmit(payment as unknown as Payment, sendEmail)}
+      disableSaveButton={!payment || isFormBusy}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <ClientSelector
@@ -521,9 +521,9 @@ export default function Create() {
               errorMessage={errors?.errors.type_id}
               withBlank
             >
-              {Object.entries(paymentType).map(([id, type], index) => (
-                <option value={id} key={index}>
-                  {t(type)}
+              {paymentTypes.map(([key, value], index) => (
+                <option value={key} key={index}>
+                  {value}
                 </option>
               ))}
             </SelectField>

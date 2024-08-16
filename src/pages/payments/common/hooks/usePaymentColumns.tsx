@@ -26,6 +26,12 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'status',
@@ -87,6 +93,7 @@ export function usePaymentColumns() {
   type PaymentColumns = (typeof paymentColumns)[number];
 
   const formatMoney = useFormatMoney();
+  const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const resolveCurrency = useResolveCurrency();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -227,8 +234,8 @@ export function usePaymentColumns() {
     },
     {
       column: 'converted_amount',
-      id: 'amount',
-      label: t('amount'),
+      id: 'converted_amount' as keyof Payment,
+      label: t('converted_amount'),
       format: (value, payment) =>
         formatMoney(
           calculateConvertedAmount(payment),
@@ -276,6 +283,7 @@ export function usePaymentColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -289,12 +297,23 @@ export function usePaymentColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -326,7 +345,9 @@ export function usePaymentColumns() {
       label: t('credits'),
       format: (value, payment) =>
         formatMoney(
-          payment.paymentables.filter((item) => item.credit_id != undefined).reduce((sum, paymentable) => sum + paymentable.amount, 0),
+          payment.paymentables
+            .filter((item) => item.credit_id != undefined)
+            .reduce((sum, paymentable) => sum + paymentable.amount, 0),
           payment.client?.country_id,
           payment.client?.settings.currency_id
         ),

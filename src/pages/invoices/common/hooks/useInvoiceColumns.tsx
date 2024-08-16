@@ -26,6 +26,13 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -115,6 +122,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
@@ -139,12 +147,16 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
-          renderSpan={disableNavigation('invoice', invoice)}
-        >
-          {value}
-        </DynamicLink>
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/invoices/:id/edit', { id: invoice.id })}
+            renderSpan={disableNavigation('invoice', invoice)}
+          >
+            {value}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={invoice.number} stopPropagation />
+        </div>
       ),
     },
     {
@@ -287,11 +299,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'discount',
       label: t('discount'),
       format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id,
-          invoice.client?.settings.currency_id
-        ),
+        invoice.is_amount_discount
+          ? formatMoney(
+              value,
+              invoice.client?.country_id,
+              invoice.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -309,6 +323,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -371,14 +386,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -388,14 +412,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },

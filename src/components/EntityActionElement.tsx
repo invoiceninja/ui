@@ -17,6 +17,7 @@ import { DropdownElement } from './dropdown/DropdownElement';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import { Entity } from './CommonActionsPreferenceModal';
 import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 interface Props extends CommonProps {
   onClick?: () => void;
@@ -28,10 +29,15 @@ interface Props extends CommonProps {
   entity: Entity;
   actionKey: string;
   excludePreferences?: boolean;
+  disablePreventNavigation?: boolean;
 }
 
 export function EntityActionElement(props: Props) {
   const navigate = useNavigate();
+
+  const preventNavigation = usePreventNavigation({
+    disablePrevention: props.disablePreventNavigation,
+  });
 
   const {
     isCommonActionSection,
@@ -62,7 +68,13 @@ export function EntityActionElement(props: Props) {
         message={tooltipText as string}
         withoutArrow
       >
-        <div onClick={() => (to ? navigate(to) : onClick?.())}>
+        <div
+          onClick={() =>
+            preventNavigation({
+              fn: () => (to ? navigate(to) : onClick?.()),
+            })
+          }
+        >
           <Icon element={icon} size={23.5} />
         </div>
       </Tooltip>

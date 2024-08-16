@@ -22,7 +22,7 @@ import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import duration from 'dayjs/plugin/duration';
 import dayjs from 'dayjs';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -47,6 +47,17 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Expense } from '$app/common/interfaces/expense';
+import { Quote } from '$app/common/interfaces/quote';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
+import { ProjectPublicNotes } from './components/ProjectPublicNotes';
 
 dayjs.extend(duration);
 
@@ -56,6 +67,8 @@ export default function Show() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const navigate = useNavigate();
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
@@ -71,7 +84,9 @@ export default function Show() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/projects/${id}?include=client,tasks`)
+        endpoint(
+          `/api/v1/projects/${id}?include=client,tasks,invoices,quotes,expenses`
+        )
       ).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
@@ -91,6 +106,12 @@ export default function Show() {
   const showEditOption = useShowEditOption();
   const colors = useColorScheme();
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
   if (!project) {
     return (
       <Default title={documentTitle} breadcrumbs={pages}>
@@ -108,71 +129,102 @@ export default function Show() {
           navigationTopRight: (
             <ResourceActions
               resource={project}
-              label={t('more_actions')}
               actions={projectActions}
+              saveButtonLabel={t('edit')}
+              onSaveClick={() => navigate(route('/projects/:id/edit', { id }))}
               cypressRef="projectActionDropdown"
             />
           ),
         })}
     >
-      <div className="grid grid-cols-3 gap-4">
-        <InfoCard title={t('details')}>
-          {project && (
-            <div className="flex space-x-20 my-3">
-              <span
-                className="text-sm"
-                style={{
-                  backgroundColor: colors.$2,
-                  color: colors.$3,
-                  colorScheme: colors.$0,
-                }}
-              >
-                {t('status')}
-              </span>
-              <EntityStatus entity={project} />
-            </div>
-          )}
+      <div className="grid grid-cols-12 lg:space-y-0 gap-4">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoCard title={project.name}>
+            {project && (
+              <div className="flex space-x-20 my-3">
+                <span
+                  className="text-sm"
+                  style={{
+                    backgroundColor: colors.$2,
+                    color: colors.$3,
+                    colorScheme: colors.$0,
+                  }}
+                >
+                  {t('status')}
+                </span>
 
-          <Link
-            className="block"
-            to={route('/clients/:id', { id: project.client_id })}
-          >
-            {project.client?.display_name}
-          </Link>
-
-          {project.due_date.length > 0 && (
-            <p>
-              {t('due_date')}: {date(project.due_date, dateFormat)}
-            </p>
-          )}
-
-          <p>
-            {t('budgeted_hours')}: {project.budgeted_hours}
-          </p>
-
-          <p>
-            {t('task_rate')}:
-            {formatMoney(
-              project.task_rate,
-              project.client?.country_id,
-              project.client?.settings.currency_id
+                <EntityStatus entity={project} />
+              </div>
             )}
-          </p>
-        </InfoCard>
 
-        <InfoCard title={t('notes')}>
-          <p>{project.public_notes}</p>
-        </InfoCard>
+            {project.client && (
+              <ClientActionButtons displayClientName client={project.client} />
+            )}
 
-        <InfoCard title={t('summary')}>
-          <p>
-            {t('tasks')}: {project.tasks?.length}
-          </p>
+            <div className="mt-2">
+              {project.due_date.length > 0 && (
+                <p>
+                  {t('due_date')}: {date(project.due_date, dateFormat)}
+                </p>
+              )}
 
-          <p>
-            {t('total_hours')}: {project.current_hours}
-          </p>
-        </InfoCard>
+              <p>
+                {t('budgeted_hours')}: {formatNumber(project.budgeted_hours)}
+              </p>
+
+              <p>
+                {t('task_rate')}:{' '}
+                {formatMoney(
+                  project.task_rate,
+                  project.client?.country_id,
+                  project.client?.settings.currency_id
+                )}
+              </p>
+            </div>
+
+            <div className="mt-2">
+              {project?.invoices?.map((invoice: Invoice, index: number) => (
+                <div key={index}>
+                  <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
+                    {t('invoice')} #{invoice.number}
+                  </Link>
+                </div>
+              ))}
+
+              {project?.quotes?.map((quote: Quote, index: number) => (
+                <div key={index}>
+                  <Link to={route('/quotes/:id/edit', { id: quote.id })}>
+                    {t('quote')} #{quote.number}
+                  </Link>
+                </div>
+              ))}
+
+              {project?.expenses?.map((expense: Expense, index: number) => (
+                <div key={index}>
+                  <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+                    {t('expense')} #{expense.number}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </InfoCard>
+        </div>
+
+        <ProjectPrivateNotes project={project} />
+
+        <ProjectPublicNotes project={project} />
+
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoCard title={t('summary')}>
+            <p>
+              {t('tasks')}: {project.tasks?.length}
+            </p>
+
+            <p>
+              {t('total_hours')}: {formatNumber(project.current_hours)}
+            </p>
+          </InfoCard>
+        </div>
       </div>
 
       {enabled(ModuleBitmask.Tasks) && (
@@ -181,7 +233,7 @@ export default function Show() {
             resource="task"
             columns={columns}
             customActions={taskActions}
-            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
+            endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
             bulkRoute="/api/v1/tasks/bulk"
             linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
             linkToEdit="/tasks/:id/edit"
@@ -202,6 +254,15 @@ export default function Show() {
           />
         </div>
       )}
+
+      <ChangeTemplateModal<Project>
+        entity="project"
+        entities={changeTemplateResources as Project[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(project) => `${t('number')}: ${project.number}`}
+        bulkUrl="/api/v1/projects/bulk"
+      />
     </Default>
   );
 }

@@ -18,10 +18,10 @@ import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
   duration,
-  handleTaskDateChange,
   handleTaskDurationChange,
-  handleTaskTimeChange,
   parseTimeToDate,
+  useHandleTaskDateChange,
+  useHandleTaskTimeChange,
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { parseTime } from '../helpers';
@@ -47,6 +47,9 @@ export function TaskTable(props: Props) {
   const colors = useColorScheme();
 
   const company = useCurrentCompany();
+
+  const handleTaskTimeChange = useHandleTaskTimeChange();
+  const handleTaskDateChange = useHandleTaskDateChange();
 
   const [lastChangedIndex, setLastChangedIndex] = useState<number>();
 
@@ -220,7 +223,12 @@ export function TaskTable(props: Props) {
                         type="date"
                         value={parseTimeToDate(stop)}
                         onValueChange={(value) =>
-                          handleDateChange(stop, value, index, LogPosition.End)
+                          handleDateChange(
+                            stop,
+                            value || parseTimeToDate(start) || '',
+                            index,
+                            LogPosition.End
+                          )
                         }
                       />
                     </Td>
@@ -231,9 +239,14 @@ export function TaskTable(props: Props) {
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="time"
                       step="1"
-                      value={parseTime(stop) || 0}
+                      value={parseTime(stop)}
                       onValueChange={(value) =>
-                        handleTimeChange(stop, value, LogPosition.End, index)
+                        handleTimeChange(
+                          stop,
+                          value || parseTime(start) || '',
+                          LogPosition.End,
+                          index
+                        )
                       }
                     />
                   </Td>

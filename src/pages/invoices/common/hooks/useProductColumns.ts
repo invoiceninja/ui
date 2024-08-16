@@ -183,6 +183,12 @@ export function useProductColumns() {
 
     updatedVariables.push('$product.line_total');
 
+    if (!company?.enable_product_quantity) {
+      updatedVariables = updatedVariables.filter(
+        (variable) => variable !== '$product.quantity'
+      );
+    }
+
     setColumns(updatedVariables);
   }, [company]);
 

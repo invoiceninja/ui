@@ -24,6 +24,11 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { Spinner } from '$app/components/Spinner';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Page } from '$app/components/Breadcrumbs';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');
@@ -64,8 +69,26 @@ export default function Task() {
     }
   }, [data]);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
+
+  const pages: Page[] = [
+    {
+      name: t('tasks'),
+      href: route('/tasks'),
+    },
+    {
+      name: t('edit_task'),
+      href: route('/tasks/:id', { id }),
+    },
+  ];
+
   return (
     <Default
+      breadcrumbs={pages}
       title={documentTitle}
       disableSaveButton={isFormBusy}
       {...((hasPermission('edit_task') || entityAssigned(task)) &&
@@ -95,6 +118,15 @@ export default function Task() {
       ) : (
         <Spinner />
       )}
+
+      <ChangeTemplateModal<TaskType>
+        entity="task"
+        entities={changeTemplateResources as TaskType[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(task) => `${t('number')}: ${task.number}`}
+        bulkUrl="/api/v1/tasks/bulk"
+      />
     </Default>
   );
 }

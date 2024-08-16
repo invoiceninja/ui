@@ -92,6 +92,32 @@ export function Notifications() {
     dispatch(injectInChangesWithData(user));
   };
 
+  const handleTaskAssignedNotificationChange = (value: boolean) => {
+    const emailNotifications = userChanges?.company_user?.notifications?.email;
+
+    let updatedNotifications: string[] = [...emailNotifications];
+
+    if (!value) {
+      updatedNotifications = updatedNotifications.filter(
+        (notificationKey) => notificationKey !== 'task_assigned'
+      );
+    } else {
+      const isAlreadyAdded = updatedNotifications.find(
+        (notificationKey) => notificationKey === 'task_assigned'
+      );
+
+      if (!isAlreadyAdded) {
+        updatedNotifications = [...updatedNotifications, 'task_assigned'];
+      }
+    }
+
+    const user = cloneDeep(userChanges);
+
+    set(user, 'company_user.notifications.email', updatedNotifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
+
   useEffect(() => {
     const emailNotifications = userChanges?.company_user?.notifications?.email;
 
@@ -110,7 +136,6 @@ export function Notifications() {
   return (
     <Card title={t('notifications')}>
       <Element
-        className="mb-4"
         leftSide={t('login_notification')}
         leftSideHelp={t('login_notification_help')}
       >
@@ -119,6 +144,21 @@ export function Notifications() {
           onChange={(value) =>
             handleChange('user_logged_in_notification', value)
           }
+        />
+      </Element>
+
+      <Element
+        className="mb-4"
+        leftSide={t('task_assigned_notification')}
+        leftSideHelp={t('task_assigned_notification_help')}
+      >
+        <Toggle
+          checked={Boolean(
+            userChanges?.company_user?.notifications?.email?.find(
+              (key: string) => key === 'task_assigned'
+            )
+          )}
+          onChange={(value) => handleTaskAssignedNotificationChange(value)}
         />
       </Element>
 

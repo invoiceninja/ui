@@ -21,7 +21,12 @@ export function useGenerateWeekDateRange() {
 
     let currentDate = start.clone();
 
-    while (currentDate.isBefore(end) || currentDate.isSame(end, 'day')) {
+    const formattedEndDate = dayjs.utc(end).format('YYYY-MM-DD');
+
+    while (
+      currentDate.isBefore(formattedEndDate, 'day') ||
+      currentDate.isSame(formattedEndDate, 'day')
+    ) {
       if (currentDate.isSame(start, 'day')) {
         dates.push(start.toDate());
       }
@@ -32,8 +37,12 @@ export function useGenerateWeekDateRange() {
 
     const lengthOfDates = dates.length;
 
-    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(end)) {
+    if (dayjs.utc(dates[lengthOfDates - 1]).isAfter(formattedEndDate, 'day')) {
       dates[lengthOfDates - 1] = end.toDate();
+    }
+
+    if (dayjs.utc(dates[lengthOfDates - 1]).isBefore(formattedEndDate, 'day')) {
+      dates.push(end.toDate());
     }
 
     return dates;

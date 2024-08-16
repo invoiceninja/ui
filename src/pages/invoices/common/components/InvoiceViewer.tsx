@@ -12,10 +12,10 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useEffect, useRef, useState } from 'react';
 import { Resource } from './InvoicePreview';
-import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/InvoiceDesign';
+import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/CustomDesign';
 
 interface Props {
   link: string;
@@ -26,6 +26,8 @@ interface Props {
   height?: number;
   enabled?: boolean;
   renderAsHTML?: boolean;
+  onError?: (error: any) => unknown;
+  onRequest?: () => unknown;
 }
 
 export const android = Boolean(navigator.userAgent.match(/Android/i));
@@ -50,8 +52,13 @@ export function InvoiceViewer(props: Props) {
     if (props.enabled !== false) {
       queryClient.fetchQuery({
         queryKey: [props.link, JSON.stringify(props.resource)],
-        queryFn: ({ signal }) =>
-          request(props.method, props.link, props.resource, {
+        retry: 0,
+        queryFn: ({ signal }) => {
+          if (props.onRequest) {
+            props.onRequest();
+          }
+
+          return request(props.method, props.link, props.resource, {
             responseType: 'arraybuffer',
             signal,
           })
@@ -75,7 +82,15 @@ export function InvoiceViewer(props: Props) {
 
               toast.dismiss();
             })
-            .finally(() => setIsLoading(false)),
+            .catch((error) => {
+              if (props.onError) {
+                props.onError(error);
+              }
+
+              toast.dismiss();
+            })
+            .finally(() => setIsLoading(false));
+        },
       });
     }
 

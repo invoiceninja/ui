@@ -52,13 +52,18 @@ export function useSettingsRoutes() {
     {
       name: t('payment_settings'),
       href: '/settings/online_payments',
-      current: location.pathname.startsWith('/settings/online_payments'),
+      current:
+        location.pathname.startsWith('/settings/online_payments') ||
+        location.pathname.startsWith('/settings/gateways') ||
+        location.pathname.startsWith('/settings/payment_terms'),
       enabled: isAdmin || isOwner || false,
     },
     {
       name: t('tax_settings'),
       href: '/settings/tax_settings',
-      current: location.pathname.startsWith('/settings/tax_settings'),
+      current:
+        location.pathname.startsWith('/settings/tax_settings') ||
+        location.pathname.startsWith('/settings/tax_rates'),
       enabled: isAdmin || isOwner || false,
     },
     {
@@ -70,13 +75,17 @@ export function useSettingsRoutes() {
     {
       name: t('task_settings'),
       href: '/settings/task_settings',
-      current: location.pathname.startsWith('/settings/task_settings'),
+      current:
+        location.pathname.startsWith('/settings/task_settings') ||
+        location.pathname.startsWith('/settings/task_statuses'),
       enabled: isAdmin || isOwner || false,
     },
     {
       name: t('expense_settings'),
       href: '/settings/expense_settings',
-      current: location.pathname.startsWith('/settings/expense_settings'),
+      current:
+        location.pathname.startsWith('/settings/expense_settings') ||
+        location.pathname.startsWith('/settings/expense_categories'),
       enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
@@ -115,7 +124,7 @@ export function useSettingsRoutes() {
     {
       name: t('custom_fields'),
       href: '/settings/custom_fields',
-      current: location.pathname.endsWith('/settings/custom_fields'),
+      current: location.pathname.startsWith('/settings/custom_fields'),
       enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {

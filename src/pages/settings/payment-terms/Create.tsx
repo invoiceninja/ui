@@ -19,7 +19,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankPaymentTermQuery } from '$app/common/queries/payment-terms';
-import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
@@ -40,7 +39,7 @@ export function Create() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     { name: t('create_payment_term'), href: '/settings/payment_terms/create' },
   ];
@@ -105,10 +104,8 @@ export function Create() {
   }, [blankPaymentTerm]);
 
   return (
-    <Settings title={t('payment_terms')}>
-      <Container className="space-y-6">
-        <Breadcrumbs pages={pages} />
-
+    <Settings title={t('payment_terms')} breadcrumbs={pages}>
+      <Container breadcrumbs={[]}>
         <Card
           title={documentTitle}
           withSaveButton

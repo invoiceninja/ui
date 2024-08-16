@@ -15,6 +15,7 @@ import { Invoice } from '../interfaces/invoice';
 import { Payment } from '../interfaces/payment';
 import { Product } from '../interfaces/product';
 import { Project } from '../interfaces/project';
+import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Quote } from '../interfaces/quote';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
@@ -37,7 +38,8 @@ type Entity =
   | 'expense'
   | 'vendor'
   | 'recurring_expense'
-  | 'bank_transaction';
+  | 'bank_transaction'
+  | 'purchase_order';
 
 type Resource =
   | Client
@@ -52,7 +54,8 @@ type Resource =
   | Expense
   | Vendor
   | RecurringExpense
-  | Transaction;
+  | Transaction
+  | PurchaseOrder;
 
 export function useDisableNavigation() {
   const hasPermission = useHasPermission();

@@ -26,13 +26,17 @@ export function Clients() {
     <div className="mt-8">
       <DataTable
         resource="client"
-        endpoint={route('/api/v1/clients?group=:groupId&sort=id|desc', {
-          groupId: id,
-        })}
+        endpoint={route(
+          '/api/v1/clients?include=group_settings&group=:groupId&sort=id|desc',
+          {
+            groupId: id,
+          }
+        )}
         bulkRoute="/api/v1/clients/bulk"
         linkToEdit="/clients/:id/edit"
         columns={columns}
         customActions={actions}
+        bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
         withResourcefulActions
         linkToCreate={route('/clients/create?group=:groupId', {

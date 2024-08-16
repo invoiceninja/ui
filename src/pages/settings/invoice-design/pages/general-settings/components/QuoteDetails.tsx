@@ -40,6 +40,7 @@ export default function QuoteDetails() {
       label: customField('invoice4').label() || t('custom4'),
     },
     { value: '$client.balance', label: t('client_balance') },
+    { value: '$quote.project', label: t('project') },
   ];
 
   return (

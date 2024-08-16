@@ -24,8 +24,10 @@ import {
   MdArchive,
   MdCancel,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdEdit,
   MdMarkEmailRead,
@@ -53,6 +55,9 @@ import {
 import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -71,27 +76,38 @@ interface Params {
 export function useActions(params?: Params) {
   const { t } = useTranslation();
 
-  const hasPermission = useHasPermission();
-
-  const { isAdmin, isOwner } = useAdmin();
-
   const {
     showEditAction,
     showCommonBulkAction,
     dropdown = true,
   } = params || {};
 
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
+  const { isEditPage } = useEntityPageIdentifier({
+    entity: 'invoice',
+    editPageTabs: [
+      'documents',
+      'settings',
+      'activity',
+      'history',
+      'email_history',
+    ],
+  });
+
+  const bulk = useBulk();
   const navigate = useNavigate();
+  const hasPermission = useHasPermission();
+  const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
   const printPdf = usePrintPdf({ entity: 'invoice' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
-
-  const reverseInvoice = useReverseInvoice();
-
-  const bulk = useBulk();
-
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'invoice' });
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
 
@@ -163,6 +179,7 @@ export function useActions(params?: Params) {
           tooltipText={t('print_pdf')}
           onClick={() => printPdf([invoice.id])}
           icon={MdPrint}
+          disablePreventNavigation
         >
           {t('print_pdf')}
         </EntityActionElement>
@@ -210,24 +227,48 @@ export function useActions(params?: Params) {
         tooltipText={t('download')}
         onClick={() => downloadPdf(invoice)}
         icon={MdDownload}
+        disablePreventNavigation
       >
         {t('download')}
       </EntityActionElement>
     ),
+    (invoice: Invoice) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'download_e_invoice',
+          })}
+          entity="invoice"
+          actionKey="download_e_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('download_e_invoice')}
+          onClick={() => downloadEInvoice(invoice)}
+          icon={MdDownload}
+          disablePreventNavigation
+        >
+          {t('download_e_invoice')}
+        </EntityActionElement>
+      ),
     (invoice: Invoice) => (
-      <EntityActionElement
+      <AddActivityComment
         {...(!dropdown && {
-          key: 'download_e_invoice',
+          key: 'add_comment',
         })}
         entity="invoice"
-        actionKey="download_e_invoice"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('download_e_invoice')}
-        onClick={() => downloadEInvoice(invoice)}
-        icon={MdDownload}
-      >
-        {t('download_e_invoice')}
-      </EntityActionElement>
+        entityId={invoice.id}
+        label={`#${invoice.number}`}
+        labelElement={
+          <EntityActionElement
+            entity="invoice"
+            actionKey="add_comment"
+            isCommonActionSection={!dropdown}
+            tooltipText={t('add_comment')}
+            icon={MdComment}
+          >
+            {t('add_comment')}
+          </EntityActionElement>
+        }
+      />
     ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Draft &&
@@ -242,6 +283,7 @@ export function useActions(params?: Params) {
           tooltipText={t('mark_sent')}
           onClick={() => bulk([invoice.id], 'mark_sent')}
           icon={MdMarkEmailRead}
+          disablePreventNavigation
         >
           {t('mark_sent')}
         </EntityActionElement>
@@ -259,6 +301,7 @@ export function useActions(params?: Params) {
           tooltipText={t('mark_paid')}
           onClick={() => bulk([invoice.id], 'mark_paid')}
           icon={MdPaid}
+          disablePreventNavigation
         >
           {t('mark_paid')}
         </EntityActionElement>
@@ -275,6 +318,7 @@ export function useActions(params?: Params) {
           tooltipText={t('auto_bill')}
           onClick={() => bulk([invoice.id], 'auto_bill')}
           icon={BiMoney}
+          disablePreventNavigation
         >
           {t('auto_bill')}
         </EntityActionElement>
@@ -310,27 +354,12 @@ export function useActions(params?: Params) {
         tooltipText={t('client_portal')}
         onClick={() => invoice && openClientPortal(invoice)}
         icon={MdCloudCircle}
+        disablePreventNavigation
       >
         {t('client_portal')}
       </EntityActionElement>
     ),
-    (invoice: Invoice) =>
-      (invoice.status_id === InvoiceStatus.Sent ||
-        invoice.status_id === InvoiceStatus.Partial) && (
-        <EntityActionElement
-          {...(!dropdown && {
-            key: 'cancel_invoice',
-          })}
-          entity="invoice"
-          actionKey="cancel_invoice"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('cancel_invoice')}
-          onClick={() => bulk([invoice.id], 'cancel')}
-          icon={MdCancel}
-        >
-          {t('cancel_invoice')}
-        </EntityActionElement>
-      ),
+
     (invoice: Invoice) =>
       (invoice.status_id === InvoiceStatus.Paid ||
         invoice.status_id === InvoiceStatus.Partial) &&
@@ -351,6 +380,21 @@ export function useActions(params?: Params) {
           {t('reverse')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([invoice]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/invoices/bulk',
+            entity: 'invoice',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) =>
       hasPermission('create_invoice') && (
@@ -394,6 +438,7 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'archive')}
           icon={MdArchive}
           excludePreferences
+          disablePreventNavigation
         >
           {t('archive')}
         </EntityActionElement>
@@ -413,6 +458,7 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'restore')}
           icon={MdRestore}
           excludePreferences
+          disablePreventNavigation
         >
           {t('restore')}
         </EntityActionElement>
@@ -431,8 +477,25 @@ export function useActions(params?: Params) {
           onClick={() => bulk([invoice.id], 'delete')}
           icon={MdDelete}
           excludePreferences
+          disablePreventNavigation
         >
           {t('delete')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
+      (invoice.status_id === InvoiceStatus.Sent ||
+        invoice.status_id === InvoiceStatus.Partial) && (
+        <EntityActionElement
+          key="cancel_invoice"
+          entity="invoice"
+          actionKey="cancel_invoice"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('cancel_invoice')}
+          onClick={() => bulk([invoice.id], 'cancel')}
+          icon={MdCancel}
+          disablePreventNavigation
+        >
+          {t('cancel_invoice')}
         </EntityActionElement>
       ),
   ];

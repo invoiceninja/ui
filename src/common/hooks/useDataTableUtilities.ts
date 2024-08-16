@@ -57,7 +57,7 @@ export function useDataTableUtilities(params: Params) {
 
       const currentStatuses = preferenceCustomFilters?.length
         ? preferenceCustomFilters
-        : ['all'];
+        : [];
 
       return (
         customFilters.filter(({ value }) =>

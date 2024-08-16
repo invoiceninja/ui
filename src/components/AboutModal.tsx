@@ -48,6 +48,7 @@ interface SystemInfo {
     is_okay: boolean;
     memory_limit: string;
   };
+  is_docker: boolean;
   env_writable: boolean;
   simple_db_check: boolean;
   cache_enabled: boolean;
@@ -99,7 +100,7 @@ export function AboutModal(props: Props) {
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo>();
 
-  const { data: installedVersion } = useQuery({
+  const { data: latestVersion } = useQuery({
     queryKey: ['/api/v1/self-update/check_version'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/self-update/check_version')).then(
@@ -108,13 +109,16 @@ export function AboutModal(props: Props) {
     staleTime: Infinity,
   });
 
-  const { data: latestVersion } = useQuery({
-    queryKey: ['https://pdf.invoicing.co/api/version'],
+  const { data: currentSystemInfo } = useQuery({
+    queryKey: ['/api/v1/health_check'],
     queryFn: () =>
-      request('GET', 'https://pdf.invoicing.co/api/version').then(
+      request('GET', endpoint('/api/v1/health_check')).then(
         (response) => response.data
       ),
     staleTime: Infinity,
+    enabled:
+      isSelfHosted() &&
+      !(import.meta.env.VITE_API_URL as string).includes('staging'), // Note: The staging API helped me test this functionality, but the health_check endpoint is not available on the staging API.
   });
 
   const handleHealthCheck = (allowAction?: boolean) => {
@@ -217,18 +221,21 @@ export function AboutModal(props: Props) {
           </Button>
         )}
 
-        {isSelfHosted() && (
-          <Button
-            behavior="button"
-            className="flex items-center"
-            onClick={() => setIsForceUpdateModalOpen(true)}
-            disableWithoutIcon
-            disabled={isFormBusy}
-          >
-            <Icon element={DownloadCloud} color="white" />
-            <span>{t('force_update')}</span>
-          </Button>
-        )}
+        {isSelfHosted() &&
+          latestVersion &&
+          currentSystemInfo?.api_version &&
+          currentSystemInfo.api_version !== latestVersion && (
+            <Button
+              behavior="button"
+              className="flex items-center"
+              onClick={() => setIsForceUpdateModalOpen(true)}
+              disableWithoutIcon
+              disabled={isFormBusy}
+            >
+              <Icon element={DownloadCloud} color="white" />
+              <span>{t('force_update')}</span>
+            </Button>
+          )}
 
         <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
           <a
@@ -346,38 +353,39 @@ export function AboutModal(props: Props) {
           </div>
 
           {(Boolean(!systemInfo?.env_writable) ||
-            Boolean(systemInfo?.file_permissions !== 'Ok')) && (
-            <Div
-              className="flex justify-between items-center cursor-pointer py-1 px-3"
-              theme={{
-                hoverColor: colors.$5,
-              }}
-              onClick={() =>
-                window
-                  .open(
-                    'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
-                    '_blank'
-                  )
-                  ?.focus()
-              }
-            >
-              <div className="flex flex-col">
-                <span className="font-medium text-base mb-1">
-                  {t('permissions')}
-                </span>
+            Boolean(systemInfo?.file_permissions !== 'Ok')) &&
+            Boolean(!systemInfo?.is_docker) && (
+              <Div
+                className="flex justify-between items-center cursor-pointer py-1 px-3"
+                theme={{
+                  hoverColor: colors.$5,
+                }}
+                onClick={() =>
+                  window
+                    .open(
+                      'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
+                      '_blank'
+                    )
+                    ?.focus()
+                }
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium text-base mb-1">
+                    {t('permissions')}
+                  </span>
 
-                <span>
-                  {!systemInfo?.env_writable
-                    ? t('env_not_writable')
-                    : systemInfo?.file_permissions}
-                </span>
-              </div>
+                  <span>
+                    {!systemInfo?.env_writable
+                      ? t('env_not_writable')
+                      : systemInfo?.file_permissions}
+                  </span>
+                </div>
 
-              <div>
-                <Icon element={MdWarning} color="red" size={25} />
-              </div>
-            </Div>
-          )}
+                <div>
+                  <Icon element={MdWarning} color="red" size={25} />
+                </div>
+              </Div>
+            )}
 
           {systemInfo?.pdf_engine !== 'SnapPDF PDF Generator' && (
             <Div
@@ -475,7 +483,8 @@ export function AboutModal(props: Props) {
 
           <div className="flex flex-col">
             <span>
-              &middot; {t('installed_version')}: {installedVersion}
+              &middot; {t('installed_version')}:{' '}
+              {currentSystemInfo?.api_version}
             </span>
             <span>
               &middot; {t('latest_version')}: {latestVersion}

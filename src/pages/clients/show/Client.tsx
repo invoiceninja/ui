@@ -29,6 +29,13 @@ import { useTabs } from './hooks/useTabs';
 import { EmailHistory } from './components/EmailHistory';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Client as IClient } from '$app/common/interfaces/client';
+import { ClientPublicNotes } from './components/ClientPublicNotes';
+import { ClientPrivateNotes } from './components/ClientPrivateNotes';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -71,6 +78,13 @@ export default function Client() {
     };
   }, [client]);
 
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+    changeTemplateEntityContext,
+  } = useChangeTemplate();
+
   return (
     <Default
       title={documentTitle}
@@ -92,14 +106,15 @@ export default function Client() {
 
       {client && (
         <>
-          <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
+          <div className="grid grid-cols-12 lg:space-y-0 gap-4">
             <Details client={client} />
             <Address client={client} />
             <Contacts client={client} />
             <Standing client={client} />
             {client.gateway_tokens.length > 0 && <Gateways client={client} />}
-
             <EmailHistory />
+            <ClientPublicNotes client={client} />
+            <ClientPrivateNotes client={client} />
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />
@@ -108,9 +123,21 @@ export default function Client() {
             <Outlet
               context={{
                 isPurgeOrMergeActionCalled,
+                displayName: client.display_name,
               }}
             />
           </div>
+
+          <ChangeTemplateModal<IClient>
+            entity={changeTemplateEntityContext?.entity ?? 'client'}
+            entities={changeTemplateResources as IClient[]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(client) => `${t('number')}: ${client.number}`}
+            bulkUrl={
+              changeTemplateEntityContext?.endpoint ?? '/api/v1/clients/bulk'
+            }
+          />
         </>
       )}
     </Default>

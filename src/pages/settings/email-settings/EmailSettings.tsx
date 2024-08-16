@@ -153,7 +153,6 @@ export function EmailSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
-      withoutBackButton
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
@@ -244,6 +243,25 @@ export function EmailSettings() {
         </Element>
         {company?.settings.enable_e_invoice ? (
           <>
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="merge_e_invoice_to_pdf"
+                  labelElement={
+                    <SettingsLabel label={t('merge_e_invoice_to_pdf')} />
+                  }
+                />
+              }
+            >
+              <Toggle
+                checked={Boolean(company?.settings.merge_e_invoice_to_pdf)}
+                onValueChange={(value) =>
+                  handleChange('settings.merge_e_invoice_to_pdf', value)
+                }
+                disabled={disableSettingsField('merge_e_invoice_to_pdf')}
+              />
+            </Element>
+
             {isCompanySettingsActive && (
               <Element
                 leftSide={t('upload_certificate')}
@@ -310,6 +328,7 @@ export function EmailSettings() {
                 disabled={disableSettingsField('e_invoice_type')}
                 errorMessage={errors?.errors['settings.e_invoice_type']}
               >
+                <option value="FACT1">FACT1</option>
                 <option value="EN16931">EN16931</option>
                 <option value="XInvoice_3_0">XInvoice_3.0</option>
                 <option value="XInvoice_2_3">XInvoice_2.3</option>
@@ -323,6 +342,29 @@ export function EmailSettings() {
                 <option value="Facturae_3.2.2">Facturae_3.2.2</option>
                 <option value="Facturae_3.2.1">Facturae_3.2.1</option>
                 <option value="Facturae_3.2">Facturae_3.2</option>
+                <option value="FatturaPA">FatturaPA</option>
+              </SelectField>
+            </Element>
+
+            <Element
+              leftSide={
+                <PropertyCheckbox
+                  propertyKey="e_quote_type"
+                  labelElement={<SettingsLabel label={t('e_quote_type')} />}
+                  defaultValue="OrderX_Comfort"
+                />
+              }
+            >
+              <SelectField
+                value={company?.settings.e_quote_type || 'OrderX_Comfort'}
+                onValueChange={(value) =>
+                  handleChange('settings.e_quote_type', value)
+                }
+                disabled={disableSettingsField('e_quote_type')}
+              >
+                <option value="OrderX_Comfort">OrderX_Comfort</option>
+                <option value="OrderX_Basic">OrderX_Basic</option>
+                <option value="OrderX_Extended">OrderX_Extended</option>
               </SelectField>
             </Element>
           </>
@@ -385,6 +427,7 @@ export function EmailSettings() {
                   handleChange('settings.gmail_sending_user_id', '0')
                 }
                 readonly={disableSettingsField('gmail_sending_user_id')}
+                withoutAction
                 errorMessage={errors?.errors['settings.gmail_sending_user_id']}
               />
             </Element>
@@ -474,9 +517,30 @@ export function EmailSettings() {
           </>
         )}
 
+        {company?.settings.email_sending_method === 'client_brevo' && (
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="brevo_secret"
+                labelElement={<SettingsLabel label={t('secret')} />}
+              />
+            }
+          >
+            <InputField
+              value={company?.settings.brevo_secret || ''}
+              onValueChange={(value) =>
+                handleChange('settings.brevo_secret', value)
+              }
+              disabled={disableSettingsField('brevo_secret')}
+              errorMessage={errors?.errors['settings.brevo_secret']}
+            />
+          </Element>
+        )}
+
         {(company?.settings.email_sending_method === 'client_mailgun' ||
           company?.settings.email_sending_method === 'client_postmark' ||
-          company?.settings.email_sending_method === 'smtp') && (
+          company?.settings.email_sending_method === 'smtp' ||
+          company?.settings.email_sending_method === 'client_brevo') && (
           <Element
             leftSide={
               <PropertyCheckbox
@@ -514,45 +578,41 @@ export function EmailSettings() {
           />
         </Element>
 
-        {company?.settings.email_sending_method !== 'smtp' && (
-          <Element
-            leftSide={
-              <PropertyCheckbox
-                propertyKey="reply_to_name"
-                labelElement={<SettingsLabel label={t('reply_to_name')} />}
-              />
-            }
-          >
-            <InputField
-              value={company?.settings.reply_to_name || ''}
-              onValueChange={(value) =>
-                handleChange('settings.reply_to_name', value)
-              }
-              disabled={disableSettingsField('reply_to_name')}
-              errorMessage={errors?.errors['settings.reply_to_name']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_name"
+              labelElement={<SettingsLabel label={t('reply_to_name')} />}
             />
-          </Element>
-        )}
+          }
+        >
+          <InputField
+            value={company?.settings.reply_to_name || ''}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_name', value)
+            }
+            disabled={disableSettingsField('reply_to_name')}
+            errorMessage={errors?.errors['settings.reply_to_name']}
+          />
+        </Element>
 
-        {company?.settings.email_sending_method !== 'smtp' && (
-          <Element
-            leftSide={
-              <PropertyCheckbox
-                propertyKey="reply_to_email"
-                labelElement={<SettingsLabel label={t('reply_to_email')} />}
-              />
-            }
-          >
-            <InputField
-              value={company?.settings.reply_to_email || ''}
-              onValueChange={(value) =>
-                handleChange('settings.reply_to_email', value)
-              }
-              disabled={disableSettingsField('reply_to_email')}
-              errorMessage={errors?.errors['settings.reply_to_email']}
+        <Element
+          leftSide={
+            <PropertyCheckbox
+              propertyKey="reply_to_email"
+              labelElement={<SettingsLabel label={t('reply_to_email')} />}
             />
-          </Element>
-        )}
+          }
+        >
+          <InputField
+            value={company?.settings.reply_to_email || ''}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_email', value)
+            }
+            disabled={disableSettingsField('reply_to_email')}
+            errorMessage={errors?.errors['settings.reply_to_email']}
+          />
+        </Element>
 
         {company?.settings.email_sending_method !== 'smtp' && (
           <Element

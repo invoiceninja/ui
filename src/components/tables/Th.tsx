@@ -23,6 +23,8 @@ interface Props extends CommonProps {
   onColumnClick?: any;
   isCurrentlyUsed?: boolean;
   childrenClassName?: string;
+  textColor?: string;
+  disableUppercase?: boolean;
 }
 
 const defaultProps: Props = {
@@ -52,14 +54,15 @@ export function Th(props: Props) {
   return (
     <th
       style={{
-        color: colors.$9,
+        color: props.textColor || colors.$9,
         borderColor: colors.$4,
       }}
       onClick={handleClick}
       className={classNames(
-        `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap ${props.className}`,
+        `px-2 lg:px-2.5 xl:px-4 py-2.5 text-left text-xs font-medium tracking-wider whitespace-nowrap ${props.className}`,
         {
           'cursor-pointer': props.onColumnClick,
+          uppercase: !props.disableUppercase,
         }
       )}
     >

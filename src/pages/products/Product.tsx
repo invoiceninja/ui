@@ -119,7 +119,7 @@ export default function Product() {
           ),
         })}
     >
-      <Container>
+      <Container breadcrumbs={[]}>
         <Tabs tabs={tabs} />
 
         <Outlet

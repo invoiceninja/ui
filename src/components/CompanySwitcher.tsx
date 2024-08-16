@@ -30,31 +30,30 @@ import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useColorScheme } from '$app/common/colors';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
 
-  const { isAdmin, isOwner } = useAdmin();
-
-  const user = useCurrentUser();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const state = useSelector((state: RootState) => state.companyUsers);
 
+  const { id } = useParams();
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const dispatch = useDispatch();
-
-  const queryClient = useQueryClient();
-
   const logo = useLogo();
-
+  const user = useCurrentUser();
+  const location = useLocation();
+  const colors = useColorScheme();
   const companyName = useCompanyName();
-
+  const queryClient = useQueryClient();
+  const { isAdmin, isOwner } = useAdmin();
   const currentCompany = useCurrentCompany();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
-
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
     useState<boolean>(false);
 
@@ -75,6 +74,16 @@ export function CompanySwitcher() {
 
     queryClient.invalidateQueries();
 
+    if (id) {
+      const basePage =
+        '/' +
+        (location.pathname.includes('/settings/gateways')
+          ? 'settings/online_payments'
+          : location.pathname.split('/')[1] || 'dashboard');
+
+      navigate(basePage);
+    }
+
     window.location.reload();
   };
 
@@ -87,8 +96,6 @@ export function CompanySwitcher() {
       setShouldShowAddCompany(false);
     }
   }, [currentCompany]);
-
-  const colors = useColorScheme();
 
   return (
     <>
@@ -145,7 +152,10 @@ export function CompanySwitcher() {
               {state?.api?.length >= 1 &&
                 state?.api?.map((record: any, index: number) => (
                   <Menu.Item key={index}>
-                    <DropdownElement onClick={() => switchCompany(index)}>
+                    <DropdownElement
+                      actionKey="switchCompany"
+                      onClick={() => switchCompany(index)}
+                    >
                       <div className="flex items-center space-x-3">
                         <span>
                           {record.company.settings.name ||

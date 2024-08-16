@@ -114,7 +114,14 @@ export default function Create() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
-      {errors ? <ValidationAlert errors={errors} /> : null}
+      {errors ? (
+        <ValidationAlert
+          errors={errors}
+          entity="client"
+          withoutTopMessage={Boolean(errors.errors?.id)}
+          withoutListBullets={Boolean(errors.errors?.id)}
+        />
+      ) : null}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">

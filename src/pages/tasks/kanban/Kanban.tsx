@@ -25,8 +25,11 @@ import { route } from '$app/common/helpers/route';
 import {
   DragDropContext,
   Draggable,
-  Droppable,
+  DraggableLocation,
+  DraggableProvided,
   DropResult,
+  Droppable,
+  DroppableProvided,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
@@ -55,7 +58,6 @@ import {
   CreateTaskModal,
   TaskDetails,
 } from '../common/components/CreateTaskModal';
-import { TaskClock } from './components/TaskClock';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import {
@@ -63,6 +65,16 @@ import {
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { TaskClock } from './components/TaskClock';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  min-width: ${(props) => props.theme.minWidth}px;
+  background-color: ${(props) => props.theme.backgroundColor};
+  color: ${(props) => props.theme.color};
+  color-scheme: ${(props) => props.theme.colorScheme};
+  border-color: ${(props) => props.theme.borderColor};
+`;
 
 interface CardItem {
   id: string;
@@ -88,46 +100,40 @@ export default function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+  const { isAdmin, isOwner } = useAdmin();
+
+  const stopTask = useStop();
+  const startTask = useStart();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
-  const { isAdmin, isOwner } = useAdmin();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
     { name: t('kanban'), href: '/tasks/kanban' },
   ];
 
-  const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
-    useState<boolean>(false);
-
   const [apiEndpoint, setApiEndpoint] = useState(
     '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
   );
+  const [board, setBoard] = useState<Board>();
   const [projectId, setProjectId] = useState<string>();
-
   const [taskDetails, setTaskDetails] = useState<TaskDetails>();
-
+  const [sliderType, setSliderType] = useState<SliderType>('view');
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
+  const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
+    useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
-
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
   });
 
-  const [board, setBoard] = useState<Board>();
-  const [sliderType, setSliderType] = useState<SliderType>('view');
-
   const [currentTask] = useAtom(currentTaskAtom);
   const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
-
   const [isKanbanViewSliderVisible, setIsKanbanViewSliderVisible] = useAtom(
     isKanbanViewSliderVisibleAtom
   );
-
-  const startTask = useStart();
-  const stopTask = useStop();
 
   useHandleCurrentTask(currentTaskId);
 
@@ -135,25 +141,31 @@ export default function Kanban() {
     if (taskStatuses && tasks) {
       const columns: Column[] = [];
 
-      taskStatuses.data.map((taskStatus) =>
+      const reorderedStatuses = [...taskStatuses.data].sort(
+        (a, b) => a.status_order - b.status_order
+      );
+
+      reorderedStatuses.map((taskStatus) =>
         columns.push({ id: taskStatus.id, title: taskStatus.name, cards: [] })
       );
 
-      tasks.data.map((task) => {
-        const index = columns.findIndex(
-          (column) => column.id === task.status_id
-        );
+      tasks.data
+        .filter(({ invoice_id }) => !invoice_id)
+        .map((task) => {
+          const index = columns.findIndex(
+            (column) => column.id === task.status_id
+          );
 
-        if (index >= 0) {
-          columns[index].cards.push({
-            id: task.id,
-            title: task.description,
-            description: calculateHours(task.time_log).toString(),
-            sortOrder: task.status_order,
-            task,
-          });
-        }
-      });
+          if (index >= 0) {
+            columns[index].cards.push({
+              id: task.id,
+              title: task.description,
+              description: calculateHours(task.time_log).toString(),
+              sortOrder: task.status_order,
+              task,
+            });
+          }
+        });
 
       columns.map(
         (c) => (c.cards = c.cards.sort((a, b) => a.sortOrder - b.sortOrder))
@@ -182,26 +194,29 @@ export default function Kanban() {
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
       .then(() => toast.success())
-      .finally(() => $refetch(['tasks']));
+      .finally(() => {
+        $refetch(['tasks']);
+        $refetch(['task_statuses']);
+      });
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onCardsDragEnd = (result: DropResult) => {
     const local = cloneDeep(board) as Board;
 
     const source = local.columns.find(
-      (c) => c.id === result.source.droppableId
+      (c) => c.title === result.source.droppableId
     );
 
     const sourceIndex = local.columns.findIndex(
-      (c) => c.id === result.source.droppableId
+      (c) => c.title === result.source.droppableId
     ) as number;
 
     const target = local.columns.find(
-      (c) => c.id === result.destination?.droppableId
+      (c) => c.title === result.destination?.droppableId
     );
 
     const targetIndex = local.columns.findIndex(
-      (c) => c.id === result.destination?.droppableId
+      (c) => c.title === result.destination?.droppableId
     );
 
     if (source && sourceIndex > -1 && target && targetIndex > -1) {
@@ -214,22 +229,58 @@ export default function Kanban() {
 
         local.columns[targetIndex].cards.push(task);
 
-        const taskIndex = local.columns[targetIndex].cards.findIndex(
-          (task) => task.id === result.draggableId
+        local.columns[targetIndex].cards = arrayMoveImmutable(
+          local.columns[targetIndex].cards,
+          local.columns[targetIndex].cards.length - 1,
+          result.destination?.index as number
         );
 
-        if (result.destination!.index > -1) {
-          local.columns[targetIndex].cards = arrayMoveImmutable(
-            local.columns[targetIndex].cards,
-            taskIndex,
-            result.destination?.index || 0
-          );
-        }
+        setBoard(local);
+        updateTasks(local);
       }
     }
+  };
+
+  const onColumnsDragEnd = (result: DropResult) => {
+    const local = cloneDeep(board) as Board;
+
+    const sortedColumns = arrayMoveImmutable(
+      local.columns as Column[],
+      result.source.index,
+      result.destination?.index as number
+    );
+
+    if (result.source.index === (result.destination?.index as number)) {
+      return;
+    }
+
+    local.columns = sortedColumns;
 
     setBoard(local);
     updateTasks(local);
+  };
+
+  const onDragEnd = (result: DropResult): void => {
+    if (!result.destination) {
+      return;
+    }
+
+    const source: DraggableLocation = result.source;
+    const destination: DraggableLocation = result.destination;
+
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return;
+    }
+
+    if (result.type === 'COLUMN') {
+      onColumnsDragEnd(result);
+      return;
+    }
+
+    onCardsDragEnd(result);
   };
 
   const handleCurrentTask = (id: string, slider: SliderType) => {
@@ -268,8 +319,6 @@ export default function Kanban() {
         );
   }, [projectId]);
 
-  const colors = useColorScheme();
-
   return (
     <Default
       title={documentTitle}
@@ -282,7 +331,7 @@ export default function Kanban() {
           </Inline>
         </Link>
       }
-      withoutBackButton
+      
     >
       <Slider
         title={
@@ -395,93 +444,39 @@ export default function Kanban() {
           className="flex pb-6 space-x-4 overflow-x-auto mt-4"
         >
           <DragDropContext onDragEnd={onDragEnd}>
-            {board.columns.map((board) => (
-              <Droppable key={board.id} droppableId={board.id}>
-                {(provided) => (
-                  <div
-                    className="bg-white rounded shadow select-none h-max"
-                    style={{
-                      minWidth: 360,
-                      color: colors.$3,
-                      colorScheme: colors.$0,
-                      backgroundColor: colors.$1,
-                      borderColor: colors.$4,
-                    }}
-                  >
-                    <div
-                      className="flex items-center justify-between border-b px-4 py-5"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
+            <Droppable
+              droppableId="columns"
+              type="COLUMN"
+              direction="horizontal"
+            >
+              {(columnProvided: DroppableProvided) => (
+                <div
+                  className="flex space-x-4"
+                  ref={columnProvided.innerRef}
+                  {...columnProvided.droppableProps}
+                >
+                  {board.columns.map((column, index) => (
+                    <Draggable
+                      key={column.id}
+                      draggableId={column.title}
+                      index={index}
                     >
-                      <h3 className="leading-6 font-medium ">{board.title}</h3>
-
-                      {hasPermission('create_task') && (
-                        <MdAddCircle
-                          className="cursor-pointer"
-                          fontSize={22}
-                          onClick={() => {
-                            setTaskDetails({
-                              taskStatusId: board.id,
-                              projectId,
-                            });
-                            setIsTaskModalOpened(true);
+                      {(columnDraggableProvided: DraggableProvided) => (
+                        <Container
+                          className="bg-white rounded border shadow select-none h-max"
+                          ref={columnDraggableProvided.innerRef}
+                          {...columnDraggableProvided.draggableProps}
+                          theme={{
+                            minWidth: 360,
+                            color: colors.$3,
+                            colorScheme: colors.$0,
+                            backgroundColor: colors.$1,
+                            borderColor: colors.$4,
                           }}
-                        />
-                      )}
-                    </div>
-
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="p-4 space-y-4"
-                      style={{
-                        color: colors.$3,
-                        colorScheme: colors.$0,
-                        backgroundColor: colors.$1,
-                        borderColor: colors.$4,
-                      }}
-                    >
-                      {board.cards.map((card, i) => (
-                        <div
-                          key={i}
-                          className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
                         >
-                          <Draggable
-                            draggableId={card.id}
-                            key={card.id}
-                            index={i}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className="px-4 sm:px-6 py-4"
-                                style={{
-                                  color: colors.$3,
-                                  colorScheme: colors.$0,
-                                  backgroundColor: colors.$1,
-                                  borderColor: colors.$4,
-                                }}
-                              >
-                                <p>{card.title}</p>
-                                <small>
-                                  {isTaskRunning(card.task) ? (
-                                    <TaskClock task={card.task} />
-                                  ) : (
-                                    card.description
-                                  )}
-                                </small>
-                              </div>
-                            )}
-                          </Draggable>
-
                           <div
-                            className="hidden group-hover:flex border-t justify-center items-center"
+                            {...columnDraggableProvided.dragHandleProps}
+                            className="flex items-center justify-between border-b px-4 py-5"
                             style={{
                               color: colors.$3,
                               colorScheme: colors.$0,
@@ -489,92 +484,306 @@ export default function Kanban() {
                               borderColor: colors.$4,
                             }}
                           >
-                            {(hasPermission('view_task') ||
-                              hasPermission('edit_task') ||
-                              entityAssigned(currentTask)) && (
-                              <button
-                                style={{
-                                  color: colors.$3,
-                                  colorScheme: colors.$0,
-                                  backgroundColor: colors.$1,
-                                  borderColor: colors.$4,
+                            <h3 className="leading-6 font-medium">
+                              {column.title}
+                            </h3>
+
+                            {hasPermission('create_task') && (
+                              <MdAddCircle
+                                className="cursor-pointer"
+                                fontSize={22}
+                                onClick={() => {
+                                  setTaskDetails({
+                                    taskStatusId: column.id,
+                                    projectId,
+                                  });
+                                  setIsTaskModalOpened(true);
                                 }}
-                                className="w-full py-2 rounded-bl"
-                                onClick={() =>
-                                  handleCurrentTask(card.id, 'view')
-                                }
-                              >
-                                {t('view')}
-                              </button>
+                              />
                             )}
-
-                            {(hasPermission('edit_task') ||
-                              entityAssigned(currentTask)) && (
-                              <button
-                                style={{
-                                  color: colors.$3,
-                                  colorScheme: colors.$0,
-                                  backgroundColor: colors.$1,
-                                  borderColor: colors.$4,
-                                }}
-                                className="w-full text-center py-2"
-                                onClick={() =>
-                                  handleCurrentTask(card.id, 'edit')
-                                }
-                              >
-                                {t('edit')}
-                              </button>
-                            )}
-
-                            {isTaskRunning(card.task) &&
-                              (hasPermission('edit_task') ||
-                                entityAssigned(currentTask)) && (
-                                <button
-                                  style={{
-                                    color: colors.$3,
-                                    colorScheme: colors.$0,
-                                    backgroundColor: colors.$1,
-                                    borderColor: colors.$4,
-                                  }}
-                                  className="w-full py-2 rounded-br"
-                                  onClick={() => stopTask(card.task)}
-                                >
-                                  {t('stop')}
-                                </button>
-                              )}
-
-                            {!isTaskRunning(card.task) &&
-                              (hasPermission('edit_task') ||
-                                entityAssigned(currentTask)) && (
-                                <button
-                                  style={{
-                                    color: colors.$3,
-                                    colorScheme: colors.$0,
-                                    backgroundColor: colors.$1,
-                                    borderColor: colors.$4,
-                                  }}
-                                  className="w-full py-2 rounded-br"
-                                  onClick={() => startTask(card.task)}
-                                >
-                                  {t('start')}
-                                </button>
-                              )}
                           </div>
-                        </div>
-                      ))}
-                    </div>
 
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))}
+                          <Droppable
+                            droppableId={column.title}
+                            type="CARD"
+                            renderClone={(provided, _, rubric) => {
+                              const card = column.cards.find(
+                                ({ id }) => id === rubric.draggableId
+                              );
+
+                              if (!card) {
+                                return <></>;
+                              }
+
+                              return (
+                                <div
+                                  className="w-full text-leftblock rounded text-sm cursor-pointer"
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                                >
+                                  <div
+                                    className="px-4 sm:px-6 py-4"
+                                    style={{
+                                      color: colors.$3,
+                                      colorScheme: colors.$0,
+                                      backgroundColor: colors.$4,
+                                      borderColor: colors.$4,
+                                    }}
+                                  >
+                                    <p>{card.title}</p>
+                                    <small>
+                                      {isTaskRunning(card.task) ? (
+                                        <TaskClock task={card.task} />
+                                      ) : (
+                                        card.description
+                                      )}
+                                    </small>
+                                  </div>
+
+                                  <div
+                                    className="flex border-t justify-center items-center"
+                                    style={{
+                                      color: colors.$3,
+                                      colorScheme: colors.$0,
+                                      backgroundColor: colors.$1,
+                                      borderColor: colors.$4,
+                                    }}
+                                  >
+                                    {(hasPermission('view_task') ||
+                                      hasPermission('edit_task') ||
+                                      entityAssigned(currentTask)) && (
+                                      <button
+                                        style={{
+                                          color: colors.$3,
+                                          colorScheme: colors.$0,
+                                          backgroundColor: colors.$1,
+                                          borderColor: colors.$4,
+                                        }}
+                                        className="w-full py-2 rounded-bl"
+                                        onClick={() =>
+                                          handleCurrentTask(card.id, 'view')
+                                        }
+                                      >
+                                        {t('view')}
+                                      </button>
+                                    )}
+
+                                    {(hasPermission('edit_task') ||
+                                      entityAssigned(currentTask)) && (
+                                      <button
+                                        style={{
+                                          color: colors.$3,
+                                          colorScheme: colors.$0,
+                                          backgroundColor: colors.$1,
+                                          borderColor: colors.$4,
+                                        }}
+                                        className="w-full text-center py-2"
+                                        onClick={() =>
+                                          handleCurrentTask(card.id, 'edit')
+                                        }
+                                      >
+                                        {t('edit')}
+                                      </button>
+                                    )}
+
+                                    {isTaskRunning(card.task) &&
+                                      (hasPermission('edit_task') ||
+                                        entityAssigned(currentTask)) && (
+                                        <button
+                                          style={{
+                                            color: colors.$3,
+                                            colorScheme: colors.$0,
+                                            backgroundColor: colors.$1,
+                                            borderColor: colors.$4,
+                                          }}
+                                          className="w-full py-2 rounded-br"
+                                          onClick={() => stopTask(card.task)}
+                                        >
+                                          {t('stop')}
+                                        </button>
+                                      )}
+
+                                    {!isTaskRunning(card.task) &&
+                                      (hasPermission('edit_task') ||
+                                        entityAssigned(currentTask)) && (
+                                        <button
+                                          style={{
+                                            color: colors.$3,
+                                            colorScheme: colors.$0,
+                                            backgroundColor: colors.$1,
+                                            borderColor: colors.$4,
+                                          }}
+                                          className="w-full py-2 rounded-br"
+                                          onClick={() => startTask(card.task)}
+                                        >
+                                          {t('start')}
+                                        </button>
+                                      )}
+                                  </div>
+                                </div>
+                              );
+                            }}
+                          >
+                            {(dropProvided) => (
+                              <div {...dropProvided.droppableProps}>
+                                <div
+                                  ref={dropProvided.innerRef}
+                                  className="p-4 space-y-4"
+                                  style={{
+                                    color: colors.$3,
+                                    colorScheme: colors.$0,
+                                    backgroundColor: colors.$1,
+                                    borderColor: colors.$3,
+                                  }}
+                                >
+                                  {column.cards.map((card, index: number) => (
+                                    <Draggable
+                                      key={card.id}
+                                      draggableId={card.id}
+                                      index={index}
+                                    >
+                                      {(dragProvided) => (
+                                        <Container
+                                          className="w-full text-leftblock rounded text-sm group"
+                                          ref={dragProvided.innerRef}
+                                          {...dragProvided.draggableProps}
+                                          {...dragProvided.dragHandleProps}
+                                          theme={{
+                                            backgroundColor: colors.$7,
+                                            color: colors.$3,
+                                          }}
+                                        >
+                                          <div className="px-4 sm:px-6 py-4">
+                                            <p>{card.title}</p>
+                                            <small>
+                                              {isTaskRunning(card.task) ? (
+                                                <TaskClock task={card.task} />
+                                              ) : (
+                                                card.description
+                                              )}
+                                            </small>
+                                          </div>
+
+                                          <div
+                                            className="hidden group-hover:flex border-t justify-center items-center"
+                                            style={{
+                                              color: colors.$3,
+                                              colorScheme: colors.$0,
+                                              backgroundColor: colors.$1,
+                                              borderColor: colors.$4,
+                                            }}
+                                          >
+                                            {(hasPermission('view_task') ||
+                                              hasPermission('edit_task') ||
+                                              entityAssigned(currentTask)) && (
+                                              <button
+                                                style={{
+                                                  color: colors.$3,
+                                                  colorScheme: colors.$0,
+                                                  backgroundColor: colors.$1,
+                                                  borderColor: colors.$4,
+                                                }}
+                                                className="w-full py-2 rounded-bl"
+                                                onClick={() =>
+                                                  handleCurrentTask(
+                                                    card.id,
+                                                    'view'
+                                                  )
+                                                }
+                                              >
+                                                {t('view')}
+                                              </button>
+                                            )}
+
+                                            {(hasPermission('edit_task') ||
+                                              entityAssigned(currentTask)) && (
+                                              <button
+                                                style={{
+                                                  color: colors.$3,
+                                                  colorScheme: colors.$0,
+                                                  backgroundColor: colors.$1,
+                                                  borderColor: colors.$4,
+                                                }}
+                                                className="w-full text-center py-2"
+                                                onClick={() =>
+                                                  handleCurrentTask(
+                                                    card.id,
+                                                    'edit'
+                                                  )
+                                                }
+                                              >
+                                                {t('edit')}
+                                              </button>
+                                            )}
+
+                                            {isTaskRunning(card.task) &&
+                                              (hasPermission('edit_task') ||
+                                                entityAssigned(
+                                                  currentTask
+                                                )) && (
+                                                <button
+                                                  style={{
+                                                    color: colors.$3,
+                                                    colorScheme: colors.$0,
+                                                    backgroundColor: colors.$1,
+                                                    borderColor: colors.$4,
+                                                  }}
+                                                  className="w-full py-2 rounded-br"
+                                                  onClick={() =>
+                                                    stopTask(card.task)
+                                                  }
+                                                >
+                                                  {t('stop')}
+                                                </button>
+                                              )}
+
+                                            {!isTaskRunning(card.task) &&
+                                              (hasPermission('edit_task') ||
+                                                entityAssigned(
+                                                  currentTask
+                                                )) && (
+                                                <button
+                                                  style={{
+                                                    color: colors.$3,
+                                                    colorScheme: colors.$0,
+                                                    backgroundColor: colors.$1,
+                                                    borderColor: colors.$4,
+                                                  }}
+                                                  className="w-full py-2 rounded-br"
+                                                  onClick={() =>
+                                                    startTask(card.task)
+                                                  }
+                                                >
+                                                  {t('start')}
+                                                </button>
+                                              )}
+                                          </div>
+                                        </Container>
+                                      )}
+                                    </Draggable>
+                                  ))}
+
+                                  {dropProvided.placeholder}
+                                </div>
+                              </div>
+                            )}
+                          </Droppable>
+                        </Container>
+                      )}
+                    </Draggable>
+                  ))}
+
+                  {columnProvided.placeholder}
+                </div>
+              )}
+            </Droppable>
           </DragDropContext>
 
           {(isAdmin || isOwner) && (
             <div>
               <div
-                className="shadow rounded p-1"
+                className="bg-white shadow rounded p-1"
                 style={{
                   color: colors.$3,
                   colorScheme: colors.$0,

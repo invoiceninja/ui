@@ -24,6 +24,7 @@ export interface Statics {
   sizes: Industry[];
   timezones: Timezone[];
   templates: Templates;
+  bulk_updates: Record<string, string[]>;
 }
 
 export interface Bank {

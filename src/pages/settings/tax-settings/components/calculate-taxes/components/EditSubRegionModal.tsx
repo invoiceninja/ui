@@ -10,7 +10,7 @@
 
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
@@ -38,36 +38,49 @@ export function EditSubRegionModal(props: Props) {
     <Modal
       title={`${region} - ${subregion}`}
       visible={visible}
-      onClose={() => setVisible(false)}
+      onClose={closeModal}
     >
       <InputField
-        id={`tax_data.regions.${region}.subregions.${subregion}.tax_name`}
         label={t('tax_name')}
         value={taxSetting.tax_name}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          handleChange(event.target.id, event.target.value)
+        onValueChange={(value) =>
+          handleChange(
+            `tax_data.regions.${region}.subregions.${subregion}.tax_name`,
+            value
+          )
         }
-      ></InputField>
+      />
 
       <InputField
-        id={`tax_data.regions.${region}.subregions.${subregion}.tax_rate`}
+        type="number"
         label={t('tax_rate')}
         value={taxSetting.tax_rate}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          handleChange(event.target.id, parseFloat(event.target.value))
+        onValueChange={(value) =>
+          handleChange(
+            `tax_data.regions.${region}.subregions.${subregion}.tax_rate`,
+            parseFloat(value)
+          )
         }
-      ></InputField>
+      />
 
       <InputField
-        id={`tax_data.regions.${region}.subregions.${subregion}.reduced_tax_rate`}
+        type="number"
         label={t('reduced_rate')}
         value={taxSetting.reduced_tax_rate}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          handleChange(event.target.id, parseFloat(event.target.value))
+        onValueChange={(value) =>
+          handleChange(
+            `tax_data.regions.${region}.subregions.${subregion}.reduced_tax_rate`,
+            parseFloat(value)
+          )
         }
-      ></InputField>
+      />
 
-      <Button className="self-end" onClick={closeModal} disableWithoutIcon>
+      <Button
+        className="self-end"
+        behavior="button"
+        onClick={closeModal}
+        disableWithoutIcon
+      >
         {t('save')}
       </Button>
     </Modal>

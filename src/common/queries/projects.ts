@@ -39,9 +39,10 @@ export function useProjectQuery(params: { id: string | undefined }) {
   return useQuery<Project>(
     ['/api/v1/projects', params.id],
     () =>
-      request('GET', endpoint('/api/v1/projects/:id', { id: params.id })).then(
-        (response) => response.data.data
-      ),
+      request(
+        'GET',
+        endpoint('/api/v1/projects/:id?include=client', { id: params.id })
+      ).then((response) => response.data.data),
     { staleTime: Infinity }
   );
 }

@@ -13,7 +13,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue, StylesConfig } from 'react-select';
+import Select, { MultiValue } from 'react-select';
 import { Identifier } from '../useReports';
 import { useCreditsFilters } from '$app/pages/credits/common/hooks/useCreditsFilters';
 import { useExpenseFilters } from '$app/pages/expenses/common/hooks';
@@ -22,6 +22,7 @@ import { useQuoteFilters } from '$app/pages/quotes/common/hooks';
 import { useRecurringInvoiceFilters } from '$app/pages/recurring-invoices/common/hooks';
 import { usePaymentFilters } from '$app/pages/payments/common/hooks/usePaymentFilters';
 import { useTaskFilters } from '$app/pages/tasks/common/hooks';
+import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
 
 interface Props {
   report: Identifier;
@@ -32,6 +33,10 @@ interface Props {
 export function StatusSelector(props: Props) {
   const [t] = useTranslation();
 
+  const { value, onValueChange, errorMessage, report } = props;
+
+  const customStyles = useSelectorCustomStyles();
+
   const taskFilters = useTaskFilters();
   const quoteFilters = useQuoteFilters();
   const creditFilters = useCreditsFilters();
@@ -41,31 +46,7 @@ export function StatusSelector(props: Props) {
   const purchaseOrderFilters = usePurchaseOrderFilters();
   const recurringInvoiceFilters = useRecurringInvoiceFilters();
 
-  const { value, onValueChange, errorMessage, report } = props;
-
   const [options, setOptions] = useState<SelectOption[]>([]);
-
-  const customStyles: StylesConfig<SelectOption, true> = {
-    multiValue: (styles, { data }) => {
-      return {
-        ...styles,
-        backgroundColor: data.backgroundColor,
-        color: data.color,
-        borderRadius: '3px',
-      };
-    },
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color: data.color,
-    }),
-    multiValueRemove: (styles) => ({
-      ...styles,
-      ':hover': {
-        color: 'white',
-      },
-      color: '#999999',
-    }),
-  };
 
   const handleStatusChange = (
     statuses: MultiValue<{ value: string; label: string }>

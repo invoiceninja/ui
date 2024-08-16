@@ -9,7 +9,6 @@
  */
 
 import { date } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useSetAtom } from 'jotai';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
@@ -32,7 +31,6 @@ export function useHandleCurrentTask(id: string | undefined) {
 }
 
 export function useFormatTimeLog() {
-  const { dateFormat } = useCurrentCompanyDateFormats();
   const { t } = useTranslation();
 
   return (log: string) => {
@@ -40,7 +38,7 @@ export function useFormatTimeLog() {
 
     parseTimeLog(log).map(([start, end]) => {
       logs.push([
-        date(start, dateFormat),
+        date(start, 'YYYY-MM-DD'),
         new Date(start * 1000).toLocaleTimeString(),
         end === 0 ? t('now') : new Date(end * 1000).toLocaleTimeString(),
       ]);

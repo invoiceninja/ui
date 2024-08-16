@@ -13,7 +13,7 @@ import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { DataTable } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
-import { CustomDesignsPlanAlert } from './components/CustomDesignsPlanAlert';
+import { CustomDesignsPlanAlert } from '../components/CustomDesignsPlanAlert';
 
 export default function CustomDesigns() {
   return (

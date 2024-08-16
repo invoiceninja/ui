@@ -53,6 +53,13 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useCalculateExpenseAmount } from './hooks/useCalculateExpenseAmount';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -224,6 +231,7 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
@@ -351,12 +359,23 @@ export function useExpenseColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -412,6 +431,7 @@ export function useExpenseColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -450,12 +470,23 @@ export function useExpenseColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -485,16 +516,19 @@ export function useExpenseColumns() {
       column: 'tax_rate1',
       id: 'tax_rate1',
       label: t('tax_rate1'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate2',
       id: 'tax_rate2',
       label: t('tax_rate2'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'tax_rate3',
       id: 'tax_rate3',
       label: t('tax_rate3'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'transaction_reference',
@@ -538,13 +572,9 @@ export function useHandleChange(params: HandleChangeExpenseParams) {
 export function useExpenseFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('logged'),
       value: 'logged',
@@ -561,19 +591,25 @@ export function useExpenseFilters() {
       label: t('invoiced'),
       value: 'invoiced',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$3 || '#1D4ED8',
     },
     {
       label: t('paid'),
       value: 'paid',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$1 || '#22C55E',
     },
     {
       label: t('unpaid'),
       value: 'unpaid',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColors.$4 || '#e6b05c',
+    },
+    {
+      label: t('uncategorized'),
+      value: 'uncategorized',
+      color: 'white',
+      backgroundColor: '#b5812c',
     },
   ];
 

@@ -54,7 +54,6 @@ export function BankAccounts() {
       title={t('bank_accounts')}
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#bank_accounts"
-      withoutBackButton
     >
       {!enterprisePlan() && isHosted() && (
         <AdvancedSettingsPlanAlert

@@ -26,15 +26,12 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
@@ -58,6 +55,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 export interface SaveOption {
   label: string;
@@ -69,37 +67,37 @@ interface Props extends CommonProps {
   title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: Page[];
+  breadcrumbs: Page[];
   topRight?: ReactNode;
   docsLink?: string;
   navigationTopRight?: ReactNode;
   saveButtonLabel?: string | null;
-  backButtonLabel?: string;
   disableSaveButton?: boolean;
-  withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
+  aboveMainContainer?: ReactNode;
 }
 
 export function Default(props: Props) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const company = useCurrentCompany();
-
-  const shouldShowUnlockButton =
-    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
-
   const [t] = useTranslation();
-  const user = useInjectUserChanges();
 
-  const hasPermission = useHasPermission();
   const location = useLocation();
-  const navigate = useNavigate();
-  const companyUser = useCurrentCompanyUser();
+  const hasPermission = useHasPermission();
+
+  const colors = useColorScheme();
+  const preventNavigation = usePreventNavigation();
+
   const enabled = useEnabled();
+  const user = useInjectUserChanges();
+  const company = useCurrentCompany();
+  const companyUser = useCurrentCompanyUser();
 
   const isMiniSidebar = Boolean(
     user?.company_user?.react_settings.show_mini_sidebar
   );
+  const shouldShowUnlockButton =
+    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const navigation: NavigationItem[] = [
     {
@@ -363,10 +361,8 @@ export function Default(props: Props) {
     },
   ];
 
-  const { isOwner } = useAdmin();
   const saveBtn = useAtomValue(saveBtnAtom);
   const navigationTopRightElement = useNavigationTopRightElement();
-  const colors = useColorScheme();
 
   return (
     <div>
@@ -400,7 +396,7 @@ export function Default(props: Props) {
             <MenuIcon className="dark:text-gray-100" />
           </button>
           <div
-            className="flex-1 px-4 md:px-8 flex items-center"
+            className="flex-1 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
           >
             <div className="flex flex-1 items-center space-x-4">
@@ -418,21 +414,19 @@ export function Default(props: Props) {
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
               {shouldShowUnlockButton && (
                 <button
-                  className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                  className="hidden sm:inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                   onClick={() =>
-                    window.open(
-                      isSelfHosted()
+                    preventNavigation({
+                      url: (isSelfHosted()
                         ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
-                            'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
-                        : user?.company_user?.ninja_portal_url,
-                      '_blank'
-                    )
+                          'https://invoiceninja.invoicing.co/client/subscriptions/O5xe7Rwd7r/purchase'
+                        : user?.company_user?.ninja_portal_url) as string,
+                      externalLink: true,
+                    })
                   }
                 >
                   <span>
-                    {isSelfHosted() && isOwner
-                      ? t('white_label_button')
-                      : t('unlock_pro')}
+                    {isSelfHosted() ? t('white_label_button') : t('unlock_pro')}
                   </span>
                 </button>
               )}
@@ -443,17 +437,24 @@ export function Default(props: Props) {
                 </Button>
               )}
 
-              {!props.withoutBackButton && (
-                <Button onClick={() => navigate(-1)} type="secondary">
-                  {t('back')}
-                </Button>
-              )}
-
-              {(props.onSaveClick || saveBtn) && (
+              {(Boolean(props.onSaveClick) || saveBtn) && (
                 <div>
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    !props.additionalSaveOptions && (
+                  {!props.additionalSaveOptions && (
+                    <Button
+                      onClick={saveBtn?.onClick || props.onSaveClick}
+                      disabled={
+                        saveBtn?.disableSaveButton || props.disableSaveButton
+                      }
+                      disableWithoutIcon
+                    >
+                      {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
+                    </Button>
+                  )}
+
+                  {props.additionalSaveOptions && (
+                    <div className="flex">
                       <Button
+                        className="rounded-br-none rounded-tr-none px-3"
                         onClick={saveBtn?.onClick || props.onSaveClick}
                         disabled={
                           saveBtn?.disableSaveButton || props.disableSaveButton
@@ -462,50 +463,32 @@ export function Default(props: Props) {
                       >
                         {(saveBtn?.label || props.saveButtonLabel) ?? t('save')}
                       </Button>
-                    )}
 
-                  {(props.onSaveClick || saveBtn?.onClick) &&
-                    props.additionalSaveOptions && (
-                      <div className="flex">
-                        <Button
-                          className="rounded-br-none rounded-tr-none px-3"
-                          onClick={saveBtn?.onClick || props.onSaveClick}
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                          disableWithoutIcon
-                        >
-                          {(saveBtn?.label || props.saveButtonLabel) ??
-                            t('save')}
-                        </Button>
-
-                        <Dropdown
-                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                          cardActions
-                          disabled={
-                            saveBtn?.disableSaveButton ||
-                            props.disableSaveButton
-                          }
-                        >
-                          {props.additionalSaveOptions.map((option, index) => (
-                            <DropdownElement
-                              key={index}
-                              icon={option.icon}
-                              disabled={props.disableSaveButton}
-                              onClick={option.onClick}
-                            >
-                              {option.label}
-                            </DropdownElement>
-                          ))}
-                        </Dropdown>
-                      </div>
-                    )}
+                      <Dropdown
+                        className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                        cardActions
+                        disabled={
+                          saveBtn?.disableSaveButton || props.disableSaveButton
+                        }
+                      >
+                        {props.additionalSaveOptions.map((option, index) => (
+                          <DropdownElement
+                            key={index}
+                            icon={option.icon}
+                            disabled={props.disableSaveButton}
+                            onClick={option.onClick}
+                          >
+                            {option.label}
+                          </DropdownElement>
+                        ))}
+                      </Dropdown>
+                    </div>
+                  )}
                 </div>
               )}
 
               {(navigationTopRightElement || props.navigationTopRight) && (
-                <div className="space-x-3 items-center hidden lg:flex">
+                <div className="flex space-x-3 items-center">
                   {navigationTopRightElement?.element ||
                     props.navigationTopRight}
                 </div>
@@ -514,16 +497,21 @@ export function Default(props: Props) {
           </div>
         </div>
 
-        <main className="flex-1">
-          {(props.breadcrumbs || props.topRight) && (
-            <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-              <div className="">
-                {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
-              </div>
+        {props.aboveMainContainer}
 
-              {props.topRight && <div>{props.topRight}</div>}
-            </div>
-          )}
+        <main className="flex-1">
+          {(props.breadcrumbs || props.topRight) &&
+            props.breadcrumbs.length > 0 && (
+              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                <div className="">
+                  {props.breadcrumbs && (
+                    <Breadcrumbs pages={props.breadcrumbs} />
+                  )}
+                </div>
+
+                {props.topRight && <div>{props.topRight}</div>}
+              </div>
+            )}
 
           <div
             style={{ color: colors.$3, backgroundColor: colors.$2 }}

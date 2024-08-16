@@ -15,6 +15,7 @@ import { cloneDeep, merge } from 'lodash';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
+import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -42,9 +43,12 @@ export interface Preferences {
   reports: {
     columns: Record<string, ClientMapRecord[][]>;
   };
+  auto_expand_product_table_notes: boolean;
 }
 
 type ImportTemplates = Record<string, Record<string, Record<number, string>>>;
+
+type ColorTheme = Record<ThemeColorField, string>;
 
 export interface ReactSettings {
   show_pdf_preview: boolean;
@@ -57,6 +61,10 @@ export interface ReactSettings {
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
+  table_footer_columns?: Record<ReactTableColumns, string[]>;
+  show_table_footer?: boolean;
+  dark_mode?: boolean;
+  color_theme?: ColorTheme;
 }
 
 export type ReactTableColumns =
@@ -73,7 +81,8 @@ export type ReactTableColumns =
   | 'purchaseOrder'
   | 'expense'
   | 'recurringExpense'
-  | 'clientDocument';
+  | 'clientDocument'
+  | 'transaction';
 
 export const preferencesDefaults: Preferences = {
   dashboard_charts: {
@@ -89,10 +98,15 @@ export const preferencesDefaults: Preferences = {
   reports: {
     columns: {},
   },
+  auto_expand_product_table_notes: false,
 };
 
-export function useReactSettings() {
-  const user = useInjectUserChanges();
+interface Options {
+  overwrite?: boolean;
+}
+
+export function useReactSettings(options?: Options) {
+  const user = useInjectUserChanges({ overwrite: options?.overwrite });
 
   const reactSettings =
     useSelector(

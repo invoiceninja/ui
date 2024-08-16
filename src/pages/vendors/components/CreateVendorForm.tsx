@@ -23,15 +23,20 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { set } from 'lodash';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import classNames from 'classnames';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
   onVendorCreated?: (vendor: Vendor) => unknown;
+  fundamentalConceptVisible: boolean;
+  setFundamentalConceptVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 export function CreateVendorForm(props: Props) {
   const [t] = useTranslation();
+
+  const { fundamentalConceptVisible, setFundamentalConceptVisible } = props;
 
   const { data } = useBlankVendorQuery();
 
@@ -99,11 +104,27 @@ export function CreateVendorForm(props: Props) {
           errors={errors}
           setContacts={setContacts}
           contacts={contacts}
+          fundamentalConceptVisible={fundamentalConceptVisible}
         />
       )}
 
-      <div className="flex justify-end space-x-4 mt-5">
-        <Button onClick={handleSave}>{t('save')}</Button>
+      <div
+        className={classNames('flex', {
+          'justify-between': fundamentalConceptVisible,
+          'justify-end space-x-5': !fundamentalConceptVisible,
+        })}
+      >
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setFundamentalConceptVisible((current) => !current)}
+        >
+          {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
+        </Button>
+
+        <Button behavior="button" onClick={handleSave}>
+          {t('save')}
+        </Button>
       </div>
     </>
   );

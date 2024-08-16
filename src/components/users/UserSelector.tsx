@@ -16,15 +16,19 @@ import { useNavigate } from 'react-router-dom';
 import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 
 interface UserSelectorProps extends GenericSelectorProps<User> {
   endpoint?: string;
   staleTime?: number;
+  withoutAction?: boolean;
 }
 
 export function UserSelector(props: UserSelectorProps) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  const preventNavigation = usePreventNavigation();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -48,8 +52,11 @@ export function UserSelector(props: UserSelectorProps) {
       onDismiss={props.onClearButtonClick}
       action={{
         label: t('new_user'),
-        onClick: () => navigate('/settings/users'),
-        visible: isAdmin || isOwner,
+        onClick: () =>
+          preventNavigation({
+            fn: () => navigate('/settings/users'),
+          }),
+        visible: (isAdmin || isOwner) && !props.withoutAction,
       }}
       onChange={(entry) =>
         entry.resource ? props.onChange(entry.resource) : null

@@ -28,6 +28,7 @@ import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 
 export function useInvoiceTask() {
   const [t] = useTranslation();
@@ -39,6 +40,8 @@ export function useInvoiceTask() {
   const { data } = useBlankInvoiceQuery();
 
   const [, setInvoice] = useAtom(invoiceAtom);
+
+  const formatNumber = useFormatNumber();
 
   const calculateTaskHours = (timeLog: string) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
@@ -118,7 +121,7 @@ export function useInvoiceTask() {
                 unixStop.diff(unixStart, 'seconds') / 3600
               ).toFixed(4);
 
-              hoursDescription = `• ${hours} ${t('hours')}`;
+              hoursDescription = `• ${formatNumber(hours)} ${t('hours')}`;
             }
 
             const description = [];
@@ -165,6 +168,10 @@ export function useInvoiceTask() {
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
           task_id: task.id,
           tax_id: '',
+          custom_value1: task.custom_value1,
+          custom_value2: task.custom_value2,
+          custom_value3: task.custom_value3,
+          custom_value4: task.custom_value4,
         };
 
         const projectName =

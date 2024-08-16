@@ -24,6 +24,11 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -36,18 +41,20 @@ export default function PurchaseOrders() {
     { name: t('purchase_orders'), href: '/purchase_orders' },
   ];
 
-  const columns = usePurchaseOrderColumns();
-
-  const filters = usePurchaseOrderFilters();
-
   const actions = useActions();
-
+  const filters = usePurchaseOrderFilters();
+  const columns = usePurchaseOrderColumns();
+  const customBulkActions = useCustomBulkActions();
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
-  const customBulkActions = useCustomBulkActions();
+  const {
+    changeTemplateVisible,
+    setChangeTemplateVisible,
+    changeTemplateResources,
+  } = useChangeTemplate();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="purchase_order"
         endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"
@@ -69,6 +76,15 @@ export default function PurchaseOrders() {
         }
         linkToCreateGuards={[permission('create_purchase_order')]}
         hideEditableOptions={!hasPermission('edit_purchase_order')}
+      />
+
+      <ChangeTemplateModal<PurchaseOrder>
+        entity="purchase_order"
+        entities={changeTemplateResources as PurchaseOrder[]}
+        visible={changeTemplateVisible}
+        setVisible={setChangeTemplateVisible}
+        labelFn={(purchase_order) => `${t('number')}: ${purchase_order.number}`}
+        bulkUrl="/api/v1/purchase_orders/bulk"
       />
     </Default>
   );

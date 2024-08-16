@@ -31,6 +31,11 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
 
 export const defaultColumns: string[] = [
   'name',
@@ -73,7 +78,7 @@ export function useAllClientColumns() {
     fourthCustom,
     'documents',
     'entity_state',
-    //   'group',
+    'group',
     'id_number',
     'is_deleted',
     'language',
@@ -86,6 +91,7 @@ export function useAllClientColumns() {
     'updated_at',
     'vat_number',
     'website',
+    'city',
   ] as const;
 
   return clientColumns;
@@ -128,7 +134,7 @@ export function useClientColumns() {
     {
       column: 'number',
       id: 'number',
-      label: t('id_number'),
+      label: t('number'),
     },
     {
       column: 'name',
@@ -315,12 +321,23 @@ export function useClientColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -330,12 +347,23 @@ export function useClientColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -384,6 +412,26 @@ export function useClientColumns() {
           </Inline>
         </Link>
       ),
+    },
+    {
+      column: 'group',
+      id: 'group_settings_id',
+      label: t('group'),
+      format: (value, client) =>
+        Boolean(value) && (
+          <Link
+            to={route('/settings/group_settings/:id/edit', {
+              id: value,
+            })}
+          >
+            {client.group_settings?.name}
+          </Link>
+        ),
+    },
+    {
+      column: 'city',
+      id: 'city',
+      label: t('city'),
     },
   ];
 

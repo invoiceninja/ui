@@ -19,6 +19,7 @@ import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandle
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Dispatch, SetStateAction } from 'react';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useSearchParams } from 'react-router-dom';
 
 interface Params {
   isDefaultTerms: boolean;
@@ -28,8 +29,10 @@ interface Params {
 export function useHandleSave(params: Params) {
   const { setErrors, isDefaultTerms, isDefaultFooter } = params;
 
-  const refreshCompanyUsers = useRefreshCompanyUsers();
+  const [searchParams] = useSearchParams();
+
   const saveCompany = useHandleCompanySave();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return async (invoice: Invoice) => {
@@ -58,11 +61,22 @@ export function useHandleSave(params: Params) {
         toast.success('updated_invoice');
 
         $refetch(['products', 'invoices']);
+
+        if (searchParams.get('action') === 'add_tasks') {
+          $refetch(['tasks']);
+        }
       })
       .catch((error) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));

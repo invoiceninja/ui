@@ -51,8 +51,10 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
+  MdDesignServices,
   MdDone,
   MdDownload,
   MdEdit,
@@ -90,6 +92,17 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -162,7 +175,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -249,8 +262,15 @@ export function useCreate(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -294,8 +314,15 @@ export function useSave(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -309,22 +336,31 @@ interface Params {
 export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
-  const { isAdmin, isOwner } = useAdmin();
+  const { showCommonBulkAction, showEditAction } = params || {};
 
   const setQuote = useSetAtom(quoteAtom);
 
-  const { showCommonBulkAction, showEditAction } = params || {};
+  const company = useCurrentCompany();
+  const { isAdmin, isOwner } = useAdmin();
+  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
 
-  const navigate = useNavigate();
-  const downloadPdf = useDownloadPdf({ resource: 'quote' });
-  const printPdf = usePrintPdf({ entity: 'quote' });
-  const markSent = useMarkSent();
   const approve = useApprove();
   const bulk = useBulkAction();
+  const navigate = useNavigate();
+  const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
+  const printPdf = usePrintPdf({ entity: 'quote' });
+  const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const downloadEQuote = useDownloadEInvoice({
+    resource: 'quote',
+    downloadType: 'download_e_quote',
+  });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
-
-  const { isEditPage } = useEntityPageIdentifier({ entity: 'quote' });
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({
@@ -384,6 +420,15 @@ export function useActions(params?: Params) {
       </DropdownElement>
     ),
     (quote) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadEQuote(quote)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_quote')}
+        </DropdownElement>
+      ),
+    (quote) =>
       quote.status_id !== QuoteStatus.Converted &&
       quote.status_id !== QuoteStatus.Approved &&
       (isAdmin || isOwner) && (
@@ -394,6 +439,18 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </DropdownElement>
       ),
+    (quote) => (
+      <AddActivityComment
+        entity="quote"
+        entityId={quote.id}
+        label={`#${quote.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/email', { id: quote.id })}
@@ -444,6 +501,21 @@ export function useActions(params?: Params) {
       hasPermission('create_project') && (
         <ConvertToProjectBulkAction selectedIds={[quote.id]} />
       ),
+    (quote) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([quote]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/quotes/bulk',
+            entity: 'quote',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (quote) =>
       hasPermission('create_quote') && (
@@ -561,6 +633,7 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
+  const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
@@ -625,12 +698,16 @@ export function useQuoteColumns() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <DynamicLink
-          to={route('/quotes/:id/edit', { id: quote.id })}
-          renderSpan={disableNavigation('quote', quote)}
-        >
-          {field}
-        </DynamicLink>
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/quotes/:id/edit', { id: quote.id })}
+            renderSpan={disableNavigation('quote', quote)}
+          >
+            {field}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={quote.number} stopPropagation />
+        </div>
       ),
     },
     {
@@ -755,11 +832,13 @@ export function useQuoteColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, quote) =>
-        formatMoney(
-          value,
-          quote.client?.country_id,
-          quote.client?.settings.currency_id
-        ),
+        quote.is_amount_discount
+          ? formatMoney(
+              value,
+              quote.client?.country_id,
+              quote.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -777,6 +856,7 @@ export function useQuoteColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -827,14 +907,23 @@ export function useQuoteColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -844,14 +933,23 @@ export function useQuoteColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -885,13 +983,9 @@ export function useQuoteColumns() {
 export function useQuoteFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('draft'),
       value: 'draft',
@@ -902,31 +996,31 @@ export function useQuoteFilters() {
       label: t('sent'),
       value: 'sent',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
     {
       label: t('approved'),
       value: 'approved',
       color: 'white',
-      backgroundColor: '#1D4ED8',
+      backgroundColor: statusThemeColors.$2 || '#1D4ED8',
     },
     {
       label: t('expired'),
       value: 'expired',
       color: 'white',
-      backgroundColor: '#DC2626',
+      backgroundColor: statusThemeColors.$5 || '#DC2626',
     },
     {
       label: t('upcoming'),
       value: 'upcoming',
       color: 'white',
-      backgroundColor: '#e6b05c',
+      backgroundColor: statusThemeColors.$4 || '#e6b05c',
     },
     {
       label: t('converted'),
       value: 'converted',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
   ];
 

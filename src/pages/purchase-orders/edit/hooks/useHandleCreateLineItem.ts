@@ -18,7 +18,7 @@ export function useHandleCreateLineItem(
   return async (purchaseOrder: PurchaseOrder) => {
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
-    po.line_items.push(blankLineItem());
+    po.line_items.push({ ...blankLineItem(), quantity: 1 });
 
     setPurchaseOrder(po);
   };

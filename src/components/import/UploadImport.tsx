@@ -30,6 +30,7 @@ import { ImportTemplateModal } from './ImportTemplateModal';
 import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ImportTemplate } from './ImportTemplate';
+import { Icon } from '../icons/Icon';
 
 interface Props {
   entity: string;
@@ -178,6 +179,15 @@ export function UploadImport(props: Props) {
       });
   };
 
+  const handleClearMapping = (index: number) => {
+    if (payload.column_map[props.entity].mapping[index]) {
+      payload.column_map[props.entity].mapping[index] = '';
+
+      setSelectedTemplate('');
+      setPayloadData({ ...payload });
+    }
+  };
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
@@ -195,15 +205,17 @@ export function UploadImport(props: Props) {
             response.data?.mappings[props.entity]?.hints.forEach(
               (mapping: number, index: number) => {
                 payload.column_map[props.entity].mapping[index] =
-                  response.data?.mappings[props.entity].available[mapping];
+                  response.data?.mappings[props.entity].available[mapping] ??
+                  '';
                 setPayloadData(payload);
                 setDefaultMapping({
                   ...payload?.column_map?.[props.entity]?.mapping,
                 });
-                setSelectedTemplate('');
               }
             );
           }
+
+          setSelectedTemplate('');
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
@@ -243,29 +255,95 @@ export function UploadImport(props: Props) {
     setFormData(updatedFormData);
   };
 
+  const checkRowsLengthInCSV = (file: File) => {
+    return new Promise((resolve) => {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const csvData = (event.target?.result as string) || '';
+          const rowData = csvData.split('\n');
+
+          if (!rowData.length || rowData.length === 1) {
+            resolve(false);
+          } else if (rowData.length === 2 && !rowData[1]) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+
+        reader.readAsText(file);
+      } catch (error) {
+        resolve(false);
+      }
+    });
+  };
+
+  const shouldUploadFiles = async (files: File[]) => {
+    for (let i = 0; i < files.length; i++) {
+      const hasCorrectRowsLength = await checkRowsLengthInCSV(files[i]);
+
+      if (!hasCorrectRowsLength) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: acceptableFileExtensions,
-    onDrop: (acceptedFiles) => {
-      const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
-        type.includes(props.type)
-      );
+    onDrop: async (acceptedFiles) => {
+      const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
-      if (isFilesTypeCorrect) {
-        acceptedFiles.forEach((file) => {
-          if (isImportFileTypeZip) {
-            setFiles((prevState) => [...prevState, file]);
-          } else {
-            formData.append(`files[${props.entity}]`, file);
+      if (shouldAddFiles) {
+        const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
+          type.includes(props.type)
+        );
+
+        if (isFilesTypeCorrect) {
+          await Promise.all(
+            acceptedFiles.map(async (file) => {
+              if (isImportFileTypeZip) {
+                setFiles((prevState) => [...prevState, file]);
+              } else {
+                const arrayBuffer = await file.arrayBuffer();
+
+                const textDecoder = new TextDecoder();
+                const text = textDecoder.decode(arrayBuffer);
+
+                const textEncoder = new TextEncoder();
+                const utf8ArrayBuffer = textEncoder.encode(text);
+
+                const modifiedFile = new File([utf8ArrayBuffer], file.name, {
+                  type: file.type,
+                });
+
+                if (file['path' as keyof typeof file]) {
+                  Object.defineProperty(modifiedFile, 'path', {
+                    value: file['path' as keyof typeof file],
+                    writable: false,
+                    enumerable: true,
+                    configurable: true,
+                  });
+                }
+
+                formData.append(`files[${props.entity}]`, modifiedFile);
+              }
+            })
+          );
+
+          if (!isImportFileTypeZip) {
+            formData.append('import_type', props.entity);
+            formik.submitForm();
+            setFormData(formData);
           }
-        });
-
-        if (!isImportFileTypeZip) {
-          formData.append('import_type', props.entity);
-          formik.submitForm();
-          setFormData(formData);
+        } else {
+          toast.error('wrong_file_extension');
         }
       } else {
-        toast.error('wrong_file_extension');
+        toast.error('csv_rows_length');
       }
     },
   });
@@ -427,20 +505,31 @@ export function UploadImport(props: Props) {
                     </span>
                   </Td>
                   <Td>
-                    <SelectField
-                      id={index}
-                      value={getColumnValue(index)}
-                      onChange={handleChange}
-                      withBlank
-                    >
-                      {mapData.mappings[props.entity].available.map(
-                        (mapping: any, index: number) => (
-                          <option value={mapping} key={index}>
-                            {decorateMapping(mapping)}
-                          </option>
-                        )
-                      )}
-                    </SelectField>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <SelectField
+                          id={index}
+                          value={getColumnValue(index)}
+                          onChange={handleChange}
+                          withBlank
+                        >
+                          {mapData.mappings[props.entity].available.map(
+                            (mapping: any, index: number) => (
+                              <option value={mapping} key={index}>
+                                {decorateMapping(mapping)}
+                              </option>
+                            )
+                          )}
+                        </SelectField>
+                      </div>
+
+                      <Icon
+                        className="cursor-pointer"
+                        element={MdClose}
+                        size={24}
+                        onClick={() => handleClearMapping(index)}
+                      />
+                    </div>
                   </Td>
                 </Tr>
               )

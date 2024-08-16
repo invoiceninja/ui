@@ -21,12 +21,13 @@ import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdDelete,
+  MdDesignServices,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
 } from 'react-icons/md';
-import { useBulk } from './useBulk';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { useConfigureClientSettings } from './useConfigureClientSettings';
 import {
@@ -36,6 +37,9 @@ import {
 import { PurgeClientAction } from '../components/PurgeClientAction';
 import { MergeClientAction } from '../components/MergeClientAction';
 import { Dispatch, SetStateAction } from 'react';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useBulk } from '$app/common/queries/clients';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
@@ -55,6 +59,12 @@ export function useActions(params?: Params) {
   });
 
   const configureClientSettings = useConfigureClientSettings();
+
+  const {
+    setChangeTemplateVisible,
+    setChangeTemplateResources,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const actions: Action<Client>[] = [
     (client) =>
@@ -85,6 +95,18 @@ export function useActions(params?: Params) {
           {t('client_portal')}
         </DropdownElement>
       ),
+    (client) => (
+      <AddActivityComment
+        entity="client"
+        entityId={client.id}
+        label={client.display_name}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (client) =>
       !client.is_deleted &&
       (isAdmin || isOwner) && (
@@ -144,13 +166,28 @@ export function useActions(params?: Params) {
           setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
         />
       ),
+    (client) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([client]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/clients/bulk',
+            entity: 'clients',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>
       isEditOrShowPage &&
       getEntityState(client) === EntityState.Active && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'archive')}
+          onClick={() => bulk([client.id], 'archive')}
           icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
@@ -161,7 +198,7 @@ export function useActions(params?: Params) {
       (getEntityState(client) === EntityState.Archived ||
         getEntityState(client) === EntityState.Deleted) && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'restore')}
+          onClick={() => bulk([client.id], 'restore')}
           icon={<Icon element={MdRestore} />}
         >
           {t('restore')}
@@ -172,7 +209,7 @@ export function useActions(params?: Params) {
       (getEntityState(client) === EntityState.Active ||
         getEntityState(client) === EntityState.Archived) && (
         <DropdownElement
-          onClick={() => bulk(client.id, 'delete')}
+          onClick={() => bulk([client.id], 'delete')}
           icon={<Icon element={MdDelete} />}
         >
           {t('delete')}

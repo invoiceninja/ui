@@ -729,31 +729,3 @@ test('cloning recurring invoice', async ({ page }) => {
     page.getByRole('heading', { name: 'Edit Recurring Invoice' }).first()
   ).toBeVisible();
 });
-
-test('Select client message', async ({ page }) => {
-  await login(page);
-
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Recurring Invoices', exact: true })
-    .click();
-
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: 'New Recurring Invoice' })
-    .click();
-
-  await page.waitForTimeout(900);
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true }).first()
-  ).toBeVisible();
-
-  await page.getByRole('option').first().click();
-
-  await expect(
-    page.getByText('Please select a client.', { exact: true })
-  ).not.toBeVisible();
-
-  await logout(page);
-});

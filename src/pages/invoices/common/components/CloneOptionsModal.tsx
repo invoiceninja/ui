@@ -9,6 +9,7 @@
  */
 
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -47,6 +48,7 @@ export function CloneOptionsModal(props: Props) {
   const setCredit = useSetAtom(creditAtom);
   const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
   const setRecurringInvoice = useSetAtom(recurringInvoiceAtom);
+  const company = useCompanyChanges();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -58,6 +60,7 @@ export function CloneOptionsModal(props: Props) {
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
+      partial_due_date: '',
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -66,6 +69,8 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      design_id: company.settings.quote_design_id,
+
     });
 
     navigate('/quotes/create?action=clone');
@@ -79,6 +84,7 @@ export function CloneOptionsModal(props: Props) {
       documents: [],
       date: dayjs().format('YYYY-MM-DD'),
       due_date: '',
+      partial_due_date: '',
       total_taxes: 0,
       exchange_rate: 1,
       last_sent_date: '',
@@ -87,6 +93,8 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      design_id: company.settings.credit_design_id,
+
     });
 
     navigate('/credits/create?action=clone');
@@ -107,6 +115,10 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      due_date: '',
+      partial_due_date: '',
+      design_id: company.settings.invoice_design_id,
+
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -127,6 +139,10 @@ export function CloneOptionsModal(props: Props) {
       status_id: '1',
       vendor_id: '',
       paid_to_date: 0,
+      due_date: '',
+      partial_due_date: '',
+      design_id: company.settings.purchase_order_design_id,
+
     });
 
     navigate('/purchase_orders/create?action=clone');

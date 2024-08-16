@@ -43,6 +43,8 @@ import { Inline } from '$app/components/Inline';
 import { FiRepeat } from 'react-icons/fi';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useLocation } from 'react-router-dom';
+import { cloneDeep } from 'lodash';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 const numberInputs = [
   'discount',
@@ -149,6 +151,7 @@ export function useResolveInputField(props: Props) {
   );
 
   const handleProductChange = useHandleProductChange({
+    relationType: props.relationType,
     resource: props.resource,
     type: props.type,
     onChange: props.onLineItemChange,
@@ -181,28 +184,30 @@ export function useResolveInputField(props: Props) {
   ) => {
     setIsDeleteActionTriggered(false);
 
-    if (product && company && company.enabled_tax_rates === 0) {
-      product.tax_name1 = '';
-      product.tax_rate1 = 0;
-      product.tax_name2 = '';
-      product.tax_rate2 = 0;
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    const updatedProduct = cloneDeep(product) as Product;
+
+    if (product && company && company.enabled_item_tax_rates === 0) {
+      updatedProduct.tax_name1 = '';
+      updatedProduct.tax_rate1 = 0;
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_tax_rates === 1) {
-      product.tax_name2 = '';
-      product.tax_rate2 = 0;
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    if (product && company && company.enabled_item_tax_rates === 1) {
+      updatedProduct.tax_name2 = '';
+      updatedProduct.tax_rate2 = 0;
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    if (product && company && company.enabled_tax_rates === 2) {
-      product.tax_name3 = '';
-      product.tax_rate3 = 0;
+    if (product && company && company.enabled_item_tax_rates === 2) {
+      updatedProduct.tax_name3 = '';
+      updatedProduct.tax_rate3 = 0;
     }
 
-    await handleProductChange(index, value, product);
+    await handleProductChange(index, value, updatedProduct);
   };
 
   const formatMoney = useFormatMoney({
@@ -227,6 +232,7 @@ export function useResolveInputField(props: Props) {
   }, [resource?.line_items, isDeleteActionTriggered]);
 
   const taxCategories = useTaxCategories();
+  const { preferences } = usePreferences();
 
   const showTaxRateSelector = (
     property: 'tax_rate1' | 'tax_rate2' | 'tax_rate3',
@@ -341,6 +347,8 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+          style={{ marginTop: '4px' }}
+          textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
       );
     }

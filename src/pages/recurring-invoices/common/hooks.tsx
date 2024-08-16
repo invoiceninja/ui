@@ -46,6 +46,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
+  MdComment,
   MdControlPointDuplicate,
   MdDelete,
   MdEdit,
@@ -72,6 +73,15 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -154,7 +164,7 @@ export function useRecurringInvoiceUtilities(
           ...recurringInvoice,
           line_items: [
             ...recurringInvoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
+            { ...blankLineItem(), type_id: typeId, quantity: 1 },
           ],
         }
     );
@@ -228,8 +238,15 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -349,6 +366,18 @@ export function useActions(params?: Params) {
       !recurringInvoice.is_deleted && (
         <IncreasePricesAction selectedIds={[recurringInvoice.id]} />
       ),
+    (recurringInvoice) => (
+      <AddActivityComment
+        entity="recurring_invoice"
+        entityId={recurringInvoice.id}
+        label={`#${recurringInvoice.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     () => <Divider withoutPadding />,
     (recurringInvoice) =>
       hasPermission('create_recurring_invoice') && (
@@ -433,8 +462,15 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -493,8 +529,11 @@ export function useAllRecurringInvoiceColumns() {
 
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const dateTime = useDateTime();
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -568,9 +607,9 @@ export function useRecurringInvoiceColumns() {
     },
     {
       column: 'next_send_date',
-      id: 'next_send_date',
+      id: 'next_send_datetime',
       label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => dateTime(value),
     },
     {
       column: 'frequency',
@@ -643,7 +682,7 @@ export function useRecurringInvoiceColumns() {
               recurringInvoice.client?.country_id,
               recurringInvoice.client?.settings.currency_id
             )
-          : `${recurringInvoice.discount}%`,
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -663,6 +702,7 @@ export function useRecurringInvoiceColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -681,12 +721,23 @@ export function useRecurringInvoiceColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -696,12 +747,23 @@ export function useRecurringInvoiceColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span dangerouslySetInnerHTML={{ __html: value as string }} />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -724,30 +786,26 @@ export function useRecurringInvoiceColumns() {
 export function useRecurringInvoiceFilters() {
   const [t] = useTranslation();
 
+  const statusThemeColors = useStatusThemeColorScheme();
+
   const filters: SelectOption[] = [
-    {
-      label: t('all'),
-      value: 'all',
-      color: 'black',
-      backgroundColor: '#e4e4e4',
-    },
     {
       label: t('active'),
       value: 'active',
       color: 'white',
-      backgroundColor: '#22C55E',
+      backgroundColor: statusThemeColors.$3 || '#22C55E',
     },
     {
       label: t('paused'),
       value: 'paused',
       color: 'white',
-      backgroundColor: '#F97316',
+      backgroundColor: statusThemeColors.$4 || '#F97316',
     },
     {
       label: t('completed'),
       value: 'completed',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: statusThemeColors.$1 || '#93C5FD',
     },
   ];
 

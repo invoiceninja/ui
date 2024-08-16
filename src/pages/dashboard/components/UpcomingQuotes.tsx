@@ -82,10 +82,11 @@ export function UpcomingQuotes() {
           resource="quote"
           columns={columns}
           className="pr-4"
-          endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+          endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1"
           withoutActions
           withoutPagination
           withoutPadding
+          withoutPerPageAsPreference
           styleOptions={{
             addRowSeparator: true,
             withoutBottomBorder: true,
@@ -101,6 +102,7 @@ export function UpcomingQuotes() {
           style={{
             height: '19.9rem',
           }}
+          withoutSortQueryParameter
         />
       </div>
     </Card>

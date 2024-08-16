@@ -51,9 +51,11 @@ import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
+  MdComment,
   MdControlPointDuplicate,
   MdCreditScore,
   MdDelete,
+  MdDesignServices,
   MdDownload,
   MdMarkEmailRead,
   MdPaid,
@@ -86,6 +88,16 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -158,7 +170,11 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
           ...current,
           line_items: [
             ...current.line_items,
-            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+            {
+              ...blankLineItem(),
+              type_id: InvoiceItemType.Product,
+              quantity: 1,
+            },
           ],
         }
     );
@@ -243,12 +259,18 @@ export function useCreate(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          toast.dismiss();
-          setErrors(error.response.data);
+          const errorMessages = error.response.data;
 
-          if (error.response.data.errors.invoice_id) {
-            toast.error(error.response.data.errors.invoice_id[0]);
+          if (errorMessages.errors.amount || errorMessages.errors.invoice_id) {
+            toast.error(
+              errorMessages.errors.amount[0] ||
+                errorMessages.errors.invoice_id[0]
+            );
+          } else {
+            toast.dismiss();
           }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -293,8 +315,15 @@ export function useSave(props: CreateProps) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.amount) {
+            toast.error(errorMessages.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
         }
       })
       .finally(() => setIsDeleteActionTriggered(undefined));
@@ -307,20 +336,29 @@ export function useActions() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
 
+  const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
-
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'credit',
   });
 
   const setCredit = useSetAtom(creditAtom);
 
-  const downloadPdf = useDownloadPdf({ resource: 'credit' });
-  const printPdf = usePrintPdf({ entity: 'credit' });
+  const bulk = useBulk();
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
-  const bulk = useBulk();
+  const printPdf = usePrintPdf({ entity: 'credit' });
+  const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
+  const downloadECredit = useDownloadEInvoice({
+    resource: 'credit',
+    downloadType: 'download_e_credit',
+  });
+  const {
+    setChangeTemplateResources,
+    setChangeTemplateVisible,
+    setChangeTemplateEntityContext,
+  } = useChangeTemplate();
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({
@@ -371,6 +409,15 @@ export function useActions() {
       </DropdownElement>
     ),
     (credit) =>
+      Boolean(company?.settings.enable_e_invoice) && (
+        <DropdownElement
+          onClick={() => downloadECredit(credit)}
+          icon={<Icon element={MdDownload} />}
+        >
+          {t('download_e_credit')}
+        </DropdownElement>
+      ),
+    (credit) =>
       (isAdmin || isOwner) && (
         <DropdownElement
           onClick={() => scheduleEmailRecord(credit.id)}
@@ -379,6 +426,18 @@ export function useActions() {
           {t('schedule')}
         </DropdownElement>
       ),
+    (credit) => (
+      <AddActivityComment
+        entity="credit"
+        entityId={credit.id}
+        label={`#${credit.number}`}
+        labelElement={
+          <DropdownElement icon={<Icon element={MdComment} />}>
+            {t('add_comment')}
+          </DropdownElement>
+        }
+      />
+    ),
     (credit) => (
       <DropdownElement
         to={route('/credits/:id/email', { id: credit.id })}
@@ -434,6 +493,21 @@ export function useActions() {
           </DropdownElement>
         </div>
       ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => {
+          setChangeTemplateVisible(true);
+          setChangeTemplateResources([credit]);
+          setChangeTemplateEntityContext({
+            endpoint: '/api/v1/credits/bulk',
+            entity: 'credit',
+          });
+        }}
+        icon={<Icon element={MdDesignServices} />}
+      >
+        {t('run_template')}
+      </DropdownElement>
+    ),
     () => <Divider withoutPadding />,
     (credit) =>
       hasPermission('create_credit') && (
@@ -543,6 +617,7 @@ export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
 
   const creditColumns = useAllCreditColumns();
@@ -569,13 +644,17 @@ export function useCreditColumns() {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (field, credit) => (
-        <DynamicLink
-          to={route('/credits/:id/edit', { id: credit.id })}
-          renderSpan={disableNavigation('credit', credit)}
-        >
-          {field}
-        </DynamicLink>
+      format: (value, credit) => (
+        <div className="flex space-x-2">
+          <DynamicLink
+            to={route('/credits/:id/edit', { id: credit.id })}
+            renderSpan={disableNavigation('credit', credit)}
+          >
+            {value}
+          </DynamicLink>
+
+          <CopyToClipboardIconOnly text={credit.number} stopPropagation />
+        </div>
       ),
     },
     {
@@ -705,11 +784,13 @@ export function useCreditColumns() {
       id: 'discount',
       label: t('discount'),
       format: (value, credit) =>
-        formatMoney(
-          value,
-          credit.client?.country_id,
-          credit.client?.settings.currency_id
-        ),
+        credit.is_amount_discount
+          ? formatMoney(
+              value,
+              credit.client?.country_id,
+              credit.client?.settings.currency_id
+            )
+          : `${formatNumber(value)} %`,
     },
     {
       column: 'documents',
@@ -727,6 +808,7 @@ export function useCreditColumns() {
       column: 'exchange_rate',
       id: 'exchange_rate',
       label: t('exchange_rate'),
+      format: (value) => formatNumber(value),
     },
     {
       column: 'is_deleted',
@@ -777,14 +859,23 @@ export function useCreditColumns() {
       label: t('private_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
@@ -794,14 +885,23 @@ export function useCreditColumns() {
       label: t('public_notes'),
       format: (value) => (
         <Tooltip
-          size="regular"
-          truncate
-          containsUnsafeHTMLTags
-          message={value as string}
+          width="auto"
+          tooltipElement={
+            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+              <article
+                className={classNames('prose prose-sm', {
+                  'prose-invert': reactSettings.dark_mode,
+                })}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(value as string),
+                }}
+              />
+            </div>
+          }
         >
-          <span
-            dangerouslySetInnerHTML={{ __html: (value as string).slice(0, 50) }}
-          />
+          <span>
+            {extractTextFromHTML(sanitizeHTML(value as string)).slice(0, 50)}
+          </span>
         </Tooltip>
       ),
     },
