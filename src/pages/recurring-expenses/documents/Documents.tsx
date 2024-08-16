@@ -46,7 +46,10 @@ export default function Documents() {
       <DocumentsTable
         documents={recurringExpense?.documents || []}
         onDocumentDelete={invalidateCache}
-        disableEditableOptions={!entityAssigned(recurringExpense, true)}
+        disableEditableOptions={
+          !entityAssigned(recurringExpense, true) &&
+          !hasPermission('edit_recurring_expense')
+        }
       />
     </div>
   );
