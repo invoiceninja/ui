@@ -54,10 +54,7 @@ export default function Documents() {
           <DocumentsTable
             documents={recurringInvoice?.documents || []}
             onDocumentDelete={() => $refetch(['recurring_invoices'])}
-            disableEditableOptions={
-              !entityAssigned(recurringInvoice, true) &&
-              !hasPermission('edit_recurring_invoice')
-            }
+            disableEditableOptions={!entityAssigned(recurringInvoice, true)}
           />
         </div>
       )}

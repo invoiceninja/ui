@@ -53,9 +53,7 @@ export default function Documents() {
           <DocumentsTable
             documents={credit?.documents || []}
             onDocumentDelete={() => $refetch(['credits'])}
-            disableEditableOptions={
-              !entityAssigned(credit, true) && !hasPermission('edit_credit')
-            }
+            disableEditableOptions={!entityAssigned(credit, true)}
           />
         </div>
       )}

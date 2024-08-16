@@ -53,9 +53,7 @@ export default function Documents() {
           <DocumentsTable
             documents={quote?.documents || []}
             onDocumentDelete={() => $refetch(['quotes'])}
-            disableEditableOptions={
-              !entityAssigned(quote, true) && !hasPermission('edit_quote')
-            }
+            disableEditableOptions={!entityAssigned(quote, true)}
           />
         </div>
       )}

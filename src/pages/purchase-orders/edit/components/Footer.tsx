@@ -212,10 +212,7 @@ export function Footer(props: Props) {
             <DocumentsTable
               documents={purchaseOrder.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={
-                !entityAssigned(purchaseOrder, true) &&
-                !hasPermission('edit_purchase_order')
-              }
+              disableEditableOptions={!entityAssigned(purchaseOrder, true)}
             />
           </div>
         )}
