@@ -122,7 +122,10 @@ export function InvoiceFooter(props: Props) {
             <DocumentsTable
               documents={recurringInvoice?.documents || []}
               onDocumentDelete={onSuccess}
-              disableEditableOptions={!entityAssigned(recurringInvoice, true)}
+              disableEditableOptions={
+                !entityAssigned(recurringInvoice, true) &&
+                !hasPermission('edit_recurring_invoice')
+              }
             />
           </div>
         )}
