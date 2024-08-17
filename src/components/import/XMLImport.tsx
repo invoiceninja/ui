@@ -60,8 +60,9 @@ export function XMLImport(props: Props) {
       setIsFormBusy(true);
       setErrors(undefined);
 
-      return request('POST', endpoint('/api/v1/edocument/upload'), formData)
+      return request('PUT', endpoint('/api/v1/edocument/upload'), formData)
         .then((response) => {
+          console.log(response);
           toast.success(response?.data?.message ?? 'success');
         })
         .catch((error: AxiosError<ValidationBag>) => {
@@ -76,7 +77,7 @@ export function XMLImport(props: Props) {
 
   const addFilesToFormData = () => {
     files.forEach((file) => {
-      formData.append('files', file);
+      formData.append(`documents[]`, file);
     });
 
     setFormData(formData);
