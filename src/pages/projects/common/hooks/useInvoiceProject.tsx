@@ -61,7 +61,7 @@ export function useInvoiceProject() {
 
   const setInvoice = useSetAtom(invoiceAtom);
 
-  return (tasks: Task[]) => {
+  return (tasks: Task[], clientId: string) => {
     if (data) {
       const invoice: Invoice = { ...data };
 
@@ -86,8 +86,7 @@ export function useInvoiceProject() {
         return toast.error('multiple_client_error');
       }
 
-      invoice.client_id = tasks.length ? tasks[0].client_id : '';
-
+      invoice.client_id = clientId;
       invoice.line_items = [];
 
       tasks.forEach((task: Task) => {
