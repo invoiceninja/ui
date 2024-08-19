@@ -45,7 +45,7 @@ export function useConfigureClientSettings(params?: Params) {
           object: 'company',
           data: {
             ...company,
-            e_invoice: client.e_invoice,
+            e_invoice: client.e_invoice || {},
             settings: client.settings,
           },
         })
@@ -63,7 +63,7 @@ export function useConfigureClientSettings(params?: Params) {
         updateChanges({
           object: 'company',
           property: 'e_invoice',
-          value: client.e_invoice,
+          value: client.e_invoice || {},
         })
       );
     }
