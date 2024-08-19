@@ -71,7 +71,11 @@ export function XMLImport(props: Props) {
             setErrors(error.response.data);
           }
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => {
+          setFiles([]);
+          setIsFormBusy(false);
+          setFormData(new FormData());
+        });
     }
   };
 
@@ -79,8 +83,6 @@ export function XMLImport(props: Props) {
     files.forEach((file) => {
       formData.append(`documents[]`, file);
     });
-
-    formData.set('_method', 'PUT');
 
     setFormData(formData);
   };
@@ -91,6 +93,8 @@ export function XMLImport(props: Props) {
     const updatedFormData = new FormData();
 
     updatedFormData.append('import_type', entity);
+
+    updatedFormData.append('_method', 'PUT');
 
     setFiles(filteredFileList);
 
@@ -153,6 +157,8 @@ export function XMLImport(props: Props) {
           setFiles(currentFiles);
 
           formData.append('import_type', entity);
+
+          formData.append('_method', 'PUT');
 
           setFormData(formData);
         } else {
