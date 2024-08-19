@@ -72,6 +72,7 @@ export function useUpdateClientSettings() {
     return {
       ...activeSettings,
       settings: adjustedSettings,
+      e_invoice: companyChanges?.e_invoice || {},
     };
   };
 
