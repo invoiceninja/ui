@@ -41,6 +41,10 @@ export function useTabs(params: Params) {
       href: route('/invoices/:id/edit', { id }),
     },
     {
+      name: t('e_invoice'),
+      href: route('/invoices/:id/e_invoice', { id }),
+    },
+    {
       name: t('documents'),
       href: route('/invoices/:id/documents', { id }),
       enabled: canEditAndView,
