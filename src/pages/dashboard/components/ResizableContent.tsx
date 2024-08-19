@@ -16,8 +16,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 
 const GridLayoutComponent = () => {
   const enabled = useEnabled();
+
   const [width, setWidth] = useState<number>(1000);
-  const [columns, setColumns] = useState<number>(4);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,36 +38,16 @@ const GridLayoutComponent = () => {
     };
   }, []);
 
-  const handleColumnsChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setColumns(parseInt(event.target.value));
-  };
-
   return (
     <div ref={containerRef} style={{ width: '100%' }}>
-      <div style={{ marginBottom: '10px' }}>
-        <label htmlFor="columns">Choose number of columns: </label>
-        <select id="columns" value={columns} onChange={handleColumnsChange}>
-          <option value={1}>1</option>
-          <option value={2}>2</option>
-          <option value={3}>3</option>
-          <option value={4}>4</option>
-        </select>
-      </div>
-
-      <GridLayout
-        className="layout"
-        cols={12} // 12-column layout
-        width={width}
-        draggableHandle=".drag-handle"
-        margin={[10, 10]} // 10px margin for spacing
-      >
+      <GridLayout cols={24} width={width} draggableHandle=".drag-handle">
         <div
           key="1"
           className="drag-handle"
           data-grid={{
             x: 0,
             y: 0,
-            w: 6,
+            w: 12,
             h: 2.2,
             isResizable: true,
             resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -80,9 +60,9 @@ const GridLayoutComponent = () => {
           key="2"
           className="drag-handle"
           data-grid={{
-            x: 6,
+            x: 12,
             y: 0,
-            w: 6,
+            w: 12,
             h: 2.2,
             isResizable: true,
             resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
@@ -98,9 +78,10 @@ const GridLayoutComponent = () => {
             data-grid={{
               x: 0,
               y: 1,
-              w: 6,
+              w: 12,
               h: 2.2,
               isResizable: true,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
             }}
           >
             <UpcomingInvoices />
@@ -112,11 +93,12 @@ const GridLayoutComponent = () => {
             key="4"
             className="drag-handle"
             data-grid={{
-              x: 6,
+              x: 12,
               y: 1,
-              w: 6,
+              w: 12,
               h: 2.2,
               isResizable: true,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
             }}
           >
             <PastDueInvoices />
@@ -130,9 +112,10 @@ const GridLayoutComponent = () => {
             data-grid={{
               x: 0,
               y: 2,
-              w: 6,
+              w: 12,
               h: 2.2,
               isResizable: true,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
             }}
           >
             <ExpiredQuotes />
@@ -144,11 +127,12 @@ const GridLayoutComponent = () => {
             key="6"
             className="drag-handle"
             data-grid={{
-              x: 6,
+              x: 12,
               y: 2,
-              w: 6,
+              w: 12,
               h: 2.2,
               isResizable: true,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
             }}
           >
             <UpcomingQuotes />
@@ -162,9 +146,10 @@ const GridLayoutComponent = () => {
             data-grid={{
               x: 0,
               y: 3,
-              w: 6,
+              w: 12,
               h: 2.2,
               isResizable: true,
+              resizeHandles: ['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne'],
             }}
           >
             <UpcomingRecurringInvoices />

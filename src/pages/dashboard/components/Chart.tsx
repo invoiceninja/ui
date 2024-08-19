@@ -12,7 +12,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate, useParseDayjs } from '$app/common/helpers';
-import { ChartData, TotalColors } from './Totals';
+import { ChartData, TotalColors } from './ResizableDashboardCards';
 import {
   Line,
   CartesianGrid,
