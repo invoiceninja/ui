@@ -61,6 +61,8 @@ export function useUpdateClientSettings() {
         delete adjustedSettings.email_subject_custom3;
       }
 
+      delete adjustedSettings.e_invoice;
+
       Object.entries(adjustedSettings).forEach(([property, value]) => {
         if (value === null) {
           adjustedSettings[property] =
