@@ -60,6 +60,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -80,7 +81,13 @@ export function useActions() {
   const { create } = useInvoiceExpense();
 
   const cloneToExpense = (expense: Expense) => {
-    setExpense({ ...expense, id: '', documents: [], number: '' });
+    setExpense({
+      ...expense,
+      id: '',
+      documents: [],
+      number: '',
+      date: dayjs().format('YYYY-MM-DD'),
+    });
 
     navigate('/expenses/create?action=clone');
   };
@@ -91,6 +98,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/recurring_expenses/create?action=clone');

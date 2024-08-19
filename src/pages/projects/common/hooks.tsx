@@ -370,7 +370,7 @@ export function useActions() {
           return toast.error('no_assigned_tasks');
         }
 
-        invoiceProject(unInvoicedTasks);
+        invoiceProject(unInvoicedTasks, project.client_id);
       });
   };
 
@@ -470,7 +470,7 @@ export const useCustomBulkActions = () => {
       return toast.error('multiple_client_error');
     }
 
-    invoiceProject(tasks);
+    invoiceProject(tasks, tasks[0].client_id);
   };
 
   const shouldDownloadDocuments = (projects: Project[]) => {
