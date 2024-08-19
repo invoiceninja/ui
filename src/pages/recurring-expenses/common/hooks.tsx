@@ -62,6 +62,7 @@ import {
 } from '$app/common/helpers/html-string';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 export const defaultColumns: string[] = [
   'status',
@@ -506,6 +507,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/recurring_expenses/create?action=clone');
@@ -517,6 +519,7 @@ export function useActions() {
       id: '',
       documents: [],
       number: '',
+      date: dayjs().format('YYYY-MM-DD'),
     });
 
     navigate('/expenses/create?action=clone');
