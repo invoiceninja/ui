@@ -43,7 +43,11 @@ export function useConfigureClientSettings(params?: Params) {
       dispatch(
         injectInChanges({
           object: 'company',
-          data: { ...company, settings: client.settings },
+          data: {
+            ...company,
+            e_invoice: client.e_invoice,
+            settings: client.settings,
+          },
         })
       );
     } else {
@@ -52,6 +56,14 @@ export function useConfigureClientSettings(params?: Params) {
           object: 'company',
           property: 'settings',
           value: client.settings,
+        })
+      );
+
+      dispatch(
+        updateChanges({
+          object: 'company',
+          property: 'e_invoice',
+          value: client.e_invoice,
         })
       );
     }

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EInvoiceType } from '$app/pages/settings';
 import { ClientContact } from './client-contact';
 import { GroupSettings } from './group-settings';
 import { TaxInfo } from './tax-info';
@@ -84,4 +85,5 @@ export interface Client extends Timestamps {
   routing_id: string;
   tax_info?: TaxInfo;
   classification: string;
+  e_invoice: EInvoiceType;
 }
