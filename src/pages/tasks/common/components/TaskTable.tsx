@@ -128,6 +128,12 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const isValidTimeFormat = (value: string) => {
+    const parts = value.split(':');
+
+    return parts.length === 3 && parts.every((part) => part.length === 2);
+  };
+
   const getDescriptionColSpan = () => {
     let colSpan = 4;
 
@@ -185,9 +191,15 @@ export function TaskTable(props: Props) {
                       style={{ color: colors.$3, colorScheme: colors.$0 }}
                       type="date"
                       value={parseTimeToDate(start)}
-                      onValueChange={(value) =>
-                        handleDateChange(start, value, index, LogPosition.Start)
-                      }
+                      onValueChange={(value) => {
+                        console.log(value);
+                        handleDateChange(
+                          start,
+                          value,
+                          index,
+                          LogPosition.Start
+                        );
+                      }}
                     />
                   </Td>
 
@@ -197,9 +209,18 @@ export function TaskTable(props: Props) {
                       type="time"
                       step="1"
                       value={parseTime(start)}
-                      onValueChange={(value) =>
-                        handleTimeChange(start, value, LogPosition.Start, index)
-                      }
+                      onValueChange={(value) => {
+                        console.log(value);
+
+                        handleTimeChange(
+                          start,
+                          isValidTimeFormat(value)
+                            ? value
+                            : parseTime(start) || '',
+                          LogPosition.Start,
+                          index
+                        );
+                      }}
                     />
                   </Td>
 
